@@ -1,0 +1,32 @@
+rules_version = '2';
+// Regole del database di Jona Ordini (da incollare in Firebase > Firestore Database > Regole).
+// Entra solo chi ha la chiave del ristorante (link o QR condiviso dallo chef o dallo sviluppatore).
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function membro() {
+      return request.auth != null && exists(/databases/$(db)/documents/membri/$(request.auth.uid));
+    }
+    // la chiave del ristorante: si crea una volta sola e nessuno la può leggere
+    match /chiave/ristorante {
+      allow create: if request.auth != null && request.resource.data.v is string && request.resource.data.v.size() >= 16;
+      allow read, update, delete: if false;
+    }
+    // stato pubblico: dice solo se il database è già stato attivato
+    match /pubblico/stato {
+      allow read: if true;
+      allow create: if request.auth != null && exists(/databases/$(db)/documents/chiave/ristorante);
+      allow update, delete: if false;
+    }
+    // ogni telefono collegato (accesso anonimo) si registra con la chiave
+    match /membri/{uid} {
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.k == get(/databases/$(db)/documents/chiave/ristorante).data.v;
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow update, delete: if false;
+    }
+    // dati dell'app
+    match /{c}/{id} {
+      allow read, write: if membro() && c in ['staff', 'fornitori', 'listini', 'config', 'richieste', 'ordini', 'notifiche'];
+    }
+  }
+}
