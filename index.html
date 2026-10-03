@@ -662,8 +662,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=7;
+const APP_VER=8;
 const NEWS=[
+  {v:8,data:'2026-10-03',titolo:'Database centrale pronto',
+    chef:['Il database centrale è pronto: quando Mario lo attiva, tutti i telefoni vedono gli stessi ordini. Gli altri telefoni si collegano con il QR code (Impostazioni → Database centrale → Invita).'],
+    dev:{aggiunte:['`firebase-config.js` con il progetto `jona-ordini`: in Impostazioni → Database centrale compaiono Attiva e Ho un codice. Finché non si preme Attiva ogni telefono resta su `LocalStore`.']}},
   {v:7,data:'2026-10-03',titolo:'Ordine a voce e Novità',
     tutti:['Puoi ordinare con la voce: premi il microfono e di\' per esempio «4 kg pomodori da Fratelli Mariano». Poi controlli e confermi.','Nuova sezione «Novità»: qui trovi cosa cambia nell\'app a ogni aggiornamento.'],
     chef:['In Storico c\'è «Consumi e costi»: quanto hai speso e quanta merce è arrivata, per periodo, fornitore, reparto e prodotto (per esempio «riso»), con grafico e file Excel.'],
