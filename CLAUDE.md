@@ -40,6 +40,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante.
 - GESTIONE ERRORI: Se un comando Git o Bash fallisce, FERMATI immediatamente. Non tentare comandi di riparazione automatica. Riporta l'errore esatto e attendi istruzioni.
 
 ## REGOLE TRASVERSALI
+- SPIEGAZIONI PER MARIO (istruzioni da seguire a mano): passi numerati e piccoli, un'azione per passo; nomi esatti di pulsanti e schede in **grassetto**; dove cliccare e cosa si vede; testo da copiare già pronto in un blocco; dire cosa cambia e perché in una riga; chiudere con «dimmi a che passo sei arrivato».
 - Non ripetere codice già fornito se non esplicitamente richiesto.
 - Prima di un refactoring massiccio, chiedi conferma con un piano sintetico.
 - Se un comando fallisce, riporta l'errore esatto e proponi una soluzione, senza inventare.
