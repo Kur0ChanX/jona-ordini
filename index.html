@@ -284,6 +284,18 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .sline>div{flex:1;min-width:0}
 .sl-q{font-weight:500;white-space:nowrap}
 .fsum-h{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 8px}
+.ord-dl{margin-top:8px}
+.ord-dl .st .ic{width:14px;height:14px}
+.wk-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:14px 16px 8px}
+.wk-h b{font:400 18px var(--font)}
+.wk-sg{padding:0 16px 10px}
+.wk-n{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 12px}
+.wk-n div{background:var(--sunk);border-radius:12px;padding:8px 10px}
+.wk-n b{display:block;font:400 22px/1.2 var(--font)}
+.wk-n span{font-size:12.5px;color:var(--muted)}
+.wk-s{display:flex;justify-content:space-between;gap:10px;font:500 13.5px var(--font);color:var(--ink2);padding:12px 16px 2px;border-top:1px solid var(--line)}
+.wk-s+.sline{border-top:0}
+.wk-note{padding:0 16px 12px;margin:0}
 
 /* ---------- sheets ---------- */
 .sheet-wrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
@@ -1154,7 +1166,8 @@ function orderText(o){
 const mailHref=o=>{const f=forn(o.fornitoreId);return`mailto:${encodeURIComponent(f.email||'')}?subject=${encodeURIComponent('Ordine '+cfg().nomeLocale+' del '+new Date().toLocaleDateString('it-IT'))}&body=${encodeURIComponent(orderText(o))}`};
 function vInvii(){
   const all=Object.values(D().ordini);
-  const open=all.filter(o=>o.stato==='aperto'&&o.items&&o.items.length).sort((a,b)=>byNome({nome:a.fornitoreNome},{nome:b.fornitoreNome}));
+  const dk=o=>{const x=dlInfo(o.fornitoreId);return x&&x.left>0?x.at:Infinity};
+  const open=all.filter(o=>o.stato==='aperto'&&o.items&&o.items.length).sort((a,b)=>(dk(a)-dk(b))||byNome({nome:a.fornitoreNome},{nome:b.fornitoreNome}));
   const sent=all.filter(o=>o.stato==='inviato').sort((a,b)=>(b.inviato||0)-(a.inviato||0)).slice(0,25);
   return`<div class="vhead"><div><h1 class="vt">Invii</h1><p class="vsub">${open.length?`${open.length} ${open.length===1?'ordine pronto':'ordini pronti'} da mandare ai fornitori`:'Niente da inviare'}</p></div><button type="button" class="btn ghost" data-a="newOrder">${ic('plus')} Ordine diretto</button></div>
   ${open.length?open.map(orderCard).join(''):empty('truck','Nessun ordine da inviare','Quando approvi una richiesta gli articoli arrivano qui, già divisi per fornitore.')}
@@ -1173,7 +1186,7 @@ function primaryActions(o){
 function orderCard(o){
   const f=forn(o.fornitoreId),m=METODI[f.metodo]||{l:'Metodo da definire',i:'mail'},meta=metaOf(o);
   let tot=0;for(const l of o.items)if(l.prezzo!=null)tot+=l.prezzo*l.qta;
-  return`<article class="panel"><header class="ord-h"><div><span class="sup big" style="--c:${fcolor(f.id)}"><i></i>${esc(f.nome)}</span><div class="ord-m">${ic(m.i)} ${m.l}${f.referente?', '+esc(f.referente):''}</div></div><button type="button" class="icon-btn" data-a="pick" data-f="${f.id}" aria-label="Aggiungi prodotto">${ic('plus')}</button></header>
+  return`<article class="panel"><header class="ord-h"><div><span class="sup big" style="--c:${fcolor(f.id)}"><i></i>${esc(f.nome)}</span><div class="ord-m">${ic(m.i)} ${m.l}${f.referente?', '+esc(f.referente):''}</div>${dlBadge(f.id)}</div><button type="button" class="icon-btn" data-a="pick" data-f="${f.id}" aria-label="Aggiungi prodotto">${ic('plus')}</button></header>
   <div class="olines">${o.items.map((l,i)=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(l.nome)}</div><div class="ln-m">${l.codice?'cod. '+esc(l.codice):'senza codice'}${l.prezzo!=null?', '+eur(l.prezzo)+(l.unita?' / '+esc(l.unita):''):''}${l.da&&l.da.length?'<br>'+esc(l.da.map(d=>firstName(d.n)+' '+fq(d.q)).join(', ')):''}</div></div>
   ${stepper('oq',o.id+'-'+i,l.qta,`data-o="${o.id}" data-i="${i}"`)}<span class="ln-u">${esc(l.unita||'')}</span><button type="button" class="icon-btn" data-a="orm" data-o="${o.id}" data-i="${i}" aria-label="Togli">${ic('x')}</button></div>`).join('')}</div>
   ${tot?`<div class="total"><span>Totale stimato</span><b>${eur(tot)}</b></div>`:''}
@@ -1183,6 +1196,29 @@ function orderCard(o){
   <div class="ord-act">${primaryActions(o)}<button type="button" class="btn ghost" data-a="omore" data-o="${o.id}">${ic('download')} Altri formati</button></div>
   <button type="button" class="btn dark block" data-a="osent" data-o="${o.id}">${ic('check')} Segna come inviato</button></div></article>`;
 }
+/* ora limite per fornitore: badge in Invii e promemoria per lo chef un'ora prima */
+function dlInfo(fid){const f=D().fornitori[fid];const m=f&&/^(\d{1,2}):(\d{2})$/.exec(f.oraLimite||'');if(!m)return null;const d=new Date();d.setHours(+m[1],+m[2],0,0);const left=d.getTime()-now();return{hm:f.oraLimite,at:d.getTime(),left,k:left<=0?'late':left<=3600000?'soon':''}}
+function dlBadge(fid){const x=dlInfo(fid);if(!x)return'';
+  if(x.k==='late')return`<div class="ord-dl"><span class="st ko">${ic('clock')} Ora limite passata (${esc(x.hm)})</span></div>`;
+  if(x.k==='soon')return`<div class="ord-dl"><span class="st wait">${ic('clock')} Da inviare entro le ${esc(x.hm)}, mancano ${Math.max(1,Math.ceil(x.left/60000))} min</span></div>`;
+  return`<div class="ord-m">${ic('clock')} Da inviare entro le ${esc(x.hm)}</div>`}
+async function deadlineTick(){
+  if(!S.db||!allLoaded())return;const me=meU();if(!me||me.stato!=='attivo'||!isGM(me))return;
+  if(S.tab==='invii')render();
+  const td=today(),t0=new Date();t0.setHours(0,0,0,0);const rem=ls('jona_rem')||{};for(const k in rem)if(rem[k]!==td)delete rem[k];
+  for(const o of Object.values(D().ordini)){
+    if(o.stato!=='aperto'||!o.items||!o.items.length)continue;const fid=o.fornitoreId;const x=dlInfo(fid);
+    if(!x||x.k!=='soon'||rem[fid]===td)continue;
+    rem[fid]=td;ls('jona_rem',rem);const f=forn(fid);const n=o.items.length;const txt=n+' '+(n===1?'articolo':'articoli')+' da inviare';
+    const old=Object.values(D().notifiche).find(z=>z.tipo==='scadenza'&&z.rif===fid&&(z.creato||0)>=t0.getTime());
+    if(!old)await notify('gm','Ordine a '+f.nome+' entro le '+f.oraLimite,txt,'scadenza',fid);
+    if(!(old&&old.da!==me.id&&now()-(old.creato||0)<120000))toast('Ordine a '+f.nome+' entro le '+f.oraLimite+': '+txt,'warn');
+  }
+  ls('jona_rem',rem);
+}
+setInterval(()=>deadlineTick().catch(e=>console.warn(e)),60000);
+setTimeout(()=>deadlineTick().catch(e=>console.warn(e)),4000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)deadlineTick().catch(e=>console.warn(e))});
 async function setOrderQty(oid,i,q){
   const o=clone(D().ordini[oid]);delete o.id;q=r3(q);
   if(q<=0)o.items.splice(i,1);else o.items[i].qta=q;
@@ -1400,7 +1436,7 @@ function vFornitori(){
   const fs=Object.values(D().fornitori).sort(byNome);const cnt={};for(const p of prods())cnt[p.fornitoreId]=(cnt[p.fornitoreId]||0)+1;
   return`<div class="vhead"><div><h1 class="vt">Fornitori</h1><p class="vsub">${fs.length} fornitori, ${prods().length} prodotti a listino</p></div><button type="button" class="btn ghost" data-a="fnew">${ic('plus')} Nuovo</button></div>
   <div class="callout">${ic('upload')}<div><b style="font-weight:500">Importa listini</b><div class="muted small">Incolla la tabella preparata con Gemini o carica un file Excel, CSV o la fattura XML.</div></div><button type="button" class="btn primary sm" data-a="imp" data-f="">Importa</button></div>
-  ${fs.length?`<div class="panel">${fs.map(f=>{const m=METODI[f.metodo];return`<button type="button" class="row link" data-a="fopen" data-f="${f.id}"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">${m?ic(m.i)+' '+m.l:'Metodo da definire'}, ${cnt[f.id]||0} prodotti</div></div>${ic('chev')}</button>`}).join('')}</div>`:empty('store','Nessun fornitore','Aggiungi i fornitori con i loro contatti e il modo in cui vogliono ricevere gli ordini.')}`;
+  ${fs.length?`<div class="panel">${fs.map(f=>{const m=METODI[f.metodo];return`<button type="button" class="row link" data-a="fopen" data-f="${f.id}"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">${m?ic(m.i)+' '+m.l:'Metodo da definire'}, ${cnt[f.id]||0} prodotti${f.oraLimite?', entro le '+esc(f.oraLimite):''}</div></div>${ic('chev')}</button>`}).join('')}</div>`:empty('store','Nessun fornitore','Aggiungi i fornitori con i loro contatti e il modo in cui vogliono ricevere gli ordini.')}`;
 }
 function supSheet(fid,tab){
   S.supFid=fid;S.supTab=tab||'listino';S.supQ='';const f0=D().fornitori[fid];S.fe=clone(f0||{});delete S.fe.id;
@@ -1426,6 +1462,7 @@ function supForm(fid){
   ${F('referente','Referente','text','Es. Giovanni')}
   <div class="two stack"><div>${F('whatsapp','WhatsApp','tel','+39 333 1234567','tel')}</div><div>${F('telefono','Telefono','tel','','tel')}</div></div>
   ${F('email','Email','email','ordini@fornitore.it')}${F('sito','Sito per gli ordini','url','https://')}
+  ${F('oraLimite','Ora limite per ordinare (facoltativa)','time')}<p class="muted small" style="margin:6px 0 0">Es. Metro entro le 18:00. Un'ora prima l'app lo ricorda allo chef.</p>
   <label class="lbl" for="fe-cat">Categoria principale</label><select class="inp" id="fe-cat" data-ch="fesel" data-k="categoria">${CATS.map(c=>`<option ${f.categoria===c?'selected':''}>${esc(c)}</option>`).join('')}</select>
   <label class="lbl" for="fe-note">Note (giorni di consegna, minimo d'ordine, credenziali dove sono custodite…)</label><textarea class="inp" id="fe-note" rows="3" data-in="fe" data-k="note">${esc(f.note||'')}</textarea>
   <div class="btns" style="margin-top:20px">${fid?`<button type="button" class="btn ghost danger" data-a="fdel" data-f="${fid}">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary" data-a="fsave" data-f="${fid||''}">${ic('check')} Salva</button></div>`;
@@ -1433,7 +1470,7 @@ function supForm(fid){
 function newSupSheet(){S.fe={metodo:'email',categoria:'Altro'};openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Nuovo fornitore</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>${supForm('')}`})}
 async function saveSup(fid){
   const f=S.fe;if(!String(f.nome||'').trim())return toast('Scrivi il nome del fornitore.','warn');
-  const d={nome:f.nome.trim(),metodo:f.metodo||'',referente:(f.referente||'').trim(),whatsapp:(f.whatsapp||'').trim(),telefono:(f.telefono||'').trim(),email:(f.email||'').trim(),sito:(f.sito||'').trim(),categoria:f.categoria||'Altro',note:(f.note||'').trim()};
+  const d={nome:f.nome.trim(),metodo:f.metodo||'',referente:(f.referente||'').trim(),whatsapp:(f.whatsapp||'').trim(),telefono:(f.telefono||'').trim(),email:(f.email||'').trim(),sito:(f.sito||'').trim(),categoria:f.categoria||'Altro',note:(f.note||'').trim(),oraLimite:/^\d{2}:\d{2}$/.test(f.oraLimite||'')?f.oraLimite:''};
   if(d.sito&&!/^https?:\/\//i.test(d.sito))d.sito='https://'+d.sito;
   if(fid){await upd('fornitori',fid,d);toast('Fornitore salvato')}else{const id=uid();d.creato=now();await put('fornitori',id,d);closeSheet();toast('Fornitore aggiunto');supSheet(id)}
 }
@@ -1628,17 +1665,90 @@ function vStorico(){
   let rs=Object.values(D().richieste).sort((a,b)=>b.creato-a.creato);
   const people=[...new Map(rs.map(r=>[r.utenteId,r.utenteNome])).entries()].sort((a,b)=>String(a[1]).localeCompare(String(b[1])));
   if(S.hf.stato!=='tutte')rs=rs.filter(r=>r.stato===S.hf.stato);if(S.hf.who)rs=rs.filter(r=>r.utenteId===S.hf.who);
-  return`<h1 class="vt">Storico</h1><p class="vsub">Chi ha chiesto cosa, e come è finita.</p>
+  return`<h1 class="vt">Storico</h1><p class="vsub">Chi ha chiesto cosa, e come è finita.</p>${isMgr(meU())?weekSummary():''}
   <div class="chips" role="group" aria-label="Stato">${[['tutte','Tutte'],['inviata','In attesa'],['approvata','Approvate'],['rifiutata','Rifiutate']].map(([k,l])=>`<button type="button" class="chip" aria-pressed="${S.hf.stato===k}" data-a="hf" data-v="${k}">${l}</button>`).join('')}</div>
   <div class="toolbar"><select class="inp" id="hf-who" data-ch="hfwho" aria-label="Persona"><option value="">Tutto lo staff</option>${people.map(([id,n])=>`<option value="${esc(id)}" ${S.hf.who===id?'selected':''}>${esc(n)}</option>`).join('')}</select></div>
   ${rs.length?`<div class="panel">${rs.slice(0,120).map(r=>reqSummary(r,true)).join('')}</div>`:empty('clock','Nessuna richiesta','Prova a cambiare i filtri.')}`;
 }
 
+/* riepilogo della settimana (lunedì-domenica, ora locale) */
+function weekRange(off){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(d.getDay()+6)%7-7*off);const e=new Date(d);e.setDate(e.getDate()+7);return[d.getTime(),e.getTime()]}
+function weekSummary(){
+  const off=S.wk===1?1:0;const [a,b]=weekRange(off);const inW=t=>t>=a&&t<b;
+  const dd=t=>new Date(t).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+  const rs=Object.values(D().richieste).filter(r=>inW(r.creato||0));
+  const cnt={inviata:0,approvata:0,rifiutata:0};for(const r of rs)if(cnt[r.stato]!=null)cnt[r.stato]++;
+  const os=Object.values(D().ordini);const sp=new Map();let tot=0,miss=false;
+  for(const o of os){if(o.stato!=='inviato'||!inW(o.inviato||0))continue;const k=o.fornitoreId||'';
+    const x=sp.get(k)||{fid:k,nome:(D().fornitori[k]||{}).nome||o.fornitoreNome||'Fornitore eliminato',n:0,t:0};x.n++;
+    for(const l of o.items||[]){const pr=l.prezzo;if(pr==null||pr===''||isNaN(pr)){miss=true;continue}const v=Number(pr)*(Number(l.qta)||0);x.t+=v;tot+=v}sp.set(k,x)}
+  const sps=[...sp.values()].sort((x,y)=>y.t-x.t||String(x.nome).localeCompare(String(y.nome),'it'));
+  const tp=new Map();for(const r of rs)for(const it of r.items||[]){const k=norm(it.nome)+'|'+(it.unita||'');const x=tp.get(k)||{nome:it.nome,unita:it.unita||'',q:0};x.q=r3(x.q+(Number(it.qta)||0));tp.set(k,x)}
+  const top=[...tp.values()].sort((x,y)=>y.q-x.q||String(x.nome).localeCompare(String(y.nome),'it')).slice(0,5);
+  const rc=os.filter(o=>o.ricevuto&&inW(o.ricevuto));const nd=rc.filter(o=>o.differenze>0).length;
+  return`<section class="panel wk" aria-label="Riepilogo della settimana"><div class="wk-h"><b>Riepilogo</b><span class="muted small">${dd(a)} – ${dd(b-1)}</span></div>
+  <div class="wk-sg"><div class="seg wide" role="group" aria-label="Settimana">${[[0,'Questa settimana'],[1,'Settimana scorsa']].map(([k,l])=>`<button type="button" aria-pressed="${off===k}" data-a="wk" data-v="${k}">${l}</button>`).join('')}</div></div>
+  <div class="wk-s"><span>Richieste</span><span class="muted">${rs.length}</span></div>
+  <div class="wk-n"><div><b>${cnt.inviata}</b><span>in attesa</span></div><div><b>${cnt.approvata}</b><span>approvate</span></div><div><b>${cnt.rifiutata}</b><span>rifiutate</span></div></div>
+  <div class="wk-s"><span>Consegne con differenze</span><span class="muted">${nd} su ${rc.length} ${rc.length===1?'controllata':'controllate'}</span></div><div style="height:10px"></div>
+  <div class="wk-s"><span>Spesa stimata per fornitore</span><span class="muted">ordini inviati</span></div>
+  ${sps.length?sps.map(x=>`<div class="sline"><div><span class="sup" style="--c:${fcolor(x.fid)}"><i></i>${esc(x.nome)}</span><div class="ln-m">${x.n} ${x.n===1?'ordine':'ordini'}</div></div><span class="sl-q">${eur(x.t)}</span></div>`).join('')
+  +`<div class="total"><span>Totale stimato</span><b>${eur(tot)}</b></div>${miss?'<p class="wk-note muted small">Alcuni prezzi mancano: la spesa vera è più alta.</p>':''}`:'<p class="wk-note muted small">Nessun ordine inviato in questa settimana.</p>'}
+  <div class="wk-s"><span>Più richiesti</span><span class="muted">quantità</span></div>
+  ${top.length?top.map((x,i)=>`<div class="sline"><div class="ln-n">${i+1}. ${esc(x.nome)}</div><span class="sl-q">${fq(x.q)} ${esc(x.unita)}</span></div>`).join(''):'<p class="wk-note muted small">Nessuna richiesta in questa settimana.</p>'}
+  </section>`;
+}
+
+/* ================= dati di prova (solo sviluppatore) ================= */
+const isTestId=id=>String(id||'').startsWith('test_');
+function testDocs(){
+  const d=D(),o={};const tf=x=>isTestId(x.fornitoreId);
+  for(const c of ['staff','fornitori','prodotti','richieste'])o[c]=Object.values(d[c]).filter(x=>x.test||isTestId(x.id));
+  for(const r of Object.values(d.richieste))if(!o.richieste.includes(r)&&(r.items||[]).length&&r.items.every(tf))o.richieste.push(r);
+  o.ordini=Object.values(d.ordini).filter(x=>x.test||tf(x));
+  const ids=new Set();for(const c in o)for(const x of o[c])ids.add(x.id);const us=new Set(o.staff.map(u=>u.id));
+  o.notifiche=Object.values(d.notifiche).filter(n=>n.test||isTestId(n.id)||isTestId(n.rif)||(n.rif&&ids.has(n.rif))||us.has(n.a)||us.has(n.da));
+  return o;
+}
+const testCount=()=>Object.values(testDocs()).reduce((s,a)=>s+a.length,0);
+async function makeTestData(){
+  if(!isDev(realU()))return;if(testCount())return toast('Ci sono già dati di prova: cancellali prima di ricrearli.','warn');
+  const U=[{id:'test_u1',nome:'Luca',username:'test1',reparto:'cucina',mansione:'Cuoco'},{id:'test_u2',nome:'Sara',username:'test2',reparto:'sala',mansione:'Cameriere'}];
+  const busy=U.find(u=>Object.values(D().staff).some(x=>x.username===u.username&&x.id!==u.id));if(busy)return toast('Il nome utente '+busy.username+' è già usato da un profilo vero.','warn');
+  const t=now(),FN={test_f1:'Fornitore di prova 1',test_f2:'Fornitore di prova 2'};
+  await put('fornitori','test_f1',{nome:FN.test_f1,metodo:'email',categoria:'Verdura e frutta',referente:'Mario',whatsapp:'',telefono:'',email:'prova1@esempio.it',sito:'',oraLimite:'18:00',note:'Fornitore finto per le prove.',creato:t,test:true});
+  await put('fornitori','test_f2',{nome:FN.test_f2,metodo:'telefono',categoria:'Latticini e uova',referente:'',whatsapp:'',telefono:'+39 333 0000000',email:'',sito:'',oraLimite:'',note:'Fornitore finto per le prove.',creato:t,test:true});
+  const PD={};[['test_f1','Pomodoro ciliegino','kg',3.2,'Verdura e frutta'],['test_f1','Zucchine','kg',2.1,'Verdura e frutta'],['test_f1','Basilico','mazzo',1.5,'Verdura e frutta'],['test_f1','Limoni','kg',2.8,'Verdura e frutta'],
+    ['test_f2','Mozzarella fior di latte','kg',9.8,'Latticini e uova'],['test_f2','Uova fresche','conf',7.5,'Latticini e uova'],['test_f2','Burro 1 kg','pz',11.4,'Latticini e uova'],['test_f2','Farina di semola 5 kg','sacco',null,'Secco e dispensa']]
+    .forEach(([f,n,u,pr,c],i)=>{PD['test_p'+(i+1)]={fornitoreId:f,nome:n+' (prova)',codice:'PROVA-'+String(i+1).padStart(2,'0'),unita:u,prezzo:pr,categoria:c,aggiornato:t,test:true}});
+  await runPool(Object.entries(PD).map(([id,d])=>()=>put('prodotti',id,d)));
+  for(const u of U)await put('staff',u.id,{nome:u.nome,cognome:'Prova',username:u.username,ruolo:'staff',reparto:u.reparto,mansione:u.mansione,foto:'',stato:'attivo',pass:await sha(u.id+':prova123'),creato:t,creatoDa:S.me||'',test:true});
+  const it=(pid,qta)=>{const p=PD[pid];return{pid,nome:p.nome,codice:p.codice,unita:p.unita,prezzo:p.prezzo,fornitoreId:p.fornitoreId,fornitoreNome:FN[p.fornitoreId],qta}};
+  const R=[['test_r1',U[0],[it('test_p1',3),it('test_p3',4),it('test_p5',2)],'Serve per il servizio di stasera',t-25*60000],['test_r2',U[1],[it('test_p2',2),it('test_p6',1),it('test_p8',1)],'',t-5*60000]];
+  for(const [i,[rid,u,items,nota,cr]] of R.entries()){
+    await put('richieste',rid,{utenteId:u.id,utenteNome:u.nome+' Prova',reparto:u.reparto,mansione:u.mansione,items,nota,stato:'inviata',creato:cr,test:true});
+    const nf=new Set(items.map(x=>x.fornitoreId)).size;
+    await put('notifiche','test_n'+(i+1),{a:'gm',titolo:'Nuova richiesta da '+u.nome,testo:`${REPARTI[u.reparto]||''}, ${items.length} articoli da ${nf} ${nf===1?'fornitore':'fornitori'}`,tipo:'richiesta',rif:rid,letta:false,creato:cr,da:u.id,test:true});
+  }
+  toast('Dati di prova creati. Profili test1 e test2, password prova123.');
+}
+async function delTestData(){
+  if(!isDev(realU()))return;const o=testDocs();const n=Object.values(o).reduce((s,a)=>s+a.length,0);if(!n)return toast('Non ci sono dati di prova.');
+  const L={fornitori:['fornitore','fornitori'],prodotti:['prodotto','prodotti'],staff:['profilo','profili'],richieste:['richiesta','richieste'],ordini:['ordine','ordini'],notifiche:['notifica','notifiche']};
+  const parts=Object.entries(L).filter(([c])=>o[c].length).map(([c,[a,b]])=>o[c].length+' '+(o[c].length===1?a:b));
+  if(!await ask('Cancellare i dati di prova?','Elimino '+parts.join(', ')+'. I dati veri restano.','Cancella',true))return;
+  const jobs=[];for(const c in o)for(const x of o[c])jobs.push(()=>del(c,x.id));await runPool(jobs);
+  for(const x of o.ordini){delete S.ometa[x.id];delete S.track[x.id];delete S.rcv[x.id]}
+  for(const r of o.richieste){delete S.drafts[r.id];delete S.removed[r.id];delete S.gmn[r.id]}
+  for(const u of o.staff)ls('jona_cart_'+u.id,null);
+  const nc=S.cart.filter(c=>!isTestId(c.pid));if(nc.length!==S.cart.length){S.cart=nc;saveCart()}
+  toast('Dati di prova cancellati: '+n+' documenti');
+}
 
 /* ================= notifiche, menu, impostazioni ================= */
 function notifSheet(){
   const me=meU();const unread=myNotifs(me).filter(n=>!n.letta);
-  const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box'};
+  const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock'};
   openSheet({live:()=>true,render:()=>{const ns=myNotifs(me).slice(0,80);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${ns.length?ns.map(n=>`<div class="notif ${unread.some(x=>x.id===n.id)?'unread':''}">${ic(NI[n.tipo]||'bell')}<div><div class="nt">${esc(n.titolo)}</div>${n.testo?`<div class="nx">${esc(n.testo)}</div>`:''}<div class="nx small">${ago(n.creato)}</div></div></div>`).join(''):'<p class="muted">Nessuna notifica.</p>'}`}});
   runPool(unread.map(n=>()=>upd('notifiche',n.id,{letta:true})),4).catch(()=>{});
@@ -1661,6 +1771,7 @@ function settingsSheet(){
   <div class="setrow"><div><b>Tema</b><span>Su questo dispositivo</span></div><div class="seg">${[['auto','Auto'],['light','Chiaro'],['dark','Scuro']].map(([k,l])=>`<button type="button" aria-pressed="${th===k}" data-a="theme" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="setrow"><div><b>Backup dei dati</b><span>Salva o ripristina tutto in un file</span></div><div class="btns"><button type="button" class="btn ghost sm" data-a="bkExport">${ic('download')} Esporta</button><button type="button" class="btn ghost sm" data-a="bkImport">${ic('upload')} Ripristina</button></div></div>
   <div class="setrow"><div><b>Prodotti di esempio</b><span>${demo?demo+' prodotti demo nel catalogo':'Nessuno'}</span></div>${demo?`<button type="button" class="btn ghost sm danger" data-a="demoDel">Elimina</button>`:''}</div>
+  ${isDev(realU())?(()=>{const nt=testCount();return`<div class="setrow"><div><b>Dati di prova</b><span>${nt?nt+' documenti di prova nell\'app':'Fornitori, prodotti, 2 profili e 2 richieste finti, solo per le prove'}</span></div>${nt?`<button type="button" class="btn ghost sm danger" data-a="testDel" aria-label="Cancella dati di prova">${ic('trash')} Cancella</button>`:`<button type="button" class="btn ghost sm" data-a="testMake" aria-label="Crea dati di prova">${ic('plus')} Crea</button>`}</div>`})():''}
   <div class="setrow"><div><b>Notifiche già lette</b><span>${read}</span></div>${read?`<button type="button" class="btn ghost sm" data-a="notifDel">Pulisci</button>`:''}</div>`}});
 }
 async function setPhoto(fs){try{S.form.foto=await fileToAvatar(fs[0]);repaint()}catch(e){toast('Non riesco a leggere questa foto.','err')}}
@@ -1774,6 +1885,9 @@ const A={
   sdel:async d=>{const u=D().staff[d.u];if(!await ask('Eliminare il profilo di '+u.nome+'?','Le sue richieste restano nello storico.','Elimina',true))return;closeSheet();await del('staff',d.u);toast('Profilo eliminato')},
   endSeason:async()=>{const us=Object.values(D().staff).filter(u=>u.ruolo==='staff'&&u.stato==='attivo');if(!await ask('Disattivare '+us.length+' profili dello staff?','Restano salvati con il loro storico. A inizio stagione li riattivi uno per uno.','Disattiva',true))return;await runPool(us.map(u=>()=>upd('staff',u.id,{stato:'disattivato'})),4);toast('Staff disattivato per fine stagione')},
   hf:d=>{S.hf.stato=d.v;render()},
+  wk:d=>{S.wk=+d.v;render()},
+  testMake:()=>makeTestData(),
+  testDel:()=>delTestData(),
   theme:d=>{ls('jona_theme',d.v==='auto'?null:d.v);applyTheme();refreshSheet()},
   cfgSave:async()=>{const n=String(S.cfgName||'').trim();if(!n)return;await put('config','app',Object.assign({},cfg(),{nomeLocale:n,luogoConsegna:String(S.cfgLuogo||'').trim()}));toast('Salvato')},
   bkExport:()=>saveBlob('backup_jona_'+today()+'.json',new Blob([JSON.stringify({app:'jona-ordini',versione:2,data:now(),dati:S.db.dump()})],{type:'application/json'})),
