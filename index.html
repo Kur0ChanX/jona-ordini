@@ -709,6 +709,7 @@ const LocalStore=(()=>{
       subs.add(run);setTimeout(run,0);return()=>subs.delete(run)}});
   return{kind:'locale',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),
     dump:()=>clone(data),load:d=>{const old=data;data=clone(d);try{save()}catch(e){data=old;throw e}fire()},
+    range:async(c,f,a,b)=>Object.entries(data[c]||{}).filter(([,d])=>(d[f]||0)>=a&&(d[f]||0)<b).map(([id,d])=>Object.assign({id},clone(d))),
     empty:()=>!Object.keys(data.fornitori||{}).length};
 })();
 
@@ -816,6 +817,7 @@ function FirebaseStore(key){
     status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy}),
     dump:()=>clone(cache),
     load:async d=>{if(!navigator.onLine)throw{code:'fb_net'};await readyP;await loadAll(d)},
+    range:async(c,f,a,b)=>{await readyP;const s=await fs.collection(c).where(f,'>=',a).where(f,'<',b).get();return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
     empty:()=>false};
 }
 
@@ -1867,10 +1869,15 @@ function rpRange(R){
 const rpDay=t=>new Date(t).toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
 const rpRangeLabel=(a,b)=>rpDay(a)===rpDay(b-1)?rpDay(a):rpDay(a)+' – '+rpDay(b-1);
 const rpFname=(fid,fb)=>(D().fornitori[fid]||{}).nome||fb||'Fornitore eliminato';
+// Il telefono tiene gli ultimi 300 ordini: per periodi più lunghi il resoconto scarica gli altri inviati dal database (una volta per periodo).
+function rpOrders(){const m=new Map(Object.values(D().ordini).map(o=>[o.id,o]));for(const o of S.rpOldList||[])if(!m.has(o.id))m.set(o.id,o);return[...m.values()]}
+function rpOld(a){const os=Object.values(D().ordini);if(os.length<300||Math.min(...os.map(o=>o.creato||0))<=a)return'';
+  if(S.rpOldFrom!=null&&S.rpOldFrom<=a)return S.rpOldErr?'err':'';if(S.rpOldBusy)return'load';
+  S.rpOldBusy=true;S.rpOldErr=false;S.db.range('ordini','inviato',a,now()+1).then(l=>{S.rpOldList=l;S.rpOldFrom=a},()=>{S.rpOldErr=true;S.rpOldFrom=a}).finally(()=>{S.rpOldBusy=false;refreshSheet()});return'load'}
 function rpCalc(R){
   const [a,b]=rpRange(R);const q=norm(R.q);const toks=q?q.split(' '):[];
   const rows=[],miss=new Set(),oids=new Set(),G=new Map(),SP=new Map();let inP=0,nRec=0,tot=0;
-  for(const o of Object.values(D().ordini)){
+  for(const o of rpOrders()){
     const t=o.inviato||0;if(o.stato!=='inviato'||t<a||t>=b)continue;const fid=o.fornitoreId||'';if(R.fid&&fid!==R.fid)continue;inP++;
     const fn=rpFname(fid,o.fornitoreNome);const rz=o.ricevuto&&o.ricezione&&Array.isArray(o.ricezione.righe)?o.ricezione.righe:null;let used=false;
     (o.items||[]).forEach((l,i)=>{
@@ -1954,10 +1961,10 @@ function rpView(){
   const R=rpState(),X=rpCalc(R);
   const sh=document.querySelector('.sheet.rp');let W=300;
   if(sh&&sh.clientWidth){const cs=getComputedStyle(sh);W=Math.max(240,Math.floor(sh.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-32))}
-  const fids=new Map(Object.values(D().fornitori).map(f=>[f.id,f.nome]));for(const o of Object.values(D().ordini))if(o.stato==='inviato'&&o.fornitoreId&&!fids.has(o.fornitoreId))fids.set(o.fornitoreId,o.fornitoreNome||'Fornitore eliminato');
+  const fids=new Map(Object.values(D().fornitori).map(f=>[f.id,f.nome]));for(const o of rpOrders())if(o.stato==='inviato'&&o.fornitoreId&&!fids.has(o.fornitoreId))fids.set(o.fornitoreId,o.fornitoreNome||'Fornitore eliminato');
   const fl=[...fids.entries()].sort((x,y)=>String(x[1]).localeCompare(String(y[1]),'it'));
   const us=new Set(X.ps.map(g=>norm(g.unita)));const showQ=X.ps.length>0&&us.size===1&&(X.toks.length>0||X.ps.length===1);const qT=X.ps.reduce((s,g)=>s+g.q,0);
-  const os=Object.values(D().ordini);const old=os.length>=300&&Math.min(...os.map(o=>o.creato||0))>X.a;
+  const old=rpOld(X.a);
   const nf=fid=>esc(rpFname(fid));
   const filters=`<div class="chips rp-per" role="group" aria-label="Periodo">${RP_PER.map(([k,l])=>`<button type="button" class="chip" aria-pressed="${R.per===k}" data-a="rpPer" data-v="${k}">${l}</button>`).join('')}</div>
   ${R.per==='dal'?`<div class="two rp-dd"><label><span class="lbl">Dal</span><input type="date" class="inp" id="rp-a" data-ch="rpd" data-k="a" value="${esc(R.a)}"></label><label><span class="lbl">Al</span><input type="date" class="inp" id="rp-b" data-ch="rpd" data-k="b" value="${esc(R.b)}"></label></div>`:''}
@@ -1971,7 +1978,7 @@ function rpView(){
     body=`<div class="rp-k"><div class="rp-kt big"><span>Spesa totale</span><b>${eur(X.tot)}</b></div><div class="rp-kt"><span>Ordini</span><b>${X.nOrd}</b></div><div class="rp-kt"><span>Prodotti diversi</span><b>${X.ps.length}</b></div>${showQ?`<div class="rp-kt"><span>Quantità totale</span><b>${fq(r3(qT))} ${esc(X.ps[0].unita)}</b></div>`:''}</div>
     ${X.miss?`<p class="rp-note">${ic('warn')} ${X.miss} ${X.miss===1?'riga senza prezzo, esclusa':'righe senza prezzo, escluse'} dal totale.</p>`:''}
     <p class="rp-note mu">${rpQNote(X)}${R.rep?' Se più reparti chiedono lo stesso prodotto, la quantità è divisa in proporzione.':''}</p>
-    ${old?`<p class="rp-note mu">Il telefono tiene solo gli ultimi 300 ordini: i più vecchi possono mancare.</p>`:''}
+    ${old==='load'?`<p class="rp-note mu">Scarico gli ordini più vecchi…</p>`:old==='err'?`<p class="rp-note mu">Senza rete non riesco a scaricare gli ordini più vecchi: il periodo può essere incompleto.</p>`:''}
     ${rpChart(R,X,W)}
     <div class="rp-sec"><b>Prodotti</b><span class="muted small">${X.ps.length}, dal costo più alto</span></div>
     <div class="panel rp-tb"><table class="rp-t"><thead><tr><th>Prodotto</th><th class="n rp-qc">Quantità</th><th class="n">Costo</th></tr></thead><tbody>
@@ -1983,7 +1990,7 @@ function rpView(){
   <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Chiudi</button><button type="button" class="btn primary" data-a="rpXls" ${X.rows.length?'':'disabled'}>${ic('download')} Scarica Excel</button></div>`;
 }
 function rpEntry(){return`<div class="panel"><button type="button" class="row link rp-open" data-a="rpOpen"><span class="fdot" style="--c:var(--lagoon)">${ic('chart')}</span><div class="row-i"><div class="row-t">Consumi e costi</div><div class="row-m">Quanto spendi per fornitore e prodotto, con file Excel</div></div>${ic('chev')}</button></div>`}
-function openReport(){rpState();openSheet({cls:'tall rp',rp:true,live:()=>true,render:rpView})}
+function openReport(){rpState();S.rpOldFrom=null;S.rpOldList=null;S.rpOldErr=false;openSheet({cls:'tall rp',rp:true,live:()=>true,render:rpView})}
 async function rpXlsx(){
   const R=rpState(),X=rpCalc(R);if(!X.rows.length)return toast('Niente da scaricare con questi filtri.','warn');
   await need('xlsx');
