@@ -1,32 +1,51 @@
-# Passaggio di consegne — Jona Ordini (3 ottobre 2026)
+# Passaggio di consegne (2026-10-04)
 
-## Stato del programma (online su https://kur0chanx.github.io/jona-ordini/, cache `jona-ordini-v11`, `APP_VER = 7`)
-Pubblicato e provato (PR #1–#5, squash su `main`):
-- App installabile a **schermo intero** (`manifest.webmanifest`: `fullscreen`).
-- Barra **Test** per lo sviluppatore: Admin Chef / Staff / Sviluppatore (`VIEW_AS`, `meU()` sovrascrive il ruolo, `realU()` è il profilo vero).
-- **Foto dei listini con Gemini** (Fornitori → Importa): fotocamera o galleria, più pagine; con la chiave Gemini (`jona_gemini_key`, solo sul telefono) trascrive da sola (`gemRun`, modelli `gemini-flash-latest` poi `gemini-2.5-flash`), senza chiave condivide le foto con l'app Gemini e poi si incolla la risposta.
-- **Database centrale Firebase** (`FirebaseStore`, parte 1): stessa interfaccia di `LocalStore`; copia offline (`enablePersistence`), indicatore «Senza rete, N da inviare»; prodotti in `listini/<fornitore>` (campo `p.<id>`, scritture accorpate in `lFlush`); accesso anonimo + chiave del ristorante (`chiave/ristorante`, `membri/<uid>`, `pubblico/stato`, regole in `firebase/firestore.rules`); Impostazioni → Database centrale: Attiva / Invita (QR locale `lib/qrcode-1.4.4.js`) / Ho un codice / Scollega / Configurazione (incolla `firebaseConfig`, solo sviluppatore). Link d'invito `#k=<chiave>` (+ `&c=<config base64>` se la configurazione non viene da `firebase-config.js`).
-- **Parte 2**: interfaccia staff semplice (`html.staff-ui`, `staffGroup`, `defOpt`, barra `cartBar`, `stepsHint`), «I tuoi soliti» (`usualOf`), avviso doppioni (`findDoppi`, campo `doppi` nella richiesta, banner in `reqCard`), ora limite per fornitore (`oraLimite`, `dlInfo`, `dlBadge`, `deadlineTick` ogni minuto per chi gestisce, chiave `jona_rem`), dati di prova per lo sviluppatore (`makeTestData`, `delTestData`, id `test_…`, campo `test:true`), riepilogo della settimana in Storico (`weekSummary`).
-- **Copie automatiche** (solo con Firebase): `autoBackup()` (10 s dopo l'apertura, al ritorno sull'app e ogni ora) sul telefono di chi gestisce (`isMgr(realU())`), una volta al giorno (`jona_bk`). `S.db.backup` (solo in `FirebaseStore`): `has/save/list/get/prune`; legge tutto dal server (`fullDump`, anche richieste e ordini oltre i limiti delle liste), documento `backup/<giorno>` (`meta:true`, `sig`, `parti`, `dim`, `data`, `da`) + pezzi `backup/<giorno>_<sig>_<n>` da 300.000 caratteri (sotto 900 KB); cancella le copie oltre 14 giorni (`BK_DAYS`). Impostazioni → Copie automatiche → Scarica / Ripristina (`bkSheet`). `backup` aggiunto in `firebase/firestore.rules`. Prova: `tools/test-firebase-backup.mjs`.
+## Stato attuale
+- App online alla **v11** (`APP_VER=11`, `sw.js` `CACHE=jona-ordini-v15`), `main` = `8aa1024`. Ramo di lavoro `backup-automatico` allineato a `main`.
+- Notifiche push **funzionanti** (provate sul Xiaomi di Mario). iPhone di Maurizio ancora da attivare (serve iOS ≥ 16.4 e app aperta dall'icona Home).
+- Regole Firestore con la collezione `push` **già pubblicate** da Mario.
 
-- **Ordine a voce** (PR #9, solo staff, anche nella vista Test «Staff»): pulsante microfono (`micBtn`), Web Speech API `it-IT`, `parseVoice` → `vMatch` (radici, prefissi, distanza di modifica, fornitore detto +0,15, a parità come `defOpt`), foglio «Ho capito» (`voiceSheet`): niente va nel carrello senza conferma; unità diverse da quella del prodotto finiscono nella nota per lo chef; prodotti sconosciuti = fuori listino con «(da Fornitore)» nel nome; senza riconoscimento vocale campo di testo. Mai provato su un telefono vero.
-- **Consumi e costi** (PR #9, solo `isMgr`): Storico → «Consumi e costi» (`openReport`, funzioni `rp*`): periodo, fornitore, reparto, ricerca prodotto; spesa, grafico SVG, tabella, Excel con due fogli. Solo ordini inviati; quantità arrivate (`ricezione.righe[i].arr`) se la consegna è controllata, altrimenti ordinate; reparto diviso in proporzione a `da`. Con più di 300 ordini scarica i più vecchi con `S.db.range(c,campo,da,a)` (nuovo metodo in `LocalStore` e `FirebaseStore`).
-- **Novità** (PR #10): `APP_VER` + `NEWS` (versioni 0–7, per ruolo: `tutti`, `chef`, `dev` con aggiunte/correzioni/risolti), etichetta piccola con contatore nell'intestazione (`newsBtn`), foglio `newsSheet`, vista in `jona_news_<id>`. **A ogni versione: nuova voce in `NEWS` e `APP_VER` +1.**
+## File toccati in questa sessione
+- `worker/src/index.js`: Cloudflare Worker `jona-notifiche` (`/salute`, `/chiave`, `/invia`). Web Push RFC 8291 + VAPID RFC 8292 con WebCrypto, solo host push noti, max 50 iscrizioni a chiamata, risposta `{inviati, scaduti, errori}`.
+- `.github/workflows/cloudflare-worker.yml`: deploy con Wrangler 4. Crea il segreto `VAPID_JWK` solo se manca (se `secret list` fallisce si ferma), poi prova `/salute` e `/chiave`.
+- `index.html`: blocco «notifiche push» (`PUSH_URL`, `pushWatch`, `pushSave`, `pushSync`, `pushOn`, `pushOff`, `pushSend`, `pushTest`, `pushHelp` + `PUSH_HELP`). `notify()` chiama `pushSend()`. Pulsanti nel menu profilo (`meMenu`), `pushSync()` in `login()`, `pushUnlink()` in `logout()`, stili `.ph-*`.
+- `sw.js`: eventi `push` e `notificationclick`.
+- `firebase/firestore.rules`: aggiunta la collezione `push`.
+- `tools/test-firebase-push.mjs` (nuovo), `tools/README.md`, `docs/FIREBASE.md`, `CLAUDE.md` (regola SPIEGAZIONI PER MARIO).
 
-**Firebase NON è ancora configurato**: `firebase-config.js` ha `self.JONA_FIREBASE = null`, quindi per ora ogni telefono usa ancora `LocalStore`. Il telefono di Mario ha già i dati locali (profilo sviluppatore).
+## Decisioni e motivi
+- **Cloudflare Worker** al posto di Firebase Blaze: gratis, deploy automatico da GitHub.
+- Le iscrizioni push si leggono e scrivono **fuori da `S.db`** (Firestore diretto con errori gestiti): un `permission-denied` dentro `S.db` blocca tutta l'app (`fb_perm`).
+- Push solo con `FirebaseStore`, verso utente, `gm` o `gestori` (ruolo vero da `D().staff`), escluso il telefono di chi invia.
+- Xiaomi: la causa del rifiuto (errore 20, `AbortError`) era «Sospendi l'attività dell'app se inutilizzata». È nella guida `PUSH_HELP`.
+- Notifiche a Maurizio già esistenti: nuova richiesta (`notify('gm',…)`, riga ~1278) e controllo merce (`notify('gm',…)`, riga ~1712).
 
-## Componenti toccati
-`index.html` (tutto il codice), `sw.js` (cache e `FILES`), `manifest.webmanifest`, `firebase-config.js`, `firebase/firestore.rules`, `lib/` (Firebase compat 10.14.1, QR), `docs/FIREBASE.md` (guida per Mario), `tools/` (prove Playwright + emulatore, vedi `tools/README.md`), `CLAUDE.md`.
+## Piano a scaglioni (deciso con Mario)
+Metodo: 3 funzioni → test → PR → squash merge → controllo online → versione e NEWS → scaglione successivo. A ogni versione: `APP_VER`+1, voce `NEWS`, `CACHE` in `sw.js`.
 
-## Prossimi passi
-1. **Configurazione Firebase** (aspetta Mario): Mario segue `docs/FIREBASE.md` e manda il blocco `firebaseConfig`. Va scritto in `firebase-config.js` (`self.JONA_FIREBASE = {apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId}`), cambiata la cache in `sw.js`, pubblicato. Poi Mario dal suo telefono: Impostazioni → Database centrale → **Attiva** (carica i suoi dati), poi **Invita** per gli altri telefoni.
-2. ~~Backup automatico~~: fatto (vedi sopra). Nota storica: Firebase gratuito non ha export programmati. Proposta: il primo telefono di chi gestisce che apre l'app ogni giorno salva una copia (`S.db.dump()`) in Firestore, collezione `backup`, documenti `<giorno>_<n>` da massimo ~900 KB (limite 1 MB per documento), tiene 14 giorni; in Impostazioni la lista con Scarica / Ripristina. Va aggiunta `backup` alle collezioni ammesse in `firebase/firestore.rules` (Mario deve ripubblicare le regole: meglio farlo prima che le incolli la prima volta).
-3. **Punto 2, notifiche push** (approvato, serve una scelta di Mario): per mandare una notifica a un telefono chiuso serve un server.
-   - (a) consigliata: piccolo Cloudflare Worker gratuito. Il telefono, dopo `notify()`, chiama il worker con chiave del ristorante e destinatari; il worker manda un Web Push **senza contenuto** firmato VAPID (ES256 con WebCrypto, chiavi generate e salvate nel Durable Object), il service worker riceve l'evento `push`, chiede il testo al worker (`/push/pull` con l'endpoint dell'iscrizione) e mostra la notifica. Un prototipo provato in locale (con wrangler) c'era nella sessione precedente; va riscritto solo per le notifiche. Serve l'account Cloudflare e i segreti `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` nel repository `jona-ordini` (workflow come `triad-server.yml` di raccoon-triad).
-   - (b) Firebase piano Blaze + Cloud Functions + FCM (serve una carta di credito, costi quasi zero).
-4. Dubbi aperti da verificare con l'uso vero:
-   - lo staff vede una riga per gruppo di prodotti (`gkey`: prime due parole): formati diversi (olio 1 l e 5 l) finiscono nella stessa riga e il «+» prende il più economico; lo chef può cambiarlo in approvazione;
-   - l'avviso doppioni confronta anche prodotti dello stesso gruppo (può segnalare formati diversi): è solo una domanda, non blocca;
-   - la barra del carrello dello staff conta su un menu in basso alto 69 px;
-   - due telefoni dello chef aperti nello stesso secondo possono creare due promemoria dell'ora limite.
-5. Idea 6 (avviso sui prezzi cambiati): Mario ha detto «per ora non serve».
+**Scaglione 1 (prossimo)**
+1. **Approvazione divisa per fornitore** (scelta 1A + regola C): in approvazione la richiesta è a blocchi colorati per fornitore; «+ Aggiungi» dentro ogni blocco cerca solo nel listino di quel fornitore. Un prodotto scritto a mano non si approva senza fornitore (già c'è il controllo in `approve()`, riga ~1397: va esteso all'aggiunta).
+2. **Controllo arrivo a semaforo** (2A): righe grandi, tocchi grigio→verde «c'è»→rosso «manca»→giallo «meno» (si apre la quantità), ordine libero, contatore «9 di 14», invio anche parziale (non toccati = «non controllato»). Resta «È arrivato tutto». Oggi c'è menu `MOTIVI` + stepper (`rcvState`, righe ~1675-1715): da sostituire con il semaforo, mantenendo il formato `ricezione.righe` usato da Storico/report (righe ~2023, ~2147).
+3. **Invii in sospeso**: coda locale delle push non partite con ritentativo su `online`, apertura app e `visibilitychange`; Background Sync in `sw.js` su Android; numero sull'icona (`navigator.setAppBadge`) finché c'è qualcosa da inviare; avviso fisso «⚠ Non ancora arrivata a Maurizio» e «Arrivata ✓» con vibrazione. SMS solo come pulsante manuale, per la richiesta rimasta in sospeso. Nota: le scritture Firestore offline partono già da sole a rete tornata (`syncPill`); mancano la push e un avviso chiaro per lo staff.
+
+**Scaglione 2**
+- Avviso aumento prezzi (all'import listino o fattura: prodotti aumentati con %).
+- Urgenza sul **singolo prodotto** da parte dello staff (in cima per Maurizio, notifica importante).
+- Notifica controllo merce più ricca: prodotti mancanti con chi li aveva chiesti.
+
+**Scaglione 3**
+- **Più lingue** per lo staff (scelta per persona; ordini e prodotti restano in italiano).
+
+**Scaglioni 4-5: Orari del personale** (nuova sezione, grafica coerente con l'app)
+- Nel profilo dipendente, prima di caricarlo: ore settimanali di contratto, pausa, giorni liberi a settimana.
+- Pianificatore settimanale grafico (righe = persone, colonne = giorni, turni a blocchi colorati per reparto), basato sulle funzioni più usate: copia la settimana precedente, turni tipo (pranzo/cena/spezzato).
+- Controlli: ore oltre il contratto, pause mancanti, giorni liberi non dati, 11 ore di riposo tra due turni e 24 ore di riposo settimanale (D.Lgs. 66/2003), turni sovrapposti.
+- Lo staff vede solo i propri orari.
+
+**Idee in lista, non ancora scelte**: HACCP all'arrivo, contestazione fornitore, giorni di consegna, scorte minime, foto prodotto, prezzo migliore in approvazione, vuoti a rendere, budget per reparto, conferma del fornitore via link, ricette e costo del piatto.
+
+## Rischi e note aperte
+- `tools/test-news.mjs` è indietro (si aspetta `APP_VER` 7): da aggiornare ai conteggi attuali.
+- `test-staff` e `test-news` vanno lanciati con `firebase-config.js` nascosto (vedi `tools/README.md`). Con l'emulatore vanno svuotati sia `demo-jona` sia `jona-ordini`.
+- Il push non parte se chi invia è senza rete: lo scaglione 1, punto 3, lo risolve.
+- Background Sync non esiste su iPhone: lì il ritentativo avviene solo ad app aperta.
