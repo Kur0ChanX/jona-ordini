@@ -662,8 +662,10 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=9;
+const APP_VER=10;
 const NEWS=[
+  {v:10,data:'2026-10-03',titolo:'Messaggio più chiaro sulle notifiche',
+    dev:{correzioni:['`pushOn`: se `pushManager.subscribe` fallisce (es. `AbortError` su telefoni senza servizi Google o browser che bloccano il push) compare un messaggio chiaro invece di «Operazione non riuscita (20)».']}},
   {v:9,data:'2026-10-03',titolo:'Notifiche sul telefono',
     tutti:['Ora l\'app ti può avvisare anche quando è chiusa. Tocca la tua foto in alto → «Attiva le notifiche» → Consenti. Con «Prova» controlli che arrivino.','Su iPhone le notifiche funzionano solo se apri l\'app dall\'icona sulla schermata Home.'],
     dev:{aggiunte:['Push con Web Push + VAPID: server in `worker/` (Cloudflare, `/chiave`, `/invia`), iscrizioni in Firestore `push/<id>` (`pushOn`, `pushSend` dentro `notify()`), `sw.js` mostra la notifica. La chiave `VAPID_JWK` la crea il workflow alla prima pubblicazione.'],noti:['Le regole Firestore vanno incollate di nuovo (nuova collezione `push`), altrimenti le notifiche non si attivano. Se chi invia è senza rete la notifica push non parte (resta quella dentro l\'app).']}},
@@ -953,7 +955,7 @@ async function pushOn(){
   const {chiave}=await(await fetch(PUSH_URL+'/chiave')).json();
   const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
   if(sub&&ls('jona_push_k')!==chiave){await sub.unsubscribe();sub=null}
-  if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)});
+  if(!sub)try{sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)})}catch(e){return toast(e&&e.name==='AbortError'?'Il servizio notifiche del telefono ha rifiutato l\'iscrizione. Apri l\'app con Chrome e controlla che il telefono abbia i servizi Google (Play Store).':'Non riesco ad attivare le notifiche su questo telefono ('+(e&&e.name||'errore')+').','err')}
   ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: Mario deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono')}
 async function pushOff(){const id=ls('jona_push');ls('jona_push',null);
   try{const sub=await(await navigator.serviceWorker.ready).pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch(e){}
