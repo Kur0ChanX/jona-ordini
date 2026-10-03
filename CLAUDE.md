@@ -38,7 +38,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - Import listini: Excel/CSV, fattura XML, tabella incollata, foto lette da Gemini (chiave in `jona_gemini_key`, solo sul telefono).
 
 ## Chiavi in localStorage
-`jona_db_v2` (dati locali), `jona_me` (profilo entrato), `jona_cart_<id>`, `jona_viewas`, `jona_theme`, `jona_key` (chiave del ristorante: segreta, mai nel codice né nei commit), `jona_member`, `jona_fb` (configurazione incollata a mano), `jona_fb_upload`, `jona_gemini_key` (segreta), `jona_rem`.
+`jona_db_v2` (dati locali), `jona_me` (profilo entrato), `jona_cart_<id>`, `jona_viewas`, `jona_theme`, `jona_key` (chiave del ristorante: segreta, mai nel codice né nei commit), `jona_member`, `jona_fb` (configurazione incollata a mano), `jona_fb_upload`, `jona_gemini_key` (segreta), `jona_rem`, `jona_bk` (giorno dell'ultima copia automatica).
 
 ## Regole di lavoro
 - Ad OGNI versione cambia `CACHE` in `sw.js`.

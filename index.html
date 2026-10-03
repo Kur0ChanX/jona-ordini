@@ -474,7 +474,7 @@ const firstName=s=>String(s||'').split(' ')[0];
 const byNome=(a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'it');
 function ago(t){if(!t)return'';const d=(now()-t)/1000;if(d<60)return'adesso';if(d<3600)return Math.floor(d/60)+' min fa';const dt=new Date(t),td=new Date();const hm=dt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});if(dt.toDateString()===td.toDateString())return'oggi '+hm;const y=new Date(td);y.setDate(td.getDate()-1);if(dt.toDateString()===y.toDateString())return'ieri '+hm;return dt.toLocaleDateString('it-IT',{day:'numeric',month:'short'})+' '+hm}
 const fdate=t=>t?new Date(t).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}):'';
-const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const today=(d=new Date())=>{return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const slug=s=>norm(s).replace(/ /g,'-')||'ordine';
 function ls(k,v){try{if(v===undefined){const r=localStorage.getItem(k);return r?JSON.parse(r):null}if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
 function num(v){if(v==null||v==='')return null;if(typeof v==='number')return isFinite(v)?v:null;let s=String(v).replace(/[^\d,.\-]/g,'');if(!s)return null;if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');else if(s.includes(','))s=s.replace(',','.');const n=parseFloat(s);return isNaN(n)?null:Math.round(n*1000)/1000}
@@ -687,7 +687,24 @@ function FirebaseStore(key){
     for(const f in byF)ops.push(b=>b.set(fs.collection('listini').doc(f),{p:byF[f]}));
     for(let i=0;i<ops.length;i+=400){const b=fs.batch();ops.slice(i,i+400).forEach(o=>o(b));await b.commit()}
   }
-  return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),
+  // ---- copie automatiche (collezione «backup»): «<giorno>» dice quanti pezzi, «<giorno>_<sigla>_<n>» sono i pezzi sotto 1 MB ----
+  const BK_PART=300000; // caratteri per pezzo: anche con lettere accentate restano sotto 900 KB
+  async function fullDump(){const d={};
+    for(const c of FB_COLS){const s=await fs.collection(c).get({source:'server'});d[c]={};s.docs.forEach(x=>{d[c][x.id]=x.data()})}
+    const l=await fs.collection('listini').get({source:'server'});d.prodotti={};l.docs.forEach(x=>Object.assign(d.prodotti,(x.data()||{}).p||{}));return d}
+  const backup={
+    has:async g=>{await readyP;return(await fs.doc('backup/'+g).get({source:'server'})).exists},
+    save:async(g,by)=>{await readyP;const txt=JSON.stringify({app:'jona-ordini',versione:2,data:now(),dati:await fullDump()});
+      const sig=randKey(6),n=Math.max(1,Math.ceil(txt.length/BK_PART));
+      for(let i=0;i<n;i++)await fs.doc('backup/'+g+'_'+sig+'_'+i).set({g,s:txt.slice(i*BK_PART,(i+1)*BK_PART)});
+      await fs.doc('backup/'+g).set({g,meta:true,sig,parti:n,dim:txt.length,data:now(),da:by||''})},
+    list:async()=>{await readyP;const s=await fs.collection('backup').where('meta','==',true).get({source:'server'});return s.docs.map(x=>x.data()).sort((a,b)=>a.g<b.g?1:-1)},
+    get:async g=>{await readyP;const m=await fs.doc('backup/'+g).get({source:'server'});if(!m.exists)throw{code:'not_found'};const b=m.data();
+      const ps=await Promise.all(Array.from({length:b.parti},(_,i)=>fs.doc('backup/'+g+'_'+b.sig+'_'+i).get({source:'server'})));
+      if(ps.some(x=>!x.exists))throw{code:'not_found'};return JSON.parse(ps.map(x=>x.data().s).join(''))},
+    prune:async keep=>{await readyP;const s=await fs.collection('backup').where('g','<',keep).get({source:'server'});for(const x of s.docs)await x.ref.delete()}
+  };
+  return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
     status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy}),
     dump:()=>clone(cache),
     load:async d=>{if(!navigator.onLine)throw{code:'fb_net'};await readyP;await loadAll(d)},
@@ -1217,6 +1234,27 @@ async function deadlineTick(){
   ls('jona_rem',rem);
 }
 setInterval(()=>deadlineTick().catch(e=>console.warn(e)),60000);
+/* copia automatica: ogni giorno il primo telefono di chi gestisce salva tutto in «backup» e cancella le copie oltre i 14 giorni */
+const BK_DAYS=14;
+async function autoBackup(){
+  if(autoBackup.run||!S.db||S.db.kind!=='firebase'||!S.db.backup||!allLoaded())return;const me=realU();if(!me||me.stato!=='attivo'||!isMgr(me))return;
+  const st=S.db.status();if(!st.ready||!st.net||navigator.onLine===false)return;
+  const g=today();if(ls('jona_bk')===g)return;
+  autoBackup.run=true;
+  try{if(!await S.db.backup.has(g))await S.db.backup.save(g,fullName(me));
+    const d=new Date();d.setDate(d.getDate()-(BK_DAYS-1));await S.db.backup.prune(today(d));ls('jona_bk',g)}
+  finally{autoBackup.run=false}
+}
+setInterval(()=>autoBackup().catch(e=>console.warn(e)),3600000);
+setTimeout(()=>autoBackup().catch(e=>console.warn(e)),10000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoBackup().catch(e=>console.warn(e))});
+function bkSheet(){
+  S.bkL=null;S.db.backup.list().then(l=>{S.bkL=l;refreshSheet()},()=>{S.bkL='err';refreshSheet()});
+  openSheet({render:()=>{const L=S.bkL;
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Copie automatiche<div class="sh-s">Una al giorno, restano ${BK_DAYS} giorni</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${L===null?'<p class="muted small">Carico le copie…</p>':L==='err'?'<p class="muted small">Serve la connessione a internet. Riprova quando c\'è rete.</p>':!L.length?'<p class="muted small">Ancora nessuna copia. La prima si fa da sola entro pochi minuti.</p>':
+  L.map(b=>`<div class="setrow"><div><b>${esc(fdate(new Date(b.g+'T12:00').getTime()))}</b><span>Alle ${new Date(b.data).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}${b.da?', dal telefono di '+esc(firstName(b.da)):''} · ${Math.max(1,Math.round(b.dim/1024))} KB</span></div><div class="btns"><button type="button" class="btn ghost sm" data-a="bkDown" data-v="${esc(b.g)}">${ic('download')} Scarica</button><button type="button" class="btn ghost sm danger" data-a="bkRest" data-v="${esc(b.g)}">${ic('upload')} Ripristina</button></div></div>`).join('')}`}});
+}
 setTimeout(()=>deadlineTick().catch(e=>console.warn(e)),4000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)deadlineTick().catch(e=>console.warn(e))});
 async function setOrderQty(oid,i,q){
@@ -1770,6 +1808,7 @@ function settingsSheet(){
   <div class="btns" style="margin:4px 0 8px"><button type="button" class="btn primary sm" data-a="cfgSave">${ic('check')} Salva</button></div>
   <div class="setrow"><div><b>Tema</b><span>Su questo dispositivo</span></div><div class="seg">${[['auto','Auto'],['light','Chiaro'],['dark','Scuro']].map(([k,l])=>`<button type="button" aria-pressed="${th===k}" data-a="theme" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="setrow"><div><b>Backup dei dati</b><span>Salva o ripristina tutto in un file</span></div><div class="btns"><button type="button" class="btn ghost sm" data-a="bkExport">${ic('download')} Esporta</button><button type="button" class="btn ghost sm" data-a="bkImport">${ic('upload')} Ripristina</button></div></div>
+  ${S.db.backup?`<div class="setrow"><div><b>Copie automatiche</b><span>Ogni giorno una copia di tutto, restano ${BK_DAYS} giorni</span></div><button type="button" class="btn ghost sm" data-a="bkList">${ic('download')} Vedi</button></div>`:''}
   <div class="setrow"><div><b>Prodotti di esempio</b><span>${demo?demo+' prodotti demo nel catalogo':'Nessuno'}</span></div>${demo?`<button type="button" class="btn ghost sm danger" data-a="demoDel">Elimina</button>`:''}</div>
   ${isDev(realU())?(()=>{const nt=testCount();return`<div class="setrow"><div><b>Dati di prova</b><span>${nt?nt+' documenti di prova nell\'app':'Fornitori, prodotti, 2 profili e 2 richieste finti, solo per le prove'}</span></div>${nt?`<button type="button" class="btn ghost sm danger" data-a="testDel" aria-label="Cancella dati di prova">${ic('trash')} Cancella</button>`:`<button type="button" class="btn ghost sm" data-a="testMake" aria-label="Crea dati di prova">${ic('plus')} Crea</button>`}</div>`})():''}
   <div class="setrow"><div><b>Notifiche già lette</b><span>${read}</span></div>${read?`<button type="button" class="btn ghost sm" data-a="notifDel">Pulisci</button>`:''}</div>`}});
@@ -1895,6 +1934,10 @@ const A={
     if(!j||j.app!=='jona-ordini'||!j.dati)return toast('Questo non è un backup di Jona Ordini.','err');
     if(!await ask('Ripristinare il backup del '+new Date(j.data).toLocaleDateString('it-IT')+'?',S.db.kind==='firebase'?'Tutti i dati attuali verranno sostituiti su tutti i telefoni.':'Tutti i dati attuali su questo dispositivo verranno sostituiti.','Ripristina',true))return;
     try{await S.db.load(j.dati);toast('Backup ripristinato')}catch(e){toast(errMsg(e),'err')}}),
+  bkList:()=>bkSheet(),
+  bkDown:async d=>{try{const j=await S.db.backup.get(d.v);saveBlob('backup_jona_'+d.v+'.json',new Blob([JSON.stringify(j)],{type:'application/json'}))}catch(e){toast(errMsg(e.code==='not_found'?e:{code:'fb_net'}),'err')}},
+  bkRest:async d=>{if(!await ask('Ripristinare la copia del '+fdate(new Date(d.v+'T12:00').getTime())+'?','Tutti i dati attuali verranno sostituiti su tutti i telefoni.','Ripristina',true))return;
+    try{const j=await S.db.backup.get(d.v);await S.db.load(j.dati);closeSheet();toast('Copia ripristinata')}catch(e){toast(errMsg(e.code==='not_found'?e:{code:'fb_net'}),'err')}},
   demoDel:async()=>{const ds=prods().filter(p=>p.demo);if(!await ask('Eliminare '+ds.length+' prodotti di esempio?','','Elimina',true))return;await runPool(ds.map(p=>()=>del('prodotti',p.id)));toast('Prodotti demo eliminati')},
   notifDel:async()=>{const ns=Object.values(D().notifiche).filter(n=>n.letta);await runPool(ns.map(n=>()=>del('notifiche',n.id)));toast('Notifiche pulite')}
 };

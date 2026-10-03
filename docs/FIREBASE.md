@@ -33,3 +33,4 @@ La configurazione non è segreta. I dati li protegge la chiave del ristorante (v
 - I dati restano anche sul telefono: senza rete l'app funziona e manda le modifiche quando la connessione torna.
 - I prodotti stanno in un documento per fornitore (`listini/<fornitore>`), così ogni apertura dell'app legge pochi documenti. Il piano gratuito (50.000 letture e 20.000 scritture al giorno) basta per il ristorante.
 - Backup: Impostazioni → Backup dei dati → Esporta / Ripristina (il ripristino vale per tutti i telefoni).
+- Copie automatiche: ogni giorno il primo telefono di chi gestisce salva una copia di tutto nel database (collezione `backup`); restano 14 giorni. Impostazioni → Copie automatiche → Scarica / Ripristina. Se le regole sono state incollate prima di questa funzione, incollale di nuovo.
