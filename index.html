@@ -383,6 +383,60 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .toast.in{opacity:1;transform:none}
 .toast.err{background:var(--corallo);color:#fff}
 .toast.warn{background:var(--ocra);color:#fff}
+/* ---------- staff: interfaccia semplice (testi e pulsanti grandi) ---------- */
+.steps3{display:flex;flex-wrap:wrap;gap:6px 18px;list-style:none;padding:0;margin:2px 0 14px;color:var(--muted);font-size:14px}
+.steps3 li{display:inline-flex;align-items:center;gap:7px}
+.steps3 b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--lagoon-soft);color:var(--lagoon);font:600 12.5px/1 var(--font)}
+.pg.one{padding:12px 16px}
+.pg.one .opt{padding:0;flex-wrap:wrap;row-gap:8px}
+.pg.one .opt-i{flex:1 1 140px}
+.pg.one .step{margin-left:auto}
+.pg.one .opt-n{margin-top:3px}
+.cartbar{position:fixed;left:0;right:0;bottom:calc(var(--navh,62px) + env(safe-area-inset-bottom,0px));z-index:29;padding:10px 12px 10px;background:linear-gradient(to top,var(--bg) 55%,transparent);pointer-events:none}
+.cartbar .btn{pointer-events:auto;max-width:560px;margin:0 auto;display:flex;box-shadow:0 12px 26px -12px rgba(0,0,0,.5)}
+.cartbar .btn>span{flex:1;text-align:center;white-space:normal;line-height:1.2}
+@media (max-width:360px){html.staff-ui .cartbar .btn.big{font-size:16.5px;padding:0 14px;gap:8px}.cartbar .btn>.ic:last-child{display:none}}
+.main.has-bar{padding-bottom:190px}
+.banner.dup{display:flex;gap:10px;align-items:flex-start;margin:8px 16px 4px}
+.banner.dup .ic{width:20px;height:20px;margin-top:1px}
+.banner.dup ul{margin:4px 0 0;padding-left:18px}
+html.staff-ui{--navh:69px}
+html.staff-ui .nav{height:calc(69px + env(safe-area-inset-bottom,0px))}
+html.staff-ui .nav button{font-size:13px;white-space:nowrap}
+html.staff-ui .nav .ic{width:25px;height:25px}
+html.staff-ui .vsub,html.staff-ui .free{font-size:17px}
+html.staff-ui .steps3{font-size:15px}
+html.staff-ui .search input{min-height:60px;font-size:19px}
+html.staff-ui .chip{padding:11px 18px;font-size:16.5px}
+html.staff-ui .sec{font-size:17px}
+html.staff-ui .pg-t{font-size:20px}
+html.staff-ui .pg-c,html.staff-ui .opt-n,html.staff-ui .ln-m,html.staff-ui .rs-m,html.staff-ui .small{font-size:15px}
+html.staff-ui .ln-n,html.staff-ui .rs-t{font-size:18px}
+html.staff-ui .lbl{font-size:15.5px}
+html.staff-ui .inp{font-size:17px}
+html.staff-ui .add{width:56px;height:56px;border-width:2px;background:var(--lagoon);color:var(--on-lagoon)}
+html.staff-ui .add .ic{width:28px;height:28px;stroke-width:2.2}
+html.staff-ui .step button{width:52px;height:52px}
+html.staff-ui .step button .ic{width:22px;height:22px;stroke-width:2}
+html.staff-ui .step input{width:54px;min-height:52px;font-size:19px}
+html.staff-ui .btn{min-height:50px;font-size:16.5px}
+html.staff-ui .btn.sm{min-height:44px;font-size:15.5px}
+html.staff-ui .btn.big{min-height:64px;font-size:19.5px;border-radius:16px}
+html.staff-ui .btn.big .ic{width:23px;height:23px}
+html.staff-ui .icon-btn{width:48px;height:48px}
+.line.big{flex-wrap:wrap;row-gap:4px}
+.line.big .ln-i{flex:1 1 180px}
+.line.big .step{margin-left:auto}
+html.staff-ui .cart-foot{position:sticky;bottom:calc(var(--navh) + 10px + env(safe-area-inset-bottom,0px));z-index:5}
+html.staff-ui .cart-foot .btn{box-shadow:0 12px 26px -12px rgba(0,0,0,.5)}
+@media (min-width:980px){
+  html.staff-ui .nav{height:auto}
+  html.staff-ui .nav button{font-size:16px}
+  html.staff-ui .nav .ic{width:22px;height:22px}
+  .cartbar{left:232px;bottom:0;padding:12px 16px 18px}
+  .main.has-bar{padding-bottom:120px}
+  html.staff-ui .cart-foot{bottom:18px}
+}
 </style>
 </head>
 <body>
@@ -456,7 +510,8 @@ send:'<path d="M20.5 3.5 10 14M20.5 3.5l-6.5 17-4-6.5-6.5-4z"/>',
 box:'<path d="M3.5 7.5 12 3.5l8.5 4v9L12 20.5l-8.5-4z"/><path d="M3.5 7.5 12 11.5l8.5-4M12 11.5v9"/>',
 qr:'<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h2v2h-2zM18 14h2M14 18h2M18 18h2v2h-2z"/>',
 cloud:'<path d="M7 18.5h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6-1.3A4.5 4.5 0 0 0 7 18.5z"/>',
-user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/>'
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/>',
+warn:'<path d="M12 3.8 2.6 20h18.8z"/><path d="M12 10v4.6M12 17.4v.2"/>'
 };
 const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
 
@@ -676,6 +731,7 @@ function paint(el,html){
 function render(){
   const html=view();
   document.documentElement.classList.toggle('on-wall',S.wallMode);
+  document.documentElement.classList.toggle('staff-ui',!S.wallMode&&!isMgr(meU()));
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
   for(const o of sheets)if(o.live&&o.live())paintSheet(o);
 }
@@ -828,11 +884,14 @@ function shell(me){
   if(!tabs.find(t=>t.id===S.tab))S.tab=tabs[0].id;
   const n=myNotifs(me).filter(x=>!x.letta).length;
   const V={catalogo:vCatalogo,carrello:vCarrello,miei:vMiei,arrivi:vArrivi,richieste:vRichieste,invii:vInvii,fornitori:vFornitori,staff:vStaff,storico:vStorico};
+  const nc=!isMgr(me)&&S.tab!=='carrello'?cartLines().length:0;
   return`<nav class="nav n${tabs.length}" aria-label="Sezioni"><div class="nav-brand"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div>${tabs.map(t=>{const b=t.b?t.b():0;return`<button type="button" data-a="tab" data-v="${t.id}" ${S.tab===t.id?'aria-current="page"':''}>${ic(t.i)}<span>${t.l}</span>${b?`<span class="badge">${b>99?'99+':b}</span>`:''}</button>`}).join('')}</nav>
-  <main class="main"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}
+  <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${testBar()}${V[S.tab](me)}</main>`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}`;
 }
+// Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
+const cartBar=n=>`<div class="cartbar"><button type="button" class="btn primary big block" data-a="tab" data-v="carrello">${ic('cart')}<span>${n} ${n===1?'articolo':'articoli'} · Invia allo chef</span>${ic('chev')}</button></div>`;
 function testBar(){
   const u=realU();if(!isDev(u))return'';
   return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['staff','Staff'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
@@ -846,31 +905,50 @@ function vCatalogo(me){
   const ps=prods();
   if(!ps.length)return`<h1 class="vt">Cosa serve?</h1>`+empty('store','Il catalogo è vuoto','Lo chef deve ancora caricare i listini dei fornitori. Intanto puoi chiedere un prodotto scrivendolo qui sotto.')+catSearch([])+`<div id="results">${catResults()}</div>`;
   const cats=[...new Set(ps.map(p=>p.categoria||'Altro'))].sort((a,b)=>CATS.indexOf(a)-CATS.indexOf(b));
-  return`<h1 class="vt">Cosa serve?</h1><p class="vsub">Cerca, scegli il fornitore e aggiungi al carrello.</p>${catSearch(cats)}<div id="results">${catResults()}</div>`;
+  return`<h1 class="vt">Cosa serve?</h1>${isMgr(me)?'<p class="vsub">Cerca, scegli il fornitore e aggiungi al carrello.</p>':stepsHint()}${catSearch(cats)}<div id="results">${catResults()}</div>`;
 }
+const stepsHint=()=>`<ol class="steps3" aria-label="Come si fa"><li><b>1</b>Cerca</li><li><b>2</b>Premi +</li><li><b>3</b>Invia allo chef</li></ol>`;
 function catSearch(cats){
-  return`<div class="search">${ic('search')}<input id="q" type="search" placeholder="Prodotto, codice o fornitore" value="${esc(S.q)}" data-in="q" autocomplete="off" enterkeyhint="search"><button type="button" class="icon-btn" data-a="qclear" aria-label="Svuota ricerca">${ic('x')}</button></div>
+  return`<div class="search">${ic('search')}<input id="q" type="search" placeholder="${isMgr(meU())?'Prodotto, codice o fornitore':'Cerca un prodotto, es. zucchero'}" value="${esc(S.q)}" data-in="q" autocomplete="off" enterkeyhint="search"><button type="button" class="icon-btn" data-a="qclear" aria-label="Svuota ricerca">${ic('x')}</button></div>
   ${cats.length?`<div class="chips" role="group" aria-label="Categorie"><button type="button" class="chip" aria-pressed="${!S.cat}" data-a="cat" data-v="">Tutte</button>${cats.map(c=>`<button type="button" class="chip" aria-pressed="${S.cat===c}" data-a="cat" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>`:''}`;
 }
+// Quante volte l'utente ha chiesto ogni prodotto (una volta per richiesta) e quando l'ultima volta.
+function usualOf(me){const m=new Map();for(const r of Object.values(D().richieste)){if(r.utenteId!==me.id)continue;const seen=new Set();for(const it of r.items||[]){if(!it.pid||seen.has(it.pid))continue;seen.add(it.pid);const x=m.get(it.pid)||{n:0,t:0};x.n++;x.t=Math.max(x.t,r.creato||0);m.set(it.pid,x)}}return m}
 function catResults(){
   const me=meU();const sp=showPrices();const q=norm(S.q);const toks=q?q.split(' '):[];
-  let list=prods();let title='';
+  const U=usualOf(me);let list=prods();let title='',keep=false;
   if(toks.length)list=list.filter(p=>{const h=norm(p.nome+' '+(p.codice||'')+' '+forn(p.fornitoreId).nome+' '+(p.categoria||''));return toks.every(t=>h.includes(t))});
   if(S.cat)list=list.filter(p=>(p.categoria||'Altro')===S.cat);
+  const hit=new Set(list.map(p=>p.id));
   if(!toks.length&&!S.cat){
-    const seen=new Set();const mine=Object.values(D().richieste).filter(r=>r.utenteId===me.id).sort((a,b)=>b.creato-a.creato);
-    const rec=[];for(const r of mine)for(const it of r.items||[])if(it.pid&&!seen.has(it.pid)&&D().prodotti[it.pid]){seen.add(it.pid);rec.push(D().prodotti[it.pid])}
-    if(rec.length){list=rec.slice(0,12);title='Ordinati di recente'}else{list=list.slice().sort(byNome).slice(0,40);title='Tutti i prodotti'}
+    const rec=[...U.entries()].filter(([pid])=>D().prodotti[pid]).sort((a,b)=>b[1].n-a[1].n||b[1].t-a[1].t).slice(0,12).map(([pid])=>D().prodotti[pid]);
+    if(rec.length){list=rec;title='I tuoi soliti';keep=true}else{list=list.slice().sort(byNome).slice(0,40);title='Tutti i prodotti'}
   }
   const groups=new Map();
   for(const p of list){const k=gkey(p.nome);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(p)}
   if(toks.length||S.cat){for(const [k,arr] of groups){for(const p of S.gidx.get(k)||[])if(!arr.includes(p))arr.push(p)}}
-  const arr=[...groups.values()].sort((a,b)=>byNome(a[0],b[0])).slice(0,80);
+  let arr=[...groups.values()];if(!keep)arr.sort((a,b)=>byNome(a[0],b[0]));arr=arr.slice(0,80);
   let html='';
   if(title)html+=`<h2 class="sec">${title}</h2>`;
-  if(arr.length)html+=`<div class="panel">${arr.map(g=>groupHTML(g,sp)).join('')}${toks.length?freeRow():''}</div>`;
+  if(arr.length)html+=`<div class="panel">${arr.map(g=>isMgr(me)?groupHTML(g,sp):staffGroup(g,U,hit)).join('')}${toks.length?freeRow():''}</div>`;
   else if(toks.length)html+=`<div class="panel">${freeRow(true)}</div>`;
   return html;
+}
+// Staff: l'opzione che aggiunge il "+": quella già nel carrello, altrimenti (tra quelle che corrispondono alla ricerca)
+// la più economica se ci sono i prezzi, poi quella che l'utente ha chiesto più spesso, poi la prima.
+function defOpt(items,U,hit){
+  const c=items.find(p=>cartQty(p.id));if(c)return c;
+  const pool=items.some(p=>hit&&hit.has(p.id))?items.filter(p=>hit.has(p.id)):items;
+  const pr=pool.filter(p=>p.prezzo!=null).sort((a,b)=>a.prezzo-b.prezzo);if(pr.length)return pr[0];
+  let b=null;for(const p of pool){const x=U.get(p.id);if(x&&(!b||x.n>U.get(b.id).n))b=p}
+  return b||pool[0];
+}
+// Staff: una riga per prodotto, senza scelta del fornitore (lo chef può cambiarlo quando approva).
+function staffGroup(items,U,hit){
+  const p=defOpt(items,U,hit);const q=cartQty(p.id);
+  const title=items.map(x=>x.nome).sort((a,b)=>a.length-b.length)[0];
+  return`<div class="pg one"><div class="opt"><div class="opt-i"><div class="pg-t">${esc(title)}</div>${p.nome!==title?`<div class="opt-n">${esc(p.nome)}</div>`:''}<div class="pg-c">${esc(p.categoria||'Altro')}${p.unita?' · '+esc(p.unita):''}</div></div>
+  ${q?stepper('c',p.id,q,`data-p="${p.id}"`):`<button type="button" class="add" data-a="cadd" data-p="${p.id}" aria-label="Aggiungi ${esc(title)}">${ic('plus')}</button>`}</div></div>`;
 }
 function groupHTML(items,sp){
   items=items.slice().sort((a,b)=>(a.prezzo??1e9)-(b.prezzo??1e9));
@@ -892,11 +970,12 @@ function vCarrello(me){
   if(!lines.length)return`<h1 class="vt">Carrello</h1>`+empty('cart','Il carrello è vuoto','Cerca i prodotti che servono in cucina o in sala e aggiungili qui.',`<button type="button" class="btn primary" data-a="tab" data-v="catalogo">${ic('search')} Vai al catalogo</button>`);
   const g=new Map();for(const l of lines){if(!g.has(l.fid))g.set(l.fid,[]);g.get(l.fid).push(l)}
   let tot=0;for(const l of lines)if(l.p&&l.p.prezzo!=null)tot+=l.p.prezzo*l.qta;
-  const nf=[...g.keys()].filter(Boolean).length;
-  return`<h1 class="vt">Carrello</h1><p class="vsub">${lines.length} ${lines.length===1?'articolo':'articoli'}${nf?` da ${nf} ${nf===1?'fornitore':'fornitori'}`:''}. Controlla le quantità e invia allo chef.</p>
-  <div class="panel">${[...g.entries()].map(([fid,ls])=>`<div class="fsec"><div class="fsec-h"><span class="sup" style="--c:${fcolor(fid)}"><i></i>${fid?esc(forn(fid).nome):'Fuori listino, lo assegna lo chef'}</span><span class="muted small">${ls.length}</span></div>
-  ${ls.map(l=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(l.libero?l.nome:l.p.nome)}</div>${l.libero?`<input class="inp unit-inp" id="cu-${l.pid}" value="${esc(l.unita||'')}" placeholder="unità" data-ch="cunit" data-p="${l.pid}" aria-label="Unità">`:`<div class="ln-m">${l.p.codice?'cod. '+esc(l.p.codice):''}${sp&&l.p.prezzo!=null?` ${eur(l.p.prezzo)}${l.p.unita?' / '+esc(l.p.unita):''}`:(l.p.unita?' '+esc(l.p.unita):'')}</div>`}</div>
-  ${stepper('c',l.pid,l.qta,`data-p="${l.pid}"`)}<button type="button" class="icon-btn" data-a="crm" data-p="${l.pid}" aria-label="Rimuovi">${ic('trash')}</button></div>`).join('')}</div>`).join('')}
+  const nf=[...g.keys()].filter(Boolean).length;const staff=!isMgr(me);
+  const lineH=l=>`<div class="line${staff?' big':''}"><div class="ln-i"><div class="ln-n">${esc(l.libero?l.nome:l.p.nome)}${l.libero&&staff?' <span class="tag">fuori listino</span>':''}</div>${l.libero?`<input class="inp unit-inp" id="cu-${l.pid}" value="${esc(l.unita||'')}" placeholder="unità" data-ch="cunit" data-p="${l.pid}" aria-label="Unità">`:`<div class="ln-m">${l.p.codice&&!staff?'cod. '+esc(l.p.codice):''}${sp&&l.p.prezzo!=null?` ${eur(l.p.prezzo)}${l.p.unita?' / '+esc(l.p.unita):''}`:(l.p.unita?' '+esc(l.p.unita):'')}</div>`}</div>
+  ${stepper('c',l.pid,l.qta,`data-p="${l.pid}"`)}<button type="button" class="icon-btn" data-a="crm" data-p="${l.pid}" aria-label="Rimuovi">${ic('trash')}</button></div>`;
+  return`<h1 class="vt">Carrello</h1><p class="vsub">${lines.length} ${lines.length===1?'articolo':'articoli'}${nf&&!staff?` da ${nf} ${nf===1?'fornitore':'fornitori'}`:''}. ${staff?'Controlla le quantità e premi «Invia allo chef».':'Controlla le quantità e invia allo chef.'}</p>
+  <div class="panel">${staff?`<div class="fsec">${lines.map(lineH).join('')}</div>`:[...g.entries()].map(([fid,ls])=>`<div class="fsec"><div class="fsec-h"><span class="sup" style="--c:${fcolor(fid)}"><i></i>${fid?esc(forn(fid).nome):'Fuori listino, lo assegna lo chef'}</span><span class="muted small">${ls.length}</span></div>
+  ${ls.map(lineH).join('')}</div>`).join('')}
   ${sp&&tot?`<div class="total"><span>Totale stimato</span><b>${eur(tot)}</b></div>`:''}</div>
   <label class="lbl" for="cart-note">Nota per lo chef</label><textarea id="cart-note" class="inp" rows="2" placeholder="Es. serve per il servizio di stasera" data-in="cnote">${esc(S.cnote)}</textarea>
   <div class="cart-foot" style="margin-top:16px"><button type="button" class="btn primary block big" data-a="csend">${ic('send')} Invia allo chef</button></div>`;
@@ -905,12 +984,33 @@ async function sendCart(){
   const me=meU();const lines=cartLines();if(!lines.length)return;
   const items=lines.map(l=>l.libero?{libero:true,nome:l.nome,qta:l.qta,unita:l.unita||'pz',fornitoreId:'',fornitoreNome:'',codice:'',prezzo:null}
     :{pid:l.p.id,nome:l.p.nome,codice:l.p.codice||'',unita:l.p.unita||'',prezzo:l.p.prezzo??null,fornitoreId:l.p.fornitoreId,fornitoreNome:forn(l.p.fornitoreId).nome,qta:l.qta});
+  const dup=findDoppi(items,me);
+  if(dup.length){
+    const L=dup.slice(0,5).map(d=>`${d.nome}: chiesto da ${d.self?'te':firstName(d.da)} ${quandoAlle(d.quando)} (${d.st})`);if(dup.length>5)L.push('…e altri '+(dup.length-5));
+    if(!await ask('Attenzione: già richiesto',L.join('\n')+'\n\nÈ corretto inviarlo di nuovo?','Sì, invia lo stesso'))return;
+  }
   const id=uid();const nf=new Set(items.map(i=>i.fornitoreId).filter(Boolean)).size;
-  await put('richieste',id,{utenteId:me.id,utenteNome:fullName(me),reparto:me.reparto||'altro',mansione:me.mansione||'',items,nota:S.cnote.trim(),stato:'inviata',creato:now()});
-  await notify('gm','Nuova richiesta da '+me.nome,`${REPARTI[me.reparto]||''}, ${items.length} ${items.length===1?'articolo':'articoli'}${nf?' da '+nf+(nf===1?' fornitore':' fornitori'):''}`,'richiesta',id);
+  const doc={utenteId:me.id,utenteNome:fullName(me),reparto:me.reparto||'altro',mansione:me.mansione||'',items,nota:S.cnote.trim(),stato:'inviata',creato:now()};
+  if(dup.length)doc.doppi=dup.map(d=>({nome:d.nome,da:d.da,quando:d.quando}));
+  await put('richieste',id,doc);
+  await notify('gm','Nuova richiesta da '+me.nome,`${REPARTI[me.reparto]||''}, ${items.length} ${items.length===1?'articolo':'articoli'}${nf?' da '+nf+(nf===1?' fornitore':' fornitori'):''}${dup.length?' (possibile doppione)':''}`,'richiesta',id);
   S.cart=[];saveCart();S.cnote='';S.tab='miei';render();window.scrollTo(0,0);
   openSheet({render:()=>`<div class="grab"></div><div class="done">${ic('check','big')}<h2>Inviato allo chef</h2><p class="muted">Riceverai una notifica quando approva o rifiuta la richiesta.</p><div class="btns col"><button type="button" class="btn primary block" data-a="logout">${ic('logout')} Esci dal profilo</button><button type="button" class="btn ghost block" data-a="closeSheet">Continua</button></div></div>`});
 }
+
+// Richieste delle ultime 24 ore (non rifiutate, di chiunque) con lo stesso prodotto: stesso pid o un'alternativa
+// dello stesso gruppo (lo chef può aver cambiato fornitore), oppure stesso nome per i prodotti scritti a mano.
+function findDoppi(items,me){
+  const since=now()-864e5,out=[],seen=new Set();
+  const rs=Object.values(D().richieste).filter(r=>(r.creato||0)>=since&&r.stato!=='rifiutata').sort((a,b)=>b.creato-a.creato);
+  for(const x of items){
+    const p=x.pid&&D().prodotti[x.pid];const ids=new Set(p?(S.gidx.get(gkey(p.nome))||[]).map(q=>q.id):[]);if(x.pid)ids.add(x.pid);const nn=norm(x.nome);
+    for(const r of rs){if(seen.has(nn+'|'+r.id))continue;
+      if((r.items||[]).some(it=>(it.pid&&ids.has(it.pid))||norm(it.nome)===nn)){seen.add(nn+'|'+r.id);out.push({nome:x.nome,da:r.utenteNome||'',self:r.utenteId===me.id,quando:r.creato,st:reqStatus(r)[1].toLowerCase()})}}
+  }
+  return out;
+}
+function quandoAlle(t){const d=new Date(t),td=new Date(),y=new Date(td);y.setDate(td.getDate()-1);const hm=d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});return(d.toDateString()===td.toDateString()?'oggi':d.toDateString()===y.toDateString()?'ieri':d.toLocaleDateString('it-IT',{day:'numeric',month:'short'}))+' alle '+hm}
 
 /* ================= requests readonly ================= */
 function reqStatus(r){
@@ -959,7 +1059,7 @@ function closeSheet(instant){const o=sheets.pop();if(!o)return;if(o.onClose)o.on
 function toast(msg,kind){const t=document.createElement('div');t.className='toast '+(kind||'');t.textContent=msg;$('#toasts').appendChild(t);requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('in')));setTimeout(()=>{t.classList.remove('in');setTimeout(()=>t.remove(),300)},kind==='err'?5200:3400)}
 function ask(title,text,ok,danger,input){
   return new Promise(res=>{let done=false;S.askVal=input&&input.value||'';
-    openSheet({onClose:()=>{if(!done)res(false)},render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(title)}</div></div>${text?`<p class="muted" style="margin-top:0">${esc(text)}</p>`:''}
+    openSheet({onClose:()=>{if(!done)res(false)},render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(title)}</div></div>${text?`<p class="muted" style="margin-top:0;white-space:pre-line">${esc(text)}</p>`:''}
     ${input?`<label class="lbl" for="ask-in">${esc(input.label)}</label><input class="inp" id="ask-in" value="${esc(S.askVal)}" data-in="askv" placeholder="${esc(input.ph||'')}">`:''}
     <div class="btns" style="margin-top:20px"><button type="button" class="btn ghost" data-a="closeSheet">Annulla</button><button type="button" class="btn ${danger?'dark':'primary'}" id="ask-ok">${esc(ok)}</button></div>`});
     $('#ask-ok').onclick=()=>{done=true;const v=S.askVal;closeSheet();res(input?{v}:true)};
@@ -997,6 +1097,7 @@ function reqCard(r){
   return`<article class="panel">
   <header class="req-h">${avatar(u,46)}<div class="req-who"><div class="req-n">${esc(r.utenteNome)}</div><div class="req-m">${esc([r.mansione,REPARTI[r.reparto]].filter(Boolean).join(', '))}</div></div><time class="req-t">${ago(r.creato)}</time></header>
   ${r.nota?`<p class="req-note">${esc(r.nota)}</p>`:''}
+  ${r.doppi&&r.doppi.length?`<div class="banner dup" role="note">${ic('warn')}<div><b>Possibile doppione.</b> Già chiesto nelle ultime 24 ore:<ul>${r.doppi.slice(0,5).map(d=>`<li>${esc(d.nome)}: chiesto da ${esc(d.da||'?')} ${esc(quandoAlle(d.quando))}</li>`).join('')}</ul>Decidi tu se ordinarlo di nuovo.</div></div>`:''}
   ${groupByF(items).map(([fid,its])=>{const f=forn(fid);const m=fid&&METODI[f.metodo];return`<div class="fsec"><div class="fsec-h"><span class="sup" style="--c:${fcolor(fid)}"><i></i>${fid?esc(f.nome):'Fuori listino, scegli il fornitore'}</span>${m?`<span class="muted small">${ic(m.i)} ${m.l}</span>`:''}</div>${its.map(it=>gmLine(r.id,it)).join('')}</div>`}).join('')}
   ${items.length?'':'<p class="muted" style="padding:0 16px">Hai tolto tutti gli articoli: puoi rifiutare la richiesta.</p>'}
   ${tot?`<div class="total"><span>Totale stimato</span><b>${eur(tot)}</b></div>`:''}
