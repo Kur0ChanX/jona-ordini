@@ -36,6 +36,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante.
      - Non sono stati eseguiti comandi distruttivi (`rm -rf`, `pkill`, `kill`, `git reset --hard`, `git clean -fd`).
   4. Se TUTTE le condizioni sono vere: avvisami che il file è pronto e chiedimi esplicitamente il permesso di aprire la nuova sessione. NON usare il tool `Create Session` in autonomia. Attendi la mia risposta "Sì, procedi" o "No, aspetta".
   5. Se ANCHE UNA SOLA condizione è falsa: FERMATI immediatamente. Scrivimi in 1-2 righe cosa è andato storto e attendi il mio intervento.
+- PROMEMORIA AUTOMATICO: `.claude/hooks/handoff-check.py` (hook `UserPromptSubmit` in `.claude/settings.json`) conta i messaggi e legge il contesto usato; dal 20° messaggio o all'80% inserisce l'avviso «PROTOCOLLO DI HANDOFF ATTIVATO», poi lo ripete ogni 5 messaggi. Quando compare, va applicato subito.
 - DIVIETO ASSOLUTO DI COMANDI DISTRUTTIVI: Non eseguire MAI `rm -rf`, `pkill`, `kill`, `git reset --hard`, `git clean -fd` o simili in autonomia. Se ritieni necessario eseguirli, FERMATI e chiedi la mia autorizzazione esplicita.
 - GESTIONE ERRORI: Se un comando Git o Bash fallisce, FERMATI immediatamente. Non tentare comandi di riparazione automatica. Riporta l'errore esatto e attendi istruzioni.
 
