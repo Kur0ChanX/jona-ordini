@@ -42,6 +42,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 
 ## Regole di lavoro
 - Ad OGNI versione cambia `CACHE` in `sw.js`.
+- Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
 - Prove: `tools/README.md` (server locale, Playwright con Chromium `/opt/pw-browsers/chromium`, emulatore Firebase con `localStorage.jona_fb_emu`).
 - Interfaccia dello staff a prova di principiante: parole semplici, pulsanti grandi.
 - Pubblicazione: branch → PR → squash merge → controllo online → `git checkout -B <branch> origin/main`.
