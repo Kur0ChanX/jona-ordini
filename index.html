@@ -100,6 +100,30 @@ img{max-width:100%}
 .icon-btn:hover{background:var(--sunk)}
 .icon-btn.danger{color:var(--corallo)}
 .bell .dot{position:absolute;top:3px;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--corallo);color:#fff;font:600 11px/18px var(--font);text-align:center}
+/* novità: chip piccola nell'intestazione, contatore più piccolo di quello della campanella */
+.news-btn{flex:none;position:relative;display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 10px 0 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink2);font:400 13px/1 var(--font)}
+.news-btn:hover{background:var(--sunk)}
+.news-btn .ic{width:16px;height:16px;color:var(--ocra)}
+.news-n{position:absolute;top:-6px;right:-6px;min-width:15px;height:15px;padding:0 4px;border-radius:8px;background:var(--lagoon);color:var(--on-lagoon);font:600 9.5px/15px var(--font);text-align:center}
+html.staff-ui .news-btn{height:36px;font-size:14px}
+html.staff-ui .news-btn .ic{width:18px;height:18px}
+/* poco spazio (schermi stretti o «Senza rete» visibile): solo l'icona; la scritta «Senza rete» può andare su due righe */
+@media (max-width:520px){.top:has(.sync-pill) .news-btn{width:34px;padding:0;justify-content:center}.top:has(.sync-pill) .news-l{display:none}}
+.top .sync-pill{min-width:0;white-space:normal;line-height:1.15}
+@media (max-width:360px){.top{gap:6px}.top .mark{display:none}.news-btn,html.staff-ui .news-btn{width:34px;padding:0;justify-content:center}.news-l{display:none}}
+.news-v{padding:16px 2px 18px;border-top:1px solid var(--line)}
+.news-h{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;font-size:13.5px;color:var(--muted)}
+.news-vn{font-weight:500;color:var(--ink2)}
+.news-new{font:500 11.5px/1 var(--font);padding:4px 8px;border-radius:999px;background:var(--lagoon-soft);color:var(--lagoon)}
+.news-t{font:400 19px/1.3 var(--font);margin:4px 0 6px}
+.news-v ul{margin:6px 0 0;padding-left:20px}
+.news-v li{margin:6px 0;line-height:1.45}
+.news-dev{margin-top:12px;padding:12px 14px 10px;border-radius:12px;background:var(--sunk);border:1px solid var(--line);font-size:14px}
+.news-dev h4{margin:12px 0 0;font:500 12px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.news-dev h4:first-child{margin-top:0}
+.news-dev ul{margin-top:2px}
+.news-dev code{font:12.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:0 4px;overflow-wrap:anywhere}
+html.staff-ui .news-v li{font-size:17px}
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--surface) 90%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
 .nav-brand{display:none}
 .nav button{flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0 4px;border:0;background:none;color:var(--muted);font:400 11.5px/1.2 var(--font);position:relative;border-radius:12px}
@@ -635,6 +659,47 @@ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 
 };
 const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
 
+/* ================= novità (versioni) =================
+   Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
+   tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
+const APP_VER=7;
+const NEWS=[
+  {v:7,data:'2026-10-03',titolo:'Ordine a voce e Novità',
+    tutti:['Puoi ordinare con la voce: premi il microfono e di\' per esempio «4 kg pomodori da Fratelli Mariano». Poi controlli e confermi.','Nuova sezione «Novità»: qui trovi cosa cambia nell\'app a ogni aggiornamento.'],
+    chef:['In Storico c\'è «Consumi e costi»: quanto hai speso e quanta merce è arrivata, per periodo, fornitore, reparto e prodotto (per esempio «riso»), con grafico e file Excel.'],
+    dev:{aggiunte:['Ordine con la voce: Web Speech API (`it-IT`), parser di quantità, unità, prodotto e fornitore, conferma prima di aggiungere al carrello; campo di testo se il telefono non ha il riconoscimento vocale.','Report «Consumi e costi» (funzioni `rp*`): quantità arrivate se la consegna è controllata, altrimenti quelle ordinate; grafico SVG; Excel con due fogli.','`S.db.range(collezione,campo,da,a)` in `LocalStore` e `FirebaseStore`: con più di 300 ordini il resoconto scarica dal database quelli più vecchi (`rpOrders`, `rpOld`).','Novità: `NEWS` e `APP_VER` in `index.html`, contatore per ruolo (`newsFor`, `newsCount`, `newsSheet`), ultima versione vista in `jona_news_<id>` (profilo vero, `realU()`); il ruolo mostrato segue `meU()`, così la vista Test fa vedere cosa vedono gli altri.']}},
+  {v:6,data:'2026-10-03',titolo:'Copie automatiche',
+    chef:['Ogni giorno l\'app salva da sola una copia di tutti i dati e la tiene per 14 giorni.','In Impostazioni → Copie automatiche puoi scaricare una copia o ripristinarla. Funziona solo con il database centrale.'],
+    dev:{aggiunte:['Collezione `backup`: ogni copia è divisa in pezzi da 300.000 caratteri (sotto il limite di 1 MB per documento).','`autoBackup` (una volta al giorno, dal primo telefono di chi gestisce; giorno in `jona_bk`), `bkSheet` (lista, scarica, ripristina), `BK_DAYS` = 14 con pulizia delle copie più vecchie.','Regole `firebase/firestore.rules` aggiornate per `backup`.','Prova `tools/test-firebase-backup.mjs`.'],
+      correzioni:['`today()` accetta una data.','`firebase.json` spostato nella radice: l\'emulatore non accettava le regole fuori dalla cartella.']}},
+  {v:5,data:'2026-10-03',titolo:'Più semplice per lo staff',
+    tutti:['Pulsanti e scritte più grandi.','Un solo «+» per prodotto: il fornitore lo sceglie l\'app (lo chef può cambiarlo).','Il pulsante «Invia allo chef» è sempre in basso.','«I tuoi soliti»: in cima al catalogo trovi i prodotti che chiedi più spesso.','Se un prodotto è già stato chiesto nelle ultime 24 ore, l\'app te lo dice prima di inviare.'],
+    chef:['Nelle richieste compare l\'avviso «possibile doppione».','Ora limite per ogni fornitore, con un promemoria un\'ora prima.','In Storico c\'è il riepilogo della settimana.'],
+    dev:{aggiunte:['`staffGroup`, `defOpt` (fornitore scelto in automatico), `cartBar`, `stepsHint`, `usualOf` (soliti).','`findDoppi`: la richiesta salva il campo `doppi`.','`oraLimite`, `dlInfo`, `dlBadge`, `deadlineTick` (un promemoria al giorno per fornitore, in `jona_rem`).','Dati di prova: `makeTestData` / `delTestData` (id `test_…`).','`weekSummary` in Storico.','Prove automatiche in `tools/`.'],
+      correzioni:['`ask()` mantiene gli a capo del testo.','La barra del carrello sta sopra il menu anche sugli schermi larghi.']}},
+  {v:4,data:'2026-10-03',titolo:'Stessi dati su tutti i telefoni',
+    tutti:['L\'app funziona anche senza rete: le richieste partono da sole quando torna la connessione. In alto compare «Senza rete».','Per collegare il telefono basta inquadrare il QR code dello chef.'],
+    chef:['Appena il database centrale (Firebase) è collegato, tutti i telefoni vedono gli stessi dati.','Impostazioni → Database centrale: Attiva, Invita (QR code e link), Scollega.'],
+    dev:{aggiunte:['`FirebaseStore`: Firestore compat 10.14.1 in `lib/`, copia offline con `enablePersistence`.','Prodotti in `listini/<fornitore>` (campo `p.<id>`) con scritture accorpate (`lFlush`).','Accesso anonimo + chiave del ristorante: `chiave/ristorante`, `membri`, `pubblico/stato`; regole in `firebase/firestore.rules`.','Schermate «Collega questo telefono» e «Accesso non valido»; `syncPill` nell\'intestazione.','Ripristino di un backup su tutti i telefoni.','Guida `docs/FIREBASE.md`.'],
+      risolti:['I telefoni non condividevano i dati.','Il QR code si crea sul telefono (`lib/qrcode-1.4.4.js`): funziona anche senza rete.']}},
+  {v:3,data:'2026-10-03',titolo:'Foto dei listini con Gemini',
+    chef:['In Fornitori → Importa puoi scattare o scegliere le foto del listino, anche più pagine: Gemini le trascrive.','Senza chiave mandi le foto all\'app Gemini e poi incolli la risposta.'],
+    dev:{aggiunte:['Vista «Staff» nella barra Test.','`gemRun`: prova `gemini-flash-latest`, poi `gemini-2.5-flash`; chiave in `jona_gemini_key`, solo sul telefono.','`shrinkImg`: foto ridotte a 2000 px in JPEG.','`gemShare`: foto mandate all\'app Gemini con Web Share.'],
+      correzioni:['Al cambio di vista nella barra Test il carrello si ricarica.']}},
+  {v:2,data:'2026-10-03',titolo:'Prove per lo sviluppatore',
+    dev:{aggiunte:['Barra «Test» con Admin Chef / Sviluppatore: `VIEW_AS`, `meU()` sostituisce il ruolo, `realU()` resta il profilo vero; scelta ricordata in `jona_viewas`. Il profilo salvato non cambia.']}},
+  {v:1,data:'2026-10-03',titolo:'Schermo intero',
+    tutti:['L\'app installata si apre a schermo intero.'],
+    dev:{aggiunte:['`display: fullscreen` e `display_override` in `manifest.webmanifest`.'],
+      correzioni:['Cache `jona-ordini-v4` in `sw.js`: per vedere il cambio bisogna reinstallare l\'app.'],
+      risolti:['Nell\'app installata si vedeva la barra in alto (indirizzo del sito, barra del telefono).']}},
+  {v:0,data:'2026-10-03',titolo:'Prima versione',
+    tutti:['Cerchi i prodotti nel catalogo, li metti nel carrello e li mandi allo chef.','In «I miei ordini» vedi se la richiesta è approvata, ordinata o arrivata.','In «Arrivi» controlli la merce che arriva.'],
+    chef:['Approvi o rifiuti le richieste, anche cambiando quantità e fornitore.','In «Invii» gli ordini sono già divisi per fornitore e partono come preferisce ognuno: WhatsApp, email, sito, telefono, modulo compilato, Excel, Word o PDF.','Controllo delle consegne con la foto della bolla e le differenze.','Fornitori e listini: Excel/CSV, fattura elettronica XML o tabella di Gemini incollata.','Profili dello staff da approvare.','Storico degli ordini.'],
+    dev:{aggiunte:['Tutta l\'app in un solo file `index.html`.','`LocalStore`: dati in localStorage (`jona_db_v2`).','Service worker «prima la rete» (`sw.js`), manifest e icone.','Dati iniziali: Metro, F.lli Mariano, DAC, Dolpa, Nieddittas, Pascucci Caffè.'],
+      noti:['I dati restavano solo sul telefono (risolto nella versione 4).','Nell\'app installata si vedeva la barra del browser (risolto nella versione 1).']}}
+];
+
 /* ================= constants ================= */
 const REPARTI={cucina:'Cucina',sala:'Sala',altro:'Altro'};
 const MANSIONI=['Chef','Sous chef','Cuoco','Commis','Pasticcere','Lavapiatti','Maître','Cameriere','Sommelier','Barman','F&B manager','Altro'];
@@ -1025,7 +1090,7 @@ function shell(me){
   const V={catalogo:vCatalogo,carrello:vCarrello,miei:vMiei,arrivi:vArrivi,richieste:vRichieste,invii:vInvii,fornitori:vFornitori,staff:vStaff,storico:vStorico};
   const nc=!isMgr(me)&&S.tab!=='carrello'?cartLines().length:0;
   return`<nav class="nav n${tabs.length}" aria-label="Sezioni"><div class="nav-brand"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div>${tabs.map(t=>{const b=t.b?t.b():0;return`<button type="button" data-a="tab" data-v="${t.id}" ${S.tab===t.id?'aria-current="page"':''}>${ic(t.i)}<span>${t.l}</span>${b?`<span class="badge">${b>99?'99+':b}</span>`:''}</button>`}).join('')}</nav>
-  <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}
+  <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
   <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?'':micBtn()}`;
 }
@@ -2074,6 +2139,23 @@ async function delTestData(){
 }
 
 /* ================= notifiche, menu, impostazioni ================= */
+/* novità: versioni visibili al ruolo mostrato (meU), ultima vista salvata per il profilo vero (realU) */
+const NEWS_DEV=[['aggiunte','Aggiunte'],['correzioni','Correzioni'],['risolti','Problemi risolti'],['noti','Problemi noti']];
+function newsFor(me){const lv=isDev(me)?2:isGM(me)?1:0;return NEWS.map(n=>{const it=(n.tutti||[]).concat(lv>=1&&n.chef||[]);const d=lv>=2&&n.dev||{};return{v:n.v,data:n.data,titolo:n.titolo,it,tech:NEWS_DEV.filter(([k])=>d[k]&&d[k].length).map(([k,l])=>[l,d[k]])}}).filter(n=>n.it.length||n.tech.length)}
+function newsSeen(){const u=realU();if(!u)return APP_VER;const k='jona_news_'+u.id;const v=ls(k);if(typeof v==='number')return v;ls(k,APP_VER-1);return APP_VER-1}
+const newsCount=me=>{const s=newsSeen();return newsFor(me).filter(n=>n.v>s).length};
+const newsBtn=me=>{const n=newsCount(me);return`<button type="button" class="news-btn" data-a="news" aria-label="Novità${n?', '+n+' da vedere':''}">${ic('sparkle')}<span class="news-l">Novità</span>${n?`<span class="news-n">${n>9?'9+':n}</span>`:''}</button>`};
+const newsDay=s=>{const [y,m,d]=String(s).split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})};
+const newsTx=s=>esc(s).replace(/`([^`]+)`/g,'<code>$1</code>');
+function newsSheet(){
+  const me=meU(),u=realU(),seen=newsSeen(),list=newsFor(me);
+  if(u)ls('jona_news_'+u.id,APP_VER);
+  openSheet({cls:'tall',render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Novità</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <p class="muted" style="margin-top:0">Cosa è cambiato nell'app, dalla versione più nuova.</p>
+  ${list.map(n=>`<section class="news-v"><div class="news-h"><span class="news-vn">Versione ${n.v}</span><span class="news-d">${newsDay(n.data)}</span>${n.v>seen?'<span class="news-new">nuova</span>':''}</div><h3 class="news-t">${esc(n.titolo)}</h3>
+  ${n.it.length?`<ul class="news-ul">${n.it.map(x=>`<li>${newsTx(x)}</li>`).join('')}</ul>`:''}${n.tech.length?`<div class="news-dev">${n.tech.map(([l,a])=>`<h4>${l}</h4><ul>${a.map(x=>`<li>${newsTx(x)}</li>`).join('')}</ul>`).join('')}</div>`:''}</section>`).join('')||'<p class="muted">Nessuna novità.</p>'}`});
+  render();
+}
 function notifSheet(){
   const me=meU();const unread=myNotifs(me).filter(n=>!n.letta);
   const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock'};
@@ -2413,6 +2495,7 @@ const A={
   photoLib:()=>pickFile({accept:'image/*'},setPhoto),
   tab:d=>{S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
   notifs:()=>notifSheet(),
+  news:()=>newsSheet(),
   meMenu:()=>meMenu(),
   reload:()=>location.reload(),
   fbJoin:()=>fbJoinKey(S.joinK),

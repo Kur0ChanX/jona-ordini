@@ -38,10 +38,11 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - Import listini: Excel/CSV, fattura XML, tabella incollata, foto lette da Gemini (chiave in `jona_gemini_key`, solo sul telefono).
 
 ## Chiavi in localStorage
-`jona_db_v2` (dati locali), `jona_me` (profilo entrato), `jona_cart_<id>`, `jona_viewas`, `jona_theme`, `jona_key` (chiave del ristorante: segreta, mai nel codice né nei commit), `jona_member`, `jona_fb` (configurazione incollata a mano), `jona_fb_upload`, `jona_gemini_key` (segreta), `jona_rem`, `jona_bk` (giorno dell'ultima copia automatica).
+`jona_db_v2` (dati locali), `jona_me` (profilo entrato), `jona_cart_<id>`, `jona_viewas`, `jona_theme`, `jona_key` (chiave del ristorante: segreta, mai nel codice né nei commit), `jona_member`, `jona_fb` (configurazione incollata a mano), `jona_fb_upload`, `jona_gemini_key` (segreta), `jona_rem`, `jona_bk` (giorno dell'ultima copia automatica), `jona_news_<id>` (ultima versione vista nelle Novità).
 
 ## Regole di lavoro
 - Ad OGNI versione cambia `CACHE` in `sw.js`.
+- Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
 - Prove: `tools/README.md` (server locale, Playwright con Chromium `/opt/pw-browsers/chromium`, emulatore Firebase con `localStorage.jona_fb_emu`).
 - Interfaccia dello staff a prova di principiante: parole semplici, pulsanti grandi.
 - Pubblicazione: branch → PR → squash merge → controllo online → `git checkout -B <branch> origin/main`.
