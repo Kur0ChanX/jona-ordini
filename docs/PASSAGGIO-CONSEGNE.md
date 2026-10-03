@@ -1,0 +1,27 @@
+# Passaggio di consegne — Jona Ordini (3 ottobre 2026)
+
+## Stato del programma (online su https://kur0chanx.github.io/jona-ordini/, cache `jona-ordini-v8`)
+Pubblicato e provato (PR #1–#5, squash su `main`):
+- App installabile a **schermo intero** (`manifest.webmanifest`: `fullscreen`).
+- Barra **Test** per lo sviluppatore: Admin Chef / Staff / Sviluppatore (`VIEW_AS`, `meU()` sovrascrive il ruolo, `realU()` è il profilo vero).
+- **Foto dei listini con Gemini** (Fornitori → Importa): fotocamera o galleria, più pagine; con la chiave Gemini (`jona_gemini_key`, solo sul telefono) trascrive da sola (`gemRun`, modelli `gemini-flash-latest` poi `gemini-2.5-flash`), senza chiave condivide le foto con l'app Gemini e poi si incolla la risposta.
+- **Database centrale Firebase** (`FirebaseStore`, parte 1): stessa interfaccia di `LocalStore`; copia offline (`enablePersistence`), indicatore «Senza rete, N da inviare»; prodotti in `listini/<fornitore>` (campo `p.<id>`, scritture accorpate in `lFlush`); accesso anonimo + chiave del ristorante (`chiave/ristorante`, `membri/<uid>`, `pubblico/stato`, regole in `firebase/firestore.rules`); Impostazioni → Database centrale: Attiva / Invita (QR locale `lib/qrcode-1.4.4.js`) / Ho un codice / Scollega / Configurazione (incolla `firebaseConfig`, solo sviluppatore). Link d'invito `#k=<chiave>` (+ `&c=<config base64>` se la configurazione non viene da `firebase-config.js`).
+- **Parte 2**: interfaccia staff semplice (`html.staff-ui`, `staffGroup`, `defOpt`, barra `cartBar`, `stepsHint`), «I tuoi soliti» (`usualOf`), avviso doppioni (`findDoppi`, campo `doppi` nella richiesta, banner in `reqCard`), ora limite per fornitore (`oraLimite`, `dlInfo`, `dlBadge`, `deadlineTick` ogni minuto per chi gestisce, chiave `jona_rem`), dati di prova per lo sviluppatore (`makeTestData`, `delTestData`, id `test_…`, campo `test:true`), riepilogo della settimana in Storico (`weekSummary`).
+
+**Firebase NON è ancora configurato**: `firebase-config.js` ha `self.JONA_FIREBASE = null`, quindi per ora ogni telefono usa ancora `LocalStore`. Il telefono di Mario ha già i dati locali (profilo sviluppatore).
+
+## Componenti toccati
+`index.html` (tutto il codice), `sw.js` (cache e `FILES`), `manifest.webmanifest`, `firebase-config.js`, `firebase/firestore.rules`, `lib/` (Firebase compat 10.14.1, QR), `docs/FIREBASE.md` (guida per Mario), `tools/` (prove Playwright + emulatore, vedi `tools/README.md`), `CLAUDE.md`.
+
+## Prossimi passi
+1. **Configurazione Firebase** (aspetta Mario): Mario segue `docs/FIREBASE.md` e manda il blocco `firebaseConfig`. Va scritto in `firebase-config.js` (`self.JONA_FIREBASE = {apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId}`), cambiata la cache in `sw.js`, pubblicato. Poi Mario dal suo telefono: Impostazioni → Database centrale → **Attiva** (carica i suoi dati), poi **Invita** per gli altri telefoni.
+2. **Punto 3, backup automatico** (approvato da Mario, da fare): Firebase gratuito non ha export programmati. Proposta: il primo telefono di chi gestisce che apre l'app ogni giorno salva una copia (`S.db.dump()`) in Firestore, collezione `backup`, documenti `<giorno>_<n>` da massimo ~900 KB (limite 1 MB per documento), tiene 14 giorni; in Impostazioni la lista con Scarica / Ripristina. Va aggiunta `backup` alle collezioni ammesse in `firebase/firestore.rules` (Mario deve ripubblicare le regole: meglio farlo prima che le incolli la prima volta).
+3. **Punto 2, notifiche push** (approvato, serve una scelta di Mario): per mandare una notifica a un telefono chiuso serve un server.
+   - (a) consigliata: piccolo Cloudflare Worker gratuito. Il telefono, dopo `notify()`, chiama il worker con chiave del ristorante e destinatari; il worker manda un Web Push **senza contenuto** firmato VAPID (ES256 con WebCrypto, chiavi generate e salvate nel Durable Object), il service worker riceve l'evento `push`, chiede il testo al worker (`/push/pull` con l'endpoint dell'iscrizione) e mostra la notifica. Un prototipo provato in locale (con wrangler) c'era nella sessione precedente; va riscritto solo per le notifiche. Serve l'account Cloudflare e i segreti `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` nel repository `jona-ordini` (workflow come `triad-server.yml` di raccoon-triad).
+   - (b) Firebase piano Blaze + Cloud Functions + FCM (serve una carta di credito, costi quasi zero).
+4. Dubbi aperti da verificare con l'uso vero:
+   - lo staff vede una riga per gruppo di prodotti (`gkey`: prime due parole): formati diversi (olio 1 l e 5 l) finiscono nella stessa riga e il «+» prende il più economico; lo chef può cambiarlo in approvazione;
+   - l'avviso doppioni confronta anche prodotti dello stesso gruppo (può segnalare formati diversi): è solo una domanda, non blocca;
+   - la barra del carrello dello staff conta su un menu in basso alto 69 px;
+   - due telefoni dello chef aperti nello stesso secondo possono creare due promemoria dell'ora limite.
+5. Idea 6 (avviso sui prezzi cambiati): Mario ha detto «per ora non serve».

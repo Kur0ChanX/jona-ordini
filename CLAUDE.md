@@ -41,6 +41,6 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 
 ## Regole di lavoro
 - Ad OGNI versione cambia `CACHE` in `sw.js`.
-- Prove: server locale (`python3 -m http.server`) + Playwright con Chromium (`/opt/pw-browsers/chromium`). Firebase si prova con l'emulatore (`firebase emulators:start --only firestore,auth --project demo-jona`) e `localStorage.jona_fb_emu = '"127.0.0.1"'`.
+- Prove: `tools/README.md` (server locale, Playwright con Chromium `/opt/pw-browsers/chromium`, emulatore Firebase con `localStorage.jona_fb_emu`).
 - Interfaccia dello staff a prova di principiante: parole semplici, pulsanti grandi.
 - Pubblicazione: branch → PR → squash merge → controllo online → `git checkout -B <branch> origin/main`.
