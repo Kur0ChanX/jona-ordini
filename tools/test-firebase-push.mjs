@@ -8,7 +8,7 @@ const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,heigh
   await c.grantPermissions(['notifications'],{origin:'http://localhost:8765'});
   await c.addInitScript(([cfg,name])=>{localStorage.setItem('jona_fb_emu',JSON.stringify('127.0.0.1'));if(cfg&&!localStorage.getItem('jona_fb'))localStorage.setItem('jona_fb',JSON.stringify(cfg));
     const sub={endpoint:'https://fcm.googleapis.com/fcm/send/'+name,keys:{p256dh:'BX',auth:'Y'},toJSON(){return{endpoint:this.endpoint,keys:this.keys}},unsubscribe:async()=>{window.__sub=null;return true}};
-    Object.defineProperty(navigator,'serviceWorker',{value:{register:async()=>({}),ready:Promise.resolve({pushManager:{getSubscription:async()=>window.__sub||null,subscribe:async()=>window.__sub=sub}})}});
+    Object.defineProperty(navigator,'serviceWorker',{value:{register:async()=>({}),ready:Promise.resolve({pushManager:{getSubscription:async()=>window.__sub||null,subscribe:async()=>{if(window.__fail)throw new DOMException('rifiutato','AbortError');return window.__sub=sub}}})}});
   },[cfg,name]);
   await c.route('https://jona-notifiche.mario-miscera.workers.dev/**',async r=>{const u=r.request().url();
     if(u.endsWith('/chiave'))return r.fulfill({json:{chiave:KEY}});
@@ -60,4 +60,17 @@ await B.fill('input[data-k="u"]','test1');await B.fill('input[data-k="p"]','prov
 ok(await A.evaluate(()=>Object.values(PUSH.subs).some(p=>p.u==='test_u1')),'rientro: iscrizione ripristinata da sola');
 await B.evaluate(()=>A.pushOff());await wait(1500);
 ok(await A.evaluate(()=>Object.keys(PUSH.subs).length===1)&&await B.evaluate(()=>!pushActive()),'Spegni: iscrizione tolta');
+// guida: il telefono rifiuta l'iscrizione → messaggio chiaro e guida aperta
+await B.evaluate(()=>{window.__fail=true;meMenu()});await wait(400);
+ok(await B.isVisible('.ph-link'),'menu: link Problemi con le notifiche');
+await B.click('[data-a="pushOn"]');await wait(1500);
+ok(/Le notifiche non arrivano/.test(await B.innerText('.sheet-wrap:last-child')),'errore → guida aperta');
+ok(await B.evaluate(()=>!/\(20\)/.test(document.body.innerText)),'niente codice (20) nel messaggio');
+await B.click('[data-a="pushBrand"][data-v="xiaomi"]');await wait(300);
+ok(/Sospendi l'attività dell'app se inutilizzata/.test(await B.innerText('.sheet-wrap:last-child')),'guida Xiaomi');
+await B.setViewportSize({width:360,height:780});await wait(300);
+ok(await B.evaluate(()=>document.documentElement.scrollWidth<=360),'guida a 360 px senza scorrimento orizzontale');
+await B.screenshot({path:'/tmp/claude-0/-home-user-jona-ordini/13ef9fb8-91a4-5db8-b2d2-12c6e3adb38b/scratchpad/guida.png'});
+await B.evaluate(()=>{window.__fail=false});await B.click('.sheet-wrap:last-child [data-a="pushOn"]');await wait(1500);
+ok(await B.evaluate(()=>pushActive()&&!sheets.length),'Riprova ad attivare dalla guida: attive e guida chiusa');
 console.log('errors',A.errs,B.errs);await b.close();
