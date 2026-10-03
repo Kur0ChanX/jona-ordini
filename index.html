@@ -488,7 +488,8 @@ const fcolor=fid=>fid?(forn(fid).colore||hue(fid)):'#8A7F76';
 const cfg=()=>Object.assign({nomeLocale:'Jona Ristorante',luogoConsegna:''},D().config.app||{});
 const realU=()=>S.me?D().staff[S.me]:null;
 // Test per lo sviluppatore: vede l'app come l'amministratore (chef) senza cambiare il suo profilo.
-const meU=()=>{const u=realU();return u&&isDev(u)&&S.viewAs==='gm'?Object.assign({},u,{ruolo:'gm',reparto:'cucina',mansione:'Chef'}):u};
+const VIEW_AS={gm:{ruolo:'gm',reparto:'cucina',mansione:'Chef'},staff:{ruolo:'staff',reparto:'cucina',mansione:'Cuoco'}};
+const meU=()=>{const u=realU();return u&&isDev(u)&&VIEW_AS[S.viewAs]?Object.assign({},u,VIEW_AS[S.viewAs]):u};
 const isGM=u=>!!u&&u.ruolo==='gm';
 const isDev=u=>!!u&&u.ruolo==='dev';
 const isMgr=u=>isGM(u)||isDev(u);
@@ -688,7 +689,7 @@ function shell(me){
 }
 function testBar(){
   const u=realU();if(!isDev(u))return'';
-  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(S.viewAs==='gm'?'gm':'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
+  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['staff','Staff'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
 }
 
 /* ================= staff: catalogo ================= */
@@ -1226,9 +1227,10 @@ Regole:
 - categoria: una tra ${CATS.join(', ')};
 - non inventare dati che non ci sono.`;
 function impSheet(fid){
-  S.imp={fid:fid||'',stage:'pick',err:'',txt:''};
+  S.imp={fid:fid||'',stage:'pick',err:'',txt:'',photos:[]};
   openSheet({cls:'tall',render:()=>{const I=S.imp,f=I.fid?forn(I.fid):null;
     const head=`<div class="grab"></div><div class="sh-h"><div class="sh-t">Importa listino<div class="sh-s">${f?esc(f.nome):'Uno o più fornitori'}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>`;
+    if(I.stage==='foto')return head+fotoStage(I);
     if(I.stage==='paste')return head+`<label class="lbl" for="imp-txt">Incolla qui la tabella (da Gemini, Excel o Fogli)</label><textarea class="inp mono" id="imp-txt" rows="12" data-in="imptxt" placeholder="${esc(TEMPLATE_HEAD)}&#10;Metro;M100;Zucchero semolato 1 kg;pz;1,20;Secco e dispensa">${esc(I.txt)}</textarea>
       <div class="btns" style="margin-top:14px"><button type="button" class="btn ghost" data-a="impBack">Indietro</button><button type="button" class="btn primary" data-a="impTxtGo">${ic('check')} Leggi la tabella</button></div>`;
     return head+(I.err?`<div class="err">${esc(I.err)}</div>`:'')+`<div class="imp-opts">
@@ -1237,10 +1239,44 @@ function impSheet(fid){
     <button type="button" class="imp-opt" data-a="impPick" data-k="xml">${ic('receipt')}<div><b>Fattura elettronica XML</b><span>Codici e prezzi reali dall'ultima fattura, utile per Metro</span></div></button>
     ${I.fid?`<button type="button" class="imp-opt" data-a="pnew" data-f="${I.fid}">${ic('pencil')}<div><b>Un prodotto a mano</b><span>Nome, codice, unità e prezzo</span></div></button>`:''}</div>
     <h2 class="sec">Per le foto dei listini</h2>
+    <div class="imp-opts" style="margin-bottom:12px"><button type="button" class="imp-opt" data-a="gemFoto" data-k="cam">${ic('camera')}<div><b>Scatta foto del listino</b><span>Gemini legge le foto e trascrive tutto</span></div></button>
+    <button type="button" class="imp-opt" data-a="gemFoto" data-k="gal">${ic('image')}<div><b>Foto dalla galleria</b><span>Una o più foto o screenshot del listino</span></div></button></div>
     <p class="muted" style="margin-top:0">Fai leggere le foto a Gemini con questo testo, poi incolla qui la tabella che ti restituisce.</p>
     <div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="copyPrompt">${ic('copy')} Copia il testo per Gemini</button><button type="button" class="btn ghost sm" data-a="tplDl">${ic('download')} Modello CSV vuoto</button></div>`;
   }});
 }
+/* foto del listino lette da Gemini: con la chiave (salvata solo su questo telefono) o condividendole con l'app Gemini */
+const GEM_MODELS=['gemini-flash-latest','gemini-2.5-flash'];
+const gemKey=()=>ls('jona_gemini_key')||'';
+function fotoStage(I){const k=gemKey(),n=I.photos.length;
+  return(I.err?`<div class="err">${esc(I.err)}</div>`:'')+`<p class="muted" style="margin-top:0">${n?n+(n===1?' foto pronta':' foto pronte'):'Nessuna foto'}. Puoi aggiungerne altre se il listino ha più pagine.</p>
+  ${n?`<div class="chips">${I.photos.map((p,i)=>`<button type="button" class="chip" data-a="gemDel" data-v="${i}">${esc(p.name.slice(0,22))} ${ic('x')}</button>`).join('')}</div>`:''}
+  <div class="btns" style="justify-content:flex-start;margin:10px 0 18px"><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="cam">${ic('camera')} Scatta</button><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="gal">${ic('image')} Galleria</button></div>
+  ${I.busy?`<div class="banner">Gemini sta leggendo il listino… può volerci un minuto.</div>`:k?`<button type="button" class="btn primary block big" data-a="gemGo" ${n?'':'disabled'}>${ic('sparkle')} Trascrivi con Gemini</button>`
+  :`<button type="button" class="btn primary block big" data-a="gemShare" ${n?'':'disabled'}>${ic('sparkle')} Apri con l'app Gemini</button>
+  <p class="muted small">Scegli Gemini, incolla il testo già copiato, poi torna qui e incolla la tabella che ti restituisce.</p><div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="impPaste">${ic('paste')} Incolla la risposta</button></div>`}
+  <h2 class="sec">Trascrizione automatica</h2>
+  <p class="muted small" style="margin-top:0">${k?'Gemini è collegato su questo telefono.':'Con una chiave Gemini gratuita (aistudio.google.com/apikey) l\'app trascrive da sola, senza copiare e incollare. La chiave resta solo su questo telefono.'}</p>
+  <div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="gemKey">${ic('pencil')} ${k?'Cambia o togli la chiave':'Inserisci la chiave Gemini'}</button><button type="button" class="btn ghost sm" data-a="impBack">Indietro</button></div>`}
+function shrinkImg(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{const m=2000,r=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>b?res(new File([b],(file.name||'foto').replace(/\.\w+$/,'')+'.jpg',{type:'image/jpeg'})):rej({code:'img'}),'image/jpeg',.85)};
+  im.onerror=()=>{URL.revokeObjectURL(url);rej({code:'img'})};im.src=url})}
+async function gemAdd(files){const I=S.imp;if(!I)return;I.err='';for(const f of files){try{I.photos.push(await shrinkImg(f))}catch(e){I.err='Una foto non si apre: prova a rifarla.'}}I.stage='foto';refreshSheet()}
+const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
+async function gemRun(){const I=S.imp;if(!I||!I.photos.length||I.busy)return;I.busy=true;I.err='';refreshSheet();
+  try{const parts=[{text:geminiPrompt()}];for(const p of I.photos)parts.push({inline_data:{mime_type:'image/jpeg',data:await b64(p)}});
+    let txt='',last='';
+    for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':gemKey()},body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:0}})});
+      const j=await r.json().catch(()=>({}));if(r.ok){txt=((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n');break}
+      last=(j.error&&j.error.message)||('errore '+r.status);if(r.status!==404)break}
+    I.busy=false;if(!txt.trim()){I.err=/key|API_KEY|permission/i.test(last)?'La chiave Gemini non è valida: controllala.':'Gemini non ha risposto'+(last?': '+last:'.')+' Riprova o usa l\'app Gemini.';refreshSheet();return}
+    I.txt=txt;impRun('txt')}
+  catch(e){I.busy=false;I.err='Non riesco a contattare Gemini. Controlla la connessione.';refreshSheet()}}
+async function gemShare(){const I=S.imp;if(!I||!I.photos.length)return;await copyText(geminiPrompt());
+  if(navigator.canShare&&navigator.canShare({files:I.photos})){try{await navigator.share({files:I.photos,text:geminiPrompt()})}catch(e){}}
+  else toast('Il telefono non permette di condividere da qui: apri Gemini, allega le foto e incolla il testo copiato.','warn');
+  I.stage='paste';refreshSheet()}
 const PICK={xls:{accept:'.xlsx,.xls,.csv,.ods,.tsv,.txt',k:'xls'},xml:{accept:'.xml,.p7m,text/xml,application/xml',k:'xml'}};
 let pickCb=null;
 function pickFile(o,cb){const p=$('#picker');p.value='';p.accept=o.accept||'';if(o.capture)p.setAttribute('capture',o.capture);else p.removeAttribute('capture');p.multiple=!!o.multiple;pickCb=cb;p.click()}
@@ -1415,7 +1451,7 @@ const A={
   tab:d=>{S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
   notifs:()=>notifSheet(),
   meMenu:()=>meMenu(),
-  viewAs:d=>{S.viewAs=d.v==='gm'?'gm':null;ls('jona_viewas',S.viewAs);S.tab=null;window.scrollTo(0,0);render();toast(S.viewAs?'Vedi l\'app come l\'amministratore':'Torni alla tua vista da sviluppatore')},
+  viewAs:d=>{S.viewAs=VIEW_AS[d.v]?d.v:null;ls('jona_viewas',S.viewAs);S.cart=ls('jona_cart_'+S.me)||[];S.tab=null;window.scrollTo(0,0);render();toast(({gm:'Vedi l\'app come l\'amministratore',staff:'Vedi l\'app come lo staff'})[S.viewAs]||'Torni alla tua vista da sviluppatore')},
   myProfile:()=>{closeSheet(true);profileSheet(S.me)},
   settings:()=>{closeSheet(true);settingsSheet()},
   qclear:()=>{S.q='';render();const q=$('#q');if(q)q.focus()},
@@ -1462,6 +1498,11 @@ const A={
   impTxtGo:()=>{if(!S.imp.txt.trim())return toast('Incolla prima la tabella.','warn');impRun('txt')},
   impPick:d=>{const o=PICK[d.k];pickFile(o,fs=>impRun(o.k,fs))},
   copyPrompt:()=>copyText(geminiPrompt()),
+  gemFoto:d=>{if(!S.imp.photos)S.imp.photos=[];pickFile({accept:'image/*',capture:d.k==='cam'?'environment':'',multiple:d.k!=='cam'},gemAdd)},
+  gemDel:d=>{S.imp.photos.splice(+d.v,1);refreshSheet()},
+  gemGo:()=>gemRun(),
+  gemShare:()=>gemShare(),
+  gemKey:async()=>{const v=prompt('Chiave Gemini (lascia vuoto per toglierla). La trovi gratis su aistudio.google.com/apikey',gemKey());if(v===null)return;ls('jona_gemini_key',v.trim()||null);toast(v.trim()?'Gemini collegato su questo telefono':'Chiave tolta');refreshSheet()},
   tplDl:()=>saveBlob('modello_listino_jona.csv',new Blob(['\ufeff'+TEMPLATE_HEAD+'\nMetro;M100;Zucchero semolato 1 kg;pz;1,20;Secco e dispensa\n'],{type:'text/csv'})),
   rvok:()=>reviewSave(),
   pnew:d=>{if(sheets.length&&S.imp)closeSheet(true);prodSheet(null,d.f)},
