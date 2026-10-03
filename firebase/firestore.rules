@@ -26,7 +26,7 @@ service cloud.firestore {
     }
     // dati dell'app
     match /{c}/{id} {
-      allow read, write: if membro() && c in ['staff', 'fornitori', 'listini', 'config', 'richieste', 'ordini', 'notifiche', 'backup'];
+      allow read, write: if membro() && c in ['staff', 'fornitori', 'listini', 'config', 'richieste', 'ordini', 'notifiche', 'backup', 'push'];
     }
   }
 }

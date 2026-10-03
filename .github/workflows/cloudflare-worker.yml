@@ -49,3 +49,20 @@ jobs:
           workingDirectory: worker
           wranglerVersion: "4"
           command: deploy
+
+      - name: Chiave delle notifiche (solo la prima volta)
+        working-directory: worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          ELENCO=$(npx --yes wrangler@4 secret list) || { echo "::error::Non riesco a leggere i segreti del Worker: non creo una chiave nuova."; exit 1; }
+          if printf '%s' "$ELENCO" | grep -q '"VAPID_JWK"'; then echo "La chiave delle notifiche c'è già: non la tocco."; exit 0; fi
+          node -e 'const {generateKeyPairSync}=require("crypto");const {privateKey}=generateKeyPairSync("ec",{namedCurve:"prime256v1"});process.stdout.write(JSON.stringify(privateKey.export({format:"jwk"})))' | npx --yes wrangler@4 secret put VAPID_JWK
+          echo "Chiave delle notifiche creata."
+
+      - name: Prova del server
+        run: |
+          sleep 5
+          curl -sf https://jona-notifiche.mario-miscera.workers.dev/salute | tee /dev/stderr | grep -q '"push":true'
+          curl -sf https://jona-notifiche.mario-miscera.workers.dev/chiave | grep -q '"chiave":"B'

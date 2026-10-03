@@ -662,8 +662,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=8;
+const APP_VER=9;
 const NEWS=[
+  {v:9,data:'2026-10-03',titolo:'Notifiche sul telefono',
+    tutti:['Ora l\'app ti può avvisare anche quando è chiusa. Tocca la tua foto in alto → «Attiva le notifiche» → Consenti. Con «Prova» controlli che arrivino.','Su iPhone le notifiche funzionano solo se apri l\'app dall\'icona sulla schermata Home.'],
+    dev:{aggiunte:['Push con Web Push + VAPID: server in `worker/` (Cloudflare, `/chiave`, `/invia`), iscrizioni in Firestore `push/<id>` (`pushOn`, `pushSend` dentro `notify()`), `sw.js` mostra la notifica. La chiave `VAPID_JWK` la crea il workflow alla prima pubblicazione.'],noti:['Le regole Firestore vanno incollate di nuovo (nuova collezione `push`), altrimenti le notifiche non si attivano. Se chi invia è senza rete la notifica push non parte (resta quella dentro l\'app).']}},
   {v:8,data:'2026-10-03',titolo:'Database centrale pronto',
     chef:['Il database centrale è pronto: quando Mario lo attiva, tutti i telefoni vedono gli stessi ordini. Gli altri telefoni si collegano con il QR code (Impostazioni → Database centrale → Invita).'],
     dev:{aggiunte:['`firebase-config.js` con il progetto `jona-ordini`: in Impostazioni → Database centrale compaiono Attiva e Ho un codice. Finché non si preme Attiva ogni telefono resta su `LocalStore`.']}},
@@ -910,6 +913,7 @@ function subscribe(name){
     const first=!S.loaded[name];const m={};
     snap.docs.forEach(d=>{m[d.id]=Object.assign({id:d.id},d.data())});
     if(name==='notifiche'&&!first)onNewNotifs(snap);
+    if(S.db.kind==='firebase')pushWatch();
     S.data[name]=m;S.loaded[name]=true;
     if(name==='prodotti')rebuildIndex();
     schedule();
@@ -923,7 +927,47 @@ function onNewNotifs(snap){
     if(n.a===me.id||(isGM(me)&&n.a==='gm')||(isMgr(me)&&n.a==='gestori')){toast(n.titolo+(n.testo?': '+n.testo:''));try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}}
   }
 }
-async function notify(a,titolo,testo,tipo,rif){const me=meU();await put('notifiche',uid(),{a,titolo,testo:testo||'',tipo:tipo||'',rif:rif||'',letta:false,creato:now(),da:me?me.id:''})}
+async function notify(a,titolo,testo,tipo,rif){const me=meU();await put('notifiche',uid(),{a,titolo,testo:testo||'',tipo:tipo||'',rif:rif||'',letta:false,creato:now(),da:me?me.id:''});pushSend(a,titolo,testo)}
+/* ================= notifiche push (server: worker/, sw.js) =================
+   Ogni telefono che le attiva salva la sua iscrizione in «push/<id>» e notify() avvisa anche con l'app chiusa.
+   Lette e scritte direttamente su Firestore, fuori da S.db: se le regole non hanno ancora «push» l'app non si blocca. */
+const PUSH_URL='https://jona-notifiche.mario-miscera.workers.dev';
+const PUSH={subs:{},on:false,retry:0};
+const pushOk=()=>isSecureContext&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+const pushFb=()=>!!S.db&&S.db.kind==='firebase'&&S.db.status().ready;
+const pushCol=()=>fbInit().fs.collection('push');
+const pushActive=()=>pushOk()&&Notification.permission==='granted'&&!!ls('jona_push');
+const ub64u=t=>{t=t.replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(t+'='.repeat((4-t.length%4)%4)),c=>c.charCodeAt(0))};
+async function pushId(ep){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(ep));return'p'+[...new Uint8Array(h)].slice(0,12).map(b=>b.toString(16).padStart(2,'0')).join('')}
+function pushWatch(){if(PUSH.on||now()<PUSH.retry||!pushFb())return;PUSH.on=true;
+  pushCol().onSnapshot(q=>{const m={};q.docs.forEach(d=>{m[d.id]=d.data()});PUSH.subs=m;pushSync()},()=>{PUSH.on=false;PUSH.retry=now()+60000})}
+async function pushSave(sub){const me=realU();if(!me)return;const id=await pushId(sub.endpoint);
+  await pushCol().doc(id).set({u:me.id,sub:JSON.parse(JSON.stringify(sub)),creato:now()});ls('jona_push',id)}
+async function pushSync(){
+  if(pushSync.busy||!pushActive()||!realU())return;const cur=PUSH.subs[ls('jona_push')];if(cur&&cur.u===realU().id)return;
+  pushSync.busy=1;try{const sub=await(await navigator.serviceWorker.ready).pushManager.getSubscription();if(sub)await pushSave(sub);else ls('jona_push',null)}catch(e){}finally{pushSync.busy=0}}
+async function pushOn(){
+  if(!pushOk())return toast(/iPhone|iPad/.test(navigator.userAgent)?'Su iPhone: aggiungi l\'app alla schermata Home e aprila da lì, poi riprova.':'Questo telefono non può ricevere notifiche.','err');
+  if(!pushFb())return toast('Le notifiche funzionano solo con il database centrale collegato.','err');
+  if(await Notification.requestPermission()!=='granted')return toast('Notifiche bloccate: consentile nelle impostazioni del telefono.','err');
+  const {chiave}=await(await fetch(PUSH_URL+'/chiave')).json();
+  const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
+  if(sub&&ls('jona_push_k')!==chiave){await sub.unsubscribe();sub=null}
+  if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)});
+  ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: Mario deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono')}
+async function pushOff(){const id=ls('jona_push');ls('jona_push',null);
+  try{const sub=await(await navigator.serviceWorker.ready).pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch(e){}
+  if(id)pushCol().doc(id).delete().catch(()=>{});toast('Notifiche spente su questo telefono')}
+function pushUnlink(){const id=ls('jona_push');if(id&&pushFb())pushCol().doc(id).delete().catch(()=>{})}
+async function pushPost(list,titolo,testo){
+  const r=await fetch(PUSH_URL+'/invia',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({titolo,testo,subs:list.map(([,p])=>p.sub)})});
+  const j=await r.json();const dead=new Set(j.scaduti||[]);for(const [id,p] of list)if(dead.has(p.sub.endpoint))pushCol().doc(id).delete().catch(()=>{});return j}
+async function pushSend(a,titolo,testo){try{pushWatch();const st=D().staff,mine=ls('jona_push');
+  const list=Object.entries(PUSH.subs).filter(([id,p])=>{const u=st[p.u];return id!==mine&&!!u&&u.stato==='attivo'&&(p.u===a||(a==='gm'&&isGM(u))||(a==='gestori'&&isMgr(u)))});
+  if(list.length)await pushPost(list,titolo,testo)}catch(e){}}
+async function pushTest(){const id=ls('jona_push'),p=PUSH.subs[id];if(!p)return toast('Iscrizione non ancora salvata: riprova tra qualche secondo.','err');
+  const j=await pushPost([[id,p]],'Prova notifica','Se leggi questo messaggio, le notifiche funzionano.');
+  toast(j.inviati?'Notifica inviata: arriva tra pochi secondi':'Notifica non partita. Spegni e riattiva le notifiche.',j.inviati?'':'err')}
 function saveBlob(name,blob){const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
 
 /* ================= rendering ================= */
@@ -1072,8 +1116,8 @@ async function doLogin(){
   if(x.stato==='disattivato')return toast('Questo profilo è disattivato. Chiedi a Maurizio di riattivarlo.','warn');
   S.login={u:'',p:''};login(x.id);
 }
-function login(id){S.me=id;ls('jona_me',id);S.cart=ls('jona_cart_'+id)||[];S.tab=null;S.q='';S.cat='';window.scrollTo(0,0);render();const u=D().staff[id];if(u)toast('Ciao '+u.nome)}
-function logout(){while(sheets.length)closeSheet(true);S.me=null;ls('jona_me',null);S.cart=[];S.drafts={};S.removed={};S.gmn={};window.scrollTo(0,0);render()}
+function login(id){S.me=id;ls('jona_me',id);S.cart=ls('jona_cart_'+id)||[];S.tab=null;S.q='';S.cat='';window.scrollTo(0,0);render();pushSync();const u=D().staff[id];if(u)toast('Ciao '+u.nome)}
+function logout(){pushUnlink();while(sheets.length)closeSheet(true);S.me=null;ls('jona_me',null);S.cart=[];S.drafts={};S.removed={};S.gmn={};window.scrollTo(0,0);render()}
 
 /* ================= shell ================= */
 const arriviCount=()=>Object.values(D().ordini).filter(o=>o.stato==='inviato'&&!o.ricevuto).length;
@@ -2170,6 +2214,7 @@ function meMenu(){
   const me=meU();
   openSheet({render:()=>`<div class="grab"></div><div class="pin-head">${avatar(me,72)}<div class="pin-name">${esc(fullName(me))}</div><div class="muted">${isMgr(me)?RUOLI[me.ruolo]:esc([me.mansione,REPARTI[me.reparto]].filter(Boolean).join(', '))}</div></div>
   <div class="imp-opts" style="margin-top:20px"><button type="button" class="imp-opt" data-a="myProfile">${ic('user')}<div><b>Modifica profilo</b><span>Foto, nome, nome utente e password</span></div></button>
+  ${S.db&&S.db.kind==='firebase'?(pushActive()?`<div class="imp-opt">${ic('bell')}<div><b>Notifiche sul telefono</b><span>Attive: ti avvisano anche con l'app chiusa</span><div class="btns" style="margin-top:8px"><button type="button" class="btn ghost sm" data-a="pushTest">Prova</button><button type="button" class="btn ghost sm" data-a="pushOff">Spegni</button></div></div></div>`:`<button type="button" class="imp-opt" data-a="pushOn">${ic('bell')}<div><b>Attiva le notifiche</b><span>Ti avvisano anche con l'app chiusa</span></div></button>`):''}
   ${isMgr(me)?`<button type="button" class="imp-opt" data-a="settings">${ic('gear')}<div><b>Impostazioni</b><span>Locale, consegna, backup dei dati</span></div></button>`:''}
   <button type="button" class="imp-opt" data-a="logout">${ic('logout')}<div><b>Esci</b><span>Torna alla schermata di accesso</span></div></button></div>`});
 }
@@ -2494,6 +2539,7 @@ const A={
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
+  pushOn:async()=>{await pushOn();closeSheet(true)},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
   photoCam:()=>pickFile({accept:'image/*',capture:'user'},setPhoto),
   photoLib:()=>pickFile({accept:'image/*'},setPhoto),
   tab:d=>{S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
