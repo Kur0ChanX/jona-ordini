@@ -112,6 +112,13 @@ html.staff-ui .news-btn .ic{width:18px;height:18px}
 .top .sync-pill{min-width:0;white-space:normal;line-height:1.15}
 @media (max-width:360px){.top{gap:6px}.top .mark{display:none}.news-btn,html.staff-ui .news-btn{width:34px;padding:0;justify-content:center}.news-l{display:none}}
 .news-v{padding:16px 2px 18px;border-top:1px solid var(--line)}
+.ph-t{font:500 16px/1.3 var(--font);margin:18px 0 6px}
+.ph-ol{margin:4px 0 8px;padding-left:24px}
+.ph-ol li{margin:10px 0;line-height:1.5;font-size:15.5px}
+.ph-brands{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 4px}
+.ph-brands .btn{min-height:48px;white-space:normal;line-height:1.2}
+.ph-brands .btn[aria-pressed="true"]{border-color:var(--lagoon);background:var(--lagoon-soft);color:var(--lagoon)}
+.ph-link{display:block;margin:-2px auto 6px;padding:10px;border:0;background:none;color:var(--lagoon);font:400 14px var(--font);text-decoration:underline}
 .news-h{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;font-size:13.5px;color:var(--muted)}
 .news-vn{font-weight:500;color:var(--ink2)}
 .news-new{font:500 11.5px/1 var(--font);padding:4px 8px;border-radius:999px;background:var(--lagoon-soft);color:var(--lagoon)}
@@ -662,8 +669,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=10;
+const APP_VER=11;
 const NEWS=[
+  {v:11,data:'2026-10-04',titolo:'Guida alle notifiche',
+    tutti:['Se le notifiche non si attivano o non arrivano, c\'è una guida semplice per il tuo telefono (iPhone, Xiaomi, Samsung, Huawei, Oppo e altri): tocca la tua foto → «Problemi con le notifiche? Guida». Si apre da sola anche quando qualcosa va storto.'],
+    dev:{aggiunte:['`pushHelp()` con `PUSH_HELP` (passi per marca, marca indovinata da `userAgent` quando possibile, `S.pushBrand`); `pushOn` apre la guida sugli errori e restituisce `true` se riesce.']}},
   {v:10,data:'2026-10-03',titolo:'Messaggio più chiaro sulle notifiche',
     dev:{correzioni:['`pushOn`: se `pushManager.subscribe` fallisce (es. `AbortError` su telefoni senza servizi Google o browser che bloccano il push) compare un messaggio chiaro invece di «Operazione non riuscita (20)».']}},
   {v:9,data:'2026-10-03',titolo:'Notifiche sul telefono',
@@ -949,14 +959,31 @@ async function pushSync(){
   if(pushSync.busy||!pushActive()||!realU())return;const cur=PUSH.subs[ls('jona_push')];if(cur&&cur.u===realU().id)return;
   pushSync.busy=1;try{const sub=await(await navigator.serviceWorker.ready).pushManager.getSubscription();if(sub)await pushSave(sub);else ls('jona_push',null)}catch(e){}finally{pushSync.busy=0}}
 async function pushOn(){
-  if(!pushOk())return toast(/iPhone|iPad/.test(navigator.userAgent)?'Su iPhone: aggiungi l\'app alla schermata Home e aprila da lì, poi riprova.':'Questo telefono non può ricevere notifiche.','err');
+  const fail=m=>{toast(m,'err');pushHelp();return false};
+  if(!pushOk())return fail(/iPhone|iPad/.test(navigator.userAgent)?'Su iPhone: apri l\'app dall\'icona sulla schermata Home.':'Questo telefono non riesce ad attivare le notifiche.');
   if(!pushFb())return toast('Le notifiche funzionano solo con il database centrale collegato.','err');
-  if(await Notification.requestPermission()!=='granted')return toast('Notifiche bloccate: consentile nelle impostazioni del telefono.','err');
+  if(await Notification.requestPermission()!=='granted')return fail('Notifiche bloccate: segui la guida per consentirle.');
   const {chiave}=await(await fetch(PUSH_URL+'/chiave')).json();
   const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
   if(sub&&ls('jona_push_k')!==chiave){await sub.unsubscribe();sub=null}
-  if(!sub)try{sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)})}catch(e){return toast(e&&e.name==='AbortError'?'Il servizio notifiche del telefono ha rifiutato l\'iscrizione. Apri l\'app con Chrome e controlla che il telefono abbia i servizi Google (Play Store).':'Non riesco ad attivare le notifiche su questo telefono ('+(e&&e.name||'errore')+').','err')}
-  ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: Mario deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono')}
+  if(!sub)try{sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)})}catch(e){return fail(e&&e.name==='AbortError'?'Il telefono ha bloccato le notifiche: segui la guida per il tuo telefono.':'Non riesco ad attivare le notifiche ('+(e&&e.name||'errore')+'): segui la guida.')}
+  ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: Mario deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono');return true}
+const PUSH_HELP=[
+  ['iphone','iPhone',['Apri <b>Impostazioni</b> → <b>Generali</b> → <b>Info</b> e guarda <b>Versione iOS</b>: deve essere <b>16.4 o più alta</b>. Se è più bassa: <b>Impostazioni</b> → <b>Generali</b> → <b>Aggiornamento software</b>.','Apri Jona <b>solo dall\'icona sulla schermata Home</b>, non da Safari. Se l\'icona non c\'è: apri <b>Safari</b> su kur0chanx.github.io/jona-ordini, premi <b>Condividi</b> (il quadrato con la freccia in su) → <b>Aggiungi alla schermata Home</b> → <b>Aggiungi</b>.','Apri <b>Impostazioni</b> → <b>Notifiche</b> → <b>Jona Ordini</b> e accendi <b>Consenti notifiche</b>.','Se è accesa la <b>Full immersion</b> (la luna), le notifiche arrivano senza suono: spegnila dal Centro di Controllo.']],
+  ['xiaomi','Xiaomi, Redmi, POCO',['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi <b>Informazioni app</b>.','<b>Spegni</b> l\'interruttore <b>Sospendi l\'attività dell\'app se inutilizzata</b>.','Premi <b>Notifiche</b> e accendile.','Apri <b>Impostazioni</b> del telefono → <b>App</b> → <b>Gestisci app</b> → <b>Chrome</b> → <b>Risparmio batteria</b> → scegli <b>Nessuna restrizione</b>.','Nella stessa pagina di Chrome accendi <b>Avvio automatico</b>.']],
+  ['samsung','Samsung',['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi la <b>i</b> (Informazioni app).','Premi <b>Notifiche</b> e accendi <b>Consenti notifiche</b>.','Se c\'è, <b>spegni</b> <b>Sospendi attività app se non utilizzata</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b> → <b>Batteria</b> → scegli <b>Senza restrizioni</b>.']],
+  ['huawei','Huawei, Honor',['Controlla se sul telefono c\'è il <b>Play Store</b>. Se <b>non c\'è</b>, le notifiche ad app chiusa non possono funzionare: gli avvisi li trovi nella <b>campanella</b> quando apri l\'app.','Se il Play Store c\'è: <b>Impostazioni</b> → <b>Batteria</b> → <b>Avvio app</b> → <b>Chrome</b> → spegni <b>Gestisci automaticamente</b> e accendi tutti gli interruttori.','Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendile.']],
+  ['oppo','Oppo, Realme, OnePlus',['Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendile.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b> → <b>Utilizzo batteria</b> → accendi <b>Consenti attività in background</b> (e <b>Avvio automatico</b>, se c\'è).']],
+  ['altro','Altro telefono',['Usa <b>Chrome</b>: apri kur0chanx.github.io/jona-ordini in Chrome, premi i <b>tre puntini</b> in alto → <b>Aggiungi a schermata Home</b> (o <b>Installa app</b>) e apri Jona dalla nuova icona.','Controlla che sul telefono ci sia il <b>Play Store</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b>: <b>Notifiche</b> accese e <b>Batteria</b> senza restrizioni.']]];
+function pushHelp(){
+  if(!S.pushBrand)S.pushBrand=/iPhone|iPad/.test(navigator.userAgent)?'iphone':/Xiaomi|Redmi|POCO/i.test(navigator.userAgent)?'xiaomi':/SM-[A-Z]\d|Samsung/i.test(navigator.userAgent)?'samsung':'';
+  openSheet({cls:'tall',render:()=>{const g=PUSH_HELP.find(x=>x[0]===S.pushBrand);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Le notifiche non arrivano?</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <h3 class="ph-t">Prima prova così</h3><ol class="ph-ol"><li>Controlla di avere <b>internet</b>.</li><li>Chiudi del tutto Jona e riaprila <b>dall'icona</b> sulla schermata Home.</li><li>Tocca <b>la tua foto</b> → <b>Attiva le notifiche</b> → <b>Consenti</b>.</li></ol>
+  <h3 class="ph-t">Non va ancora? Scegli il tuo telefono</h3><div class="ph-brands">${PUSH_HELP.map(([k,l])=>`<button type="button" class="btn ghost" aria-pressed="${k===S.pushBrand}" data-a="pushBrand" data-v="${k}">${l}</button>`).join('')}</div>
+  ${g?`<h3 class="ph-t">${g[1]}</h3><ol class="ph-ol">${g[2].map(x=>`<li>${x}</li>`).join('')}</ol>
+  <p class="muted">Fatto? Premi qui sotto. Se non funziona ancora, chiedi a Mario e digli cosa c'è scritto nel messaggio rosso.</p>
+  ${pushActive()?'':`<div class="btns col"><button type="button" class="btn primary block" data-a="pushOn">${ic('bell')} Riprova ad attivare</button></div>`}`:''}`}});
+}
 async function pushOff(){const id=ls('jona_push');ls('jona_push',null);
   try{const sub=await(await navigator.serviceWorker.ready).pushManager.getSubscription();if(sub)await sub.unsubscribe()}catch(e){}
   if(id)pushCol().doc(id).delete().catch(()=>{});toast('Notifiche spente su questo telefono')}
@@ -2216,7 +2243,7 @@ function meMenu(){
   const me=meU();
   openSheet({render:()=>`<div class="grab"></div><div class="pin-head">${avatar(me,72)}<div class="pin-name">${esc(fullName(me))}</div><div class="muted">${isMgr(me)?RUOLI[me.ruolo]:esc([me.mansione,REPARTI[me.reparto]].filter(Boolean).join(', '))}</div></div>
   <div class="imp-opts" style="margin-top:20px"><button type="button" class="imp-opt" data-a="myProfile">${ic('user')}<div><b>Modifica profilo</b><span>Foto, nome, nome utente e password</span></div></button>
-  ${S.db&&S.db.kind==='firebase'?(pushActive()?`<div class="imp-opt">${ic('bell')}<div><b>Notifiche sul telefono</b><span>Attive: ti avvisano anche con l'app chiusa</span><div class="btns" style="margin-top:8px"><button type="button" class="btn ghost sm" data-a="pushTest">Prova</button><button type="button" class="btn ghost sm" data-a="pushOff">Spegni</button></div></div></div>`:`<button type="button" class="imp-opt" data-a="pushOn">${ic('bell')}<div><b>Attiva le notifiche</b><span>Ti avvisano anche con l'app chiusa</span></div></button>`):''}
+  ${S.db&&S.db.kind==='firebase'?(pushActive()?`<div class="imp-opt">${ic('bell')}<div><b>Notifiche sul telefono</b><span>Attive: ti avvisano anche con l'app chiusa</span><div class="btns" style="margin-top:8px"><button type="button" class="btn ghost sm" data-a="pushTest">Prova</button><button type="button" class="btn ghost sm" data-a="pushOff">Spegni</button><button type="button" class="btn ghost sm" data-a="pushHelp">Non arrivano?</button></div></div></div>`:`<button type="button" class="imp-opt" data-a="pushOn">${ic('bell')}<div><b>Attiva le notifiche</b><span>Ti avvisano anche con l'app chiusa</span></div></button><button type="button" class="ph-link" data-a="pushHelp">Problemi con le notifiche? Guida</button>`):''}
   ${isMgr(me)?`<button type="button" class="imp-opt" data-a="settings">${ic('gear')}<div><b>Impostazioni</b><span>Locale, consegna, backup dei dati</span></div></button>`:''}
   <button type="button" class="imp-opt" data-a="logout">${ic('logout')}<div><b>Esci</b><span>Torna alla schermata di accesso</span></div></button></div>`});
 }
@@ -2541,7 +2568,7 @@ const A={
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
-  pushOn:async()=>{await pushOn();closeSheet(true)},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
+  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
   photoCam:()=>pickFile({accept:'image/*',capture:'user'},setPhoto),
   photoLib:()=>pickFile({accept:'image/*'},setPhoto),
   tab:d=>{S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
