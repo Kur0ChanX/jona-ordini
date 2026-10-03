@@ -34,3 +34,9 @@ La configurazione non è segreta. I dati li protegge la chiave del ristorante (v
 - I prodotti stanno in un documento per fornitore (`listini/<fornitore>`), così ogni apertura dell'app legge pochi documenti. Il piano gratuito (50.000 letture e 20.000 scritture al giorno) basta per il ristorante.
 - Backup: Impostazioni → Backup dei dati → Esporta / Ripristina (il ripristino vale per tutti i telefoni).
 - Copie automatiche: ogni giorno il primo telefono di chi gestisce salva una copia di tutto nel database (collezione `backup`); restano 14 giorni. Impostazioni → Copie automatiche → Scarica / Ripristina. Se le regole sono state incollate prima di questa funzione, incollale di nuovo.
+
+## Notifiche push
+- Ogni telefono le attiva da sé: foto del profilo → **Attiva le notifiche** → Consenti. L'iscrizione va nella collezione `push`.
+- Le manda il server `worker/` su Cloudflare (gratis), pubblicato dal workflow GitHub a ogni modifica di `worker/`.
+- Dopo questo aggiornamento le regole vanno **incollate di nuovo** (scheda Regole → Pubblica): senza la collezione `push` le notifiche non si attivano (il resto dell'app funziona lo stesso).
+- iPhone: solo con l'app aperta dall'icona sulla schermata Home (iOS 16.4 o successivo).
