@@ -20,3 +20,4 @@ Le prove Firebase impostano `localStorage.jona_fb_emu` e una configurazione fint
 - `node tools/test-voice.mjs`: ordine a voce (parser di 35 frasi, riconoscimento vocale finto, conferma, carrello, campo di testo se il telefono non ha il riconoscimento).
 - `node tools/test-report.mjs`: Consumi e costi (totali calcolati a mano, filtri, grafico, Excel). Serve una copia di SheetJS: `curl -o /tmp/xlsx.full.min.js https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js`.
 - `node tools/test-firebase-report.mjs` (con l'emulatore): con più di 300 ordini il resoconto scarica dal database quelli più vecchi.
+- `node tools/test-news.mjs`: Novità (contatore per ruolo, contenuto per staff/chef/sviluppatore, intestazione a 320 px, tema scuro).
