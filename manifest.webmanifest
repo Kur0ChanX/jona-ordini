@@ -1,17 +1,18 @@
 {
+  "id": "/jona-ordini/",
   "name": "Jona Ordini",
   "short_name": "Jona Ordini",
   "description": "Ordini di cucina e sala del Jona Ristorante",
   "lang": "it",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/jona-ordini/",
+  "scope": "/jona-ordini/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#3A2F2C",
   "theme_color": "#3A2F2C",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/jona-ordini/jona-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/jona-ordini/jona-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/jona-ordini/jona-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
