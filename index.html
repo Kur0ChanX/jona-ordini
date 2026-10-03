@@ -183,6 +183,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .lbl{display:block;font:500 13.5px var(--font);color:var(--ink2);margin:14px 0 6px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:420px){.two.stack{grid-template-columns:1fr}}
+.testbar{display:flex;align-items:center;gap:10px;margin:0 0 14px}
 .seg{display:inline-flex;padding:3px;background:var(--sunk);border-radius:999px;border:1px solid var(--line);max-width:100%;overflow-x:auto;scrollbar-width:none}
 .seg.wide{display:flex}
 .seg.wide button{flex:1}
@@ -477,7 +478,7 @@ const COLS={staff:null,fornitori:null,prodotti:null,config:null,
   notifiche:q=>q.orderBy('creato','desc').limit(250)};
 const S={db:null,loadTimeout:false,
   loaded:{},data:{staff:{},fornitori:{},prodotti:{},config:{},richieste:{},ordini:{},notifiche:{}},
-  gidx:new Map(),me:ls('jona_me'),tab:null,q:'',cat:'',grp:'utente',cart:[],cnote:'',
+  gidx:new Map(),me:ls('jona_me'),viewAs:ls('jona_viewas'),tab:null,q:'',cat:'',grp:'utente',cart:[],cnote:'',
   drafts:{},removed:{},gmn:{},ometa:{},track:{},rcv:{},rev:null,form:{},login:{u:'',p:''},fe:{},pe:{},imp:null,
   supTab:'listino',supQ:'',pkq:'',hf:{stato:'tutte',who:''}};
 if(S.me)S.cart=ls('jona_cart_'+S.me)||[];
@@ -485,7 +486,9 @@ const D=()=>S.data;
 const forn=id=>D().fornitori[id]||{id,nome:'Da assegnare'};
 const fcolor=fid=>fid?(forn(fid).colore||hue(fid)):'#8A7F76';
 const cfg=()=>Object.assign({nomeLocale:'Jona Ristorante',luogoConsegna:''},D().config.app||{});
-const meU=()=>S.me?D().staff[S.me]:null;
+const realU=()=>S.me?D().staff[S.me]:null;
+// Test per lo sviluppatore: vede l'app come l'amministratore (chef) senza cambiare il suo profilo.
+const meU=()=>{const u=realU();return u&&isDev(u)&&S.viewAs==='gm'?Object.assign({},u,{ruolo:'gm',reparto:'cucina',mansione:'Chef'}):u};
 const isGM=u=>!!u&&u.ruolo==='gm';
 const isDev=u=>!!u&&u.ruolo==='dev';
 const isMgr=u=>isGM(u)||isDev(u);
@@ -681,7 +684,11 @@ function shell(me){
   return`<nav class="nav n${tabs.length}" aria-label="Sezioni"><div class="nav-brand"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div>${tabs.map(t=>{const b=t.b?t.b():0;return`<button type="button" data-a="tab" data-v="${t.id}" ${S.tab===t.id?'aria-current="page"':''}>${ic(t.i)}<span>${t.l}</span>${b?`<span class="badge">${b>99?'99+':b}</span>`:''}</button>`}).join('')}</nav>
   <main class="main"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${V[S.tab](me)}</main>`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${testBar()}${V[S.tab](me)}</main>`;
+}
+function testBar(){
+  const u=realU();if(!isDev(u))return'';
+  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(S.viewAs==='gm'?'gm':'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
 }
 
 /* ================= staff: catalogo ================= */
@@ -1408,6 +1415,7 @@ const A={
   tab:d=>{S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
   notifs:()=>notifSheet(),
   meMenu:()=>meMenu(),
+  viewAs:d=>{S.viewAs=d.v==='gm'?'gm':null;ls('jona_viewas',S.viewAs);S.tab=null;window.scrollTo(0,0);render();toast(S.viewAs?'Vedi l\'app come l\'amministratore':'Torni alla tua vista da sviluppatore')},
   myProfile:()=>{closeSheet(true);profileSheet(S.me)},
   settings:()=>{closeSheet(true);settingsSheet()},
   qclear:()=>{S.q='';render();const q=$('#q');if(q)q.focus()},
