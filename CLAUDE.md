@@ -43,3 +43,28 @@ Obiettivi: token economy, contesto pulito, codice funzionante.
 - Non ripetere codice già fornito se non esplicitamente richiesto.
 - Prima di un refactoring massiccio, chiedi conferma con un piano sintetico.
 - Se un comando fallisce, riporta l'errore esatto e proponi una soluzione, senza inventare.
+
+---
+
+# Jona Ordini
+
+App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Maurizio amministratore/chef, staff). App statica in un solo file, senza build, pubblicata con GitHub Pages: https://kur0chanx.github.io/jona-ordini/ (si installa come app, schermo intero).
+
+## Struttura
+- `index.html`: tutta l'app (~260 KB, righe lunghissime). Non leggerla per intero: `grep -n -o '.\{0,80\}PAROLA.\{0,200\}'` e `sed -n 'A,Bp' | cut -c1-1500`; modifiche con sostituzioni Python che controllano che il pezzo compaia una volta sola.
+- Ruoli: `staff`, `gm` (amministratore, chef), `dev` (sviluppatore). Lo sviluppatore ha la barra **Test** (`viewAs`: Admin Chef / Staff / Sviluppatore) per simulare tutto.
+- Dati: interfaccia unica `S.db.collection(c).doc(id).set/update/delete` e `orderBy().limit().onSnapshot()`. Due versioni:
+  - `LocalStore`: tutto in localStorage (`jona_db_v2`), solo sul telefono.
+  - `FirebaseStore`: Firestore con copia offline; i prodotti stanno in `listini/<fornitore>` (campo `p.<id>`), il resto una collezione per tipo. Accesso anonimo + chiave del ristorante (`chiave/ristorante`, `membri/<uid>`, `pubblico/stato`); regole in `firebase/firestore.rules`, guida in `docs/FIREBASE.md`.
+- `firebase-config.js` (`self.JONA_FIREBASE`, null = non configurato), `lib/` (Firebase compat 10.14.1 e generatore QR, locali per l'uso senza rete), `sw.js` (network-first: ogni file nuovo va in `FILES`), `manifest.webmanifest` (fullscreen).
+- Import listini: Excel/CSV, fattura XML, tabella incollata, foto lette da Gemini (chiave in `jona_gemini_key`, solo sul telefono).
+
+## Chiavi in localStorage
+`jona_db_v2` (dati locali), `jona_me` (profilo entrato), `jona_cart_<id>`, `jona_viewas`, `jona_theme`, `jona_key` (chiave del ristorante: segreta, mai nel codice né nei commit), `jona_member`, `jona_fb` (configurazione incollata a mano), `jona_fb_upload`, `jona_gemini_key` (segreta), `jona_rem`, `jona_bk` (giorno dell'ultima copia automatica), `jona_news_<id>` (ultima versione vista nelle Novità).
+
+## Regole di lavoro
+- Ad OGNI versione cambia `CACHE` in `sw.js`.
+- Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
+- Prove: `tools/README.md` (server locale, Playwright con Chromium `/opt/pw-browsers/chromium`, emulatore Firebase con `localStorage.jona_fb_emu`).
+- Interfaccia dello staff a prova di principiante: parole semplici, pulsanti grandi.
+- Pubblicazione: branch → PR → squash merge → controllo online → `git checkout -B <branch> origin/main`.
