@@ -32,14 +32,13 @@ Metodo: 3 funzioni → prove → PR → squash merge → controllo online → sc
 2. PR #23 → squash merge → online → ramo riallineato: fatto.
 3. Mario prova sul telefono (carrello «È urgente?», import di un listino con un prezzo più alto, controllo merce con un prodotto mancante).
 
-**Scaglione 3 (prossimo)**
-- **Più lingue** per lo staff (scelta per persona; ordini e prodotti restano in italiano).
-
-**Scaglioni 4-5: Orari del personale** (nuova sezione, grafica coerente con l'app)
+**Scaglioni 3-4 (prossimi): Orari del personale** — Mario (2026-10-04): «vai punto 1 fallo bene bene un lavoro d'arte». Prima gli orari, poi le lingue. Testo originale in `docs/RICHIESTE-MARIO.md`. Qualità alta: grafica curata, prove complete, nessuna regressione.
 - Nel profilo dipendente, prima di caricarlo: ore settimanali di contratto, pausa, giorni liberi a settimana.
 - Pianificatore settimanale grafico (righe = persone, colonne = giorni, turni a blocchi colorati per reparto), basato sulle funzioni più usate: copia la settimana precedente, turni tipo (pranzo/cena/spezzato).
 - Controlli: ore oltre il contratto, pause mancanti, giorni liberi non dati, 11 ore di riposo tra due turni e 24 ore di riposo settimanale (D.Lgs. 66/2003), turni sovrapposti.
 - Lo staff vede solo i propri orari.
+
+**Scaglione 5: Più lingue** per lo staff (scelta per persona; ordini e prodotti restano in italiano).
 
 **Idee in lista, non ancora scelte**: HACCP all'arrivo, contestazione fornitore, giorni di consegna, scorte minime, foto prodotto, prezzo migliore in approvazione, vuoti a rendere, budget per reparto, conferma del fornitore via link, ricette e costo del piatto.
 
