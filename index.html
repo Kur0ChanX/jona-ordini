@@ -1018,8 +1018,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=32;
+const APP_VER=33;
 const NEWS=[
+  {v:33,data:'2026-10-04',titolo:'Vocali dall\'iPhone più sicuri',
+    tutti:['Su iPhone i vocali partono anche quando prima davano errore. Se un vocale lungo arriva al limite, si ferma e parte da solo. Se un invio non riesce, il messaggio dice il motivo.'],
+    dev:{correzioni:['`chAuType`: tipo del vocale normalizzato (Safari può dare `video/mp4` o vuoto, che il Worker rifiutava con 415).','`chRec`: pezzi arrivati dopo `stop` (WebKit) raccolti con un\'attesa di 400 ms; fermata automatica a 1,15 MB (Safari può ignorare `audioBitsPerSecond`).','`chFile`: errore con il codice HTTP e messaggio giusto per 413.']}},
   {v:32,data:'2026-10-04',titolo:'Schermate più leggibili sui telefoni piccoli',
     chef:['Nelle richieste da approvare, sui telefoni piccoli il nome del prodotto ha tutta la riga e quantità, unità e «togli» vanno sotto: niente più parole spezzate una per riga.'],
     tutti:['Sui telefoni piccoli i pulsanti a due scelte (per esempio «Questa settimana» e «Settimana scorsa») vanno a capo invece di nascondere metà della scritta.'],
@@ -3642,7 +3645,8 @@ async function chFile(tipo,blob,x){
     if(S.chat)S.chat.stick=true;
     netWatch(chCol().add(d)).catch(e=>toast('Messaggio non inviato: riprova.','err'));
     chMarkRead(x.c,d.creato);chPush(x.c,me,t)}
-  catch(e){toast(e.status===403?'Questo telefono non è collegato al ristorante.':e.status===503?'Foto e vocali non sono ancora attivi sul server.':(tipo==='foto'?'Foto':'Vocale')+' non inviat'+(tipo==='foto'?'a':'o')+': controlla la connessione e riprova.','err')}
+  catch(e){const nf=(tipo==='foto'?'Foto':'Vocale')+' non inviat'+(tipo==='foto'?'a':'o');
+    toast(e.status===403?'Questo telefono non è collegato al ristorante.':e.status===503?'Foto e vocali non sono ancora attivi sul server.':e.status===413?(tipo==='foto'?'Foto troppo grande.':'Vocale troppo lungo.'):e.status?nf+' (errore '+e.status+'): riprova o avvisa Mario.':nf+': controlla la connessione e riprova.','err')}
   finally{CHAT.up--;chPaint(true)}}
 function chPhoto(){const c=S.chat&&S.chat.c;if(!c)return;
   pickFile({accept:'image/*'},async fs=>{let x;try{x=await algImg(fs[0])}catch(e){return toast('Non riesco ad aprire questa foto.','err')}chFile('foto',x.blob,Object.assign(x,{c}))})}
@@ -3677,6 +3681,10 @@ function wfStop(R){clearInterval(R.wi);if(R.ac){R.ac.close().catch(()=>{});R.ac=
 function wfCode(lv,n=WF_N){if(!lv||lv.length<3)return'';const o=[];for(let i=0;i<n;i++){const a=Math.floor(i*lv.length/n),b=Math.max(a+1,Math.floor((i+1)*lv.length/n));let m=0;for(let j=a;j<b&&j<lv.length;j++)m=Math.max(m,lv[j]);o.push(m)}
   const top=Math.max(...o);return o.map(v=>top<.008||v<.006?0:Math.max(1,Math.round(9*Math.pow(v/top,.7)))).join('')}
 function wfBars(wf,k=0,n=WF_N){const ok=new RegExp('^[0-9]{'+n+'}$').test(wf||'');let h='';for(let i=0;i<n;i++){const v=ok?+wf[i]:-1;h+=`<i${i<k?' class="on"':''} style="height:${v<0?6:v===0?2:Math.round(4+v*2.6)}px"></i>`}return h}
+// tipo del vocale per il server: Safari a volte dice «video/mp4» (o niente) anche per un file solo audio
+const ALG_AU=/^audio\/(mp4|aac|mpeg|webm|ogg)$/;
+function chAuType(mt,type){let t=String(mt||'').split(';')[0].trim().toLowerCase();if(t==='video/mp4'||t==='audio/x-m4a'||t==='audio/m4a')t='audio/mp4';
+  if(ALG_AU.test(t))return t;const f=String(type||'').split(';')[0].trim().toLowerCase();return ALG_AU.test(f)?f:chApple()?'audio/mp4':'audio/webm'}
 async function chRec(){
   const C=S.chat;if(!C||!C.c||C.rec)return;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder)return toast('Questo telefono non può registrare vocali.','warn');
@@ -3688,10 +3696,12 @@ async function chRec(){
   if(S.chat!==C||C.rec){st.getTracks().forEach(t=>t.stop());return}
   let mr;try{mr=aac?aacRec(st):new MediaRecorder(st,Object.assign({audioBitsPerSecond:24000},type?{mimeType:type}:{}))}catch(e){st.getTracks().forEach(t=>t.stop());return toast('Non riesco a registrare su questo telefono.','err')}
   const R={mr,c:C.c,ch:[],t0:now(),send:false};C.rec=R;wfStart(st,R);
-  mr.ondataavailable=e=>{if(e.data&&e.data.size)R.ch.push(e.data)};
+  R.b=0;mr.ondataavailable=e=>{if(e.data&&e.data.size){R.ch.push(e.data);R.b+=e.data.size;if(R.b>1.15e6&&!R.done)chRecStop(true)}};
   mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());clearInterval(R.iv);wfStop(R);if(S.chat&&S.chat.rec===R)S.chat.rec=null;chPaint(true);
-    if(!R.send)return;if(R.dur<1)return toast('Vocale troppo corto.','warn');if(mr.err||!R.ch.length)return toast('Vocale non registrato: riprova.','err');
-    chFile('audio',new Blob(R.ch,{type:(mr.mimeType||type||'audio/webm').split(';')[0]}),{c:R.c,dur:R.dur,wf:wfCode(R.lv)})};
+    if(!R.send)return;if(R.dur<1)return toast('Vocale troppo corto.','warn');
+    // su iPhone l'ultimo pezzo (a volte l'unico) può arrivare subito DOPO «stop»: si aspetta un attimo prima di unire i pezzi
+    setTimeout(()=>{if(mr.err||!R.ch.length)return toast('Vocale non registrato: riprova.','err');
+      chFile('audio',new Blob(R.ch,{type:chAuType(mr.mimeType,type)}),{c:R.c,dur:R.dur,wf:wfCode(R.lv)})},400)};
   mr.start(1000);
   R.iv=setInterval(()=>{const s=(now()-R.t0)/1000,el=document.getElementById('ch-rt');if(el)el.textContent=chDur(s);if(s>=120)chRecStop(true)},250);
   chPaint(true)}

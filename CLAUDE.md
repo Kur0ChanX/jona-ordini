@@ -44,7 +44,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
      - Le consegne riportano l'ultimo messaggio di Mario, anche se arrivato mentre preparavi l'handoff.
   3. Se TUTTE le condizioni sono vere: apri automaticamente la nuova sessione (usando lo strumento `Create Session`) e avvisami quando è pronta, senza chiedere permesso.
   4. Se ANCHE UNA SOLA condizione è falsa: FERMATI immediatamente. Non aprire nuove sessioni. Scrivimi in 1-2 righe cosa è andato storto e attendi il mio intervento.
-  5. NOMI CHIARI DELLE SESSIONI: dai sempre un titolo alla nuova sessione nel formato `▶ ATTIVA · <Progetto> · da v<versione> · <data> · prossimo: <argomento>` e rinomina quella vecchia in `✓ CHIUSA · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>` (strumento di rinomina della sessione). Così tra tante conversazioni si capisce subito quale usare.
+  5. NOMI CHIARI DELLE SESSIONI: dai sempre un titolo alla nuova sessione nel formato `▶ ATTIVA · #<NN> · <Progetto> · da v<versione> · <data> · prossimo: <argomento>` e rinomina quella vecchia in `✓ CHIUSA · #<NN> · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>` (strumento di rinomina della sessione). Così tra tante conversazioni si capisce subito quale usare.
   6. PROMPT MINIMALE PER NUOVA SESSIONE: Quando crei la nuova sessione, passa un prompt iniziale di MASSIMO 3 RIGHE. Dì solo alla nuova sessione di fare `git fetch origin <ramo> && git merge --ff-only origin/<ramo>`, poi leggere `CLAUDE.md` e `docs/PASSAGGIO-CONSEGNE.md` e attendere le mie istruzioni. Non duplicare codice o dettagli.
 
 
@@ -72,6 +72,7 @@ Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scr
 
 - Se un comando Git o Bash fallisce, FERMATI immediatamente. Non tentare auto-riparazioni azzardate.
 - Non ripetere codice già fornito o informazioni già presenti in `docs/PASSAGGIO-CONSEGNE.md`.
+- NUMERO PROGRESSIVO DELLE SESSIONI: ogni sessione ha un numero a due cifre (`#01`, `#02`, `#03`…) nel titolo, subito dopo `▶ ATTIVA` o `✓ CHIUSA`. Per Jona Ordini la numerazione parte da `#01` (la sessione del 04/10/2026). Il numero della sessione attuale è scritto in cima a `docs/PASSAGGIO-CONSEGNE.md` (`Sessione attuale: #NN`): all'handoff la sessione vecchia tiene il suo numero, la nuova prende quello dopo (+1) e lo aggiorna nelle consegne. Così il numero più alto è sempre l'ultima sessione.
 
 ---
 
@@ -97,6 +98,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - v27 reazioni in chat: `messaggi/<id>.r.<persona>` = una delle emoji di `CH_RE` (le altre ignorate), barra con pressione lunga (`chLp`, `chReOpen`), «Copia» del testo.
 - v30 inviti con codice: Worker `worker/invito` (link corto `invito.<WK_SUB>.workers.dev/<CODICE>`, anteprima e redirect all'app con `#i=`), nel Worker principale `/inviti` (crea, solo membri, chiave presa da `membri/<uid>.k`) e `/invito/<codice>` (tabella `inviti` nel primo D1, 7 giorni). Sottodominio Cloudflare in `WK_SUB` (index.html), `PUSH_URL` di `sw.js` e prova del workflow.
 - v31: «In turno oggi» (`orOggi`, da `tp` della settimana corrente) in «I miei orari» e Staff → Orari; promemoria ordini per giorno (`fornitori.giorniOrdine` 0=lun..6=dom, `oraPromemoria`, `promInfo` in `deadlineTick`, notifica tipo `promemoria`); «Consumi e costi» con confronto col periodo prima (`rpCmp`), secondo tocco su una barra per entrare (`rpDrill`), «Indietro» (`rpBack`), prodotto (`rpProd`).
+- v32: controllo completo; `tools/test-giro.mjs` gira ogni scheda per ruolo a 320/390 px chiaro/scuro (da rilanciare dopo modifiche all'interfaccia).
 - v20 Gemini: `gemCall` usa la chiave del telefono (`jona_gemini_key`) se c'è, altrimenti il Worker `/gemini` (chiave del ristorante nel segreto `GEMINI_KEY`, copiato dal segreto GitHub `GEMINI_API_KEY`; entra solo chi ha `membri/<uid>`, controllato con il gettone Firebase del telefono; 429 → attesa `retryDelay`, poi modello Lite). Solo con Firebase.
 
 ## Chiavi in localStorage

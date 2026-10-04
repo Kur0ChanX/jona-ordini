@@ -1,33 +1,41 @@
-# Passaggio di consegne (2026-10-04, notte)
+# Passaggio di consegne (2026-10-04, sera)
 
-## Ultimo messaggio di Mario (arrivato nella sessione precedente, girato qui)
-«Alla fine fai un bel controllo accurato di tutte le funzioni dell'app, in modo autonomo. Mancherò per qualche ora: vai da solo, e le decisioni importanti lasciale a me per quando torno in chat, alla fine di tutto.»
+Sessione attuale: #02
 
-## Messaggio di Mario prima di questo
-«Procedi con il cambio del sottodominio Cloudflare (accetto qualche ora senza notifiche), poi procedi con tutto il resto senza fermarti. Se devi cambiare sessione fallo da solo: ho un impegno, non posso dare consensi. Fermati solo quando hai finito tutta la lista, poi fammi una lista dettagliata di tutto ciò che hai fatto.»
+## Ultimo messaggio di Mario
+«sì, pubblica la v33»
+
+## Da fare SUBITO (sessione #02)
+1. **Pubblicare la v33** (già sul ramo `ccr-402d6602-imjwpw`, commit `a3e3e72` + questo handoff): PR verso `main` → squash merge → controllo online (`APP_VER=33`, `sw.js` `jona-ordini-v37`) → riallineamento senza force (`git fetch origin main && git merge origin/main`, poi `git push`).
+2. Dire a Mario cosa far provare al collega con iPhone (passi numerati): aggiornare l'app (chiudi e riapri), mandare un vocale corto e uno lungo (>1 min), riferire l'eventuale messaggio d'errore con il codice.
 
 ## Stato
-- **v31 unita in main** (PR #40, squash `964585a`), online verificata (`APP_VER=31`, `sw.js` `jona-ordini-v35`). Ramo riallineato (merge di main, nessuna differenza).
-- v30 verificata online: workflow Cloudflare run 37210528836 verde, `invito.mario-miscera.workers.dev/ABCDEF` → `#i=ABCDEF`, `/salute` ok (push, gemini, 4 allegati).
+- **v33 pronta, NON ancora pubblicata.** Vocali da iPhone (`index.html`):
+  - `chAuType(mimeType,type)`: tipo del vocale normalizzato (Safari può dare `video/mp4` o vuoto → il Worker rispondeva 415, e il telefono diceva «controlla la connessione»).
+  - `chRec`: in `onstop` attesa di 400 ms prima di unire i pezzi (WebKit può mandare l'ultimo/unico pezzo DOPO `stop` → prima «Vocale non registrato»); `R.b` somma i byte e a 1,15 MB chiama `chRecStop(true)` (Safari può ignorare `audioBitsPerSecond`; limite 1,3 MB in `chFile`, `ALG_MAX` del Worker 1,85 MB in base64).
+  - `chFile`: errori con codice HTTP («errore 415») e 413 → «Vocale troppo lungo».
+  - `APP_VER=33`, voce v33 in `NEWS`, `sw.js` `CACHE` `jona-ordini-v37`.
+  - Prova nuova `tools/test-v33.mjs` (MediaRecorder finto «alla Safari»): 7 verdi; contro la v32 falliva (provato). Verdi anche `test-v28`, `test-v30`, `test-news`, `test-firebase-allegati` (emulatore). `tools/README.md` aggiornato.
+  - Limite: niente iPhone vero (solo Chromium); sono le cause più probabili, la conferma arriva dalla prova del collega.
+- `CLAUDE.md`: titoli sessioni con numero `#NN` (punto 5 dell'handoff) e regola «NUMERO PROGRESSIVO DELLE SESSIONI» in REGOLE TRASVERSALI. Questa sessione era la #01; la nuova è la **#02**.
+- Mario ha chiesto il prompt per portare le regole in altri progetti: dato in chat (lo copia lui, NON salvarlo nel repo).
+- v32 online (PR #41, squash `9ed0d26`).
 
-## v31 (fatto)
-- `orOggi()` in `index.html`: «In turno oggi» da `tp` della settimana corrente (solo persone `attivo`, riposi/assenze esclusi, tag «Adesso»), in `vMieiOrari` (non sulla settimana «Prossima») e in `vOrari` (solo settimana corrente). Lo staff vede nomi e orari di oggi dei colleghi (scelta voluta dalla richiesta).
-- Promemoria ordini: `fornitori.giorniOrdine` [0=lun..6=dom] + `oraPromemoria` (vuota = 1 h prima di `oraLimite`, altrimenti 10:00); chip giorni in `supForm` (azione `feDay`), tag 🔔 sulla card; `promInfo` + ciclo in `deadlineTick` (solo gestori, `jona_rem` chiave `p_<fid>`, notifica `tipo:'promemoria'` non ripetuta fra telefoni; niente avviso se oggi è già partito un ordine al fornitore o se l'ora limite è passata).
-- Consumi e costi: `rpCalc(R,rng)`, `rpPrev`/`rpCmp` (confronto con lo stesso tratto del periodo prima: mese→mese prima, settimana, anno, altrimenti stessa durata), `rpDrill` (tocco: 1° valore, 2° entra; mouse: clic; tastiera: Invio), pila `S.rp.back` + `rpBack`, `rpProd` (tocco sul nome prodotto).
-- Prova `tools/test-v31.mjs` (30 verdi). Verdi: test-report, orari, news, staff, v16, v29, v30 (aggiornato a `APP_VER>=30`), inviti, scaglione2.
+## Domande ancora aperte per Mario (sul collega con iPhone)
+Modello e versione iOS, app installata in Home o Safari, cosa vede (errore? niente?), data del problema.
 
-## NON fatto
-- **Cambio sottodominio workers.dev**: bloccato dal controllo di sicurezza automatico della sessione (categoria «DNS / Domain / Cert Changes») mentre preparavo lo step del workflow. Non aggirato. Resta `mario-miscera`. Quando Mario lo cambia a mano (o autorizza), serve una v32: `WK_SUB` in `index.html`, `PUSH_URL` in `sw.js`, prova del workflow, route nei test (`tools/test-firebase-*.mjs`, `test-gemini-server.mjs`), `CLAUDE.md`, `CACHE` v36. Finché l'app non è aggiornata: niente notifiche/foto/vocali/«Chiedi a Jona».
-- Maurizio Lai (registrazione/approvazione/ruolo): niente codice, lo fa Mario.
-- Mauro Loi in «F&B Manager»: da confermare con Mario.
+## NON fatto (da prima)
+- Cambio sottodominio workers.dev: bloccato dal controllo di sicurezza della sessione; resta `mario-miscera`. Se Mario lo cambia: `WK_SUB` (index.html), `PUSH_URL` (sw.js), workflow, test Firebase/Gemini, `CLAUDE.md`, `CACHE`.
+- Maurizio Lai (registrazione/ruolo): lo fa Mario. Mauro Loi in «F&B Manager»: da confermare.
 
-## Prossimi passi
-0. **Da fare ora, da soli: controllo completo dell'app.** Tutte le prove in `tools/` (anche quelle Firebase con l'emulatore, vedi `tools/README.md`), più un giro con Playwright su ogni schermata e ruolo (Staff, Admin Chef, Sviluppatore) a 320 e 390 px, tema chiaro e scuro. Correggere i difetti chiari (nuova versione v32: `APP_VER`, `NEWS`, `CACHE` v36, PR → squash → controllo online → riallineamento). Le scelte importanti NON prenderle: elencarle in fondo al resoconto finale come «Decisioni per Mario». Alla fine: resoconto dettagliato + prove numerate.
-1. Risposta di Mario sul sottodominio → v32 come sopra.
+## Prossimi passi dopo la v33
+1. Risposta del collega iPhone → se c'è ancora un errore, usare il codice mostrato.
 2. Prove dal vero di Mario: vocale Android→iPhone, gesto indietro Android, pallino, invito con codice, v31 (In turno oggi, promemoria, consumi).
+3. «Decisioni per Mario» del resoconto v32: sottodominio, netWatch, «In turno oggi» visibile allo staff, Mauro Loi F&B, `/invia` e inviti senza limiti.
 
 ## Rischi aperti
 - `/invia` del Worker non controlla chi chiama; tutti i telefoni approvati leggono tutti i messaggi e allegati.
-- `/invito/<codice>` senza limite di tentativi (resta l'approvazione del telefono).
-- Promemoria: parte solo se un telefono di un gestore ha l'app aperta (o in background attivo) dopo l'ora scelta; con l'app chiusa su tutti i telefoni l'avviso arriva alla prima apertura del giorno (prima dell'ora limite). Un cron nel Worker lo renderebbe puntuale.
-- `test-firebase-sync` già rotto da prima; `test-firebase-flow` fallisce 23:30–24:00.
+- `/invito/<codice>` senza limite di tentativi.
+- Promemoria ordini: parte solo con un telefono di un gestore aperto (un cron nel Worker lo renderebbe puntuale).
+- `test-firebase-flow` fallisce 23:30–24:00.
+- netWatch: con molte scritture di fila passa al long polling per sempre e ricarica una volta.
