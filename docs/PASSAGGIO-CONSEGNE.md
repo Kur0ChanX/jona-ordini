@@ -1,7 +1,7 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- Online la **v18** (PR #28, squash `ecbfd1a`): `APP_VER=18`, `sw.js` `CACHE=jona-ordini-v22`. File online identici a quelli provati. Ramo `backup-automatico` riallineato con `git merge origin/main`.
+- Online la **v19** (PR #29, squash `d9b493b`; animazione invertita): `APP_VER=19`, `sw.js` `CACHE=jona-ordini-v23`. File online identici a quelli provati. Ramo `backup-automatico` riallineato con `git merge origin/main`.
 - Versioni di oggi: v14 orari, v15 animazione invio + «È urgente», v16 ordine suggerito / timbratura QR (spenta) / cambi turno / contratto solo per l'amministratore + consenso sugli errori, v17 chat + «Chiedi a Jona», v18 fornitori con logo e schede grandi + animazione nuova.
 - Regole Firestore con `messaggi` pubblicate da Mario: chat verificata sul suo telefono (spunta ✓ = scritto sul server).
 - Prove tutte verdi: `test-invio-anim` 14, `test-v16` 42, `test-v17` 29, `test-orari` 70, `test-staff` 35, `test-news` 94, `test-scaglione2` 20, `test-voice` 83, `test-report` 63; con l'emulatore `test-firebase-chat` 13, `test-firebase-orari` 18, flow, push, approva-arrivi, backup.
