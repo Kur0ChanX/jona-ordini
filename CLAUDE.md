@@ -26,7 +26,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 
 ## PROTOCOLLO DI HANDOFF E RESET (Prevenzione Saturazione Contesto)
 
-- TRIGGER: Lo script `.claude/hooks/handoff-check.py` segnala quando è ora di fare l'handoff (soglia 70%). Segui le sue indicazioni. Non usare altri trigger.
+- TRIGGER: Lo script `.claude/hooks/handoff-check.py` segnala quando è ora di fare l'handoff (soglia 70% di 200k = 140k token, oppure 20 messaggi, oppure dopo una compressione automatica della conversazione). L'avviso si ripete a ogni messaggio finché l'handoff non è fatto: eseguilo SUBITO, prima di qualsiasi lavoro nuovo. Non usare altri trigger.
 
 - AZIONE AUTOMATICA:
   1. Genera o aggiorna l'Handoff Tecnico conciso (max 1000 parole) in `docs/PASSAGGIO-CONSEGNE.md` contenente:
