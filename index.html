@@ -171,6 +171,10 @@ html.staff-ui .news-v li{font-size:17px}
 .fdot.lg{width:46px;height:46px;font-size:20px}
 .tag{display:inline-block;font:400 11.5px/1 var(--font);padding:4px 7px;border-radius:6px;background:var(--sunk);color:var(--muted);vertical-align:2px;border:1px solid var(--line)}
 .tag.gm{background:var(--lagoon-soft);color:var(--lagoon);border-color:transparent}
+.tag.urg{background:var(--corallo);color:#fff;border-color:transparent;font-weight:700}
+.panel.urg{box-shadow:inset 4px 0 0 var(--corallo)}
+.urg-b{min-height:44px;border-radius:12px;border:2px solid var(--corallo);background:transparent;color:var(--corallo);font:600 15px/1 var(--font);padding:0 14px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.urg-b.on{background:var(--corallo);color:#fff}
 .tag.best{background:var(--mirto-soft);color:var(--mirto);border-color:transparent}
 .sup{display:inline-flex;align-items:center;gap:7px;font:500 13.5px/1.2 var(--font);color:var(--ink2)}
 .sup i{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
@@ -688,8 +692,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=12;
+const APP_VER=13;
 const NEWS=[
+  {v:13,data:'2026-10-04',titolo:'Prodotti urgenti e prezzi aumentati',
+    tutti:['Nel carrello, sotto ogni prodotto, c\'è il pulsante «È urgente?». Toccalo se quel prodotto serve subito: Maurizio riceve un avviso importante e vede la tua richiesta in cima.','Se nel controllo merce manca un prodotto che avevi chiesto tu, ricevi un avviso.'],
+    chef:['Le richieste con prodotti urgenti sono in cima, con la scritta rossa URGENTE. La notifica sul telefono resta sullo schermo finché non la tocchi.','Quando carichi un listino o una fattura, in alto vedi i prodotti che costano di più, con la percentuale di aumento. Dopo il salvataggio compare il riepilogo «Prezzi aumentati» e arriva una notifica.','Nella notifica del controllo merce vedi i prodotti mancanti o arrivati in meno e chi li aveva chiesti.'],
+    dev:{aggiunte:['Import: `pctUp`, `pctS`, `rvUps` (aumenti rispetto a `matchProd`), banner in `reviewSheet`, `upsSheet` dopo `reviewSave`, notifica tipo `prezzi`; nel listino il pill «era» diventa rosso con la percentuale.','Urgenza: `S.cart[i].urg` (azione `curg`), `items[i].urgente` nella richiesta e `urgente` sulla riga d\'ordine; `reqUrg` ordina le richieste; notifica tipo `urgente` con titolo che inizia per «URGENTE» (`sw.js`: `requireInteraction` e vibrazione lunga).','Controllo merce: `ricezione.righe[i]` ha `key` e `da` (nomi di chi aveva chiesto); `rcvDiffTxt`; avviso per persona a chi aveva chiesto i prodotti mancanti.']}},
   {v:12,data:'2026-10-04',titolo:'Controllo merce a colori e invii sicuri',
     tutti:['Controllo della merce più semplice: tocca ogni prodotto. 1 tocco verde «c\'è», 2 tocchi rosso «manca», 3 tocchi giallo «ne è arrivato meno» (scegli quanti). In alto vedi quanti ne hai fatti, per esempio «9 di 14». Se è tutto giusto basta «È arrivato tutto».','Se manca la rete, in alto compare «Non ancora arrivata a Maurizio»: la richiesta parte da sola appena torna la rete e vedi «Arrivata ✓». Se hai fretta c\'è il pulsante «Manda SMS».'],
     chef:['In approvazione la richiesta è divisa in blocchi colorati, uno per fornitore. Con «+ Aggiungi da …» dentro il blocco aggiungi prodotti cercando solo nel listino di quel fornitore.','I prodotti senza fornitore sono in un blocco rosso: scegli il fornitore prima di approvare.','Nel controllo merce ora vedi anche i prodotti «non controllati».'],
@@ -1321,9 +1329,12 @@ function vCarrello(me){
   const g=new Map();for(const l of lines){if(!g.has(l.fid))g.set(l.fid,[]);g.get(l.fid).push(l)}
   let tot=0;for(const l of lines)if(l.p&&l.p.prezzo!=null)tot+=l.p.prezzo*l.qta;
   const nf=[...g.keys()].filter(Boolean).length;const staff=!isMgr(me);
-  const lineH=l=>`<div class="line${staff?' big':''}"><div class="ln-i"><div class="ln-n">${esc(l.libero?l.nome:l.p.nome)}${l.libero&&staff?' <span class="tag">fuori listino</span>':''}</div>${l.libero?`<input class="inp unit-inp" id="cu-${l.pid}" value="${esc(l.unita||'')}" placeholder="unità" data-ch="cunit" data-p="${l.pid}" aria-label="Unità">`:`<div class="ln-m">${l.p.codice&&!staff?'cod. '+esc(l.p.codice):''}${sp&&l.p.prezzo!=null?` ${eur(l.p.prezzo)}${l.p.unita?' / '+esc(l.p.unita):''}`:(l.p.unita?' '+esc(l.p.unita):'')}</div>`}</div>
-  ${stepper('c',l.pid,l.qta,`data-p="${l.pid}"`)}<button type="button" class="icon-btn" data-a="crm" data-p="${l.pid}" aria-label="Rimuovi">${ic('trash')}</button></div>`;
-  return`<h1 class="vt">Carrello</h1><p class="vsub">${lines.length} ${lines.length===1?'articolo':'articoli'}${nf&&!staff?` da ${nf} ${nf===1?'fornitore':'fornitori'}`:''}. ${staff?'Controlla le quantità e premi «Invia allo chef».':'Controlla le quantità e invia allo chef.'}</p>
+  const lineH=l=>`<div class="line wrap${staff?' big':''}"><div class="ln-i"><div class="ln-n">${esc(l.libero?l.nome:l.p.nome)}${l.libero&&staff?' <span class="tag">fuori listino</span>':''}</div>${l.libero?`<input class="inp unit-inp" id="cu-${l.pid}" value="${esc(l.unita||'')}" placeholder="unità" data-ch="cunit" data-p="${l.pid}" aria-label="Unità">`:`<div class="ln-m">${l.p.codice&&!staff?'cod. '+esc(l.p.codice):''}${sp&&l.p.prezzo!=null?` ${eur(l.p.prezzo)}${l.p.unita?' / '+esc(l.p.unita):''}`:(l.p.unita?' '+esc(l.p.unita):'')}</div>`}</div>
+  ${stepper('c',l.pid,l.qta,`data-p="${l.pid}"`)}<button type="button" class="icon-btn" data-a="crm" data-p="${l.pid}" aria-label="Rimuovi">${ic('trash')}</button>
+  <div class="ln-x"><button type="button" class="urg-b${l.urg?' on':''}" data-a="curg" data-p="${l.pid}" aria-pressed="${!!l.urg}">${ic('warn')} ${l.urg?'Urgente ✓':'È urgente?'}</button></div></div>`;
+  const nu=lines.filter(l=>l.urg).length;
+  return`<h1 class="vt">Carrello</h1><p class="vsub">${lines.length} ${lines.length===1?'articolo':'articoli'}${nf&&!staff?` da ${nf} ${nf===1?'fornitore':'fornitori'}`:''}. ${staff?'Controlla le quantità e premi «Invia allo chef».':'Controlla le quantità e invia allo chef.'} Se un prodotto serve subito tocca «È urgente?».</p>
+  ${nu?`<div class="banner dup" role="note">${ic('warn')}<div><b>${nu===1?'1 prodotto urgente':nu+' prodotti urgenti'}.</b> Maurizio riceve un avviso importante e li vede in cima.</div></div>`:''}
   <div class="panel">${staff?`<div class="fsec">${lines.map(lineH).join('')}</div>`:[...g.entries()].map(([fid,ls])=>`<div class="fsec"><div class="fsec-h"><span class="sup" style="--c:${fcolor(fid)}"><i></i>${fid?esc(forn(fid).nome):'Fuori listino, lo assegna lo chef'}</span><span class="muted small">${ls.length}</span></div>
   ${ls.map(lineH).join('')}</div>`).join('')}
   ${sp&&tot?`<div class="total"><span>Totale stimato</span><b>${eur(tot)}</b></div>`:''}</div>
@@ -1334,6 +1345,7 @@ async function sendCart(){
   const me=meU();const lines=cartLines();if(!lines.length)return;
   const items=lines.map(l=>l.libero?{libero:true,nome:l.nome,qta:l.qta,unita:l.unita||'pz',fornitoreId:'',fornitoreNome:'',codice:'',prezzo:null}
     :{pid:l.p.id,nome:l.p.nome,codice:l.p.codice||'',unita:l.p.unita||'',prezzo:l.p.prezzo??null,fornitoreId:l.p.fornitoreId,fornitoreNome:forn(l.p.fornitoreId).nome,qta:l.qta});
+  lines.forEach((l,i)=>{if(l.urg)items[i].urgente=true});
   const dup=findDoppi(items,me);
   if(dup.length){
     const L=dup.slice(0,5).map(d=>`${d.nome}: chiesto da ${d.self?'te':firstName(d.da)} ${quandoAlle(d.quando)} (${d.st})`);if(dup.length>5)L.push('…e altri '+(dup.length-5));
@@ -1343,7 +1355,9 @@ async function sendCart(){
   const doc={utenteId:me.id,utenteNome:fullName(me),reparto:me.reparto||'altro',mansione:me.mansione||'',items,nota:S.cnote.trim(),stato:'inviata',creato:now()};
   if(dup.length)doc.doppi=dup.map(d=>({nome:d.nome,da:d.da,quando:d.quando}));
   await put('richieste',id,doc);
-  await notify('gm','Nuova richiesta da '+me.nome,`${REPARTI[me.reparto]||''}, ${items.length} ${items.length===1?'articolo':'articoli'}${nf?' da '+nf+(nf===1?' fornitore':' fornitori'):''}${dup.length?' (possibile doppione)':''}`,'richiesta',id);
+  const urg=items.filter(i=>i.urgente);
+  if(urg.length)await notify('gm','URGENTE: '+me.nome+' chiede '+urg.map(i=>i.nome).slice(0,3).join(', ')+(urg.length>3?'…':''),`${urg.length===1?'Serve subito':urg.length+' prodotti servono subito'}. Richiesta di ${items.length} ${items.length===1?'articolo':'articoli'}${dup.length?' (possibile doppione)':''}`,'urgente',id);
+  else await notify('gm','Nuova richiesta da '+me.nome,`${REPARTI[me.reparto]||''}, ${items.length} ${items.length===1?'articolo':'articoli'}${nf?' da '+nf+(nf===1?' fornitore':' fornitori'):''}${dup.length?' (possibile doppione)':''}`,'richiesta',id);
   S.cart=[];saveCart();S.cnote='';S.tab='miei';render();window.scrollTo(0,0);
   openSheet({render:()=>`<div class="grab"></div><div class="done">${ic('check','big')}<h2>Inviato allo chef</h2><p class="muted">Riceverai una notifica quando approva o rifiuta la richiesta.</p><div class="btns col"><button type="button" class="btn primary block" data-a="logout">${ic('logout')} Esci dal profilo</button><button type="button" class="btn ghost block" data-a="closeSheet">Continua</button></div></div>`});
 }
@@ -1376,7 +1390,7 @@ function reqStatus(r){
 function groupByF(items){const g=new Map();for(const it of items){const k=it.fornitoreId||'';if(!g.has(k))g.set(k,[]);g.get(k).push(it)}return[...g.entries()]}
 function itemsRO(r){
   return groupByF(r.items||[]).map(([fid,its])=>`<div class="fsec"><div class="fsec-h"><span class="sup" style="--c:${fcolor(fid)}"><i></i>${fid?esc(forn(fid).nome||its[0].fornitoreNome):'Da assegnare'}</span>${r.ordinati&&r.ordinati[fid]?`<span class="muted small">ordinato ${ago(r.ordinati[fid])}</span>`:''}</div>
-  ${its.map(it=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(it.nome)}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice)+' ':''}${it.aggiunto?'<span class="was">aggiunto dallo chef</span>':it.qtaOrig!=null&&it.qtaOrig!==it.qta?`<span class="was">chiesti ${fq(it.qtaOrig)}, lo chef ha messo ${fq(it.qta)}</span>`:''}</div></div><b>${fq(it.qta)}</b><span class="ln-u">${esc(it.unita||'')}</span></div>`).join('')}</div>`).join('')
+  ${its.map(it=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(it.nome)}${it.urgente?' <span class="tag urg">urgente</span>':''}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice)+' ':''}${it.aggiunto?'<span class="was">aggiunto dallo chef</span>':it.qtaOrig!=null&&it.qtaOrig!==it.qta?`<span class="was">chiesti ${fq(it.qtaOrig)}, lo chef ha messo ${fq(it.qta)}</span>`:''}</div></div><b>${fq(it.qta)}</b><span class="ln-u">${esc(it.unita||'')}</span></div>`).join('')}</div>`).join('')
   +((r.rimossi&&r.rimossi.length)?`<p class="removed">Tolti dallo chef: ${esc(r.rimossi.map(x=>x.nome).join(', '))}</p>`:'');
 }
 function reqSummary(r,who){
@@ -1418,10 +1432,11 @@ function ask(title,text,ok,danger,input){
 
 /* ================= GM: richieste ================= */
 function itemsOf(r){return S.drafts[r.id]||r.items||[]}
+const reqUrg=r=>(r.items||[]).some(i=>i.urgente)?1:0;
 function draft(rid){if(!S.drafts[rid]){const r=D().richieste[rid];S.drafts[rid]=clone(r.items||[]).map(it=>Object.assign(it,{qtaOrig:it.qtaOrig??it.qta}));S.removed[rid]=[]}return S.drafts[rid]}
 function altsOf(it){const p=D().prodotti[it.pid];const arr=S.gidx.get(gkey(p?p.nome:it.nome))||[];return arr.some(x=>x.id===it.pid)?arr:[]}
 function vRichieste(){
-  const pend=Object.values(D().richieste).filter(r=>r.stato==='inviata').sort((a,b)=>a.creato-b.creato);
+  const pend=Object.values(D().richieste).filter(r=>r.stato==='inviata').sort((a,b)=>reqUrg(b)-reqUrg(a)||a.creato-b.creato);
   const seg=`<div class="seg" role="group" aria-label="Raggruppa">${[['utente','Per persona'],['fornitore','Per fornitore'],['reparto','Per reparto']].map(([k,l])=>`<button type="button" aria-pressed="${S.grp===k}" data-a="grp" data-v="${k}">${l}</button>`).join('')}</div>`;
   let body;
   if(!pend.length)body=empty('inbox','Nessuna richiesta in attesa','Quando qualcuno dello staff invia una richiesta ricevi una notifica e la trovi qui.');
@@ -1436,16 +1451,16 @@ function vRichieste(){
 function bySupplier(pend){
   const m=new Map();
   for(const r of pend)for(const it of itemsOf(r)){const fid=it.fornitoreId||'';if(!m.has(fid))m.set(fid,new Map());const L=m.get(fid);const k=it.pid||('l:'+norm(it.nome));
-    if(!L.has(k))L.set(k,{nome:it.nome,codice:it.codice,unita:it.unita,qta:0,da:[]});const x=L.get(k);x.qta=r3(x.qta+Number(it.qta));x.da.push(firstName(r.utenteNome)+' '+fq(it.qta))}
+    if(!L.has(k))L.set(k,{nome:it.nome,codice:it.codice,unita:it.unita,qta:0,da:[]});const x=L.get(k);if(it.urgente)x.urgente=true;x.qta=r3(x.qta+Number(it.qta));x.da.push(firstName(r.utenteNome)+' '+fq(it.qta))}
   return`<div style="height:12px"></div>`+[...m.entries()].map(([fid,L])=>`<section class="panel"><div class="fsum-h"><span class="sup big" style="--c:${fcolor(fid)}"><i></i>${fid?esc(forn(fid).nome):'Da assegnare'}</span><span class="muted small">${L.size} ${L.size===1?'prodotto':'prodotti'}</span></div>
-  ${[...L.values()].map(x=>`<div class="sline"><div><div class="ln-n">${esc(x.nome)}</div><div class="ln-m">${x.codice?'cod. '+esc(x.codice)+', ':''}${esc(x.da.join(', '))}</div></div><span class="sl-q">${fq(x.qta)} ${esc(x.unita||'')}</span></div>`).join('')}</section>`).join('')
+  ${[...L.values()].map(x=>`<div class="sline"><div><div class="ln-n">${esc(x.nome)}${x.urgente?' <span class="tag urg">urgente</span>':''}</div><div class="ln-m">${x.codice?'cod. '+esc(x.codice)+', ':''}${esc(x.da.join(', '))}</div></div><span class="sl-q">${fq(x.qta)} ${esc(x.unita||'')}</span></div>`).join('')}</section>`).join('')
   +`<p class="hint">Per approvare o modificare passa alla vista Per persona.</p>`;
 }
 function reqCard(r){
   const items=itemsOf(r).map((it,idx)=>Object.assign({},it,{idx}));const u=D().staff[r.utenteId]||{id:r.utenteId,nome:r.utenteNome};const dirty=!!S.drafts[r.id];
   let tot=0;for(const it of items)if(it.prezzo!=null)tot+=it.prezzo*it.qta;
-  return`<article class="panel">
-  <header class="req-h">${avatar(u,46)}<div class="req-who"><div class="req-n">${esc(r.utenteNome)}</div><div class="req-m">${esc([r.mansione,REPARTI[r.reparto]].filter(Boolean).join(', '))}</div></div><time class="req-t">${ago(r.creato)}</time></header>
+  return`<article class="panel${reqUrg(r)?' urg':''}">
+  <header class="req-h">${avatar(u,46)}<div class="req-who"><div class="req-n">${esc(r.utenteNome)}${reqUrg(r)?' <span class="tag urg">URGENTE</span>':''}</div><div class="req-m">${esc([r.mansione,REPARTI[r.reparto]].filter(Boolean).join(', '))}</div></div><time class="req-t">${ago(r.creato)}</time></header>
   ${r.nota?`<p class="req-note">${esc(r.nota)}</p>`:''}
   ${r.doppi&&r.doppi.length?`<div class="banner dup" role="note">${ic('warn')}<div><b>Possibile doppione.</b> Già chiesto nelle ultime 24 ore:<ul>${r.doppi.slice(0,5).map(d=>`<li>${esc(d.nome)}: chiesto da ${esc(d.da||'?')} ${esc(quandoAlle(d.quando))}</li>`).join('')}</ul>Decidi tu se ordinarlo di nuovo.</div></div>`:''}
   ${groupByF(items).map(([fid,its])=>{const f=forn(fid);const m=fid&&METODI[f.metodo];return`<div class="fsec fblk${fid?'':' nof'}" style="--c:${fcolor(fid)}"><div class="fsec-h"><span class="sup"><i></i>${fid?esc(f.nome):'Senza fornitore'}</span>${m?`<span class="muted small">${ic(m.i)} ${m.l}</span>`:''}</div>${fid?'':`<p class="nof-h">${ic('warn')} Scegli il fornitore: senza non si può approvare.</p>`}${its.map(it=>gmLine(r.id,it)).join('')}${fid?`<button type="button" class="btn ghost sm block fadd" data-a="rpick" data-r="${r.id}" data-f="${fid}">${ic('plus')} Aggiungi da ${esc(f.nome)}</button>`:''}</div>`}).join('')}
@@ -1459,7 +1474,7 @@ function gmLine(rid,it){
   if(it.libero)sw=`<select class="inp sm" id="rsup-${rid}-${it.idx}" data-ch="rsup" data-r="${rid}" data-i="${it.idx}" aria-label="Fornitore"><option value="">Scegli il fornitore…</option>${Object.values(D().fornitori).sort(byNome).map(f=>`<option value="${f.id}" ${it.fornitoreId===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}</select>`;
   else{const alts=altsOf(it);if(alts.length>1)sw=`<select class="inp sm" id="rsw-${rid}-${it.idx}" data-ch="rswap" data-r="${rid}" data-i="${it.idx}" aria-label="Cambia fornitore">${alts.map(p=>`<option value="${p.id}" ${p.id===it.pid?'selected':''}>${esc(forn(p.fornitoreId).nome)}${p.prezzo!=null?', '+eur(p.prezzo)+(p.unita?' / '+p.unita:''):''}</option>`).join('')}</select>`}
   const ch=!it.aggiunto&&it.qtaOrig!=null&&it.qtaOrig!==it.qta;
-  return`<div class="line wrap"><div class="ln-i"><div class="ln-n">${esc(it.nome)}${it.libero?' <span class="tag">fuori listino</span>':''}${it.aggiunto?' <span class="tag gm">aggiunto da te</span>':''}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice):''}${it.prezzo!=null?' '+eur(it.prezzo)+(it.unita?' / '+esc(it.unita):''):''}${ch?` <span class="was">chiesti ${fq(it.qtaOrig)}</span>`:''}</div></div>
+  return`<div class="line wrap"><div class="ln-i"><div class="ln-n">${esc(it.nome)}${it.urgente?' <span class="tag urg">urgente</span>':''}${it.libero?' <span class="tag">fuori listino</span>':''}${it.aggiunto?' <span class="tag gm">aggiunto da te</span>':''}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice):''}${it.prezzo!=null?' '+eur(it.prezzo)+(it.unita?' / '+esc(it.unita):''):''}${ch?` <span class="was">chiesti ${fq(it.qtaOrig)}</span>`:''}</div></div>
   ${stepper('rq',rid+'-'+it.idx,it.qta,`data-r="${rid}" data-i="${it.idx}"`)}<span class="ln-u">${esc(it.unita||'')}</span><button type="button" class="icon-btn" data-a="rrm" data-r="${rid}" data-i="${it.idx}" aria-label="Togli ${esc(it.nome)}">${ic('x')}</button>${sw?`<div class="ln-x">${sw}</div>`:''}</div>`;
 }
 // «+ Aggiungi» dentro il blocco di un fornitore: cerca solo nel suo listino, così ogni prodotto aggiunto ha già il fornitore.
@@ -1488,7 +1503,7 @@ async function approve(rid){
     const o=cur?clone(cur):{fornitoreId:fid,fornitoreNome:forn(fid).nome,stato:'aperto',items:[],richieste:[],creato:now()};
     for(const it of its){const key=it.pid||('l:'+norm(it.nome));let L=o.items.find(x=>x.key===key);
       if(!L){L={key,pid:it.pid||'',nome:it.nome,codice:it.codice||'',unita:it.unita||'',prezzo:it.prezzo??null,qta:0,da:[]};o.items.push(L)}
-      L.qta=r3(L.qta+Number(it.qta));L.da.push({n:r.utenteNome,r:r.reparto,q:Number(it.qta)})}
+      if(it.urgente)L.urgente=true;L.qta=r3(L.qta+Number(it.qta));L.da.push({n:r.utenteNome,r:r.reparto,q:Number(it.qta)})}
     if(!o.richieste.includes(rid))o.richieste.push(rid);o.aggiornato=now();delete o.id;
     await put('ordini',oid,o);
   }
@@ -1536,7 +1551,7 @@ function orderCard(o){
   const f=forn(o.fornitoreId),m=METODI[f.metodo]||{l:'Metodo da definire',i:'mail'},meta=metaOf(o);
   let tot=0;for(const l of o.items)if(l.prezzo!=null)tot+=l.prezzo*l.qta;
   return`<article class="panel"><header class="ord-h"><div><span class="sup big" style="--c:${fcolor(f.id)}"><i></i>${esc(f.nome)}</span><div class="ord-m">${ic(m.i)} ${m.l}${f.referente?', '+esc(f.referente):''}</div>${dlBadge(f.id)}</div><button type="button" class="icon-btn" data-a="pick" data-f="${f.id}" aria-label="Aggiungi prodotto">${ic('plus')}</button></header>
-  <div class="olines">${o.items.map((l,i)=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(l.nome)}</div><div class="ln-m">${l.codice?'cod. '+esc(l.codice):'senza codice'}${l.prezzo!=null?', '+eur(l.prezzo)+(l.unita?' / '+esc(l.unita):''):''}${l.da&&l.da.length?'<br>'+esc(l.da.map(d=>firstName(d.n)+' '+fq(d.q)).join(', ')):''}</div></div>
+  <div class="olines">${o.items.map((l,i)=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(l.nome)}${l.urgente?' <span class="tag urg">urgente</span>':''}</div><div class="ln-m">${l.codice?'cod. '+esc(l.codice):'senza codice'}${l.prezzo!=null?', '+eur(l.prezzo)+(l.unita?' / '+esc(l.unita):''):''}${l.da&&l.da.length?'<br>'+esc(l.da.map(d=>firstName(d.n)+' '+fq(d.q)).join(', ')):''}</div></div>
   ${stepper('oq',o.id+'-'+i,l.qta,`data-o="${o.id}" data-i="${i}"`)}<span class="ln-u">${esc(l.unita||'')}</span><button type="button" class="icon-btn" data-a="orm" data-o="${o.id}" data-i="${i}" aria-label="Togli">${ic('x')}</button></div>`).join('')}</div>
   ${tot?`<div class="total"><span>Totale stimato</span><b>${eur(tot)}</b></div>`:''}
   <div class="ord-body"><div class="two"><div><label class="lbl" for="dc-${o.id}">Consegna richiesta</label><input type="date" class="inp" id="dc-${o.id}" value="${esc(meta.consegna)}" data-in="ometa" data-o="${o.id}" data-k="consegna"></div>
@@ -1788,25 +1803,33 @@ async function setBolla(oid,fs){
   const img=await loadImg(fs[0]);const sc=Math.min(1,1400/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
   rcvState(oid).foto=c.toDataURL('image/jpeg',.6);refreshSheet();
 }
+const rcvDiffTxt=d=>d.nome+': '+(d.motivo==='mancante'?'manca':'arrivati '+fq(d.arr)+' su '+fq(d.qta));
 async function confirmReceipt(oid,all){
   const o=D().ordini[oid];if(!o||o.ricevuto)return;const R=rcvState(oid);const me=meU();const f=forn(o.fornitoreId);
   const nc0=all?0:R.lines.filter(l=>!l.st).length;
   if(nc0&&!await ask(nc0===1?'Un prodotto non controllato':nc0+' prodotti non controllati','Puoi inviare lo stesso: Maurizio li vedrà come «non controllati».','Invia lo stesso'))return;
   const righe=o.items.map((l,i)=>{const L=all?{st:'ok'}:R.lines[i];
     const arr=L.st==='ko'?0:L.st==='meno'?L.arr:l.qta;const motivo=!L.st?'nonctrl':L.st==='ko'?'mancante':arr!==l.qta?'quantita':'';
-    return{nome:l.nome,codice:l.codice||'',unita:l.unita||'',qta:l.qta,arr,motivo}});
+    return{nome:l.nome,codice:l.codice||'',unita:l.unita||'',qta:l.qta,arr,motivo,key:l.key||'',da:[...new Set((l.da||[]).map(x=>firstName(x.n||'')).filter(Boolean))]}});
   const diffs=righe.filter(r=>r.motivo&&r.motivo!=='nonctrl');const nc=righe.length-righe.filter(r=>r.motivo!=='nonctrl').length;
   await upd('ordini',oid,{ricevuto:now(),ricevutoDa:me.id,ricevutoNome:fullName(me),ricezione:{righe,note:all?'':R.note.trim(),foto:all?'':R.foto},differenze:diffs.length,nonControllati:nc});
   for(const rid of o.richieste||[]){const r=D().richieste[rid];if(r)await upd('richieste',rid,{arrivati:Object.assign({},r.arrivati||{},{[o.fornitoreId]:now()})})}
   await notify('gm',diffs.length?`Consegna ${f.nome}: ${diffs.length===1?'1 differenza':diffs.length+' differenze'}`:`Consegna ${f.nome} arrivata`,
-    (diffs.length?diffs.slice(0,3).map(d=>d.nome+' '+(d.motivo==='mancante'?'manca':'arrivati '+fq(d.arr)+' su '+fq(d.qta))).join(', ')+(diffs.length>3?'…':''):'Controllata da '+me.nome+(nc?'':', tutto ok'))+(nc?(diffs.length?'; ':', ')+nc+' non controllati':''),'arrivo',oid);
+    (diffs.length?diffs.slice(0,5).map(d=>rcvDiffTxt(d)+(d.da.length?' (chiesto da '+d.da.join(', ')+')':'')).join('; ')+(diffs.length>5?'; …e altri '+(diffs.length-5):'')+'. Controllata da '+me.nome:'Controllata da '+me.nome+(nc?'':', tutto ok'))+(nc?(diffs.length?'; ':', ')+nc+' non controllati':''),'arrivo',oid);
+  // Chi aveva chiesto un prodotto mancante o arrivato in meno riceve un avviso solo per i suoi prodotti.
+  if(diffs.length){const per=new Map();
+    for(const rid of o.richieste||[]){const r=D().richieste[rid];if(!r||!r.utenteId||r.utenteId===me.id)continue;
+      for(const it of r.items||[]){const k=it.pid||('l:'+norm(it.nome));const d=diffs.find(x=>x.key===k);if(!d)continue;
+        if(!per.has(r.utenteId))per.set(r.utenteId,new Map());per.get(r.utenteId).set(k,d)}}
+    for(const [u,m] of per){const ds=[...m.values()];
+      await notify(u,`Consegna ${f.nome}: manca qualcosa che avevi chiesto`,ds.map(rcvDiffTxt).join('; ')+'. Maurizio è già avvisato.','arrivo',oid)}}
   delete S.rcv[oid];closeSheet();toast(diffs.length?'Controllo inviato: Maurizio vede le differenze':nc?'Controllo inviato: '+nc+' non controllati':'Consegna registrata, tutto ok');
 }
 function receiptView(oid){
   openSheet({cls:'tall',render:()=>{const o=D().ordini[oid];if(!o||!o.ricevuto)return'<p class="muted">Controllo non trovato.</p>';const f=forn(o.fornitoreId);const rz=o.ricezione||{righe:[]};
     return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Consegna ${esc(f.nome)}<div class="sh-s">Controllata da ${esc(o.ricevutoNome||'')} ${ago(o.ricevuto)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     ${o.differenze||o.nonControllati?'':`<p>${pill('ok','tutto arrivato')}</p>`}
-    <div>${rz.righe.map(r=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(r.nome)}</div><div class="ln-m">ordinati ${fq(r.qta)}, arrivati ${fq(r.arr)} ${esc(r.unita||'')}</div></div>${r.motivo?pill(r.motivo==='danneggiato'||r.motivo==='mancante'?'ko':'wait',MOTIVI[r.motivo]||r.motivo):pill('ok','ok')}</div>`).join('')}</div>
+    <div>${rz.righe.map(r=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(r.nome)}</div><div class="ln-m">ordinati ${fq(r.qta)}, arrivati ${fq(r.arr)} ${esc(r.unita||'')}${r.motivo&&r.motivo!=='nonctrl'&&r.da&&r.da.length?`<br>chiesto da ${esc(r.da.join(', '))}`:''}</div></div>${r.motivo?pill(r.motivo==='danneggiato'||r.motivo==='mancante'?'ko':'wait',MOTIVI[r.motivo]||r.motivo):pill('ok','ok')}</div>`).join('')}</div>
     ${rz.note?`<p class="gm-note"><b>Note:</b> ${esc(rz.note)}</p>`:''}${rz.foto?`<div class="bolla"><img src="${rz.foto}" alt="Foto della bolla"></div>`:''}`}});
 }
 </script>
@@ -1833,7 +1856,7 @@ function supSheet(fid,tab){
 function supList(fid){
   const q=norm(S.supQ);const toks=q?q.split(' '):[];
   const list=prods().filter(p=>p.fornitoreId===fid&&(!toks.length||toks.every(t=>norm(p.nome+' '+(p.codice||'')+' '+(p.categoria||'')).includes(t)))).sort(byNome);
-  return list.slice(0,200).map(p=>`<button type="button" class="prow" data-a="pedit" data-p="${p.id}"><div class="row-i"><div class="row-t">${esc(p.nome)}${p.demo?' <span class="tag">demo</span>':''}</div><div class="row-m">${esc([p.codice?'cod. '+p.codice:'',p.categoria].filter(Boolean).join(', '))}${p.prezzoPrec!=null&&p.prezzoPrec!==p.prezzo?`<span class="st wait">era ${eur(p.prezzoPrec)}</span>`:''}</div></div><span class="pr">${p.prezzo!=null?eur(p.prezzo):'—'}<span class="muted small">${p.unita?' / '+esc(p.unita):''}</span></span></button>`).join('')+(list.length>200?`<p class="muted small">Mostro 200 di ${list.length}: usa la ricerca.</p>`:'');
+  return list.slice(0,200).map(p=>`<button type="button" class="prow" data-a="pedit" data-p="${p.id}"><div class="row-i"><div class="row-t">${esc(p.nome)}${p.demo?' <span class="tag">demo</span>':''}</div><div class="row-m">${esc([p.codice?'cod. '+p.codice:'',p.categoria].filter(Boolean).join(', '))}${p.prezzoPrec!=null&&p.prezzoPrec!==p.prezzo?`<span class="st ${pctUp(p.prezzoPrec,p.prezzo)?'ko':'wait'}">era ${eur(p.prezzoPrec)}${pctUp(p.prezzoPrec,p.prezzo)?', '+pctS(pctUp(p.prezzoPrec,p.prezzo)):''}</span>`:''}</div></div><span class="pr">${p.prezzo!=null?eur(p.prezzo):'—'}<span class="muted small">${p.unita?' / '+esc(p.unita):''}</span></span></button>`).join('')+(list.length>200?`<p class="muted small">Mostro 200 di ${list.length}: usa la ricerca.</p>`:'');
 }
 function supForm(fid){
   const f=S.fe;const F=(k,l,t='text',ph='',im='')=>`<label class="lbl" for="fe-${k}">${l}</label><input class="inp" id="fe-${k}" type="${t}" ${im?`inputmode="${im}"`:''} value="${esc(f[k]||'')}" placeholder="${esc(ph)}" data-in="fe" data-k="${k}">`;
@@ -1990,16 +2013,23 @@ async function impRun(kind,files){
     S.rev={fonte,items:rows};closeSheet();reviewSheet();
   }catch(e){I.stage='pick';I.err=errMsg(e);refreshSheet()}
 }
+// Aumento di prezzo in percentuale (0 se non è aumentato o manca il prezzo vecchio).
+function pctUp(old,nw){return old>0&&nw!=null&&nw>old?Math.round((nw-old)/old*1000)/10:0}
+const pctS=x=>'+'+String(x).replace('.',',')+'%';
+// Prodotti dell'import che costano più di prima, dal più aumentato.
+function rvUps(items){const out=[];for(const it of items){if(!it.fid)continue;const m=matchProd(prods().filter(p=>p.fornitoreId===it.fid),it);const nw=num(it.prezzo);
+  const pc=m?pctUp(m.prezzo,nw):0;if(pc)out.push({it,nome:String(it.nome).trim(),fnome:forn(it.fid).nome,old:m.prezzo,nw,pc})}return out.sort((a,b)=>b.pc-a.pc)}
 function matchProd(existing,it){const c=norm(it.codice);return(c&&existing.find(p=>norm(p.codice)===c))||existing.find(p=>norm(p.nome)===norm(it.nome))}
 function reviewSheet(){
   openSheet({cls:'tall',render:()=>{const R=S.rev;if(!R)return'<p class="muted">Niente da importare.</p>';const ns=R.items.filter(i=>i.sel).length;const fs=Object.values(D().fornitori).sort(byNome);
-  const miss=R.items.filter(i=>!i.fid).length;
+  const miss=R.items.filter(i=>!i.fid).length;const ups=rvUps(R.items);
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Controlla e salva<div class="sh-s">${R.items.length} prodotti, da ${esc(R.fonte)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <p class="muted" style="margin:0">Correggi quello che serve. Se un prodotto esiste già nel listino del fornitore, aggiorno nome e prezzo.</p>
   ${miss?`<div class="err">${miss===1?'Una riga':miss+' righe'} senza fornitore riconosciuto: scegli il fornitore${R.items.length>1?' (puoi applicarlo a tutte con il menu qui sotto)':''}.</div><select class="inp" id="rv-all-f" data-ch="rvallf" aria-label="Fornitore per le righe senza fornitore"><option value="">Assegna un fornitore alle righe mancanti…</option>${fs.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')}</select>`:''}
+  ${ups.length?`<div class="banner dup" role="note">${ic('warn')}<div><b>${ups.length===1?'1 prodotto costa di più':ups.length+' prodotti costano di più'}</b> rispetto al listino:<ul>${ups.slice(0,8).map(u=>`<li>${esc(u.nome)}: ${eur(u.old)} → ${eur(u.nw)} <b>${pctS(u.pc)}</b></li>`).join('')}</ul>${ups.length>8?`…e altri ${ups.length-8}, segnati in rosso qui sotto.`:''}</div></div>`:''}
   <label class="checkall"><input type="checkbox" id="rvall" data-ch="rvall" ${ns===R.items.length?'checked':''}> Seleziona tutti</label>
   <div>${R.items.map((it,i)=>{const ex=prods().filter(p=>p.fornitoreId===it.fid);const m=it.fid&&matchProd(ex,it);
-    const st=!it.fid?pill('ko','fornitore mancante'+(it.fnome?': '+it.fnome:'')):m?(num(it.prezzo)!==m.prezzo?pill('wait','prezzo attuale '+(m.prezzo!=null?eur(m.prezzo):'vuoto')):pill('','già a listino')):pill('ok','nuovo');const id=`rv-${i}`;
+    const st=!it.fid?pill('ko','fornitore mancante'+(it.fnome?': '+it.fnome:'')):m?(num(it.prezzo)!==m.prezzo?(pctUp(m.prezzo,num(it.prezzo))?pill('ko','aumentato '+pctS(pctUp(m.prezzo,num(it.prezzo)))+', era '+eur(m.prezzo)):pill('wait','prezzo attuale '+(m.prezzo!=null?eur(m.prezzo):'vuoto'))):pill('','già a listino')):pill('ok','nuovo');const id=`rv-${i}`;
     return`<div class="rv ${it.sel?'':'off'}"><input type="checkbox" class="rv-c" id="${id}-s" data-ch="rvsel" data-i="${i}" ${it.sel?'checked':''} ${it.fid?'':'disabled'} aria-label="Seleziona ${esc(it.nome)}"><div class="rv-f">
     <select class="inp sm" id="${id}-f" data-ch="rvf" data-i="${i}" aria-label="Fornitore"><option value="">Fornitore…</option>${fs.map(f=>`<option value="${f.id}" ${it.fid===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}</select>
     <input class="inp sm" id="${id}-n" value="${esc(it.nome)}" data-in="rv" data-i="${i}" data-k="nome" aria-label="Nome">
@@ -2008,11 +2038,21 @@ function reviewSheet(){
   <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Annulla</button><button type="button" class="btn primary" data-a="rvok" ${ns?'':'disabled'}>${ic('check')} Salva ${ns} nel listino</button></div>`}});
 }
 async function reviewSave(){
-  const R=S.rev;const sel=R.items.filter(i=>i.sel&&i.fid);if(!sel.length)return;
+  const R=S.rev;const sel=R.items.filter(i=>i.sel&&i.fid);if(!sel.length)return;const ups=rvUps(sel);
   const tasks=sel.map(it=>()=>{const ex=prods().filter(p=>p.fornitoreId===it.fid);const m=matchProd(ex,it);
     const d={fornitoreId:it.fid,nome:String(it.nome).trim(),codice:String(it.codice||'').trim(),unita:String(it.unita||'').trim(),prezzo:num(it.prezzo),categoria:it.categoria||'Altro',aggiornato:now(),caricatoDa:S.me};
     if(m){if(m.prezzo!=null&&m.prezzo!==d.prezzo)d.prezzoPrec=m.prezzo;return upd('prodotti',m.id,d)}return put('prodotti',uid(),d)});
   await runPool(tasks,4);S.rev=null;closeSheet();toast(sel.length+' prodotti salvati nel listino');
+  if(ups.length){
+    const fs=[...new Set(ups.map(u=>u.fnome))];
+    await notify('gm',`Prezzi aumentati: ${ups.length===1?'1 prodotto':ups.length+' prodotti'}`,(fs.length===1?fs[0]+': ':'')+ups.slice(0,4).map(u=>u.nome+' '+pctS(u.pc)).join(', ')+(ups.length>4?'…':''),'prezzi',R.fonte||'');
+    upsSheet(ups);
+  }
+}
+function upsSheet(ups){
+  openSheet({cls:'tall',render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Prezzi aumentati<div class="sh-s">${ups.length===1?'1 prodotto costa':ups.length+' prodotti costano'} più di prima</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <div>${ups.map(u=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(u.nome)}</div><div class="ln-m">${esc(u.fnome)}: era ${eur(u.old)}, ora ${eur(u.nw)}</div></div>${pill('ko',pctS(u.pc))}</div>`).join('')}</div>
+  <div class="sheet-foot"><button type="button" class="btn primary block" data-a="closeSheet">Ho capito</button></div>`});
 }
 
 /* ================= staff ================= */
@@ -2323,7 +2363,7 @@ function newsSheet(){
 }
 function notifSheet(){
   const me=meU();const unread=myNotifs(me).filter(n=>!n.letta);
-  const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock'};
+  const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',prezzi:'warn',urgente:'warn'};
   openSheet({live:()=>true,render:()=>{const ns=myNotifs(me).slice(0,80);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${ns.length?ns.map(n=>`<div class="notif ${unread.some(x=>x.id===n.id)?'unread':''}">${ic(NI[n.tipo]||'bell')}<div><div class="nt">${esc(n.titolo)}</div>${n.testo?`<div class="nx">${esc(n.testo)}</div>`:''}<div class="nx small">${ago(n.creato)}</div></div></div>`).join(''):'<p class="muted">Nessuna notifica.</p>'}`}});
   runPool(unread.map(n=>()=>upd('notifiche',n.id,{letta:true})),4).catch(()=>{});
@@ -2681,6 +2721,7 @@ const A={
   cadd:d=>{setCart(d.p,1);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}},
   c:d=>setCart(d.p,cartQty(d.p)+Number(d.d)),
   crm:d=>setCart(d.p,0),
+  curg:d=>{const c=S.cart.find(x=>x.pid===d.p);if(!c)return;c.urg=!c.urg;saveCart();render();if(c.urg)toast('Segnato urgente: Maurizio lo vedrà in cima')},
   cfree:()=>{const n=S.q.trim();if(!n)return;S.cart.push({pid:'lib_'+uid(),libero:true,nome:n,qta:1,unita:'pz'});saveCart();S.q='';render();toast('«'+n+'» aggiunto al carrello')},
   csend:()=>sendCart(),
   voice:()=>voiceOpen(),
