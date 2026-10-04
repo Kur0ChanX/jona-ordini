@@ -17,9 +17,12 @@ await pg.click('[data-a="formset"][data-v="dev"]');
 for(const [k,v] of [['nome','Mario'],['cognome','Rossi'],['username','mario'],['pw','password123'],['pw2','password123']])await pg.fill(`input[data-k="${k}"]`,v);
 await pg.click('[data-a="setupGo"]');
 await pg.waitForSelector('.testbar');
+/* 1. Contratto nel profilo: solo l'amministratore (Maurizio) */
+await pg.evaluate(()=>{S.tab='staff';render()});await wait(200);
+await pg.click('[data-a="addProfile"]');await wait(300);
+ok(await pg.locator('.sheet .or-cf').count()===0,'developer: no contract section');
+await pg.click('.sheet [data-a="closeSheet"].icon-btn');await wait(300);
 await pg.click('[data-a="viewAs"][data-v="gm"]');await wait(300);
-
-/* 1. Contratto nel profilo */
 await pg.evaluate(()=>{S.tab='staff';render()});await wait(200);
 await pg.click('[data-a="addProfile"]');await wait(300);
 ok(await pg.locator('.sheet .or-cf').count()===1,'add profile: «Contratto e orari» section shown');
@@ -69,21 +72,29 @@ await pg.click('.sheet [data-a="orTwo"][data-v="1"]');await wait(100);
 await pg.fill('#or-a2','19:00');await pg.dispatchEvent('#or-a2','change');await pg.fill('#or-b2','00:30');await pg.dispatchEvent('#or-b2','change');await wait(100);
 ok((await pg.locator('.sheet .or-sum').innerText()).includes('dopo mezzanotte'),'night shift recognised');
 await pg.click('.sheet [data-a="orSave"]');await wait(400);
+ok(await pg.locator('#ask-ok').count()===1,'13h30 day asks for consent');await pg.click('#ask-ok');await wait(500);
 w=await week();
 ok(w.t[anna.id][5]==='11:00-15:00,19:00-00:30'&&w.t.u_luca[0]==='10:00-15:00','split shift saved, other rows untouched');
 ok(await pg.evaluate(()=>orTot(orWeek(S.orW).t[S.data.staff[Object.keys(S.data.staff).find(k=>S.data.staff[k].username==='anna')].id],{ore:36,pausa:45,liberi:2}))===(4*60+5*60+30),'hours: 4h + 5h30');
 
 /* 3. Controlli */
-// Luca: cena il lunedì e pranzo martedì → 10h30 di riposo
+// Luca: cena il lunedì e pranzo martedì → 10h30 di riposo: chiede il consenso prima di salvare
 await pg.click('.or-c[data-u="u_luca"][data-g="0"]');await wait(300);
 await pg.click('.sheet [data-a="orPick"][data-v="18:00-23:30"]');await pg.click('.sheet [data-a="orSave"]');await wait(400);
+ok(await pg.locator('#ask-ok').count()===1&&(await pg.locator('.sheet').last().innerText()).includes('11'),'error asks for informed consent before saving');
+await pg.locator('.sheet').last().locator('[data-a="closeSheet"].btn').click();await wait(400);
+ok((await week()).t.u_luca[0]==='10:00-15:00','«Annulla»: nothing saved');
+await pg.click('.sheet [data-a="orSave"]');await wait(400);await pg.click('#ask-ok');await wait(500);
 let p=await probs();
+ok((await week()).t.u_luca[0]==='18:00-23:30','«Salva lo stesso»: saved');
 ok(p.some(x=>x.id==='u_luca'&&x.g===1&&x.k==='err'&&x.t.includes('11')),'11-hour rest error: '+(p.find(x=>x.id==='u_luca')||{}).t);
-ok(await pg.locator('.or-c.err[data-u="u_luca"][data-g="1"]').count()===1,'cell has red border');
+ok(await pg.evaluate(()=>orProblems(S.orW).some(p=>p.u.id==='u_luca'&&p.ok)),'error marked as accepted (ok.<persona>)');
+ok(await pg.locator('.or-c.acc[data-u="u_luca"][data-g="1"]').count()===1,'accepted error: dashed border');
 // Sara: 6 giornate senza pausa → giorni liberi, 48 ore, pausa
 await pg.evaluate(()=>orSaveRow(S.orW,'u_sara',{0:'09:00-17:30',1:'09:00-17:30',2:'09:00-17:30',3:'09:00-17:30',4:'09:00-17:30',5:'09:00-17:30',6:'R'}));await wait(300);
 p=await probs();const ps=p.filter(x=>x.id==='u_sara');
 ok(ps.some(x=>x.k==='err'&&x.t.includes('Lavora 6 giorni')),'days off error');
+ok(await pg.locator('.or-c.err[data-u="u_sara"]').count()===0&&await pg.locator('.or-pc.err').count()>=1,'week-level errors mark the name');
 ok(ps.some(x=>x.k==='err'&&x.t.includes('48')),'over 48 hours error');
 ok(ps.filter(x=>x.k==='warn'&&x.t.includes('senza pausa')).length===1,'one no-break warning for the whole week');
 ok(await pg.locator('.or-c.warn[data-u="u_sara"]').count()===6,'all six days without break are marked');
@@ -157,6 +168,7 @@ ok(days[3].includes('18:00 – 23:00')&&!days[3].includes('Ferie'),'unpublished 
 ok(!(await pg.locator('#app').innerText()).match(/Sara|Anna|Gino/),'staff sees only their own shifts');
 ok(await pg.locator('.or-day.today').count()===1,'today highlighted');
 ok((await pg.locator('.or-mtot').innerText()).includes('di lavoro'),'weekly total shown');
+ok(!(await pg.locator('#app').innerText()).includes('contratto'),'staff does not see contract hours');
 // settimana prossima pubblicata → compare la scelta
 await pg.evaluate(async()=>{const n=orShift(orLun(),1),w=orWeek(n);await upd('config','orari_'+n,{tp:clone(w.t),pub:now()})});await wait(300);
 ok(await pg.locator('[data-a="orMy"][data-v="next"]').count()===1,'«Settimana prossima» appears when published');

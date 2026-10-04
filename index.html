@@ -609,6 +609,60 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
   html.staff-ui .main:not(.has-bar){padding-bottom:110px}
 }
 @media (min-width:1260px){html.staff-ui .cart-foot{margin-right:0}}
+/* ---------- timbratura ---------- */
+.tb-card{background:var(--surface);border-radius:18px;box-shadow:var(--lift);padding:14px 16px;margin:0 0 14px;display:grid;gap:12px}
+.tb-card.on{box-shadow:inset 0 0 0 2px var(--mirto),var(--lift)}
+.tb-st{display:flex;align-items:center;gap:12px}.tb-st>.ic{width:30px;height:30px;color:var(--muted);flex:none}.tb-card.on .tb-st>.ic{color:var(--mirto)}
+.tb-st b{display:block;font:400 19px var(--font)}.tb-st span{display:block;font-size:14.5px;color:var(--muted)}.tb-st .tb-oggi{color:var(--mirto);margin-top:2px}
+.tb-cam{position:relative;aspect-ratio:3/4;max-height:58vh;margin:0 auto;border-radius:18px;overflow:hidden;background:#111;display:grid;place-items:center}
+.tb-cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s}.tb-cam.live video{opacity:1}
+.tb-cam p{position:relative;color:#eee;padding:20px;text-align:center;font-size:15px}
+.tb-frame{position:absolute;inset:22% 16%;border:3px solid rgba(255,255,255,.85);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
+.tb-qr{display:grid;justify-items:center;gap:4px;text-align:center}.tb-qr b{font:400 20px var(--font)}.tb-qr span{color:var(--muted);font-size:14px}
+.or-tb{display:block;font:500 11px/1.2 var(--font);padding:2px 0;border-radius:6px;color:var(--mirto);white-space:nowrap}
+.or-tb.ok::before{content:'✓ '}.or-tb.diff{color:var(--ocra)}.or-tb.miss{color:var(--corallo)}
+.or-tbh{display:flex!important;align-items:center;gap:3px;color:var(--mirto)!important}.or-tbh .ic{width:12px;height:12px}
+.or-leg b.or-tb{display:inline;font-size:12px;margin-right:4px}
+.or-dtb{display:flex;align-items:center;gap:6px;font-size:15px;color:var(--mirto)}.or-dtb .ic{width:18px;height:18px}
+.or-cm{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;justify-self:start;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line);color:var(--ink2);font:400 15px var(--font);cursor:pointer}
+.or-cm .ic{width:18px;height:18px;color:var(--lagoon)}.or-cm:focus-visible{outline:2px solid var(--lagoon);outline-offset:2px}
+/* ---------- cambi turno ---------- */
+.cm-box{background:var(--surface);border-radius:18px;box-shadow:var(--lift);padding:6px 14px;margin:0 0 14px}
+.cm-box.gm{padding-top:14px}
+.cm-it{display:flex;align-items:center;flex-wrap:wrap;gap:10px 12px;padding:12px 0;border-top:1px solid var(--line)}
+.cm-box>.cm-it:first-child,.cm-box h2+.cm-it{border-top:0}
+.cm-tx{flex:1 1 180px;min-width:0}.cm-tx b{display:block;font:400 16px/1.3 var(--font)}.cm-tx span{display:block;font-size:14px;color:var(--ink2)}
+.cm-tx i{display:inline-block;font-style:normal;font-size:12.5px;margin-top:3px;padding:2px 8px;border-radius:99px;background:var(--ocra-soft);color:var(--ocra)}
+.cm-it.approvato .cm-tx i{background:var(--mirto-soft);color:var(--mirto)}.cm-it.rifiutato .cm-tx i,.cm-it.annullato .cm-tx i{background:var(--sunk);color:var(--muted)}
+.cm-tx em{display:flex;align-items:center;gap:5px;font-style:normal;font-size:13px;margin-top:4px}.cm-tx em .ic{width:15px;height:15px}
+.cm-err{color:var(--corallo)}.cm-ok{color:var(--mirto)}
+.cm-it .btns{margin-left:auto}
+.cm-av{display:flex}.cm-av .av+.av{margin-left:-10px;box-shadow:0 0 0 2px var(--surface)}
+.cm-ppl{display:grid;gap:6px}
+.cm-p{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:14px;border:1px solid var(--line);cursor:pointer}
+.cm-p[aria-pressed="true"]{border-color:var(--lagoon);background:var(--lagoon-soft)}
+.cm-p span{display:grid}.cm-p b{font:400 16px var(--font)}.cm-p i{font-style:normal;font-size:13.5px;color:var(--muted)}
+.cm-g{flex-wrap:wrap}
+.cm-prev{margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--sunk);display:grid;gap:8px}
+.cm-prev>b{font:500 14px var(--font);color:var(--ink2)}
+.cm-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.cm-row>span{font:400 15px var(--font);min-width:60px}
+.cm-row div{display:flex;flex-wrap:wrap;gap:6px}.cm-row em{font-style:normal;font-size:13.5px;padding:3px 9px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+/* ---------- ordine suggerito ---------- */
+.sug-cta{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin:0 0 14px;border-radius:18px;background:linear-gradient(120deg,var(--lagoon-soft),var(--surface) 70%);box-shadow:var(--lift);cursor:pointer}
+.sug-cta:focus-visible{outline:2px solid var(--lagoon);outline-offset:2px}
+.sug-cta>.ic:first-child{width:28px;height:28px;flex:none;color:var(--ocra)}
+.sug-cta>.ic:last-child{color:var(--muted)}
+.sug-cta div{flex:1;min-width:0}.sug-cta b{display:block;font:500 16px var(--font);color:var(--ink)}.sug-cta span{display:block;font-size:13.5px;color:var(--muted)}
+.sug-wx{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.sug-d{flex:1 0 56px;display:grid;justify-items:center;gap:2px;padding:8px 4px;border-radius:12px;background:var(--sunk);font-size:12px;color:var(--muted);text-transform:capitalize}
+.sug-d .ic{width:22px;height:22px;color:var(--ocra)}.sug-d b{font:500 15px var(--font);color:var(--ink)}.sug-d i{font-style:normal;color:var(--lagoon)}
+.sug-wxr{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;justify-content:space-between;font-size:14px;color:var(--ink2);margin:2px 0 2px}
+.sug-list{margin-top:12px}
+.sug-r{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:10px 0;border-top:1px solid var(--line)}
+.sug-r.off .sug-i,.sug-r.off .step{opacity:.5}
+.sug-i{flex:1 1 150px;min-width:0;cursor:pointer}.sug-i b{display:block;font:400 15.5px/1.3 var(--font)}.sug-i span{font-size:13px;color:var(--muted)}
+.sug-r .step{margin-left:auto}
+.sug-r .rv-c{margin-top:0}
 /* ---------- orari del personale ---------- */
 .staff-sw{margin:0 0 16px}
 .staff-sw .ic{width:17px;height:17px;vertical-align:-3px;margin-right:5px}
@@ -676,6 +730,11 @@ button.or-pi{cursor:pointer}
 .or-leg i{width:13px;height:13px;border-radius:4px;border-left:3px solid var(--k);background:color-mix(in srgb,var(--k) 25%,var(--surface))}
 .or-leg i.abs{border:1px dashed var(--sand);background:var(--sunk)}
 .or-leg i.dot{width:9px;height:9px;border:0;border-radius:50%;background:var(--lagoon)}
+.or-pb.a{border-color:var(--line);background:var(--sunk)}.or-pb.a .or-pbh .ic{color:var(--muted)}
+.or-pi.acc{border-left-color:var(--sand);color:var(--ink2)}.or-pi.acc>.ic{color:var(--muted)}
+.or-acc{font-style:normal;font-size:12px;padding:2px 7px;border-radius:99px;background:var(--sunk);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.or-c.acc{border:2px dashed color-mix(in srgb,var(--corallo) 55%,var(--line))}
+.or-grid .or-pc.acc{box-shadow:inset 4px 0 0 var(--sand)}
 /* foglio della casella e turni tipo */
 .or-shp{display:grid;gap:4px;margin:0 0 6px}
 .or-shp .or-pi{background:var(--sunk)}
@@ -805,15 +864,21 @@ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 
 warn:'<path d="M12 3.8 2.6 20h18.8z"/><path d="M12 10v4.6M12 17.4v.2"/>',
 mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>',
 calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="1.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M7.5 14h2M11 14h2M14.5 14h2M7.5 17h2M11 17h2"/>',
-chevl:'<path d="m14.5 5.5-6.5 6.5 6.5 6.5"/>'
+chevl:'<path d="m14.5 5.5-6.5 6.5 6.5 6.5"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+rain:'<path d="M7 15.5h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6-1.3A4.5 4.5 0 0 0 7 15.5z"/><path d="M8.5 18.5l-1 2.2M12.5 18.5l-1 2.2M16.5 18.5l-1 2.2"/>'
 };
 const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
 
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=15;
+const APP_VER=16;
 const NEWS=[
+  {v:16,data:'2026-10-04',titolo:'Cambi turno, timbratura e ordine suggerito',
+    tutti:['Nella voce «Orari» puoi chiedere un cambio turno a un collega: tocca «Chiedi un cambio» sotto il giorno, scegli il collega e, se vuoi, un suo giorno da fare tu. Il collega accetta o rifiuta, poi Maurizio approva e gli orari si aggiornano da soli.','Se Maurizio accende la timbratura, nella voce «Orari» trovi il pulsante «Timbra»: quando arrivi e quando finisci inquadra il QR attaccato in cucina.'],
+    chef:['In Invii c\'è «Ordine suggerito»: per ogni fornitore l\'app propone le quantità guardando gli ordini degli ultimi 2 mesi, ogni quanti giorni ordini, la gente prevista e il meteo di Porto Cervo. Controlli, cambi e aggiungi all\'ordine.','Contratto, ore e pause li imposti solo tu, e lo staff non li vede più. Chi fa gli orari li usa per i controlli.','Quando un turno non rispetta una regola, l\'app chiede il consenso prima di salvare: con «Salva lo stesso» l\'errore resta segnato come accettato (bordo tratteggiato) e non blocca la pubblicazione.','I cambi turno chiesti dallo staff li trovi in Staff → Orari, con il controllo delle regole: «Approva» aggiorna gli orari pubblicati e avvisa i due.','Timbratura con QR (in Impostazioni, spenta di partenza): QR da stampare, «Cambia codice», orari timbrati nella tabella e «Presenze» in Excel per il consulente del lavoro.'],
+    dev:{aggiunte:['Ordine suggerito: `sugStats` (cadenza mediana e uso al giorno dagli ordini inviati degli ultimi 56 giorni), `sugRows`, `sugSheet`, `sugAdd` (un solo `put` dell\'ordine aperto), meteo Open-Meteo con `meteo()` e `wxFactor`.','Timbratura: `config/app.timbra` e `timbraK`, `config/timbr_<lunedì>` (`t.<id>.<g>` come gli orari, «HH:MM-» = in servizio, `m` = senza QR), `tbPunch` e `tbOpen` (16 ore, dopo mezzanotte), lettura con `BarcodeDetector` o `lib/jsqr-1.4.0.js`, `tbExcel`.','Cambi turno: `cambi.<id>` nella settimana pubblicata, `cmApply` scambia le giornate, `cmDecide` aggiorna `t` e `tp` passando da `orConsent`.','Consenso consapevole: `orConsent` e `ok.<persona>` con i testi degli errori accettati. Contratto modificabile solo con `isGM`.']}},
   {v:15,data:'2026-10-04',titolo:'Invio allo chef con animazione',
     tutti:['Quando tocchi «Invia allo chef» compare una breve animazione: il menù JONA passa dalle tue mani a quelle dello chef. Se hai fretta, tocca lo schermo per saltarla.','Nel carrello il pulsante per i prodotti che servono subito ora si chiama «È urgente».'],
     dev:{aggiunte:['`media/invio-chef.mp4`: video H.264 con il colore sopra e la trasparenza sotto (alpha impilato, 720×404 ciascuna); `sendAnim` lo unisce con WebGL su un canvas trasparente sopra l\'app, poi apre il solito foglio «Inviato allo chef». Caricato come blob da `animPrefetch` (apertura del carrello e invio). Si salta con «riduci movimento», senza WebGL o se il video non parte.','Video ricavato dal filmato di Mario: scontorno con rembg (isnet + u2net), tolti i bianchi e grigi neutri (sfondo e giacca), bordi sfumati, colore dei bordi preso dal soggetto.']}},
@@ -887,6 +952,7 @@ const hue=id=>{let h=0;for(const c of String(id||'x'))h=(h*31+c.charCodeAt(0))>>
 const LIB={
   firebase:{src:['lib/firebase-10.14.1.js'],ok:()=>window.firebase&&firebase.firestore&&firebase.auth},
   qr:{src:['lib/qrcode-1.4.4.js'],ok:()=>window.qrcode},
+  jsqr:{src:['lib/jsqr-1.4.0.js'],ok:()=>window.jsQR},
   xlsx:{src:['https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'],ok:()=>window.XLSX},
   jszip:{src:['https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'],ok:()=>window.JSZip},
   jspdf:{src:['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'],ok:()=>window.jspdf},
@@ -1340,7 +1406,7 @@ async function createProfile(mode){
   else toast('Profilo creato: comunica a '+doc.nome+' nome utente e password.');
 }
 function registerSheet(mode){
-  S.form={ruolo:'staff',reparto:'cucina',mansione:'Cameriere'};if(mode==='admin')Object.assign(S.form,CONTR0,{_c:true});
+  S.form={ruolo:'staff',reparto:'cucina',mansione:'Cameriere'};if(mode==='admin'&&isGM(meU()))Object.assign(S.form,CONTR0,{_c:true});
   openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${mode==='admin'?'Aggiungi profilo':'Crea il tuo profilo'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${mode==='admin'?'':'<p class="muted" style="margin:0">Dopo la registrazione Maurizio o Mario approvano il profilo.</p>'}
   ${profileForm('rg',{roles:mode==='admin'?['staff','gm','dev']:null,contr:mode==='admin'})}
@@ -1359,15 +1425,15 @@ function logout(){pushUnlink();while(sheets.length)closeSheet(true);S.me=null;ls
 
 /* ================= shell ================= */
 const arriviCount=()=>Object.values(D().ordini).filter(o=>o.stato==='inviato'&&!o.ricevuto).length;
-const STAFF_TABS=[{id:'catalogo',l:'Catalogo',i:'search'},{id:'carrello',l:'Carrello',i:'cart',b:()=>S.cart.length},{id:'arrivi',l:'Arrivi',i:'box',b:arriviCount},{id:'miei',l:'I miei ordini',i:'clock'},{id:'orari',l:'Orari',i:'calendar'}];
+const STAFF_TABS=[{id:'catalogo',l:'Catalogo',i:'search'},{id:'carrello',l:'Carrello',i:'cart',b:()=>S.cart.length},{id:'arrivi',l:'Arrivi',i:'box',b:arriviCount},{id:'miei',l:'I miei ordini',i:'clock'},{id:'orari',l:'Orari',i:'calendar',b:()=>cmToMe(meU()).length}];
 const GM_TABS=[
   {id:'richieste',l:'Richieste',i:'inbox',b:()=>Object.values(D().richieste).filter(r=>r.stato==='inviata').length},
   {id:'invii',l:'Invii',i:'truck',b:()=>Object.values(D().ordini).filter(o=>o.stato==='aperto'&&o.items&&o.items.length).length},
   {id:'arrivi',l:'Arrivi',i:'box',b:arriviCount},
   {id:'fornitori',l:'Fornitori',i:'store'},
-  {id:'staff',l:'Staff',i:'users',b:()=>Object.values(D().staff).filter(u=>u.stato==='in_attesa').length},
+  {id:'staff',l:'Staff',i:'users',b:()=>Object.values(D().staff).filter(u=>u.stato==='in_attesa').length+cmToApprove().length},
   {id:'storico',l:'Storico',i:'clock'}];
-const DEV_TABS=[{id:'fornitori',l:'Fornitori',i:'store'},{id:'staff',l:'Staff',i:'users',b:()=>Object.values(D().staff).filter(u=>u.stato==='in_attesa').length},{id:'storico',l:'Storico',i:'clock'}];
+const DEV_TABS=[{id:'fornitori',l:'Fornitori',i:'store'},{id:'staff',l:'Staff',i:'users',b:()=>Object.values(D().staff).filter(u=>u.stato==='in_attesa').length+cmToApprove().length},{id:'storico',l:'Storico',i:'clock'}];
 function shell(me){
   const tabs=isGM(me)?GM_TABS:isDev(me)?DEV_TABS:STAFF_TABS;
   if(!tabs.find(t=>t.id===S.tab))S.tab=tabs[0].id;
@@ -1715,6 +1781,7 @@ function vInvii(){
   const open=all.filter(o=>o.stato==='aperto'&&o.items&&o.items.length).sort((a,b)=>(dk(a)-dk(b))||byNome({nome:a.fornitoreNome},{nome:b.fornitoreNome}));
   const sent=all.filter(o=>o.stato==='inviato').sort((a,b)=>(b.inviato||0)-(a.inviato||0)).slice(0,25);
   return`<div class="vhead"><div><h1 class="vt">Invii</h1><p class="vsub">${open.length?`${open.length} ${open.length===1?'ordine pronto':'ordini pronti'} da mandare ai fornitori`:'Niente da inviare'}</p></div><button type="button" class="btn ghost" data-a="newOrder">${ic('plus')} Ordine diretto</button></div>
+  ${(()=>{const due=Object.values(D().fornitori).filter(f=>sugStats(f.id).due).sort(byNome);return`<button type="button" class="sug-cta" data-a="sugOpen">${ic('sparkle')}<div><b>Ordine suggerito</b><span>${due.length?'Da riordinare: '+due.slice(0,3).map(f=>esc(f.nome)).join(', ')+(due.length>3?'…':''):'Quantità proposte dallo storico degli ordini e dal meteo'}</span></div>${ic('chev')}</button>`})()}
   ${open.length?open.map(orderCard).join(''):empty('truck','Nessun ordine da inviare','Quando approvi una richiesta gli articoli arrivano qui, già divisi per fornitore.')}
   ${sent.length?`<h2 class="sec">Inviati di recente</h2><div class="panel">${sent.map(o=>`<button type="button" class="row link" data-a="sentView" data-o="${o.id}"><span class="fdot" style="--c:${fcolor(o.fornitoreId)}">${esc((forn(o.fornitoreId).nome||'?').charAt(0))}</span><div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome||o.fornitoreNome)}</div><div class="row-m">${ago(o.inviato)}, ${o.items.length} ${o.items.length===1?'articolo':'articoli'}</div></div>${o.ricevuto?(o.differenze?pill('wait','differenze'):pill('ok','arrivato')):pill('sent','in arrivo')}</button>`).join('')}</div>`:''}`;
 }
@@ -1942,6 +2009,85 @@ function pickSheet(fid){
     return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Aggiungi da ${esc(f.nome)}<div class="sh-s">${cur?cur.items.length+' articoli già in ordine':'Nuovo ordine'}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     <div class="search" style="box-shadow:none;border-color:var(--line)">${ic('search')}<input id="pkq" type="search" placeholder="Cerca nel listino" value="${esc(S.pkq)}" data-in="pkq" autocomplete="off"></div>
     <div id="pk-list">${list.length?list.map(p=>{const inO=cur&&cur.items.find(x=>x.key===p.id);return`<div class="prow"><div class="row-i"><div class="row-t">${esc(p.nome)}</div><div class="row-m">${p.codice?'cod. '+esc(p.codice)+', ':''}${p.prezzo!=null?eur(p.prezzo)+(p.unita?' / '+esc(p.unita):''):esc(p.unita||'')}${inO?`, in ordine: ${fq(inO.qta)}`:''}</div></div><button type="button" class="add" data-a="pkadd" data-f="${fid}" data-p="${p.id}" aria-label="Aggiungi">${ic('plus')}</button></div>`}).join(''):`<p class="muted">Nessun prodotto${q?' trovato':' a listino: caricalo da Fornitori'}.</p>`}</div>`}});
+}
+
+/* ================= ordine suggerito =================
+   Dagli ordini inviati negli ultimi 2 mesi: ogni quanti giorni si ordina da quel fornitore (mediana) e quanto si usa al giorno
+   (quantità ordinate prima dell'ultimo ordine / giorni tra il primo e l'ultimo). Proposta = uso al giorno × giorni fino al
+   prossimo ordine × gente prevista × meteo, meno quello che è già nell'ordine aperto. Meteo: Open-Meteo (gratis, senza chiave). */
+const SUG_DAYS=56,DAY=864e5,METEO_POS={lat:41.1366,lon:9.5323,nome:'Porto Cervo'};
+const SUG_GENTE=[[0.8,'Meno'],[1,'Normale'],[1.2,'Di più'],[1.5,'Evento']];
+const sugKey=l=>l.pid||'n:'+norm(l.nome);
+function sugStats(fid){
+  const t0=now()-SUG_DAYS*DAY;
+  const os=Object.values(D().ordini).filter(o=>o.fornitoreId===fid&&o.stato==='inviato'&&(o.inviato||0)>=t0).sort((a,b)=>a.inviato-b.inviato);
+  if(os.length<2)return{n:os.length};
+  const gaps=os.slice(1).map((o,i)=>(o.inviato-os[i].inviato)/DAY).sort((a,b)=>a-b);
+  const cad=Math.max(1,Math.round(gaps[Math.floor(gaps.length/2)]));
+  const span=Math.max(1,(os[os.length-1].inviato-os[0].inviato)/DAY),P=new Map();
+  os.forEach((o,i)=>{for(const l of o.items||[]){const k=sugKey(l),q=Number(l.qta)||0;
+    const x=P.get(k)||{k,pid:l.pid||'',nome:l.nome,unita:l.unita||'',q:0,qs:[]};x.qs.push(q);if(i<os.length-1)x.q+=q;P.set(k,x)}});
+  const items=[...P.values()].map(x=>{const s=x.qs.slice().sort((a,b)=>a-b);return Object.assign(x,{n:x.qs.length,tip:s[Math.floor(s.length/2)],day:x.q/span})});
+  const late=(now()-os[os.length-1].inviato)/DAY;
+  return{n:os.length,cad,last:os[os.length-1].inviato,due:late>=cad-0.5,items};
+}
+const sugUnitHalf=u=>/^(kg|g|gr|lt?|litri?|ml)$/i.test(String(u||'').trim());
+const sugRound=(q,u)=>q<=0?0:sugUnitHalf(u)?Math.max(0.5,Math.round(q*2)/2):Math.max(1,Math.ceil(q-0.15));
+// meteo dei prossimi 7 giorni, in memoria per 3 ore
+let wxMem=null;
+async function meteo(){
+  if(wxMem&&now()-wxMem.t<3*36e5)return wxMem.d;
+  try{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${METEO_POS.lat}&longitude=${METEO_POS.lon}&daily=weather_code,temperature_2m_max,precipitation_probability_max&timezone=Europe%2FRome&forecast_days=7`);
+    if(!r.ok)throw 0;const j=await r.json(),y=j.daily;const d=y.time.map((t,i)=>({t,c:y.weather_code[i],tx:Math.round(y.temperature_2m_max[i]),p:y.precipitation_probability_max[i]||0}));
+    wxMem={t:now(),d};return d}catch(e){return null}
+}
+const wxIc=c=>c>=51||c>=95?'rain':c>=1?'cloud':'sun';
+// effetto del meteo sui giorni coperti dall'ordine: pioggia → meno gente in terrazza, caldo e sole → di più
+function wxFactor(d,cad){
+  if(!d)return{f:1,t:''};const ds=d.slice(1,1+Math.max(1,cad));if(!ds.length)return{f:1,t:''};
+  const p=ds.reduce((s,x)=>s+x.p,0)/ds.length,tx=ds.reduce((s,x)=>s+x.tx,0)/ds.length;
+  if(p>=60)return{f:0.9,t:'Pioggia probabile: −10%'};
+  if(tx>=27&&p<30)return{f:1.1,t:'Sole e caldo: +10%'};
+  return{f:1,t:'Tempo normale: nessuna correzione'};
+}
+function sugRows(){
+  const G=S.sug,st=sugStats(G.fid);if(!st.items)return[];
+  const wf=G.useWx?wxFactor(G.wx,st.cad).f:1,cur=D().ordini['aperto_'+G.fid];
+  return st.items.map(x=>{const inO=cur&&cur.items.find(l=>(l.key||l.pid)===x.pid)?.qta||0;
+    const base=sugRound(x.day*st.cad*G.gente*wf-inO,x.unita);const p=x.pid?D().prodotti[x.pid]:null;
+    const q=G.q[x.k]!=null?G.q[x.k]:base;const sel=G.sel[x.k]!=null?G.sel[x.k]:(x.n>=2&&base>0&&!!p);
+    return Object.assign({},x,{p,inO,base,q,sel})}).filter(x=>x.p).sort((a,b)=>(b.sel-a.sel)||(b.n-a.n)||String(a.nome).localeCompare(String(b.nome),'it'));
+}
+function sugSheet(){
+  S.sug={fid:'',gente:1,useWx:true,wx:null,q:{},sel:{}};
+  meteo().then(d=>{if(S.sug){S.sug.wx=d;refreshSheet()}});
+  openSheet({cls:'tall',live:()=>true,onClose:()=>{S.sug=null},render:()=>{const G=S.sug;if(!G)return'';
+    const head=(t,s,back)=>`<div class="grab"></div><div class="sh-h">${back?`<button type="button" class="icon-btn" data-a="sugBack" aria-label="Indietro">${ic('back')}</button>`:''}<div class="sh-t">${t}<div class="sh-s">${s}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>`;
+    if(!G.fid){
+      const fs=Object.values(D().fornitori).map(f=>({f,st:sugStats(f.id)})).sort((a,b)=>((b.st.due?2:0)+(b.st.n>=2?1:0))-((a.st.due?2:0)+(a.st.n>=2?1:0))||byNome(a.f,b.f));
+      return head('Ordine suggerito','Scegli il fornitore')+`<p class="muted" style="margin-top:0">L'app guarda gli ordini degli ultimi 2 mesi, ogni quanti giorni ordini e quanto usi, poi corregge con la gente prevista e il meteo. Tu controlli e cambi le quantità.</p>
+      <div class="panel" style="box-shadow:none;border:1px solid var(--line)">${fs.map(({f,st})=>st.n>=2?`<button type="button" class="row link" data-a="sugF" data-f="${f.id}"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">Di solito ogni ${st.cad===1?'giorno':st.cad+' giorni'} · ultimo ${ago(st.last)}</div></div>${st.due?pill('wait','da riordinare'):''}${ic('chev')}</button>`
+        :`<div class="row dim"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">${st.n?'Solo 1 ordine':'Nessun ordine'} negli ultimi 2 mesi: servono almeno 2</div></div></div>`).join('')}</div>`}
+    const f=forn(G.fid),st=sugStats(G.fid),rows=sugRows(),wf=wxFactor(G.wx,st.cad),nsel=rows.filter(r=>r.sel&&r.q>0).length;
+    const fino=new Date(now()+st.cad*DAY).toLocaleDateString('it-IT',{weekday:'long'});
+    return head('Ordine suggerito',esc(f.nome)+' · copre '+(st.cad===1?'1 giorno':st.cad+' giorni')+', fino a '+fino,true)+`
+    <div class="sug-wx">${G.wx?G.wx.slice(1,1+Math.min(6,Math.max(3,st.cad))).map(d=>`<div class="sug-d"><span>${new Date(d.t+'T12:00').toLocaleDateString('it-IT',{weekday:'short'})}</span>${ic(wxIc(d.c))}<b>${d.tx}°</b><i>${d.p}%</i></div>`).join(''):`<p class="muted small" style="margin:0">${G.wx===null?'Meteo non disponibile (serve la rete).':'Carico il meteo…'}</p>`}</div>
+    ${G.wx?`<div class="sug-wxr"><span>${esc(wf.t)}</span><div class="seg" role="group" aria-label="Usa il meteo">${[[1,'Usa il meteo'],[0,'Ignora']].map(([k,l])=>`<button type="button" aria-pressed="${!!G.useWx===!!k}" data-a="sugWx" data-v="${k}">${l}</button>`).join('')}</div></div>`:''}
+    <span class="lbl">Quanta gente ti aspetti?</span><div class="seg wide" role="group" aria-label="Gente prevista">${SUG_GENTE.map(([k,l])=>`<button type="button" aria-pressed="${G.gente===k}" data-a="sugG" data-v="${k}">${l}</button>`).join('')}</div>
+    <div class="sug-list">${rows.length?rows.map(r=>`<div class="sug-r${r.sel?'':' off'}"><input type="checkbox" class="rv-c" id="sg-${esc(r.k)}" data-ch="sugSel" data-k="${esc(r.k)}" ${r.sel?'checked':''} aria-label="Ordina ${esc(r.nome)}">
+      <label class="sug-i" for="sg-${esc(r.k)}"><b>${esc(r.nome)}</b><span>${r.n>=2?`di solito ${fq(r.tip)} ${esc(r.unita)} a ordine · si usano circa ${fq(Math.round(r.day*st.cad*10)/10)} ${esc(r.unita)} ${st.cad===1?'al giorno':'ogni '+st.cad+' giorni'}`:'ordinato una volta sola'}${r.inO?` · già in ordine ${fq(r.inO)}`:''}</span></label>
+      ${stepper('sugQ',esc(r.k).replace(/[^\w-]/g,'_'),r.q,`data-k="${esc(r.k)}"`)}<span class="ln-u">${esc(r.unita)}</span></div>`).join(''):'<p class="muted">Nessun prodotto da proporre.</p>'}</div>
+    <div class="sheet-foot"><button type="button" class="btn primary block" data-a="sugAdd" ${nsel?'':'disabled'}>${ic('plus')} Aggiungi all'ordine${nsel?' ('+nsel+')':''}</button></div>`}});
+}
+async function sugAdd(){
+  const G=S.sug;if(!G||!G.fid)return;const rows=sugRows().filter(r=>r.sel&&r.q>0);if(!rows.length)return;
+  const fid=G.fid,oid='aperto_'+fid,cur=D().ordini[oid],me=meU();
+  const o=cur?clone(cur):{fornitoreId:fid,fornitoreNome:forn(fid).nome,stato:'aperto',items:[],richieste:[],creato:now()};delete o.id;
+  for(const r of rows){const p=r.p;let L=o.items.find(x=>x.key===p.id);
+    if(!L){L={key:p.id,pid:p.id,nome:p.nome,codice:p.codice||'',unita:p.unita||'',prezzo:p.prezzo??null,qta:0,da:[]};o.items.push(L)}
+    L.qta=r3(L.qta+r.q);L.da.push({n:fullName(me),r:me.reparto,q:r.q,sug:true})}
+  o.aggiornato=now();await put('ordini',oid,o);closeSheet();
+  toast((rows.length===1?'1 prodotto aggiunto':rows.length+' prodotti aggiunti')+' all\'ordine di '+forn(fid).nome);
 }
 
 /* ================= arrivi: controllo merce ================= */
@@ -2252,7 +2398,7 @@ function vStaff(me){
 }
 function profileSheet(id){
   const u=D().staff[id];if(!u)return;const mgr=isMgr(meU());const self=id===S.me;
-  S.form=Object.assign(clone(u),{pw:'',pw2:''});if(mgr)Object.assign(S.form,contrOf(u)||CONTR0,{_c:true});
+  S.form=Object.assign(clone(u),{pw:'',pw2:''});if(isGM(meU()))Object.assign(S.form,contrOf(u)||CONTR0,{_c:true});
   openSheet({render:()=>{const u=D().staff[id]||{};return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${self?'Il tuo profilo':esc(fullName(u))}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${profileForm('pf',{roles:mgr&&!self?['staff','gm','dev']:null,pwLabel:'Nuova password (facoltativa)',noRep:isMgr(S.form),contr:mgr})}
   <div class="btns" style="margin-top:22px">${mgr&&!self?`<button type="button" class="btn ghost danger" data-a="sdel" data-u="${id}">${ic('trash')} Elimina</button><button type="button" class="btn ghost" data-a="stoggle" data-u="${id}">${u.stato==='disattivato'?'Riattiva':'Disattiva'}</button>`:''}<button type="button" class="btn primary" data-a="psaveProfile" data-u="${id}">${ic('check')} Salva</button></div>`}});
@@ -2262,7 +2408,7 @@ async function saveProfile(id){
   const d={nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||''};
   if(isMgr(meU())&&f.ruolo&&f.ruolo!==u.ruolo){if(u.ruolo==='gm'&&Object.values(D().staff).filter(x=>x.ruolo==='gm'&&x.stato==='attivo').length<2)return toast('Serve almeno un amministratore attivo.','warn');d.ruolo=f.ruolo}
   if(f.pw)d.pass=await sha(id+':'+f.pw);
-  if(isMgr(meU())&&withContr(f))d.contratto=orContr(f);
+  if(isGM(meU())&&withContr(f))d.contratto=orContr(f);
   await upd('staff',id,d);closeSheet();toast('Profilo salvato');
 }
 /* ================= GM: storico ================= */
@@ -2593,7 +2739,8 @@ function orCheck(u,row,prev){
 }
 function orProblems(lun){const t=(orWeek(lun)||{}).t||{},pt=(orWeek(orShift(lun,-1))||{}).t||{};const r=[];
   for(const u of orPeople())for(const x of orCheck(u,t[u.id],pt[u.id]))r.push(Object.assign({u},x));
-  return r.sort((a,b)=>(a.k==='err'?0:1)-(b.k==='err'?0:1))}
+  const w=orWeek(lun);for(const p of r)if(p.k==='err'&&orOk(w,p.u.id).includes(p.t))p.ok=true;
+  return r.sort((a,b)=>(a.ok?2:a.k==='err'?0:1)-(b.ok?2:b.k==='err'?0:1))}
 function orStato(w){
   if(!w||(!orAny(w.t)&&!w.tp))return{k:'',l:'Settimana vuota'};
   if(!w.tp)return{k:'wait',l:'Bozza: lo staff non la vede ancora'};
@@ -2601,40 +2748,54 @@ function orStato(w){
 }
 // a chi serve il pranzo e la cena: turni che toccano 12:00–14:30 e 19:30–22:00
 const orIn=(v,a,b)=>orShifts(v).some(s=>s[0]<b&&s[1]>a);
-async function orSaveRow(lun,id,row){
-  if(orWeek(lun))await upd('config','orari_'+lun,{['t.'+id]:row,mod:now()});
-  else await put('config','orari_'+lun,{tipo:'orari',lun,t:{[id]:row},mod:now()});
+async function orSaveRow(lun,id,row,ok){
+  const x=ok?{['ok.'+id]:ok}:{};
+  if(orWeek(lun))await upd('config','orari_'+lun,Object.assign({['t.'+id]:row,mod:now()},x));
+  else await put('config','orari_'+lun,Object.assign({tipo:'orari',lun,t:{[id]:row},mod:now()},ok?{ok:{[id]:ok}}:{}));
+}
+// errori accettati con il consenso di chi fa gli orari: restano visibili ma non bloccano più
+const orOk=(w,id)=>((w&&w.ok)||{})[id]||[];
+// chiede il consenso per gli errori nuovi; restituisce i testi da salvare in ok.<persona> o null se annullato
+async function orConsent(u,errs,prima){
+  const nuovi=errs.filter(p=>!prima.includes(p.t));if(!nuovi.length)return errs.map(p=>p.t);
+  const t=nuovi.length===1?'Questo turno non rispetta una regola':'Questo turno non rispetta '+nuovi.length+' regole';
+  if(!await ask(t,u.nome+': '+nuovi.map(p=>p.t).join('\n')+'\n\nSe salvi lo stesso, l\'errore resta segnato come accettato da te.','Salva lo stesso',true))return null;
+  return errs.map(p=>p.t);
 }
 
 /* pianificatore dei gestori: scheda Staff → Orari */
 function vOrari(){
   const lun=S.orW||(S.orW=orLun()),cur=orLun();const w=orWeek(lun)||{};const t=w.t||{},tp=w.tp||null;
   const ppl=orPeople(),probs=orProblems(lun),st=orStato(w);
-  const cellK={},nameK={};for(const p of probs)for(const g of p.gs||[p.g]){const m=g<0?nameK:cellK,k=g<0?p.u.id:p.u.id+'_'+g;if(m[k]!=='err')m[k]=p.k}
+  const cellK={},nameK={};for(const p of probs)for(const g of p.gs||[p.g]){const m=g<0?nameK:cellK,k=g<0?p.u.id:p.u.id+'_'+g,v=p.ok?'acc':p.k;if(m[k]!=='err'&&!(m[k]==='warn'&&v==='acc'))m[k]=v}
   const td=lun===cur?(new Date().getDay()+6)%7:-1;
   const rel=lun===cur?'Questa settimana':lun===orShift(cur,1)?'Settimana prossima':lun===orShift(cur,-1)?'Settimana scorsa':orDate(lun).getFullYear()+'';
-  const nerr=probs.filter(p=>p.k==='err').length;const fd=(u,g)=>g>=0?g:Math.max(0,[0,1,2,3,4,5,6].find(i=>orShifts((t[u.id]||{})[i]).length)??0);
+  const nerr=probs.filter(p=>p.k==='err'&&!p.ok).length,nacc=probs.filter(p=>p.ok).length,nda=probs.length-nacc;const fd=(u,g)=>g>=0?g:Math.max(0,[0,1,2,3,4,5,6].find(i=>orShifts((t[u.id]||{})[i]).length)??0);
   const cell=(u,g)=>{const v=(t[u.id]||{})[g]||'';const sh=orShifts(v);const ch=tp&&((tp[u.id]||{})[g]||'')!==v;
     return`<td${g===td?' class="today"':''}><button type="button" class="or-c ${cellK[u.id+'_'+g]||''}" data-a="orCell" data-u="${u.id}" data-g="${g}" aria-label="${esc(fullName(u))}, ${OR_GGL[g]}: ${esc(orFmt(v)||'nessun turno')}">${
-      OR_ASS[v]?`<span class="or-a">${OR_ASS[v]}</span>`:sh.length?sh.map(([a,b])=>`<span class="or-b rep-${orRep(u)}">${orHMc(a)}–${orHMc(b)}</span>`).join(''):`<span class="or-e">${ic('plus')}</span>`}${ch?'<i class="or-dot"></i>':''}</button></td>`};
+      OR_ASS[v]?`<span class="or-a">${OR_ASS[v]}</span>`:sh.length?sh.map(([a,b])=>`<span class="or-b rep-${orRep(u)}">${orHMc(a)}–${orHMc(b)}</span>`).join(''):`<span class="or-e">${ic('plus')}</span>`}${tbCell(u,g)}${ch?'<i class="or-dot"></i>':''}</button></td>`};
   const who=u=>{const c=contrOf(u),tot=orTot(t[u.id],c),pc=c?Math.min(100,Math.round(tot/(c.ore*60)*100)):0;
-    return`<th class="or-pc ${nameK[u.id]||''}" scope="row"><div class="or-who">${avatar(u,30)}<div><b>${esc(u.nome)}${u.cognome?' '+esc(u.cognome.charAt(0))+'.':''}</b><span>${c?`${orH(tot)} / ${c.ore}h`:`${orH(tot)} · senza contratto`}</span>${c?`<i class="or-bar ${tot>c.ore*60?'over':tot===c.ore*60?'full':''}"><i style="width:${pc}%"></i></i>`:''}</div></div></th>`};
+    return`<th class="or-pc ${nameK[u.id]||''}" scope="row"><div class="or-who">${avatar(u,30)}<div><b>${esc(u.nome)}${u.cognome?' '+esc(u.cognome.charAt(0))+'.':''}</b><span>${c?`${orH(tot)} / ${c.ore}h`:`${orH(tot)} · senza contratto`}</span>${tbo?`<span class="or-tbh" title="Ore timbrate">${ic('check')} ${orH(D7.reduce((s,g)=>s+tbNet(tbVal(lun,u.id,g),c),0))}</span>`:''}${c?`<i class="or-bar ${tot>c.ore*60?'over':tot===c.ore*60?'full':''}"><i style="width:${pc}%"></i></i>`:''}</div></div></th>`};
   const groups=Object.entries(REPARTI).map(([k,l])=>[l,ppl.filter(u=>orRep(u)===k)]).filter(([,us])=>us.length);
-  const D7=[0,1,2,3,4,5,6];
+  const D7=[0,1,2,3,4,5,6],tbo=tbOn(),now0=new Date(),nowM=now0.getHours()*60+now0.getMinutes(),tdy=today(now0);
+  const tbCell=(u,g)=>{if(!tbo)return'';const p=((tp||t)[u.id]||{})[g]||'',a=tbVal(lun,u.id,g),dk=today(orDay(lun,g)),P=orShifts(p);
+    const end=dk<tdy||(dk===tdy&&P.length&&nowM>P[P.length-1][1]+30),k=tbCmp(p,a,end);if(!k)return'';
+    return`<span class="or-tb ${k}">${k==='miss'?'non timbrato':esc(tbFmt(a))}</span>`};
   return`<div class="or-week"><button type="button" class="icon-btn" data-a="orW" data-v="-1" aria-label="Settimana prima">${ic('chevl')}</button>
   <div class="or-wt"><b>${orRange(lun)}</b><span>${rel}${lun!==cur?` · <button type="button" class="or-today" data-a="orW" data-v="0">Torna a oggi</button>`:''}</span></div>
   <button type="button" class="icon-btn" data-a="orW" data-v="1" aria-label="Settimana dopo">${ic('chev')}</button></div>
   <div class="or-st">${st.k?pill(st.k,st.l):`<span class="st">${st.l}</span>`}${w.pub&&st.ch?`<span class="muted small">pubblicata ${ago(w.pub)}</span>`:''}</div>
-  <div class="or-acts"><button type="button" class="btn ghost sm" data-a="orCopy">${ic('copy')} Copia settimana prima</button><button type="button" class="btn ghost sm" data-a="orTipi">${ic('clock')} Turni tipo</button>${st.k==='ok'||!st.k?'':`<button type="button" class="btn primary sm" data-a="orPub">${ic('send')} ${tp?'Avvisa delle modifiche':'Pubblica'}</button>`}</div>
-  ${probs.length?`<section class="or-pb ${nerr?'':'w'}"><button type="button" class="or-pbh" data-a="orPb" aria-expanded="${!!S.orPb}">${ic('warn')}<b>${probs.length} da controllare</b><span>${nerr?nerr+(nerr===1?' errore':' errori'):'solo avvisi'}</span>${ic('chev',S.orPb?'up':'dn')}</button>
-  ${S.orPb?`<div class="or-pl">${probs.map(p=>`<button type="button" class="or-pi ${p.k}" data-a="orCell" data-u="${p.u.id}" data-g="${fd(p.u,p.g)}">${avatar(p.u,28)}<span><b>${esc(p.u.nome)}</b> ${esc(p.t)}</span></button>`).join('')}</div>`:''}</section>`
+  <div class="or-acts"><button type="button" class="btn ghost sm" data-a="orCopy">${ic('copy')} Copia settimana prima</button><button type="button" class="btn ghost sm" data-a="orTipi">${ic('clock')} Turni tipo</button>${tbOn()?`<button type="button" class="btn ghost sm" data-a="tbXls">${ic('sheet')} Presenze</button>`:''}${st.k==='ok'||!st.k?'':`<button type="button" class="btn primary sm" data-a="orPub">${ic('send')} ${tp?'Avvisa delle modifiche':'Pubblica'}</button>`}</div>
+  ${cmGmBox()}
+  ${probs.length?`<section class="or-pb ${nerr?'':nda?'w':'a'}"><button type="button" class="or-pbh" data-a="orPb" aria-expanded="${!!S.orPb}">${ic('warn')}<b>${nda?nda+' da controllare':'Errori accettati'}</b><span>${[nerr?nerr+(nerr===1?' errore':' errori'):nda?'solo avvisi':'',nacc?nacc+' accettat'+(nacc===1?'o':'i'):''].filter(Boolean).join(' · ')}</span>${ic('chev',S.orPb?'up':'dn')}</button>
+  ${S.orPb?`<div class="or-pl">${probs.map(p=>`<button type="button" class="or-pi ${p.ok?'acc':p.k}" data-a="orCell" data-u="${p.u.id}" data-g="${fd(p.u,p.g)}">${avatar(p.u,28)}<span><b>${esc(p.u.nome)}</b> ${esc(p.t)}${p.ok?' <i class="or-acc">accettato</i>':''}</span></button>`).join('')}</div>`:''}</section>`
   :orAny(t)?`<div class="or-ok">${ic('check')} Tutto a posto: riposi, pause e ore controllati.</div>`:''}
   ${ppl.length?`<div class="or-scroll" role="region" aria-label="Orari della settimana" tabindex="0"><table class="or-grid">
   <thead><tr><th class="or-pc" scope="col">Persona</th>${D7.map(g=>`<th scope="col"${g===td?' class="today"':''}><span>${OR_GG[g]}</span><b>${orDay(lun,g).getDate()}</b></th>`).join('')}</tr></thead>
   <tbody>${groups.map(([l,us])=>`<tr class="or-rep"><th colspan="8" scope="colgroup"><span>${l}</span></th></tr>${us.map(u=>`<tr>${who(u)}${D7.map(g=>cell(u,g)).join('')}</tr>`).join('')}`).join('')}</tbody>
   <tfoot><tr><th class="or-pc" scope="row">In servizio</th>${D7.map(g=>{const vs=ppl.map(u=>(t[u.id]||{})[g]);const n=vs.filter(v=>orShifts(v).length).length;
     return`<td${g===td?' class="today"':''}><b>${n}</b><span>Pranzo ${vs.filter(v=>orIn(v,720,870)).length}</span><span>Cena ${vs.filter(v=>orIn(v,1170,1320)).length}</span></td>`}).join('')}</tr></tfoot></table></div>
-  <div class="or-leg"><span><i class="rep-cucina"></i>Cucina</span><span><i class="rep-sala"></i>Sala</span><span><i class="rep-altro"></i>Altro</span><span><i class="abs"></i>Riposo e assenze</span>${tp?'<span><i class="dot"></i>Cambiato dopo la pubblicazione</span>':''}</div>`
+  <div class="or-leg"><span><i class="rep-cucina"></i>Cucina</span><span><i class="rep-sala"></i>Sala</span><span><i class="rep-altro"></i>Altro</span><span><i class="abs"></i>Riposo e assenze</span>${tbo?'<span><b class="or-tb ok">9–15</b>timbrato</span><span><b class="or-tb diff">9:20–15</b>diverso dal turno</span>':''}${tp?'<span><i class="dot"></i>Cambiato dopo la pubblicazione</span>':''}</div>`
   :empty('users','Nessuna persona attiva','Aggiungi o approva i profili dello staff per fare gli orari.')}`;
 }
 function orSetV(v){const E=S.orE,sh=orShifts(v);E.abs=OR_ASS[v]?v:'';
@@ -2647,7 +2808,7 @@ function orCellSheet(id,g){
     const pr=orCheck(u,((orWeek(E.lun)||{}).t||{})[E.id],((orWeek(orShift(E.lun,-1))||{}).t||{})[E.id]);
     const net=orNet(v,c),gross=sh.reduce((s,[a,b])=>s+b-a,0);
     return`<div class="grab"></div><div class="sh-h">${avatar(u,40)}<div class="sh-t">${esc(fullName(u))}<div class="sh-s">${orDayL(E.lun,E.g)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${pr.length?`<div class="or-shp">${pr.map(p=>`<div class="or-pi ${p.k}">${ic('warn')}<span>${esc(p.t)}</span></div>`).join('')}</div>`:''}
+  ${pr.length?`<div class="or-shp">${pr.map(p=>{const a=p.k==='err'&&orOk(orWeek(E.lun),E.id).includes(p.t);return`<div class="or-pi ${a?'acc':p.k}">${ic('warn')}<span>${esc(p.t)}${a?' <i class="or-acc">accettato</i>':''}</span></div>`}).join('')}</div>`:''}
   <span class="lbl">Turni tipo</span><div class="or-chips">${orTipi().map(x=>`<button type="button" class="chip" aria-pressed="${!E.abs&&v===x.v}" data-a="orPick" data-v="${esc(x.v)}"><b>${esc(x.n)}</b><span>${esc(orFmt(x.v))}</span></button>`).join('')}</div>
   <span class="lbl">Assenza</span><div class="or-chips">${Object.entries(OR_ASS).map(([k,l])=>`<button type="button" class="chip" aria-pressed="${E.abs===k}" data-a="orPick" data-v="${k}">${l}</button>`).join('')}</div>
   <span class="lbl">Orari a mano</span>
@@ -2664,11 +2825,14 @@ async function orSaveCell(clear){
     if(!E.a1!==!E.b1||(E.two&&!E.a2!==!E.b2))return toast('Scrivi l\'ora di inizio e quella di fine.','warn');
     if([[E.a1,E.b1],[E.a2,E.b2]].some(([a,b])=>a&&a===b))return toast('Inizio e fine non possono essere uguali.','warn');
     if(!orVal(E))return toast('Scegli un turno o un\'assenza, oppure tocca «Togli».','warn')}
-  const v=clear?'':orVal(E);const row=Object.assign({},((orWeek(E.lun)||{}).t||{})[E.id]||{});
+  const v=clear?'':orVal(E);const w=orWeek(E.lun);const row=Object.assign({},((w||{}).t||{})[E.id]||{});
   for(const g of E.days){if(v)row[g]=v;else delete row[g]}
-  await orSaveRow(E.lun,E.id,row);closeSheet();
-  const pr=orCheck(u,row,((orWeek(orShift(E.lun,-1))||{}).t||{})[E.id]);const p=pr.find(x=>x.k==='err')||pr[0];
-  if(p)toast(u.nome+' – '+p.t,p.k==='err'?'err':'warn');else toast(clear?'Turno tolto':'Salvato'+(E.days.length>1?' su '+E.days.length+' giorni':''));
+  const pr=orCheck(u,row,((orWeek(orShift(E.lun,-1))||{}).t||{})[E.id]);const errs=pr.filter(x=>x.k==='err');
+  const ok=await orConsent(u,errs,orOk(w,E.id));if(ok===null)return;
+  await orSaveRow(E.lun,E.id,row,ok);closeSheet();
+  const p=pr.find(x=>x.k==='warn');
+  if(errs.length)toast(u.nome+': salvato con '+(errs.length===1?'un errore accettato':errs.length+' errori accettati'),'warn');
+  else if(p)toast(u.nome+' – '+p.t,'warn');else toast(clear?'Turno tolto':'Salvato'+(E.days.length>1?' su '+E.days.length+' giorni':''));
 }
 async function orCopy(){
   const lun=S.orW||orLun(),p=orWeek(orShift(lun,-1));if(!p||!orAny(p.t))return toast('La settimana prima è vuota.','warn');
@@ -2700,7 +2864,7 @@ async function orPublish(){
   const lun=S.orW||orLun(),w=orWeek(lun);if(!w||(!orAny(w.t)&&!w.tp))return toast('Non ci sono turni da pubblicare.','warn');
   const first=!w.tp,t=w.t||{};const ids=first?Object.keys(t).filter(id=>orHas(t[id])):orChanged(w);
   if(!ids.length)return toast('Niente di nuovo da avvisare.');
-  const errs=orProblems(lun).filter(p=>p.k==='err');
+  const errs=orProblems(lun).filter(p=>p.k==='err'&&!p.ok);
   if(errs.length&&!await ask(errs.length===1?'C\'è 1 errore negli orari':'Ci sono '+errs.length+' errori negli orari','Il primo: '+errs[0].u.nome+', '+errs[0].t+'.\nVuoi pubblicare lo stesso?','Pubblica lo stesso',true))return;
   await upd('config','orari_'+lun,{tp:clone(t),pub:now(),pubDa:S.me||''});
   const rg=orRange(lun),me=realU()||{};let n=0;
@@ -2711,6 +2875,192 @@ async function orPublish(){
   toast((first?'Orari pubblicati':'Modifiche pubblicate')+(n?': '+(n===1?'avvisata 1 persona':'avvisate '+n+' persone'):''));
 }
 
+/* ================= timbratura con QR (si accende in Impostazioni, spenta di partenza) =================
+   QR stampato in cucina con «JONA-TIMBRA:<codice>» (config/app.timbraK). Lo staff lo inquadra dalla voce Orari.
+   Una settimana per documento: config/timbr_<lunedì> = {tipo:'timbr',lun,t:{<persona>:{'0'..'6':'09:58-15:03,18:00-'}},m:{<persona>:{<g>:1}}}
+   stesso formato degli orari; «18:00-» = in servizio adesso; m = timbrata senza QR (fotocamera non disponibile). */
+const TB_MAX=16*60; // un'entrata aperta da più di 16 ore non si chiude più: la prossima timbratura è una nuova entrata
+const tbOn=()=>!!cfg().timbra;
+const tbWeek=lun=>D().config['timbr_'+lun]||null;
+const tbCode=()=>'JONA-TIMBRA:'+(cfg().timbraK||'');
+const tbVal=(lun,id,g)=>(((tbWeek(lun)||{}).t||{})[id]||{})[g]||'';
+// entrata aperta (oggi o ieri entro 16 ore): {lun,g,a} oppure null
+function tbOpen(id,d=new Date()){
+  const lun=orLun(d),g=(d.getDay()+6)%7,mins=d.getHours()*60+d.getMinutes();
+  const pl=g?lun:orShift(lun,-1),pg=g?g-1:6;
+  for(const [L,G,off] of [[lun,g,0],[pl,pg,1440]]){const m=/(?:^|,)(\d\d:\d\d)-$/.exec(tbVal(L,id,G));if(m){const a=orMin(m[1]);if(mins+off-a<=TB_MAX&&mins+off>=a)return{lun:L,g:G,a}}}
+  return null;
+}
+async function tbPunch(id,manual){
+  const d=new Date(),hm=orHM(d.getHours()*60+d.getMinutes()),op=tbOpen(id,d);
+  const lun=op?op.lun:orLun(d),g=op?op.g:(d.getDay()+6)%7,v=tbVal(lun,id,g);
+  const nv=op?v+hm:(v?v+',':'')+hm+'-';
+  const set={['t.'+id+'.'+g]:nv};if(manual)set['m.'+id+'.'+g]=1;
+  if(tbWeek(lun))await upd('config','timbr_'+lun,set);
+  else await put('config','timbr_'+lun,{tipo:'timbr',lun,t:{[id]:{[g]:nv}},m:manual?{[id]:{[g]:1}}:{}});
+  return{out:!!op,hm};
+}
+// ore timbrate nette (stessa pausa del contratto, come negli orari)
+const tbNet=(v,c)=>orNet(String(v||'').split(',').filter(p=>/^\d\d:\d\d-\d\d:\d\d$/.test(p)).join(','),c);
+// confronto con il turno previsto: ok (entro 10 minuti), diff, miss (turno passato senza timbratura)
+function tbCmp(plan,act,dayEnd){
+  const P=orShifts(plan),A=String(act||'').split(',').filter(Boolean);
+  if(!P.length)return A.length?'diff':'';
+  if(!A.length)return dayEnd?'miss':'';
+  const a0=orMin(A[0].split('-')[0]),lastEnd=A[A.length-1].split('-')[1];
+  if(Math.abs(a0-P[0][0])>10)return'diff';
+  if(lastEnd){let e=orMin(lastEnd);const pe=P[P.length-1][1];if(e<a0)e+=1440;if(Math.abs(e-pe)>10)return'diff'}
+  return'ok';
+}
+const tbFmt=v=>String(v||'').split(',').filter(Boolean).map(p=>{const [a,b]=p.split('-');return orHMc(orMin(a))+'–'+(b?orHMc(orMin(b)):'…')}).join(' ');
+
+/* staff: riquadro «Timbra» in I miei orari */
+function tbCard(me){
+  if(!tbOn())return'';const op=tbOpen(me.id),d=new Date(),oggi=tbVal(orLun(d),me.id,(d.getDay()+6)%7);
+  return`<section class="tb-card${op?' on':''}"><div class="tb-st">${ic('clock')}<div><b>${op?'In servizio dalle '+orHM(op.a%1440):'Non in servizio'}</b><span>${op?'Quando finisci, timbra l\'uscita':'Quando arrivi, timbra l\'entrata'}</span>${oggi?`<span class="tb-oggi">Oggi: ${esc(tbFmt(oggi))}</span>`:''}</div></div>
+  <button type="button" class="btn ${op?'dark':'primary'} big block" data-a="tbScan">${ic('qr')} ${op?'Timbra l\'uscita':'Timbra l\'entrata'}</button></section>`;
+}
+function tbScanSheet(){
+  const me=meU();if(!me||!tbOn())return;S.tbs={st:'start',err:''};
+  let stream=null,timer=0,det=null,stop=false,warned=false;
+  const close=()=>{stop=true;clearInterval(timer);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null};
+  const done=async manual=>{close();const r=await tbPunch(me.id,manual);closeSheet();try{navigator.vibrate&&navigator.vibrate([30,40,30])}catch(e){}
+    toast((r.out?'Uscita':'Entrata')+' alle '+r.hm+(manual?' (senza QR)':'')+' ✓')};
+  openSheet({onClose:close,render:()=>{const T=S.tbs||{};const op=tbOpen(me.id);
+    return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${op?'Timbra l\'uscita':'Timbra l\'entrata'}<div class="sh-s">Inquadra il QR attaccato in cucina</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+    <div class="tb-cam${T.st==='live'?' live':''}"><video id="tb-v" playsinline muted autoplay></video><i class="tb-frame"></i>${T.st!=='live'?`<p>${T.st==='err'?esc(T.err):'Apro la fotocamera…'}</p>`:''}</div>
+    ${T.st==='err'?`<div class="btns col" style="margin-top:14px"><button type="button" class="btn primary block" data-a="tbRetry">Riprova</button><button type="button" class="btn ghost block" data-a="tbManual">Timbra senza QR</button></div><p class="muted small">Senza QR la timbratura resta segnata: Maurizio la vede.</p>`:''}`}});
+  S.tbs.done=done;
+  (async()=>{
+    try{
+      if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw{m:'Questo telefono non apre la fotocamera dall\'app.'};
+      stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});if(stop){close();return}
+      const v=$('#tb-v');if(!v)return close();v.srcObject=stream;await v.play();
+      const cam=$('.tb-cam');if(cam){cam.classList.add('live');const p=cam.querySelector('p');if(p)p.remove()} // niente nuovo disegno: il video resterebbe vuoto
+      if('BarcodeDetector' in window){try{det=new BarcodeDetector({formats:['qr_code']})}catch(e){det=null}}
+      if(!det)await need('jsqr');
+      const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});let busy=false;
+      timer=setInterval(async()=>{const v=$('#tb-v');if(stop||busy||!v||v.readyState<2)return;busy=true;
+        try{let txt='';
+          if(det){const r=await det.detect(v);txt=r[0]&&r[0].rawValue||''}
+          else{const w=Math.min(640,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth);cv.width=w;cv.height=h;cx.drawImage(v,0,0,w,h);const r=jsQR(cx.getImageData(0,0,w,h).data,w,h,{inversionAttempts:'dontInvert'});txt=r&&r.data||''}
+          if(txt){if(txt===tbCode()&&cfg().timbraK)await done(false);else if(/^JONA-TIMBRA:/.test(txt)&&!warned){warned=true;toast('Questo QR è vecchio: chiedi a Maurizio quello nuovo.','warn')}}
+        }catch(e){}busy=false},280);
+    }catch(e){close();if(!S.tbs)return;S.tbs.st='err';S.tbs.err=e&&e.m||'Non riesco ad aprire la fotocamera. Controlla il permesso nelle impostazioni del telefono.';refreshSheet()}
+  })();
+}
+
+/* impostazioni: accendi/spegni, QR da stampare */
+async function tbToggle(on){
+  if(on&&!await ask('Accendere la timbratura?','Lo staff vedrà il pulsante «Timbra» nella voce Orari e dovrà inquadrare il QR attaccato in cucina. Avvisa i ragazzi prima di accenderla: le timbrature restano salvate.','Accendi'))return;
+  await put('config','app',Object.assign({},cfg(),{timbra:!!on},on&&!cfg().timbraK?{timbraK:randKey(12)}:{}));
+  toast(on?'Timbratura accesa: stampa il QR':'Timbratura spenta');
+}
+function tbQrSheet(){
+  S.tbQr='';
+  openSheet({live:()=>true,render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">QR per timbrare<div class="sh-s">Stampalo e attaccalo all'ingresso della cucina</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <div class="qr tb-qr">${S.tbQr?`<img src="${S.tbQr}" alt="QR per timbrare">`:'<p class="muted small">Preparo il QR…</p>'}<b>${esc(cfg().nomeLocale)}</b><span>Timbra entrata e uscita</span></div>
+  <div class="btns col" style="margin-top:14px"><button type="button" class="btn primary block" data-a="tbQrDl">${ic('download')} Scarica il QR</button><button type="button" class="btn ghost block danger" data-a="tbNewK">Cambia codice</button></div>
+  <p class="muted small">«Cambia codice» serve se qualcuno ha fotografato il QR: quello vecchio smette di funzionare e va stampato il nuovo.</p>`});
+  (async()=>{try{await need('qr');const q=qrcode(0,'M');q.addData(tbCode());q.make();S.tbQr=q.createDataURL(10,4)}catch(e){toast('QR non disponibile senza rete.','warn')}refreshSheet()})();
+}
+
+/* presenze del mese in Excel: previsto e timbrato, giorno per giorno */
+async function tbExcel(off){
+  const d0=new Date();d0.setHours(0,0,0,0);d0.setDate(1);d0.setMonth(d0.getMonth()-(off||0));const d1=new Date(d0);d1.setMonth(d1.getMonth()+1);
+  await need('xlsx');const ppl=orPeople(),rows=[['Persona','Data','Giorno','Previsto','Ore previste','Timbrato','Ore timbrate','Differenza','Note']];
+  const tot={};
+  for(const d=new Date(d0);d<d1;d.setDate(d.getDate()+1)){const lun=orLun(d),g=(d.getDay()+6)%7,w=orWeek(lun)||{},pl=w.tp||w.t||{};
+    for(const u of ppl){const c=contrOf(u),p=(pl[u.id]||{})[g]||'',a=tbVal(lun,u.id,g),man=(((tbWeek(lun)||{}).m||{})[u.id]||{})[g];if(!p&&!a)continue;
+      const hp=orNet(p,c),ha=tbNet(a,c);const x=tot[u.id]||(tot[u.id]={hp:0,ha:0});x.hp+=hp;x.ha+=ha;
+      rows.push([fullName(u),(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(1899,11,30))/864e5,OR_GGL[g],orFmt(p),r3(hp/60),String(a).replace(/-$/,'-…').replace(/,/g,', '),r3(ha/60),r3((ha-hp)/60),[man?'senza QR':'',/-$/.test(a)?'uscita non timbrata':''].filter(Boolean).join(', ')])}}
+  const mese=d0.toLocaleDateString('it-IT',{month:'long',year:'numeric'});
+  const R=[[cfg().nomeLocale+' - Presenze di '+mese],[],['Persona','Ore previste','Ore timbrate','Differenza'],...ppl.filter(u=>tot[u.id]).map(u=>[fullName(u),r3(tot[u.id].hp/60),r3(tot[u.id].ha/60),r3((tot[u.id].ha-tot[u.id].hp)/60)])];
+  const ws1=XLSX.utils.aoa_to_sheet(R);ws1['!cols']=[{wch:26},{wch:13},{wch:13},{wch:11}];
+  const ws2=XLSX.utils.aoa_to_sheet(rows);for(let i=1;i<rows.length;i++){const c=ws2[XLSX.utils.encode_cell({r:i,c:1})];if(c)c.z='dd/mm/yyyy'}
+  ws2['!cols']=[{wch:24},{wch:11},{wch:11},{wch:24},{wch:12},{wch:24},{wch:12},{wch:11},{wch:22}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws1,'Riepilogo');XLSX.utils.book_append_sheet(wb,ws2,'Giorni');
+  saveBlob('presenze_'+today(d0).slice(0,7)+'.xlsx',new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  toast('Presenze di '+mese+' pronte');
+}
+
+/* ================= scambio turno tra colleghi =================
+   Nella settimana pubblicata: cambi.<id> = {da,a,g1,g2 (-1 = nessuno),stato,creato}. Si scambiano le giornate g1 (e g2) tra le due persone.
+   chiesto → (il collega) accettato | rifiutato → (chi fa gli orari) approvato | rifiutato; chi chiede può annullare prima dell'approvazione.
+   All'approvazione cambiano sia la bozza «t» sia la copia pubblicata «tp»; gli errori chiedono il consenso come nella tabella. */
+const CM_ST={chiesto:'In attesa del collega',accettato:'In attesa di approvazione',approvato:'Approvato',rifiutato:'Rifiutato',annullato:'Annullato'};
+const cmDays=c=>[c.g1].concat(c.g2>=0&&c.g2!==c.g1?[c.g2]:[]);
+function cmApply(rows,c){const A=Object.assign({},rows[c.da]||{}),B=Object.assign({},rows[c.a]||{});
+  for(const g of cmDays(c)){const x=A[g],y=B[g];if(y)A[g]=y;else delete A[g];if(x)B[g]=x;else delete B[g]}return[A,B]}
+// cambi delle settimane caricate (le più recenti), con la settimana di appartenenza
+function cmAll(){const r=[];for(const [k,w] of Object.entries(D().config))if(/^orari_\d{4}-/.test(k)&&w.cambi)for(const [id,c] of Object.entries(w.cambi))r.push(Object.assign({id,lun:w.lun},c));return r.sort((a,b)=>b.creato-a.creato)}
+const cmOpen=c=>c.stato==='chiesto'||c.stato==='accettato';
+const cmToMe=me=>me?cmAll().filter(c=>c.a===me.id&&c.stato==='chiesto'):[];
+const cmToApprove=()=>cmAll().filter(c=>c.stato==='accettato');
+const cmTxt=(c,lun)=>{const w=orWeek(lun)||{},tp=w.tp||{},v=(id,g)=>orFmt((tp[id]||{})[g])||'nessun turno';
+  return cmDays(c).map(g=>`${OR_GGL[g]}: ${v(c.da,g)} ↔ ${v(c.a,g)}`).join(' · ')};
+async function cmSet(c,x){await upd('config','orari_'+c.lun,Object.fromEntries(Object.entries(x).map(([k,v])=>['cambi.'+c.id+'.'+k,v])))}
+
+/* staff: chiedi un cambio per un giorno della settimana pubblicata */
+function cmSheet(lun,g1){
+  const me=meU();S.cm={lun,g1,a:'',g2:-1};
+  openSheet({cls:'tall',live:()=>true,render:()=>{const C=S.cm;if(!C)return'';const w=orWeek(C.lun)||{},tp=w.tp||{};
+    const mine=(tp[me.id]||{})[C.g1]||'',ppl=orPeople().filter(u=>u.id!==me.id&&!isDev(u)).sort((a,b)=>(orRep(b)===orRep(me))-(orRep(a)===orRep(me))||byNome(a,b));
+    const o=C.a?D().staff[C.a]:null,their=o?(tp[o.id]||{}):{};const td=C.lun===orLun()?(new Date().getDay()+6)%7:-1;
+    const c={da:me.id,a:C.a,g1:C.g1,g2:C.g2};const [A,B]=o?cmApply(tp,c):[{},{}];
+    return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Chiedi un cambio<div class="sh-s">${orDayL(C.lun,C.g1)} · ${esc(orFmt(mine)||'nessun turno')}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+    <span class="lbl">Con chi?</span><div class="cm-ppl">${ppl.map(u=>`<button type="button" class="cm-p" aria-pressed="${C.a===u.id}" data-a="cmWho" data-u="${u.id}">${avatar(u,36)}<span><b>${esc(u.nome)}</b><i>${OR_GG[C.g1]}: ${esc(orFmt((tp[u.id]||{})[C.g1])||'nessun turno')}</i></span></button>`).join('')||'<p class="muted">Nessun collega con gli orari.</p>'}</div>
+    ${o?`<span class="lbl">In cambio fai un suo giorno? (facoltativo)</span><div class="chips cm-g">${[-1,0,1,2,3,4,5,6].filter(g=>g<0||(g!==C.g1&&g>=td&&orShifts(their[g]).length)).map(g=>`<button type="button" class="chip" aria-pressed="${C.g2===g}" data-a="cmG2" data-v="${g}">${g<0?'No':OR_GG[g]+' '+esc(orFmt(their[g]))}</button>`).join('')}</div>
+    <div class="cm-prev"><b>Dopo il cambio</b>${[[me,A],[o,B]].map(([u,r])=>`<div class="cm-row">${avatar(u,28)}<span>${esc(u.nome)}</span><div>${cmDays(c).map(g=>`<em>${OR_GG[g]} ${esc(orFmt(r[g])||'libero')}</em>`).join('')}</div></div>`).join('')}</div>`:''}
+    <div class="sheet-foot"><button type="button" class="btn primary block" data-a="cmSend" ${o?'':'disabled'}>${ic('send')} Chiedi a ${o?esc(o.nome):'…'}</button></div>`}});
+}
+async function cmSend(){
+  const C=S.cm,me=meU();if(!C||!C.a)return;const o=D().staff[C.a];if(!o)return;
+  if(cmAll().some(c=>cmOpen(c)&&c.lun===C.lun&&c.da===me.id&&cmDays(c).includes(C.g1)))return toast('Hai già chiesto un cambio per questo giorno.','warn');
+  const id=uid(),c={da:me.id,a:o.id,g1:C.g1,g2:C.g2,stato:'chiesto',creato:now()};c.testo=cmTxt(c,C.lun);
+  await upd('config','orari_'+C.lun,{['cambi.'+id]:c});
+  await notify(o.id,'Cambio turno: '+me.nome+' te lo chiede',cmTxt(c,C.lun)+'. Apri «Orari» per rispondere.','cambio',C.lun);
+  S.cm=null;closeSheet();toast('Richiesta mandata a '+o.nome);
+}
+async function cmAnswer(lun,id,si){
+  const w=orWeek(lun);const c=w&&w.cambi&&w.cambi[id];if(!c||c.stato!=='chiesto')return;const x=Object.assign({id,lun},c),me=meU(),da=D().staff[c.da]||{};
+  await cmSet(x,{stato:si?'accettato':'rifiutato',risposta:now()});
+  if(si){await notify('gestori','Cambio turno da approvare: '+(da.nome||'')+' e '+me.nome,cmTxt(c,lun),'cambio',lun);toast('Accettato: ora decide chi fa gli orari')}
+  else{await notify(c.da,'Cambio turno rifiutato da '+me.nome,cmTxt(c,lun),'cambio',lun);toast('Hai rifiutato il cambio')}
+}
+async function cmCancel(lun,id){const w=orWeek(lun),c=w&&w.cambi&&w.cambi[id];if(!c||!cmOpen(c))return;await cmSet({id,lun},{stato:'annullato'});toast('Richiesta annullata')}
+// chi fa gli orari: approva (con controllo delle regole) o rifiuta
+async function cmDecide(lun,id,si){
+  const w=orWeek(lun);const c=w&&w.cambi&&w.cambi[id];if(!c||!cmOpen(c))return;const x=Object.assign({id,lun},c);
+  const da=D().staff[c.da],a=D().staff[c.a];if(!da||!a)return toast('Una delle due persone non c\'è più.','warn');
+  if(!si){await cmSet(x,{stato:'rifiutato',deciso:now()});for(const p of [c.da,c.a])await notify(p,'Cambio turno non approvato',cmTxt(c,lun),'cambio',lun);return toast('Cambio rifiutato')}
+  const t=w.t||{},tp=w.tp||{},[tA,tB]=cmApply(t,c),[pA,pB]=cmApply(tp,c),prev=(orWeek(orShift(lun,-1))||{}).t||{};
+  const set={['t.'+c.da]:tA,['t.'+c.a]:tB,['tp.'+c.da]:pA,['tp.'+c.a]:pB,mod:now()};
+  for(const [u,r] of [[da,tA],[a,tB]]){const ok=await orConsent(u,orCheck(u,r,prev[u.id]).filter(p=>p.k==='err'),orOk(w,u.id));if(ok===null)return;set['ok.'+u.id]=ok}
+  const txt=cmTxt(c,lun);
+  set['cambi.'+id+'.stato']='approvato';set['cambi.'+id+'.deciso']=now();
+  await upd('config','orari_'+lun,set);
+  for(const p of [c.da,c.a])await notify(p,'Cambio turno approvato',txt,'cambio',lun);
+  toast('Cambio approvato: orari aggiornati e pubblicati');
+}
+// riquadri: per lo staff (richieste che lo riguardano) e per chi fa gli orari
+function cmStaffBox(me){
+  const cs=cmAll().filter(c=>(c.a===me.id||c.da===me.id)&&(cmOpen(c)||now()-(c.deciso||c.risposta||c.creato)<3*DAY));if(!cs.length)return'';
+  return`<section class="cm-box">${cs.map(c=>{const o=D().staff[c.a===me.id?c.da:c.a]||{nome:'?'},toMe=c.a===me.id;
+    return`<div class="cm-it ${c.stato}">${avatar(o,36)}<div class="cm-tx"><b>${toMe?esc(o.nome)+' ti chiede un cambio':'Cambio con '+esc(o.nome)}</b><span>${esc(c.testo||cmTxt(c,c.lun))}</span><i>${toMe&&c.stato==='chiesto'?'Rispondi tu':CM_ST[c.stato]}</i></div>
+    ${toMe&&c.stato==='chiesto'?`<div class="btns"><button type="button" class="btn ghost sm" data-a="cmNo" data-l="${c.lun}" data-c="${c.id}">Rifiuta</button><button type="button" class="btn primary sm" data-a="cmSi" data-l="${c.lun}" data-c="${c.id}">Accetta</button></div>`
+    :!toMe&&cmOpen(c)?`<button type="button" class="btn ghost sm" data-a="cmAnn" data-l="${c.lun}" data-c="${c.id}">Annulla</button>`:''}</div>`}).join('')}</section>`;
+}
+function cmGmBox(){
+  const cs=cmAll().filter(cmOpen);if(!cs.length)return'';
+  return`<section class="cm-box gm"><h2 class="sec" style="margin-top:0">Cambi turno<span>${cs.length}</span></h2>${cs.map(c=>{const da=D().staff[c.da]||{nome:'?'},a=D().staff[c.a]||{nome:'?'};
+    const w=orWeek(c.lun)||{},[tA,tB]=cmApply(w.t||{},c),prev=(orWeek(orShift(c.lun,-1))||{}).t||{};
+    const pr=[[da,tA],[a,tB]].flatMap(([u,r])=>u.id?orCheck(u,r,prev[u.id]).filter(p=>p.k==='err').map(p=>u.nome+': '+p.t):[]);
+    return`<div class="cm-it ${c.stato}"><span class="cm-av">${avatar(da,32)}${avatar(a,32)}</span><div class="cm-tx"><b>${esc(da.nome)} ↔ ${esc(a.nome)}</b><span>${esc(orRange(c.lun))} · ${esc(c.testo||cmTxt(c,c.lun))}</span>
+    <i>${CM_ST[c.stato]}</i>${pr.length?`<em class="cm-err">${ic('warn')} ${esc(pr[0])}${pr.length>1?' (+'+(pr.length-1)+')':''}</em>`:'<em class="cm-ok">'+ic('check')+' Regole rispettate</em>'}</div>
+    <div class="btns"><button type="button" class="btn ghost sm" data-a="cmRif" data-l="${c.lun}" data-c="${c.id}">Rifiuta</button><button type="button" class="btn primary sm" data-a="cmApp" data-l="${c.lun}" data-c="${c.id}">Approva</button></div></div>`}).join('')}</section>`;
+}
+
 /* staff: i miei orari (solo la copia pubblicata, solo la propria riga) */
 function vMieiOrari(me){
   const cur=orLun(),nx=orShift(cur,1),wn=orWeek(nx);const nextOk=!!(wn&&wn.tp&&orHas(wn.tp[me.id]));
@@ -2718,17 +3068,20 @@ function vMieiOrari(me){
   const lun=S.orMy==='next'?nx:cur,w=orWeek(lun),r=w&&w.tp?w.tp[me.id]:null,c=contrOf(me);
   const td=lun===cur?(new Date().getDay()+6)%7:-1;
   const head=`<h1 class="vt">I miei orari</h1><p class="vsub">${orRange(lun)}</p>
+  ${tbCard(me)}${cmStaffBox(me)}
   ${nextOk?`<div class="seg wide or-my" role="group" aria-label="Settimana">${[['','Questa settimana'],['next','Prossima']].map(([k,l])=>`<button type="button" aria-pressed="${(S.orMy||'')===k}" data-a="orMy" data-v="${k}">${l}</button>`).join('')}</div>`:''}`;
   if(!orHas(r))return head+empty('calendar',w&&w.tp?'Nessun turno':'Orari non ancora pronti',w&&w.tp?'In questa settimana non hai turni.':'Quando Maurizio li pubblica ricevi un avviso.');
-  return head+`<div class="or-mtot"><b>${orH(orTot(r,c))}</b><span>di lavoro in settimana${c?', contratto '+c.ore+' ore':''}</span></div>
+  return head+`<div class="or-mtot"><b>${orH(orTot(r,c))}</b><span>di lavoro in settimana</span></div>
   ${[0,1,2,3,4,5,6].map(g=>{const v=r[g]||'',sh=orShifts(v);
     return`<article class="or-day${g===td?' today':''}${td>=0&&g<td?' past':''}"><div class="or-dh"><b>${OR_GGL[g]}</b><span>${orDay(lun,g).toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span>${g===td?'<span class="tag gm">Oggi</span>':''}</div>
     ${sh.length?sh.map(([a,b])=>`<div class="or-dt rep-${orRep(me)}">${orHM(a)} – ${orHM(b)}</div>`).join('')+`<div class="or-dm">${orH(orNet(v,c))} di lavoro${sh.some(s=>s[1]>1440)?', finisci dopo mezzanotte':''}</div>`
-    :OR_ASS[v]?`<div class="or-da">${OR_ASS[v]}</div>`:'<div class="or-dn">Nessun turno</div>'}</article>`}).join('')}`;
+    :OR_ASS[v]?`<div class="or-da">${OR_ASS[v]}</div>`:'<div class="or-dn">Nessun turno</div>'}
+    ${tbOn()&&tbVal(lun,me.id,g)?`<div class="or-dtb">${ic('check')} Timbrato ${esc(tbFmt(tbVal(lun,me.id,g)))}</div>`:''}
+    ${sh.length&&(td<0||g>=td)?`<button type="button" class="or-cm" data-a="cmOpen" data-l="${lun}" data-g="${g}">${ic('users')} Chiedi un cambio</button>`:''}</article>`}).join('')}`;
 }
 function orContrForm(p){
   const f=S.form,o=String(f.ore??'');
-  return`<div class="or-cf"><div class="or-cfh">${ic('calendar')} Contratto e orari</div><p class="muted small" style="margin:2px 0 0">Servono per controllare gli orari della settimana.</p>
+  return`<div class="or-cf"><div class="or-cfh">${ic('calendar')} Contratto e orari</div><p class="muted small" style="margin:2px 0 0">Li vedi solo tu e chi fa gli orari: servono per controllare i turni. La persona non li vede.</p>
   <label class="lbl" for="${p}-ore">Ore a settimana</label><div class="or-ore"><div class="chips" role="group" aria-label="Ore a settimana">${[40,36,30,24,20].map(n=>`<button type="button" class="chip" aria-pressed="${o===String(n)}" data-a="formset" data-k="ore" data-v="${n}">${n}</button>`).join('')}</div><input class="inp" id="${p}-ore" type="number" inputmode="numeric" min="1" max="60" value="${esc(o)}" data-in="form" data-k="ore"></div>
   <span class="lbl">Pausa nei turni oltre 6 ore (minuti)</span><div class="seg wide" role="group" aria-label="Pausa">${[[0,'No'],[15,'15'],[30,'30'],[45,'45'],[60,'60']].map(([n,l])=>`<button type="button" aria-pressed="${String(f.pausa)===String(n)}" data-a="formset" data-k="pausa" data-v="${n}">${l}</button>`).join('')}</div>
   <span class="lbl">Giorni liberi a settimana</span><div class="seg wide" role="group" aria-label="Giorni liberi">${[1,2,3].map(n=>`<button type="button" aria-pressed="${String(f.liberi)===String(n)}" data-a="formset" data-k="liberi" data-v="${n}">${n}</button>`).join('')}</div></div>`;
@@ -2754,7 +3107,7 @@ function newsSheet(){
 }
 function notifSheet(){
   const me=meU();const unread=myNotifs(me).filter(n=>!n.letta);
-  const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',prezzi:'warn',urgente:'warn',orari:'calendar'};
+  const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',prezzi:'warn',urgente:'warn',orari:'calendar',cambio:'users'};
   openSheet({live:()=>true,render:()=>{const ns=myNotifs(me).slice(0,80);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${ns.length?ns.map(n=>`<div class="notif ${unread.some(x=>x.id===n.id)?'unread':''}">${ic(NI[n.tipo]||'bell')}<div><div class="nt">${esc(n.titolo)}</div>${n.testo?`<div class="nx">${esc(n.testo)}</div>`:''}<div class="nx small">${ago(n.creato)}</div></div></div>`).join(''):'<p class="muted">Nessuna notifica.</p>'}`}});
   runPool(unread.map(n=>()=>upd('notifiche',n.id,{letta:true})),4).catch(()=>{});
@@ -2775,6 +3128,8 @@ function settingsSheet(){
   <div class="setrow"><div><b>Nome del locale</b><span>Compare negli ordini ai fornitori</span><input class="inp" id="cfg-name" style="margin-top:8px" value="${esc(S.cfgName)}" data-in="cfgName"></div></div>
   <div class="setrow"><div><b>Luogo di consegna</b><span>Compare nel modulo d'ordine e nei messaggi</span><input class="inp" id="cfg-luogo" style="margin-top:8px" value="${esc(S.cfgLuogo)}" data-in="cfgLuogo"></div></div>
   <div class="btns" style="margin:4px 0 8px"><button type="button" class="btn primary sm" data-a="cfgSave">${ic('check')} Salva</button></div>
+  <div class="setrow"><div><b>Timbratura con QR</b><span>${tbOn()?'Accesa: lo staff timbra dalla voce Orari':'Spenta'}</span></div><div class="seg">${[[1,'Accesa'],[0,'Spenta']].map(([k,l])=>`<button type="button" aria-pressed="${tbOn()===!!k}" data-a="tbSet" data-v="${k}">${l}</button>`).join('')}</div></div>
+  ${tbOn()?`<div class="btns" style="margin:4px 0 8px"><button type="button" class="btn ghost sm" data-a="tbQr">${ic('qr')} QR da stampare</button></div>`:''}
   <div class="setrow"><div><b>Tema</b><span>Su questo dispositivo</span></div><div class="seg">${[['auto','Auto'],['light','Chiaro'],['dark','Scuro']].map(([k,l])=>`<button type="button" aria-pressed="${th===k}" data-a="theme" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="setrow"><div><b>Backup dei dati</b><span>Salva o ripristina tutto in un file</span></div><div class="btns"><button type="button" class="btn ghost sm" data-a="bkExport">${ic('download')} Esporta</button><button type="button" class="btn ghost sm" data-a="bkImport">${ic('upload')} Ripristina</button></div></div>
   ${S.db.backup?`<div class="setrow"><div><b>Copie automatiche</b><span>Ogni giorno una copia di tutto, restano ${BK_DAYS} giorni</span></div><button type="button" class="btn ghost sm" data-a="bkList">${ic('download')} Vedi</button></div>`:''}
@@ -3254,6 +3609,43 @@ const CH={
   fesel:t=>{S.fe[t.dataset.k]=t.value},
   pesel:t=>{S.pe[t.dataset.k]=t.value}
 };
+/* timbratura e cambi turno */
+Object.assign(A,{
+  tbScan:()=>tbScanSheet(),
+  tbManual:()=>S.tbs&&S.tbs.done&&S.tbs.done(true),
+  tbRetry:()=>{closeSheet(true);tbScanSheet()},
+  tbSet:d=>tbToggle(d.v==='1'),
+  tbQr:()=>{closeSheet(true);tbQrSheet()},
+  tbQrDl:async()=>{if(!S.tbQr)return;const img=await new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=S.tbQr});
+    const c=document.createElement('canvas');c.width=1240;c.height=1754;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.imageSmoothingEnabled=false;x.drawImage(img,220,330,800,800);
+    x.fillStyle='#2B2321';x.textAlign='center';x.font='300 84px Jost, Futura, sans-serif';x.fillText(cfg().nomeLocale,620,230);x.font='400 54px Jost, Futura, sans-serif';x.fillText('Timbra entrata e uscita',620,1260);
+    x.font='400 38px Jost, Futura, sans-serif';x.fillStyle='#5E534D';x.fillText('App Jona Ordini → Orari → Timbra',620,1340);
+    c.toBlob(b=>saveBlob('qr-timbratura.png',b),'image/png')},
+  tbNewK:async()=>{if(!await ask('Cambiare il codice?','Il QR attaccato adesso smette di funzionare: dovrai stampare e attaccare quello nuovo.','Cambia codice',true))return;await put('config','app',Object.assign({},cfg(),{timbraK:randKey(12)}));closeSheet(true);tbQrSheet();toast('Nuovo codice: stampa il QR')},
+  tbXls:()=>openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Presenze in Excel<div class="sh-s">Previsto e timbrato, giorno per giorno</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div><div class="btns col"><button type="button" class="btn primary block" data-a="tbXlsGo" data-v="0">${ic('download')} Questo mese</button><button type="button" class="btn ghost block" data-a="tbXlsGo" data-v="1">${ic('download')} Mese scorso</button></div>`}),
+  tbXlsGo:async d=>{await tbExcel(+d.v);closeSheet()},
+  cmOpen:d=>cmSheet(d.l,+d.g),
+  cmWho:d=>{S.cm.a=d.u;S.cm.g2=-1;refreshSheet()},
+  cmG2:d=>{S.cm.g2=+d.v;refreshSheet()},
+  cmSend:()=>cmSend(),
+  cmSi:d=>cmAnswer(d.l,d.c,true),
+  cmNo:d=>cmAnswer(d.l,d.c,false),
+  cmAnn:d=>cmCancel(d.l,d.c),
+  cmApp:d=>cmDecide(d.l,d.c,true),
+  cmRif:d=>cmDecide(d.l,d.c,false)
+});
+/* ordine suggerito */
+Object.assign(A,{
+  sugOpen:()=>sugSheet(),
+  sugF:d=>{Object.assign(S.sug,{fid:d.f,q:{},sel:{}});refreshSheet()},
+  sugBack:()=>{S.sug.fid='';refreshSheet()},
+  sugWx:d=>{S.sug.useWx=d.v==='1';refreshSheet()},
+  sugG:d=>{S.sug.gente=+d.v;refreshSheet()},
+  sugQ:d=>{const r=sugRows().find(x=>x.k===d.k);if(!r)return;const v=Math.max(0,r3(r.q+(sugUnitHalf(r.unita)?0.5:1)*Number(d.d)));S.sug.q[d.k]=v;S.sug.sel[d.k]=v>0;refreshSheet()},
+  sugAdd:()=>sugAdd()
+});
+CH.sugSel=t=>{if(!S.sug)return;S.sug.sel[t.dataset.k]=t.checked;refreshSheet()};
+CH.sugQv=t=>{if(!S.sug)return;const v=Math.max(0,num(t.value)||0);S.sug.q[t.dataset.k]=v;S.sug.sel[t.dataset.k]=v>0;refreshSheet()};
 /* orari del personale */
 Object.assign(A,{
   staffSub:d=>{S.staffSub=d.v;ls('jona_staffsub',d.v);window.scrollTo(0,0);render()},

@@ -46,5 +46,20 @@ await A.evaluate(()=>orSaveRow(S.orW,'test_u1',Object.assign({},orWeek(S.orW).t.
 await A.click('[data-a="orPub"]');await wait(600);if(await A.locator('#ask-ok').count())await A.click('#ask-ok');await wait(3000);
 ok(await B.evaluate(()=>myNotifs(meU()).some(n=>n.titolo.startsWith('Orari cambiati')&&n.testo.includes('sabato'))),'B: notifica «Orari cambiati» con il giorno');
 ok((await B.locator('.or-day').nth(5).innerText()).includes('18:00 – 23:30'),'B: vede il cambio');
+// v16: timbratura (t.<persona>.<giorno>) e cambio turno (cambi.<id>.stato) su Firestore
+await A.evaluate(()=>put('config','app',Object.assign({},cfg(),{timbra:true,timbraK:'K123'})));await wait(1500);
+await B.evaluate(()=>tbPunch(meU().id,true));await wait(1500);
+await B.evaluate(()=>tbPunch(meU().id,false));await wait(2000);
+const tb=await A.evaluate(async()=>{const d=await firebase.firestore().doc('config/timbr_'+orLun()).get({source:'server'});return d.data()});
+const g0=await A.evaluate(()=>(new Date().getDay()+6)%7);
+ok(tb&&tb.t&&tb.t.test_u1&&/^\d\d:\d\d-\d\d:\d\d$/.test(tb.t.test_u1[g0])&&tb.m.test_u1[g0]===1&&!Object.keys(tb).some(k=>k.includes('.')),'server: timbratura annidata, entrata senza QR e uscita');
+const L1=await A.evaluate(async()=>{const L=orShift(orLun(),1),t={test_u1:{5:'10:00-15:00'},test_u2:{5:'R',2:'18:00-23:00'}};await put('config','orari_'+L,{tipo:'orari',lun:L,t,tp:clone(t),pub:now(),mod:now()});return L});await wait(2500);
+await B.evaluate(async L=>{S.cm={lun:L,g1:5,a:'test_u2',g2:2};await cmSend()},L1);await wait(2500);
+const cid=await A.evaluate(L=>Object.keys(orWeek(L).cambi||{})[0],L1);
+ok(!!cid,'A vede la richiesta di cambio di B');
+await A.evaluate(([L,id])=>cmDecide(L,id,true),[L1,cid]);await wait(2500);
+const w1=await A.evaluate(async L=>{const d=await firebase.firestore().doc('config/orari_'+L).get({source:'server'});return d.data()},L1);
+ok(w1.cambi[cid].stato==='approvato'&&w1.tp.test_u1[5]==='R'&&w1.tp.test_u2[5]==='10:00-15:00'&&w1.tp.test_u1[2]==='18:00-23:00'&&!Object.keys(w1).some(k=>k.includes('.')),'server: cambio approvato, giornate scambiate');
+ok(await B.evaluate(()=>myNotifs(meU()).some(n=>n.tipo==='cambio'&&n.titolo.includes('approvato'))),'B: notifica «Cambio turno approvato»');
 ok(A.errs.length===0&&B.errs.length===0,'nessun errore '+A.errs.concat(B.errs).join(' | '));
 await b.close();
