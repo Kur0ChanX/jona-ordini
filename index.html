@@ -968,8 +968,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=20;
+const APP_VER=21;
 const NEWS=[
+  {v:21,data:'2026-10-04',titolo:'Nuovi telefoni: niente più attese infinite',
+    chef:['Se un telefono nuovo non riesce a collegarsi, invece di restare su «Un momento…» dice cosa fare e mostra il pulsante Riprova.'],
+    dev:{risolti:['Primo collegamento bloccato su iPhone: accesso e iscrizione in `membri` ora hanno un tempo massimo (`fbTmo`, 20 s); oltre, errore `fb_slow` con Riprova e, al tentativo dopo, Firestore in long polling forzato (`jona_fb_lp`).','La schermata di collegamento compare subito dopo la creazione del database (prima restava quella iniziale finché il collegamento non finiva).']}},
   {v:20,data:'2026-10-04',titolo:'Gemini per tutto il ristorante',
     chef:['«Chiedi a Jona» e le foto dei listini funzionano senza mettere la chiave Gemini su ogni telefono: basta la chiave del ristorante sul server.'],
     dev:{aggiunte:['`/gemini` nel Worker: chiave nel segreto `GEMINI_KEY` (dal segreto GitHub `GEMINI_API_KEY`), accesso solo ai telefoni in `membri/<uid>` (gettone Firebase controllato leggendo il proprio documento), se Gemini risponde 429 aspetta il `retryDelay` e riprova, poi passa al modello Lite.','`gemCall` nell\'app: chiave del telefono se c\'è, altrimenti il server; `/salute` dice `gemini:true`.']}},
@@ -1150,16 +1153,18 @@ const FB_COLS=['staff','fornitori','config','richieste','ordini','notifiche'];
 const randKey=(n=24)=>{const a='abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';return[...crypto.getRandomValues(new Uint8Array(n))].map(x=>a[x%a.length]).join('')};
 function fbInit(){
   const app=firebase.apps.length?firebase.app():firebase.initializeApp(fbCfg());const fs=firebase.firestore(),auth=firebase.auth();
+  if(ls('jona_fb_lp')&&!fbInit.lp){fbInit.lp=1;try{fs.settings({experimentalForceLongPolling:true,merge:true})}catch(e){}}
   const emu=ls('jona_fb_emu');if(emu&&!fbInit.emu){fbInit.emu=1;fs.useEmulator(emu,8080);auth.useEmulator('http://'+emu+':9099',{disableWarnings:true})}
   return{fs,auth};
 }
+const fbTmo=(p,ms=20000)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j({code:'fb_slow'}),ms))]);
 async function fbSignIn(auth){await new Promise(r=>{const u=auth.onAuthStateChanged(()=>{u();r()})});if(!auth.currentUser)await auth.signInAnonymously();return auth.currentUser.uid}
-async function fbPublic(){try{await need('firebase');const{fs}=fbInit();const d=await fs.doc('pubblico/stato').get();return!!(d.exists&&d.data().attivo)}catch(e){return null}}
+async function fbPublic(){try{await need('firebase');const{fs}=fbInit();const d=await fbTmo(fs.doc('pubblico/stato').get(),12000);return!!(d.exists&&d.data().attivo)}catch(e){return null}}
 function FirebaseStore(key){
   const{fs,auth}=fbInit();
   fs.enablePersistence({synchronizeTabs:true}).catch(()=>{});
   const FV=firebase.firestore.FieldValue,FP=firebase.firestore.FieldPath;
-  const st={ready:false,err:'',pend:0,net:navigator.onLine!==false,busy:''};
+  const st={ready:false,err:'',pend:0,net:navigator.onLine!==false,busy:'',step:''};
   const ping=()=>schedule();
   addEventListener('online',()=>{st.net=true;ping()});addEventListener('offline',()=>{st.net=false;ping()});
   const mapErr=e=>({code:!e?'fb':e.code==='not-found'?'not_found':e.code==='permission-denied'?'fb_perm':e.code==='unavailable'?'fb_net':e.code?'fb':'fb',msg:e&&e.message});
@@ -1170,12 +1175,14 @@ function FirebaseStore(key){
   // ---- collegamento: accesso anonimo e iscrizione del telefono con la chiave ----
   (async function connect(){
     try{
-      const u=await fbSignIn(auth);
-      if(ls('jona_member')!==u){const m=await fs.doc('membri/'+u).get().catch(()=>null);
-        if(!m||!m.exists)await fs.doc('membri/'+u).set({k:key,creato:now(),ua:navigator.userAgent.slice(0,120)});ls('jona_member',u)}
+      st.step='accesso';ping();
+      const u=await fbTmo(fbSignIn(auth));
+      if(ls('jona_member')!==u){st.step='iscrizione';ping();const m=await fbTmo(fs.doc('membri/'+u).get(),12000).catch(()=>null);
+        if(!m||!m.exists)await fbTmo(fs.doc('membri/'+u).set({k:key,creato:now(),ua:navigator.userAgent.slice(0,120)}));ls('jona_member',u)}
+      st.step='';
       if(ls('jona_fb_upload')){st.busy='upload';ping();await loadAll(LocalStore.dump());ls('jona_fb_upload',null);st.busy='';toast('Database centrale attivo: i dati di questo telefono sono stati caricati')}
       st.ready=true;st.err='';ping();okReady();
-    }catch(e){st.err=mapErr(e).code;st.busy='';ping();if(st.err!=='fb_perm')setTimeout(connect,5000)}
+    }catch(e){st.err=e&&e.code==='fb_slow'?'fb_slow':mapErr(e).code;st.busy='';if(st.err==='fb_slow')ls('jona_fb_lp',1);ping();if(st.err!=='fb_perm')setTimeout(connect,5000)}
   })();
   // ---- prodotti raggruppati per fornitore ----
   const L={data:{},fidOf:{},buf:new Map(),t:null};
@@ -1241,7 +1248,7 @@ function FirebaseStore(key){
     prune:async keep=>{await readyP;const s=await fs.collection('backup').where('g','<',keep).get({source:'server'});for(const x of s.docs)await x.ref.delete()}
   };
   return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
-    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy}),
+    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy,step:st.step}),
     dump:()=>clone(cache),
     load:async d=>{if(!navigator.onLine)throw{code:'fb_net'};await readyP;await loadAll(d)},
     range:async(c,f,a,b)=>{await readyP;const s=await fs.collection(c).where(f,'>=',a).where(f,'<',b).get();return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
@@ -1423,7 +1430,8 @@ const wallMsg=(t,p,act='')=>`<div class="wall linen"><div class="logo-full" role
 function wallFb(s){
   if(s.err==='fb_perm')return wallMsg('Accesso non valido','Il codice di questo telefono non è più valido. Chiedi allo chef il QR code o il link e aprilo di nuovo.',`<button type="button" class="btn ghost block" data-a="fbLeave">Scollega questo telefono</button>`);
   if(s.busy==='upload')return wallMsg('Carico i dati…','Sto copiando sul database centrale i dati di questo telefono. Non chiudere l\'app.');
-  return wallMsg('Collegamento al ristorante…',!s.net||s.err?'Non c\'è connessione. Appena torna la rete l\'app si collega da sola.':'Un momento…');
+  if(s.err==='fb_slow')return wallMsg('Il collegamento non riesce','Controlla che ci sia internet (meglio il Wi-Fi o i dati attivi), poi tocca Riprova. Se non va, apri il link con Safari o Chrome, non dentro WhatsApp.',`<button type="button" class="btn primary block big" data-a="reload">Riprova</button>`);
+  return wallMsg('Collegamento al ristorante…',!s.net||s.err?'Non c\'è connessione. Appena torna la rete l\'app si collega da sola.':s.step==='iscrizione'?'Registro questo telefono…':'Un momento…');
 }
 function screenJoin(){
   return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>Collega questo telefono</h1>
@@ -4012,7 +4020,7 @@ async function boot(){
   $('#picker').addEventListener('change',()=>{const p=$('#picker');const fs=[...(p.files||[])];const cb=pickCb;pickCb=null;if(fs.length&&cb)guard(()=>cb(fs))});
   render();
   const key=ls('jona_key');
-  if(fbCfg()&&key){try{await need('firebase');S.db=FirebaseStore(key)}catch(e){S.fbLibErr=true;render();return}}
+  if(fbCfg()&&key){try{await need('firebase');S.db=FirebaseStore(key);render()}catch(e){S.fbLibErr=true;render();return}}
   else S.db=LocalStore;
   try{await seedIfEmpty()}catch(e){toast(errMsg(e),'err')}
   if(S.db.kind==='locale'&&fbCfg())fbPublic().then(a=>{S.fbActive=a;schedule()});

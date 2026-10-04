@@ -1,13 +1,20 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- Online la **v19** (PR #29, squash `d9b493b`; animazione invertita): `APP_VER=19`, `sw.js` `CACHE=jona-ordini-v23`. File online identici a quelli provati. Ramo `backup-automatico` riallineato con `git merge origin/main`.
+- **v21**: un iPhone nuovo aperto dal link d'invito restava per sempre su «Un momento…». Ora `connect` in `FirebaseStore` ha tempi massimi (`fbTmo`, 20 s su accesso e iscrizione `membri`, 12 s su `pubblico/stato`), errore `fb_slow` → schermata «Il collegamento non riesce» con Riprova, e `jona_fb_lp` forza il long polling di Firestore al tentativo dopo (`fbInit`). `render()` subito dopo la creazione del database. `APP_VER=21`, `CACHE=jona-ordini-v25`. Prova `tools/test-invito-bloccato.mjs`. Causa esatta sull'iPhone del collega non ancora confermata: farlo riprovare.
+- Online la **v20** (PR #30, squash `98363e3`): Gemini dal server del ristorante. `APP_VER=20`, `CACHE=jona-ordini-v24`. File online identici, Worker pubblicato (`/salute` → `gemini:false` finché Mario non mette il segreto). Ramo riallineato con `git merge origin/main`.
+- v20: Worker `/gemini` (segreto `GEMINI_KEY` copiato dal segreto GitHub `GEMINI_API_KEY` dal workflow; solo telefoni in `membri/<uid>` col gettone Firebase; 429 → attesa `retryDelay`, poi `gemini-flash-lite-latest`; tetto ~25 s). App: `gemCall`, `gemSrvOk`, `gemOn` (chiave del telefono se c'è, altrimenti server, solo con Firebase). Prova `tools/test-gemini-server.mjs` (29). Foto già ridotte a 2000 px (`shrinkImg`).
+- **Da fare per Mario:** creare la chiave su aistudio.google.com, metterla nel segreto GitHub `GEMINI_API_KEY`, rilanciare il workflow «Pubblica server notifiche».
 - Versioni di oggi: v14 orari, v15 animazione invio + «È urgente», v16 ordine suggerito / timbratura QR (spenta) / cambi turno / contratto solo per l'amministratore + consenso sugli errori, v17 chat + «Chiedi a Jona», v18 fornitori con logo e schede grandi + animazione nuova.
 - Regole Firestore con `messaggi` pubblicate da Mario: chat verificata sul suo telefono (spunta ✓ = scritto sul server).
 - Prove tutte verdi: `test-invio-anim` 14, `test-v16` 42, `test-v17` 29, `test-orari` 70, `test-staff` 35, `test-news` 94, `test-scaglione2` 20, `test-voice` 83, `test-report` 63; con l'emulatore `test-firebase-chat` 13, `test-firebase-orari` 18, flow, push, approva-arrivi, backup.
 - Mario non ha accesso al telefono di Maurizio: le prove a due telefoni si fanno con una scheda in incognito e i «Dati di prova» (test1 / prova123).
 
-## Domanda aperta di Mario (da rispondere in modalità BRAINSTORMING)
+## Idee parcheggiate da Mario (non farle finché non le richiede)
+Foto della confezione → carrello (via `/gemini`), allarme quantità strana, «Rifai come martedì scorso», mancanti riordinati, risposta del fornitore letta dallo screenshot. Codice a barre scartato (molti prodotti non lo hanno). Anche le idee personale/HACCP/allergeni/inventario/stagione: non servono per ora.
+- Rischio noto: `/invia` del Worker non controlla chi chiama (proteggerlo come `/gemini`, attenzione a `sw.js` Background Sync che non ha il gettone).
+
+## Domanda aperta di Mario (in attesa, parcheggiata)
 > «pensi che la parte dei caricamenti dei listini sia abbastanza potente automatizzata e completa?»
 Già esiste: Excel/CSV, fattura XML (FatturaPA), tabella incollata, foto lette da Gemini, revisione con abbinamento ai prodotti (`matchProd`) e avviso aumenti (`rvUps`). Mancano (idee da proporre e far scegliere): PDF dei listini (pdf.js è già in `LIB`), fattura XML che aggiorna i prezzi e controlla la merce arrivata in un colpo, abbinamento intelligente dei nomi (sinonimi, unità diverse kg/conf), storico prezzi per prodotto con grafico, listino condiviso da email o WhatsApp direttamente nell'app, avviso «listino vecchio» dopo N giorni.
 
