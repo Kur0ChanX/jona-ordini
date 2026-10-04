@@ -18,7 +18,7 @@ Già esiste: Excel/CSV, fattura XML (FatturaPA), tabella incollata, foto lette d
 - Chat: collezione `messaggi` fuori da `S.db` (come le push), `CHAT`, `chWatch`, `chPaint`, `messaggi/letti`; chat `tutti`, `rep_<reparto>`, `dm_<a>--<b>`.
 - «Chiedi a Jona»: `jonaCtx`, `jonaAsk`, `jonaMic` (Gemini, chiave `jona_gemini_key`).
 - Fornitori: `fDot` (logo o iniziale), `fornitori.logo` (data URL ≤320 px, `fileToLogo`), `.fgrid`/`.fcard`.
-- Animazione: `media/invio-chef.mp4` (alpha impilato 720×808), `sendAnim`; rifare con `python3 tools/anim-invio.py <video> 4.2 0.12 0.12` (rembg + scipy + ffmpeg; memoria in `/tmp/anim-invio-cache`). Sorgente attuale: il video nuovo di Mario (menù verticale), tagliato a 4,2 s.
+- Animazione: `media/invio-chef.mp4` (alpha impilato 720×808, v19: invertito nel tempo con ffmpeg `reverse`, lo chef a sinistra porge il menù; non specchiare, il logo si leggerebbe al contrario), `sendAnim`; rifare con `python3 tools/anim-invio.py <video> 4.2 0.12 0.12` e poi `reverse` (rembg + scipy + ffmpeg; memoria in `/tmp/anim-invio-cache`). Sorgente attuale: il video nuovo di Mario (menù verticale), tagliato a 4,2 s.
 - Prove nuove: `tools/test-orari.mjs`, `test-invio-anim.mjs`, `test-v16.mjs`, `test-v17.mjs`, `test-firebase-orari.mjs`, `test-firebase-chat.mjs` (vedi `tools/README.md`).
 
 ## Decisioni e motivi
