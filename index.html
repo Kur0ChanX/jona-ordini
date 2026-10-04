@@ -718,6 +718,15 @@ button.or-pi{cursor:pointer}
 .or-da{padding:8px 14px;border-radius:12px;border:1px dashed var(--sand);background:var(--sunk);color:var(--ink2);font:400 20px var(--font)}
 .or-dn{color:var(--muted);font-size:17px}
 @media (max-width:420px){html.staff-ui .nav.n5 button{font-size:12px;white-space:normal;line-height:1.1;text-align:center}}
+/* ---------- animazione «Inviato allo chef» ---------- */
+.snd-anim{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:16px;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(10px) saturate(1.1);backdrop-filter:blur(10px) saturate(1.1);opacity:0;transition:opacity .28s ease;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.snd-anim.in{opacity:1}
+.snd-stage{width:min(100%,640px)}
+.snd-stage canvas{display:block;width:100%;height:auto;aspect-ratio:720/404}
+.snd-cap{display:flex;align-items:center;gap:10px;margin-top:6px;font:300 27px/1.2 var(--font);color:var(--ink);opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
+.snd-cap.in{opacity:1;transform:none}
+.snd-cap .ic{width:34px;height:34px;padding:6px;border-radius:50%;background:var(--mirto);color:#fff;stroke-width:2.4}
+.snd-hint{margin:10px 0 0;font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -803,8 +812,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=14;
+const APP_VER=15;
 const NEWS=[
+  {v:15,data:'2026-10-04',titolo:'Invio allo chef con animazione',
+    tutti:['Quando tocchi «Invia allo chef» compare una breve animazione: il menù JONA passa dalle tue mani a quelle dello chef. Se hai fretta, tocca lo schermo per saltarla.','Nel carrello il pulsante per i prodotti che servono subito ora si chiama «È urgente».'],
+    dev:{aggiunte:['`media/invio-chef.mp4`: video H.264 con il colore sopra e la trasparenza sotto (alpha impilato, 720×404 ciascuna); `sendAnim` lo unisce con WebGL su un canvas trasparente sopra l\'app, poi apre il solito foglio «Inviato allo chef». Caricato come blob da `animPrefetch` (apertura del carrello e invio). Si salta con «riduci movimento», senza WebGL o se il video non parte.','Video ricavato dal filmato di Mario: scontorno con rembg (isnet + u2net), tolti i bianchi e grigi neutri (sfondo e giacca), bordi sfumati, colore dei bordi preso dal soggetto.']}},
   {v:14,data:'2026-10-04',titolo:'Orari del personale',
     tutti:['Nel menu in basso c\'è la nuova voce «Orari»: vedi i tuoi turni della settimana, giorno per giorno, con le ore di lavoro. Il giorno di oggi è evidenziato.','Quando Maurizio pubblica gli orari, o li cambia, ricevi un avviso. Se sono già pronti quelli della settimana dopo, li trovi con «Settimana prossima».'],
     chef:['Nella scheda Staff tocca «Orari»: c\'è la tabella della settimana con tutte le persone, divise per reparto. Tocca una casella per mettere un turno tipo (Pranzo, Cena, Spezzato, Giornata), un\'assenza (Riposo, Ferie, Malattia, Permesso) o gli orari a mano. Con «Uguale anche per» lo metti su più giorni insieme.','Nel profilo di ogni persona ci sono le ore a settimana del contratto, la pausa e i giorni liberi.','L\'app controlla da sola: 11 ore di riposo tra un giorno e l\'altro, un riposo di 24 ore nella settimana, giornate oltre 13 ore, pause, giorni liberi e ore oltre il contratto. Le caselle con un problema hanno il bordo rosso (errore) o giallo (avviso) e in alto trovi l\'elenco «da controllare».','«Copia settimana prima» per partire dai turni già fatti, «Pubblica» per mandarli allo staff, «Avvisa delle modifiche» avvisa solo chi ha i turni cambiati. Lo staff vede gli orari solo dopo la pubblicazione.'],
@@ -1452,9 +1464,9 @@ function vCarrello(me){
   const nf=[...g.keys()].filter(Boolean).length;const staff=!isMgr(me);
   const lineH=l=>`<div class="line wrap${staff?' big':''}"><div class="ln-i"><div class="ln-n">${esc(l.libero?l.nome:l.p.nome)}${l.libero&&staff?' <span class="tag">fuori listino</span>':''}</div>${l.libero?`<input class="inp unit-inp" id="cu-${l.pid}" value="${esc(l.unita||'')}" placeholder="unità" data-ch="cunit" data-p="${l.pid}" aria-label="Unità">`:`<div class="ln-m">${l.p.codice&&!staff?'cod. '+esc(l.p.codice):''}${sp&&l.p.prezzo!=null?` ${eur(l.p.prezzo)}${l.p.unita?' / '+esc(l.p.unita):''}`:(l.p.unita?' '+esc(l.p.unita):'')}</div>`}</div>
   ${stepper('c',l.pid,l.qta,`data-p="${l.pid}"`)}<button type="button" class="icon-btn" data-a="crm" data-p="${l.pid}" aria-label="Rimuovi">${ic('trash')}</button>
-  <div class="ln-x"><button type="button" class="urg-b${l.urg?' on':''}" data-a="curg" data-p="${l.pid}" aria-pressed="${!!l.urg}">${ic('warn')} ${l.urg?'Urgente ✓':'È urgente?'}</button></div></div>`;
+  <div class="ln-x"><button type="button" class="urg-b${l.urg?' on':''}" data-a="curg" data-p="${l.pid}" aria-pressed="${!!l.urg}">${ic('warn')} ${l.urg?'Urgente ✓':'È urgente'}</button></div></div>`;
   const nu=lines.filter(l=>l.urg).length;
-  return`<h1 class="vt">Carrello</h1><p class="vsub">${lines.length} ${lines.length===1?'articolo':'articoli'}${nf&&!staff?` da ${nf} ${nf===1?'fornitore':'fornitori'}`:''}. ${staff?'Controlla le quantità e premi «Invia allo chef».':'Controlla le quantità e invia allo chef.'} Se un prodotto serve subito tocca «È urgente?».</p>
+  return`<h1 class="vt">Carrello</h1><p class="vsub">${lines.length} ${lines.length===1?'articolo':'articoli'}${nf&&!staff?` da ${nf} ${nf===1?'fornitore':'fornitori'}`:''}. ${staff?'Controlla le quantità e premi «Invia allo chef».':'Controlla le quantità e invia allo chef.'} Se un prodotto serve subito tocca «È urgente».</p>
   ${nu?`<div class="banner dup" role="note">${ic('warn')}<div><b>${nu===1?'1 prodotto urgente':nu+' prodotti urgenti'}.</b> Maurizio riceve un avviso importante e li vede in cima.</div></div>`:''}
   <div class="panel">${staff?`<div class="fsec">${lines.map(lineH).join('')}</div>`:[...g.entries()].map(([fid,ls])=>`<div class="fsec"><div class="fsec-h"><span class="sup" style="--c:${fcolor(fid)}"><i></i>${fid?esc(forn(fid).nome):'Fuori listino, lo assegna lo chef'}</span><span class="muted small">${ls.length}</span></div>
   ${ls.map(lineH).join('')}</div>`).join('')}
@@ -1463,7 +1475,7 @@ function vCarrello(me){
   <div class="cart-foot" style="margin-top:16px"><button type="button" class="btn primary block big" data-a="csend">${ic('send')} Invia allo chef</button></div>`;
 }
 async function sendCart(){
-  const me=meU();const lines=cartLines();if(!lines.length)return;
+  const me=meU();const lines=cartLines();if(!lines.length)return;animPrefetch();
   const items=lines.map(l=>l.libero?{libero:true,nome:l.nome,qta:l.qta,unita:l.unita||'pz',fornitoreId:'',fornitoreNome:'',codice:'',prezzo:null}
     :{pid:l.p.id,nome:l.p.nome,codice:l.p.codice||'',unita:l.p.unita||'',prezzo:l.p.prezzo??null,fornitoreId:l.p.fornitoreId,fornitoreNome:forn(l.p.fornitoreId).nome,qta:l.qta});
   lines.forEach((l,i)=>{if(l.urg)items[i].urgente=true});
@@ -1480,6 +1492,7 @@ async function sendCart(){
   if(urg.length)await notify('gm','URGENTE: '+me.nome+' chiede '+urg.map(i=>i.nome).slice(0,3).join(', ')+(urg.length>3?'…':''),`${urg.length===1?'Serve subito':urg.length+' prodotti servono subito'}. Richiesta di ${items.length} ${items.length===1?'articolo':'articoli'}${dup.length?' (possibile doppione)':''}`,'urgente',id);
   else await notify('gm','Nuova richiesta da '+me.nome,`${REPARTI[me.reparto]||''}, ${items.length} ${items.length===1?'articolo':'articoli'}${nf?' da '+nf+(nf===1?' fornitore':' fornitori'):''}${dup.length?' (possibile doppione)':''}`,'richiesta',id);
   S.cart=[];saveCart();S.cnote='';S.tab='miei';render();window.scrollTo(0,0);
+  await sendAnim();
   openSheet({render:()=>`<div class="grab"></div><div class="done">${ic('check','big')}<h2>Inviato allo chef</h2><p class="muted">Riceverai una notifica quando approva o rifiuta la richiesta.</p><div class="btns col"><button type="button" class="btn primary block" data-a="logout">${ic('logout')} Esci dal profilo</button><button type="button" class="btn ghost block" data-a="closeSheet">Continua</button></div></div>`});
 }
 
@@ -1527,6 +1540,53 @@ function vMiei(me){
 }
 </script>
 <script>
+/* ================= animazione «Inviato allo chef» =================
+   media/invio-chef.mp4 è un video normale (H.264: va anche su iPhone) con due immagini una sopra l'altra:
+   sopra il colore, sotto la trasparenza in bianco e nero. WebGL le unisce su un canvas trasparente.
+   Il video arriva come blob (niente richieste a pezzi nel service worker). Si salta con «riduci movimento»,
+   senza WebGL o se il video non parte; un tocco la chiude. */
+const ANIM_SRC='media/invio-chef.mp4';
+let animUrl=null;
+const animOff=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+function animPrefetch(){
+  if(!animUrl&&!animOff())animUrl=fetch(ANIM_SRC).then(r=>{if(!r.ok)throw 0;return r.blob()}).then(b=>URL.createObjectURL(b)).catch(()=>{animUrl=null;return null});
+  return animUrl||Promise.resolve(null);
+}
+function animGL(cv){
+  const gl=cv.getContext('webgl',{alpha:true,premultipliedAlpha:true,antialias:false,preserveDrawingBuffer:true});if(!gl)return null;
+  const sh=(t,src)=>{const x=gl.createShader(t);gl.shaderSource(x,src);gl.compileShader(x);return gl.getShaderParameter(x,gl.COMPILE_STATUS)?x:null};
+  const vs=sh(gl.VERTEX_SHADER,'attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}');
+  const fs=sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec2 uv;uniform sampler2D t;void main(){vec3 c=texture2D(t,vec2(uv.x,uv.y*.5)).rgb;float a=dot(texture2D(t,vec2(uv.x,.5+uv.y*.5)).rgb,vec3(.299,.587,.114));a=smoothstep(.05,.95,a);gl_FragColor=vec4(c*a,a);}');
+  if(!vs||!fs)return null;const pr=gl.createProgram();gl.attachShader(pr,vs);gl.attachShader(pr,fs);gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return null;gl.useProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const l=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
+  gl.bindTexture(gl.TEXTURE_2D,gl.createTexture());
+  for(const [k,v] of [[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE],[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR]])gl.texParameteri(gl.TEXTURE_2D,k,v);
+  gl.clearColor(0,0,0,0);
+  const draw=v=>{if(v.readyState<2)return false;gl.viewport(0,0,cv.width,cv.height);gl.clear(gl.COLOR_BUFFER_BIT);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,v);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);return true};
+  draw.free=()=>{try{const x=gl.getExtension('WEBGL_lose_context');if(x)x.loseContext()}catch(e){}};
+  return draw;
+}
+function sendAnim(){return new Promise(async done=>{
+  if(animOff())return done();
+  const url=await Promise.race([animPrefetch(),new Promise(r=>setTimeout(()=>r(null),1500))]);if(!url)return done();
+  const cv=document.createElement('canvas');cv.width=720;cv.height=404;let draw=null;try{draw=animGL(cv)}catch(e){}if(!draw)return done();
+  const v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('muted','');v.preload='auto';v.src=url;
+  const el=document.createElement('div');el.className='snd-anim';el.setAttribute('role','status');
+  el.innerHTML=`<div class="snd-stage"></div><div class="snd-cap">${ic('check')}<span>Inviato allo chef</span></div><p class="snd-hint">Tocca per continuare</p>`;
+  el.querySelector('.snd-stage').appendChild(cv);
+  let fin=false,raf=0,shown=false;const cap=el.querySelector('.snd-cap');
+  const end=()=>{if(fin)return;fin=true;cancelAnimationFrame(raf);clearTimeout(safe);v.pause();el.classList.remove('in');setTimeout(()=>{el.remove();v.removeAttribute('src');v.load();draw.free();done()},280)};
+  const showCap=()=>{if(!shown){shown=true;cap.classList.add('in')}};
+  const tick=()=>{if(fin)return;if(draw(v)&&!el.classList.contains('in'))el.classList.add('in');if(v.duration&&v.currentTime>v.duration*.72)showCap();raf=requestAnimationFrame(tick)};
+  const safe=setTimeout(end,9000);
+  el.addEventListener('click',end);v.addEventListener('error',end);
+  v.addEventListener('ended',()=>{showCap();draw(v);setTimeout(end,1100)});
+  document.body.appendChild(el);
+  try{v.playbackRate=1.15;await v.play()}catch(e){fin=true;clearTimeout(safe);el.remove();draw.free();return done()}
+  raf=requestAnimationFrame(tick);
+})}
+
 /* ================= sheets & toasts ================= */
 const sheets=[];
 function openSheet(o){
@@ -3031,7 +3091,7 @@ const A={
   pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
   photoCam:()=>pickFile({accept:'image/*',capture:'user'},setPhoto),
   photoLib:()=>pickFile({accept:'image/*'},setPhoto),
-  tab:d=>{S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
+  tab:d=>{if(d.v==='carrello')animPrefetch();S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
   notifs:()=>notifSheet(),
   news:()=>newsSheet(),
   meMenu:()=>meMenu(),

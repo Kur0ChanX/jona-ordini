@@ -1,9 +1,13 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- Online la **v14 Orari del personale** (PR #24, squash `ff329a2`): `APP_VER=14`, `sw.js` `CACHE=jona-ordini-v18`. File online identici a quelli provati. Ramo `backup-automatico` riallineato con `git merge origin/main`.
-- Prove verdi: `test-orari` (62), `test-firebase-orari` (14, emulatore), `test-staff`, `test-news`, `test-scaglione2`, `test-voice`, `test-report`, `test-firebase-*`.
-- Mario deve ancora provare sul telefono la v13 (carrello «È urgente?», import con prezzo più alto, controllo merce con un mancante) e la v14 (contratto nel profilo, Staff → Orari, pubblica, vista «Orari» dello staff).
+- In pubblicazione la **v15**: animazione «Inviato allo chef» + «È urgente» senza punto di domanda. `APP_VER=15`, `CACHE=jona-ordini-v19`. Online prima: v14 Orari (PR #24, squash `ff329a2`).
+- Prove verdi: `test-invio-anim` (14), `test-orari` (62), `test-firebase-orari` (14), `test-staff`, `test-news`, `test-scaglione2`, `test-voice`, `test-report`, `test-firebase-*`.
+- Mario deve ancora provare sul telefono v13 (urgente, prezzi, controllo merce), v14 (orari) e v15 (animazione dopo «Invia allo chef», anche su iPhone).
+
+## Animazione invio (v15): com'è fatta
+- `media/invio-chef.mp4` (265 KB, 4,8 s, 24 fps): H.264 720×808, sopra il colore e sotto la trasparenza («alpha impilato»: i video trasparenti WebM/HEVC non vanno su tutti i telefoni). `sendAnim` lo carica come blob (`animPrefetch`, all'apertura del carrello e all'invio), lo unisce con WebGL su un canvas trasparente sopra l'app (`.snd-anim`, sfondo sfocato), scritta «Inviato allo chef» verso la fine, poi il solito foglio. Si salta con «riduci movimento», senza WebGL, se il video non parte o con un tocco; massimo 9 s.
+- Rifarlo: `python3 tools/anim-invio.py <filmato>` (rembg isnet + u2net, colori caldi, bordi sfumati). Il Chromium di Playwright non legge l'H.264: `test-invio-anim` usa una copia WebM e blocca il service worker.
 
 ## Orari (v14): com'è fatto
 - **Dati in `config`** (nessuna regola Firestore nuova): `config/orari_<lunedì AAAA-MM-GG>` = `{tipo:'orari',lun,t:{<persona>:{'0'..'6':valore}},tp,pub,pubDa,mod}`; valori `"10:00-15:00"`, `"10:00-15:00,18:00-23:00"` (fine ≤ inizio = dopo mezzanotte), `R`/`F`/`M`/`P`. Turni tipo in `config/orari_tipi` `{l:[{id,n,v}]}` (predefiniti `OR_TIPI0`). Contratto in `staff.contratto` `{ore,pausa,liberi}` (predefinito `CONTR0` 40/30/1).
@@ -13,7 +17,7 @@
 
 ## Prossimi passi
 - Chiedere a Mario se gli orari vanno bene dopo la prova sul telefono (passi da dargli: profilo → contratto; Staff → Orari → casella → turno tipo → «Uguale anche per» → Salva → Pubblica; entrare come staff dalla barra **Test** → voce «Orari»).
-- **In coda (prossimo gruppo di 3):** «È urgente?» → «È urgente» nel carrello dello staff (`index.html`: pulsante `curg` in `vCarrello` e frase di aiuto; la voce NEWS v13 resta). Poi le idee scelte da Mario tra le 10 in `docs/RICHIESTE-MARIO.md`.
+- **In coda:** le idee scelte da Mario tra le 10 in `docs/RICHIESTE-MARIO.md` (consigliate: timbratura con QR, bolla letta dalla foto, bacheca del servizio).
 - **Scaglione 4** (da proporre a Mario): condividi/stampa degli orari (PDF, WhatsApp), riepilogo ore del mese, richieste di cambio turno o ferie dallo staff.
 - **Scaglione 5:** più lingue per lo staff (scelta per persona; ordini e prodotti in italiano).
 - Idee non scelte: vedi `docs/RICHIESTE-MARIO.md`.
