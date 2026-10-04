@@ -1,5 +1,7 @@
 # Passaggio di consegne (2026-10-04, notte)
 
+Sessione attuale: #01
+
 ## Ultimo messaggio di Mario (tornato, dopo il resoconto v32)
 «Grazie per aver fatto tutto il passaggio da solo… Come priorità inizierei a verificare se con l'iPhone ci sono problemi a inviare il messaggio vocale perché lui me l'aveva detto che c'erano problemi ancora, però non so se tu avevi aggiornato l'app o no, non so se era successo prima o dopo, quindi puoi fare un check e controllare se funziona.»
 
