@@ -1018,8 +1018,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=33;
+const APP_VER=34;
 const NEWS=[
+  {v:34,data:'2026-10-04',titolo:'Promemoria degli ordini puntuali',
+    chef:['L\'avviso «Oggi si ordina da…» ora lo manda il server all\'ora giusta, anche se nessuno ha l\'app aperta. Basta aprire l\'app una volta dopo l\'aggiornamento.'],
+    dev:{aggiunte:['Worker `/promemoria` (solo membri): piano con fuso, fornitori (`g`, `at`, `lim`, `s` = ultimo invio) e iscrizioni dei gestori nella tabella `prom` del primo D1; cron `*/5 * * * *` → `promTick` (una volta al giorno per fornitore, iscrizioni scadute tolte).','App: `promPlan`/`promSrv` in `deadlineTick` mandano il piano solo se cambia (impronta in `jona_prom`, ripetuto ogni 6 h); con il server attivo l\'app scrive solo l\'avviso nella campanella, senza push (`notify` con `np`).']}},
   {v:33,data:'2026-10-04',titolo:'Vocali dall\'iPhone più sicuri',
     tutti:['Su iPhone i vocali partono anche quando prima davano errore. Se un vocale lungo arriva al limite, si ferma e parte da solo. Se un invio non riesce, il messaggio dice il motivo.'],
     dev:{correzioni:['`chAuType`: tipo del vocale normalizzato (Safari può dare `video/mp4` o vuoto, che il Worker rifiutava con 415).','`chRec`: pezzi arrivati dopo `stop` (WebKit) raccolti con un\'attesa di 400 ms; fermata automatica a 1,15 MB (Safari può ignorare `audioBitsPerSecond`).','`chFile`: errore con il codice HTTP e messaggio giusto per 413.']}},
@@ -1405,9 +1408,9 @@ function onNewNotifs(snap){
     if(n.a===me.id||(isGM(me)&&n.a==='gm')||(isMgr(me)&&n.a==='gestori')){toast(n.titolo+(n.testo?': '+n.testo:''));try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}}
   }
 }
-async function notify(a,titolo,testo,tipo,rif){const me=meU();
-  if((a==='gm'||a==='gestori')&&S.db&&S.db.kind==='firebase'){S.obxWait=now();S.obxMsg={titolo,testo:testo||''};setTimeout(schedule,4500)}
-  await put('notifiche',uid(),{a,titolo,testo:testo||'',tipo:tipo||'',rif:rif||'',letta:false,creato:now(),da:me?me.id:''});pushSend(a,titolo,testo)}
+async function notify(a,titolo,testo,tipo,rif,np){const me=meU();
+  if(!np&&(a==='gm'||a==='gestori')&&S.db&&S.db.kind==='firebase'){S.obxWait=now();S.obxMsg={titolo,testo:testo||''};setTimeout(schedule,4500)}
+  await put('notifiche',uid(),{a,titolo,testo:testo||'',tipo:tipo||'',rif:rif||'',letta:false,creato:now(),da:me?me.id:''});if(!np)pushSend(a,titolo,testo)}
 /* ================= notifiche push (server: worker/, sw.js) =================
    Ogni telefono che le attiva salva la sua iscrizione in «push/<id>» e notify() avvisa anche con l'app chiusa.
    Lette e scritte direttamente su Firestore, fuori da S.db: se le regole non hanno ancora «push» l'app non si blocca. */
@@ -1420,7 +1423,7 @@ const pushActive=()=>pushOk()&&Notification.permission==='granted'&&!!ls('jona_p
 const ub64u=t=>{t=t.replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(t+'='.repeat((4-t.length%4)%4)),c=>c.charCodeAt(0))};
 async function pushId(ep){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(ep));return'p'+[...new Uint8Array(h)].slice(0,12).map(b=>b.toString(16).padStart(2,'0')).join('')}
 function pushWatch(){if(PUSH.on||now()<PUSH.retry||!pushFb())return;PUSH.on=true;
-  pushCol().onSnapshot(q=>{const m={};q.docs.forEach(d=>{m[d.id]=d.data()});PUSH.subs=m;pushSync()},()=>{PUSH.on=false;PUSH.retry=now()+60000})}
+  pushCol().onSnapshot(q=>{const m={};q.docs.forEach(d=>{m[d.id]=d.data()});PUSH.subs=m;PUSH.ld=true;pushSync()},()=>{PUSH.on=false;PUSH.retry=now()+60000})}
 async function pushSave(sub){const me=realU();if(!me)return;const id=await pushId(sub.endpoint);
   await pushCol().doc(id).set({u:me.id,sub:JSON.parse(JSON.stringify(sub)),creato:now()});ls('jona_push',id)}
 async function pushSync(){
@@ -2169,6 +2172,24 @@ function promInfo(f){const gs=f&&f.giorniOrdine;if(!Array.isArray(gs)||!gs.lengt
   const lim=orMin(f.oraLimite),at=orMin(f.oraPromemoria)??(lim!=null?Math.max(0,lim-60):600),nm=d.getHours()*60+d.getMinutes();
   const sent=Object.values(D().ordini).some(o=>o.fornitoreId===f.id&&(o.inviato||0)>=t0.getTime());
   return{at,due:gs.includes(g)&&nm>=at&&(lim==null||nm<lim)&&!sent}}
+/* promemoria dal server (worker /promemoria, cron ogni 5 minuti): il telefono del gestore manda il piano solo quando cambia
+   (o ogni 6 ore); finché il server ha il piano giusto (meno di 24 ore) l'app non manda la sua push «Oggi si ordina da…» */
+function promPlan(){const st=D().staff,forn=[];
+  for(const f of Object.values(D().fornitori)){const gs=f.giorniOrdine;if(!Array.isArray(gs)||!gs.length)continue;
+    const lim=orMin(f.oraLimite),at=orMin(f.oraPromemoria)??(lim!=null?Math.max(0,lim-60):600);
+    const s=Math.max(0,...Object.values(D().ordini).filter(o=>o.fornitoreId===f.id).map(o=>+o.inviato||0));
+    forn.push({id:f.id,nome:f.nome||'',g:gs,at,lim,s})}
+  forn.sort((a,b)=>a.id<b.id?-1:1);
+  const subs=Object.entries(PUSH.subs).filter(([,p])=>{const u=st[p.u];return!!u&&u.stato==='attivo'&&isGM(u)}).sort((a,b)=>a[0]<b[0]?-1:1).map(([,p])=>p.sub);
+  let tz='Europe/Rome';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||tz}catch(e){}
+  return JSON.stringify({tz,forn,subs})}
+async function promSrv(){if(!pushFb())return false;pushWatch();if(!PUSH.ld)return false;
+  const body=promPlan(),h=await sha(body),last=ls('jona_prom')||{};
+  if(last.h===h&&now()-(last.t||0)<6*36e5)return true;
+  if(promSrv.busy||now()<(promSrv.retry||0))return last.h===h&&now()-(last.t||0)<864e5;
+  promSrv.busy=1;try{const r=await fetch(PUSH_URL+'/promemoria',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+await algTok()},body});
+    if(!r.ok)throw new Error('promemoria '+r.status);ls('jona_prom',{h,t:now()});return true}
+  catch(e){promSrv.retry=now()+15*60000;return last.h===h&&now()-(last.t||0)<864e5}finally{promSrv.busy=0}}
 async function deadlineTick(){
   if(!S.db||!allLoaded())return;const me=meU();if(!me||me.stato!=='attivo'||!isGM(me))return;
   if(S.tab==='invii')render();
@@ -2181,12 +2202,13 @@ async function deadlineTick(){
     if(!old)await notify('gm','Ordine a '+f.nome+' entro le '+f.oraLimite,txt,'scadenza',fid);
     if(!(old&&old.da!==me.id&&now()-(old.creato||0)<120000))toast('Ordine a '+f.nome+' entro le '+f.oraLimite+': '+txt,'warn');
   }
+  const srv=await promSrv().catch(()=>false);
   for(const f of Object.values(D().fornitori)){const x=promInfo(f);if(!x||!x.due||rem['p_'+f.id]===td)continue;
     rem['p_'+f.id]=td;ls('jona_rem',rem);
     if(Object.values(D().notifiche).some(z=>z.tipo==='promemoria'&&z.rif===f.id&&(z.creato||0)>=t0.getTime()))continue;
     const o=Object.values(D().ordini).find(z=>z.stato==='aperto'&&z.fornitoreId===f.id),n=o&&o.items?o.items.length:0;
     const txt=(n?n+(n===1?' articolo':' articoli')+' nel carrello':'Il carrello è vuoto: prepara l\'ordine')+(f.oraLimite?', da inviare entro le '+f.oraLimite:'');
-    await notify('gm','Oggi si ordina da '+f.nome,txt,'promemoria',f.id);toast('Oggi si ordina da '+f.nome+': '+txt,'warn');
+    await notify('gm','Oggi si ordina da '+f.nome,txt,'promemoria',f.id,srv);toast('Oggi si ordina da '+f.nome+': '+txt,'warn');
   }
   ls('jona_rem',rem);
 }

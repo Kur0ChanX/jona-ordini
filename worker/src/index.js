@@ -8,6 +8,8 @@
 // troppo lente da convertire nei 10 ms del piano gratuito. Ogni file va nel database più vuoto; oltre il tetto si cancellano i più vecchi, e ogni notte (cron) quelli oltre 60 giorni.
 // /inviti: un telefono del ristorante chiede un codice d'invito di 6 lettere (vale 7 giorni, tabella «inviti» nel primo database D1);
 // /invito/<codice>: il telefono nuovo lo scambia con la chiave del ristorante (resta l'approvazione del telefono).
+// /promemoria: il telefono di un gestore manda giorni e ore dei promemoria ordini con le iscrizioni push dei gestori (tabella «prom»
+// nel primo database D1); ogni 5 minuti (cron) il server manda «Oggi si ordina da …» anche con l'app chiusa su tutti i telefoni.
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -202,6 +204,69 @@ async function invLeggi(c, env) {
   return r ? json({ k: r.k }) : json({ errore: "codice scaduto o sbagliato" }, 404);
 }
 
+const PROM_CRON = "*/5 * * * *";
+const PROM_GG = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const promMin = v => Number.isInteger(v) && v >= 0 && v < 1440;
+let promPronto = false;
+async function promDb(env) {
+  const d = algDbs(env)[0];
+  if (!d) return null;
+  if (!promPronto) {
+    await d[1].prepare("CREATE TABLE IF NOT EXISTS prom (id TEXT PRIMARY KEY, v TEXT NOT NULL)").run();
+    promPronto = true;
+  }
+  return d[1];
+}
+const promGet = async (db, id) => { const r = await db.prepare("SELECT v FROM prom WHERE id = ?").bind(id).first(); try { return r ? JSON.parse(r.v) : null; } catch { return null; } };
+const promPut = (db, id, v) => db.prepare("INSERT OR REPLACE INTO prom (id, v) VALUES (?, ?)").bind(id, JSON.stringify(v)).run();
+// giorno (AAAA-MM-GG), giorno della settimana (0=lun) e minuti dalla mezzanotte nel fuso del ristorante
+function promOra(tz, t) {
+  const p = {};
+  for (const x of new Intl.DateTimeFormat("en-GB", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", weekday: "short", hourCycle: "h23" }).formatToParts(new Date(t))) p[x.type] = x.value;
+  return { d: `${p.year}-${p.month}-${p.day}`, g: PROM_GG.indexOf(p.weekday), m: (+p.hour % 24) * 60 + +p.minute };
+}
+async function promSalva(request, env) {
+  if (!(await membro(request, env))) return json({ errore: "Telefono non collegato al ristorante" }, 403);
+  const db = await promDb(env);
+  if (!db) return json({ errore: "promemoria non attivi sul server" }, 503);
+  const b = await request.json().catch(() => null);
+  if (!b || !Array.isArray(b.forn)) return json({ errore: "richiesta non valida" }, 400);
+  let tz = String(b.tz || "Europe/Rome").slice(0, 64);
+  try { promOra(tz, Date.now()); } catch { tz = "Europe/Rome"; }
+  const forn = b.forn.slice(0, 100).map(f => ({
+    id: String(f && f.id || "").slice(0, 64),
+    nome: String(f && f.nome || "").slice(0, 60),
+    g: Array.isArray(f && f.g) ? [...new Set(f.g.filter(x => Number.isInteger(x) && x >= 0 && x < 7))] : [],
+    at: promMin(f && f.at) ? f.at : 600,
+    lim: promMin(f && f.lim) ? f.lim : null,
+    s: Number(f && f.s) || 0,
+  })).filter(f => f.id && f.g.length);
+  const subs = (Array.isArray(b.subs) ? b.subs : []).filter(validSub).slice(0, MAX_SUBS);
+  await promPut(db, "piano", { tz, forn, subs, agg: Date.now() });
+  return json({ ok: true, fornitori: forn.length, telefoni: subs.length });
+}
+const promHm = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+async function promTick(env, t = Date.now()) {
+  const db = await promDb(env);
+  if (!db) return;
+  const p = await promGet(db, "piano");
+  if (!p || !p.forn || !p.forn.length || !p.subs || !p.subs.length) return;
+  const o = promOra(p.tz, t);
+  const fatto = await promGet(db, "fatto") || {};
+  for (const k in fatto) if (fatto[k] !== o.d) delete fatto[k];
+  const morti = new Set();
+  let cambiato = false;
+  for (const f of p.forn) {
+    if (fatto[f.id] === o.d || !f.g.includes(o.g) || o.m < f.at || (f.lim != null && o.m >= f.lim)) continue;
+    if (f.s && promOra(p.tz, f.s).d === o.d) continue;
+    fatto[f.id] = o.d; cambiato = true;
+    const r = await send(env, { titolo: "Oggi si ordina da " + f.nome, testo: "Prepara e invia l'ordine" + (f.lim != null ? " entro le " + promHm(f.lim) : ""), tag: "prom_" + f.id, subs: p.subs.filter(s => !morti.has(s.endpoint)) });
+    for (const e of r.scaduti) morti.add(e);
+  }
+  if (cambiato) await promPut(db, "fatto", fatto);
+  if (morti.size) { p.subs = p.subs.filter(s => !morti.has(s.endpoint)); await promPut(db, "piano", p); }
+}
+
 const attesa = j => {
   const d = ((j.error && j.error.details) || []).find(x => x && x.retryDelay);
   const s = d ? parseFloat(d.retryDelay) : NaN;
@@ -321,6 +386,7 @@ async function algPulizia(env) {
 
 export default {
   async scheduled(event, env, ctx) {
+    if (event && event.cron === PROM_CRON) return ctx.waitUntil(promTick(env));
     ctx.waitUntil(algPulizia(env));
     ctx.waitUntil(invDb(env).then(db => db && db.prepare("DELETE FROM inviti WHERE scade < ?").bind(Date.now()).run()));
   },
@@ -328,11 +394,12 @@ export default {
     const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     try {
-      if (url.pathname === "/salute") return json({ ok: true, servizio: "jona-notifiche", push: !!env.VAPID_JWK, gemini: !!env.GEMINI_KEY, allegati: algDbs(env).length });
+      if (url.pathname === "/salute") return json({ ok: true, servizio: "jona-notifiche", push: !!env.VAPID_JWK, promemoria: algDbs(env).length > 0, gemini: !!env.GEMINI_KEY, allegati: algDbs(env).length });
       if (url.pathname === "/chiave" && request.method === "GET") return json({ chiave: (await vapid(env)).pub });
       if (url.pathname === "/gemini" && request.method === "POST") return await gemini(request, env);
       if (url.pathname === "/inviti" && request.method === "POST") return await invCrea(request, env);
       if (url.pathname.startsWith("/invito/") && request.method === "GET") return await invLeggi(url.pathname.slice(8), env);
+      if (url.pathname === "/promemoria" && request.method === "POST") return await promSalva(request, env);
       if (url.pathname.startsWith("/allegati")) {
         const uid = await membro(request, env);
         if (!uid) return algErr("Telefono non collegato al ristorante", 403);
