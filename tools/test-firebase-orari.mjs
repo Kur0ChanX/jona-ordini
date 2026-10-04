@@ -16,6 +16,8 @@ await A.evaluate(()=>{fbActivate()});await A.waitForTimeout(300);await A.click('
 ok(await A.evaluate(()=>S.db.kind==='firebase'&&S.db.status().ready),'A attivo su firebase');
 await A.evaluate(()=>makeTestData());await A.waitForTimeout(3000);
 const B=await mk(null);await B.goto(await A.evaluate(()=>inviteLink()));await B.waitForTimeout(5000);
+// v24: il telefono nuovo resta in attesa finché A non lo approva
+await A.evaluate(async()=>{for(const d of (await fbInit().fs.collection('membri').where('ok','==',false).get()).docs)await d.ref.update({ok:true})});await B.waitForTimeout(4000);
 await B.fill('input[data-k="u"]','test1');await B.fill('input[data-k="p"]','prova123');await B.click('[data-a="doLogin"]');await B.waitForTimeout(1500);
 ok(await B.evaluate(()=>meU()&&meU().id==='test_u1'),'B entra come Luca (staff)');
 

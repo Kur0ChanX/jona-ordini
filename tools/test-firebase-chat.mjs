@@ -30,6 +30,8 @@ ok(await A.evaluate(()=>S.db.status().ready&&!S.db.status().err&&cfg().nomeLocal
 await setRules(RULES);await A.evaluate(()=>{CHAT.retry=0;CHAT.on=false;render()});await wait(2500);
 ok(await A.evaluate(()=>CHAT.on&&!CHAT.err),'regole nuove: la chat si collega');
 const B=await mk(null);await B.goto(await A.evaluate(()=>inviteLink()));await B.waitForTimeout(5000);
+// v24: il telefono nuovo resta in attesa finché A non lo approva
+await A.evaluate(async()=>{for(const d of (await fbInit().fs.collection('membri').where('ok','==',false).get()).docs)await d.ref.update({ok:true})});await B.waitForTimeout(4000);
 await B.fill('input[data-k="u"]','test1');await B.fill('input[data-k="p"]','prova123');await B.click('[data-a="doLogin"]');await B.waitForTimeout(2500);
 ok(await B.evaluate(()=>meU()&&meU().id==='test_u1'&&CHAT.on),'B entra come Luca e la chat è collegata');
 // A scrive a tutti

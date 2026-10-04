@@ -21,6 +21,8 @@ const link=await A.evaluate(()=>inviteLink());console.log('link',link.slice(0,90
 // telefono B (nuovo): senza config, la prende dal link
 const [cb,B]=await mk(null);
 await B.goto(link);await B.waitForTimeout(6000);
+// v24: il telefono nuovo resta in attesa finché A non lo approva
+await A.evaluate(async()=>{for(const d of (await fbInit().fs.collection('membri').where('ok','==',false).get()).docs)await d.ref.update({ok:true})});await B.waitForTimeout(4000);
 console.log('B:',await txt(B), await B.evaluate(()=>S.db.kind+' '+JSON.stringify(S.db.status())+' staff='+Object.keys(D().staff).length+' prod='+Object.keys(D().prodotti).length));
 // B si registra come staff
 await B.click('[data-a="register"]');await B.waitForTimeout(500);

@@ -968,8 +968,13 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=23;
+const APP_VER=24;
 const NEWS=[
+  {v:24,data:'2026-10-04',titolo:'Telefoni approvati e chat più svelta',
+    tutti:['Quando riapri l\'app la chat si aggiorna subito, senza aspettare.'],
+    chef:['Un telefono nuovo non vede più nessun dato finché tu o Mario non lo approvate: lo trovi in Staff → «Telefoni da approvare». Con un profilo nuovo, approvando crei anche il profilo.'],
+    dev:{aggiunte:['`membri/<uid>.ok=false` per i telefoni nuovi, richiesta in `req` (profilo nuovo con `sid` e `pass`, o «ho già un profilo»); `screenPhone`, `phoneSheet`, `phSend`; gestori: `PH`, `phWatch`, `phApprove`, `phReject`. Regole: `membro()` vuole `ok` non falso, solo chi ha attivato (`chiave.uid`) entra senza attesa. Worker `/gemini` rifiuta `ok:false`.'],
+      risolti:['Chat lenta dopo il ritorno in primo piano: `disableNetwork`/`enableNetwork` se l\'app è rimasta nascosta più di 5 s.','L\'approvazione conta solo se confermata dal server (non da una scrittura locale).']}},
   {v:23,data:'2026-10-04',titolo:'Nome utente automatico',
     tutti:['Mentre scrivi nome e cognome, il nome utente si compila da solo (per esempio mario.loi). Puoi cambiarlo se vuoi.','Accenti e apostrofi nel nome utente vanno bene: li togliamo noi.'],
     dev:{risolti:['Registrazione: con il nome utente vuoto o con accenti/apostrofi l\'errore diceva sempre «almeno 3 caratteri». Ora `normUser` toglie accenti e apostrofi e `checkForm` ha tre messaggi (vuoto, corto, caratteri).'],aggiunte:['`userSug`: nome.cognome senza accenti, con un numero se già usato; proposto finché il campo è vuoto o uguale alla proposta (`_uSug`), mai nella modifica di un profilo esistente.']}},
@@ -1178,13 +1183,26 @@ function FirebaseStore(key){
   const track=p=>{st.pend++;ping();p.then(()=>{st.pend--;ping()},e=>{st.pend--;const m=mapErr(e);if(m.code==='fb_perm'){st.err='fb_perm';st.ready=false}ping();toast(errMsg(m),'err')})};
   const run=f=>{track(readyP.then(f));return Promise.resolve()};
   const cache={};
+  // ---- telefono nuovo: resta in attesa («ok» falso) finché un telefono approvato non lo approva ----
+  const newMember=()=>({k:key,ok:false,creato:now(),ua:navigator.userAgent.slice(0,120)});
+  const approval=u=>new Promise((res,rej)=>{let un=null;const to=setTimeout(()=>{if(un)un();rej({code:'fb_slow'})},20000);
+    un=fs.doc('membri/'+u).onSnapshot(d=>{if(!d.exists&&d.metadata.fromCache)return;clearTimeout(to);
+      if(!d.exists){st.wait='no';st.req=null;ping();return}
+      const x=d.data();if(x.ok===false){st.wait='attesa';st.req=x.req||null;ping();return}
+      if(d.metadata.hasPendingWrites||d.metadata.fromCache)return;
+      un();st.wait='';st.req=null;ping();res()},e=>{clearTimeout(to);rej(e)})});
+  // al ritorno in primo piano il collegamento vecchio può essere morto senza che Firestore lo sappia: lo rifà subito
+  let hidAt=0;
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){hidAt=Date.now();return}
+    if(hidAt&&Date.now()-hidAt>5000&&st.ready&&navigator.onLine!==false)fs.disableNetwork().then(()=>fs.enableNetwork()).catch(()=>{});hidAt=0});
   // ---- collegamento: accesso anonimo e iscrizione del telefono con la chiave ----
   (async function connect(){
     try{
       st.step='accesso';ping();
-      const u=await fbTmo(fbSignIn(auth));
-      if(ls('jona_member')!==u){st.step='iscrizione';ping();const m=await fbTmo(fs.doc('membri/'+u).get(),12000).catch(()=>null);
-        if(!m||!m.exists)await fbTmo(fs.doc('membri/'+u).set({k:key,creato:now(),ua:navigator.userAgent.slice(0,120)}));ls('jona_member',u)}
+      const u=await fbTmo(fbSignIn(auth));st.uid=u;
+      if(ls('jona_member')!==u){st.step='iscrizione';ping();const m=await fbTmo(fs.doc('membri/'+u).get(),12000);
+        if(!m.exists)await fbTmo(fs.doc('membri/'+u).set(newMember()));else if(m.data().ok!==false)ls('jona_member',u);
+        if(ls('jona_member')!==u){st.step='';await approval(u);ls('jona_member',u)}}
       st.step='';
       if(ls('jona_fb_upload')){st.busy='upload';ping();await loadAll(LocalStore.dump());ls('jona_fb_upload',null);st.busy='';toast('Database centrale attivo: i dati di questo telefono sono stati caricati')}
       st.ready=true;st.err='';ping();okReady();
@@ -1254,7 +1272,8 @@ function FirebaseStore(key){
     prune:async keep=>{await readyP;const s=await fs.collection('backup').where('g','<',keep).get({source:'server'});for(const x of s.docs)await x.ref.delete()}
   };
   return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
-    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy,step:st.step}),
+    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null}),
+    phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember())},
     dump:()=>clone(cache),
     load:async d=>{if(!navigator.onLine)throw{code:'fb_net'};await readyP;await loadAll(d)},
     range:async(c,f,a,b)=>{await readyP;const s=await fs.collection(c).where(f,'>=',a).where(f,'<',b).get();return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
@@ -1415,7 +1434,7 @@ function render(){
   document.documentElement.classList.toggle('staff-ui',!S.wallMode&&!isMgr(meU()));
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
   for(const o of sheets)if(o.live&&o.live())paintSheet(o);
-  if(!S.wallMode&&realU()){chWatch();if(CHAT.box)chPaint()}else if(CHAT.box)chClose();
+  if(!S.wallMode&&realU()){chWatch();phWatch();if(CHAT.box)chPaint()}else if(CHAT.box)chClose();
 }
 function repaint(){render();refreshSheet()}
 function allLoaded(){return(S.loadTimeout&&S.db.kind!=='firebase')||Object.keys(COLS).every(k=>S.loaded[k])}
@@ -1436,10 +1455,61 @@ function view(){
 function banner(){return''}
 const wallMsg=(t,p,act='')=>`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>${esc(t)}</h1><p class="muted">${esc(p)}</p>${act}</div></div>`;
 function wallFb(s){
+  if(s.wait)return screenPhone(s);
   if(s.err==='fb_perm')return wallMsg('Accesso non valido','Il codice di questo telefono non è più valido. Chiedi allo chef il QR code o il link e aprilo di nuovo.',`<button type="button" class="btn ghost block" data-a="fbLeave">Scollega questo telefono</button>`);
   if(s.busy==='upload')return wallMsg('Carico i dati…','Sto copiando sul database centrale i dati di questo telefono. Non chiudere l\'app.');
   if(s.err==='fb_slow')return wallMsg('Il collegamento non riesce','Controlla che ci sia internet (meglio il Wi-Fi o i dati attivi), poi tocca Riprova. Se non va, apri il link con Safari o Chrome, non dentro WhatsApp.',`<button type="button" class="btn primary block big" data-a="reload">Riprova</button>`);
   return wallMsg('Collegamento al ristorante…',!s.net||s.err?'Non c\'è connessione. Appena torna la rete l\'app si collega da sola.':s.step==='iscrizione'?'Registro questo telefono…':'Un momento…');
+}
+function screenPhone(s){
+  const r=s.req,logo='<div class="logo-full" role="img" aria-label="Jona Ristorante"></div>';
+  if(s.wait==='no')return wallMsg('Richiesta non approvata','Maurizio o Mario non hanno approvato questo telefono. Se è un errore, parla con loro e chiedi di nuovo.',`<button type="button" class="btn primary block big" data-a="phAgain">Chiedi di nuovo</button>`);
+  if(r)return`<div class="wall linen">${logo}<div class="wall-card" style="text-align:center"><div style="display:flex;justify-content:center;margin-bottom:12px">${avatar(r,84)}</div>
+  <h1>Ciao ${esc(r.nome)}!</h1><p class="muted">Richiesta inviata. Maurizio o Mario devono <b>approvare questo telefono</b>.</p><p class="muted">Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>
+  ${r.nuovo?`<p class="muted small">Nuovo profilo · nome utente <b>${esc(r.username)}</b></p>`:`<p class="muted small">Hai già un profilo: dopo l'approvazione entri con il tuo nome utente e la tua password.</p>`}
+  <div style="margin-top:18px"><button type="button" class="btn ghost block" data-a="${r.nuovo?'phNew':'phOld'}">Modifica la richiesta</button></div></div></div>`;
+  return`<div class="wall linen">${logo}<div class="wall-card"><h1>Benvenuto!</h1>
+  <p class="muted">Prima di entrare, Maurizio o Mario devono approvare questo telefono. Dicci chi sei:</p>
+  <div style="margin-top:18px;display:grid;gap:12px"><button type="button" class="btn primary block big" data-a="phNew">Sono nuovo: creo il mio profilo</button><button type="button" class="btn ghost block big" data-a="phOld">Ho già un profilo</button></div></div></div>`;
+}
+function phoneSheet(nuovo){
+  const r=S.db&&S.db.status().req;S.form=r&&!!r.nuovo===nuovo?Object.assign({reparto:'cucina',mansione:'Cameriere'},clone(r),{pw:'',pw2:''}):{reparto:'cucina',mansione:'Cameriere'};if(r&&r.nuovo)S.form._uSug=r.username;
+  openSheet({reg:nuovo?'ph':false,render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${nuovo?'Crea il tuo profilo':'Chi sei?'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${nuovo?profileForm('ph',{}):`<p class="muted" style="margin:0">Scrivi nome e cognome, così Maurizio o Mario ti riconoscono.</p>
+  <div class="two stack"><div><label class="lbl" for="ph-nome">Nome</label><input class="inp" id="ph-nome" autocomplete="given-name" value="${esc(S.form.nome||'')}" data-in="form" data-k="nome"></div>
+  <div><label class="lbl" for="ph-cognome">Cognome</label><input class="inp" id="ph-cognome" autocomplete="family-name" value="${esc(S.form.cognome||'')}" data-in="form" data-k="cognome"></div></div>`}
+  <div style="margin-top:22px"><button type="button" class="btn primary block big" data-a="phSend" data-v="${nuovo?1:0}">Chiedi l'approvazione</button></div>`});
+}
+async function phSend(nuovo){
+  const f=S.form,st=S.db&&S.db.kind==='firebase'?S.db.status():null;if(!st||!st.wait)return toast('Un attimo: sto ancora collegando il telefono.','warn');
+  let r;
+  if(nuovo){const e=checkForm(true);if(e)return toast(e,'warn');const sid=(st.req&&st.req.nuovo&&st.req.sid)||uid();
+    r={nuovo:true,sid,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||'',pass:await sha(sid+':'+f.pw),creato:now()};
+    ls('jona_wait',{id:sid,t:Date.now()})}
+  else{if(!String(f.nome||'').trim())return toast('Scrivi il nome.','warn');r={nuovo:false,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),creato:now()};ls('jona_wait',null)}
+  ls('jona_reg',null);S.db.phone.req(r).catch(e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
+}
+/* telefoni in attesa: li vedono e li approvano i gestori (Maurizio e Mario) */
+const PH={on:false,list:[],retry:0,seen:null};
+function phWatch(){
+  const me=realU();if(PH.on||now()<PH.retry||!S.db||S.db.kind!=='firebase'||!S.db.status().ready||!me||!isMgr(me))return;PH.on=true;
+  fbInit().fs.collection('membri').where('ok','==',false).onSnapshot(q=>{PH.list=q.docs.map(d=>Object.assign({},d.data(),{id:d.id})).sort((a,b)=>(a.creato||0)-(b.creato||0));
+    const ids=new Set(PH.list.map(x=>x.id));if(PH.seen)for(const x of PH.list)if(x.req&&!PH.seen.has(x.id+(x.req.creato||'')))toast(x.req.nome+' chiede di entrare: approvalo nella scheda Staff.');
+    PH.seen=new Set(PH.list.filter(x=>x.req).map(x=>x.id+(x.req.creato||'')));void ids;schedule()},()=>{PH.on=false;PH.retry=now()+300000;PH.list=[]});
+}
+const phPend=()=>PH.list.filter(x=>x.req);
+const phDev=ua=>/iPhone|iPad/.test(ua||'')?'iPhone':/Android/.test(ua||'')?'Android':'telefono';
+async function phApprove(id){
+  const x=PH.list.find(m=>m.id===id);if(!x||!x.req)return;const r=x.req,me=realU();let msg='Telefono approvato';
+  if(r.nuovo){const st=D().staff;let un=r.username||normUser(r.nome);const used=new Set(Object.values(st).filter(u=>u.id!==r.sid).map(u=>u.username));const b=un;let n=2;while(used.has(un))un=b+n++;
+    if(!st[r.sid])await put('staff',r.sid,{nome:r.nome,cognome:r.cognome||'',username:un,ruolo:'staff',reparto:r.reparto||'altro',mansione:r.mansione||'',foto:r.foto||'',stato:'attivo',pass:r.pass,creato:now(),creatoDa:me?me.id:''});
+    msg=r.nome+' può entrare'+(un!==r.username?' con il nome utente '+un:'')}
+  try{await fbTmo(fbInit().fs.doc('membri/'+id).update({ok:true,req:firebase.firestore.FieldValue.delete(),approvato:now(),da:me?me.id:''}),15000);toast(msg)}
+  catch(e){toast(e&&e.code==='permission-denied'?'Il database non lo permette ancora: aggiorna le regole (docs/FIREBASE.md).':'Approvazione non riuscita: controlla la connessione e riprova.','err')}
+}
+async function phReject(id){
+  const x=PH.list.find(m=>m.id===id);if(!x)return;if(!await ask('Rifiutare questo telefono?',(x.req?x.req.nome+' non':'Il telefono non')+' potrà vedere i dati del ristorante.','Rifiuta',true))return;
+  fbInit().fs.doc('membri/'+id).delete().catch(()=>toast('Non riesco a rifiutare: controlla la connessione e riprova.','err'));
 }
 function screenJoin(){
   return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>Collega questo telefono</h1>
@@ -1470,7 +1540,7 @@ async function fbActivate(){
   if(!await ask('Attivare il database centrale?','Copio sul database tutti i dati di questo telefono: profili, fornitori, listini e richieste. Dopo, gli altri telefoni si collegano con il QR code.','Attiva'))return;
   toast('Attivo il database…');
   await need('firebase');const{fs,auth}=fbInit();const u=await fbSignIn(auth);const key=randKey();
-  try{await fs.doc('chiave/ristorante').set({v:key,creato:now()})}catch(e){S.fbActive=true;repaint();return toast('Il database è già attivo: collega questo telefono con il codice o il QR code.','warn')}
+  try{await fs.doc('chiave/ristorante').set({v:key,uid:u,creato:now()})}catch(e){S.fbActive=true;repaint();return toast('Il database è già attivo: collega questo telefono con il codice o il QR code.','warn')}
   await fs.doc('membri/'+u).set({k:key,creato:now(),ua:navigator.userAgent.slice(0,120)});
   await fs.doc('pubblico/stato').set({attivo:true,creato:now()});
   ls('jona_key',key);ls('jona_member',u);ls('jona_fb_upload',1);location.reload();
@@ -1551,9 +1621,9 @@ async function createProfile(mode){
   if(mode==='self'){await notify('gestori','Nuovo profilo da approvare',fullName(doc)+', '+(REPARTI[doc.reparto]||''),'staff',id);ls('jona_reg',null);ls('jona_wait',{id,t:Date.now()});repaint()}
   else toast('Profilo creato: comunica a '+doc.nome+' nome utente e password.');
 }
-function regKeep(){const o=sheets[sheets.length-1];if(!o||!o.reg)return;const f=Object.assign({},S.form);delete f.pw;delete f.pw2;delete f.foto;ls('jona_reg',{f,t:Date.now()})}
+function regKeep(){const o=sheets[sheets.length-1];if(!o||!o.reg)return;const f=Object.assign({},S.form);delete f.pw;delete f.pw2;delete f.foto;ls('jona_reg',{f,t:Date.now(),m:o.reg==='ph'?'ph':'self'})}
 function regRestore(){const d=ls('jona_reg');ls('jona_reg',null);if(!d||Date.now()-d.t>1800000||ls('jona_me'))return;
-  registerSheet('self');Object.assign(S.form,d.f);refreshSheet();toast('Il telefono ha ricaricato l\'app mentre sceglievi la foto. I tuoi dati sono ancora qui: rifai la foto e scrivi la password.','warn')}
+  if(d.m==='ph')phoneSheet(true);else registerSheet('self');Object.assign(S.form,d.f);refreshSheet();toast('Il telefono ha ricaricato l\'app mentre sceglievi la foto. I tuoi dati sono ancora qui: rifai la foto e scrivi la password.','warn')}
 function registerSheet(mode){
   S.form={ruolo:'staff',reparto:'cucina',mansione:'Cameriere'};if(mode==='admin'&&isGM(meU()))Object.assign(S.form,CONTR0,{_c:true});
   openSheet({reg:mode==='self',render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${mode==='admin'?'Aggiungi profilo':'Crea il tuo profilo'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
@@ -1580,9 +1650,9 @@ const GM_TABS=[
   {id:'invii',l:'Invii',i:'truck',b:()=>Object.values(D().ordini).filter(o=>o.stato==='aperto'&&o.items&&o.items.length).length},
   {id:'arrivi',l:'Arrivi',i:'box',b:arriviCount},
   {id:'fornitori',l:'Fornitori',i:'store'},
-  {id:'staff',l:'Staff',i:'users',b:()=>Object.values(D().staff).filter(u=>u.stato==='in_attesa').length+cmToApprove().length},
+  {id:'staff',l:'Staff',i:'users',b:()=>Object.values(D().staff).filter(u=>u.stato==='in_attesa').length+cmToApprove().length+phPend().length},
   {id:'storico',l:'Storico',i:'clock'}];
-const DEV_TABS=[{id:'fornitori',l:'Fornitori',i:'store'},{id:'staff',l:'Staff',i:'users',b:()=>Object.values(D().staff).filter(u=>u.stato==='in_attesa').length+cmToApprove().length},{id:'storico',l:'Storico',i:'clock'}];
+const DEV_TABS=[{id:'fornitori',l:'Fornitori',i:'store'},{id:'staff',l:'Staff',i:'users',b:()=>Object.values(D().staff).filter(u=>u.stato==='in_attesa').length+cmToApprove().length+phPend().length},{id:'storico',l:'Storico',i:'clock'}];
 function shell(me){
   const tabs=isGM(me)?GM_TABS:isDev(me)?DEV_TABS:STAFF_TABS;
   if(!tabs.find(t=>t.id===S.tab))S.tab=tabs[0].id;
@@ -2561,6 +2631,7 @@ function vStaff(me){
   const mg=act.filter(u=>isMgr(u)).sort(byNome);
   const row=u=>`<button type="button" class="row link ${u.stato==='disattivato'?'dim':''}" data-a="sedit" data-u="${u.id}">${avatar(u,44)}<div class="row-i"><div class="row-t">${esc(fullName(u))}${isMgr(u)?` <span class="tag gm">${RUOLI[u.ruolo].toLowerCase()}</span>`:''}</div><div class="row-m">@${esc(u.username||'')}${!isMgr(u)&&u.mansione?', '+esc(u.mansione):''}${u.stato==='disattivato'?', disattivato':''}</div></div>${ic('chev')}</button>`;
   return`<div class="vhead"><div><h1 class="vt">Staff</h1><p class="vsub">${act.filter(u=>u.stato==='attivo').length} profili attivi</p></div><button type="button" class="btn primary" data-a="addProfile">${ic('plus')} Aggiungi</button></div>${sw}
+  ${phPend().length?`<h2 class="sec">Telefoni da approvare<span>${phPend().length}</span></h2><div class="panel">${phPend().map(x=>`<div class="row">${avatar(x.req,48)}<div class="row-i"><div class="row-t">${esc(fullName(x.req))}</div><div class="row-m">${x.req.nuovo?esc(['nuovo profilo',x.req.mansione,REPARTI[x.req.reparto]].filter(Boolean).join(', ')):'ha già un profilo'} · ${phDev(x.ua)}</div></div><button type="button" class="icon-btn danger" data-a="phNo" data-v="${x.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="phOk" data-v="${x.id}">Approva</button></div>`).join('')}</div>`:''}
   ${pend.length?`<h2 class="sec">Da approvare<span>${pend.length}</span></h2><div class="panel">${pend.map(u=>`<div class="row">${avatar(u,48)}<div class="row-i"><div class="row-t">${esc(fullName(u))}</div><div class="row-m">${esc([u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</div></div><button type="button" class="icon-btn danger" data-a="sno" data-u="${u.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="sok" data-u="${u.id}">Approva</button></div>`).join('')}</div>`:''}
   ${mg.length?`<h2 class="sec">Gestione<span>${mg.length}</span></h2><div class="panel">${mg.map(row).join('')}</div>`:''}
   ${Object.entries(REPARTI).map(([k,l])=>{const us=act.filter(u=>!isMgr(u)&&(u.reparto||'altro')===k).sort(byNome);return us.length?`<h2 class="sec">${l}<span>${us.length}</span></h2><div class="panel">${us.map(row).join('')}</div>`:''}).join('')}
@@ -3776,6 +3847,9 @@ const A={
   setupGo:()=>createProfile('setup'),
   regGo:()=>createProfile('self'),
   waitLeave:()=>{ls('jona_wait',null);render()},
+  phNew:()=>phoneSheet(true),phOld:()=>phoneSheet(false),phSend:d=>phSend(d.v==='1'),
+  phAgain:()=>{ls('jona_wait',null);S.db.phone.again().catch(()=>toast('Non riesco: controlla la connessione e riprova.','err'))},
+  phOk:d=>phApprove(d.v),phNo:d=>phReject(d.v),
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),

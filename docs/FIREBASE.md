@@ -26,10 +26,11 @@ La configurazione non è segreta. I dati li protegge la chiave del ristorante (v
 ## 5. Attiva e collega i telefoni
 1. Dal telefono che ha già i dati (Mario): Impostazioni → Database centrale → **Attiva**. I dati del telefono vengono copiati sul database.
 2. Impostazioni → Database centrale → **Invita**: compare un QR code.
-3. Gli altri telefoni inquadrano il QR con la fotocamera, aprono il link, installano l'app e accedono. Chi è nuovo si registra e tu lo approvi in Staff.
+3. Gli altri telefoni inquadrano il QR con la fotocamera e aprono il link. Il telefono resta **in attesa** e non vede nessun dato: la persona scrive chi è (profilo nuovo o già esistente) e tu la approvi in **Staff → Telefoni da approvare**. Con un profilo nuovo l'app si apre da sola.
 
 ## Come funziona
 - Ogni telefono entra con un accesso anonimo e si iscrive con la **chiave del ristorante**, che sta nel link e nel QR. Senza chiave non si leggono i dati (regole in `firebase/firestore.rules`).
+- Dalla versione 24 la chiave non basta: il telefono nuovo nasce con `membri/<uid>.ok = false` e legge solo il proprio documento finché un telefono già approvato non mette `ok` a vero. I telefoni collegati prima (senza `ok`) restano approvati. Dopo l'aggiornamento della versione 24 le regole vanno **incollate di nuovo**: finché non lo fai, i telefoni nuovi restano in attesa e «Approva» dice di aggiornare le regole.
 - I dati restano anche sul telefono: senza rete l'app funziona e manda le modifiche quando la connessione torna.
 - I prodotti stanno in un documento per fornitore (`listini/<fornitore>`), così ogni apertura dell'app legge pochi documenti. Il piano gratuito (50.000 letture e 20.000 scritture al giorno) basta per il ristorante.
 - Backup: Impostazioni → Backup dei dati → Esporta / Ripristina (il ripristino vale per tutti i telefoni).

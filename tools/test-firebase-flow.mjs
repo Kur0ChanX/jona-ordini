@@ -13,6 +13,8 @@ await A.click('[data-a="setupGo"]');await A.waitForTimeout(1200);
 await A.evaluate(()=>{fbActivate()});await A.waitForTimeout(300);await A.click('#ask-ok');await A.waitForTimeout(8000);
 ok(await A.evaluate(()=>S.db.kind==='firebase'&&S.db.status().ready),'A attivo su firebase');
 const [cb,B]=await mk(null);await B.goto(await A.evaluate(()=>inviteLink()));await B.waitForTimeout(5000);
+// v24: il telefono nuovo resta in attesa finché A non lo approva
+await A.evaluate(async()=>{for(const d of (await fbInit().fs.collection('membri').where('ok','==',false).get()).docs)await d.ref.update({ok:true})});await B.waitForTimeout(4000);
 await A.evaluate(()=>makeTestData());await A.waitForTimeout(3000);
 const cnt=p=>p.evaluate(()=>testCount());
 ok(await cnt(B)>=16,'B vede i dati di prova: '+await cnt(B));

@@ -13,6 +13,8 @@ await A.evaluate(()=>{fbActivate()});await A.waitForTimeout(300);await A.click('
 console.log('A',await A.evaluate(()=>S.db.kind+' prod='+Object.keys(D().prodotti).length));
 const link=await A.evaluate(()=>inviteLink());
 const [cb,B]=await mk(null);await B.goto(link);await B.waitForTimeout(5000);
+// v24: il telefono nuovo resta in attesa finché A non lo approva
+await A.evaluate(async()=>{for(const d of (await fbInit().fs.collection('membri').where('ok','==',false).get()).docs)await d.ref.update({ok:true})});await B.waitForTimeout(4000);
 // 300 prodotti di colpo (come un import)
 const t0=Date.now();
 await A.evaluate(async()=>{await runPool(Array.from({length:300},(_,i)=>()=>put('prodotti','bulk'+i,{fornitoreId:i%2?'metro':'dac',nome:'Prodotto '+i,codice:'B'+i,unita:'pz',prezzo:i/10,categoria:'Altro',aggiornato:now()})),4)});

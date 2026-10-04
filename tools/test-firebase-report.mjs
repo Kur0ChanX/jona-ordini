@@ -17,6 +17,8 @@ await A.evaluate(async()=>{const d0=Date.now();for(let i=0;i<320;i++){const t=d0
 for(let i=0;i<60;i++){if(await A.evaluate(()=>S.db.status().pend===0))break;await A.waitForTimeout(500)}
 console.log('A pend',await A.evaluate(()=>S.db.status().pend));
 const [cb,B]=await mk(null);await B.goto(await A.evaluate(()=>inviteLink()));await B.waitForTimeout(6000);
+// v24: il telefono nuovo resta in attesa finché A non lo approva
+await A.evaluate(async()=>{for(const d of (await fbInit().fs.collection('membri').where('ok','==',false).get()).docs)await d.ref.update({ok:true})});await B.waitForTimeout(4000);
 await B.fill('input[data-k="u"]','mario');await B.fill('input[data-k="p"]','prova1234');await B.click('.login .btn.primary');await B.waitForTimeout(2000);
 console.log('B ordini caricati',await B.evaluate(()=>Object.keys(D().ordini).length));
 // atteso: giorni dell'anno trascorsi (ordine al giorno, fino a 320)
