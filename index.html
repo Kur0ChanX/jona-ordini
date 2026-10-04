@@ -1008,8 +1008,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=29;
+const APP_VER=30;
 const NEWS=[
+  {v:30,data:'2026-10-04',titolo:'Pallino sull\'icona',
+    tutti:['Sull\'icona dell\'app compare un pallino col numero delle cose importanti: messaggi in chat non letti, avvisi e cose da approvare. Le novità dell\'app non contano.','Su iPhone il pallino si vede con l\'app sulla schermata Home e le notifiche permesse nelle Impostazioni del telefono. Su Android dipende dal telefono: di solito compare solo con le notifiche attive.'],
+    dev:{aggiunte:['`badgeCount`/`appBadge` (in `render`, `obxBadge` lo richiama), numero salvato nella cache `jona-badge` (`./badge-n`); `sw.js` lo aumenta di 1 a ogni push con l\'app non in vista e lo cala dopo l\'invio della coda.']}},
   {v:29,data:'2026-10-04',titolo:'Invito più bello',
     chef:['Impostazioni → Database centrale → Invita: «Manda l\'invito» spedisce un messaggio di benvenuto con i passi da fare, e su WhatsApp il link compare con l\'anteprima del Jona.','Nuovo pulsante «Cartolina con QR»: un\'immagine con logo e QR code da mandare o stampare (per esempio da appendere in cucina).'],
     dev:{aggiunte:['`inviteText`, `inviteCard` (canvas 1080×1350, condivisione file o download), meta Open Graph con `media/invito.jpg`.']}},
@@ -1454,7 +1457,14 @@ const OBX={list:[],busy:false};
 const OBX_MAX=864e5;
 function obxDb(){return obxDb.p||(obxDb.p=new Promise((res,rej)=>{const r=indexedDB.open('jona-outbox',1);r.onupgradeneeded=()=>r.result.createObjectStore('q',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>{obxDb.p=null;rej(r.error)}}))}
 async function obxTx(mode,f){const db=await obxDb();return new Promise((res,rej)=>{const t=db.transaction('q',mode);const q=f(t.objectStore('q'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})}
-function obxBadge(){try{const n=OBX.list.length;if(navigator.setAppBadge)(n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{})}catch(e){}}
+function obxBadge(){appBadge()}
+/* pallino sull'icona: chat non lette + avvisi non letti + cose da fare del ruolo (no carrello, no ordini in preparazione, no novità dell'app) + push in coda.
+   Il numero va anche nella cache «jona-badge»: sw.js lo aumenta di 1 a ogni push che arriva ad app chiusa. */
+const BADGE={n:-1};
+function badgeCount(){const me=realU();if(!me||S.wallMode)return 0;const tabs=isGM(me)?GM_TABS:isDev(me)?DEV_TABS:STAFF_TABS;let n=chUnread(me)+myNotifs(me).filter(x=>!x.letta).length;for(const t of tabs)if(t.b&&t.id!=='carrello'&&t.id!=='invii')n+=+t.b()||0;return n}
+function appBadge(){let n=0;try{n=badgeCount()+OBX.list.length}catch(e){}if(n===BADGE.n)return;BADGE.n=n;
+  try{if(navigator.setAppBadge)(n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{})}catch(e){}
+  try{caches.open('jona-badge').then(c=>c.put('./badge-n',new Response(String(n)))).catch(()=>{})}catch(e){}}
 async function obxSyncReg(){try{const st=S.db&&S.db.kind==='firebase'?S.db.status():null;if(!OBX.list.length||(st&&st.pend))return;const reg=await navigator.serviceWorker.ready;if(reg.sync)await reg.sync.register('jona-outbox')}catch(e){}}
 async function obxAdd(x){OBX.list.push(x);S.obxShown=true;obxBadge();schedule();try{await obxTx('readwrite',st=>st.put(x))}catch(e){}obxSyncReg()}
 async function obxLoad(){try{const l=await obxTx('readonly',st=>st.getAll());if(Array.isArray(l)){OBX.list=l.sort((a,b)=>a.creato-b.creato);if(l.length)S.obxShown=true}}catch(e){}obxBadge();schedule()}
@@ -1507,7 +1517,7 @@ function render(){
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
   for(const o of sheets)if(o.live&&o.live())paintSheet(o);
   if(!S.wallMode&&realU()){chWatch();phWatch();if(CHAT.box)chPaint()}else if(CHAT.box)chClose();
-  if(!S.tab||!realU())NAV.tabs=[];navSync();
+  if(!S.tab||!realU())NAV.tabs=[];navSync();appBadge();
 }
 function repaint(){render();refreshSheet()}
 function allLoaded(){return(S.loadTimeout&&S.db.kind!=='firebase')||Object.keys(COLS).every(k=>S.loaded[k])}

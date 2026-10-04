@@ -1,0 +1,31 @@
+// v30 (modalità locale): pallino sull'icona = chat non lette + avvisi non letti + cose da fare (senza carrello e ordini in preparazione).
+// Il numero va anche nella cache «jona-badge»; sw.js lo aumenta a ogni push con l'app non in vista (controllato a parte sul file).
+import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+import fs from 'fs';
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
+const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const ctx=await b.newContext({viewport:{width:390,height:800},serviceWorkers:'block'});
+await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
+await ctx.addInitScript(()=>{self.__bd=[];navigator.setAppBadge=n=>{self.__bd.push(n);return Promise.resolve()};navigator.clearAppBadge=()=>{self.__bd.push(0);return Promise.resolve()}});
+const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
+const W=ms=>pg.waitForTimeout(ms);const last=()=>pg.evaluate(()=>self.__bd[self.__bd.length-1]);
+await pg.goto('http://localhost:8765/index.html');
+await pg.click('[data-a="formset"][data-v="dev"]');
+for(const [k,v] of [['nome','Mario'],['cognome','Rossi'],['username','mario'],['pw','password123'],['pw2','password123']])await pg.fill(`input[data-k="${k}"]`,v);
+await pg.click('[data-a="setupGo"]');await pg.waitForSelector('.testbar');await W(300);
+ok(await pg.evaluate(()=>APP_VER===30&&NEWS[0].v===30),'version 30 with news');
+ok((await last()||0)===0,'nothing to do: no badge');
+await pg.evaluate(async()=>{await put('staff','u_luca',{nome:'Luca',cognome:'Bianchi',username:'luca',ruolo:'staff',reparto:'cucina',mansione:'Cuoco',stato:'attivo',pass:await sha('u_luca:password123'),creato:now()});
+  await put('messaggi','m1',{c:'tutti',da:'u_luca',t:'Ciao',creato:Date.now()-1000});});
+await W(400);const a=await last();ok(a===1,'one unread chat message → 1 ('+a+')');
+await pg.evaluate(async()=>{await put('staff','u_new',{nome:'Nuovo',cognome:'X',username:'nuovo',ruolo:'staff',reparto:'sala',mansione:'',stato:'in_attesa',pass:'x',creato:now()});
+  await put('notifiche','n1',{a:realU().id,titolo:'Ordine approvato',testo:'',tipo:'richiesta',letta:false,creato:now()});});
+await W(400);const c=await last();ok(c===3,'+ profile to approve + unread notice → 3 ('+c+')');
+const cached=await pg.evaluate(async()=>{const r=await (await caches.open('jona-badge')).match('./badge-n');return r&&await r.text()});
+ok(cached==='3','number saved for the service worker ('+cached+')');
+await pg.click('[data-a="chatOpen"]');await W(300);await pg.click('[data-a="chGo"][data-c="tutti"]');await W(500);
+const d=await last();ok(d===2,'chat read → 2 ('+d+')');
+const sw=fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8');
+ok(/badgeBump\(\)\]\)\)/.test(sw)&&/k !== 'jona-badge'/.test(sw),'sw: push bumps the badge, cache kept on update');
+ok(errs.length===0,'no page errors '+JSON.stringify(errs));
+await b.close();
