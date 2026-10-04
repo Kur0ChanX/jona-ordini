@@ -721,6 +721,24 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .cm-prev>b{font:500 14px var(--font);color:var(--ink2)}
 .cm-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.cm-row>span{font:400 15px var(--font);min-width:60px}
 .cm-row div{display:flex;flex-wrap:wrap;gap:6px}.cm-row em{font-style:normal;font-size:13.5px;padding:3px 9px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+/* ---------- fornitori: schede grandi con logo ---------- */
+.fdot.logo{background:#fff;padding:3px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.fdot img{width:100%;height:100%;object-fit:contain;border-radius:inherit}
+.fdot.xl{width:64px;height:64px;border-radius:18px;font-size:28px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.fcard{all:unset;box-sizing:border-box;display:flex;flex-direction:column;background:var(--surface);border-radius:20px;box-shadow:var(--lift);overflow:hidden;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;-webkit-tap-highlight-color:transparent}
+.fcard:hover{transform:translateY(-2px)}.fcard:active{transform:scale(.98)}.fcard:focus-visible{outline:2px solid var(--lagoon);outline-offset:2px}
+.fc-top{height:108px;display:grid;place-items:center;background:linear-gradient(140deg,color-mix(in srgb,var(--c) 26%,var(--surface)),color-mix(in srgb,var(--c) 8%,var(--surface)))}
+.fc-top img{max-width:78%;max-height:76px;object-fit:contain;background:#fff;border-radius:14px;padding:8px;box-shadow:0 6px 16px -10px rgba(0,0,0,.45)}
+.fc-top b{width:66px;height:66px;border-radius:20px;display:grid;place-items:center;background:var(--c);color:#fff;font:300 32px var(--font);box-shadow:0 8px 18px -10px var(--c)}
+.fc-b{display:grid;gap:5px;padding:12px 14px 14px}
+.fc-n{font:500 17px/1.25 var(--font);color:var(--ink);overflow-wrap:anywhere}
+.fc-m{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}.fc-m .ic{width:15px;height:15px;flex:none}
+.fc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px}
+.fc-tags i{display:inline-flex;align-items:center;gap:4px;font-style:normal;font-size:12px;padding:3px 9px;border-radius:99px;background:var(--sunk);color:var(--ink2)}
+.fc-tags i.t{background:var(--ocra-soft);color:var(--ocra)}.fc-tags .ic{width:13px;height:13px}
+.f-logo{display:flex;align-items:center;gap:14px;padding:12px;margin:4px 0 2px;border-radius:16px;background:var(--sunk)}
+.f-logo b{display:block;font-weight:500}.f-logo>div>span{display:block;font-size:13px;color:var(--muted);margin:1px 0 8px}.f-logo .btns{justify-content:flex-start}
 /* ---------- ordine suggerito ---------- */
 .sug-cta{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin:0 0 14px;border-radius:18px;background:linear-gradient(120deg,var(--lagoon-soft),var(--surface) 70%);box-shadow:var(--lift);cursor:pointer}
 .sug-cta:focus-visible{outline:2px solid var(--lagoon);outline-offset:2px}
@@ -950,8 +968,13 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=17;
+const APP_VER=18;
 const NEWS=[
+  {v:18,data:'2026-10-04',titolo:'Fornitori più belli e animazione nuova',
+    tutti:['L\'animazione dopo «Invia allo chef» è nuova: il menù JONA passa dalle tue mani a quelle dello chef.'],
+    chef:['La pagina Fornitori ha schede grandi. Puoi aggiungere il logo di ogni fornitore: apri il fornitore, «Contatti e invio», «Scegli immagine», poi «Salva». Il logo compare anche negli ordini e negli invii.'],
+    dev:{aggiunte:['`fDot` (logo o iniziale) in tutti i segni dei fornitori, `fornitori.logo` (data URL, massimo 320 px, `fileToLogo`), griglia `.fgrid`/`.fcard`.','Video rifatto dal filmato nuovo di Mario con `tools/anim-invio.py <video> 4.2 0.12 0.12` (riempimento dei buchi per il logo chiaro, memoria degli scontorni in `/tmp/anim-invio-cache`).'],
+      correzioni:['Chat: «1 persona» al singolare.']}},
   {v:17,data:'2026-10-04',titolo:'Chat tra colleghi e «Chiedi a Jona»',
     tutti:['In alto, accanto alla campanella, c\'è la chat: scrivi a tutto lo staff, al tuo reparto o a un collega. Tocca la matita per una chat nuova. Le spunte diventano blu quando l\'altro ha letto.','Quando arriva un messaggio vedi un avviso e il numero dei messaggi nuovi sul pulsante della chat.'],
     chef:['Il pulsante tondo con la stellina in basso a destra è «Chiedi a Jona»: fai domande sui dati dell\'app, scritte o a voce («Quanto abbiamo speso da Metro questo mese?», «Chi lavora sabato sera?»). Risponde Gemini con la chiave di questo telefono.','Nella chat vedi i gruppi di tutti i reparti.'],
@@ -1058,6 +1081,11 @@ if(S.me)S.cart=ls('jona_cart_'+S.me)||[];
 const D=()=>S.data;
 const forn=id=>D().fornitori[id]||{id,nome:'Da assegnare'};
 const fcolor=fid=>fid?(forn(fid).colore||hue(fid)):'#8A7F76';
+// segno del fornitore: il logo (su fondo bianco, si legge anche col tema scuro) o l'iniziale nel suo colore
+const fDot=(fid,cls='')=>{const f=forn(fid);return`<span class="fdot ${cls}${f.logo?' logo':''}" style="--c:${fcolor(fid)}">${f.logo?`<img src="${esc(f.logo)}" alt="">`:esc((f.nome||'?').charAt(0))}</span>`};
+// logo scelto dalla galleria: al massimo 320 px, PNG (trasparenza) o JPEG su bianco se pesa troppo
+async function fileToLogo(file){const img=await loadImg(file);const sc=Math.min(1,320/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*sc));c.height=Math.max(1,Math.round(img.height*sc));
+  const x=c.getContext('2d');x.drawImage(img,0,0,c.width,c.height);let u=c.toDataURL('image/png');if(u.length>150000){x.globalCompositeOperation='destination-over';x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);u=c.toDataURL('image/jpeg',.85)}return u}
 const cfg=()=>Object.assign({nomeLocale:'Jona Ristorante',luogoConsegna:''},D().config.app||{});
 const realU=()=>S.me?D().staff[S.me]:null;
 // Test per lo sviluppatore: vede l'app come l'amministratore (chef) senza cambiare il suo profilo.
@@ -1814,7 +1842,7 @@ function reqPickSheet(rid,fid){
   openSheet({cls:'tall',render:()=>{const r=D().richieste[rid];if(!r||r.stato!=='inviata')return'<p class="muted">Questa richiesta non è più da approvare.</p>';
     const f=forn(fid);const q=norm(S.pkq);const toks=q?q.split(' '):[];const its=itemsOf(r);
     const list=prods().filter(p=>p.fornitoreId===fid&&(!toks.length||toks.every(t=>norm(p.nome+' '+(p.codice||'')).includes(t)))).sort(byNome).slice(0,120);
-    return`<div class="grab"></div><div class="sh-h"><span class="fdot lg" style="--c:${fcolor(fid)}">${esc((f.nome||'?').charAt(0))}</span><div class="sh-t">Aggiungi da ${esc(f.nome)}<div class="sh-s">Alla richiesta di ${esc(firstName(r.utenteNome))}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+    return`<div class="grab"></div><div class="sh-h">${fDot(fid,'lg')}<div class="sh-t">Aggiungi da ${esc(f.nome)}<div class="sh-s">Alla richiesta di ${esc(firstName(r.utenteNome))}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     <div class="search" style="box-shadow:none;border-color:var(--line)">${ic('search')}<input id="rpq" type="search" placeholder="Cerca nel listino di ${esc(f.nome)}" value="${esc(S.pkq)}" data-in="pkq" autocomplete="off"></div>
     <div>${list.length?list.map(p=>{const inR=its.find(x=>x.pid===p.id);return`<div class="prow"><div class="row-i"><div class="row-t">${esc(p.nome)}</div><div class="row-m">${p.codice?'cod. '+esc(p.codice)+', ':''}${p.prezzo!=null?eur(p.prezzo)+(p.unita?' / '+esc(p.unita):''):esc(p.unita||'')}${inR?`, nella richiesta: ${fq(inR.qta)}`:''}</div></div><button type="button" class="add" data-a="rpadd" data-r="${rid}" data-p="${p.id}" aria-label="Aggiungi ${esc(p.nome)}">${ic('plus')}</button></div>`}).join(''):`<p class="muted">Nessun prodotto${q?' trovato':' a listino'}.</p>`}</div>
     <div class="sheet-foot"><button type="button" class="btn primary block" data-a="closeSheet">Fatto</button></div>`}});
@@ -1867,7 +1895,7 @@ function vInvii(){
   return`<div class="vhead"><div><h1 class="vt">Invii</h1><p class="vsub">${open.length?`${open.length} ${open.length===1?'ordine pronto':'ordini pronti'} da mandare ai fornitori`:'Niente da inviare'}</p></div><button type="button" class="btn ghost" data-a="newOrder">${ic('plus')} Ordine diretto</button></div>
   ${(()=>{const due=Object.values(D().fornitori).filter(f=>sugStats(f.id).due).sort(byNome);return`<button type="button" class="sug-cta" data-a="sugOpen">${ic('sparkle')}<div><b>Ordine suggerito</b><span>${due.length?'Da riordinare: '+due.slice(0,3).map(f=>esc(f.nome)).join(', ')+(due.length>3?'…':''):'Quantità proposte dallo storico degli ordini e dal meteo'}</span></div>${ic('chev')}</button>`})()}
   ${open.length?open.map(orderCard).join(''):empty('truck','Nessun ordine da inviare','Quando approvi una richiesta gli articoli arrivano qui, già divisi per fornitore.')}
-  ${sent.length?`<h2 class="sec">Inviati di recente</h2><div class="panel">${sent.map(o=>`<button type="button" class="row link" data-a="sentView" data-o="${o.id}"><span class="fdot" style="--c:${fcolor(o.fornitoreId)}">${esc((forn(o.fornitoreId).nome||'?').charAt(0))}</span><div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome||o.fornitoreNome)}</div><div class="row-m">${ago(o.inviato)}, ${o.items.length} ${o.items.length===1?'articolo':'articoli'}</div></div>${o.ricevuto?(o.differenze?pill('wait','differenze'):pill('ok','arrivato')):pill('sent','in arrivo')}</button>`).join('')}</div>`:''}`;
+  ${sent.length?`<h2 class="sec">Inviati di recente</h2><div class="panel">${sent.map(o=>`<button type="button" class="row link" data-a="sentView" data-o="${o.id}">${fDot(o.fornitoreId)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome||o.fornitoreNome)}</div><div class="row-m">${ago(o.inviato)}, ${o.items.length} ${o.items.length===1?'articolo':'articoli'}</div></div>${o.ricevuto?(o.differenze?pill('wait','differenze'):pill('ok','arrivato')):pill('sent','in arrivo')}</button>`).join('')}</div>`:''}`;
 }
 function primaryActions(o){
   const f=forn(o.fornitoreId),me=f.metodo||'email';
@@ -2150,8 +2178,8 @@ function sugSheet(){
     if(!G.fid){
       const fs=Object.values(D().fornitori).map(f=>({f,st:sugStats(f.id)})).sort((a,b)=>((b.st.due?2:0)+(b.st.n>=2?1:0))-((a.st.due?2:0)+(a.st.n>=2?1:0))||byNome(a.f,b.f));
       return head('Ordine suggerito','Scegli il fornitore')+`<p class="muted" style="margin-top:0">L'app guarda gli ordini degli ultimi 2 mesi, ogni quanti giorni ordini e quanto usi, poi corregge con la gente prevista e il meteo. Tu controlli e cambi le quantità.</p>
-      <div class="panel" style="box-shadow:none;border:1px solid var(--line)">${fs.map(({f,st})=>st.n>=2?`<button type="button" class="row link" data-a="sugF" data-f="${f.id}"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">Di solito ogni ${st.cad===1?'giorno':st.cad+' giorni'} · ultimo ${ago(st.last)}</div></div>${st.due?pill('wait','da riordinare'):''}${ic('chev')}</button>`
-        :`<div class="row dim"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">${st.n?'Solo 1 ordine':'Nessun ordine'} negli ultimi 2 mesi: servono almeno 2</div></div></div>`).join('')}</div>`}
+      <div class="panel" style="box-shadow:none;border:1px solid var(--line)">${fs.map(({f,st})=>st.n>=2?`<button type="button" class="row link" data-a="sugF" data-f="${f.id}">${fDot(f.id)}<div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">Di solito ogni ${st.cad===1?'giorno':st.cad+' giorni'} · ultimo ${ago(st.last)}</div></div>${st.due?pill('wait','da riordinare'):''}${ic('chev')}</button>`
+        :`<div class="row dim">${fDot(f.id)}<div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">${st.n?'Solo 1 ordine':'Nessun ordine'} negli ultimi 2 mesi: servono almeno 2</div></div></div>`).join('')}</div>`}
     const f=forn(G.fid),st=sugStats(G.fid),rows=sugRows(),wf=wxFactor(G.wx,st.cad),nsel=rows.filter(r=>r.sel&&r.q>0).length;
     const fino=new Date(now()+st.cad*DAY).toLocaleDateString('it-IT',{weekday:'long'});
     return head('Ordine suggerito',esc(f.nome)+' · copre '+(st.cad===1?'1 giorno':st.cad+' giorni')+', fino a '+fino,true)+`
@@ -2187,7 +2215,7 @@ function vArrivi(){
   const all=Object.values(D().ordini);
   const pend=all.filter(o=>o.stato==='inviato'&&!o.ricevuto).sort((a,b)=>String(a.consegna||'9').localeCompare(String(b.consegna||'9'))||(a.inviato-b.inviato));
   const done=all.filter(o=>o.ricevuto).sort((a,b)=>b.ricevuto-a.ricevuto).slice(0,20);
-  const fd=o=>`<span class="fdot" style="--c:${fcolor(o.fornitoreId)}">${esc((forn(o.fornitoreId).nome||'?').charAt(0))}</span>`;
+  const fd=o=>`${fDot(o.fornitoreId)}`;
   return`<h1 class="vt">Arrivi</h1><p class="vsub">${pend.length?(pend.length===1?'Una consegna':pend.length+' consegne')+' da controllare':'Nessuna consegna in attesa'}</p>
   ${pend.length?`<div class="panel">${pend.map(o=>`<button type="button" class="row link" data-a="rcvOpen" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${o.items.length} ${o.items.length===1?'articolo':'articoli'}, ordinato ${ago(o.inviato)}${o.consegna?', consegna '+consegnaTxt(o.consegna):''}</div></div><span class="btn primary sm">Controlla</span></button>`).join('')}</div>`
   :empty('box','Niente in arrivo','Quando Maurizio invia un ordine a un fornitore, compare qui per il controllo della merce.')}
@@ -2197,7 +2225,7 @@ function receiveSheet(oid){
   openSheet({cls:'tall',render:()=>{const o=D().ordini[oid];if(!o)return'<p class="muted">Ordine non trovato.</p>';const f=forn(o.fornitoreId);
     if(o.ricevuto)return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(f.nome)}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div><p>Questa consegna è già stata controllata da ${esc(o.ricevutoNome||'')}.</p>`;
     const R=rcvState(oid);const nd=R.lines.filter(rcvDiff).length;const tot=R.lines.length;const fatti=R.lines.filter(l=>l.st).length;
-    return`<div class="grab"></div><div class="sh-h"><span class="fdot lg" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="sh-t">Controllo merce<div class="sh-s">${esc(f.nome)}, ordinato ${ago(o.inviato)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+    return`<div class="grab"></div><div class="sh-h">${fDot(f.id,'lg')}<div class="sh-t">Controllo merce<div class="sh-s">${esc(f.nome)}, ordinato ${ago(o.inviato)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     <p class="muted" style="margin-top:0">Se è tutto giusto basta un tocco.</p>
     <button type="button" class="btn primary block big" data-a="rcvAll" data-o="${oid}" ${nd?'disabled':''}>${ic('check')} È arrivato tutto</button>
     <h2 class="sec">Oppure tocca ogni prodotto</h2>
@@ -2249,14 +2277,17 @@ function receiptView(oid){
 function vFornitori(){
   const fs=Object.values(D().fornitori).sort(byNome);const cnt={};for(const p of prods())cnt[p.fornitoreId]=(cnt[p.fornitoreId]||0)+1;
   return`<div class="vhead"><div><h1 class="vt">Fornitori</h1><p class="vsub">${fs.length} fornitori, ${prods().length} prodotti a listino</p></div><button type="button" class="btn ghost" data-a="fnew">${ic('plus')} Nuovo</button></div>
-  <div class="callout">${ic('upload')}<div><b style="font-weight:500">Importa listini</b><div class="muted small">Incolla la tabella preparata con Gemini o carica un file Excel, CSV o la fattura XML.</div></div><button type="button" class="btn primary sm" data-a="imp" data-f="">Importa</button></div>
-  ${fs.length?`<div class="panel">${fs.map(f=>{const m=METODI[f.metodo];return`<button type="button" class="row link" data-a="fopen" data-f="${f.id}"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">${m?ic(m.i)+' '+m.l:'Metodo da definire'}, ${cnt[f.id]||0} prodotti${f.oraLimite?', entro le '+esc(f.oraLimite):''}</div></div>${ic('chev')}</button>`}).join('')}</div>`:empty('store','Nessun fornitore','Aggiungi i fornitori con i loro contatti e il modo in cui vogliono ricevere gli ordini.')}`;
+  <button type="button" class="sug-cta" data-a="imp" data-f="">${ic('upload')}<div><b>Importa listini</b><span>Excel, CSV, fattura XML, tabella preparata con Gemini o foto</span></div>${ic('chev')}</button>
+  ${fs.length?`<div class="fgrid">${fs.map(f=>{const m=METODI[f.metodo],n=cnt[f.id]||0;return`<button type="button" class="fcard" data-a="fopen" data-f="${f.id}" style="--c:${fcolor(f.id)}" aria-label="${esc(f.nome)}">
+    <span class="fc-top">${f.logo?`<img src="${esc(f.logo)}" alt="">`:`<b>${esc(f.nome.charAt(0))}</b>`}</span>
+    <span class="fc-b"><span class="fc-n">${esc(f.nome)}</span><span class="fc-m">${m?ic(m.i)+esc(m.l):'Invio da definire'}</span>
+    <span class="fc-tags"><i>${n===1?'1 prodotto':n+' prodotti'}</i>${f.oraLimite?`<i class="t">${ic('clock')}entro le ${esc(f.oraLimite)}</i>`:''}</span></span></button>`}).join('')}</div>`:empty('store','Nessun fornitore','Aggiungi i fornitori con i loro contatti e il modo in cui vogliono ricevere gli ordini.')}`;
 }
 function supSheet(fid,tab){
   S.supFid=fid;S.supTab=tab||'listino';S.supQ='';const f0=D().fornitori[fid];S.fe=clone(f0||{});delete S.fe.id;
   openSheet({cls:'tall',live:()=>S.supTab==='listino',render:()=>{
     const f=D().fornitori[fid];if(!f)return`<p class="muted">Fornitore eliminato.</p>`;
-    const head=`<div class="grab"></div><div class="sh-h"><span class="fdot lg" style="--c:${fcolor(fid)}">${esc(f.nome.charAt(0))}</span><div class="sh-t">${esc(f.nome)}<div class="sh-s">${METODI[f.metodo]?METODI[f.metodo].l:'Metodo da definire'}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+    const head=`<div class="grab"></div><div class="sh-h">${fDot(fid,'xl')}<div class="sh-t">${esc(f.nome)}<div class="sh-s">${METODI[f.metodo]?METODI[f.metodo].l:'Metodo da definire'}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     <div class="seg wide" role="group">${[['listino','Listino'],['contatti','Contatti e invio']].map(([k,l])=>`<button type="button" aria-pressed="${S.supTab===k}" data-a="suptab" data-v="${k}">${l}</button>`).join('')}</div>`;
     if(S.supTab==='contatti')return head+supForm(fid);
     const all=prods().filter(p=>p.fornitoreId===fid);
@@ -2271,7 +2302,9 @@ function supList(fid){
 }
 function supForm(fid){
   const f=S.fe;const F=(k,l,t='text',ph='',im='')=>`<label class="lbl" for="fe-${k}">${l}</label><input class="inp" id="fe-${k}" type="${t}" ${im?`inputmode="${im}"`:''} value="${esc(f[k]||'')}" placeholder="${esc(ph)}" data-in="fe" data-k="${k}">`;
-  return`${F('nome','Nome del fornitore')}
+  return`<div class="f-logo"><span class="fdot xl${f.logo?' logo':''}" style="--c:${fid?fcolor(fid):'var(--lagoon)'}">${f.logo?`<img src="${esc(f.logo)}" alt="">`:esc((f.nome||'?').charAt(0))}</span>
+  <div><b>Logo</b><span>Un'immagine del marchio: la vedi nelle schede e negli ordini.</span><div class="btns"><button type="button" class="btn ghost sm" data-a="fLogo">${ic('image')} ${f.logo?'Cambia':'Scegli immagine'}</button>${f.logo?`<button type="button" class="btn ghost sm danger" data-a="fLogoDel">Togli</button>`:''}</div></div></div>
+  ${F('nome','Nome del fornitore')}
   <label class="lbl" for="fe-metodo">Come vuole ricevere l'ordine</label><select class="inp" id="fe-metodo" data-ch="fesel" data-k="metodo"><option value="">Da definire</option>${Object.entries(METODI).map(([k,m])=>`<option value="${k}" ${f.metodo===k?'selected':''}>${m.l}</option>`).join('')}</select>
   ${F('referente','Referente','text','Es. Giovanni')}
   <div class="two stack"><div>${F('whatsapp','WhatsApp','tel','+39 333 1234567','tel')}</div><div>${F('telefono','Telefono','tel','','tel')}</div></div>
@@ -2284,7 +2317,7 @@ function supForm(fid){
 function newSupSheet(){S.fe={metodo:'email',categoria:'Altro'};openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Nuovo fornitore</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>${supForm('')}`})}
 async function saveSup(fid){
   const f=S.fe;if(!String(f.nome||'').trim())return toast('Scrivi il nome del fornitore.','warn');
-  const d={nome:f.nome.trim(),metodo:f.metodo||'',referente:(f.referente||'').trim(),whatsapp:(f.whatsapp||'').trim(),telefono:(f.telefono||'').trim(),email:(f.email||'').trim(),sito:(f.sito||'').trim(),categoria:f.categoria||'Altro',note:(f.note||'').trim(),oraLimite:/^\d{2}:\d{2}$/.test(f.oraLimite||'')?f.oraLimite:''};
+  const d={nome:f.nome.trim(),metodo:f.metodo||'',referente:(f.referente||'').trim(),whatsapp:(f.whatsapp||'').trim(),telefono:(f.telefono||'').trim(),email:(f.email||'').trim(),sito:(f.sito||'').trim(),categoria:f.categoria||'Altro',note:(f.note||'').trim(),logo:f.logo||'',oraLimite:/^\d{2}:\d{2}$/.test(f.oraLimite||'')?f.oraLimite:''};
   if(d.sito&&!/^https?:\/\//i.test(d.sito))d.sito='https://'+d.sito;
   if(fid){await upd('fornitori',fid,d);toast('Fornitore salvato')}else{const id=uid();d.creato=now();await put('fornitori',id,d);closeSheet();toast('Fornitore aggiunto');supSheet(id)}
 }
@@ -3254,7 +3287,7 @@ const chPeople=()=>Object.values(D().staff).filter(u=>u.stato==='attivo');
 function chMembers(c){const P=chPeople();if(c==='tutti')return P;if(c.startsWith('rep_'))return P.filter(u=>isMgr(u)||(u.reparto||'altro')===c.slice(4));if(c.startsWith('dm_'))return chDmIds(c).map(id=>D().staff[id]).filter(Boolean);return[]}
 function chCan(c,me){if(c==='tutti')return true;if(c.startsWith('rep_'))return isMgr(me)||(me.reparto||'altro')===c.slice(4);if(c.startsWith('dm_'))return chDmIds(c).includes(me.id);return false}
 function chInfo(c,me){
-  if(c==='tutti')return{n:'Tutto lo staff',s:chPeople().length+' persone',g:'tutti'};
+  if(c==='tutti'){const n=chPeople().length;return{n:'Tutto lo staff',s:n===1?'1 persona':n+' persone',g:'tutti'}}
   if(c.startsWith('rep_'))return{n:REPARTI[c.slice(4)]||c.slice(4),s:chMembers(c).map(u=>u.nome).join(', '),g:c.slice(4)};
   const o=D().staff[chDmIds(c).find(id=>id!==me.id)]||{nome:'Profilo eliminato'};return{n:fullName(o),s:isMgr(o)?RUOLI[o.ruolo]:[o.mansione,REPARTI[o.reparto]].filter(Boolean).join(', '),u:o};
 }
@@ -3744,7 +3777,7 @@ const A={
     if(it)it.qta=r3(Number(it.qta)+1);else x.push({pid:p.id,nome:p.nome,codice:p.codice||'',unita:p.unita||'',prezzo:p.prezzo??null,fornitoreId:p.fornitoreId,fornitoreNome:forn(p.fornitoreId).nome,qta:1,qtaOrig:0,aggiunto:true});
     repaint();toast('Aggiunto: '+p.nome)},
   reject:d=>reject(d.r),
-  newOrder:()=>openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Ordine diretto</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div><p class="muted" style="margin-top:0">Scegli il fornitore e aggiungi tu i prodotti, senza passare da una richiesta.</p><div class="panel" style="box-shadow:none;border:1px solid var(--line)">${Object.values(D().fornitori).sort(byNome).map(f=>`<button type="button" class="row link" data-a="pickNew" data-f="${f.id}"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div></div>${ic('chev')}</button>`).join('')}</div>`}),
+  newOrder:()=>openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Ordine diretto</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div><p class="muted" style="margin-top:0">Scegli il fornitore e aggiungi tu i prodotti, senza passare da una richiesta.</p><div class="panel" style="box-shadow:none;border:1px solid var(--line)">${Object.values(D().fornitori).sort(byNome).map(f=>`<button type="button" class="row link" data-a="pickNew" data-f="${f.id}">${fDot(f.id)}<div class="row-i"><div class="row-t">${esc(f.nome)}</div></div>${ic('chev')}</button>`).join('')}</div>`}),
   pickNew:d=>{closeSheet(true);pickSheet(d.f)},
   pick:d=>pickSheet(d.f),
   pkadd:async d=>{const p=D().prodotti[d.p];if(!p)return;await addToOrder(d.f,p,1);toast('Aggiunto: '+p.nome)},
@@ -3773,6 +3806,8 @@ const A={
   fopen:d=>supSheet(d.f,d.t),
   suptab:d=>{S.supTab=d.v;if(d.v==='contatti'){S.fe=clone(D().fornitori[S.supFid]||{});delete S.fe.id}refreshSheet()},
   fsave:d=>saveSup(d.f),
+  fLogo:()=>pickFile({accept:'image/*'},async fs=>{try{S.fe.logo=await fileToLogo(fs[0]);refreshSheet();toast('Logo pronto: tocca «Salva»')}catch(e){toast('Non riesco a leggere questa immagine.','err')}}),
+  fLogoDel:()=>{S.fe.logo='';refreshSheet()},
   fdel:d=>delSup(d.f),
   imp:d=>impSheet(d.f),
   impPaste:()=>{S.imp.stage='paste';S.imp.err='';refreshSheet();setTimeout(()=>{const t=$('#imp-txt');if(t)t.focus()},50)},
