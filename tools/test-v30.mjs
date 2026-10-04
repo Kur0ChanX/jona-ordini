@@ -3,8 +3,9 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 import fs from 'fs';
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
-const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream','--autoplay-policy=no-user-gesture-required']});
 const ctx=await b.newContext({viewport:{width:390,height:800},serviceWorkers:'block'});
+await ctx.grantPermissions(['microphone'],{origin:'http://localhost:8765'});
 await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
 await ctx.addInitScript(()=>{self.__bd=[];navigator.setAppBadge=n=>{self.__bd.push(n);return Promise.resolve()};navigator.clearAppBadge=()=>{self.__bd.push(0);return Promise.resolve()}});
 const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
@@ -25,6 +26,26 @@ const cached=await pg.evaluate(async()=>{const r=await (await caches.open('jona-
 ok(cached==='3','number saved for the service worker ('+cached+')');
 await pg.click('[data-a="chatOpen"]');await W(300);await pg.click('[data-a="chGo"][data-c="tutti"]');await W(500);
 const d=await last();ok(d===2,'chat read → 2 ('+d+')');
+// forma d'onda
+const u=await pg.evaluate(()=>({sil:wfCode(Array(50).fill(.001)),loud:wfCode(Array.from({length:80},(_,i)=>i<40?.2:.001)),short:wfCode([.1,.2,.05,.3])}));
+ok(u.sil==='0'.repeat(40),'silence → flat line');
+ok(/^[1-9]{20}0{20}$/.test(u.loud)&&u.loud.includes('9'),'voice then silence → bars then flat '+u.loud);
+ok(u.short.length===40,'short voice still 40 bars');
+// registrazione vera con il microfono finto di Chromium (tono)
+await pg.evaluate(()=>{self.__cf=null;chFile=(t,bl,x)=>{self.__cf=x}});
+await pg.evaluate(()=>chRec());await W(2600);
+const live=await pg.locator('#ch-rw i').count();ok(live===24,'live bars while recording ('+live+')');
+const hs=await pg.evaluate(()=>[...document.querySelectorAll('#ch-rw i')].map(i=>parseInt(i.style.height)));
+ok(hs.some(h=>h>4),'live bars move with the sound '+hs.join(','));
+await pg.evaluate(()=>chRecStop(true));await W(800);
+const cf=await pg.evaluate(()=>self.__cf);ok(cf&&/^[0-9]{40}$/.test(cf.wf)&&/[1-9]/.test(cf.wf),'message gets wf '+(cf&&cf.wf));
+// messaggio con wf: barre di altezze diverse; senza wf: barre grigie uguali
+await pg.evaluate(async()=>{await put('messaggi','a1',{c:'tutti',da:'u_luca',t:'🎤',tipo:'audio',m:'0-a1',dur:4,wf:'0123456789'.repeat(4),creato:Date.now()});
+  await put('messaggi','a2',{c:'tutti',da:'u_luca',t:'🎤',tipo:'audio',m:'0-a2',dur:3,creato:Date.now()+1});});
+await W(500);
+const r=await pg.evaluate(()=>({h:[...document.querySelectorAll('[data-au="0-a1"] .cht-wf i')].slice(0,10).map(i=>parseInt(i.style.height)),old:document.querySelector('[data-au="0-a2"] .cht-wf').classList.contains('old')}));
+ok(r.h.join(',')==='2,7,9,12,14,17,20,22,25,27'&&r.old,'bars follow wf, old voice neutral '+JSON.stringify(r));
+await pg.screenshot({path:process.env.SHOT||'/tmp/v30.png'});
 const sw=fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8');
 ok(/badgeBump\(\)\]\)\)/.test(sw)&&/k !== 'jona-badge'/.test(sw),'sw: push bumps the badge, cache kept on update');
 ok(errs.length===0,'no page errors '+JSON.stringify(errs));
