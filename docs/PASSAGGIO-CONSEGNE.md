@@ -28,7 +28,7 @@ Metodo: 3 funzioni → prove → PR → squash merge → controllo online → sc
 **Scaglione 2: pubblicato (v13)**
 1. Prove Firebase: fatte, tutte verdi.
 2. PR #23 → squash merge → online → ramo riallineato: fatto.
-3. Mario prova sul telefono sul telefono (carrello «È urgente?», import di un listino con un prezzo più alto, controllo merce con un prodotto mancante).
+3. Mario prova sul telefono (carrello «È urgente?», import di un listino con un prezzo più alto, controllo merce con un prodotto mancante).
 
 **Scaglione 3 (prossimo)**
 - **Più lingue** per lo staff (scelta per persona; ordini e prodotti restano in italiano).
