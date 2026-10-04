@@ -1,6 +1,7 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
+- **v21**: un iPhone nuovo aperto dal link d'invito restava per sempre su «Un momento…». Ora `connect` in `FirebaseStore` ha tempi massimi (`fbTmo`, 20 s su accesso e iscrizione `membri`, 12 s su `pubblico/stato`), errore `fb_slow` → schermata «Il collegamento non riesce» con Riprova, e `jona_fb_lp` forza il long polling di Firestore al tentativo dopo (`fbInit`). `render()` subito dopo la creazione del database. `APP_VER=21`, `CACHE=jona-ordini-v25`. Prova `tools/test-invito-bloccato.mjs`. Causa esatta sull'iPhone del collega non ancora confermata: farlo riprovare.
 - Online la **v20** (PR #30, squash `98363e3`): Gemini dal server del ristorante. `APP_VER=20`, `CACHE=jona-ordini-v24`. File online identici, Worker pubblicato (`/salute` → `gemini:false` finché Mario non mette il segreto). Ramo riallineato con `git merge origin/main`.
 - v20: Worker `/gemini` (segreto `GEMINI_KEY` copiato dal segreto GitHub `GEMINI_API_KEY` dal workflow; solo telefoni in `membri/<uid>` col gettone Firebase; 429 → attesa `retryDelay`, poi `gemini-flash-lite-latest`; tetto ~25 s). App: `gemCall`, `gemSrvOk`, `gemOn` (chiave del telefono se c'è, altrimenti server, solo con Firebase). Prova `tools/test-gemini-server.mjs` (29). Foto già ridotte a 2000 px (`shrinkImg`).
 - **Da fare per Mario:** creare la chiave su aistudio.google.com, metterla nel segreto GitHub `GEMINI_API_KEY`, rilanciare il workflow «Pubblica server notifiche».
