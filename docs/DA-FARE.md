@@ -14,7 +14,7 @@ Aggiornato: 2026-10-05 (sessione #04). Ogni cosa ha un **numero fisso** (M1…, 
 | M4 | Mauro Loi: reparto «F&B Manager» | Mario | quando vuoi (2 minuti) |
 | M5 | Stampare e appendere il QR da cucina | Mario | quando vuoi |
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
-| M7 | Rispondermi sulla frase «Lo staff può vedere chi c'è in turno ma non…» | Mario | quando vuoi |
+| M7 | Decidere: lo staff deve vedere il totale delle ore a settimana nei suoi orari? | Mario | quando vuoi |
 | M8 | Prove dal vero della v35 | Mario | con calma |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
 | D2 | Sottodominio del Worker `mario-miscera`: cambiarlo? | Claude, dopo il tuo sì | da decidere |
@@ -43,7 +43,7 @@ Niente per ora.
 - **M4 · Mauro Loi**: **Staff** → **Mauro Loi** → Reparto «F&B Manager», svuota **Mansione**, **Salva**.
 - **M5 · QR da cucina**: **Impostazioni** → **QR da cucina** → **Crea il QR**, stampalo e appendilo.
 - **M6 · Scadenze dello staff**: le imposta Maurizio in **Impostazioni** → **Scadenze per lo staff** (dopo M2).
-- **M7 · Una risposta**: come finiva la frase «Lo staff può vedere chi c'è in turno ma non…».
+- **M7 · Decidere**: nei suoi orari lo staff vede «X ore di lavoro in settimana» e le ore di ogni giorno. Il contratto non lo vede mai. Tenere così, o nascondere anche il totale delle ore? (Se nascosto, Claude lo fa in una prossima versione.)
 
 ### M8 · Prove dal vero della v35, con calma
 Una alla volta; dimmi solo «ok» o cosa non va:
@@ -55,5 +55,7 @@ Una alla volta; dimmi solo «ok» o cosa non va:
 6. Promemoria ordini dal server
 7. Scadenze dello staff (dopo M6)
 8. QR da cucina (dopo M5)
+
+Regola decisa da Mario: **il contratto (ore dovute, confronto con le ore fatte) lo vedono solo i capi servizio, mai lo staff.**
 
 Già provato e funziona: vocale da iPad verso Android.
