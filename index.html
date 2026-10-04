@@ -215,6 +215,10 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .lbl{display:block;font:500 13.5px var(--font);color:var(--ink2);margin:14px 0 6px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:420px){.two.stack{grid-template-columns:1fr}}
+.obx{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ocra-soft);color:var(--ocra);border:1px solid var(--ocra);border-radius:14px;padding:12px 14px;margin:10px 0 4px}
+.obx>.ic{width:24px;height:24px;flex:none}.obx-i{flex:1 1 200px;min-width:0}.obx-i b{display:block;font-size:16px}.obx-i span{display:block;font-size:13.5px;color:var(--ink2);margin-top:2px}
+.obx-b{display:flex;gap:8px;flex-wrap:wrap}.obx-b .btn{min-height:42px}
+.wall .obx{max-width:420px;width:calc(100% - 32px);box-sizing:border-box;margin:0 auto 12px}
 .sync-pill{display:inline-flex;align-items:center;gap:5px;font:500 12.5px var(--font);background:var(--ocra-soft);color:var(--ocra);padding:4px 10px;border-radius:999px;white-space:nowrap}.sync-pill .ic{width:15px;height:15px}
 .qr{display:flex;justify-content:center;margin:14px 0 0}.qr img{width:min(240px,70vw);height:auto;background:#fff;padding:10px;border-radius:12px}
 .invite-steps{margin:0;padding-left:20px;color:var(--ink2);line-height:1.5}
@@ -269,6 +273,12 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .fsec-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0 4px}
 .fsec-h .muted{display:inline-flex;align-items:center;gap:6px}
 .fsec-h .ic{width:15px;height:15px}
+.fsec.fblk{margin:10px 12px;padding:4px 14px 10px;border:1px solid var(--line);border-left:5px solid var(--c);border-radius:12px;background:var(--surface);background:color-mix(in srgb,var(--c) 7%,var(--surface))}
+.fsec.fblk:first-child{border-top:1px solid var(--line)}
+.fsec.fblk.nof{--c:var(--corallo);background:var(--corallo-soft)}
+.fblk .sup{font-size:15px;font-weight:600;color:var(--ink)}
+.fblk .fadd{margin-top:8px;min-height:44px}
+.nof-h{display:flex;gap:8px;align-items:center;color:var(--corallo);font-size:14px;margin:4px 0 2px}.nof-h .ic{width:18px;height:18px;flex:none}
 .line{display:flex;align-items:center;gap:8px;padding:9px 0}
 .line+.line{border-top:1px dashed var(--line)}
 .ln-i{flex:1;min-width:0}
@@ -404,6 +414,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .sh-s{font:400 13.5px var(--font);color:var(--muted);margin-top:2px}
 .sheet-foot{position:sticky;bottom:0;background:var(--surface);display:flex;gap:10px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);margin-top:14px;z-index:3;box-shadow:0 30px 0 var(--surface)}
 .sheet-foot .btn{flex:1}
+.sheet-foot .btn.wrapt{flex:2;white-space:normal;line-height:1.2;text-align:center}
 @media (min-width:700px){
   .sheet-wrap{align-items:center;padding:24px}
   .sheet{border-radius:22px;max-height:88vh;transform:translateY(20px) scale(.98);opacity:0;transition:transform .22s,opacity .22s}
@@ -475,11 +486,19 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .local-note{color:#A3978D;font:300 13px/1.4 var(--font);text-align:center;margin:18px 0 0;max-width:420px}
 .login h1{margin-bottom:2px}
 .nav.n6 button{font-size:10.5px}
-.rc{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-top:1px dashed var(--line)}
-.rc:first-child{border-top:0}
-.rc .ln-i select{margin-top:8px;max-width:260px}
-.rc.bad .ln-n{color:var(--corallo)}
-.rc-q{display:flex;flex-direction:column;align-items:center;gap:2px}
+/* controllo arrivo a semaforo: grigio da controllare, verde c'è, rosso manca, giallo meno */
+.sem-top{display:flex;align-items:center;gap:12px;margin:14px 0 8px}
+.sem-bar{flex:1;height:8px;border-radius:99px;background:var(--sunk);border:1px solid var(--line);overflow:hidden}.sem-bar i{display:block;height:100%;background:var(--mirto);transition:width .2s}
+.sem-cnt{font:600 15px var(--font);white-space:nowrap}
+.sem-leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin:0 0 10px}.sem-leg span{display:inline-flex;align-items:center;gap:6px}.sem-leg i{width:12px;height:12px;border-radius:50%;background:var(--k)}
+.sem{--k:var(--sand);--bgk:var(--surface);border:1px solid var(--line);border-left:6px solid var(--k);border-radius:14px;background:var(--bgk);margin:8px 0}
+.sem.s-ok{--k:var(--mirto);--bgk:var(--mirto-soft)}.sem.s-ko{--k:var(--corallo);--bgk:var(--corallo-soft)}.sem.s-meno{--k:var(--ocra);--bgk:var(--ocra-soft)}
+.sem-b{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:10px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sem-b:focus-visible{outline:2px solid var(--lagoon);outline-offset:-2px;border-radius:12px}
+.sem-d{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--k);color:#fff}.sem.s-no .sem-d{background:transparent;border:2px dashed var(--sand)}.sem-d .ic{width:20px;height:20px}
+.sem-i{flex:1;min-width:0}.sem-n{display:block;font:500 16.5px/1.25 var(--font);color:var(--ink)}.sem-m{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.sem-l{font:600 14px var(--font);color:var(--k);white-space:nowrap}.sem.s-no .sem-l{color:var(--muted);font-weight:500}
+.sem-q{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 12px 12px 58px;font-size:14px;color:var(--ink2)}
 .bolla{display:grid;gap:8px;justify-items:start;margin:4px 0}
 .bolla img{max-height:320px;border-radius:12px;border:1px solid var(--line)}
 .row.link span.btn{pointer-events:none}
@@ -669,8 +688,13 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=11;
+const APP_VER=12;
 const NEWS=[
+  {v:12,data:'2026-10-04',titolo:'Controllo merce a colori e invii sicuri',
+    tutti:['Controllo della merce più semplice: tocca ogni prodotto. 1 tocco verde «c\'è», 2 tocchi rosso «manca», 3 tocchi giallo «ne è arrivato meno» (scegli quanti). In alto vedi quanti ne hai fatti, per esempio «9 di 14». Se è tutto giusto basta «È arrivato tutto».','Se manca la rete, in alto compare «Non ancora arrivata a Maurizio»: la richiesta parte da sola appena torna la rete e vedi «Arrivata ✓». Se hai fretta c\'è il pulsante «Manda SMS».'],
+    chef:['In approvazione la richiesta è divisa in blocchi colorati, uno per fornitore. Con «+ Aggiungi da …» dentro il blocco aggiungi prodotti cercando solo nel listino di quel fornitore.','I prodotti senza fornitore sono in un blocco rosso: scegli il fornitore prima di approvare.','Nel controllo merce ora vedi anche i prodotti «non controllati».'],
+    dev:{aggiunte:['`reqPickSheet` (azioni `rpick`, `rpadd`): righe aggiunte dallo chef con `aggiunto:true` e `qtaOrig:0`, non finiscono in `rimossi`.','Semaforo in `receiveSheet`: `rcvState().lines[i].st` (`\'\'`/`ok`/`ko`/`meno`), `SEM`, `SEM_NEXT`, azione `rst`; `ricezione.righe` invariato con nuovo motivo `nonctrl` e campo `nonControllati` sull\'ordine.','Invii in sospeso: `pushSend` mette in coda (IndexedDB `jona-outbox`) le push non partite; `obxFlush` su `online`, apertura, `visibilitychange` e ogni minuto; `sw.js` con Background Sync (`jona-outbox`); `navigator.setAppBadge`; `obxBar`/`obxTick` con «Arrivata ✓».'],
+      noti:['Background Sync non c\'è su iPhone: lì le push in coda partono solo ad app aperta. Le scritture Firestore in sospeso ripartono solo ad app aperta.']}},
   {v:11,data:'2026-10-04',titolo:'Guida alle notifiche',
     tutti:['Se le notifiche non si attivano o non arrivano, c\'è una guida semplice per il tuo telefono (iPhone, Xiaomi, Samsung, Huawei, Oppo e altri): tocca la tua foto → «Problemi con le notifiche? Guida». Si apre da sola anche quando qualcosa va storto.'],
     dev:{aggiunte:['`pushHelp()` con `PUSH_HELP` (passi per marca, marca indovinata da `userAgent` quando possibile, `S.pushBrand`); `pushOn` apre la guida sugli errori e restituisce `true` se riesce.']}},
@@ -939,7 +963,9 @@ function onNewNotifs(snap){
     if(n.a===me.id||(isGM(me)&&n.a==='gm')||(isMgr(me)&&n.a==='gestori')){toast(n.titolo+(n.testo?': '+n.testo:''));try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}}
   }
 }
-async function notify(a,titolo,testo,tipo,rif){const me=meU();await put('notifiche',uid(),{a,titolo,testo:testo||'',tipo:tipo||'',rif:rif||'',letta:false,creato:now(),da:me?me.id:''});pushSend(a,titolo,testo)}
+async function notify(a,titolo,testo,tipo,rif){const me=meU();
+  if((a==='gm'||a==='gestori')&&S.db&&S.db.kind==='firebase'){S.obxWait=now();S.obxMsg={titolo,testo:testo||''};setTimeout(schedule,4500)}
+  await put('notifiche',uid(),{a,titolo,testo:testo||'',tipo:tipo||'',rif:rif||'',letta:false,creato:now(),da:me?me.id:''});pushSend(a,titolo,testo)}
 /* ================= notifiche push (server: worker/, sw.js) =================
    Ogni telefono che le attiva salva la sua iscrizione in «push/<id>» e notify() avvisa anche con l'app chiusa.
    Lette e scritte direttamente su Firestore, fuori da S.db: se le regole non hanno ancora «push» l'app non si blocca. */
@@ -990,10 +1016,52 @@ async function pushOff(){const id=ls('jona_push');ls('jona_push',null);
 function pushUnlink(){const id=ls('jona_push');if(id&&pushFb())pushCol().doc(id).delete().catch(()=>{})}
 async function pushPost(list,titolo,testo){
   const r=await fetch(PUSH_URL+'/invia',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({titolo,testo,subs:list.map(([,p])=>p.sub)})});
-  const j=await r.json();const dead=new Set(j.scaduti||[]);for(const [id,p] of list)if(dead.has(p.sub.endpoint))pushCol().doc(id).delete().catch(()=>{});return j}
-async function pushSend(a,titolo,testo){try{pushWatch();const st=D().staff,mine=ls('jona_push');
-  const list=Object.entries(PUSH.subs).filter(([id,p])=>{const u=st[p.u];return id!==mine&&!!u&&u.stato==='attivo'&&(p.u===a||(a==='gm'&&isGM(u))||(a==='gestori'&&isMgr(u)))});
-  if(list.length)await pushPost(list,titolo,testo)}catch(e){}}
+  if(!r.ok)throw new Error('invia '+r.status);
+  const j=await r.json();const dead=new Set(j.scaduti||[]);try{for(const [id,p] of list)if(dead.has(p.sub.endpoint))pushCol().doc(id).delete().catch(()=>{})}catch(e){}return j}
+async function pushSend(a,titolo,testo){let list=[];try{pushWatch();const st=D().staff,mine=ls('jona_push');
+  list=Object.entries(PUSH.subs).filter(([id,p])=>{const u=st[p.u];return id!==mine&&!!u&&u.stato==='attivo'&&(p.u===a||(a==='gm'&&isGM(u))||(a==='gestori'&&isMgr(u)))});
+  if(!list.length)return;if(navigator.onLine===false)throw new Error('offline');await pushPost(list,titolo,testo)}
+  catch(e){if(list.length)obxAdd({id:uid(),a,titolo,testo:testo||'',subs:list.map(([id,p])=>({id,sub:p.sub})),creato:now()})}}
+/* ================= invii in sospeso =================
+   Le push non partite (senza rete o server irraggiungibile) restano in IndexedDB «jona-outbox» e ripartono con la rete,
+   all'apertura, quando l'app torna in primo piano e ogni minuto. Su Android le manda anche sw.js con l'app chiusa (Background Sync).
+   L'avviso fisso resta finché le push sono in coda o la richiesta allo chef non è ancora sul database (scritture in sospeso). */
+const OBX={list:[],busy:false};
+const OBX_MAX=864e5;
+function obxDb(){return obxDb.p||(obxDb.p=new Promise((res,rej)=>{const r=indexedDB.open('jona-outbox',1);r.onupgradeneeded=()=>r.result.createObjectStore('q',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>{obxDb.p=null;rej(r.error)}}))}
+async function obxTx(mode,f){const db=await obxDb();return new Promise((res,rej)=>{const t=db.transaction('q',mode);const q=f(t.objectStore('q'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})}
+function obxBadge(){try{const n=OBX.list.length;if(navigator.setAppBadge)(n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{})}catch(e){}}
+async function obxSyncReg(){try{const st=S.db&&S.db.kind==='firebase'?S.db.status():null;if(!OBX.list.length||(st&&st.pend))return;const reg=await navigator.serviceWorker.ready;if(reg.sync)await reg.sync.register('jona-outbox')}catch(e){}}
+async function obxAdd(x){OBX.list.push(x);S.obxShown=true;obxBadge();schedule();try{await obxTx('readwrite',st=>st.put(x))}catch(e){}obxSyncReg()}
+async function obxLoad(){try{const l=await obxTx('readonly',st=>st.getAll());if(Array.isArray(l)){OBX.list=l.sort((a,b)=>a.creato-b.creato);if(l.length)S.obxShown=true}}catch(e){}obxBadge();schedule()}
+async function obxFlush(){
+  if(OBX.busy||!OBX.list.length||document.hidden||navigator.onLine===false)return;OBX.busy=true;
+  try{for(const x of OBX.list.slice()){
+    if(now()-x.creato<OBX_MAX)try{await pushPost(x.subs.map(s=>[s.id,{sub:s.sub}]),x.titolo,x.testo)}catch(e){break}
+    OBX.list=OBX.list.filter(y=>y.id!==x.id);try{await obxTx('readwrite',st=>st.delete(x.id))}catch(e){}}}
+  finally{OBX.busy=false;obxBadge();schedule()}}
+function obxWaiting(){if(OBX.list.length)return true;if(!S.obxWait||!S.db||S.db.kind!=='firebase')return false;const st=S.db.status();return st.pend>0&&(!st.net||now()-S.obxWait>4000)}
+const gmNome=()=>{const u=Object.values(D().staff||{}).find(x=>isGM(x)&&x.stato==='attivo');return u?u.nome:''};
+const gmA=()=>gmNome()?'a '+gmNome():'allo chef';
+const obxToGm=()=>OBX.list.some(x=>x.a==='gm'||x.a==='gestori')||(!OBX.list.length&&!!S.obxWait);
+// chiamata a ogni render: quando tutto è partito dopo un avviso, conferma «Arrivata ✓» con vibrazione
+function obxTick(){
+  if(obxWaiting()){if(!S.obxShown)S.obxShown=true;S.obxGm=obxToGm();return}
+  if(S.obxWait&&!(S.db&&S.db.kind==='firebase'&&S.db.status().pend))S.obxWait=0;
+  if(!S.obxShown||S.obxWait)return;S.obxShown=false;
+  toast(S.obxGm?'Arrivata ✓ '+gmA():'Avvisi partiti ✓');try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(e){}
+}
+function obxBar(){
+  if(!obxWaiting())return'';const n=OBX.list.length;const gm=obxToGm();const chi=gmNome()||'chef';
+  const last=[...OBX.list].reverse().find(x=>x.a==='gm'||x.a==='gestori')||S.obxMsg||{titolo:'Ti ho mandato una richiesta',testo:''};
+  const sms='sms:?&body='+encodeURIComponent('Ciao '+chi+', su Jona Ordini: '+last.titolo+(last.testo?'. '+last.testo:''));
+  return`<div class="obx" role="status">${ic('warn')}<div class="obx-i"><b>${gm?'Non ancora arrivata '+esc(gmA()):(n===1?'Un avviso non ancora partito':n+' avvisi non ancora partiti')}</b><span>${navigator.onLine===false?'Manca la rete: parte da sola appena torna.':'Riprovo da solo.'} Tieni aperta l'app finché vedi «Arrivata ✓».</span></div>
+  <div class="obx-b"><button type="button" class="btn ghost sm" data-a="obxGo">${ic('send')} Riprova</button>${gm?`<a class="btn ghost sm" href="${esc(sms)}">${ic('chat')} Manda SMS</a>`:''}</div></div>`;
+}
+addEventListener('online',()=>obxFlush());
+document.addEventListener('visibilitychange',()=>{if(document.hidden)obxSyncReg();else obxLoad().then(obxFlush)});
+setInterval(()=>{if(OBX.list.length)obxFlush()},60000);
+setTimeout(()=>obxLoad().then(obxFlush),3000);
 async function pushTest(){const id=ls('jona_push'),p=PUSH.subs[id];if(!p)return toast('Iscrizione non ancora salvata: riprova tra qualche secondo.','err');
   const j=await pushPost([[id,p]],'Prova notifica','Se leggi questo messaggio, le notifiche funzionano.');
   toast(j.inviati?'Notifica inviata: arriva tra pochi secondi':'Notifica non partita. Spegni e riattiva le notifiche.',j.inviati?'':'err')}
@@ -1009,7 +1077,7 @@ function paint(el,html){
   if(id){const n=document.getElementById(id);if(n){n.focus({preventScroll:true});try{if(s1!=null)n.setSelectionRange(s1,s2)}catch(e){}}}
 }
 function render(){
-  const html=view();
+  obxTick();const html=view();
   document.documentElement.classList.toggle('on-wall',S.wallMode);
   document.documentElement.classList.toggle('staff-ui',!S.wallMode&&!isMgr(meU()));
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
@@ -1081,7 +1149,7 @@ const localNote=()=>S.db&&S.db.kind==='locale'?`<p class="local-note">Versione d
 /* ================= accesso ================= */
 function screenLogin(){
   const L=S.login;
-  return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Ordini di cucina e sala</p>
+  return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Ordini di cucina e sala</p>${obxBar()}
   <form class="wall-card login" data-form="login" autocomplete="on" onsubmit="return false"><h1>Accedi</h1>
   <label class="lbl" for="li-u">Nome utente</label><input class="inp" id="li-u" autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(L.u)}" data-in="login" data-k="u">
   <label class="lbl" for="li-p">Password</label><input class="inp" id="li-p" type="password" autocomplete="current-password" value="${esc(L.p)}" data-in="login" data-k="p" enterkeyhint="go">
@@ -1168,7 +1236,7 @@ function shell(me){
   return`<nav class="nav n${tabs.length}" aria-label="Sezioni"><div class="nav-brand"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div>${tabs.map(t=>{const b=t.b?t.b():0;return`<button type="button" data-a="tab" data-v="${t.id}" ${S.tab===t.id?'aria-current="page"':''}>${ic(t.i)}<span>${t.l}</span>${b?`<span class="badge">${b>99?'99+':b}</span>`:''}</button>`}).join('')}</nav>
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?'':micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?'':micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -1308,7 +1376,7 @@ function reqStatus(r){
 function groupByF(items){const g=new Map();for(const it of items){const k=it.fornitoreId||'';if(!g.has(k))g.set(k,[]);g.get(k).push(it)}return[...g.entries()]}
 function itemsRO(r){
   return groupByF(r.items||[]).map(([fid,its])=>`<div class="fsec"><div class="fsec-h"><span class="sup" style="--c:${fcolor(fid)}"><i></i>${fid?esc(forn(fid).nome||its[0].fornitoreNome):'Da assegnare'}</span>${r.ordinati&&r.ordinati[fid]?`<span class="muted small">ordinato ${ago(r.ordinati[fid])}</span>`:''}</div>
-  ${its.map(it=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(it.nome)}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice)+' ':''}${it.qtaOrig!=null&&it.qtaOrig!==it.qta?`<span class="was">chiesti ${fq(it.qtaOrig)}, lo chef ha messo ${fq(it.qta)}</span>`:''}</div></div><b>${fq(it.qta)}</b><span class="ln-u">${esc(it.unita||'')}</span></div>`).join('')}</div>`).join('')
+  ${its.map(it=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(it.nome)}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice)+' ':''}${it.aggiunto?'<span class="was">aggiunto dallo chef</span>':it.qtaOrig!=null&&it.qtaOrig!==it.qta?`<span class="was">chiesti ${fq(it.qtaOrig)}, lo chef ha messo ${fq(it.qta)}</span>`:''}</div></div><b>${fq(it.qta)}</b><span class="ln-u">${esc(it.unita||'')}</span></div>`).join('')}</div>`).join('')
   +((r.rimossi&&r.rimossi.length)?`<p class="removed">Tolti dallo chef: ${esc(r.rimossi.map(x=>x.nome).join(', '))}</p>`:'');
 }
 function reqSummary(r,who){
@@ -1380,7 +1448,7 @@ function reqCard(r){
   <header class="req-h">${avatar(u,46)}<div class="req-who"><div class="req-n">${esc(r.utenteNome)}</div><div class="req-m">${esc([r.mansione,REPARTI[r.reparto]].filter(Boolean).join(', '))}</div></div><time class="req-t">${ago(r.creato)}</time></header>
   ${r.nota?`<p class="req-note">${esc(r.nota)}</p>`:''}
   ${r.doppi&&r.doppi.length?`<div class="banner dup" role="note">${ic('warn')}<div><b>Possibile doppione.</b> Già chiesto nelle ultime 24 ore:<ul>${r.doppi.slice(0,5).map(d=>`<li>${esc(d.nome)}: chiesto da ${esc(d.da||'?')} ${esc(quandoAlle(d.quando))}</li>`).join('')}</ul>Decidi tu se ordinarlo di nuovo.</div></div>`:''}
-  ${groupByF(items).map(([fid,its])=>{const f=forn(fid);const m=fid&&METODI[f.metodo];return`<div class="fsec"><div class="fsec-h"><span class="sup" style="--c:${fcolor(fid)}"><i></i>${fid?esc(f.nome):'Fuori listino, scegli il fornitore'}</span>${m?`<span class="muted small">${ic(m.i)} ${m.l}</span>`:''}</div>${its.map(it=>gmLine(r.id,it)).join('')}</div>`}).join('')}
+  ${groupByF(items).map(([fid,its])=>{const f=forn(fid);const m=fid&&METODI[f.metodo];return`<div class="fsec fblk${fid?'':' nof'}" style="--c:${fcolor(fid)}"><div class="fsec-h"><span class="sup"><i></i>${fid?esc(f.nome):'Senza fornitore'}</span>${m?`<span class="muted small">${ic(m.i)} ${m.l}</span>`:''}</div>${fid?'':`<p class="nof-h">${ic('warn')} Scegli il fornitore: senza non si può approvare.</p>`}${its.map(it=>gmLine(r.id,it)).join('')}${fid?`<button type="button" class="btn ghost sm block fadd" data-a="rpick" data-r="${r.id}" data-f="${fid}">${ic('plus')} Aggiungi da ${esc(f.nome)}</button>`:''}</div>`}).join('')}
   ${items.length?'':'<p class="muted" style="padding:0 16px">Hai tolto tutti gli articoli: puoi rifiutare la richiesta.</p>'}
   ${tot?`<div class="total"><span>Totale stimato</span><b>${eur(tot)}</b></div>`:''}
   <div class="req-f"><input class="inp" id="gmn-${r.id}" placeholder="Nota per ${esc(firstName(r.utenteNome))} (facoltativa)" value="${esc(S.gmn[r.id]||'')}" data-in="gmn" data-r="${r.id}">
@@ -1390,16 +1458,27 @@ function gmLine(rid,it){
   let sw='';
   if(it.libero)sw=`<select class="inp sm" id="rsup-${rid}-${it.idx}" data-ch="rsup" data-r="${rid}" data-i="${it.idx}" aria-label="Fornitore"><option value="">Scegli il fornitore…</option>${Object.values(D().fornitori).sort(byNome).map(f=>`<option value="${f.id}" ${it.fornitoreId===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}</select>`;
   else{const alts=altsOf(it);if(alts.length>1)sw=`<select class="inp sm" id="rsw-${rid}-${it.idx}" data-ch="rswap" data-r="${rid}" data-i="${it.idx}" aria-label="Cambia fornitore">${alts.map(p=>`<option value="${p.id}" ${p.id===it.pid?'selected':''}>${esc(forn(p.fornitoreId).nome)}${p.prezzo!=null?', '+eur(p.prezzo)+(p.unita?' / '+p.unita:''):''}</option>`).join('')}</select>`}
-  const ch=it.qtaOrig!=null&&it.qtaOrig!==it.qta;
-  return`<div class="line wrap"><div class="ln-i"><div class="ln-n">${esc(it.nome)}${it.libero?' <span class="tag">fuori listino</span>':''}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice):''}${it.prezzo!=null?' '+eur(it.prezzo)+(it.unita?' / '+esc(it.unita):''):''}${ch?` <span class="was">chiesti ${fq(it.qtaOrig)}</span>`:''}</div></div>
+  const ch=!it.aggiunto&&it.qtaOrig!=null&&it.qtaOrig!==it.qta;
+  return`<div class="line wrap"><div class="ln-i"><div class="ln-n">${esc(it.nome)}${it.libero?' <span class="tag">fuori listino</span>':''}${it.aggiunto?' <span class="tag gm">aggiunto da te</span>':''}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice):''}${it.prezzo!=null?' '+eur(it.prezzo)+(it.unita?' / '+esc(it.unita):''):''}${ch?` <span class="was">chiesti ${fq(it.qtaOrig)}</span>`:''}</div></div>
   ${stepper('rq',rid+'-'+it.idx,it.qta,`data-r="${rid}" data-i="${it.idx}"`)}<span class="ln-u">${esc(it.unita||'')}</span><button type="button" class="icon-btn" data-a="rrm" data-r="${rid}" data-i="${it.idx}" aria-label="Togli ${esc(it.nome)}">${ic('x')}</button>${sw?`<div class="ln-x">${sw}</div>`:''}</div>`;
+}
+// «+ Aggiungi» dentro il blocco di un fornitore: cerca solo nel suo listino, così ogni prodotto aggiunto ha già il fornitore.
+function reqPickSheet(rid,fid){
+  S.pkq='';
+  openSheet({cls:'tall',render:()=>{const r=D().richieste[rid];if(!r||r.stato!=='inviata')return'<p class="muted">Questa richiesta non è più da approvare.</p>';
+    const f=forn(fid);const q=norm(S.pkq);const toks=q?q.split(' '):[];const its=itemsOf(r);
+    const list=prods().filter(p=>p.fornitoreId===fid&&(!toks.length||toks.every(t=>norm(p.nome+' '+(p.codice||'')).includes(t)))).sort(byNome).slice(0,120);
+    return`<div class="grab"></div><div class="sh-h"><span class="fdot lg" style="--c:${fcolor(fid)}">${esc((f.nome||'?').charAt(0))}</span><div class="sh-t">Aggiungi da ${esc(f.nome)}<div class="sh-s">Alla richiesta di ${esc(firstName(r.utenteNome))}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+    <div class="search" style="box-shadow:none;border-color:var(--line)">${ic('search')}<input id="rpq" type="search" placeholder="Cerca nel listino di ${esc(f.nome)}" value="${esc(S.pkq)}" data-in="pkq" autocomplete="off"></div>
+    <div>${list.length?list.map(p=>{const inR=its.find(x=>x.pid===p.id);return`<div class="prow"><div class="row-i"><div class="row-t">${esc(p.nome)}</div><div class="row-m">${p.codice?'cod. '+esc(p.codice)+', ':''}${p.prezzo!=null?eur(p.prezzo)+(p.unita?' / '+esc(p.unita):''):esc(p.unita||'')}${inR?`, nella richiesta: ${fq(inR.qta)}`:''}</div></div><button type="button" class="add" data-a="rpadd" data-r="${rid}" data-p="${p.id}" aria-label="Aggiungi ${esc(p.nome)}">${ic('plus')}</button></div>`}).join(''):`<p class="muted">Nessun prodotto${q?' trovato':' a listino'}.</p>`}</div>
+    <div class="sheet-foot"><button type="button" class="btn primary block" data-a="closeSheet">Fatto</button></div>`}});
 }
 async function approve(rid){
   const r=D().richieste[rid];if(!r||r.stato!=='inviata')return;const me=meU();
   let items=clone(itemsOf(r)).filter(i=>Number(i.qta)>0);
   if(!items.length)return toast('La richiesta è vuota: rifiutala.','warn');
   const miss=items.find(i=>!i.fornitoreId);if(miss)return toast('Scegli il fornitore per «'+miss.nome+'».','warn');
-  const removed=(S.removed[rid]||[]).concat(itemsOf(r).filter(i=>!(Number(i.qta)>0)).map(i=>({nome:i.nome,qta:i.qtaOrig??i.qta})));
+  const removed=(S.removed[rid]||[]).concat(itemsOf(r).filter(i=>!i.aggiunto&&!(Number(i.qta)>0)).map(i=>({nome:i.nome,qta:i.qtaOrig??i.qta})));
   let modified=removed.length>0;
   items=items.map(i=>{if(i.qtaOrig!=null&&i.qtaOrig!==i.qta)modified=true;else delete i.qtaOrig;if(i.cambiato)modified=true;return i});
   const notaGM=(S.gmn[rid]||'').trim();
@@ -1670,9 +1749,14 @@ function pickSheet(fid){
 }
 
 /* ================= arrivi: controllo merce ================= */
-const MOTIVI={'':'Arrivato giusto',quantita:'Quantità diversa',mancante:'Mancante',danneggiato:'Danneggiato',sbagliato:'Articolo sbagliato'};
+// motivo in ricezione.righe (Storico e report): '' giusto, quantita, mancante, nonctrl; danneggiato/sbagliato solo nei controlli vecchi.
+const MOTIVI={'':'Arrivato giusto',quantita:'Quantità diversa',mancante:'Mancante',danneggiato:'Danneggiato',sbagliato:'Articolo sbagliato',nonctrl:'Non controllato'};
+// semaforo: '' da controllare → ok c'è → ko manca → meno (arrivato meno) → ok …
+const SEM={'':['no','da controllare',''],ok:['ok',"c'è",'check'],ko:['ko','manca','x'],meno:['meno','meno','minus']};
+const SEM_NEXT={'':'ok',ok:'ko',ko:'meno',meno:'ok'};
+const rcvDiff=L=>L.st==='ko'||(L.st==='meno'&&L.arr!==L.qta);
 const consegnaTxt=c=>c?fdate(new Date(c+'T12:00').getTime()):'';
-function rcvState(oid){if(!S.rcv[oid]){const o=D().ordini[oid];S.rcv[oid]={lines:(o?o.items:[]).map(l=>({qta:l.qta,arr:l.qta,motivo:''})),note:'',foto:''}}return S.rcv[oid]}
+function rcvState(oid){if(!S.rcv[oid]){const o=D().ordini[oid];S.rcv[oid]={lines:(o?o.items:[]).map(l=>({qta:l.qta,arr:l.qta,st:''})),note:'',foto:''}}return S.rcv[oid]}
 function vArrivi(){
   const all=Object.values(D().ordini);
   const pend=all.filter(o=>o.stato==='inviato'&&!o.ricevuto).sort((a,b)=>String(a.consegna||'9').localeCompare(String(b.consegna||'9'))||(a.inviato-b.inviato));
@@ -1681,23 +1765,24 @@ function vArrivi(){
   return`<h1 class="vt">Arrivi</h1><p class="vsub">${pend.length?(pend.length===1?'Una consegna':pend.length+' consegne')+' da controllare':'Nessuna consegna in attesa'}</p>
   ${pend.length?`<div class="panel">${pend.map(o=>`<button type="button" class="row link" data-a="rcvOpen" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${o.items.length} ${o.items.length===1?'articolo':'articoli'}, ordinato ${ago(o.inviato)}${o.consegna?', consegna '+consegnaTxt(o.consegna):''}</div></div><span class="btn primary sm">Controlla</span></button>`).join('')}</div>`
   :empty('box','Niente in arrivo','Quando Maurizio invia un ordine a un fornitore, compare qui per il controllo della merce.')}
-  ${done.length?`<h2 class="sec">Controllati di recente</h2><div class="panel">${done.map(o=>`<button type="button" class="row link" data-a="rcvView" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${esc(o.ricevutoNome||'')} ${ago(o.ricevuto)}</div></div>${o.differenze?pill('wait',o.differenze===1?'1 differenza':o.differenze+' differenze'):pill('ok','tutto ok')}</button>`).join('')}</div>`:''}`;
+  ${done.length?`<h2 class="sec">Controllati di recente</h2><div class="panel">${done.map(o=>`<button type="button" class="row link" data-a="rcvView" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${esc(o.ricevutoNome||'')} ${ago(o.ricevuto)}</div></div>${o.differenze?pill('wait',o.differenze===1?'1 differenza':o.differenze+' differenze'):o.nonControllati?pill('wait',o.nonControllati+' non controllati'):pill('ok','tutto ok')}</button>`).join('')}</div>`:''}`;
 }
 function receiveSheet(oid){
   openSheet({cls:'tall',render:()=>{const o=D().ordini[oid];if(!o)return'<p class="muted">Ordine non trovato.</p>';const f=forn(o.fornitoreId);
     if(o.ricevuto)return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(f.nome)}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div><p>Questa consegna è già stata controllata da ${esc(o.ricevutoNome||'')}.</p>`;
-    const R=rcvState(oid);const nd=R.lines.filter(l=>l.motivo||l.arr!==l.qta).length;
+    const R=rcvState(oid);const nd=R.lines.filter(rcvDiff).length;const tot=R.lines.length;const fatti=R.lines.filter(l=>l.st).length;
     return`<div class="grab"></div><div class="sh-h"><span class="fdot lg" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="sh-t">Controllo merce<div class="sh-s">${esc(f.nome)}, ordinato ${ago(o.inviato)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-    <p class="muted" style="margin-top:0">Confronta la merce con l'ordine. Se è tutto giusto basta un tocco.</p>
+    <p class="muted" style="margin-top:0">Se è tutto giusto basta un tocco.</p>
     <button type="button" class="btn primary block big" data-a="rcvAll" data-o="${oid}" ${nd?'disabled':''}>${ic('check')} È arrivato tutto</button>
-    <h2 class="sec">Oppure segna le differenze</h2>
-    <div>${o.items.map((l,i)=>{const L=R.lines[i];const bad=L.motivo||L.arr!==L.qta;return`<div class="rc ${bad?'bad':''}"><div class="ln-i"><div class="ln-n">${esc(l.nome)}</div><div class="ln-m">ordinati ${fq(l.qta)} ${esc(l.unita||'')}${l.codice?', cod. '+esc(l.codice):''}</div>
-      <select class="inp sm" id="rm-${oid}-${i}" data-ch="rmot" data-o="${oid}" data-i="${i}" aria-label="Esito ${esc(l.nome)}">${Object.entries(MOTIVI).map(([k,t])=>`<option value="${k}" ${L.motivo===k?'selected':''}>${t}</option>`).join('')}</select></div>
-      <div class="rc-q"><span class="muted small">arrivati</span>${stepper('rq2',oid+'-'+i,L.arr,`data-o="${oid}" data-i="${i}"`)}</div></div>`}).join('')}</div>
+    <h2 class="sec">Oppure tocca ogni prodotto</h2>
+    <div class="sem-leg"><span style="--k:var(--mirto)"><i></i>1 tocco: c'è</span><span style="--k:var(--corallo)"><i></i>2 tocchi: manca</span><span style="--k:var(--ocra)"><i></i>3 tocchi: ne è arrivato meno</span></div>
+    <div class="sem-top"><div class="sem-bar" aria-hidden="true"><i style="width:${tot?Math.round(fatti*100/tot):0}%"></i></div><span class="sem-cnt" id="sem-cnt">${fatti} di ${tot}</span></div>
+    <div>${o.items.map((l,i)=>{const L=R.lines[i];const [k,t,icn]=SEM[L.st||''];return`<div class="sem s-${k}"><button type="button" class="sem-b" id="sem-${oid}-${i}" data-a="rst" data-o="${oid}" data-i="${i}" aria-label="${esc(l.nome)}: ${t}. Tocca per cambiare"><span class="sem-d">${icn?ic(icn):''}</span><span class="sem-i"><span class="sem-n">${esc(l.nome)}</span><span class="sem-m">ordinati ${fq(l.qta)} ${esc(l.unita||'')}${l.codice?', cod. '+esc(l.codice):''}</span></span><span class="sem-l">${t}</span></button>
+      ${L.st==='meno'?`<div class="sem-q"><span>Quanti ne sono arrivati?</span>${stepper('rq2',oid+'-'+i,L.arr,`data-o="${oid}" data-i="${i}"`)}<span>${esc(l.unita||'')}</span></div>`:''}</div>`}).join('')}</div>
     <label class="lbl" for="rcv-note">Note</label><textarea class="inp" id="rcv-note" rows="2" placeholder="Es. pomodori troppo maturi" data-in="rcvnote" data-o="${oid}">${esc(R.note)}</textarea>
     <span class="lbl">Foto della bolla (facoltativa)</span>
     ${R.foto?`<div class="bolla"><img src="${R.foto}" alt="Foto della bolla"><button type="button" class="btn ghost sm danger" data-a="bollaDel" data-o="${oid}">${ic('trash')} Togli</button></div>`:`<div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="bollaCam" data-o="${oid}">${ic('camera')} Fotocamera</button><button type="button" class="btn ghost sm" data-a="bollaLib" data-o="${oid}">${ic('image')} Galleria</button></div>`}
-    <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Più tardi</button><button type="button" class="btn ${nd?'dark':'primary'}" data-a="rcvGo" data-o="${oid}">${ic('check')} ${nd?'Conferma con '+(nd===1?'1 differenza':nd+' differenze'):'Conferma controllo'}</button></div>`}});
+    <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Più tardi</button><button type="button" class="btn wrapt ${nd?'dark':'primary'}" data-a="rcvGo" data-o="${oid}" ${fatti?'':'disabled'}>${ic('send')} ${nd?'Invia con '+(nd===1?'1 differenza':nd+' differenze'):'Invia controllo'}</button></div>`}});
 }
 async function setBolla(oid,fs){
   const img=await loadImg(fs[0]);const sc=Math.min(1,1400/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
@@ -1705,19 +1790,23 @@ async function setBolla(oid,fs){
 }
 async function confirmReceipt(oid,all){
   const o=D().ordini[oid];if(!o||o.ricevuto)return;const R=rcvState(oid);const me=meU();const f=forn(o.fornitoreId);
-  const righe=o.items.map((l,i)=>{const L=all?{arr:l.qta,motivo:''}:R.lines[i];const motivo=L.motivo||(L.arr!==l.qta?'quantita':'');return{nome:l.nome,codice:l.codice||'',unita:l.unita||'',qta:l.qta,arr:L.arr,motivo}});
-  const diffs=righe.filter(r=>r.motivo);
-  await upd('ordini',oid,{ricevuto:now(),ricevutoDa:me.id,ricevutoNome:fullName(me),ricezione:{righe,note:all?'':R.note.trim(),foto:all?'':R.foto},differenze:diffs.length});
+  const nc0=all?0:R.lines.filter(l=>!l.st).length;
+  if(nc0&&!await ask(nc0===1?'Un prodotto non controllato':nc0+' prodotti non controllati','Puoi inviare lo stesso: Maurizio li vedrà come «non controllati».','Invia lo stesso'))return;
+  const righe=o.items.map((l,i)=>{const L=all?{st:'ok'}:R.lines[i];
+    const arr=L.st==='ko'?0:L.st==='meno'?L.arr:l.qta;const motivo=!L.st?'nonctrl':L.st==='ko'?'mancante':arr!==l.qta?'quantita':'';
+    return{nome:l.nome,codice:l.codice||'',unita:l.unita||'',qta:l.qta,arr,motivo}});
+  const diffs=righe.filter(r=>r.motivo&&r.motivo!=='nonctrl');const nc=righe.length-righe.filter(r=>r.motivo!=='nonctrl').length;
+  await upd('ordini',oid,{ricevuto:now(),ricevutoDa:me.id,ricevutoNome:fullName(me),ricezione:{righe,note:all?'':R.note.trim(),foto:all?'':R.foto},differenze:diffs.length,nonControllati:nc});
   for(const rid of o.richieste||[]){const r=D().richieste[rid];if(r)await upd('richieste',rid,{arrivati:Object.assign({},r.arrivati||{},{[o.fornitoreId]:now()})})}
   await notify('gm',diffs.length?`Consegna ${f.nome}: ${diffs.length===1?'1 differenza':diffs.length+' differenze'}`:`Consegna ${f.nome} arrivata`,
-    diffs.length?diffs.slice(0,3).map(d=>d.nome+' '+MOTIVI[d.motivo].toLowerCase()).join(', ')+(diffs.length>3?'…':''):'Controllata da '+me.nome+', tutto ok','arrivo',oid);
-  delete S.rcv[oid];closeSheet();toast(diffs.length?'Controllo salvato: Maurizio vede le differenze':'Consegna registrata, tutto ok');
+    (diffs.length?diffs.slice(0,3).map(d=>d.nome+' '+(d.motivo==='mancante'?'manca':'arrivati '+fq(d.arr)+' su '+fq(d.qta))).join(', ')+(diffs.length>3?'…':''):'Controllata da '+me.nome+(nc?'':', tutto ok'))+(nc?(diffs.length?'; ':', ')+nc+' non controllati':''),'arrivo',oid);
+  delete S.rcv[oid];closeSheet();toast(diffs.length?'Controllo inviato: Maurizio vede le differenze':nc?'Controllo inviato: '+nc+' non controllati':'Consegna registrata, tutto ok');
 }
 function receiptView(oid){
   openSheet({cls:'tall',render:()=>{const o=D().ordini[oid];if(!o||!o.ricevuto)return'<p class="muted">Controllo non trovato.</p>';const f=forn(o.fornitoreId);const rz=o.ricezione||{righe:[]};
     return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Consegna ${esc(f.nome)}<div class="sh-s">Controllata da ${esc(o.ricevutoNome||'')} ${ago(o.ricevuto)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-    ${o.differenze?'':`<p>${pill('ok','tutto arrivato')}</p>`}
-    <div>${rz.righe.map(r=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(r.nome)}</div><div class="ln-m">ordinati ${fq(r.qta)}, arrivati ${fq(r.arr)} ${esc(r.unita||'')}</div></div>${r.motivo?pill(r.motivo==='danneggiato'||r.motivo==='mancante'?'ko':'wait',MOTIVI[r.motivo]):pill('ok','ok')}</div>`).join('')}</div>
+    ${o.differenze||o.nonControllati?'':`<p>${pill('ok','tutto arrivato')}</p>`}
+    <div>${rz.righe.map(r=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(r.nome)}</div><div class="ln-m">ordinati ${fq(r.qta)}, arrivati ${fq(r.arr)} ${esc(r.unita||'')}</div></div>${r.motivo?pill(r.motivo==='danneggiato'||r.motivo==='mancante'?'ko':'wait',MOTIVI[r.motivo]||r.motivo):pill('ok','ok')}</div>`).join('')}</div>
     ${rz.note?`<p class="gm-note"><b>Note:</b> ${esc(rz.note)}</p>`:''}${rz.foto?`<div class="bolla"><img src="${rz.foto}" alt="Foto della bolla"></div>`:''}`}});
 }
 </script>
@@ -2605,9 +2694,14 @@ const A={
   vadd:()=>voiceAdd(),
   grp:d=>{S.grp=d.v;render()},
   rq:d=>{const x=draft(d.r);const it=x[+d.i];it.qta=Math.max(0,r3(it.qta+Number(d.d)));render()},
-  rrm:d=>{const x=draft(d.r);const [it]=x.splice(+d.i,1);S.removed[d.r].push({nome:it.nome,qta:it.qtaOrig??it.qta});render()},
+  rrm:d=>{const x=draft(d.r);const [it]=x.splice(+d.i,1);if(!it.aggiunto)S.removed[d.r].push({nome:it.nome,qta:it.qtaOrig??it.qta});render()},
   rreset:d=>{delete S.drafts[d.r];delete S.removed[d.r];render()},
   approve:d=>approve(d.r),
+  obxGo:()=>{if(navigator.onLine===false)return toast('Manca ancora la rete: parte da sola appena torna.','warn');obxFlush()},
+  rpick:d=>reqPickSheet(d.r,d.f),
+  rpadd:d=>{const p=D().prodotti[d.p];const r=D().richieste[d.r];if(!p||!r||r.stato!=='inviata')return;const x=draft(d.r);const it=x.find(i=>i.pid===p.id);
+    if(it)it.qta=r3(Number(it.qta)+1);else x.push({pid:p.id,nome:p.nome,codice:p.codice||'',unita:p.unita||'',prezzo:p.prezzo??null,fornitoreId:p.fornitoreId,fornitoreNome:forn(p.fornitoreId).nome,qta:1,qtaOrig:0,aggiunto:true});
+    repaint();toast('Aggiunto: '+p.nome)},
   reject:d=>reject(d.r),
   newOrder:()=>openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Ordine diretto</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div><p class="muted" style="margin-top:0">Scegli il fornitore e aggiungi tu i prodotti, senza passare da una richiesta.</p><div class="panel" style="box-shadow:none;border:1px solid var(--line)">${Object.values(D().fornitori).sort(byNome).map(f=>`<button type="button" class="row link" data-a="pickNew" data-f="${f.id}"><span class="fdot" style="--c:${fcolor(f.id)}">${esc(f.nome.charAt(0))}</span><div class="row-i"><div class="row-t">${esc(f.nome)}</div></div>${ic('chev')}</button>`).join('')}</div>`}),
   pickNew:d=>{closeSheet(true);pickSheet(d.f)},
@@ -2629,7 +2723,8 @@ const A={
   rpPer:d=>{rpState().per=d.v;refreshSheet()},
   rpAll:()=>{rpState().all=true;refreshSheet()},
   rpXls:()=>rpXlsx(),
-  rq2:d=>{const R=rcvState(d.o);const L=R.lines[+d.i];L.arr=Math.max(0,r3(L.arr+Number(d.d)));if(L.arr!==L.qta&&!L.motivo)L.motivo='quantita';if(L.arr===L.qta&&L.motivo==='quantita')L.motivo='';refreshSheet()},
+  rq2:d=>{const L=rcvState(d.o).lines[+d.i];L.arr=Math.max(0,r3(L.arr+Number(d.d)));refreshSheet()},
+  rst:d=>{const L=rcvState(d.o).lines[+d.i];L.st=SEM_NEXT[L.st||''];if(L.st==='meno')L.arr=L.qta>1?r3(L.qta-1):r3(L.qta/2);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}refreshSheet()},
   bollaCam:d=>pickFile({accept:'image/*',capture:'environment'},fs=>setBolla(d.o,fs)),
   bollaLib:d=>pickFile({accept:'image/*'},fs=>setBolla(d.o,fs)),
   bollaDel:d=>{rcvState(d.o).foto='';refreshSheet()},
@@ -2714,8 +2809,7 @@ const CH={
   rswap:t=>{const p=D().prodotti[t.value];if(!p)return;const x=draft(t.dataset.r);Object.assign(x[+t.dataset.i],{pid:p.id,nome:p.nome,codice:p.codice||'',unita:p.unita||'',prezzo:p.prezzo??null,fornitoreId:p.fornitoreId,fornitoreNome:forn(p.fornitoreId).nome,cambiato:true});render()},
   oqv:t=>{const v=num(t.value);return setOrderQty(t.dataset.o,+t.dataset.i,v==null?0:v)},
   ometasel:t=>{const o=D().ordini[t.dataset.o];if(o)metaOf(o)[t.dataset.k]=t.value},
-  rq2v:t=>{const R=rcvState(t.dataset.o);const L=R.lines[+t.dataset.i];L.arr=Math.max(0,num(t.value)||0);if(L.arr!==L.qta&&!L.motivo)L.motivo='quantita';refreshSheet()},
-  rmot:t=>{const R=rcvState(t.dataset.o);const L=R.lines[+t.dataset.i];L.motivo=t.value;if(t.value==='mancante')L.arr=0;if(!t.value)L.arr=L.qta;refreshSheet()},
+  rq2v:t=>{const L=rcvState(t.dataset.o).lines[+t.dataset.i];L.arr=Math.max(0,num(t.value)||0);refreshSheet()},
   rvsel:t=>{S.rev.items[+t.dataset.i].sel=t.checked;refreshSheet()},
   rvall:t=>{S.rev.items.forEach(i=>{if(i.fid)i.sel=t.checked});refreshSheet()},
   rvf:t=>{const it=S.rev.items[+t.dataset.i];it.fid=t.value;it.sel=!!t.value;refreshSheet()},

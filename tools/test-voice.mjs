@@ -2,6 +2,8 @@ import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 const OUT='/tmp/';
 const URL='http://localhost:8765/index.html';
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+// modalità locale: firebase-config.js nascosto (vedi README)
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c){fails++;process.exitCode=1}};
 // finto riconoscimento vocale: start() → risultato parziale, poi (se non window.__vhold) il risultato finale e onend
 const MOCK=()=>{

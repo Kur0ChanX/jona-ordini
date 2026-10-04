@@ -1,0 +1,127 @@
+// Con l'emulatore: approvazione divisa per fornitore, controllo arrivo a semaforo, invii in sospeso (coda delle push).
+import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const CFG={apiKey:'fake-key',authDomain:'demo-jona.firebaseapp.com',projectId:'demo-jona',appId:'1:1:web:1'};
+const KEY='B'+'A'.repeat(86);
+const sent=[];let down=false;
+const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,height:800},serviceWorkers:'block'});
+  await c.grantPermissions(['notifications'],{origin:'http://localhost:8765'});
+  await c.addInitScript(([cfg,name])=>{localStorage.setItem('jona_fb_emu',JSON.stringify('127.0.0.1'));if(cfg&&!localStorage.getItem('jona_fb'))localStorage.setItem('jona_fb',JSON.stringify(cfg));
+    const sub={endpoint:'https://fcm.googleapis.com/fcm/send/'+name,keys:{p256dh:'BX',auth:'Y'},toJSON(){return{endpoint:this.endpoint,keys:this.keys}},unsubscribe:async()=>true};
+    Object.defineProperty(navigator,'serviceWorker',{value:{register:async()=>({}),ready:Promise.resolve({pushManager:{getSubscription:async()=>window.__sub||null,subscribe:async()=>window.__sub=sub}})}});
+  },[cfg,name]);
+  await c.route('https://jona-notifiche.mario-miscera.workers.dev/**',async r=>{const u=r.request().url();
+    if(u.endsWith('/chiave'))return r.fulfill({json:{chiave:KEY}});
+    if(down)return r.fulfill({status:503,body:'giù'});
+    const body=JSON.parse(r.request().postData());sent.push({da:name,...body});
+    r.fulfill({json:{inviati:body.subs.length,scaduti:[],errori:[]}})});
+  const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));return [c,p]};
+const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const SHOT='/tmp/claude-0/-home-user-jona-ordini/227e7e5c-730e-5e29-b544-103e6d4f1d62/scratchpad/';
+const [,A]=await mk(CFG,'A');
+await A.goto('http://localhost:8765/index.html');await A.waitForTimeout(3000);
+await A.click('[data-a="formset"][data-v="dev"]');
+for(const [k,v] of Object.entries({nome:'Mario',cognome:'Test',username:'mario',pw:'prova1234',pw2:'prova1234'}))await A.fill('input[data-k="'+k+'"]',v);
+await A.click('[data-a="setupGo"]');await A.waitForTimeout(1200);
+await A.evaluate(()=>{fbActivate()});await A.waitForTimeout(300);await A.click('#ask-ok');await A.waitForTimeout(8000);
+ok(await A.evaluate(()=>S.db.kind==='firebase'&&S.db.status().ready),'A attivo su firebase');
+const [cb,B]=await mk(null,'B');await B.goto(await A.evaluate(()=>inviteLink()));await B.waitForTimeout(5000);
+await A.evaluate(()=>makeTestData());await A.waitForTimeout(3000);
+await B.fill('input[data-k="u"]','test1');await B.fill('input[data-k="p"]','prova123');await B.click('[data-a="doLogin"], .login .btn.primary');await B.waitForTimeout(1500);
+ok(await B.evaluate(()=>meU()&&meU().id==='test_u1'),'B entra come Luca (staff)');
+
+// ---------- 1. approvazione divisa per fornitore ----------
+await A.evaluate(async()=>{const r=D().richieste.test_r2;await upd('richieste','test_r2',{items:r.items.concat([{libero:true,nome:'Carta forno',qta:2,unita:'pz',fornitoreId:'',fornitoreNome:'',codice:'',prezzo:null}])})});
+await A.click('[data-a="viewAs"][data-v="gm"]');await A.waitForTimeout(600);
+await A.click('[data-a="tab"][data-v="richieste"]');await A.waitForTimeout(800);
+const c1=A.locator('article.panel',{hasText:'Luca Prova'});
+ok(await c1.locator('.fsec.fblk').count()===2,'richiesta di Luca: 2 blocchi colorati (uno per fornitore)');
+ok(await c1.locator('[data-a="rpick"]').count()===2,'ogni blocco ha «+ Aggiungi da …»');
+await c1.locator('[data-a="rpick"][data-f="test_f1"]').click();await A.waitForTimeout(400);
+const names=await A.$$eval('.sheet-wrap:last-child .prow .row-t',e=>e.map(x=>x.textContent));
+ok(names.length===4&&names.every(n=>['Basilico','Limoni','Pomodoro','Zucchine'].some(k=>n.startsWith(k))),'Aggiungi cerca solo nel listino del fornitore 1: '+names.join(', '));
+await A.fill('#rpq','limo');await A.waitForTimeout(300);
+ok(await A.locator('.sheet-wrap:last-child .prow').count()===1,'ricerca «limo»: 1 risultato');
+await A.click('.sheet-wrap:last-child [data-a="rpadd"]');await A.click('.sheet-wrap:last-child [data-a="rpadd"]');await A.waitForTimeout(300);
+await A.click('.sheet-wrap:last-child .sheet-foot [data-a="closeSheet"]');await A.waitForTimeout(400);
+ok(/aggiunto da te/.test(await c1.innerText())&&await A.evaluate(()=>{const x=S.drafts.test_r1.find(i=>i.pid==='test_p4');return x&&x.qta===2&&x.aggiunto&&x.fornitoreId==='test_f1'}),'Limoni aggiunti 2 volte → qta 2 nel blocco del fornitore 1');
+await c1.locator('[data-a="approve"]').click();await A.waitForTimeout(2500);
+ok(await B.evaluate(()=>{const o=D().ordini.aperto_test_f1;const r=D().richieste.test_r1;return o&&o.items.some(l=>l.pid==='test_p4'&&l.qta===2)&&r.modificata&&!(r.rimossi||[]).length}),'approvata: Limoni nell\'ordine del fornitore 1, richiesta «con modifiche», niente «tolti»');
+await B.click('[data-a="tab"][data-v="miei"]');await B.waitForTimeout(500);
+const c2=A.locator('article.panel',{hasText:'Sara Prova'});
+ok(await c2.locator('.fsec.fblk.nof').count()===1&&/senza non si può approvare/.test(await c2.innerText()),'prodotto scritto a mano: blocco rosso «Senza fornitore»');
+await c2.locator('[data-a="approve"]').click();await A.waitForTimeout(800);
+ok(await A.evaluate(()=>D().richieste.test_r2.stato==='inviata')&&/Scegli il fornitore per «Carta forno»/.test(await A.innerText('#toasts')),'senza fornitore non si approva');
+await A.screenshot({path:SHOT+'approva.png',fullPage:true});
+
+// ---------- 2. controllo arrivo a semaforo ----------
+const mkOrd=(id,n)=>A.evaluate(async([id,n])=>{const P=['test_p1','test_p2','test_p3','test_p4'].slice(0,n).map(k=>D().prodotti[k]);
+  await put('ordini',id,{fornitoreId:'test_f1',fornitoreNome:'Fornitore di prova 1',stato:'inviato',items:P.map((p,i)=>({key:p.id,pid:p.id,nome:p.nome,codice:p.codice,unita:p.unita,prezzo:p.prezzo,qta:[5,3,4,2][i],da:[]})),richieste:[],creato:now(),inviato:now(),test:true})},[id,n]);
+await mkOrd('test_o1',3);await mkOrd('test_o2',4);await B.waitForTimeout(1500);
+await B.evaluate(()=>receiveSheet('test_o1'));await B.waitForTimeout(400);
+const sh='.sheet-wrap:last-child ';
+ok(/0 di 3/.test(await B.innerText(sh+'#sem-cnt'))&&await B.locator(sh+'.sem.s-no').count()===3,'tutti grigi, contatore «0 di 3»');
+ok(await B.isDisabled(sh+'[data-a="rcvGo"]'),'Invia spento finché non si tocca niente');
+await B.click(sh+'#sem-test_o1-2');await B.click(sh+'#sem-test_o1-2');await B.click(sh+'#sem-test_o1-2');
+await B.click(sh+'#sem-test_o1-0');
+await B.click(sh+'#sem-test_o1-1');await B.click(sh+'#sem-test_o1-1');
+ok(await B.locator(sh+'.sem.s-ok').count()===1&&await B.locator(sh+'.sem.s-ko').count()===1&&await B.locator(sh+'.sem.s-meno').count()===1,'ordine libero: verde, rosso, giallo');
+ok(/3 di 3/.test(await B.innerText(sh+'#sem-cnt')),'contatore «3 di 3»');
+ok(await B.evaluate(()=>S.rcv.test_o1.lines[2].arr===3)&&await B.locator(sh+'.sem-q').count()===1,'giallo: quantità aperta (proposta 3 su 4)');
+await B.click(sh+'.sem-q [data-a="rq2"][data-d="-1"]');await B.waitForTimeout(100);
+ok(await B.isDisabled(sh+'[data-a="rcvAll"]')&&/Invia con 2 differenze/.test(await B.innerText(sh+'[data-a="rcvGo"]')),'con differenze: «È arrivato tutto» spento, «Invia con 2 differenze»');
+await B.setViewportSize({width:360,height:780});await B.waitForTimeout(200);
+ok(await B.evaluate(()=>document.documentElement.scrollWidth<=360),'semaforo a 360 px senza scorrimento orizzontale');
+await B.screenshot({path:SHOT+'semaforo.png'});
+await B.click(sh+'[data-a="rcvGo"]');await B.waitForTimeout(2500);
+const z=await A.evaluate(()=>{const o=D().ordini.test_o1;return{r:o.ricezione.righe.map(r=>[r.arr,r.motivo]),d:o.differenze,n:o.nonControllati}});
+ok(JSON.stringify(z.r)===JSON.stringify([[5,''],[0,'mancante'],[2,'quantita']])&&z.d===2&&z.n===0,'ricezione.righe: '+JSON.stringify(z));
+ok(await A.evaluate(()=>{const n=Object.values(D().notifiche).find(n=>n.tipo==='arrivo'&&n.rif==='test_o1');return n&&/2 differenze/.test(n.titolo)&&/manca/.test(n.testo)&&/arrivati 2 su 4/.test(n.testo)}),'notifica a Maurizio con manca e quantità');
+// invio parziale
+await B.evaluate(()=>receiveSheet('test_o2'));await B.waitForTimeout(400);
+await B.click(sh+'#sem-test_o2-0');await B.click(sh+'[data-a="rcvGo"]');await B.waitForTimeout(400);
+ok(/3 prodotti non controllati/.test(await B.innerText('.sheet-wrap:last-child')),'invio parziale: chiede conferma');
+await B.click('#ask-ok');await B.waitForTimeout(2500);
+const z2=await A.evaluate(()=>{const o=D().ordini.test_o2;return{r:o.ricezione.righe.map(r=>[r.arr,r.motivo]),d:o.differenze,n:o.nonControllati}});
+ok(JSON.stringify(z2.r)===JSON.stringify([[5,''],[3,'nonctrl'],[4,'nonctrl'],[2,'nonctrl']])&&z2.d===0&&z2.n===3,'non toccati = non controllati: '+JSON.stringify(z2));
+await A.evaluate(()=>receiptView('test_o2'));await A.waitForTimeout(400);
+ok((await A.innerText('.sheet-wrap:last-child')).split('Non controllato').length===4,'Storico/controllo: 3 «Non controllato»');
+await A.evaluate(()=>closeSheet(true));
+await B.evaluate(()=>{S.rcv={};receiveSheet('test_o1')});await B.waitForTimeout(300);await B.evaluate(()=>closeSheet(true));
+// «È arrivato tutto» resta
+await mkOrd('test_o3',2);await B.waitForTimeout(1500);
+await B.evaluate(()=>receiveSheet('test_o3'));await B.waitForTimeout(300);await B.click(sh+'[data-a="rcvAll"]');await B.waitForTimeout(2000);
+ok(await A.evaluate(()=>{const o=D().ordini.test_o3;return o.ricevuto&&o.differenze===0&&o.nonControllati===0&&o.ricezione.righe.every(r=>r.motivo==='')}),'«È arrivato tutto»: tutto giusto con un tocco');
+
+// ---------- 3. invii in sospeso ----------
+await A.click('[data-a="viewAs"][data-v="dev"]');await A.waitForTimeout(400);
+await A.evaluate(()=>pushOn());await A.waitForTimeout(1500);await B.waitForTimeout(1000);
+ok(await B.evaluate(()=>Object.values(PUSH.subs).some(p=>p.u===realU().id)===false&&Object.keys(PUSH.subs).length===1),'B vede l\'iscrizione di A');
+down=true;sent.length=0;
+await B.evaluate(()=>notify('gestori','Nuova richiesta da Luca','Cucina, 2 articoli'));await B.waitForTimeout(1500);
+ok(await B.evaluate(()=>OBX.list.length===1),'server giù: push in coda');
+ok(await B.isVisible('.obx')&&/Non ancora arrivata allo chef/.test(await B.innerText('.obx')),'avviso fisso «Non ancora arrivata»');
+ok(/^sms:\?&body=.*Nuova%20richiesta%20da%20Luca/.test(await B.getAttribute('.obx a.btn','href')),'pulsante Manda SMS con il testo pronto');
+await B.screenshot({path:SHOT+'sospeso.png'});
+await B.reload();await B.waitForTimeout(6000);
+ok(await B.evaluate(()=>OBX.list.length===1)&&await B.isVisible('.obx'),'dopo la riapertura la coda c\'è ancora');
+down=false;await B.evaluate(()=>dispatchEvent(new Event('online')));await B.waitForTimeout(1500);
+ok(sent.length===1&&sent[0].da==='B'&&sent[0].titolo==='Nuova richiesta da Luca','rete tornata: la push parte una volta sola');
+ok(await B.evaluate(()=>OBX.list.length===0)&&!await B.isVisible('.obx'),'coda vuota, avviso sparito');
+ok(/Arrivata ✓/.test(await B.innerText('#toasts')),'conferma «Arrivata ✓»');
+// telefono senza rete: scrittura e push in sospeso, poi partono da sole
+sent.length=0;await B.waitForTimeout(3500);
+await cb.setOffline(true);await B.waitForTimeout(500);
+await B.evaluate(()=>notify('gestori','Seconda richiesta','prova senza rete'));await B.waitForTimeout(1500);
+ok(await B.isVisible('.obx')&&await B.evaluate(()=>OBX.list.length===1),'senza rete: avviso e push in coda');
+await B.evaluate(()=>{window.__toasts=[];new MutationObserver(m=>m.forEach(x=>x.addedNodes.forEach(n=>window.__toasts.push(n.textContent)))).observe($('#toasts'),{childList:true})});
+await cb.setOffline(false);await B.waitForTimeout(8000);
+ok(sent.length===1&&sent[0].titolo==='Seconda richiesta','rete tornata: push partita');
+ok(await A.evaluate(()=>Object.values(D().notifiche).some(n=>n.titolo==='Seconda richiesta')),'la notifica è arrivata nel database');
+const tt=await B.evaluate(()=>window.__toasts);
+ok(!await B.isVisible('.obx')&&tt.filter(t=>/Arrivata ✓/.test(t)).length===1,'avviso sparito, «Arrivata ✓» una volta: '+JSON.stringify(tt)+' '+JSON.stringify(await B.evaluate(()=>[S.obxWait,S.obxShown,S.db.status()])));
+// pulizia
+await A.evaluate(()=>{delTestData()});await A.waitForTimeout(400);await A.click('#ask-ok');await A.waitForTimeout(4000);
+ok(await A.evaluate(()=>testCount())===0,'dati di prova cancellati');
+console.log('errors',A.errs,B.errs);await b.close();
