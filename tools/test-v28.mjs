@@ -104,6 +104,6 @@ await G.click('[data-a="addProfile"]');await G.waitForTimeout(400);await G.click
 ok(await G.evaluate(()=>!NAV.trap&&!NAV.skip),'closing with X removes the extra history entry');
 await back();
 ok(G.url()==='about:blank','nothing left to close → back leaves the app');
-ok(await P.evaluate(()=>NEWS[0].v===28&&APP_VER===28),'version 28 with news');
+ok(await P.evaluate(()=>NEWS.some(n=>n.v===28)&&APP_VER>=28),'version 28 with news');
 for(const [n,pg] of [['android',A],['iphone',I],['player',P],['back',G]])ok(!pg.errs.length,n+': no page errors '+pg.errs.join('; '));
 await b.close();
