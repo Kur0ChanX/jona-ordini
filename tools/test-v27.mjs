@@ -59,7 +59,7 @@ const p3=await pg.locator('.cht-b[data-id="x8"] p').boundingBox();await pg.mouse
 const g2=await pg.evaluate(()=>{const r=document.querySelector('.cht-rb'),m=document.querySelector('#ch-m').getBoundingClientRect();const p=document.querySelector('.cht-b[data-id="x8"]').getBoundingClientRect();return r&&{dn:r.classList.contains('dn'),ok:r.getBoundingClientRect().top>=m.top,pt:Math.round(p.top),mt:Math.round(m.top)}});
 ok(g2&&g2.dn&&g2.ok,'message at the top: bar below it, visible '+JSON.stringify(g2));
 await pg.click('.cht-rb [data-v="✅"]');await W(300);ok((await chips()).includes('x8:✅*'),'reaction from the bar below');
-ok(await pg.evaluate(()=>NEWS[0].v===27&&APP_VER===27),'version 27 with news');
+ok(await pg.evaluate(()=>NEWS.some(n=>n.v===27)&&APP_VER>=27),'version 27 with news');
 await pg.screenshot({path:'/tmp/claude-0/-home-user-jona-ordini/22576bef-aaba-583b-af6d-83af0e8af48c/scratchpad/v27-chips.png'});
 ok(errs.length===0,'no page errors '+errs.join(' | '));
 await b.close();

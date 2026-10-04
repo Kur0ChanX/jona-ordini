@@ -1,6 +1,7 @@
 # Passaggio di consegne (2026-10-04, sera)
 
 ## Stato attuale
+- **v28** sul ramo (`APP_VER=28`, `CACHE=jona-ordini-v32`), da pubblicare insieme alla v27: vocali leggibili su iPhone. Causa: Chrome Android con `audio/mp4` senza codec registra **Opus dentro l'MP4** (verificato: `isTypeSupported('audio/mp4')` sì, `mp4a.40.2` no), che l'iPhone non legge; inoltre su iPhone il play dopo lo scaricamento può essere rifiutato. Ora `chRec`: MediaRecorder solo con `mp4a.40.2`, MP4 semplice solo su iPhone/Safari (`chApple`), altrimenti `aacRec` (WebCodecs `AudioEncoder` AAC 32 kbps + ADTS, `audio/aac`, già accettato dal Worker), WebM/Opus per ultimo. `chPlay`: lettore unico `chAu` sbloccato con `ALG_SIL` dentro il tocco, barra con `dur` del messaggio. Prove: `test-v28` (18), `test-firebase-allegati` (22), `test-firebase-chat` (17), `test-v27` (20), `test-v26`, `test-v17` verdi. **Da provare dal vero**: Android → iPhone e iPhone → Android; i vocali vecchi (Opus) restano illeggibili su iPhone (messaggio «chiedi di rimandarlo»).
 - **v27** sul ramo `ccr-402d6602-imjwpw` (`APP_VER=27`, `CACHE=jona-ordini-v31`), da pubblicare: reazioni in chat 👍 ❤️ 😂 ✅ 😢 👎 (tenere premuto il messaggio o tasto destro) e «Copia» del testo. Dati in `messaggi/<id>.r.<persona>` (tolta con `FieldValue.delete()`), nessuna regola nuova. Funzioni: `CH_RE`, `chRx`, `chRb`, `chReact`, `chReOpen` (inserisce la barra senza ridisegnare: su iPhone il tocco non si perde), `chReClose`, `chRbFix` (barra sotto il messaggio se sopra non c'è posto), `chLp`. Prove: `test-v27` (20), `test-firebase-chat` (17, con le reazioni tra due telefoni), `test-v17`, `test-v26`, `test-firebase-allegati` (22) verdi.
 - **Gemini sul server attivo** (4 ottobre, 14:17): segreto `GEMINI_API_KEY` aggiunto, workflow #15 verde, `/salute` → `"gemini":true`; «Chiedi a Jona» provato da Mario sul telefono.
 - **v26** pronta (`APP_VER=26`, `CACHE=jona-ordini-v30`): foto e vocali in chat, reparti F&B Manager/Responsabile, guida «notifiche bloccate». Prove tutte verdi (nuove: `test-allegati-server` 25, `test-firebase-allegati` 22, `test-v26` 15).
@@ -22,8 +23,8 @@
 4. Il repository ora è `Kur0ChanX/jona-ordini` (GitHub segnala lo spostamento, i push funzionano).
 
 ## Richieste di Mario da fare (in ordine)
-1. **Vocale iPhone (urgente)**: Mauro Loi (iPhone) non sente il vocale mandato da Mario (Android, probabilmente WebM/Opus o MP4 da Chrome). Controllare `chRec` (formato scelto: su Android Chrome forse `audio/webm`, che Safari vecchio non legge) e `chPlay`; soluzione probabile: registrare sempre MP4/AAC se `MediaRecorder.isTypeSupported('audio/mp4')`, altrimenti avviso/ripiego; per i vocali WebM già inviati valutare messaggio chiaro su iPhone. Verificare anche Android ← iPhone.
-2. **Pubblicare v27** (Mario non ha ancora detto sì): PR → squash merge → controllo online → `git merge origin/main` sul ramo.
+1. **Vocale iPhone**: fatto in v28, manca la prova dal vero dopo la pubblicazione.
+2. **Pubblicare v27+v28** (Mario non ha ancora detto sì): PR → squash merge → controllo online → `git merge origin/main` sul ramo.
 3. **«Chi c'è in turno oggi»**: tasto ben visibile nella voce «Orari» dello staff e nel pianificatore (Staff → Orari) che mostra chi lavora oggi (da `tp` della settimana pubblicata), con orari.
 4. **Promemoria ordini**: Maurizio crea regole («ordinare Dolpa entro data e ora», a chi: staff/reparto/sé stesso, eventualmente ripetute); avviso appena l'utente entra nell'app (+ push all'orario); anche promemoria personali per Maurizio. Proporre prima lo schema (BRAINSTORMING) se ci sono dubbi.
 5. **Consumi e costi** più interattivo, animazioni moderne, facile da leggere (caricare la skill `dataviz` prima di toccare i grafici).

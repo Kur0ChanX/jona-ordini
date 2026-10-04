@@ -998,8 +998,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=27;
+const APP_VER=28;
 const NEWS=[
+  {v:28,data:'2026-10-04',titolo:'Vocali anche su iPhone',
+    tutti:['I vocali mandati da Android ora si ascoltano anche su iPhone. I vocali vecchi che l\'iPhone non riesce ad aprire vanno rimandati.'],
+    dev:{correzioni:['Chrome con `audio/mp4` senza codec registrava Opus dentro l\'MP4, illeggibile su iPhone: `chRec` usa MediaRecorder solo con `mp4a.40.2` (o MP4 semplice su iPhone/Safari, `chApple`), altrimenti `aacRec` (WebCodecs `AudioEncoder` AAC + intestazioni ADTS, `audio/aac`, 32 kbps), WebM/Opus per ultimo.','`chPlay` usa un solo lettore (`chAu`) sbloccato con un attimo di silenzio dentro il tocco (su iPhone il play dopo lo scaricamento veniva rifiutato); barra con `dur` del messaggio se il file non dice la durata; messaggi d\'errore distinti.']}},
   {v:27,data:'2026-10-04',titolo:'Reazioni ai messaggi',
     tutti:['In chat puoi rispondere a un messaggio con una faccina: tieni premuto il messaggio e scegli 👍 ❤️ 😂 ✅ 😢 o 👎. Tocca di nuovo la stessa faccina per toglierla.','Tenendo premuto un messaggio scritto puoi anche copiarne il testo.'],
     dev:{aggiunte:['Reazioni in `messaggi/<id>.r.<persona>` (solo le emoji di `CH_RE`, tolta con `FieldValue.delete()`): `chRx`, `chRb`, `chReact`, `chLp` (pressione lunga 450 ms o tasto destro, il clic dopo viene ignorato), `chCopy`. Nessuna regola nuova: `messaggi` è già scrivibile dai membri.']}},
@@ -3496,7 +3499,7 @@ function chPush(c,me,t){const to=chMembers(c).filter(u=>u.id!==me.id).map(u=>u.i
 /* ---- foto e vocali: il file va nel Worker (database D1, in base64), nel messaggio restano tipo, id e anteprima.
    {tipo:'foto', m, w, h, mini} | {tipo:'audio', m, dur}; «t» resta un testo («📷 Foto») per le liste, gli avvisi e le versioni vecchie.
    I file scaricati restano nella cache «jona-allegati» del telefono (il service worker non la cancella). */
-const ALG={ok:null,p:null,url:{},load:{},gone:{},pl:null,sp:null,io:null};
+const ALG={ok:null,p:null,url:{},load:{},gone:{},pl:null,sp:null,io:null,au:null,auOk:0};
 const algOn=()=>chFb()&&ALG.ok===true;
 function algCheck(){if(ALG.ok!==null||ALG.p||!chFb())return;
   ALG.p=fetch(PUSH_URL+'/salute').then(r=>r.json()).then(j=>{ALG.ok=!!j.allegati;chPaint(true)}).catch(()=>{}).finally(()=>{ALG.p=null})}
@@ -3539,33 +3542,62 @@ async function chFile(tipo,blob,x){
 function chPhoto(){const c=S.chat&&S.chat.c;if(!c)return;
   pickFile({accept:'image/*'},async fs=>{let x;try{x=await algImg(fs[0])}catch(e){return toast('Non riesco ad aprire questa foto.','err')}chFile('foto',x.blob,Object.assign(x,{c}))})}
 const chDur=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
-// vocali: mono a 24 kbps, al massimo 2 minuti. Prima l'MP4/AAC (lo leggono iPhone e Android), poi il WebM/Opus
+// vocali: mono, al massimo 2 minuti, sempre in AAC dove si può (lo leggono iPhone e Android).
+// Chrome con «audio/mp4» senza codec registra Opus dentro l'MP4, che l'iPhone non legge: l'MP4 semplice solo su iPhone/Safari;
+// su Android l'AAC si fa con il codificatore del telefono (WebCodecs) e diventa un file .aac (ADTS). Ultima scelta il WebM/Opus.
+const chApple=()=>/iPhone|iPad|iPod/.test(navigator.userAgent)||/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|CriOS|Android|Edg/.test(navigator.userAgent)||navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent);
+async function aacOk(){if(!window.AudioEncoder||!window.MediaStreamTrackProcessor)return false;
+  try{return!!(await AudioEncoder.isConfigSupported({codec:'mp4a.40.2',sampleRate:48000,numberOfChannels:1,bitrate:32000})).supported}catch(e){return false}}
+// fa le veci di MediaRecorder: legge il microfono, codifica in AAC e aggiunge a ogni pezzo l'intestazione ADTS di 7 byte
+function aacRec(st){
+  const rd=new MediaStreamTrackProcessor({track:st.getAudioTracks()[0]}).readable.getReader(),out=[];
+  const R={mimeType:'audio/aac',state:'recording',ondataavailable:null,onstop:null,start(){}};let enc=null,sr=48000,nc=1,end=false;
+  const SR=[96000,88200,64000,48000,44100,32000,24000,22050,16000,12000,11025,8000,7350];
+  const hd=n=>{const f=n+7,i=Math.max(0,SR.indexOf(sr));return new Uint8Array([0xFF,0xF1,64|i<<2|nc>>2,(nc&3)<<6|f>>11,f>>3&255,(f&7)<<5|31,0xFC])};
+  (async()=>{try{for(;;){const{value:ad,done}=await rd.read();if(done)break;if(end){ad.close();break}
+      if(!enc){sr=ad.sampleRate;nc=ad.numberOfChannels;
+        enc=new AudioEncoder({output:c=>{const b=new Uint8Array(c.byteLength);c.copyTo(b);out.push(hd(b.length),b)},error:e=>{R.err=e}});
+        enc.configure({codec:'mp4a.40.2',sampleRate:sr,numberOfChannels:nc,bitrate:32000})}
+      enc.encode(ad);ad.close()}
+    if(enc&&enc.state==='configured')await enc.flush()}catch(e){R.err=e}
+    R.state='inactive';if(out.length&&!R.err&&R.ondataavailable)R.ondataavailable({data:new Blob(out,{type:'audio/aac'})});if(R.onstop)R.onstop()})();
+  R.stop=()=>{end=true;rd.cancel().catch(()=>{})};return R}
 async function chRec(){
   const C=S.chat;if(!C||!C.c||C.rec)return;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder)return toast('Questo telefono non può registrare vocali.','warn');
   let st;try{st=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
   catch(e){return toast(e&&e.name==='NotAllowedError'?'Il microfono è bloccato: consenti il microfono a Jona nelle impostazioni del telefono.':'Non riesco a usare il microfono.','err')}
-  const type=['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm;codecs=opus','audio/webm'].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
-  let mr;try{mr=new MediaRecorder(st,Object.assign({audioBitsPerSecond:24000},type?{mimeType:type}:{}))}catch(e){st.getTracks().forEach(t=>t.stop());return toast('Non riesco a registrare su questo telefono.','err')}
+  const ok=t=>!!(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t));
+  let type=ok('audio/mp4;codecs=mp4a.40.2')?'audio/mp4;codecs=mp4a.40.2':chApple()&&ok('audio/mp4')?'audio/mp4':'';
+  const aac=!type&&await aacOk();if(!type&&!aac)type=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(ok)||'';
+  if(S.chat!==C||C.rec){st.getTracks().forEach(t=>t.stop());return}
+  let mr;try{mr=aac?aacRec(st):new MediaRecorder(st,Object.assign({audioBitsPerSecond:24000},type?{mimeType:type}:{}))}catch(e){st.getTracks().forEach(t=>t.stop());return toast('Non riesco a registrare su questo telefono.','err')}
   const R={mr,c:C.c,ch:[],t0:now(),send:false};C.rec=R;
   mr.ondataavailable=e=>{if(e.data&&e.data.size)R.ch.push(e.data)};
   mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());clearInterval(R.iv);if(S.chat&&S.chat.rec===R)S.chat.rec=null;chPaint(true);
-    if(!R.send)return;if(R.dur<1)return toast('Vocale troppo corto.','warn');
+    if(!R.send)return;if(R.dur<1)return toast('Vocale troppo corto.','warn');if(mr.err||!R.ch.length)return toast('Vocale non registrato: riprova.','err');
     chFile('audio',new Blob(R.ch,{type:(mr.mimeType||type||'audio/webm').split(';')[0]}),{c:R.c,dur:R.dur})};
   mr.start(1000);
   R.iv=setInterval(()=>{const s=(now()-R.t0)/1000,el=document.getElementById('ch-rt');if(el)el.textContent=chDur(s);if(s>=120)chRecStop(true)},250);
   chPaint(true)}
 function chRecStop(send){const R=S.chat&&S.chat.rec;if(!R||R.done)return;R.done=1;R.send=send;R.dur=Math.min(120,Math.round((now()-R.t0)/1000));try{R.mr.stop()}catch(e){}}
+// un solo lettore, «sbloccato» con un attimo di silenzio dentro il tocco: su iPhone il play dopo lo scaricamento verrebbe rifiutato
+const ALG_SIL='data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+function chAu(){let a=ALG.au;if(!a){a=ALG.au=new Audio();a.preload='auto';a.setAttribute('playsinline','')}
+  if(!ALG.auOk){ALG.auOk=1;a.src=ALG_SIL;const p=a.play();if(p)p.catch(()=>{ALG.auOk=0})}return a}
 async function chPlay(id){
   const P=ALG.pl;if(P&&P.id===id){if(P.a.paused)P.a.play().catch(()=>{});else P.a.pause();return}
   if(P){P.a.pause();ALG.pl=null;chAuPaint(P.id)}
-  let u;try{u=await algGet(id)}catch(e){chPaint(true);return toast(e.gone?'Questo vocale non è più disponibile.':'Non riesco a scaricare il vocale.','warn')}
-  const a=new Audio(u),N={id,a};ALG.pl=N;
-  a.onplay=a.onpause=()=>chAuPaint(id);a.ontimeupdate=()=>chAuPaint(id);a.onended=()=>{if(ALG.pl===N)ALG.pl=null;chAuPaint(id)};
-  a.play().catch(()=>{if(ALG.pl===N)ALG.pl=null;chAuPaint(id);toast('Questo vocale non si apre su questo telefono.','warn')})}
+  const a=chAu(),m=chAll().find(x=>x.m===id),N={id,a,dur:Number(m&&m.dur)||0};ALG.pl=N;chAuPaint(id);
+  let u;try{u=await algGet(id)}catch(e){if(ALG.pl===N)ALG.pl=null;chPaint(true);return toast(e.gone?'Questo vocale non è più disponibile.':'Non riesco a scaricare il vocale.','warn')}
+  if(ALG.pl!==N)return;
+  a.onplay=a.onpause=a.ontimeupdate=()=>{if(ALG.pl===N)chAuPaint(id)};a.onended=()=>{if(ALG.pl===N){ALG.pl=null;chAuPaint(id)}};
+  a.src=u;a.currentTime=0;
+  a.play().catch(e=>{if(ALG.pl!==N)return;ALG.pl=null;chAuPaint(id);
+    toast(e&&e.name==='NotAllowedError'?'Tocca di nuovo ▶ per ascoltare il vocale.':'Questo vocale è in un formato che questo telefono non legge: chiedi di rimandarlo dopo aver aggiornato l\'app.','warn')})}
 function chAuPaint(id){const el=CHAT.box&&CHAT.box.querySelector(`[data-au="${id}"]`);if(!el)return;const P=ALG.pl&&ALG.pl.id===id?ALG.pl:null,a=P&&P.a;
   el.querySelector('.cht-play').innerHTML=ic(a&&!a.paused?'pause':'play');
-  el.querySelector('.cht-bar i').style.width=(a&&a.duration&&isFinite(a.duration)?Math.min(100,a.currentTime/a.duration*100):0)+'%';
+  const du=a&&(a.duration&&isFinite(a.duration)?a.duration:P.dur);el.querySelector('.cht-bar i').style.width=(du?Math.min(100,a.currentTime/du*100):0)+'%';
   if(a&&a.currentTime)el.querySelector('.cht-dur').textContent=chDur(a.currentTime)}
 function chView(id){
   const show=u=>{if(!CHAT.box)return;const v=document.createElement('div');v.className='cht-view';v.dataset.a='chViewX';v.innerHTML=`<img alt="Foto" src="${u}"><button type="button" class="icon-btn" data-a="chViewX" aria-label="Chiudi">${ic('x')}</button>`;CHAT.box.appendChild(v)};
