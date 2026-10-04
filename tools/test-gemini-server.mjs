@@ -7,6 +7,7 @@ const b64u=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
 const jwt=p=>b64u({alg:'RS256'})+'.'+b64u(p)+'.firma';
 const T0=Math.floor(Date.now()/1000);
 const GOOD=jwt({sub:'uidMembro123',exp:T0+3600}),OUT=jwt({sub:'uidEstraneo1',exp:T0+3600}),OLD=jwt({sub:'uidMembro123',exp:T0-10});
+const WAIT=jwt({sub:'uidAttesa123',exp:T0+3600});
 
 /* 1. Worker */
 const calls=[];let plan=[];let fsCalls=0;
@@ -14,7 +15,8 @@ const realFetch=globalThis.fetch;
 globalThis.fetch=async(url,init={})=>{url=String(url);
   if(url.startsWith('https://firestore.googleapis.com/')){fsCalls++;
     const tok=(init.headers.authorization||'').slice(7);
-    return new Response('{}',{status:tok===GOOD&&url.endsWith('/projects/jona-ordini/databases/(default)/documents/membri/uidMembro123')?200:403})}
+    if(tok===WAIT&&url.endsWith('/membri/uidAttesa123'))return new Response(JSON.stringify({fields:{ok:{booleanValue:false}}}),{status:200});
+    return new Response(JSON.stringify({fields:{k:{stringValue:'x'}}}),{status:tok===GOOD&&url.endsWith('/projects/jona-ordini/databases/(default)/documents/membri/uidMembro123')?200:403})}
   if(url.startsWith('https://generativelanguage.googleapis.com/')){const m=url.match(/models\/([^:]+):/)[1];calls.push({m,t:Date.now(),key:init.headers['x-goog-api-key'],body:JSON.parse(init.body)});
     const step=plan.shift()||'ok';
     if(step==='429')return new Response(JSON.stringify({error:{code:429,message:'Resource exhausted',details:[{'@type':'type.googleapis.com/google.rpc.RetryInfo',retryDelay:'1s'}]}}),{status:429});
@@ -33,6 +35,7 @@ r=await call(req(''));ok(r.s===403&&calls.length===0,'no token: 403');
 r=await call(req('spazzatura'));ok(r.s===403,'broken token: 403');
 r=await call(req(OUT));ok(r.s===403&&calls.length===0,'token of a phone not in membri: 403');
 r=await call(req(OLD));ok(r.s===403,'expired token: 403');
+r=await call(req(WAIT));ok(r.s===403&&calls.length===0,'phone waiting for approval: 403');
 r=await call(req(GOOD));
 ok(r.s===200&&r.j.candidates[0].content.parts[0].text==='ciao da gemini-flash-latest','member: answer from Gemini');
 ok(calls[0].key==='CHIAVE-SEGRETA'&&!('extra' in calls[0].body)&&calls[0].body.generationConfig.temperature===0,'server key used, only Gemini fields forwarded');

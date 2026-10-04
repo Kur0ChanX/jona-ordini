@@ -1,14 +1,18 @@
 rules_version = '2';
 // Regole del database di Jona Ordini (da incollare in Firebase > Firestore Database > Regole).
-// Entra solo chi ha la chiave del ristorante (link o QR condiviso dallo chef o dallo sviluppatore).
+// Entra solo chi ha la chiave del ristorante (link o QR condiviso dallo chef o dallo sviluppatore)
+// e il cui telefono è stato approvato da un telefono già approvato («ok» falso = in attesa; senza «ok» = approvato).
 service cloud.firestore {
   match /databases/{db}/documents {
     function membro() {
-      return request.auth != null && exists(/databases/$(db)/documents/membri/$(request.auth.uid));
+      return request.auth != null
+        && exists(/databases/$(db)/documents/membri/$(request.auth.uid))
+        && get(/databases/$(db)/documents/membri/$(request.auth.uid)).data.get('ok', true) != false;
     }
     // la chiave del ristorante: si crea una volta sola e nessuno la può leggere
     match /chiave/ristorante {
-      allow create: if request.auth != null && request.resource.data.v is string && request.resource.data.v.size() >= 16;
+      allow create: if request.auth != null && request.resource.data.v is string && request.resource.data.v.size() >= 16
+        && request.resource.data.get('uid', request.auth.uid) == request.auth.uid;
       allow read, update, delete: if false;
     }
     // stato pubblico: dice solo se il database è già stato attivato
@@ -17,12 +21,17 @@ service cloud.firestore {
       allow create: if request.auth != null && exists(/databases/$(db)/documents/chiave/ristorante);
       allow update, delete: if false;
     }
-    // ogni telefono collegato (accesso anonimo) si registra con la chiave
+    // ogni telefono (accesso anonimo) si registra con la chiave e resta in attesa finché un telefono approvato non lo approva;
+    // solo chi ha attivato il database entra subito. In attesa può solo scrivere la sua richiesta («req»).
     match /membri/{uid} {
       allow create: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.k == get(/databases/$(db)/documents/chiave/ristorante).data.v;
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow update, delete: if false;
+        && request.resource.data.k == get(/databases/$(db)/documents/chiave/ristorante).data.v
+        && (request.resource.data.get('ok', true) == false
+            || get(/databases/$(db)/documents/chiave/ristorante).data.get('uid', '') == request.auth.uid);
+      allow read: if request.auth != null && (request.auth.uid == uid || membro());
+      allow update: if request.auth != null && ((request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['req'])) || membro());
+      allow delete: if membro();
     }
     // dati dell'app
     match /{c}/{id} {

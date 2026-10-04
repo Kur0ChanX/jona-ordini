@@ -130,7 +130,7 @@ const GEM_MAX_BODY = 20 * 1024 * 1024;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const geminiErr = (message, status) => json({ error: { message } }, status);
 
-// il telefono manda il suo gettone Firebase: se con quel gettone può leggere membri/<uid>, è del ristorante
+// il telefono manda il suo gettone Firebase: se con quel gettone può leggere membri/<uid> e non è in attesa, è del ristorante
 const membriOk = new Map();
 async function membro(request, env) {
   const tok = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
@@ -147,6 +147,9 @@ async function membro(request, env) {
   const r = await fetch(`https://firestore.googleapis.com/v1/projects/${progetto}/databases/(default)/documents/membri/${uid}`,
     { headers: { authorization: "Bearer " + tok } });
   if (!r.ok) return false;
+  // telefono in attesa di approvazione («ok» falso): non è ancora del ristorante
+  const d = await r.json().catch(() => ({}));
+  if (d.fields && d.fields.ok && d.fields.ok.booleanValue === false) return false;
   if (membriOk.size > 200) membriOk.clear();
   membriOk.set(tok, Math.min(exp, now + 10 * 60 * 1000));
   return true;

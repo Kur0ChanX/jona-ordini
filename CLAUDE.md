@@ -90,6 +90,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - v16: ordine suggerito in Invii (`sugStats`, meteo Open-Meteo per Porto Cervo), timbratura con QR (`config/app.timbra`, spenta di partenza; `config/timbr_<lunedì>`; `lib/jsqr-1.4.0.js`), cambi turno (`cambi.<id>` nella settimana pubblicata). Contratto modificabile solo dall'amministratore (`isGM`), lo staff non lo vede; errori dei turni salvati solo con il consenso (`ok.<persona>`).
 - v17: chat tra colleghi (collezione `messaggi`, fuori da `S.db` come le push: serve la regola con `messaggi`; `CHAT`, `chWatch`, `chPaint`; chat `tutti`, `rep_<reparto>`, `dm_<a>--<b>`) e «Chiedi a Jona» per i gestori (`jonaCtx`, `jonaAsk`, Gemini con `jona_gemini_key`).
 - Import listini: Excel/CSV, fattura XML, tabella incollata, foto lette da Gemini.
+- v24 telefoni approvati: `membri/<uid>.ok=false` finché un gestore non approva (Staff → Telefoni da approvare, `phApprove`); richiesta del telefono in `membri.req`; regole e Worker controllano `ok`. Al ritorno in primo piano `disableNetwork`/`enableNetwork` per la chat.
 - v20 Gemini: `gemCall` usa la chiave del telefono (`jona_gemini_key`) se c'è, altrimenti il Worker `/gemini` (chiave del ristorante nel segreto `GEMINI_KEY`, copiato dal segreto GitHub `GEMINI_API_KEY`; entra solo chi ha `membri/<uid>`, controllato con il gettone Firebase del telefono; 429 → attesa `retryDelay`, poi modello Lite). Solo con Firebase.
 
 ## Chiavi in localStorage
