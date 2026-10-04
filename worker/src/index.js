@@ -3,11 +3,15 @@
 // La chiave VAPID (JWK P-256) sta nel segreto VAPID_JWK, creato dal workflow GitHub alla prima pubblicazione.
 // /gemini: fa da tramite verso Google Gemini con la chiave del ristorante (segreto GEMINI_KEY), solo per i telefoni
 // registrati (membri/<uid> in Firestore); se Gemini è occupato (429) aspetta quanto chiede e riprova, poi prova il modello Lite.
+// /allegati: foto e vocali della chat nei database D1 ALLEGATI0, ALLEGATI1… (creati dal workflow; piano gratuito: 500 MB l'uno).
+// Il telefono manda il file in base64 (testo) con il tipo in «x-tipo»: D1 restituirebbe i BLOB come liste di numeri,
+// troppo lente da convertire nei 10 ms del piano gratuito. Ogni file va nel database più vuoto; oltre il tetto si cancellano i più vecchi, e ogni notte (cron) quelli oltre 60 giorni.
 
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, OPTIONS",
-  "access-control-allow-headers": "content-type, authorization",
+  "access-control-expose-headers": "x-tipo",
+  "access-control-allow-headers": "content-type, authorization, x-tipo",
 };
 const PUSH_HOSTS = /(^|\.)(fcm\.googleapis\.com|push\.services\.mozilla\.com|push\.apple\.com|notify\.windows\.com)$/;
 const MAX_SUBS = 50;
@@ -135,7 +139,7 @@ const membriOk = new Map();
 async function membro(request, env) {
   const tok = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
   const now = Date.now();
-  if (membriOk.get(tok) > now) return true;
+  if (membriOk.get(tok) > now) return membriUid.get(tok) || true;
   let uid = "", exp = 0;
   try {
     const p = JSON.parse(new TextDecoder().decode(ub64u(tok.split(".")[1])));
@@ -150,10 +154,12 @@ async function membro(request, env) {
   // telefono in attesa di approvazione («ok» falso): non è ancora del ristorante
   const d = await r.json().catch(() => ({}));
   if (d.fields && d.fields.ok && d.fields.ok.booleanValue === false) return false;
-  if (membriOk.size > 200) membriOk.clear();
+  if (membriOk.size > 200) { membriOk.clear(); membriUid.clear(); }
   membriOk.set(tok, Math.min(exp, now + 10 * 60 * 1000));
-  return true;
+  membriUid.set(tok, uid);
+  return uid;
 }
+const membriUid = new Map();
 
 const attesa = j => {
   const d = ((j.error && j.error.details) || []).find(x => x && x.retryDelay);
@@ -193,14 +199,103 @@ async function gemini(request, env) {
   return geminiErr(last, stato === 404 ? 502 : 429);
 }
 
+/* ---- allegati della chat ---- */
+const ALG_MAX = 1850 * 1000;             // un file in base64 (circa 1,35 MB veri): sotto i 2 MB di una riga D1
+const ALG_CAP = 440 * 1000 * 1000;       // tetto di ogni database (il piano gratuito si ferma a 500 MB)
+const ALG_GIORNI = 60;
+const ALG_TIPI = /^(image\/(jpeg|webp|png)|audio\/(mp4|aac|mpeg|webm|ogg))$/;
+const algErr = (errore, status) => json({ errore }, status);
+const algDbs = env => Object.keys(env).filter(k => /^ALLEGATI\d+$/.test(k) && env[k] && env[k].prepare).sort().map(k => [k.slice(8), env[k]]);
+const algPronti = new Set();
+async function algSchema(n, db) {
+  if (algPronti.has(n)) return;
+  await db.batch([
+    db.prepare("CREATE TABLE IF NOT EXISTS f (id TEXT PRIMARY KEY, tipo TEXT NOT NULL, dim INTEGER NOT NULL, creato INTEGER NOT NULL, da TEXT, dati TEXT NOT NULL)"),
+    db.prepare("CREATE INDEX IF NOT EXISTS f_creato ON f (creato, dim)"),
+  ]);
+  algPronti.add(n);
+}
+const algUsato = async db => (await db.prepare("SELECT COUNT(*) AS n, COALESCE(SUM(dim), 0) AS b FROM f").first()) || { n: 0, b: 0 };
+
+async function algSalva(request, env, uid) {
+  const dbs = algDbs(env);
+  if (!dbs.length) return algErr("Foto e vocali non sono attivi sul server", 503);
+  const tipo = (request.headers.get("x-tipo") || "").split(";")[0].trim().toLowerCase();
+  if (!ALG_TIPI.test(tipo)) return algErr("tipo di file non accettato", 415);
+  const len = Number(request.headers.get("content-length") || 0);
+  if (len > ALG_MAX) return algErr("file troppo grande", 413);
+  const dati = await request.text();
+  if (!dati.length) return algErr("file vuoto", 400);
+  if (dati.length > ALG_MAX) return algErr("file troppo grande", 413);
+  // il database più vuoto
+  let scelto = null;
+  for (const [n, db] of dbs) {
+    await algSchema(n, db);
+    const u = await algUsato(db);
+    if (!scelto || u.b < scelto.b) scelto = { n, db, b: u.b };
+  }
+  // oltre il tetto: via i file più vecchi di quel database
+  let libera = scelto.b + dati.length - ALG_CAP;
+  while (libera > 0) {
+    const { results } = await scelto.db.prepare("SELECT id, dim FROM f ORDER BY creato LIMIT 40").all();
+    if (!results.length) break;
+    const via = [];
+    for (const r of results) { if (libera <= 0) break; via.push(r.id); libera -= r.dim; }
+    await scelto.db.prepare(`DELETE FROM f WHERE id IN (${via.map(() => "?").join(",")})`).bind(...via).run();
+  }
+  const id = scelto.n + "-" + b64u(crypto.getRandomValues(new Uint8Array(15)));
+  await scelto.db.prepare("INSERT INTO f (id, tipo, dim, creato, da, dati) VALUES (?, ?, ?, ?, ?, ?)")
+    .bind(id, tipo, dati.length, Date.now(), typeof uid === "string" ? uid : "", dati).run();
+  return json({ id, dim: dati.length });
+}
+
+async function algLeggi(id, env) {
+  const m = /^(\d+)-[A-Za-z0-9_-]{20}$/.exec(id);
+  const db = m && env["ALLEGATI" + m[1]];
+  if (!db || !db.prepare) return algErr("non trovato", 404);
+  await algSchema(m[1], db);
+  const r = await db.prepare("SELECT tipo, dati FROM f WHERE id = ?").bind(id).first();
+  if (!r) return algErr("non trovato", 404);
+  return new Response(r.dati, { headers: { "content-type": "text/plain; charset=us-ascii", "x-tipo": r.tipo, "x-content-type-options": "nosniff",
+    "cache-control": "private, max-age=31536000, immutable", ...CORS } });
+}
+
+async function algSpazio(env) {
+  const out = { tetto: 0, usato: 0, file: 0, giorni: ALG_GIORNI };
+  for (const [n, db] of algDbs(env)) {
+    await algSchema(n, db);
+    const u = await algUsato(db);
+    out.tetto += ALG_CAP; out.usato += u.b; out.file += u.n;
+  }
+  return out;
+}
+
+async function algPulizia(env) {
+  const prima = Date.now() - ALG_GIORNI * 864e5;
+  for (const [n, db] of algDbs(env)) {
+    await algSchema(n, db);
+    await db.prepare("DELETE FROM f WHERE creato < ?").bind(prima).run();
+  }
+}
+
 export default {
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(algPulizia(env));
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     try {
-      if (url.pathname === "/salute") return json({ ok: true, servizio: "jona-notifiche", push: !!env.VAPID_JWK, gemini: !!env.GEMINI_KEY });
+      if (url.pathname === "/salute") return json({ ok: true, servizio: "jona-notifiche", push: !!env.VAPID_JWK, gemini: !!env.GEMINI_KEY, allegati: algDbs(env).length });
       if (url.pathname === "/chiave" && request.method === "GET") return json({ chiave: (await vapid(env)).pub });
       if (url.pathname === "/gemini" && request.method === "POST") return await gemini(request, env);
+      if (url.pathname.startsWith("/allegati")) {
+        const uid = await membro(request, env);
+        if (!uid) return algErr("Telefono non collegato al ristorante", 403);
+        if (url.pathname === "/allegati" && request.method === "POST") return await algSalva(request, env, uid);
+        if (url.pathname === "/allegati/spazio" && request.method === "GET") return json(await algSpazio(env));
+        if (request.method === "GET") return await algLeggi(url.pathname.slice(10), env);
+      }
       if (url.pathname === "/invia" && request.method === "POST") {
         const body = await request.json().catch(() => null);
         if (!body) return json({ errore: "richiesta non valida" }, 400);

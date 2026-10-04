@@ -1,54 +1,44 @@
-# Passaggio di consegne (2026-10-04)
+# Passaggio di consegne (2026-10-04, notte)
 
 ## Stato attuale
-- **v25**: Wi-Fi lento dell'hotel (UniFi): `netWatch` passa al long polling se una scrittura non è confermata in 4 s, ricarica solo a scritture finite e senza fogli o testo in chat. Avviso «Usa questa chat in modo responsabile e solo per lavoro» (`.cht-rule`). Regole v24 già pubblicate da Mario. `APP_VER=25`, `CACHE=jona-ordini-v29`. Prova `tools/test-firebase-wifi-lento.mjs`.
-- Prossimo (proposto, in attesa del via): allegati in chat (foto, vocali, reazioni, sticker Jona) e dove salvarli gratis.
-- **v24**: telefoni approvati (strada A) e chat subito aggiornata al ritorno in primo piano. Regole pubblicate da Mario. Worker ripubblicato dal workflow (rifiuta `ok:false`). `APP_VER=24`, `CACHE=jona-ordini-v28`. Prova `tools/test-firebase-telefoni.mjs` (24). Limite: il telefono in attesa non può mandare push ai gestori (non legge `push`): li avvisa la lista in Staff e un avviso in app.
-- **v23**: nome utente. `userSug` propone nome.cognome mentre si scrive (solo se il campo è vuoto o uguale alla proposta `_uSug`), `normUser` toglie accenti e apostrofi, `checkForm` distingue vuoto/corto/caratteri. Prima con il campo vuoto diceva «almeno 3 caratteri» e confondeva (caso «Loi»). `APP_VER=23`, `CACHE=jona-ordini-v27`. Prova in `tools/test-registrazione.mjs` (21).
-- **v22**: registrazione. Foto profilo letta già ridotta (`fileToAvatar` con `createImageBitmap` `resizeWidth:640`): su iPhone la foto intera faceva ricaricare Safari. Bozza del modulo in `jona_reg` (`regKeep` prima di fotocamera/galleria, `regRestore` all'avvio, senza password). Dopo la registrazione `jona_wait` → `screenWait`, `waitCheck` in `render` fa entrare da solo quando il profilo è attivo. `APP_VER=22`, `CACHE=jona-ordini-v26`. Prova `tools/test-registrazione.mjs` (14).
-- **v21**: un iPhone nuovo aperto dal link d'invito restava per sempre su «Un momento…». Ora `connect` in `FirebaseStore` ha tempi massimi (`fbTmo`, 20 s su accesso e iscrizione `membri`, 12 s su `pubblico/stato`), errore `fb_slow` → schermata «Il collegamento non riesce» con Riprova, e `jona_fb_lp` forza il long polling di Firestore al tentativo dopo (`fbInit`). `render()` subito dopo la creazione del database. `APP_VER=21`, `CACHE=jona-ordini-v25`. Prova `tools/test-invito-bloccato.mjs`. Causa esatta sull'iPhone del collega non ancora confermata: farlo riprovare.
-- Online la **v20** (PR #30, squash `98363e3`): Gemini dal server del ristorante. `APP_VER=20`, `CACHE=jona-ordini-v24`. File online identici, Worker pubblicato (`/salute` → `gemini:false` finché Mario non mette il segreto). Ramo riallineato con `git merge origin/main`.
-- v20: Worker `/gemini` (segreto `GEMINI_KEY` copiato dal segreto GitHub `GEMINI_API_KEY` dal workflow; solo telefoni in `membri/<uid>` col gettone Firebase; 429 → attesa `retryDelay`, poi `gemini-flash-lite-latest`; tetto ~25 s). App: `gemCall`, `gemSrvOk`, `gemOn` (chiave del telefono se c'è, altrimenti server, solo con Firebase). Prova `tools/test-gemini-server.mjs` (29). Foto già ridotte a 2000 px (`shrinkImg`).
-- **Da fare per Mario:** creare la chiave su aistudio.google.com, metterla nel segreto GitHub `GEMINI_API_KEY`, rilanciare il workflow «Pubblica server notifiche».
-- Versioni di oggi: v14 orari, v15 animazione invio + «È urgente», v16 ordine suggerito / timbratura QR (spenta) / cambi turno / contratto solo per l'amministratore + consenso sugli errori, v17 chat + «Chiedi a Jona», v18 fornitori con logo e schede grandi + animazione nuova.
-- Regole Firestore con `messaggi` pubblicate da Mario: chat verificata sul suo telefono (spunta ✓ = scritto sul server).
-- Prove tutte verdi: `test-invio-anim` 14, `test-v16` 42, `test-v17` 29, `test-orari` 70, `test-staff` 35, `test-news` 94, `test-scaglione2` 20, `test-voice` 83, `test-report` 63; con l'emulatore `test-firebase-chat` 13, `test-firebase-orari` 18, flow, push, approva-arrivi, backup.
-- Mario non ha accesso al telefono di Maurizio: le prove a due telefoni si fanno con una scheda in incognito e i «Dati di prova» (test1 / prova123).
+- **v26** pronta (`APP_VER=26`, `CACHE=jona-ordini-v30`): foto e vocali in chat, reparti F&B Manager/Responsabile, guida «notifiche bloccate». Prove tutte verdi (nuove: `test-allegati-server` 25, `test-firebase-allegati` 22, `test-v26` 15).
+- Versioni precedenti (v21–v25: collegamento lento, foto profilo, nome utente, telefoni approvati, Wi-Fi lento) già online.
+- **Allegati (v26)**: `worker/src/index.js` `/allegati` (POST testo base64 + `x-tipo`, GET `/allegati/<db>-<id>`, GET `/allegati/spazio`, solo `membro()`), `scheduled` = pulizia oltre 60 giorni (`[triggers]` in `worker/wrangler.toml`, ore 3:17 UTC). Workflow: passo «Database di foto e vocali» crea `jona-allegati-0..3` via API e aggiunge i binding `ALLEGATI0..3` a `wrangler.toml` solo nel CI; senza permesso D1 avvisa e pubblica senza allegati. App: `ALG`, `algCheck` (`/salute` → `allegati`), `algUp`, `algGet` (cache `jona-allegati`, max 400 file), `algImg`, `chFile`, `chPhoto`, `chRec`/`chRecStop`, `chPlay`/`chAuPaint`, `chView`, `chImgs` (IntersectionObserver), `chMsgBody`, `chPush`. Tasti foto/microfono solo se `algOn()`.
+- Reparti: `REPARTI` con `fb` e `resp`; `altro` resta «Altro» (nessuna migrazione: chi è F&B Manager va spostato a mano dal profilo). Notifiche: `PUSH_DENY`, `pushDenied()`, `S.pushAll`, foglio non duplicato (`ph:1`).
 
-## Idee parcheggiate da Mario (non farle finché non le richiede)
-Foto della confezione → carrello (via `/gemini`), allarme quantità strana, «Rifai come martedì scorso», mancanti riordinati, risposta del fornitore letta dallo screenshot. Codice a barre scartato (molti prodotti non lo hanno). Anche le idee personale/HACCP/allergeni/inventario/stagione: non servono per ora.
-- Rischio noto: `/invia` del Worker non controlla chi chiama (proteggerlo come `/gemini`, attenzione a `sw.js` Background Sync che non ha il gettone).
+## Decisioni e motivi (v26)
+- D1 gratuito = **500 MB per database** (5 GB totali, 10 database): 4 database da 440 MB ≈ 1,7 GB. Si può salire fino a 10 cambiando `QUANTI` nel workflow.
+- File salvati come **testo base64**: D1 restituisce i BLOB come liste di numeri, troppo lente per i 10 ms di CPU del piano gratuito. Decodifica sul telefono.
+- Vocali: prima MP4/AAC (iPhone e Android), poi WebM/Opus; 24 kbps, 2 minuti. Foto 1280 px WebP 0,7 (JPEG su iPhone), anteprima 40 px nel messaggio.
+- `t` del messaggio («📷 Foto», «🎤 Messaggio vocale (0:12)») per liste, avvisi e versioni vecchie dell'app.
 
-## Domanda aperta di Mario (in attesa, parcheggiata)
-> «pensi che la parte dei caricamenti dei listini sia abbastanza potente automatizzata e completa?»
-Già esiste: Excel/CSV, fattura XML (FatturaPA), tabella incollata, foto lette da Gemini, revisione con abbinamento ai prodotti (`matchProd`) e avviso aumenti (`rvUps`). Mancano (idee da proporre e far scegliere): PDF dei listini (pdf.js è già in `LIB`), fattura XML che aggiorna i prezzi e controlla la merce arrivata in un colpo, abbinamento intelligente dei nomi (sinonimi, unità diverse kg/conf), storico prezzi per prodotto con grafico, listino condiviso da email o WhatsApp direttamente nell'app, avviso «listino vecchio» dopo N giorni.
+## Da fare / in sospeso
+1. **Mario**: aggiungere al token Cloudflare `CLOUDFLARE_API_TOKEN` il permesso **Account › D1 › Edit**, poi rilanciare il workflow «Pubblica server notifiche (Cloudflare Worker)» e controllare nel log «Foto e vocali: 4 database collegati».
+2. Gemini: chiave su aistudio.google.com (account Google privato va bene) → segreto GitHub `GEMINI_API_KEY` → rilanciare lo stesso workflow.
+3. Domande aperte a Mario: reazioni veloci (👍 ❤️ 😂 ✅) e sticker Jona; chi spostare in «F&B Manager».
+4. Provare sui telefoni veri il vocale iPhone → Android e viceversa.
 
-## File e funzioni principali di oggi (`index.html` salvo dove indicato)
-- Orari: `config/orari_<lunedì>` (`t` bozza, `tp` pubblicata, `ok.<persona>` errori accettati, `cambi.<id>`), `orCheck`, `vOrari`, `orCellSheet`, `orPublish`, `vMieiOrari`, `orConsent`. Contratto in `staff.contratto`, modificabile solo con `isGM`.
-- Timbratura: `config/app.timbra` (spenta), `timbraK`, `config/timbr_<lunedì>`, `tbPunch`, `tbOpen`, `tbScanSheet`, `tbExcel`; `lib/jsqr-1.4.0.js`.
-- Ordine suggerito: `sugStats`, `sugRows`, `sugSheet`, `sugAdd`, `meteo()` (Open-Meteo, `METEO_POS` Porto Cervo).
-- Chat: collezione `messaggi` fuori da `S.db` (come le push), `CHAT`, `chWatch`, `chPaint`, `messaggi/letti`; chat `tutti`, `rep_<reparto>`, `dm_<a>--<b>`.
-- «Chiedi a Jona»: `jonaCtx`, `jonaAsk`, `jonaMic` (Gemini, chiave `jona_gemini_key`).
-- Fornitori: `fDot` (logo o iniziale), `fornitori.logo` (data URL ≤320 px, `fileToLogo`), `.fgrid`/`.fcard`.
-- Animazione: `media/invio-chef.mp4` (alpha impilato 720×808, v19: invertito nel tempo con ffmpeg `reverse`, lo chef a sinistra porge il menù; non specchiare, il logo si leggerebbe al contrario), `sendAnim`; rifare con `python3 tools/anim-invio.py <video> 4.2 0.12 0.12` e poi `reverse` (rembg + scipy + ffmpeg; memoria in `/tmp/anim-invio-cache`). Sorgente attuale: il video nuovo di Mario (menù verticale), tagliato a 4,2 s.
-- Prove nuove: `tools/test-orari.mjs`, `test-invio-anim.mjs`, `test-v16.mjs`, `test-v17.mjs`, `test-firebase-orari.mjs`, `test-firebase-chat.mjs` (vedi `tools/README.md`).
+## Idee parcheggiate (non farle finché Mario non le chiede)
+Foto della confezione → carrello, allarme quantità strana, «Rifai come martedì scorso», mancanti riordinati, risposta del fornitore dallo screenshot; codice a barre scartato. Domanda sui listini (PDF, fattura XML che aggiorna prezzi e controlla la merce, sinonimi/unità, storico prezzi, listino vecchio): proposte da fare se la riprende.
+
+## File e funzioni (`index.html` salvo dove indicato)
+- Collegamento: `FirebaseStore` (`connect`, `approval`, `newMember`, ritorno in primo piano con `disableNetwork`/`enableNetwork`), `fbInit` (long polling con `jona_fb_lp`), `fbTmo`, `netWatch`, `wallFb`, `screenPhone`, `phoneSheet`, `phSend`.
+- Registrazione: `profileForm`, `checkForm`, `userSug`, `createProfile`, `regKeep`/`regRestore`, `screenWait`/`waitCheck`.
+- Chat: `CHAT`, `chWatch`, `chPaint`, `chSend` (avviso `.cht-rule`).
+- Worker: `worker/src/index.js` (`/chiave`, `/invia`, `/gemini`, `membro()` con controllo `ok`), `worker/wrangler.toml`, `.github/workflows/cloudflare-worker.yml`.
+- Regole: `firebase/firestore.rules` (Mario le incolla a mano in Firebase → Firestore Database → Regole → Pubblica).
 
 ## Decisioni e motivi
-- Pubblicazione senza force: squash merge, poi `git merge origin/main` sul ramo e push normale.
-- Orari, timbrature e cambi in `config` (nessuna regola nuova); la chat ha la sua collezione e parla con Firestore direttamente, così con regole vecchie l'app non si blocca.
-- Video con trasparenza «impilata» in H.264 + WebGL: i video trasparenti WebM/HEVC non vanno su tutti i telefoni (iPhone).
-- Gli errori dei turni non bloccano: si salvano solo con «Salva lo stesso» (consenso registrato).
-- Contratti nascosti allo staff (lamentele sulle ore fuori contratto), mandati a Gemini solo se chiede l'amministratore.
+- Approvazione del telefono nel database (non solo nell'app): chi ha il link non legge nulla finché non è approvato.
+- Long polling solo quando serve (passa i filtri del Wi-Fi, costa qualche decimo di secondo).
+- Pubblicazione: squash merge, poi `git merge origin/main` sul ramo e push normale, mai force.
 
-## Prossimi passi
-1. Rispondere a Mario sulla domanda dei listini (2-3 strade con pro e contro), poi fare quella scelta.
-2. Altre idee in coda (`docs/RICHIESTE-MARIO.md`): bolla letta dalla foto, scadenze «da usare oggi», registro sprechi, bacheca del servizio, checklist apertura/chiusura; più lingue; notifiche in più per i ragazzi.
-3. Mario deve provare sul telefono v13-v18.
+## Prove
+`tools/README.md`. Nuove oggi: `test-invito-bloccato`, `test-registrazione` (21), `test-firebase-telefoni` (24), `test-firebase-wifi-lento` (13); le prove Firebase approvano il secondo telefono da A. Dopo un riavvio: `python3 -m http.server 8765` e l'emulatore (`npx firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`), poi caricare le regole nell'emulatore e svuotare `demo-jona` e `jona-ordini`.
 
-## Rischi e note aperte
-- Animazione: per circa un decimo di secondo la mano dello staff, mossa e sfocata, si perde nello scontorno; si nota appena.
-- Chat: tutti i telefoni collegati scaricano tutti i messaggi, anche privati (scritto in `docs/FIREBASE.md`).
-- Il Chromium di Playwright non legge l'H.264: `test-invio-anim` usa una copia WebM. Nella sessione cloud il controllo online si fa confrontando gli hash.
-- Dopo un riavvio della sessione va riacceso il server locale (`python3 -m http.server 8765`) e, per le prove Firebase, l'emulatore (svuotare `demo-jona` e `jona-ordini`).
-- `test-firebase-flow` fallisce tra le 23:30 e mezzanotte: non è un errore dell'app.
-- Background Sync non esiste su iPhone; il promemoria del contesto può segnalare troppo presto.
+## Rischi aperti
+- `/invia` del Worker non controlla chi chiama.
+- Il telefono in attesa non può mandare push ai gestori: li avvisa la lista in Staff.
+- Tutti i telefoni approvati leggono tutti i messaggi, anche privati.
+- `test-firebase-flow` fallisce tra le 23:30 e mezzanotte.
+- Foto e vocali: chiunque sia approvato può scaricarli conoscendo l'id (come per i messaggi privati).

@@ -230,6 +230,8 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .seg{display:inline-flex;padding:3px;background:var(--sunk);border-radius:999px;border:1px solid var(--line);max-width:100%;overflow-x:auto;scrollbar-width:none}
 .seg.wide{display:flex}
 .seg.wide button{flex:1}
+.seg.rep{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:18px;overflow:visible}
+.seg.rep button{white-space:normal;min-height:44px;padding:8px 4px;border-radius:14px;line-height:1.2}
 .seg button{border:0;background:none;padding:8px 14px;border-radius:999px;font:400 14.5px var(--font);color:var(--muted);white-space:nowrap}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none;margin:0 -2px}
@@ -662,7 +664,25 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .cht-in textarea{flex:1;min-width:0;resize:none;min-height:48px;max-height:140px;padding:13px 18px;border-radius:24px;border:0;background:var(--surface);color:var(--ink);font:400 16px/1.35 var(--font);box-shadow:0 1px .5px rgba(0,0,0,.12)}
 .cht-in textarea:focus{outline:2px solid var(--lagoon-soft)}
 .cht-send{width:48px;height:48px;flex:none;border:0;border-radius:50%;background:var(--lagoon);color:var(--on-lagoon);display:grid;place-items:center;box-shadow:0 2px 6px -2px rgba(0,0,0,.3)}
-.cht-send .ic{width:22px;height:22px;margin-left:-2px}.cht-send:active{transform:scale(.94)}
+.cht-send .ic{width:22px;height:22px;margin-left:-2px}
+.cht-in .cht-mic,.cht-in.has-t .cht-snd{display:grid}.cht-in .cht-snd,.cht-in.has-t .cht-mic{display:none}.cht-in.no-alg .cht-snd{display:grid}.cht-in.no-alg .cht-mic{display:none}
+.cht-cam{width:44px;height:48px;flex:none;border:0;background:none;color:var(--muted);display:grid;place-items:center;border-radius:50%}.cht-cam .ic{width:25px;height:25px}
+.cht-rec{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:48px;padding:0 18px;border-radius:24px;background:var(--surface);font:400 16px var(--font)}
+.cht-rec i{width:11px;height:11px;border-radius:50%;background:#D64545;animation:chrec 1s ease-in-out infinite}.cht-rec b{font-weight:500;font-variant-numeric:tabular-nums}.cht-rec span{color:var(--muted);font-size:14px}
+@keyframes chrec{50%{opacity:.25}}
+.cht-del{width:48px;height:48px;flex:none;border:0;border-radius:50%;background:var(--surface);color:#D64545;display:grid;place-items:center}.cht-del .ic{width:22px;height:22px}
+.cht-b p.cht-f{padding:3px 3px 5px}.cht-b p.cht-f .cht-who{margin:3px 6px 3px}.cht-b p.cht-f .cht-t{margin-right:6px}
+.cht-ph{all:unset;box-sizing:border-box;display:block;position:relative;width:min(260px,66vw);max-height:340px;border-radius:9px;overflow:hidden;background:var(--sunk);cursor:pointer}
+.cht-ph img{display:block;width:100%;height:100%;object-fit:cover;filter:blur(8px);transform:scale(1.06);transition:filter .25s}.cht-ph img.ok{filter:none;transform:none}
+.cht-ph>span{position:absolute;inset:auto 8px 8px;padding:5px 8px;border-radius:8px;background:rgba(0,0,0,.6);color:#fff;font-size:12.5px;text-align:center}
+.cht-au{display:flex;align-items:center;gap:10px;width:min(240px,62vw);padding:2px 0}
+.cht-play{width:40px;height:40px;flex:none;border:0;border-radius:50%;background:var(--lagoon);color:var(--on-lagoon);display:grid;place-items:center}.cht-play .ic{width:18px;height:18px}
+.cht-bar{flex:1;height:4px;border-radius:2px;background:var(--line);overflow:hidden}.cht-bar i{display:block;height:100%;background:var(--lagoon)}
+.cht-dur{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cht-up{align-self:flex-end;margin:6px 0;padding:6px 12px;border-radius:10px;background:var(--surface);color:var(--muted);font-size:13px}
+.cht-view{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:rgba(0,0,0,.92)}.cht-view img{max-width:100%;max-height:100%;object-fit:contain}
+.cht-view .icon-btn{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:10px;color:#fff;background:rgba(255,255,255,.15)}
+.cht-sp{margin:12px 16px 16px;font-size:12.5px;color:var(--muted)}.cht-send:active{transform:scale(.94)}
 .cht-more{display:block;margin:6px auto 4px;padding:7px 14px;border:0;border-radius:99px;background:var(--surface);color:var(--lagoon);font:500 13px var(--font);box-shadow:0 1px 1px rgba(0,0,0,.08)}
 .cht-hint{align-self:center;margin:20px 0;padding:8px 14px;border-radius:10px;background:var(--ocra-soft);color:var(--ink2);font-size:13.5px}
 /* ---------- «Chiedi a Jona» ---------- */
@@ -962,15 +982,20 @@ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h
 rain:'<path d="M7 15.5h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6-1.3A4.5 4.5 0 0 0 7 15.5z"/><path d="M8.5 18.5l-1 2.2M12.5 18.5l-1 2.2M16.5 18.5l-1 2.2"/>',
 pot:'<path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M9 7.2c0-1.6 1.3-2.7 3-2.7s3 1.1 3 2.7"/>',
 glass:'<path d="M7 3h10l-1 7.5a4 4 0 0 1-8 0z"/><path d="M12 14.5V20M8.5 20.5h7M7.5 7h9"/>',
-msg:'<path d="M4.5 5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h-1A1.5 1.5 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5z"/><path d="M7.5 9.5h9M7.5 12.5h6"/>'
+msg:'<path d="M4.5 5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h-1A1.5 1.5 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5z"/><path d="M7.5 9.5h9M7.5 12.5h6"/>',
+play:'<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
+pause:'<path d="M8 5.5v13M16 5.5v13" stroke-width="3"/>'
 };
 const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
 
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=25;
+const APP_VER=26;
 const NEWS=[
+  {v:26,data:'2026-10-04',titolo:'Foto e vocali in chat',
+    tutti:['In chat puoi mandare una «foto» (tasto con la macchina fotografica) e un «messaggio vocale» (tasto con il microfono: parla, poi premi la freccia per inviare o il cestino per cancellare). I vocali durano al massimo 2 minuti.','Foto e vocali restano 60 giorni, poi si cancellano da soli.','Nuovi reparti: «F&B Manager» e «Responsabile».','Se hai bloccato le notifiche per sbaglio, l\'app ti spiega passo passo come sbloccarle.'],
+    dev:{aggiunte:['Worker `/allegati` (POST base64 con `x-tipo`, GET `/allegati/<db>-<id>`, `/allegati/spazio`) su D1 `ALLEGATI0..3` creati dal workflow (Account › D1 › Edit sul token), tetto 440 MB per database con cancellazione dei più vecchi, cron notturno oltre 60 giorni. App: `ALG`, `algUp`/`algGet` (cache `jona-allegati`), `algImg` (1280 px WebP/JPEG + `mini` 40 px), `chRec` (MediaRecorder MP4/AAC o WebM/Opus, 24 kbps, 2 min), `chPlay`, `chView`, spazio in fondo alla lista chat per lo sviluppatore.','`REPARTI` con `fb` e `resp` (la chiave `altro` resta «Altro»); `PUSH_DENY` e `pushDenied()` in `pushHelp` quando `Notification.permission` è `denied`.']}},
   {v:25,data:'2026-10-04',titolo:'Chat anche sul Wi-Fi lento',
     tutti:['Se il Wi-Fi rallenta i messaggi (per esempio quello dell\'hotel), l\'app se ne accorge e passa da sola a un collegamento che funziona meglio.','Nella chat: «Usa questa chat in modo responsabile e solo per lavoro».'],
     dev:{risolti:['`netWatch`: scrittura non confermata in 4 s con la rete accesa → `jona_fb_lp` e ricarica dopo la conferma (solo senza fogli aperti, testo in chat o scritture in sospeso), altrimenti alla prossima apertura. Usato in `track` e in `chSend`.']}},
@@ -1072,7 +1097,7 @@ const NEWS=[
 ];
 
 /* ================= constants ================= */
-const REPARTI={cucina:'Cucina',sala:'Sala',altro:'Altro'};
+const REPARTI={cucina:'Cucina',sala:'Sala',fb:'F&B Manager',resp:'Responsabile',altro:'Altro'};
 const MANSIONI=['Chef','Sous chef','Cuoco','Commis','Pasticcere','Lavapiatti','Maître','Cameriere','Sommelier','Barman','F&B manager','Altro'];
 const CATS=['Pesce','Carne','Verdura e frutta','Latticini e uova','Secco e dispensa','Bevande','Caffè','Pulizia e monouso','Altro'];
 const METODI={modulo:{l:'Modulo d\'ordine compilato',i:'file'},whatsapp:{l:'WhatsApp',i:'chat'},email:{l:'Email',i:'mail'},excel:{l:'File Excel per email',i:'sheet'},word:{l:'File Word per email',i:'file'},pdf:{l:'PDF per email',i:'file'},sito:{l:'Sito del fornitore',i:'globe'},telefono:{l:'Telefono',i:'phone'}};
@@ -1177,7 +1202,7 @@ function fbInit(){
 function netWatch(p){
   if(ls('jona_fb_lp')||!S.db||S.db.kind!=='firebase')return p;
   const t=setTimeout(()=>{if(navigator.onLine===false||document.hidden||ls('jona_fb_lp'))return;ls('jona_fb_lp',1);
-    const go=()=>{const ta=$('#ch-ta');return!sheets.length&&!(ta&&ta.value.trim())};
+    const go=()=>{const ta=$('#ch-ta');return!sheets.length&&!(ta&&ta.value.trim())&&!CHAT.up&&!(S.chat&&S.chat.rec)};
     const later=(n=0)=>{if(!go())return;if(S.db.status().pend&&n<60)return setTimeout(()=>later(n+1),1000);if(!S.db.status().pend)location.reload()};
     toast(go()?'Questa rete Wi-Fi rallenta i messaggi: passo a un collegamento compatibile…':'Questa rete Wi-Fi rallenta i messaggi: dalla prossima apertura l\'app userà un collegamento compatibile.','warn');
     Promise.resolve(p).then(()=>setTimeout(later,600),()=>{})},4000);
@@ -1367,9 +1392,16 @@ const PUSH_HELP=[
   ['huawei','Huawei, Honor',['Controlla se sul telefono c\'è il <b>Play Store</b>. Se <b>non c\'è</b>, le notifiche ad app chiusa non possono funzionare: gli avvisi li trovi nella <b>campanella</b> quando apri l\'app.','Se il Play Store c\'è: <b>Impostazioni</b> → <b>Batteria</b> → <b>Avvio app</b> → <b>Chrome</b> → spegni <b>Gestisci automaticamente</b> e accendi tutti gli interruttori.','Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendile.']],
   ['oppo','Oppo, Realme, OnePlus',['Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendile.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b> → <b>Utilizzo batteria</b> → accendi <b>Consenti attività in background</b> (e <b>Avvio automatico</b>, se c\'è).']],
   ['altro','Altro telefono',['Usa <b>Chrome</b>: apri kur0chanx.github.io/jona-ordini in Chrome, premi i <b>tre puntini</b> in alto → <b>Aggiungi a schermata Home</b> (o <b>Installa app</b>) e apri Jona dalla nuova icona.','Controlla che sul telefono ci sia il <b>Play Store</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b>: <b>Notifiche</b> accese e <b>Batteria</b> senza restrizioni.']]];
+const PUSH_DENY={iphone:['Apri <b>Impostazioni</b> del telefono (l\'icona con l\'ingranaggio).','Premi <b>Notifiche</b>.','Scorri e premi <b>Jona Ordini</b>.','Accendi <b>Consenti notifiche</b>.','Chiudi del tutto Jona e riaprila <b>dall\'icona</b> sulla schermata Home.'],
+  android:['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi <b>Informazioni app</b> (o la <b>i</b>).','Premi <b>Notifiche</b> e accendi <b>Consenti notifiche</b>.','Non trovi la voce? Apri <b>Chrome</b> → <b>tre puntini</b> in alto a destra → <b>Impostazioni</b> → <b>Impostazioni sito</b> → <b>Notifiche</b>.','Sotto <b>Bloccate</b> premi <b>kur0chanx.github.io</b> → scegli <b>Consenti</b>.','Chiudi del tutto Jona e riaprila <b>dall\'icona</b>.']};
+const pushDenied=()=>pushOk()&&Notification.permission==='denied';
 function pushHelp(){
   if(!S.pushBrand)S.pushBrand=/iPhone|iPad/.test(navigator.userAgent)?'iphone':/Xiaomi|Redmi|POCO/i.test(navigator.userAgent)?'xiaomi':/SM-[A-Z]\d|Samsung/i.test(navigator.userAgent)?'samsung':'';
-  openSheet({cls:'tall',render:()=>{const g=PUSH_HELP.find(x=>x[0]===S.pushBrand);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Le notifiche non arrivano?</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  if(sheets.some(x=>x.ph)){repaint();return}S.pushAll=false;
+  openSheet({cls:'tall',ph:1,render:()=>{const g=PUSH_HELP.find(x=>x[0]===S.pushBrand);if(pushDenied()&&!S.pushAll){const ios=/iPhone|iPad/.test(navigator.userAgent);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche bloccate</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <p>Su questo telefono le notifiche di Jona sono <b>bloccate</b> (forse hai premuto <b>Blocca</b> o <b>Non consentire</b> per sbaglio). L'app non può chiedere di nuovo: vanno sbloccate a mano, così.</p>
+  <h3 class="ph-t">${ios?'iPhone':'Android'}</h3><ol class="ph-ol">${PUSH_DENY[ios?'iphone':'android'].map(x=>`<li>${x}</li>`).join('')}</ol>
+  <div class="btns col"><button type="button" class="btn primary block" data-a="pushOn">${ic('bell')} Riprova ad attivare</button><button type="button" class="btn ghost block" data-a="pushAll">Ho un altro problema</button></div>`}return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Le notifiche non arrivano?</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <h3 class="ph-t">Prima prova così</h3><ol class="ph-ol"><li>Controlla di avere <b>internet</b>.</li><li>Chiudi del tutto Jona e riaprila <b>dall'icona</b> sulla schermata Home.</li><li>Tocca <b>la tua foto</b> → <b>Attiva le notifiche</b> → <b>Consenti</b>.</li></ol>
   <h3 class="ph-t">Non va ancora? Scegli il tuo telefono</h3><div class="ph-brands">${PUSH_HELP.map(([k,l])=>`<button type="button" class="btn ghost" aria-pressed="${k===S.pushBrand}" data-a="pushBrand" data-v="${k}">${l}</button>`).join('')}</div>
   ${g?`<h3 class="ph-t">${g[1]}</h3><ol class="ph-ol">${g[2].map(x=>`<li>${x}</li>`).join('')}</ol>
@@ -1593,7 +1625,7 @@ function profileForm(p,o={}){
   <div class="two stack"><div><label class="lbl" for="${p}-nome">Nome</label><input class="inp" id="${p}-nome" autocomplete="given-name" value="${esc(f.nome||'')}" data-in="form" data-k="nome"></div>
   <div><label class="lbl" for="${p}-cognome">Cognome</label><input class="inp" id="${p}-cognome" autocomplete="family-name" value="${esc(f.cognome||'')}" data-in="form" data-k="cognome"></div></div>
   ${o.roles?`<span class="lbl">Ruolo</span><div class="seg wide">${o.roles.map(k=>`<button type="button" aria-pressed="${f.ruolo===k}" data-a="formset" data-k="ruolo" data-v="${k}">${RUOLI[k]}</button>`).join('')}</div><p class="muted small" style="margin:6px 0 0">${({staff:'Cerca prodotti, invia richieste e controlla la merce in arrivo. Non vede i prezzi.',gm:'Approva le richieste, ordina ai fornitori, gestisce tutto.',dev:'Carica listini e gestisce fornitori e profili. Non approva e non ordina.'})[f.ruolo]||''}</p>`:''}
-  ${(f.ruolo||'staff')==='staff'&&!o.noRep?`<span class="lbl">Reparto</span><div class="seg wide">${Object.entries(REPARTI).map(([k,l])=>`<button type="button" aria-pressed="${f.reparto===k}" data-a="formset" data-k="reparto" data-v="${k}">${l}</button>`).join('')}</div>
+  ${(f.ruolo||'staff')==='staff'&&!o.noRep?`<span class="lbl">Reparto</span><div class="seg wide rep">${Object.entries(REPARTI).map(([k,l])=>`<button type="button" aria-pressed="${f.reparto===k}" data-a="formset" data-k="reparto" data-v="${k}">${l}</button>`).join('')}</div>
   <label class="lbl" for="${p}-mans">Mansione</label><select class="inp" id="${p}-mans" data-ch="formsel" data-k="mansione">${MANSIONI.map(m=>`<option ${f.mansione===m?'selected':''}>${esc(m)}</option>`).join('')}</select>`:''}
   ${o.contr&&withContr(f)?orContrForm(p):''}
   ${o.user!==false?`<label class="lbl" for="${p}-user">Nome utente <span class="muted small">(serve per entrare)</span></label><input class="inp" id="${p}-user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="es. marco.rossi" value="${esc(f.username||'')}" data-in="form" data-k="username">`:''}
@@ -3446,10 +3478,99 @@ async function chSend(){
   const d={c:C.c,da:me.id,t,creato:now()};C.draft[C.c]='';if(el){el.value='';el.style.height=''}C.stick=true;
   if(chFb())netWatch(chCol().add(d)).catch(e=>toast(e&&e.code==='permission-denied'?'La chat non è ancora attiva sul database.':'Messaggio non inviato: riprova.','err'));
   else await put('messaggi',uid(),d);
-  chMarkRead(C.c,d.creato);
-  const to=chMembers(C.c).filter(u=>u.id!==me.id).map(u=>u.id),info=chInfo(C.c,me);
-  if(to.length)pushSend(to,me.nome+(C.c.startsWith('dm_')?'':' · '+info.n),t.slice(0,140));
+  chMarkRead(C.c,d.creato);chPush(C.c,me,t);
 }
+function chPush(c,me,t){const to=chMembers(c).filter(u=>u.id!==me.id).map(u=>u.id),info=chInfo(c,me);
+  if(to.length)pushSend(to,me.nome+(c.startsWith('dm_')?'':' · '+info.n),t.slice(0,140))}
+
+/* ---- foto e vocali: il file va nel Worker (database D1, in base64), nel messaggio restano tipo, id e anteprima.
+   {tipo:'foto', m, w, h, mini} | {tipo:'audio', m, dur}; «t» resta un testo («📷 Foto») per le liste, gli avvisi e le versioni vecchie.
+   I file scaricati restano nella cache «jona-allegati» del telefono (il service worker non la cancella). */
+const ALG={ok:null,p:null,url:{},load:{},gone:{},pl:null,sp:null,io:null};
+const algOn=()=>chFb()&&ALG.ok===true;
+function algCheck(){if(ALG.ok!==null||ALG.p||!chFb())return;
+  ALG.p=fetch(PUSH_URL+'/salute').then(r=>r.json()).then(j=>{ALG.ok=!!j.allegati;chPaint(true)}).catch(()=>{}).finally(()=>{ALG.p=null})}
+async function algTok(){try{return await fbInit().auth.currentUser.getIdToken()}catch(e){return''}}
+const algB64=blob=>new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=()=>ko(r.error);r.readAsDataURL(blob)});
+async function algUp(blob){
+  const r=await fetch(PUSH_URL+'/allegati',{method:'POST',headers:{'content-type':'text/plain','x-tipo':blob.type.split(';')[0],authorization:'Bearer '+await algTok()},body:await algB64(blob)});
+  const j=await r.json().catch(()=>({}));if(!r.ok||!j.id)throw Object.assign(new Error(j.errore||'errore'),{status:r.status});return j.id}
+function algGet(id){
+  if(ALG.url[id])return Promise.resolve(ALG.url[id]);
+  return ALG.load[id]||(ALG.load[id]=(async()=>{const key=PUSH_URL+'/allegati/'+id;let c=null,res=null;
+    try{c=await caches.open('jona-allegati');res=await c.match(key)}catch(e){}
+    if(!res){const r=await fetch(key,{headers:{authorization:'Bearer '+await algTok()}});
+      if(r.status===404){ALG.gone[id]=1;throw Object.assign(new Error('via'),{gone:1})}if(!r.ok)throw new Error('errore '+r.status);
+      const bin=atob(await r.text()),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+      res=new Response(new Blob([u],{type:r.headers.get('x-tipo')||''}));
+      if(c)try{await c.put(key,res.clone());const ks=await c.keys();for(const k of ks.slice(0,Math.max(0,ks.length-400)))await c.delete(k)}catch(e){}}
+    return ALG.url[id]=URL.createObjectURL(await res.blob())})().finally(()=>{delete ALG.load[id]}))}
+async function algSpace(){try{const r=await fetch(PUSH_URL+'/allegati/spazio',{headers:{authorization:'Bearer '+await algTok()}});if(r.ok){ALG.sp=await r.json();chPaint(true)}}catch(e){}}
+const algMB=b=>b>=1e9?(b/1e9).toFixed(1).replace('.',',')+' GB':Math.round(b/1e6)+' MB';
+// foto: lato lungo 1280 px (WebP 0,7, o JPEG dove il WebP non c'è), anteprima 40 px dentro il messaggio
+async function algImg(file){
+  const im=await loadImg(file),W=im.naturalWidth||im.width,H=im.naturalHeight||im.height;
+  const cv=m=>{const k=Math.min(1,m/Math.max(W,H)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(W*k));c.height=Math.max(1,Math.round(H*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c};
+  const big=cv(1280);let blob=await new Promise(r=>big.toBlob(r,'image/webp',.7));
+  if(!blob||blob.type!=='image/webp')blob=await new Promise(r=>big.toBlob(r,'image/jpeg',.72));
+  return{blob,w:big.width,h:big.height,mini:cv(40).toDataURL('image/jpeg',.5)}}
+async function chFile(tipo,blob,x){
+  const me=realU();if(!x.c||!me||!blob)return;
+  if(blob.size>1.3e6)return toast(tipo==='foto'?'Foto troppo grande.':'Vocale troppo lungo.','warn');
+  CHAT.up=(CHAT.up||0)+1;chPaint(true);
+  try{const id=await algUp(blob);ALG.url[id]=URL.createObjectURL(blob);
+    const t=tipo==='foto'?'📷 Foto':'🎤 Messaggio vocale ('+chDur(x.dur)+')';
+    const d=Object.assign({c:x.c,da:me.id,t,creato:now(),tipo,m:id},tipo==='foto'?{w:x.w,h:x.h,mini:x.mini}:{dur:x.dur});
+    if(S.chat)S.chat.stick=true;
+    netWatch(chCol().add(d)).catch(e=>toast('Messaggio non inviato: riprova.','err'));
+    chMarkRead(x.c,d.creato);chPush(x.c,me,t)}
+  catch(e){toast(e.status===403?'Questo telefono non è collegato al ristorante.':e.status===503?'Foto e vocali non sono ancora attivi sul server.':(tipo==='foto'?'Foto':'Vocale')+' non inviat'+(tipo==='foto'?'a':'o')+': controlla la connessione e riprova.','err')}
+  finally{CHAT.up--;chPaint(true)}}
+function chPhoto(){const c=S.chat&&S.chat.c;if(!c)return;
+  pickFile({accept:'image/*'},async fs=>{let x;try{x=await algImg(fs[0])}catch(e){return toast('Non riesco ad aprire questa foto.','err')}chFile('foto',x.blob,Object.assign(x,{c}))})}
+const chDur=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+// vocali: mono a 24 kbps, al massimo 2 minuti. Prima l'MP4/AAC (lo leggono iPhone e Android), poi il WebM/Opus
+async function chRec(){
+  const C=S.chat;if(!C||!C.c||C.rec)return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder)return toast('Questo telefono non può registrare vocali.','warn');
+  let st;try{st=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}})}
+  catch(e){return toast(e&&e.name==='NotAllowedError'?'Il microfono è bloccato: consenti il microfono a Jona nelle impostazioni del telefono.':'Non riesco a usare il microfono.','err')}
+  const type=['audio/mp4;codecs=mp4a.40.2','audio/mp4','audio/webm;codecs=opus','audio/webm'].find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
+  let mr;try{mr=new MediaRecorder(st,Object.assign({audioBitsPerSecond:24000},type?{mimeType:type}:{}))}catch(e){st.getTracks().forEach(t=>t.stop());return toast('Non riesco a registrare su questo telefono.','err')}
+  const R={mr,c:C.c,ch:[],t0:now(),send:false};C.rec=R;
+  mr.ondataavailable=e=>{if(e.data&&e.data.size)R.ch.push(e.data)};
+  mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());clearInterval(R.iv);if(S.chat&&S.chat.rec===R)S.chat.rec=null;chPaint(true);
+    if(!R.send)return;if(R.dur<1)return toast('Vocale troppo corto.','warn');
+    chFile('audio',new Blob(R.ch,{type:(mr.mimeType||type||'audio/webm').split(';')[0]}),{c:R.c,dur:R.dur})};
+  mr.start(1000);
+  R.iv=setInterval(()=>{const s=(now()-R.t0)/1000,el=document.getElementById('ch-rt');if(el)el.textContent=chDur(s);if(s>=120)chRecStop(true)},250);
+  chPaint(true)}
+function chRecStop(send){const R=S.chat&&S.chat.rec;if(!R||R.done)return;R.done=1;R.send=send;R.dur=Math.min(120,Math.round((now()-R.t0)/1000));try{R.mr.stop()}catch(e){}}
+async function chPlay(id){
+  const P=ALG.pl;if(P&&P.id===id){if(P.a.paused)P.a.play().catch(()=>{});else P.a.pause();return}
+  if(P){P.a.pause();ALG.pl=null;chAuPaint(P.id)}
+  let u;try{u=await algGet(id)}catch(e){chPaint(true);return toast(e.gone?'Questo vocale non è più disponibile.':'Non riesco a scaricare il vocale.','warn')}
+  const a=new Audio(u),N={id,a};ALG.pl=N;
+  a.onplay=a.onpause=()=>chAuPaint(id);a.ontimeupdate=()=>chAuPaint(id);a.onended=()=>{if(ALG.pl===N)ALG.pl=null;chAuPaint(id)};
+  a.play().catch(()=>{if(ALG.pl===N)ALG.pl=null;chAuPaint(id);toast('Questo vocale non si apre su questo telefono.','warn')})}
+function chAuPaint(id){const el=CHAT.box&&CHAT.box.querySelector(`[data-au="${id}"]`);if(!el)return;const P=ALG.pl&&ALG.pl.id===id?ALG.pl:null,a=P&&P.a;
+  el.querySelector('.cht-play').innerHTML=ic(a&&!a.paused?'pause':'play');
+  el.querySelector('.cht-bar i').style.width=(a&&a.duration&&isFinite(a.duration)?Math.min(100,a.currentTime/a.duration*100):0)+'%';
+  if(a&&a.currentTime)el.querySelector('.cht-dur').textContent=chDur(a.currentTime)}
+function chView(id){
+  const show=u=>{if(!CHAT.box)return;const v=document.createElement('div');v.className='cht-view';v.dataset.a='chViewX';v.innerHTML=`<img alt="Foto" src="${u}"><button type="button" class="icon-btn" data-a="chViewX" aria-label="Chiudi">${ic('x')}</button>`;CHAT.box.appendChild(v)};
+  algGet(id).then(show,e=>{chPaint(true);toast(e.gone?'Questa foto non è più disponibile.':'Non riesco a scaricare la foto.','warn')})}
+// le foto si scaricano quando arrivano vicino allo schermo
+function chImgs(box){
+  if(!ALG.io&&'IntersectionObserver' in window)ALG.io=new IntersectionObserver(es=>{for(const e of es)if(e.isIntersecting){ALG.io.unobserve(e.target);chImg(e.target)}},{rootMargin:'300px'});
+  box.querySelectorAll('img[data-alg]:not(.ok)').forEach(img=>{if(ALG.gone[img.dataset.alg])return;ALG.io?ALG.io.observe(img):chImg(img)})}
+function chImg(img){const id=img.dataset.alg;algGet(id).then(u=>{img.src=u;img.classList.add('ok')},e=>{if(e.gone)chPaint(true)})}
+function chMsgBody(m,who){
+  if(m.tipo==='foto'&&m.m){const u=ALG.url[m.m],w=Number(m.w)||4,h=Number(m.h)||3;
+    return`<p class="cht-f">${who}<button type="button" class="cht-ph" data-a="chView" data-v="${esc(m.m)}" style="aspect-ratio:${w}/${h}" aria-label="Apri la foto"><img alt="" src="${esc(u||m.mini||'')}" data-alg="${esc(m.m)}"${u?' class="ok"':''}>${ALG.gone[m.m]?'<span>Foto non più disponibile</span>':''}</button>`}
+  if(m.tipo==='audio'&&m.m){const P=ALG.pl&&ALG.pl.id===m.m?ALG.pl.a:null;
+    return`<p>${who}<span class="cht-au" data-au="${esc(m.m)}"><button type="button" class="cht-play" data-a="chPlay" data-v="${esc(m.m)}" aria-label="Ascolta il vocale">${ic(P&&!P.paused?'pause':'play')}</button><span class="cht-bar"><i style="width:0%"></i></span><span class="cht-dur">${ALG.gone[m.m]?'non più disponibile':chDur(Number(m.dur)||0)}</span></span>`}
+  return`<p>${who}${esc(m.t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}`}
 function chMarkRead(c,t){
   const me=realU();if(!me||!c)return;t=t||now();if(chRead(me,c)>=t)return;
   (CHAT.letti[me.id]=CHAT.letti[me.id]||{})[c]=t;const key=me.id+'.'+c;
@@ -3469,10 +3590,10 @@ function chOpen(c){
   S.chat={c:c||null,draft:{},pick:false,stick:true};
   if(!CHAT.box){CHAT.box=document.createElement('div');CHAT.box.className='cht';CHAT.box.setAttribute('role','dialog');CHAT.box.setAttribute('aria-label','Chat');document.body.appendChild(CHAT.box)}
   CHAT.last={};CHAT.box.innerHTML=`<aside class="cht-l"></aside><section class="cht-c"></section>`;document.body.classList.add('noscroll');
-  requestAnimationFrame(()=>CHAT.box&&CHAT.box.classList.add('open'));chPaint(true);
+  requestAnimationFrame(()=>CHAT.box&&CHAT.box.classList.add('open'));algCheck();if(isDev(realU())&&chFb())algSpace();chPaint(true);
 }
-function chClose(){if(!CHAT.box)return;const b=CHAT.box;CHAT.box=null;S.chat=null;b.classList.remove('open');setTimeout(()=>b.remove(),250);if(!sheets.length)document.body.classList.remove('noscroll');render()}
-const CH_G={tutti:['var(--lagoon)','users'],cucina:['var(--ocra)','pot'],sala:['#5B6FA8','glass'],altro:['var(--mirto)','msg']};
+function chClose(){if(!CHAT.box)return;chRecStop(false);if(ALG.pl){ALG.pl.a.pause();ALG.pl=null}const b=CHAT.box;CHAT.box=null;S.chat=null;b.classList.remove('open');setTimeout(()=>b.remove(),250);if(!sheets.length)document.body.classList.remove('noscroll');render()}
+const CH_G={tutti:['var(--lagoon)','users'],cucina:['var(--ocra)','pot'],sala:['#5B6FA8','glass'],fb:['#8A5A9E','chart'],resp:['#B5654A','user'],altro:['var(--mirto)','msg']};
 const chAv=(info,size)=>{if(info.u)return avatar(info.u,size);const [c,i]=CH_G[info.g]||CH_G.altro;return`<span class="av cht-gav" style="--s:${size}px;--c:${c}">${ic(i)}</span>`};
 const chTime=t=>new Date(t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 const chDay=t=>{const d=new Date(t),td=new Date();const y=new Date(td);y.setDate(td.getDate()-1);return d.toDateString()===td.toDateString()?'Oggi':d.toDateString()===y.toDateString()?'Ieri':d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})};
@@ -3485,14 +3606,16 @@ function chPaint(force){
     ${err?`<div class="cht-off">${ic('warn')}<b>La chat va attivata</b><span>Il database non accetta ancora i messaggi. ${isMgr(me)?'Aggiorna le regole di Firebase con il file <code>firebase/firestore.rules</code> (vedi la guida di Mario).':'Chiedi a Maurizio o a Mario di attivarla.'}</span></div>`:''}
     <div class="cht-items">${C.pick?`<p class="cht-sub">Nuova chat con…</p>`+chPeople().filter(u=>u.id!==me.id).sort(byNome).map(u=>`<button type="button" class="cht-it" data-a="chGo" data-c="${chDm(me.id,u.id)}">${avatar(u,46)}<div class="cht-ii"><b>${esc(fullName(u))}</b><span>${esc(isMgr(u)?RUOLI[u.ruolo]:[u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</span></div></button>`).join('')
     :list.map(x=>{const i=chInfo(x.c,me),l=x.last,w=l&&D().staff[l.da];return`<button type="button" class="cht-it${C.c===x.c?' on':''}" data-a="chGo" data-c="${x.c}">${chAv(i,46)}<div class="cht-ii"><div class="cht-r"><b>${esc(i.n)}</b>${l?`<time class="${x.un?'un':''}">${chDay(l.creato)==='Oggi'?chTime(l.creato):chDay(l.creato)==='Ieri'?'Ieri':new Date(l.creato).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</time>`:''}</div>
-      <div class="cht-r"><span>${l?(l.da===me.id?'Tu: ':!x.c.startsWith('dm_')&&w?esc(w.nome)+': ':'')+esc(l.t):`<i>${esc(i.s)}</i>`}</span>${x.un?`<em>${x.un>99?'99+':x.un}</em>`:''}</div></div></button>`}).join('')}</div>`);
+      <div class="cht-r"><span>${l?(l.da===me.id?'Tu: ':!x.c.startsWith('dm_')&&w?esc(w.nome)+': ':'')+esc(l.t):`<i>${esc(i.s)}</i>`}</span>${x.un?`<em>${x.un>99?'99+':x.un}</em>`:''}</div></div></button>`}).join('')}
+    ${isDev(me)&&ALG.sp&&!C.pick?`<p class="cht-sp">Foto e vocali sul server: ${algMB(ALG.sp.usato)} su ${algMB(ALG.sp.tetto)} (${ALG.sp.file} file). Si cancellano da soli dopo ${ALG.sp.giorni} giorni o, se lo spazio finisce, dai più vecchi.</p>`:''}</div>`);
   // conversazione
   if(!C.c){set('.cht-c',`<div class="cht-empty">${ic('chat')}<b>Messaggi tra colleghi</b><span>Scegli una chat o tocca la matita per scriverne una nuova.</span><span>Usa questa chat in modo responsabile e solo per lavoro.</span></div>`);return}
   if(!chCan(C.c,me)){C.c=null;return chPaint(true)}
   const i=chInfo(C.c,me);const fresh=set('.cht-c',`<header class="cht-h cht-ch"><button type="button" class="icon-btn" data-a="chBack" aria-label="Torna alla lista">${ic('back')}</button>${chAv(i,40)}<div class="cht-ct"><b>${esc(i.n)}</b><span>${esc(i.s)}</span></div></header>
     <div class="cht-m" id="ch-m"></div>
-    <div class="cht-in"><textarea id="ch-ta" rows="1" placeholder="Scrivi un messaggio" aria-label="Messaggio" enterkeyhint="send" data-in="chTa"></textarea><button type="button" class="cht-send" data-a="chSend" aria-label="Invia">${ic('send')}</button></div><!--${C.c}-->`);
-  if(fresh){const ta=$('#ch-ta');if(ta)ta.value=C.draft[C.c]||''}
+    ${C.rec?`<div class="cht-in"><button type="button" class="cht-del" data-a="chRecNo" aria-label="Cancella il vocale">${ic('trash')}</button><div class="cht-rec" role="status"><i></i><b id="ch-rt">${chDur((now()-C.rec.t0)/1000)}</b><span>Registrazione…</span></div><button type="button" class="cht-send" data-a="chRecOk" aria-label="Invia il vocale">${ic('send')}</button></div>`
+    :`<div class="cht-in${algOn()?'':' no-alg'}">${algOn()?`<button type="button" class="cht-cam" data-a="chPhoto" aria-label="Manda una foto">${ic('camera')}</button>`:''}<textarea id="ch-ta" rows="1" placeholder="Scrivi un messaggio" aria-label="Messaggio" enterkeyhint="send" data-in="chTa"></textarea><button type="button" class="cht-send cht-snd" data-a="chSend" aria-label="Invia">${ic('send')}</button>${algOn()?`<button type="button" class="cht-send cht-mic" data-a="chRec" aria-label="Registra un vocale">${ic('mic')}</button>`:''}</div>`}<!--${C.c}${C.rec?'r':''}${algOn()?'a':''}-->`);
+  if(fresh){const ta=$('#ch-ta');if(ta){ta.value=C.draft[C.c]||'';ta.parentNode.classList.toggle('has-t',!!ta.value.trim())}}
   const ms=chAll().filter(m=>m.c===C.c).sort((a,b)=>a.creato-b.creato),other=C.c.startsWith('dm_')?chDmIds(C.c).find(id=>id!==me.id):null;
   const oRead=other?((CHAT.letti[other]||{})[C.c]||0):0;let h=ms.length>=20&&!(C.noMore&&C.noMore[C.c])?`<button type="button" class="cht-more" data-a="chMore">Messaggi precedenti</button>`:'',day='',prev=null;
   h+=`<div class="cht-rule">${ic('chat')}Usa questa chat in modo responsabile e solo per lavoro.</div>`;
@@ -3500,9 +3623,10 @@ function chPaint(force){
   for(const m of ms){const dd=chDay(m.creato);if(dd!==day){day=dd;h+=`<div class="cht-day"><span>${dd}</span></div>`;prev=null}
     const mine=m.da===me.id,u=D().staff[m.da]||{nome:'?'},first=!prev||prev.da!==m.da||m.creato-prev.creato>5*60000;
     const tick=mine?(m.pend?ic('clock','tk'):`<i class="tk${oRead>=m.creato?' rd':''}">${other?'✓✓':'✓'}</i>`):'';
-    h+=`<div class="cht-b ${mine?'me':'ot'}${first?' first':''}"><p>${!mine&&first&&!other?`<b class="cht-who" style="color:${hue(u.id||u.nome)}">${esc(u.nome)}</b>`:''}${esc(m.t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}<span class="cht-t">${chTime(m.creato)}${tick}</span></p></div>`;prev=m}
+    h+=`<div class="cht-b ${mine?'me':'ot'}${first?' first':''}">${chMsgBody(m,!mine&&first&&!other?`<b class="cht-who" style="color:${hue(u.id||u.nome)}">${esc(u.nome)}</b>`:'')}<span class="cht-t">${chTime(m.creato)}${tick}</span></p></div>`;prev=m}
+  if(CHAT.up)h+=`<div class="cht-up" role="status">Invio in corso…</div>`;
   const box=B.querySelector('#ch-m');if(!box)return;const near=box.scrollHeight-box.scrollTop-box.clientHeight<90;
-  if(fresh||CHAT.last['#ch-m']!==h){CHAT.last['#ch-m']=h;const top=box.scrollTop,hh=box.scrollHeight;box.innerHTML=h;
+  if(fresh||CHAT.last['#ch-m']!==h){CHAT.last['#ch-m']=h;const top=box.scrollTop,hh=box.scrollHeight;box.innerHTML=h;chImgs(box);
     if(fresh||C.stick||near){box.scrollTop=box.scrollHeight;C.stick=false}else if(force)box.scrollTop=top+(box.scrollHeight-hh)}
   if(!document.hidden&&ms.length){const lastO=ms.filter(m=>m.da!==me.id).pop();if(lastO&&lastO.creato>chRead(me,C.c))chMarkRead(C.c,lastO.creato)}
   if(fresh){const ta=$('#ch-ta');if(ta&&matchMedia('(min-width:760px)').matches)ta.focus({preventScroll:true})}
@@ -3868,7 +3992,7 @@ const A={
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
-  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
+  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushAll:()=>{S.pushAll=true;repaint()},pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
   photoCam:()=>{regKeep();pickFile({accept:'image/*',capture:'user'},setPhoto)},
   photoLib:()=>{regKeep();pickFile({accept:'image/*'},setPhoto)},
   tab:d=>{if(d.v==='carrello')animPrefetch();S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
@@ -4046,12 +4170,19 @@ Object.assign(A,{
   chPick:()=>{S.chat.pick=!S.chat.pick;chPaint(true)},
   chSend:()=>chSend(),
   chMore:()=>chMore(),
+  chPhoto:()=>chPhoto(),
+  chRec:()=>chRec(),
+  chRecOk:()=>chRecStop(true),
+  chRecNo:()=>chRecStop(false),
+  chPlay:d=>chPlay(d.v),
+  chView:d=>chView(d.v),
+  chViewX:()=>{const v=CHAT.box&&CHAT.box.querySelector('.cht-view');if(v)v.remove()},
   jonaOpen:()=>jonaSheet(),
   jonaAsk:()=>jonaAsk(),
   jonaTip:d=>jonaAsk(d.v),
   jonaMic:()=>jonaMic()
 });
-IN.chTa=t=>{if(S.chat&&S.chat.c)S.chat.draft[S.chat.c]=t.value;t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px'};
+IN.chTa=t=>{if(S.chat&&S.chat.c)S.chat.draft[S.chat.c]=t.value;t.parentNode.classList.toggle('has-t',!!t.value.trim());t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px'};
 IN.jonaQ=t=>{if(S.jona)S.jona.q=t.value;t.style.height='auto';t.style.height=Math.min(t.scrollHeight,120)+'px'};
 /* timbratura e cambi turno */
 Object.assign(A,{
