@@ -64,6 +64,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 
 ## Chiavi in localStorage
 `jona_db_v2` (dati locali), `jona_me` (profilo entrato), `jona_cart_<id>`, `jona_viewas`, `jona_theme`, `jona_key` (chiave del ristorante: segreta, mai nel codice né nei commit), `jona_member`, `jona_fb` (configurazione incollata a mano), `jona_fb_upload`, `jona_gemini_key` (segreta), `jona_rem`, `jona_bk` (giorno dell'ultima copia automatica), `jona_news_<id>` (ultima versione vista nelle Novità), `jona_push` (id dell'iscrizione push di questo telefono), `jona_push_k` (chiave pubblica usata).
+IndexedDB `jona-outbox` (store `q`): push non partite, lette sia da `index.html` (`obx*`) sia da `sw.js` (Background Sync, tag `jona-outbox`).
 
 ## Regole di lavoro
 - Ad OGNI versione cambia `CACHE` in `sw.js`.

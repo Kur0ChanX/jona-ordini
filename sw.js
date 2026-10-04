@@ -1,6 +1,6 @@
 // Jona Ordini: service worker minimo per installare l'app e aprirla anche senza rete.
 // Strategia "prima la rete": prende sempre la versione più recente, usa la copia salvata solo se offline.
-const CACHE = 'jona-ordini-v15';
+const CACHE = 'jona-ordini-v16';
 const FILES = ['./', './index.html', './manifest.webmanifest', './firebase-config.js', './lib/firebase-10.14.1.js', './lib/qrcode-1.4.4.js', './jona-icon-192.png', './jona-icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -46,3 +46,36 @@ self.addEventListener('notificationclick', e => {
     return w ? w.focus() : self.clients.openWindow('./');
   }));
 });
+
+// Invii in sospeso (index.html, IndexedDB «jona-outbox»): su Android le push non partite escono anche con l'app chiusa.
+// Se l'app è aperta in primo piano le manda lei (obxFlush), così non partono due volte.
+const PUSH_URL = 'https://jona-notifiche.mario-miscera.workers.dev';
+const obxDb = () => new Promise((res, rej) => {
+  const r = indexedDB.open('jona-outbox', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('q', { keyPath: 'id' });
+  r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+});
+const obxTx = (db, mode, f) => new Promise((res, rej) => {
+  const t = db.transaction('q', mode); const q = f(t.objectStore('q'));
+  t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error);
+});
+async function obxFlush() {
+  const open = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  if (open.some(c => c.visibilityState === 'visible')) return;
+  const db = await obxDb();
+  const list = ((await obxTx(db, 'readonly', s => s.getAll())) || []).sort((a, b) => a.creato - b.creato);
+  let left = list.length;
+  try {
+    for (const x of list) {
+      if (Date.now() - x.creato < 864e5) {
+        const r = await fetch(PUSH_URL + '/invia', { method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ titolo: x.titolo, testo: x.testo, subs: x.subs.map(s => s.sub) }) });
+        if (!r.ok) throw new Error('invia ' + r.status); // Background Sync riprova più tardi
+      }
+      await obxTx(db, 'readwrite', s => s.delete(x.id)); left--;
+    }
+  } finally {
+    try { if (self.navigator.setAppBadge) await (left ? self.navigator.setAppBadge(left) : self.navigator.clearAppBadge()); } catch (err) {}
+  }
+}
+self.addEventListener('sync', e => { if (e.tag === 'jona-outbox') e.waitUntil(obxFlush()); });

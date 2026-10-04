@@ -13,9 +13,10 @@ Servono Playwright e Chromium (`/opt/pw-browsers/chromium`, già presenti nelle 
    - `node tools/test-firebase-bulk.mjs` (300 prodotti, backup e ripristino)
    - `node tools/test-firebase-flow.mjs` (dati di prova, approvazione, ora limite, riepilogo)
    - `node tools/test-firebase-push.mjs` (notifiche push: attiva, prova, chi riceve cosa, iscrizioni scadute, uscita e rientro, spegni)
+   - `node tools/test-firebase-approva-arrivi.mjs` (approvazione a blocchi per fornitore con «+ Aggiungi», controllo arrivo a semaforo e invio parziale, invii in sospeso: coda delle push, avviso, SMS, «Arrivata ✓», telefono senza rete)
    - `node tools/test-firebase-backup.mjs` (copie automatiche: pezzi sotto 1 MB, lista, scarica, ripristina, pulizia oltre 14 giorni, modalità locale)
 
-Le prove Firebase impostano `localStorage.jona_fb_emu` e una configurazione finta (`projectId: demo-jona`), ma `firebase-config.js` ha la precedenza: svuota anche il progetto `jona-ordini` (stessi due `curl` con `jona-ordini` al posto di `demo-jona`). Le prove in modalità locale (`test-staff`, `test-news`) vanno lanciate con `firebase-config.js` nascosto (`ctx.route('**/firebase-config.js', ...)` che risponde `self.JONA_FIREBASE=null`).
+Le prove Firebase impostano `localStorage.jona_fb_emu` e una configurazione finta (`projectId: demo-jona`), ma `firebase-config.js` ha la precedenza: svuota anche il progetto `jona-ordini` (stessi due `curl` con `jona-ordini` al posto di `demo-jona`). Le prove in modalità locale (`test-staff`, `test-news`, `test-voice`, `test-report`) nascondono da sole `firebase-config.js` (`route` che risponde `self.JONA_FIREBASE=null`). `test-firebase-flow` fallisce tra le 23:30 e mezzanotte (ora limite «tra 30 minuti» cade nel giorno dopo).
 
 ## Altre prove
 - `node tools/test-voice.mjs`: ordine a voce (parser di 35 frasi, riconoscimento vocale finto, conferma, carrello, campo di testo se il telefono non ha il riconoscimento).

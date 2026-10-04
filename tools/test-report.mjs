@@ -5,6 +5,8 @@ const URL='http://localhost:8765/index.html';
 const XLSXJS=fs.readFileSync(SP+'xlsx.full.min.js','utf8');
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+// modalità locale: firebase-config.js nascosto (vedi README)
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 
 async function setup(ctx){
   const pg=await ctx.newPage();

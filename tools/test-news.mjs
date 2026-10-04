@@ -1,6 +1,8 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 const OUT='/tmp/news-';
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+// modalità locale: firebase-config.js nascosto (vedi README)
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const ctx=await b.newContext({viewport:{width:400,height:800},deviceScaleFactor:1});
 const pg=await ctx.newPage();
 const errs=[],cerrs=[];pg.on('pageerror',e=>errs.push('pageerror: '+e.message));pg.on('console',m=>{if(m.type()==='error')cerrs.push(m.text()+' @ '+(m.location().url||''))});pg.on('requestfailed',r=>cerrs.push('requestfailed '+r.url().slice(0,80)+' '+(r.failure()||{}).errorText));
