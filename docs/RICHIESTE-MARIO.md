@@ -23,7 +23,17 @@ Ancora da decidere: quali notifiche in più abilitare per i ragazzi.
 ## Metodo di lavoro
 > avanti di 3 in 3 intendo: programmi 3 funzioni e publichi passi ad altre 3 e aggiorni app e cosí via
 
+## «È urgente» senza punto di domanda (4 ottobre 2026)
+> metti in coda dopo il software orari staff questo: è urgente? senza punto di domanda nell avviso del cartello dello staff per lo chef
+
+Cosa vuol dire: nel carrello dello staff il pulsante «È urgente?» diventa «È urgente» (anche nella frase di aiuto sopra il carrello). La voce v13 delle Novità resta com'era (è storia). Va nel prossimo gruppo di 3.
+
+## Idee nuove chieste da Mario (4 ottobre 2026)
+> in coda dopo ,cosa manca all app di utile? dammi 10 idee valide innovative geniali
+
+Proposte (da scegliere): ordine suggerito (storico + meteo + coperti), bolla letta con la foto (Gemini spunta il controllo merce e trova prezzi diversi), scadenze «da usare oggi», registro sprechi con foto e costo, timbratura con QR confrontata con gli orari (foglio presenze per il consulente), scambio turno tra colleghi con controllo regole, chi riceve la merce (incrocio orari e consegne), bacheca del servizio di oggi, checklist di apertura e chiusura, «Chiedi a Jona» (domande a voce sui dati dell'app).
+
 ## Stato
-- Fatto: approvazione per fornitore, controllo arrivo a semaforo, invii in sospeso (v12); aumento prezzi, prodotto urgente, controllo merce con chi aveva chiesto (v13).
-- Da fare: più lingue, orari del personale, notifiche in più per i ragazzi (da decidere).
+- Fatto: approvazione per fornitore, controllo arrivo a semaforo, invii in sospeso (v12); aumento prezzi, prodotto urgente, controllo merce con chi aveva chiesto (v13); orari del personale (v14).
+- In coda, in ordine: «È urgente» senza punto di domanda; poi le idee nuove scelte da Mario; più lingue; notifiche in più per i ragazzi (da decidere).
 - Idee proposte ma non ancora scelte da Mario: riepilogo della sera per Maurizio, giorni di consegna, HACCP all'arrivo, contestazione fornitore, scorte minime, foto prodotto, prezzo migliore in approvazione, vuoti a rendere, budget per reparto, conferma del fornitore, ricette e costo del piatto.

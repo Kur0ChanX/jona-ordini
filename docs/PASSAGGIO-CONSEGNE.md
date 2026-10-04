@@ -13,6 +13,7 @@
 
 ## Prossimi passi
 - Chiedere a Mario se gli orari vanno bene dopo la prova sul telefono (passi da dargli: profilo → contratto; Staff → Orari → casella → turno tipo → «Uguale anche per» → Salva → Pubblica; entrare come staff dalla barra **Test** → voce «Orari»).
+- **In coda (prossimo gruppo di 3):** «È urgente?» → «È urgente» nel carrello dello staff (`index.html`: pulsante `curg` in `vCarrello` e frase di aiuto; la voce NEWS v13 resta). Poi le idee scelte da Mario tra le 10 in `docs/RICHIESTE-MARIO.md`.
 - **Scaglione 4** (da proporre a Mario): condividi/stampa degli orari (PDF, WhatsApp), riepilogo ore del mese, richieste di cambio turno o ferie dallo staff.
 - **Scaglione 5:** più lingue per lo staff (scelta per persona; ordini e prodotti in italiano).
 - Idee non scelte: vedi `docs/RICHIESTE-MARIO.md`.
