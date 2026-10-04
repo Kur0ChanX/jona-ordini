@@ -7,6 +7,7 @@ Aggiornato: 2026-10-04 (sessione #03). Si aggiorna a ogni cambiamento: quello ch
 
 ## 2. Claude, dopo la scelta o l'approvazione di Mario
 - **v35 promemoria ordini**: «Oggi si ordina da…» solo a Maurizio; allo staff «le richieste vanno inviate entro le HH:MM» con giorni e ora decisi da Maurizio. Servono 4 risposte: Maurizio = profilo scelto o tutti gli Admin Chef? Scadenza unica o per fornitore? Tutto lo staff o per reparto? Quando avvisare (es. 1 ora prima + all'orario)?
+- **QR fisso da cucina / «Porta aperta»**: QR stampabile che non scade, approvazione con una notifica, ed eventualmente un periodo a tempo in cui i telefoni nuovi entrano senza approvazione. Mario deve scegliere la strada.
 - **Telefoni collegati** (proposta in attesa di sì): in Staff, solo gestori e sviluppatore, elenco dei telefoni (iPhone/iPad/Android, stato, ultimo profilo entrato con data e ora).
 - **Sicurezza del Worker**: `/invia` non controlla chi chiama; `/invito/<codice>` senza limite di tentativi; `/promemoria` modificabile da qualsiasi telefono approvato.
 - **netWatch**: con molte scritture di fila passa al long polling per sempre e ricarica una volta.
