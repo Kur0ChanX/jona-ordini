@@ -57,5 +57,25 @@ ok(await pg.locator('[data-a="doLogin"]').count()===1,'«Entra con un altro prof
 await pg.evaluate(()=>{const u=Object.values(D().staff).find(x=>x.username==='anna');ls('jona_wait',{id:u.id,t:Date.now()-120000});return del('staff',u.id)});
 await pg.waitForTimeout(800);
 ok(/non è stato approvato/.test(await txt('body'))&&await pg.evaluate(()=>ls('jona_wait'))===null,'profilo cancellato: avviso e niente attesa');
+// 5. v23: nome utente proposto da nome e cognome, accenti e apostrofi, messaggi chiari
+const err=async()=>{await pg.click('.sheet [data-a="regGo"]');await pg.waitForTimeout(250);const t=await pg.locator('.toast').last().innerText().catch(()=>'');return t};
+await pg.click('[data-a="register"]');await pg.waitForTimeout(300);
+await pg.locator('.sheet input[data-k="nome"]').pressSequentially('Mario');await pg.locator('.sheet input[data-k="cognome"]').pressSequentially('Loi');
+ok(await pg.inputValue('.sheet input[data-k="username"]')==='mario.loi','«Mario Loi» → nome utente mario.loi');
+await pg.fill('.sheet input[data-k="nome"]','Niccolò');await pg.fill('.sheet input[data-k="cognome"]',"D'Angelo");
+ok(await pg.inputValue('.sheet input[data-k="username"]')==='niccolo.dangelo','accenti e apostrofi tolti: niccolo.dangelo');
+await pg.fill('.sheet input[data-k="username"]','');
+for(const k of ['pw','pw2'])await pg.fill(`.sheet input[data-k="${k}"]`,'segreto1');
+ok(/Scrivi il nome utente/.test(await err()),'nome utente vuoto: «Scrivi il nome utente»');
+await pg.fill('.sheet input[data-k="username"]','lo');ok(/almeno 3 caratteri/.test(await err()),'nome utente corto: «almeno 3 caratteri»');
+await pg.fill('.sheet input[data-k="username"]','loi!');ok(/solo lettere, numeri/.test(await err()),'carattere strano: messaggio sui caratteri');
+await pg.fill('.sheet input[data-k="username"]','Loì');await pg.click('.sheet [data-a="regGo"]');await pg.waitForTimeout(500);
+ok(await pg.evaluate(()=>Object.values(D().staff).some(x=>x.username==='loi'&&x.cognome==="D'Angelo")),'«Loì» accettato come loi');
+await pg.click('[data-a="waitLeave"]');await pg.waitForTimeout(300);
+await pg.click('[data-a="register"]');await pg.waitForTimeout(300);
+await pg.fill('.sheet input[data-k="nome"]','Luca');await pg.fill('.sheet input[data-k="cognome"]','');
+await pg.fill('.sheet input[data-k="nome"]','Luca');
+ok(await pg.inputValue('.sheet input[data-k="username"]')==='luca2','nome utente già usato: luca2');
+await pg.click('.sheet [data-a="closeSheet"]');
 ok(errs.length===0,'nessun errore '+errs.join(' | '));
 await b.close();
