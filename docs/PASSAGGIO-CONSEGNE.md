@@ -21,6 +21,14 @@
 3. Vocali: Android ↔ Android funzionano; manca la prova con iPhone.
 4. Il repository ora è `Kur0ChanX/jona-ordini` (GitHub segnala lo spostamento, i push funzionano).
 
+## Richieste di Mario da fare (in ordine)
+1. **Vocale iPhone (urgente)**: Mauro Loi (iPhone) non sente il vocale mandato da Mario (Android, probabilmente WebM/Opus o MP4 da Chrome). Controllare `chRec` (formato scelto: su Android Chrome forse `audio/webm`, che Safari vecchio non legge) e `chPlay`; soluzione probabile: registrare sempre MP4/AAC se `MediaRecorder.isTypeSupported('audio/mp4')`, altrimenti avviso/ripiego; per i vocali WebM già inviati valutare messaggio chiaro su iPhone. Verificare anche Android ← iPhone.
+2. **Pubblicare v27** (Mario non ha ancora detto sì): PR → squash merge → controllo online → `git merge origin/main` sul ramo.
+3. **«Chi c'è in turno oggi»**: tasto ben visibile nella voce «Orari» dello staff e nel pianificatore (Staff → Orari) che mostra chi lavora oggi (da `tp` della settimana pubblicata), con orari.
+4. **Promemoria ordini**: Maurizio crea regole («ordinare Dolpa entro data e ora», a chi: staff/reparto/sé stesso, eventualmente ripetute); avviso appena l'utente entra nell'app (+ push all'orario); anche promemoria personali per Maurizio. Proporre prima lo schema (BRAINSTORMING) se ci sono dubbi.
+5. **Consumi e costi** più interattivo, animazioni moderne, facile da leggere (caricare la skill `dataviz` prima di toccare i grafici).
+6. Mauro Loi in «F&B Manager»: istruzioni date a Mario (Staff → Mauro Loi → Reparto → **Salva**), da confermare.
+
 ## Idee parcheggiate (non farle finché Mario non le chiede)
 Foto della confezione → carrello, allarme quantità strana, «Rifai come martedì scorso», mancanti riordinati, risposta del fornitore dallo screenshot; codice a barre scartato. Domanda sui listini (PDF, fattura XML che aggiorna prezzi e controlla la merce, sinonimi/unità, storico prezzi, listino vecchio): proposte da fare se la riprende.
 
