@@ -60,9 +60,9 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 
 ## COMUNICAZIONE
 
-- Istruzioni per me: passo passo numerato, con i nomi ESATTI dei pulsanti e dei menu che vedo sullo schermo. Non inventare nomi diversi.
-- Report di cosa hai fatto: cosa hai fatto, problemi trovati e come li hai risolti, cosa devo fare io. Massimo 2-3 paragrafi brevi.
-- Niente termini tecnici se non indispensabili.
+Report del lavoro (Cosa hai fatto tu): Spiega in modo chiaro e diretto cosa hai modificato, i problemi trovati e le soluzioni adottate. Prendi tutto lo spazio che ti serve per farti capire bene, ma evita di allungare il brodo. Niente gergo informatico complesso se non indispensabile.
+
+Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scrivi SOLO un elenco numerato passo passo. Usa i nomi ESATTI dei pulsanti e dei menu che vedrò sullo schermo, senza inventarli o tradurli.
 
 
 ## REGOLE TRASVERSALI
