@@ -10,6 +10,10 @@
 // /invito/<codice>: il telefono nuovo lo scambia con la chiave del ristorante (resta l'approvazione del telefono).
 // /promemoria: il telefono di un gestore manda giorni e ore dei promemoria ordini con le iscrizioni push dei gestori (tabella «prom»
 // nel primo database D1); ogni 5 minuti (cron) il server manda «Oggi si ordina da …» anche con l'app chiusa su tutti i telefoni.
+// Dalla v35 il piano porta anche le scadenze per lo staff («Richieste allo chef entro le…», con le iscrizioni dello staff scelto)
+// e le iscrizioni dei gestori («gest») per /richiesta: un telefono in attesa avvisa i gestori che chiede di entrare.
+// /inviti con {fisso:true}: codice del «QR da cucina» che non scade (il vecchio, se indicato, viene cancellato).
+// /invito/<codice>: al massimo INV_ERR codici sbagliati all'ora per indirizzo IP.
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -169,12 +173,15 @@ const membriK = new Map();
 
 const INV_ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const INV_GIORNI = 7;
+const INV_FISSO = 50 * 365 * 864e5;
+const INV_ERR = 20;
 let invPronto = false;
 async function invDb(env) {
   const d = algDbs(env)[0];
   if (!d) return null;
   if (!invPronto) {
     await d[1].prepare("CREATE TABLE IF NOT EXISTS inviti (c TEXT PRIMARY KEY, k TEXT NOT NULL, scade INTEGER NOT NULL)").run();
+    await d[1].prepare("CREATE TABLE IF NOT EXISTS inv_err (ip TEXT PRIMARY KEY, n INTEGER NOT NULL, t INTEGER NOT NULL)").run();
     invPronto = true;
   }
   return d[1];
@@ -187,7 +194,11 @@ async function invCrea(request, env) {
   if (!/^[A-Za-z0-9]{16,64}$/.test(k)) return json({ errore: "chiave non trovata" }, 409);
   const db = await invDb(env);
   if (!db) return json({ errore: "inviti non attivi sul server" }, 503);
-  const scade = Date.now() + INV_GIORNI * 864e5;
+  const b = await request.json().catch(() => ({})) || {};
+  const fisso = b.fisso === true;
+  const scade = Date.now() + (fisso ? INV_FISSO : INV_GIORNI * 864e5);
+  const vecchio = String(b.vecchio || "").toUpperCase();
+  if (fisso && /^[A-HJ-NP-Z2-9]{6}$/.test(vecchio)) await db.prepare("DELETE FROM inviti WHERE c = ? AND k = ? AND scade > ?").bind(vecchio, k, Date.now() + 365 * 864e5).run();
   for (let i = 0; i < 5; i++) {
     const c = Array.from(crypto.getRandomValues(new Uint8Array(6)), b => INV_ABC[b & 31]).join("");
     const r = await db.prepare("INSERT OR IGNORE INTO inviti (c, k, scade) VALUES (?, ?, ?)").bind(c, k, scade).run();
@@ -195,13 +206,18 @@ async function invCrea(request, env) {
   }
   return json({ errore: "riprova" }, 500);
 }
-async function invLeggi(c, env) {
+async function invLeggi(c, env, ip = "") {
   c = String(c || "").toUpperCase();
-  if (!/^[A-HJ-NP-Z2-9]{6}$/.test(c)) return json({ errore: "codice non valido" }, 404);
   const db = await invDb(env);
   if (!db) return json({ errore: "inviti non attivi sul server" }, 503);
-  const r = await db.prepare("SELECT k FROM inviti WHERE c = ? AND scade > ?").bind(c, Date.now()).first();
-  return r ? json({ k: r.k }) : json({ errore: "codice scaduto o sbagliato" }, 404);
+  // troppi codici sbagliati dallo stesso indirizzo: stop per un'ora
+  const ora = Date.now(), e = ip ? await db.prepare("SELECT n, t FROM inv_err WHERE ip = ?").bind(ip).first() : null;
+  const err = e && ora - e.t < 36e5 ? e.n : 0;
+  if (err >= INV_ERR) return json({ errore: "troppi tentativi: riprova tra un'ora" }, 429);
+  const r = /^[A-HJ-NP-Z2-9]{6}$/.test(c) ? await db.prepare("SELECT k FROM inviti WHERE c = ? AND scade > ?").bind(c, ora).first() : null;
+  if (r) return json({ k: r.k });
+  if (ip) await db.prepare("INSERT OR REPLACE INTO inv_err (ip, n, t) VALUES (?, ?, ?)").bind(ip, err + 1, err ? e.t : ora).run();
+  return json({ errore: "codice scaduto o sbagliato" }, 404);
 }
 
 const PROM_CRON = "*/5 * * * *";
@@ -241,30 +257,78 @@ async function promSalva(request, env) {
     lim: promMin(f && f.lim) ? f.lim : null,
     s: Number(f && f.s) || 0,
   })).filter(f => f.id && f.g.length);
-  const subs = (Array.isArray(b.subs) ? b.subs : []).filter(validSub).slice(0, MAX_SUBS);
-  await promPut(db, "piano", { tz, forn, subs, agg: Date.now() });
-  return json({ ok: true, fornitori: forn.length, telefoni: subs.length });
+  const lista = v => (Array.isArray(v) ? v : []).filter(validSub).slice(0, MAX_SUBS);
+  const subs = lista(b.subs), gest = lista(b.gest);
+  const scad = (Array.isArray(b.scad) ? b.scad : []).slice(0, 50).map(x => ({
+    id: String(x && x.id || "").slice(0, 64),
+    nome: String(x && x.nome || "").slice(0, 60),
+    g: Array.isArray(x && x.g) ? [...new Set(x.g.filter(y => Number.isInteger(y) && y >= 0 && y < 7))] : [],
+    avv: promMin(x && x.avv) ? x.avv : null,
+    entro: promMin(x && x.entro) ? x.entro : null,
+    subs: lista(x && x.subs),
+  })).filter(x => x.id && x.g.length && x.avv != null && x.entro != null && x.avv < x.entro);
+  await promPut(db, "piano", { tz, forn, subs, gest, scad, agg: Date.now() });
+  return json({ ok: true, fornitori: forn.length, telefoni: subs.length, scadenze: scad.length });
 }
 const promHm = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 async function promTick(env, t = Date.now()) {
   const db = await promDb(env);
   if (!db) return;
   const p = await promGet(db, "piano");
-  if (!p || !p.forn || !p.forn.length || !p.subs || !p.subs.length) return;
+  if (!p) return;
+  p.forn = p.forn || []; p.subs = p.subs || []; p.scad = p.scad || [];
   const o = promOra(p.tz, t);
   const fatto = await promGet(db, "fatto") || {};
   for (const k in fatto) if (fatto[k] !== o.d) delete fatto[k];
   const morti = new Set();
   let cambiato = false;
-  for (const f of p.forn) {
+  for (const f of p.subs.length ? p.forn : []) {
     if (fatto[f.id] === o.d || !f.g.includes(o.g) || o.m < f.at || (f.lim != null && o.m >= f.lim)) continue;
     if (f.s && promOra(p.tz, f.s).d === o.d) continue;
     fatto[f.id] = o.d; cambiato = true;
     const r = await send(env, { titolo: "Oggi si ordina da " + f.nome, testo: "Prepara e invia l'ordine" + (f.lim != null ? " entro le " + promHm(f.lim) : ""), tag: "prom_" + f.id, subs: p.subs.filter(s => !morti.has(s.endpoint)) });
     for (const e of r.scaduti) morti.add(e);
   }
+  for (const x of p.scad) {
+    const k = "s_" + x.id;
+    if (fatto[k] === o.d || !x.g.includes(o.g) || o.m < x.avv || o.m >= x.entro || !x.subs.length) continue;
+    fatto[k] = o.d; cambiato = true;
+    const r = await send(env, { titolo: (x.nome ? "Richieste per " + x.nome : "Richieste allo chef") + " entro le " + promHm(x.entro),
+      testo: "Manda allo chef le richieste" + (x.nome ? " per " + x.nome : "") + " entro le " + promHm(x.entro) + ".", tag: "scad_" + x.id, subs: x.subs.filter(s => !morti.has(s.endpoint)) });
+    for (const e of r.scaduti) morti.add(e);
+  }
   if (cambiato) await promPut(db, "fatto", fatto);
-  if (morti.size) { p.subs = p.subs.filter(s => !morti.has(s.endpoint)); await promPut(db, "piano", p); }
+  if (morti.size) {
+    const vivi = l => (l || []).filter(s => !morti.has(s.endpoint));
+    p.subs = vivi(p.subs); p.gest = vivi(p.gest); for (const x of p.scad) x.subs = vivi(x.subs);
+    await promPut(db, "piano", p);
+  }
+}
+
+// telefono in attesa (membri/<uid> con ok falso e la richiesta «req»): avvisa i gestori, al massimo una volta ogni 10 minuti
+async function richiesta(request, env) {
+  const tok = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  let uid = "";
+  try { uid = String(JSON.parse(new TextDecoder().decode(ub64u(tok.split(".")[1]))).sub || ""); } catch (e) { return json({ errore: "gettone non valido" }, 403); }
+  if (!/^[A-Za-z0-9_-]{6,128}$/.test(uid)) return json({ errore: "gettone non valido" }, 403);
+  const progetto = env.FB_PROJECT || "jona-ordini";
+  const r = await fetch(`https://firestore.googleapis.com/v1/projects/${progetto}/databases/(default)/documents/membri/${uid}`, { headers: { authorization: "Bearer " + tok } });
+  if (!r.ok) return json({ errore: "Telefono non registrato" }, 403);
+  const f = ((await r.json().catch(() => ({}))).fields) || {};
+  const req = f.req && f.req.mapValue && f.req.mapValue.fields;
+  if (!(f.ok && f.ok.booleanValue === false) || !req) return json({ errore: "nessuna richiesta in attesa" }, 409);
+  const db = await promDb(env);
+  if (!db) return json({ errore: "avvisi non attivi sul server" }, 503);
+  const k = "rq_" + uid, prima = await promGet(db, k);
+  if (prima && Date.now() - prima < 10 * 60000) return json({ ok: true, gia: true });
+  const p = await promGet(db, "piano");
+  const gest = (p && p.gest) || [];
+  if (!gest.length) return json({ ok: true, telefoni: 0 });
+  await promPut(db, k, Date.now());
+  const s = x => String(x && x.stringValue || "").slice(0, 40);
+  const nome = [s(req.nome), s(req.cognome)].filter(Boolean).join(" ") || "Un telefono nuovo";
+  const out = await send(env, { titolo: "Telefono da approvare", testo: nome + " chiede di entrare: apri Staff e approvalo.", tag: "rq_" + uid, subs: gest });
+  return json({ ok: true, telefoni: out.inviati });
 }
 
 const attesa = j => {
@@ -398,7 +462,8 @@ export default {
       if (url.pathname === "/chiave" && request.method === "GET") return json({ chiave: (await vapid(env)).pub });
       if (url.pathname === "/gemini" && request.method === "POST") return await gemini(request, env);
       if (url.pathname === "/inviti" && request.method === "POST") return await invCrea(request, env);
-      if (url.pathname.startsWith("/invito/") && request.method === "GET") return await invLeggi(url.pathname.slice(8), env);
+      if (url.pathname.startsWith("/invito/") && request.method === "GET") return await invLeggi(url.pathname.slice(8), env, request.headers.get("cf-connecting-ip") || "");
+      if (url.pathname === "/richiesta" && request.method === "POST") return await richiesta(request, env);
       if (url.pathname === "/promemoria" && request.method === "POST") return await promSalva(request, env);
       if (url.pathname.startsWith("/allegati")) {
         const uid = await membro(request, env);

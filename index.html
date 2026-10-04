@@ -488,6 +488,7 @@ button.rp-pn{all:unset;display:block;font:400 15px/1.3 var(--font);overflow-wrap
 .checkall{display:flex;align-items:center;gap:10px;font-size:14.5px;padding:8px 0}
 .checkall input{width:20px;height:20px;accent-color:var(--lagoon)}
 .setrow{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.sc-row{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px}.sc-row>div{min-width:0}.sc-row b{display:block;font-weight:500}.sc-row span{display:block}
 .setrow:first-of-type{border-top:0}
 .setrow>div{flex:1}
 .setrow b{display:block;font-weight:400}
@@ -1018,8 +1019,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=34;
+const APP_VER=35;
 const NEWS=[
+  {v:35,data:'2026-10-05',titolo:'Scadenze per lo staff e QR da cucina',
+    tutti:['Se Maurizio fissa una scadenza, ti arriva un avviso sul telefono: «Richieste allo chef entro le…». Arriva anche con l\'app chiusa.','Quando c\'è una versione nuova dell\'app compare l\'avviso «App da aggiornare»: chiudi e riapri l\'app, oppure tocca «Aggiorna ora».'],
+    chef:['Impostazioni → «Oggi si ordina» arriva a: scegli chi riceve il promemoria degli ordini. Se non scegli nessuno, arriva a tutti gli Admin Chef.','Impostazioni → Scadenze per lo staff: giorni, ora «Entro le», ora dell\'avviso e reparti. Puoi fare una scadenza per tutte le richieste o una per ogni fornitore.','Impostazioni → QR da cucina: un QR da stampare e appendere che non scade. Chi lo inquadra chiede di entrare e a te arriva una notifica: lo approvi in Staff.'],
+    dev:{aggiunte:['`config/app.scad` (`scadL`, `scadDue`, `scadTick`: notifica `scad_<id>_<giorno>_<persona>` per lo staff dei reparti scelti) e `config/app.promA` (`promDest`/`promTo`); `promPlan` manda anche `gest` e `scad` al Worker, `promTick` le scadenze (`s_<id>` in `fatto`).','Worker `/richiesta` (telefono in attesa con `req` → push ai gestori, una volta ogni 10 min), `/inviti` con `{fisso, vecchio}` (QR da cucina, `config/app.qrFisso`), `/invito/<codice>` con al massimo 20 codici sbagliati all\'ora per IP (tabella `inv_err`).','`banner`/`updOn`: avviso «App da aggiornare» su `controllerchange` (controllo con `registration.update()` al ritorno in primo piano) e da `netWatch`, che non ricarica più da solo.']}},
   {v:34,data:'2026-10-04',titolo:'Promemoria degli ordini puntuali',
     chef:['L\'avviso «Oggi si ordina da…» ora lo manda il server all\'ora giusta, anche se nessuno ha l\'app aperta. Basta aprire l\'app una volta dopo l\'aggiornamento.'],
     dev:{aggiunte:['Worker `/promemoria` (solo membri): piano con fuso, fornitori (`g`, `at`, `lim`, `s` = ultimo invio) e iscrizioni dei gestori nella tabella `prom` del primo D1; cron `*/5 * * * *` → `promTick` (una volta al giorno per fornitore, iscrizioni scadute tolte).','App: `promPlan`/`promSrv` in `deadlineTick` mandano il piano solo se cambia (impronta in `jona_prom`, ripetuto ogni 6 h); con il server attivo l\'app scrive solo l\'avviso nella campanella, senza push (`notify` con `np`).']}},
@@ -1256,10 +1261,7 @@ function fbInit(){
 function netWatch(p){
   if(ls('jona_fb_lp')||!S.db||S.db.kind!=='firebase')return p;
   const t=setTimeout(()=>{if(navigator.onLine===false||document.hidden||ls('jona_fb_lp'))return;ls('jona_fb_lp',1);
-    const go=()=>{const ta=$('#ch-ta');return!sheets.length&&!(ta&&ta.value.trim())&&!CHAT.up&&!(S.chat&&S.chat.rec)};
-    const later=(n=0)=>{if(!go())return;if(S.db.status().pend&&n<60)return setTimeout(()=>later(n+1),1000);if(!S.db.status().pend)location.reload()};
-    toast(go()?'Questa rete Wi-Fi rallenta i messaggi: passo a un collegamento compatibile…':'Questa rete Wi-Fi rallenta i messaggi: dalla prossima apertura l\'app userà un collegamento compatibile.','warn');
-    Promise.resolve(p).then(()=>setTimeout(later,600),()=>{})},4000);
+    toast('Questa rete Wi-Fi rallenta i messaggi: chiudi e riapri l\'app per usare un collegamento compatibile.','warn');updOn()},4000);
   Promise.resolve(p).then(()=>clearTimeout(t),()=>clearTimeout(t));return p}
 const fbTmo=(p,ms=20000)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j({code:'fb_slow'}),ms))]);
 async function fbSignIn(auth){await new Promise(r=>{const u=auth.onAuthStateChanged(()=>{u();r()})});if(!auth.currentUser)await auth.signInAnonymously();return auth.currentUser.uid}
@@ -1560,7 +1562,10 @@ function view(){
   S.wallMode=false;
   return shell(me);
 }
-function banner(){return''}
+/* v35 «App da aggiornare»: c'è una versione nuova (service worker cambiato mentre l'app era aperta) o serve il collegamento
+   compatibile (netWatch). Niente riavvio automatico: lo decide la persona */
+function banner(){if(!S.upd)return'';return`<div class="obx" role="status">${ic('warn')}<div class="obx-i"><b>App da aggiornare</b><span>Hai una versione non aggiornata: potresti avere problemi o funzioni in meno. Ti consigliamo di chiudere e riaprire l'app.</span></div><div class="obx-b"><button type="button" class="btn primary sm" data-a="reload">Aggiorna ora</button></div></div>`}
+function updOn(){if(S.upd)return;S.upd=1;schedule()}
 const wallMsg=(t,p,act='')=>`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>${esc(t)}</h1><p class="muted">${esc(p)}</p>${act}</div></div>`;
 function wallFb(s){
   if(s.wait)return screenPhone(s);
@@ -1595,7 +1600,7 @@ async function phSend(nuovo){
     r={nuovo:true,sid,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||'',pass:await sha(sid+':'+f.pw),creato:now()};
     ls('jona_wait',{id:sid,t:Date.now()})}
   else{if(!String(f.nome||'').trim())return toast('Scrivi il nome.','warn');r={nuovo:false,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),creato:now()};ls('jona_wait',null)}
-  ls('jona_reg',null);S.db.phone.req(r).catch(e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
+  ls('jona_reg',null);S.db.phone.req(r).then(async()=>{await fetch(PUSH_URL+'/richiesta',{method:'POST',headers:{authorization:'Bearer '+await algTok()}}).catch(()=>{})},e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
 }
 /* telefoni in attesa: li vedono e li approvano i gestori (Maurizio e Mario) */
 const PH={on:false,list:[],retry:0,seen:null};
@@ -1633,20 +1638,20 @@ function fbRow(){
   return`<div class="setrow"><div><b>Database centrale</b><span>${S.fbActive?'Già attivo: collega questo telefono con il codice':'Non attivo: i dati restano solo su questo telefono'}</span></div><div class="btns">${S.fbActive?'':`<button type="button" class="btn primary sm" data-a="fbActivate">${ic('cloud')} Attiva</button>`}<button type="button" class="btn ghost sm" data-a="fbCode">Ho un codice</button></div></div>`;
 }
 function inviteText(l,c){const n=cfg().nomeLocale||'Jona Ristorante';return `✨ Benvenuto nella squadra del ${n}!\n\nOrdini, turni e chat con i colleghi: da oggi è tutto in un'unica app.\n\n1️⃣ Tocca il link qui sotto\n2️⃣ Aggiungi l'app alla schermata Home\n3️⃣ Registrati con nome e foto: ti approviamo noi\n\n${c?`🔑 Se l'app ti chiede un codice, scrivi: *${c}* (vale 7 giorni)\n\n`:''}👉 ${l}`}
-async function inviteCard(){const inv=await invNew();if(!S.qrImg){await need('qr');const q=qrcode(0,'M');q.addData(inv.l);q.make();S.qrImg=q.createDataURL(8,4)}
+async function inviteCard(fx){const inv=fx||await invNew();let qs=fx?'':S.qrImg;if(!qs){await need('qr');const q=qrcode(0,'M');q.addData(inv.l);q.make();qs=q.createDataURL(8,4);if(!fx)S.qrImg=qs}
   const img=src=>new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=src});
   try{await Promise.all(['200','300','500'].map(w=>document.fonts.load(w+' 40px Jost')))}catch(e){}
-  const [logo,qr]=await Promise.all([img('jona-icon-512.png'),img(S.qrImg)]),W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),F=(w,z)=>w+' '+z+'px Jost, "Avenir Next", sans-serif';
+  const [logo,qr]=await Promise.all([img('jona-icon-512.png'),img(qs)]),W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),F=(w,z)=>w+' '+z+'px Jost, "Avenir Next", sans-serif';
   x.fillStyle='#3A2F2C';x.fillRect(0,0,W,H);x.drawImage(logo,W/2-170,10,340,340);const g=x.createRadialGradient(W,0,0,W,0,760);g.addColorStop(0,'rgba(31,127,134,.38)');g.addColorStop(1,'rgba(31,127,134,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
   x.textAlign='center';x.fillStyle='#BDB2A6';x.font=F(400,26);x.letterSpacing='8px';x.fillText('JONA RISTORANTE · PORTO CERVO',W/2,384);x.letterSpacing='0px';
   x.fillStyle='#F3EDE7';x.font=F(200,82);x.fillText('Benvenuto nella squadra',W/2,488);x.fillStyle='#D9CFC5';x.font=F(300,34);x.fillText('Ordini, turni e chat della brigata, tutto in un\'app.',W/2,548);
   const q=430,qx=W/2-q/2,qy=626;x.fillStyle='#FFFFFF';x.beginPath();x.roundRect(qx-26,qy-26,q+52,q+52,36);x.fill();x.imageSmoothingEnabled=false;x.drawImage(qr,qx,qy,q,q);x.imageSmoothingEnabled=true;
   x.fillStyle='#1F7F86';x.beginPath();x.roundRect(W/2-300,qy+q+60,600,84,42);x.fill();x.fillStyle='#FFFFFF';x.font=F(500,34);x.fillText('Inquadra con la fotocamera',W/2,qy+q+114);
-  x.fillStyle='#BDB2A6';x.font=F(300,28);x.fillText('Poi aggiungi l\'app alla schermata Home e registrati',W/2,qy+q+196);
+  x.fillStyle='#BDB2A6';x.font=F(300,28);x.fillText(fx?'Registrati: Maurizio o Mario approvano il tuo telefono':'Poi aggiungi l\'app alla schermata Home e registrati',W/2,qy+q+196);
   if(inv.c){x.font=F(300,28);const t1='Codice d\'invito  ',w1=x.measureText(t1).width;x.font=F(500,34);x.letterSpacing='6px';const w2=x.measureText(inv.c).width;x.textAlign='left';x.fillStyle='#F3EDE7';x.fillText(inv.c,W/2-(w1+w2)/2+w1,qy+q+250);x.letterSpacing='0px';x.font=F(300,28);x.fillStyle='#BDB2A6';x.fillText(t1,W/2-(w1+w2)/2,qy+q+250);x.textAlign='center'}
-  const b=await new Promise(r=>c.toBlob(r,'image/png')),f=new File([b],'invito-jona.png',{type:'image/png'});
+  const b=await new Promise(r=>c.toBlob(r,'image/png')),f=new File([b],fx?'qr-cucina-jona.png':'invito-jona.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Invito Jona'});return}catch(e){if(e&&e.name==='AbortError')return}}
-  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='invito-jona.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('Cartolina salvata nei download.')}
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(fx?'qr-cucina-jona.png':'invito-jona.png');document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('Cartolina salvata nei download.')}
 async function invNew(){if(S.invL)return S.invL;let r={l:inviteLink(),c:''};
   if(S.db&&S.db.kind==='firebase'&&navigator.onLine){try{const x=await fetch(PUSH_URL+'/inviti',{method:'POST',headers:{authorization:'Bearer '+await algTok()}});const j=await x.json();if(x.ok&&/^[A-HJ-NP-Z2-9]{6}$/.test(j.codice||''))r={l:INV_URL+'/'+j.codice,c:j.codice}}catch(e){}}
   return S.invL=r}
@@ -1794,7 +1799,7 @@ function shell(me){
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -2172,6 +2177,26 @@ function promInfo(f){const gs=f&&f.giorniOrdine;if(!Array.isArray(gs)||!gs.lengt
   const lim=orMin(f.oraLimite),at=orMin(f.oraPromemoria)??(lim!=null?Math.max(0,lim-60):600),nm=d.getHours()*60+d.getMinutes();
   const sent=Object.values(D().ordini).some(o=>o.fornitoreId===f.id&&(o.inviato||0)>=t0.getTime());
   return{at,due:gs.includes(g)&&nm>=at&&(lim==null||nm<lim)&&!sent}}
+/* v35 scadenze per lo staff: config/app.scad = [{id, f: fornitore o '' (tutte le richieste), g: [0=lun..6=dom], entro, avv: 'HH:MM' (vuota = un'ora prima),
+   rep: reparti (vuoto = tutto lo staff)}]; avviso a ogni persona dello staff (notifica «scad_<id>_<giorno>_<persona>»).
+   «Oggi si ordina» va ai profili di config/app.promA (vuoto = tutti gli Admin Chef) */
+const scadL=()=>(Array.isArray(cfg().scad)?cfg().scad:[]).filter(s=>s&&s.id&&Array.isArray(s.g)&&s.g.length&&orMin(s.entro)!=null);
+const scadAvv=s=>{const a=orMin(s.avv),e=orMin(s.entro);return a!=null&&a<e?a:Math.max(0,e-60)};
+const scadNome=s=>s.f&&D().fornitori[s.f]?D().fornitori[s.f].nome||'':'';
+const scadTit=s=>(scadNome(s)?'Richieste per '+scadNome(s):'Richieste allo chef')+' entro le '+s.entro;
+const scadTxt=s=>'Manda allo chef le richieste'+(scadNome(s)?' per '+scadNome(s):'')+' entro le '+s.entro+'.';
+const scadPer=(s,u)=>!!u&&u.stato==='attivo'&&u.ruolo==='staff'&&(!(s.rep||[]).length||s.rep.includes(u.reparto));
+const minHm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+function scadDue(s){const d=new Date(),g=(d.getDay()+6)%7,nm=d.getHours()*60+d.getMinutes();return s.g.includes(g)&&nm>=scadAvv(s)&&nm<orMin(s.entro)}
+const promDest=()=>{const st=D().staff,l=(cfg().promA||[]).filter(id=>st[id]&&st[id].stato==='attivo');return l.length?l:'gm'};
+const promTo=(d,u)=>!!u&&u.stato==='attivo'&&(d==='gm'?isGM(u):d.includes(u.id));
+/* avviso nella campanella e a schermo: lo scrive il telefono dello staff per sé e quello dell'Admin Chef per tutti */
+async function scadTick(me){const td=today(),rem=ls('jona_rem')||{};let push=[];
+  for(const s of scadL()){if(!scadDue(s))continue;
+    for(const u of Object.values(D().staff)){if(!scadPer(s,u)||!(isGM(me)||u.id===me.id))continue;const nid='scad_'+s.id+'_'+td+'_'+u.id;
+      if(!D().notifiche[nid]){await put('notifiche',nid,{a:u.id,titolo:scadTit(s),testo:scadTxt(s),tipo:'scadenza',rif:s.id,letta:false,creato:now(),da:me.id});if(isGM(me))push.push([s,u.id])}}
+    if(scadPer(s,me)&&rem['s_'+s.id]!==td){rem['s_'+s.id]=td;ls('jona_rem',rem);toast(scadTit(s),'warn')}}
+  return push}
 /* promemoria dal server (worker /promemoria, cron ogni 5 minuti): il telefono del gestore manda il piano solo quando cambia
    (o ogni 6 ore); finché il server ha il piano giusto (meno di 24 ore) l'app non manda la sua push «Oggi si ordina da…» */
 function promPlan(){const st=D().staff,forn=[];
@@ -2180,9 +2205,11 @@ function promPlan(){const st=D().staff,forn=[];
     const s=Math.max(0,...Object.values(D().ordini).filter(o=>o.fornitoreId===f.id).map(o=>+o.inviato||0));
     forn.push({id:f.id,nome:f.nome||'',g:gs,at,lim,s})}
   forn.sort((a,b)=>a.id<b.id?-1:1);
-  const subs=Object.entries(PUSH.subs).filter(([,p])=>{const u=st[p.u];return!!u&&u.stato==='attivo'&&isGM(u)}).sort((a,b)=>a[0]<b[0]?-1:1).map(([,p])=>p.sub);
+  const ps=Object.entries(PUSH.subs).sort((a,b)=>a[0]<b[0]?-1:1).map(([,p])=>p),dst=promDest(),sub=ok=>ps.filter(p=>ok(st[p.u])).map(p=>p.sub);
+  const subs=sub(u=>promTo(dst,u)),gest=sub(u=>!!u&&u.stato==='attivo'&&isMgr(u));
+  const scad=scadL().map(s=>({id:s.id,nome:scadNome(s),g:s.g,avv:scadAvv(s),entro:orMin(s.entro),subs:sub(u=>scadPer(s,u))})).sort((a,b)=>a.id<b.id?-1:1);
   let tz='Europe/Rome';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||tz}catch(e){}
-  return JSON.stringify({tz,forn,subs})}
+  return JSON.stringify({tz,forn,subs,gest,scad})}
 async function promSrv(){if(!pushFb())return false;pushWatch();if(!PUSH.ld)return false;
   const body=promPlan(),h=await sha(body),last=ls('jona_prom')||{};
   if(last.h===h&&now()-(last.t||0)<6*36e5)return true;
@@ -2191,7 +2218,8 @@ async function promSrv(){if(!pushFb())return false;pushWatch();if(!PUSH.ld)retur
     if(!r.ok)throw new Error('promemoria '+r.status);ls('jona_prom',{h,t:now()});return true}
   catch(e){promSrv.retry=now()+15*60000;return last.h===h&&now()-(last.t||0)<864e5}finally{promSrv.busy=0}}
 async function deadlineTick(){
-  if(!S.db||!allLoaded())return;const me=meU();if(!me||me.stato!=='attivo'||!isGM(me))return;
+  if(!S.db||!allLoaded())return;const me=meU();if(!me||me.stato!=='attivo')return;
+  const sp=await scadTick(me);if(!isGM(me))return;
   if(S.tab==='invii')render();
   const td=today(),t0=new Date();t0.setHours(0,0,0,0);const rem=ls('jona_rem')||{};for(const k in rem)if(rem[k]!==td)delete rem[k];
   for(const o of Object.values(D().ordini)){
@@ -2203,12 +2231,15 @@ async function deadlineTick(){
     if(!(old&&old.da!==me.id&&now()-(old.creato||0)<120000))toast('Ordine a '+f.nome+' entro le '+f.oraLimite+': '+txt,'warn');
   }
   const srv=await promSrv().catch(()=>false);
+  if(!srv)for(const[s,id]of sp)pushSend([id],scadTit(s),scadTxt(s)).catch(()=>{});
+  const dst=promDest();
   for(const f of Object.values(D().fornitori)){const x=promInfo(f);if(!x||!x.due||rem['p_'+f.id]===td)continue;
     rem['p_'+f.id]=td;ls('jona_rem',rem);
     if(Object.values(D().notifiche).some(z=>z.tipo==='promemoria'&&z.rif===f.id&&(z.creato||0)>=t0.getTime()))continue;
     const o=Object.values(D().ordini).find(z=>z.stato==='aperto'&&z.fornitoreId===f.id),n=o&&o.items?o.items.length:0;
     const txt=(n?n+(n===1?' articolo':' articoli')+' nel carrello':'Il carrello è vuoto: prepara l\'ordine')+(f.oraLimite?', da inviare entro le '+f.oraLimite:'');
-    await notify('gm','Oggi si ordina da '+f.nome,txt,'promemoria',f.id,srv);toast('Oggi si ordina da '+f.nome+': '+txt,'warn');
+    if(dst==='gm')await notify('gm','Oggi si ordina da '+f.nome,txt,'promemoria',f.id,srv);else for(const id of dst)await notify(id,'Oggi si ordina da '+f.nome,txt,'promemoria',f.id,srv);
+    if(promTo(dst,me))toast('Oggi si ordina da '+f.nome+': '+txt,'warn');
   }
   ls('jona_rem',rem);
 }
@@ -3895,6 +3926,8 @@ function settingsSheet(){
   <div class="btns" style="margin:4px 0 8px"><button type="button" class="btn primary sm" data-a="cfgSave">${ic('check')} Salva</button></div>
   <div class="setrow"><div><b>Timbratura con QR</b><span>${tbOn()?'Accesa: lo staff timbra dalla voce Orari':'Spenta'}</span></div><div class="seg">${[[1,'Accesa'],[0,'Spenta']].map(([k,l])=>`<button type="button" aria-pressed="${tbOn()===!!k}" data-a="tbSet" data-v="${k}">${l}</button>`).join('')}</div></div>
   ${tbOn()?`<div class="btns" style="margin:4px 0 8px"><button type="button" class="btn ghost sm" data-a="tbQr">${ic('qr')} QR da stampare</button></div>`:''}
+  ${S.db.kind==='firebase'?qfRow():''}
+  ${promRows()}
   <div class="setrow"><div><b>Tema</b><span>Su questo dispositivo</span></div><div class="seg">${[['auto','Auto'],['light','Chiaro'],['dark','Scuro']].map(([k,l])=>`<button type="button" aria-pressed="${th===k}" data-a="theme" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="setrow"><div><b>Backup dei dati</b><span>Salva o ripristina tutto in un file</span></div><div class="btns"><button type="button" class="btn ghost sm" data-a="bkExport">${ic('download')} Esporta</button><button type="button" class="btn ghost sm" data-a="bkImport">${ic('upload')} Ripristina</button></div></div>
   ${S.db.backup?`<div class="setrow"><div><b>Copie automatiche</b><span>Ogni giorno una copia di tutto, restano ${BK_DAYS} giorni</span></div><button type="button" class="btn ghost sm" data-a="bkList">${ic('download')} Vedi</button></div>`:''}
@@ -3902,6 +3935,40 @@ function settingsSheet(){
   ${isDev(realU())?(()=>{const nt=testCount();return`<div class="setrow"><div><b>Dati di prova</b><span>${nt?nt+' documenti di prova nell\'app':'Fornitori, prodotti, 2 profili e 2 richieste finti, solo per le prove'}</span></div>${nt?`<button type="button" class="btn ghost sm danger" data-a="testDel" aria-label="Cancella dati di prova">${ic('trash')} Cancella</button>`:`<button type="button" class="btn ghost sm" data-a="testMake" aria-label="Crea dati di prova">${ic('plus')} Crea</button>`}</div>`})():''}
   <div class="setrow"><div><b>Notifiche già lette</b><span>${read}</span></div>${read?`<button type="button" class="btn ghost sm" data-a="notifDel">Pulisci</button>`:''}</div>`}});
 }
+/* QR da cucina (v35): codice d'invito che non scade (Worker /inviti con fisso), in config/app.qrFisso {c, creato};
+   chi lo inquadra chiede di entrare e i gestori lo approvano in Staff (avviso con /richiesta) */
+function qfRow(){const q=cfg().qrFisso;return`<div class="setrow"><div><b>QR da cucina</b><span>${q&&q.c?'Codice '+esc(q.c)+': non scade. Chi lo inquadra chiede di entrare e voi lo approvate in Staff':'Un QR da stampare e appendere: non scade, chi lo inquadra chiede di entrare e voi lo approvate'}</span></div>
+  <div class="btns">${q&&q.c?`<button type="button" class="btn primary sm" data-a="qfCard">${ic('qr')} Stampa o condividi</button><button type="button" class="btn ghost sm" data-a="qfNew" data-v="1">Cambia QR</button>`:`<button type="button" class="btn primary sm" data-a="qfNew" data-v="">${ic('qr')} Crea il QR</button>`}</div></div>`}
+async function qfNew(cambia){const q=cfg().qrFisso;
+  if(cambia&&!await ask('Cambiare il QR da cucina?','Il QR appeso smette di funzionare: dovrai stampare quello nuovo. Chi è già entrato non deve fare niente.','Cambia'))return;
+  if(!navigator.onLine)return toast('Serve la connessione per creare il QR.','warn');
+  try{const r=await fetch(PUSH_URL+'/inviti',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+await algTok()},body:JSON.stringify({fisso:true,vecchio:q&&q.c||''})});const j=await r.json().catch(()=>({}));
+    if(!r.ok||!/^[A-HJ-NP-Z2-9]{6}$/.test(j.codice||''))throw new Error('inviti '+r.status);
+    await put('config','app',Object.assign({},cfg(),{qrFisso:{c:j.codice,creato:now()}}));toast(cambia?'QR cambiato: stampa quello nuovo':'QR da cucina pronto');await qfCard()}
+  catch(e){toast('Non riesco a creare il QR: controlla la connessione e riprova.','err')}}
+async function qfCard(){const q=cfg().qrFisso;if(!q||!q.c)return;try{await inviteCard({l:INV_URL+'/'+q.c,c:q.c})}catch(e){toast('Immagine del QR non riuscita: riprova.','err')}}
+function promRows(){const sel=cfg().promA||[],mg=Object.values(D().staff).filter(u=>u.stato==='attivo'&&isMgr(u)).sort((a,b)=>fullName(a).localeCompare(fullName(b)));
+  return`<div class="setrow"><div><b>«Oggi si ordina» arriva a</b><span>${sel.length?'Solo ai nomi scelti':'Tutti gli Admin Chef. Tocca un nome per mandarlo solo a lui'}</span><div class="chips" role="group" aria-label="Chi riceve Oggi si ordina" style="margin-top:8px">${mg.map(u=>`<button type="button" class="chip" aria-pressed="${sel.includes(u.id)}" data-a="promA" data-v="${u.id}">${esc(fullName(u))}</button>`).join('')}</div></div></div>
+  <div class="setrow"><div style="flex:1"><b>Scadenze per lo staff</b><span>Avviso sul telefono dello staff: «Richieste allo chef entro le…»</span>
+  ${scadL().map(x=>`<div class="sc-row"><div><b>${esc(scadNome(x)||'Tutte le richieste')} · entro le ${esc(x.entro)}</b><span>${x.g.map(g=>OR_GG[g]).join(' ')} · avviso alle ${minHm(scadAvv(x))} · ${(x.rep||[]).length?x.rep.map(r=>REPARTI[r]||r).join(', '):'Tutto lo staff'}</span></div><button type="button" class="btn ghost sm" data-a="scEdit" data-v="${x.id}">Modifica</button></div>`).join('')}
+  <div class="btns" style="margin-top:8px"><button type="button" class="btn ghost sm" data-a="scEdit" data-v="">${ic('plus')} Aggiungi scadenza</button></div></div></div>`}
+function scSheet(id){const x0=scadL().find(x=>x.id===id);S.sc=x0?clone(x0):{id:'',f:'',g:[0,1,2,3,4,5],entro:'11:00',avv:'',rep:[]};if(!Array.isArray(S.sc.rep))S.sc.rep=[];
+  openSheet({render:()=>{const x=S.sc,fs=Object.values(D().fornitori).sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${id?'Modifica scadenza':'Nuova scadenza'}<div class="sh-s">Avviso allo staff sul telefono</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <label class="lbl" for="sc-f">Per quali richieste</label><select class="inp" id="sc-f" data-ch="sc" data-k="f"><option value="">Tutte le richieste</option>${fs.map(f=>`<option value="${esc(f.id)}" ${x.f===f.id?'selected':''}>${esc(f.nome||'')}</option>`).join('')}</select>
+  <span class="lbl">Giorni</span><div class="chips" role="group" aria-label="Giorni">${OR_GG.map((l,g)=>`<button type="button" class="chip" aria-pressed="${x.g.includes(g)}" data-a="scDay" data-v="${g}">${l}</button>`).join('')}</div>
+  <div class="two stack"><div><label class="lbl" for="sc-entro">Entro le</label><input class="inp" type="time" id="sc-entro" value="${esc(x.entro||'')}" data-in="sc" data-k="entro"></div><div><label class="lbl" for="sc-avv">Avviso alle</label><input class="inp" type="time" id="sc-avv" value="${esc(x.avv||'')}" data-in="sc" data-k="avv"></div></div>
+  <p class="muted small" style="margin:6px 0 0">Se lasci vuoto «Avviso alle», l'avviso arriva un'ora prima.</p>
+  <span class="lbl">A chi</span><div class="chips" role="group" aria-label="Reparti"><button type="button" class="chip" aria-pressed="${!x.rep.length}" data-a="scRep" data-v="">Tutto lo staff</button>${Object.entries(REPARTI).map(([k,l])=>`<button type="button" class="chip" aria-pressed="${x.rep.includes(k)}" data-a="scRep" data-v="${k}">${l}</button>`).join('')}</div>
+  <div class="btns" style="margin-top:20px">${id?`<button type="button" class="btn ghost danger" data-a="scDel">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary" data-a="scSave">${ic('check')} Salva</button></div>`}});
+}
+async function scSave(del){const x=S.sc,l=(Array.isArray(cfg().scad)?cfg().scad:[]).filter(y=>y&&y.id!==x.id);
+  if(!del){const e=orMin(x.entro),a=x.avv?orMin(x.avv):null;
+    if(!x.g.length)return toast('Scegli almeno un giorno.','warn');if(e==null)return toast('Scrivi l\'ora «Entro le».','warn');
+    if(x.avv&&(a==null||a>=e))return toast('L\'avviso deve venire prima dell\'ora «Entro le».','warn');
+    l.push({id:x.id||uid(),f:x.f||'',g:x.g.slice().sort(),entro:minHm(e),avv:a!=null?minHm(a):'',rep:x.rep.slice()})}
+  else if(!await ask('Eliminare questa scadenza?','Lo staff non riceverà più questo avviso.','Elimina',true))return;
+  await put('config','app',Object.assign({},cfg(),{scad:l}));closeSheet();toast(del?'Scadenza eliminata':'Scadenza salvata')}
 async function setPhoto(fs){ls('jona_reg',null);try{S.form.foto=await fileToAvatar(fs[0]);repaint()}catch(e){toast('Non riesco a leggere questa foto.','err')}}
 function applyTheme(){const t=ls('jona_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}
 
@@ -4338,6 +4405,7 @@ const A={
   notifDel:async()=>{const ns=Object.values(D().notifiche).filter(n=>n.letta);await runPool(ns.map(n=>()=>del('notifiche',n.id)));toast('Notifiche pulite')}
 };
 const IN={
+  sc:t=>{S.sc[t.dataset.k]=t.value},
   q:t=>{S.q=t.value;const r=$('#results');if(r)r.innerHTML=catResults();else render()},
   login:t=>{S.login[t.dataset.k]=t.value},
   joinK:t=>{S.joinK=t.value},
@@ -4383,6 +4451,7 @@ const CH={
   rprep:t=>{const R=rpState();R.rep=t.value;R.all=false;refreshSheet()},
   rpd:t=>{const R=rpState();R[t.dataset.k]=t.value;refreshSheet()},
   fesel:t=>{S.fe[t.dataset.k]=t.value},
+  sc:t=>{S.sc[t.dataset.k]=t.value},
   pesel:t=>{S.pe[t.dataset.k]=t.value}
 };
 /* chat e «Chiedi a Jona» */
@@ -4420,6 +4489,14 @@ Object.assign(A,{
   tbRetry:()=>{closeSheet(true);tbScanSheet()},
   tbSet:d=>tbToggle(d.v==='1'),
   tbQr:()=>{closeSheet(true);tbQrSheet()},
+  qfNew:d=>qfNew(!!d.v),
+  qfCard:()=>qfCard(),
+  promA:async d=>{const l=(cfg().promA||[]).filter(id=>D().staff[id]),i=l.indexOf(d.v);i<0?l.push(d.v):l.splice(i,1);await put('config','app',Object.assign({},cfg(),{promA:l}))},
+  scEdit:d=>scSheet(d.v),
+  scDay:d=>{const g=+d.v,l=S.sc.g,i=l.indexOf(g);i<0?l.push(g):l.splice(i,1);l.sort();refreshSheet()},
+  scRep:d=>{const l=S.sc.rep;if(!d.v)l.length=0;else{const i=l.indexOf(d.v);i<0?l.push(d.v):l.splice(i,1)}refreshSheet()},
+  scSave:()=>scSave(false),
+  scDel:()=>scSave(true),
   tbQrDl:async()=>{if(!S.tbQr)return;const img=await new Promise((r,j)=>{const i=new Image();i.onload=()=>r(i);i.onerror=j;i.src=S.tbQr});
     const c=document.createElement('canvas');c.width=1240;c.height=1754;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.imageSmoothingEnabled=false;x.drawImage(img,220,330,800,800);
     x.fillStyle='#2B2321';x.textAlign='center';x.font='300 84px Jost, Futura, sans-serif';x.fillText(cfg().nomeLocale,620,230);x.font='400 54px Jost, Futura, sans-serif';x.fillText('Timbra entrata e uscita',620,1260);
@@ -4527,7 +4604,10 @@ async function boot(){
   setTimeout(()=>{if(!allLoaded()){S.loadTimeout=true;render()}},5000);
 }
 boot();
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  // versione nuova pubblicata mentre l'app era aperta: il service worker nuovo prende il posto del vecchio → avviso «App da aggiornare»
+  const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had)updOn()});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{})})}
 </script>
 </body>
 </html>
