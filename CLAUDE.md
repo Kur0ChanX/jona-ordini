@@ -40,10 +40,12 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
      - Nessun comando Git/Bash ha fallito (exit code != 0).
      - Non ci sono conflitti di merge o modifiche pendenti.
      - Non sono stati usati comandi vietati/distruttivi/forzati.
+     - Il commit con `docs/PASSAGGIO-CONSEGNE.md` è pushato e GitHub lo conferma: `git fetch origin <ramo>` e `git rev-parse HEAD` uguale a `git rev-parse origin/<ramo>`. Solo DOPO crea la nuova sessione (altrimenti la nuova sessione scarica le consegne vecchie).
+     - Le consegne riportano l'ultimo messaggio di Mario, anche se arrivato mentre preparavi l'handoff.
   3. Se TUTTE le condizioni sono vere: apri automaticamente la nuova sessione (usando lo strumento `Create Session`) e avvisami quando è pronta, senza chiedere permesso.
   4. Se ANCHE UNA SOLA condizione è falsa: FERMATI immediatamente. Non aprire nuove sessioni. Scrivimi in 1-2 righe cosa è andato storto e attendi il mio intervento.
   5. NOMI CHIARI DELLE SESSIONI: dai sempre un titolo alla nuova sessione nel formato `▶ ATTIVA · <Progetto> · da v<versione> · <data> · prossimo: <argomento>` e rinomina quella vecchia in `✓ CHIUSA · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>` (strumento di rinomina della sessione). Così tra tante conversazioni si capisce subito quale usare.
-  6. PROMPT MINIMALE PER NUOVA SESSIONE: Quando crei la nuova sessione, passa un prompt iniziale di MASSIMO 3 RIGHE. Dì solo alla nuova sessione di leggere `CLAUDE.md` e `docs/PASSAGGIO-CONSEGNE.md` e attendere le mie istruzioni. Non duplicare codice o dettagli.
+  6. PROMPT MINIMALE PER NUOVA SESSIONE: Quando crei la nuova sessione, passa un prompt iniziale di MASSIMO 3 RIGHE. Dì solo alla nuova sessione di fare `git fetch origin <ramo> && git merge --ff-only origin/<ramo>`, poi leggere `CLAUDE.md` e `docs/PASSAGGIO-CONSEGNE.md` e attendere le mie istruzioni. Non duplicare codice o dettagli.
 
 
 ## DIVIETO ASSOLUTO DI COMANDI DISTRUTTIVI E FORCE PUSH (POLITICA ZERO RISCHIO)
