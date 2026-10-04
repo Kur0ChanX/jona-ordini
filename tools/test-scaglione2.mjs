@@ -19,7 +19,7 @@ await pg.waitForSelector('.testbar');
 await pg.click('[data-a="viewAs"][data-v="staff"]');await wait(300);
 // prima una richiesta normale, poi una con un prodotto urgente
 await pg.evaluate(()=>{S.cart=[{pid:'demo07',qta:1}];saveCart();S.tab='carrello';render()});await wait(200);
-ok(await pg.locator('[data-a="curg"]').count()===1,'cart: «È urgente?» button per line');
+ok(await pg.locator('[data-a="curg"]').count()===1,'cart: «È urgente» button per line');
 await pg.click('[data-a="csend"]');await wait(500);
 await pg.click('.sheet [data-a="closeSheet"].btn');await wait(300);
 await pg.evaluate(()=>{S.cart=[{pid:'demo02',qta:2},{pid:'demo01',qta:1}];saveCart();S.tab='carrello';render()});await wait(200);
