@@ -1,4 +1,4 @@
-# Passaggio di consegne (2026-10-04, notte)
+# Passaggio di consegne (2026-10-04, pomeriggio)
 
 ## Stato attuale
 - **v26** pronta (`APP_VER=26`, `CACHE=jona-ordini-v30`): foto e vocali in chat, reparti F&B Manager/Responsabile, guida «notifiche bloccate». Prove tutte verdi (nuove: `test-allegati-server` 25, `test-firebase-allegati` 22, `test-v26` 15).
@@ -13,7 +13,8 @@
 - `t` del messaggio («📷 Foto», «🎤 Messaggio vocale (0:12)») per liste, avvisi e versioni vecchie dell'app.
 
 ## Da fare / in sospeso
-1. **Mario (in corso)**: crea un **token Cloudflare nuovo solo per Jona** (modello «Modifica Cloudflare Workers» + Account › D1 › Modifica), lo mette nel segreto GitHub `CLOUDFLARE_API_TOKEN` (il token vecchio resta per i suoi altri progetti). Poi crea la chiave Gemini (nome «Jona Ordini», con l'account Google del ristorante) → segreto `GEMINI_API_KEY` → rilancia il workflow «Pubblica server notifiche (Cloudflare Worker)». Controllo: log «Foto e vocali: 4 database collegati.» e `/salute` con `"allegati":4,"gemini":true`. Oggi `/salute` dice `allegati:0, gemini:false`.
+1. **Fatto (4 ottobre, 13:40)**: token Cloudflare nuovo «Jona Ordini» (Token API dell'account, modello Edit Cloudflare Workers + policy Intero account → D1 Write) nel segreto `CLOUDFLARE_API_TOKEN`; workflow #14 verde, `/salute` → `"allegati":4`. Foto e vocali attivi.
+   **Mario (in corso)**: segreto `GEMINI_API_KEY` ancora mancante (su GitHub ci sono solo `CLOUDFLARE_ACCOUNT_ID` e `CLOUDFLARE_API_TOKEN`). Deve: **New repository secret** → Name `GEMINI_API_KEY` → incolla la chiave «Jona» → **Add secret** → Actions → «Pubblica server notifiche (Cloudflare Worker)» → **Run workflow**. Controllo: `curl https://jona-notifiche.mario-miscera.workers.dev/salute` deve dire `"gemini":true`.
 2. Domande aperte a Mario: reazioni veloci (👍 ❤️ 😂 ✅) e sticker Jona; chi spostare in «F&B Manager».
 3. Provare sui telefoni veri il vocale iPhone → Android e viceversa.
 4. Il repository ora è `Kur0ChanX/jona-ordini` (GitHub segnala lo spostamento, i push funzionano).
