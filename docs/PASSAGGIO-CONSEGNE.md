@@ -1,7 +1,7 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- In pubblicazione la **v17** (chat tra colleghi, «Chiedi a Jona»): `APP_VER=17`, `CACHE=jona-ordini-v21`. Online prima: v16 (PR #26, squash `d69b4d2`: ordine suggerito, timbratura con QR spenta di partenza, cambi turno, contratto solo per l'amministratore, consenso sugli errori dei turni).
+- Online la **v17** (PR #27, squash `44e2c02`; chat tra colleghi, «Chiedi a Jona»): `APP_VER=17`, `CACHE=jona-ordini-v21`. File online identici a quelli provati. Online prima: v16 (PR #26, squash `d69b4d2`: ordine suggerito, timbratura con QR spenta di partenza, cambi turno, contratto solo per l'amministratore, consenso sugli errori dei turni).
 - **Blocco aperto: Mario deve ripubblicare le regole Firestore** (collezione `messaggi`, file `firebase/firestore.rules`). Fino ad allora la chat mostra «La chat va attivata»; il resto funziona.
 - **Video dell'invio**: il menù generato dall'IA cambia forma durante lo scambio (fotogrammi ~25-33 e ~57-73). Non si corregge tagliando: serve un video nuovo da Mario (prompt e consigli dati in chat), poi `python3 tools/anim-invio.py <video>`.
 - Prove verdi: `test-v17` (29), `test-v16` (42), `test-orari` (70), `test-invio-anim` (14), `test-staff`, `test-news`, `test-scaglione2`, `test-voice`, `test-report`, `test-firebase-chat` (13), `test-firebase-orari` (18), flow, push, approva-arrivi, backup.
