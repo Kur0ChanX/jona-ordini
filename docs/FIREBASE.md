@@ -35,6 +35,10 @@ La configurazione non è segreta. I dati li protegge la chiave del ristorante (v
 - Backup: Impostazioni → Backup dei dati → Esporta / Ripristina (il ripristino vale per tutti i telefoni).
 - Copie automatiche: ogni giorno il primo telefono di chi gestisce salva una copia di tutto nel database (collezione `backup`); restano 14 giorni. Impostazioni → Copie automatiche → Scarica / Ripristina. Se le regole sono state incollate prima di questa funzione, incollale di nuovo.
 
+## Chat tra colleghi
+- I messaggi stanno nella collezione `messaggi`. Dopo l'aggiornamento della versione 17 le regole vanno **incollate di nuovo** (scheda Regole → Pubblica): finché non lo fai la chat mostra «La chat va attivata» e il resto dell'app funziona normalmente.
+- Tutti i telefoni collegati leggono tutti i messaggi (anche i privati): non scrivete password o dati delicati in chat.
+
 ## Notifiche push
 - Ogni telefono le attiva da sé: foto del profilo → **Attiva le notifiche** → Consenti. L'iscrizione va nella collezione `push`.
 - Le manda il server `worker/` su Cloudflare (gratis), pubblicato dal workflow GitHub a ogni modifica di `worker/`.

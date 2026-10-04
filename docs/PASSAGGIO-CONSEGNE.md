@@ -1,9 +1,19 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- Online la **v15** (PR #25, squash `81d7022`): animazione «Inviato allo chef» + «È urgente» senza punto di domanda. `APP_VER=15`, `CACHE=jona-ordini-v19`. File online identici a quelli provati; ramo riallineato con `git merge origin/main`.
-- Prove verdi: `test-invio-anim` (14), `test-orari` (62), `test-firebase-orari` (14), `test-staff`, `test-news`, `test-scaglione2`, `test-voice`, `test-report`, `test-firebase-*`.
-- Mario deve ancora provare sul telefono v13 (urgente, prezzi, controllo merce), v14 (orari) e v15 (animazione dopo «Invia allo chef», anche su iPhone).
+- In pubblicazione la **v17** (chat tra colleghi, «Chiedi a Jona»): `APP_VER=17`, `CACHE=jona-ordini-v21`. Online prima: v16 (PR #26, squash `d69b4d2`: ordine suggerito, timbratura con QR spenta di partenza, cambi turno, contratto solo per l'amministratore, consenso sugli errori dei turni).
+- **Blocco aperto: Mario deve ripubblicare le regole Firestore** (collezione `messaggi`, file `firebase/firestore.rules`). Fino ad allora la chat mostra «La chat va attivata»; il resto funziona.
+- **Video dell'invio**: il menù generato dall'IA cambia forma durante lo scambio (fotogrammi ~25-33 e ~57-73). Non si corregge tagliando: serve un video nuovo da Mario (prompt e consigli dati in chat), poi `python3 tools/anim-invio.py <video>`.
+- Prove verdi: `test-v17` (29), `test-v16` (42), `test-orari` (70), `test-invio-anim` (14), `test-staff`, `test-news`, `test-scaglione2`, `test-voice`, `test-report`, `test-firebase-chat` (13), `test-firebase-orari` (18), flow, push, approva-arrivi, backup.
+- Mario deve ancora provare sul telefono v13-v17.
+
+## v16-v17 in breve
+- Ordine suggerito: `sugStats`/`sugRows`/`sugSheet`/`sugAdd`, meteo Open-Meteo (Porto Cervo, `METEO_POS`).
+- Timbratura: `config/app.timbra` (spenta), `timbraK`, `config/timbr_<lunedì>`, `tbPunch`/`tbOpen`/`tbScanSheet` (BarcodeDetector o `lib/jsqr-1.4.0.js`), `tbExcel`.
+- Cambi turno: `cambi.<id>` nella settimana pubblicata, `cmSheet`/`cmAnswer`/`cmDecide` (aggiorna `t` e `tp`, consenso sugli errori).
+- Contratto solo `isGM`; `orConsent` + `ok.<persona>` per gli errori accettati.
+- Chat: `CHAT`, `chWatch` (Firestore diretto come le push), `chPaint`, `messaggi/letti`; chat `tutti`, `rep_<reparto>`, `dm_<a>--<b>` («--» perché gli id possono avere «_»).
+- «Chiedi a Jona»: `jonaCtx`, `jonaAsk` (Gemini, chiave del telefono), pulsante tondo per i gestori al posto del microfono.
 
 ## Animazione invio (v15): com'è fatta
 - `media/invio-chef.mp4` (265 KB, 4,8 s, 24 fps): H.264 720×808, sopra il colore e sotto la trasparenza («alpha impilato»: i video trasparenti WebM/HEVC non vanno su tutti i telefoni). `sendAnim` lo carica come blob (`animPrefetch`, all'apertura del carrello e all'invio), lo unisce con WebGL su un canvas trasparente sopra l'app (`.snd-anim`, sfondo sfocato), scritta «Inviato allo chef» verso la fine, poi il solito foglio. Si salta con «riduci movimento», senza WebGL, se il video non parte o con un tocco; massimo 9 s.
@@ -17,7 +27,7 @@
 
 ## Prossimi passi
 - Chiedere a Mario se gli orari vanno bene dopo la prova sul telefono (passi da dargli: profilo → contratto; Staff → Orari → casella → turno tipo → «Uguale anche per» → Salva → Pubblica; entrare come staff dalla barra **Test** → voce «Orari»).
-- **In coda:** le idee scelte da Mario tra le 10 in `docs/RICHIESTE-MARIO.md` (consigliate: timbratura con QR, bolla letta dalla foto, bacheca del servizio).
+- **In coda:** video nuovo dello scambio; altre idee in `docs/RICHIESTE-MARIO.md` (bolla letta dalla foto, scadenze, sprechi, bacheca del servizio, checklist).
 - **Scaglione 4** (da proporre a Mario): condividi/stampa degli orari (PDF, WhatsApp), riepilogo ore del mese, richieste di cambio turno o ferie dallo staff.
 - **Scaglione 5:** più lingue per lo staff (scelta per persona; ordini e prodotti in italiano).
 - Idee non scelte: vedi `docs/RICHIESTE-MARIO.md`.

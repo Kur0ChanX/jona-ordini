@@ -47,5 +47,6 @@ Cosa vuol dire: v16 = ordine suggerito (1), timbratura con QR spenta di partenza
 
 ## Stato
 - Fatto: approvazione per fornitore, controllo arrivo a semaforo, invii in sospeso (v12); aumento prezzi, prodotto urgente, controllo merce con chi aveva chiesto (v13); orari del personale (v14); animazione invio allo chef e «È urgente» senza punto di domanda (v15); ordine suggerito, timbratura, cambi turno, contratto riservato e consenso (v16).
-- In coda, in ordine: «Chiedi a Jona» e chat tra colleghi (v17); video nuovo dello scambio del menù (da Mario); più lingue; notifiche in più per i ragazzi (da decidere).
+- Fatto anche: «Chiedi a Jona» e chat tra colleghi (v17; la chat parte dopo la nuova pubblicazione delle regole Firestore).
+- In coda, in ordine: video nuovo dello scambio del menù (da Mario); più lingue; notifiche in più per i ragazzi (da decidere).
 - Idee proposte ma non ancora scelte da Mario: riepilogo della sera per Maurizio, giorni di consegna, HACCP all'arrivo, contestazione fornitore, scorte minime, foto prodotto, prezzo migliore in approvazione, vuoti a rendere, budget per reparto, conferma del fornitore, ricette e costo del piatto.
