@@ -647,8 +647,8 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .cht-day{text-align:center;margin:12px 0 6px}
 .cht-day span{display:inline-block;padding:5px 12px;border-radius:9px;background:var(--surface);color:var(--ink2);font-size:12.5px;box-shadow:0 1px 1px rgba(0,0,0,.08)}
 .cht-day span::first-letter{text-transform:uppercase}
-.cht-b{display:flex;max-width:min(82%,560px);margin-top:2px}.cht-b.first{margin-top:8px}
-.cht-b.me{align-self:flex-end}.cht-b.ot{align-self:flex-start}
+.cht-b{display:flex;flex-direction:column;position:relative;max-width:min(82%,560px);margin-top:2px}.cht-b.first{margin-top:8px}
+.cht-b.me{align-self:flex-end;align-items:flex-end}.cht-b.ot{align-self:flex-start;align-items:flex-start}
 .cht-b p{position:relative;margin:0;padding:6px 9px 7px 10px;border-radius:12px;font:400 15.5px/1.38 var(--font);color:var(--ink);overflow-wrap:anywhere;box-shadow:0 1px .5px rgba(0,0,0,.13)}
 .cht-b.me p{background:var(--cht-me)}.cht-b.ot p{background:var(--surface)}
 .cht-b.first.me p{border-top-right-radius:2px}.cht-b.first.ot p{border-top-left-radius:2px}
@@ -656,6 +656,13 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .cht-b.first.me p::after{right:-7px;border-width:0 0 9px 8px;border-color:transparent transparent transparent var(--cht-me)}
 .cht-b.first.ot p::after{left:-7px;border-width:0 8px 9px 0;border-color:transparent var(--surface) transparent transparent}
 .cht-b p a{color:var(--lagoon)}
+.cht-b p,.cht-b img{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
+.cht-rb{position:absolute;bottom:calc(100% + 4px);z-index:3;display:flex;gap:1px;padding:4px 5px;border-radius:26px;background:var(--surface);box-shadow:0 6px 20px -6px rgba(0,0,0,.45);animation:chrb .15s ease-out}
+.cht-b.me .cht-rb{right:0}.cht-b.ot .cht-rb{left:0}.cht-rb.dn{bottom:auto;top:calc(100% + 4px)}
+.cht-rb button{width:40px;height:42px;flex:none;border:0;border-radius:50%;background:none;font-size:24px;line-height:1;display:grid;place-items:center;padding:0;color:var(--muted)}.cht-rb button.on{background:var(--lagoon-soft)}.cht-rb .ic{width:21px;height:21px}
+@keyframes chrb{from{opacity:0;transform:scale(.9)}}
+.cht-rx{display:flex;flex-wrap:wrap;gap:4px;margin:-3px 8px 1px;position:relative;z-index:1}
+.cht-rx button{display:inline-flex;align-items:center;gap:3px;min-height:28px;padding:1px 8px;border-radius:14px;border:1px solid var(--line);background:var(--surface);font:500 13px var(--font);color:var(--ink2);line-height:1}.cht-rx button.on{border-color:var(--lagoon);background:var(--lagoon-soft)}
 .cht-who{display:block;font:500 13px var(--font);margin-bottom:1px}
 .cht-t{float:right;display:inline-flex;align-items:center;gap:3px;margin:8px 0 -6px 12px;font-size:11px;color:var(--muted);position:relative;top:2px;white-space:nowrap}
 .cht-t .tk{font-style:normal;font-size:11.5px;letter-spacing:-3.5px;padding-right:3px;color:var(--muted)}.cht-t .tk.rd{color:var(--lagoon)}
@@ -991,8 +998,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=26;
+const APP_VER=27;
 const NEWS=[
+  {v:27,data:'2026-10-04',titolo:'Reazioni ai messaggi',
+    tutti:['In chat puoi rispondere a un messaggio con una faccina: tieni premuto il messaggio e scegli 👍 ❤️ 😂 ✅ 😢 o 👎. Tocca di nuovo la stessa faccina per toglierla.','Tenendo premuto un messaggio scritto puoi anche copiarne il testo.'],
+    dev:{aggiunte:['Reazioni in `messaggi/<id>.r.<persona>` (solo le emoji di `CH_RE`, tolta con `FieldValue.delete()`): `chRx`, `chRb`, `chReact`, `chLp` (pressione lunga 450 ms o tasto destro, il clic dopo viene ignorato), `chCopy`. Nessuna regola nuova: `messaggi` è già scrivibile dai membri.']}},
   {v:26,data:'2026-10-04',titolo:'Foto e vocali in chat',
     tutti:['In chat puoi mandare una «foto» (tasto con la macchina fotografica) e un «messaggio vocale» (tasto con il microfono: parla, poi premi la freccia per inviare o il cestino per cancellare). I vocali durano al massimo 2 minuti.','Foto e vocali restano 60 giorni, poi si cancellano da soli.','Nuovi reparti: «F&B Manager» e «Responsabile».','Se hai bloccato le notifiche per sbaglio, l\'app ti spiega passo passo come sbloccarle.'],
     dev:{aggiunte:['Worker `/allegati` (POST base64 con `x-tipo`, GET `/allegati/<db>-<id>`, `/allegati/spazio`) su D1 `ALLEGATI0..3` creati dal workflow (Account › D1 › Edit sul token), tetto 440 MB per database con cancellazione dei più vecchi, cron notturno oltre 60 giorni. App: `ALG`, `algUp`/`algGet` (cache `jona-allegati`), `algImg` (1280 px WebP/JPEG + `mini` 40 px), `chRec` (MediaRecorder MP4/AAC o WebM/Opus, 24 kbps, 2 min), `chPlay`, `chView`, spazio in fondo alla lista chat per lo sviluppatore.','`REPARTI` con `fb` e `resp` (la chiave `altro` resta «Altro»); `PUSH_DENY` e `pushDenied()` in `pushHelp` quando `Notification.permission` è `denied`.']}},
@@ -3571,6 +3581,36 @@ function chMsgBody(m,who){
   if(m.tipo==='audio'&&m.m){const P=ALG.pl&&ALG.pl.id===m.m?ALG.pl.a:null;
     return`<p>${who}<span class="cht-au" data-au="${esc(m.m)}"><button type="button" class="cht-play" data-a="chPlay" data-v="${esc(m.m)}" aria-label="Ascolta il vocale">${ic(P&&!P.paused?'pause':'play')}</button><span class="cht-bar"><i style="width:0%"></i></span><span class="cht-dur">${ALG.gone[m.m]?'non più disponibile':chDur(Number(m.dur)||0)}</span></span>`}
   return`<p>${who}${esc(m.t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}`}
+// reazioni: «r.<id persona>» = emoji (solo quelle di CH_RE); si aprono tenendo premuto il messaggio
+const CH_RE=['👍','❤️','😂','✅','😢','👎'];
+function chRx(m,me){const by={};for(const [u,e] of Object.entries(m.r||{}))if(CH_RE.includes(e))(by[e]=by[e]||[]).push(u);
+  const ks=Object.keys(by).sort((a,b)=>by[b].length-by[a].length||CH_RE.indexOf(a)-CH_RE.indexOf(b));if(!ks.length)return'';
+  return`<div class="cht-rx">${ks.map(e=>{const n=by[e].map(id=>id===me.id?'Tu':(D().staff[id]||{nome:'?'}).nome).join(', ');
+    return`<button type="button"${by[e].includes(me.id)?' class="on"':''} data-a="chReact" data-id="${esc(m.id)}" data-v="${e}" title="${esc(n)}" aria-label="${e} ${esc(n)}">${e}${by[e].length>1?`<span>${by[e].length}</span>`:''}</button>`}).join('')}</div>`}
+const chRb=(m,me)=>`<div class="cht-rb" role="toolbar" aria-label="Reazioni">${CH_RE.map(e=>`<button type="button"${(m.r||{})[me.id]===e?' class="on"':''} data-a="chReact" data-id="${esc(m.id)}" data-v="${e}" aria-label="Reagisci con ${e}">${e}</button>`).join('')}${m.tipo?'':`<button type="button" data-a="chCopy" data-id="${esc(m.id)}" aria-label="Copia il testo">${ic('copy')}</button>`}</div>`;
+function chReact(id,e){
+  const me=realU(),m=chAll().find(x=>x.id===id);if(!me||!m||!CH_RE.includes(e))return;const v=(m.r||{})[me.id]===e?null:e;
+  m.r=Object.assign({},m.r,{[me.id]:v});chReClose();
+  const fail=()=>toast('Reazione non salvata: riprova.','warn');
+  if(chFb())chCol().doc(id).update({['r.'+me.id]:v||firebase.firestore.FieldValue.delete()}).catch(fail);else upd('messaggi',id,{['r.'+me.id]:v}).catch(fail);
+}
+const chRbFix=box=>{const rb=box&&box.querySelector('.cht-rb');if(rb&&rb.getBoundingClientRect().top<box.getBoundingClientRect().top+4)rb.classList.add('dn')};
+// la barra va dentro il messaggio senza ridisegnare la chat (il dito è ancora appoggiato: su iPhone il tocco si perderebbe)
+// chiude la barra anche se era stata aggiunta senza ridisegnare
+function chReClose(){if(S.chat)S.chat.re=null;if(CHAT.box)CHAT.box.querySelectorAll('.cht-rb').forEach(x=>x.remove());chPaint()}
+function chReOpen(id,b){const me=realU(),m=chAll().find(x=>x.id===id);if(!S.chat||!me||!m)return;S.chat.re=id;try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}
+  if(!b||!b.isConnected)return chPaint();CHAT.box.querySelectorAll('.cht-rb').forEach(x=>x.remove());b.insertAdjacentHTML('afterbegin',chRb(m,me));chRbFix(CHAT.box.querySelector('#ch-m'))}
+// tenere premuto (o tasto destro) apre le reazioni; il tocco che segue non apre la foto; un tocco altrove le chiude
+function chLp(B){let T=null,x=0,y=0,fired=false;const stop=()=>{clearTimeout(T);T=null};
+  B.addEventListener('pointerdown',e=>{const b=e.target.closest('.cht-b');stop();fired=false;if(!b||e.button>0||e.target.closest('.cht-rb,.cht-rx,.cht-play'))return;
+    x=e.clientX;y=e.clientY;T=setTimeout(()=>{T=null;fired=true;chReOpen(b.dataset.id,b)},450)});
+  B.addEventListener('pointermove',e=>{if(T&&Math.hypot(e.clientX-x,e.clientY-y)>10)stop()});
+  B.addEventListener('pointerup',()=>{stop();if(fired){fired=false;CHAT.lpUp=now()}});
+  B.addEventListener('pointercancel',stop);B.addEventListener('scroll',stop,true);
+  B.addEventListener('contextmenu',e=>{const b=e.target.closest('.cht-b');if(!b)return;e.preventDefault();if(!fired&&!T&&e.pointerType!=='touch')chReOpen(b.dataset.id,b)});
+  B.addEventListener('click',e=>{const inBar=e.target.closest('.cht-rb');if(!inBar&&now()-(CHAT.lpUp||0)<400){CHAT.lpUp=0;e.stopPropagation();e.preventDefault();return}
+    if(S.chat&&S.chat.re&&!inBar)chReClose()},true);
+}
 function chMarkRead(c,t){
   const me=realU();if(!me||!c)return;t=t||now();if(chRead(me,c)>=t)return;
   (CHAT.letti[me.id]=CHAT.letti[me.id]||{})[c]=t;const key=me.id+'.'+c;
@@ -3588,7 +3628,7 @@ async function chMore(){
 /* ---- interfaccia: schermo intero sopra l'app, lista + conversazione (affiancate sugli schermi larghi) ---- */
 function chOpen(c){
   S.chat={c:c||null,draft:{},pick:false,stick:true};
-  if(!CHAT.box){CHAT.box=document.createElement('div');CHAT.box.className='cht';CHAT.box.setAttribute('role','dialog');CHAT.box.setAttribute('aria-label','Chat');document.body.appendChild(CHAT.box)}
+  if(!CHAT.box){CHAT.box=document.createElement('div');CHAT.box.className='cht';CHAT.box.setAttribute('role','dialog');CHAT.box.setAttribute('aria-label','Chat');document.body.appendChild(CHAT.box);chLp(CHAT.box)}
   CHAT.last={};CHAT.box.innerHTML=`<aside class="cht-l"></aside><section class="cht-c"></section>`;document.body.classList.add('noscroll');
   requestAnimationFrame(()=>CHAT.box&&CHAT.box.classList.add('open'));algCheck();if(isDev(realU())&&chFb())algSpace();chPaint(true);
 }
@@ -3623,11 +3663,12 @@ function chPaint(force){
   for(const m of ms){const dd=chDay(m.creato);if(dd!==day){day=dd;h+=`<div class="cht-day"><span>${dd}</span></div>`;prev=null}
     const mine=m.da===me.id,u=D().staff[m.da]||{nome:'?'},first=!prev||prev.da!==m.da||m.creato-prev.creato>5*60000;
     const tick=mine?(m.pend?ic('clock','tk'):`<i class="tk${oRead>=m.creato?' rd':''}">${other?'✓✓':'✓'}</i>`):'';
-    h+=`<div class="cht-b ${mine?'me':'ot'}${first?' first':''}">${chMsgBody(m,!mine&&first&&!other?`<b class="cht-who" style="color:${hue(u.id||u.nome)}">${esc(u.nome)}</b>`:'')}<span class="cht-t">${chTime(m.creato)}${tick}</span></p></div>`;prev=m}
+    h+=`<div class="cht-b ${mine?'me':'ot'}${first?' first':''}" data-id="${esc(m.id)}">${C.re===m.id?chRb(m,me):''}${chMsgBody(m,!mine&&first&&!other?`<b class="cht-who" style="color:${hue(u.id||u.nome)}">${esc(u.nome)}</b>`:'')}<span class="cht-t">${chTime(m.creato)}${tick}</span></p>${chRx(m,me)}</div>`;prev=m}
   if(CHAT.up)h+=`<div class="cht-up" role="status">Invio in corso…</div>`;
   const box=B.querySelector('#ch-m');if(!box)return;const near=box.scrollHeight-box.scrollTop-box.clientHeight<90;
   if(fresh||CHAT.last['#ch-m']!==h){CHAT.last['#ch-m']=h;const top=box.scrollTop,hh=box.scrollHeight;box.innerHTML=h;chImgs(box);
-    if(fresh||C.stick||near){box.scrollTop=box.scrollHeight;C.stick=false}else if(force)box.scrollTop=top+(box.scrollHeight-hh)}
+    if(fresh||C.stick||near){box.scrollTop=box.scrollHeight;C.stick=false}else if(force)box.scrollTop=top+(box.scrollHeight-hh)
+    chRbFix(box)}
   if(!document.hidden&&ms.length){const lastO=ms.filter(m=>m.da!==me.id).pop();if(lastO&&lastO.creato>chRead(me,C.c))chMarkRead(C.c,lastO.creato)}
   if(fresh){const ta=$('#ch-ta');if(ta&&matchMedia('(min-width:760px)').matches)ta.focus({preventScroll:true})}
 }
@@ -4165,7 +4206,7 @@ const CH={
 Object.assign(A,{
   chatOpen:()=>{while(sheets.length)closeSheet(true);chOpen()},
   chClose:()=>chClose(),
-  chGo:d=>{Object.assign(S.chat,{c:d.c,pick:false,stick:true});chPaint(true)},
+  chGo:d=>{Object.assign(S.chat,{c:d.c,pick:false,stick:true,re:null});chPaint(true)},
   chBack:()=>{S.chat.c=null;chPaint(true)},
   chPick:()=>{S.chat.pick=!S.chat.pick;chPaint(true)},
   chSend:()=>chSend(),
@@ -4176,6 +4217,8 @@ Object.assign(A,{
   chRecNo:()=>chRecStop(false),
   chPlay:d=>chPlay(d.v),
   chView:d=>chView(d.v),
+  chReact:d=>chReact(d.id,d.v),
+  chCopy:d=>{const m=chAll().find(x=>x.id===d.id);chReClose();if(m)Promise.resolve().then(()=>navigator.clipboard.writeText(m.t)).then(()=>toast('Testo copiato.'),()=>toast('Non riesco a copiare il testo.','warn'))},
   chViewX:()=>{const v=CHAT.box&&CHAT.box.querySelector('.cht-view');if(v)v.remove()},
   jonaOpen:()=>jonaSheet(),
   jonaAsk:()=>jonaAsk(),
