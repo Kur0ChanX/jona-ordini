@@ -1,7 +1,7 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- Online la **v12**. Sul ramo `backup-automatico` (commit `6463841`, già su GitHub) c'è la **v13 = Scaglione 2**, NON ancora pubblicata: `APP_VER=13`, `sw.js` `CACHE=jona-ordini-v17`, voce `NEWS` v13.
+- Online la **v13 = Scaglione 2** (PR #23, squash `4562ed6`, controllata online): `APP_VER=13`, `sw.js` `CACHE=jona-ordini-v17`. Ramo `backup-automatico` riallineato a `main`.
 - Prove tutte verdi: `test-staff`, `test-voice`, `test-scaglione2`, `test-news` (riscritta: conteggi calcolati da `NEWS`, contatore «9+»), e con l'emulatore `test-firebase-approva-arrivi`, `-push`, `-flow`, `-sync`, `-backup`, `-bulk`, `-report`.
 
 ## File toccati nello Scaglione 2 (v13)
@@ -25,12 +25,12 @@
 ## Piano a scaglioni
 Metodo: 3 funzioni → prove → PR → squash merge → controllo online → scaglione successivo. A ogni versione: `APP_VER`+1, voce `NEWS`, `CACHE` in `sw.js`.
 
-**Scaglione 2: scritto (v13), da finire**
+**Scaglione 2: pubblicato (v13)**
 1. Prove Firebase: fatte, tutte verdi.
-2. PR da `backup-automatico` → squash merge → controllo online → `git fetch origin main && git merge origin/main` e push normale.
-3. Dire a Mario cosa provare sul telefono (carrello «È urgente?», import di un listino con un prezzo più alto, controllo merce con un prodotto mancante).
+2. PR #23 → squash merge → online → ramo riallineato: fatto.
+3. Mario prova sul telefono sul telefono (carrello «È urgente?», import di un listino con un prezzo più alto, controllo merce con un prodotto mancante).
 
-**Scaglione 3 (dopo)**
+**Scaglione 3 (prossimo)**
 - **Più lingue** per lo staff (scelta per persona; ordini e prodotti restano in italiano).
 
 **Scaglioni 4-5: Orari del personale** (nuova sezione, grafica coerente con l'app)
