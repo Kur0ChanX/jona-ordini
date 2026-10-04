@@ -634,6 +634,7 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .cht-r em{flex:none;min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:var(--lagoon);color:var(--on-lagoon);font:600 12px/22px var(--font);font-style:normal;text-align:center}
 .cht-gav{background:var(--c)!important}.cht-gav .ic{width:52%;height:52%;color:#fff}
 .cht-sub{margin:14px 16px 4px;font-size:13px;color:var(--muted)}
+.cht-rule{display:flex;align-items:center;gap:6px;width:fit-content;max-width:min(320px,90%);margin:6px auto 12px;padding:6px 12px;border-radius:10px;background:var(--ocra-soft);color:var(--ink2);font-size:12.5px;line-height:1.35;text-align:center}.cht-rule .ic{width:15px;height:15px;flex:none;color:var(--ocra)}
 .cht-off{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:12px;padding:12px 14px;border-radius:14px;background:var(--ocra-soft);flex:none}
 .cht-off .ic{grid-row:span 2;width:22px;height:22px;color:var(--ocra)}.cht-off b{font-weight:500}.cht-off span{font-size:13.5px;color:var(--ink2)}.cht-off code{font-size:12px}
 .cht-empty{flex:1;display:grid;place-content:center;justify-items:center;gap:6px;padding:20px;text-align:center;color:var(--muted);background:var(--cht-wall),var(--cht-bg)}
@@ -968,8 +969,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=24;
+const APP_VER=25;
 const NEWS=[
+  {v:25,data:'2026-10-04',titolo:'Chat anche sul Wi-Fi lento',
+    tutti:['Se il Wi-Fi rallenta i messaggi (per esempio quello dell\'hotel), l\'app se ne accorge e passa da sola a un collegamento che funziona meglio.','Nella chat: «Usa questa chat in modo responsabile e solo per lavoro».'],
+    dev:{risolti:['`netWatch`: scrittura non confermata in 4 s con la rete accesa → `jona_fb_lp` e ricarica dopo la conferma (solo senza fogli aperti, testo in chat o scritture in sospeso), altrimenti alla prossima apertura. Usato in `track` e in `chSend`.']}},
   {v:24,data:'2026-10-04',titolo:'Telefoni approvati e chat più svelta',
     tutti:['Quando riapri l\'app la chat si aggiorna subito, senza aspettare.'],
     chef:['Un telefono nuovo non vede più nessun dato finché tu o Mario non lo approvate: lo trovi in Staff → «Telefoni da approvare». Con un profilo nuovo, approvando crei anche il profilo.'],
@@ -1168,6 +1172,16 @@ function fbInit(){
   const emu=ls('jona_fb_emu');if(emu&&!fbInit.emu){fbInit.emu=1;fs.useEmulator(emu,8080);auth.useEmulator('http://'+emu+':9099',{disableWarnings:true})}
   return{fs,auth};
 }
+// reti Wi-Fi con filtri (es. UniFi con IPS) trattengono il collegamento continuo di Firestore: se una scrittura non arriva in 4 s
+// con la rete accesa, si passa al long polling (jona_fb_lp); si ricarica solo dopo la conferma, senza fogli aperti né testo in chat
+function netWatch(p){
+  if(ls('jona_fb_lp')||!S.db||S.db.kind!=='firebase')return p;
+  const t=setTimeout(()=>{if(navigator.onLine===false||document.hidden||ls('jona_fb_lp'))return;ls('jona_fb_lp',1);
+    const go=()=>{const ta=$('#ch-ta');return!sheets.length&&!(ta&&ta.value.trim())};
+    const later=(n=0)=>{if(!go())return;if(S.db.status().pend&&n<60)return setTimeout(()=>later(n+1),1000);if(!S.db.status().pend)location.reload()};
+    toast(go()?'Questa rete Wi-Fi rallenta i messaggi: passo a un collegamento compatibile…':'Questa rete Wi-Fi rallenta i messaggi: dalla prossima apertura l\'app userà un collegamento compatibile.','warn');
+    Promise.resolve(p).then(()=>setTimeout(later,600),()=>{})},4000);
+  Promise.resolve(p).then(()=>clearTimeout(t),()=>clearTimeout(t));return p}
 const fbTmo=(p,ms=20000)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j({code:'fb_slow'}),ms))]);
 async function fbSignIn(auth){await new Promise(r=>{const u=auth.onAuthStateChanged(()=>{u();r()})});if(!auth.currentUser)await auth.signInAnonymously();return auth.currentUser.uid}
 async function fbPublic(){try{await need('firebase');const{fs}=fbInit();const d=await fbTmo(fs.doc('pubblico/stato').get(),12000);return!!(d.exists&&d.data().attivo)}catch(e){return null}}
@@ -1180,7 +1194,7 @@ function FirebaseStore(key){
   addEventListener('online',()=>{st.net=true;ping()});addEventListener('offline',()=>{st.net=false;ping()});
   const mapErr=e=>({code:!e?'fb':e.code==='not-found'?'not_found':e.code==='permission-denied'?'fb_perm':e.code==='unavailable'?'fb_net':e.code?'fb':'fb',msg:e&&e.message});
   let okReady;const readyP=new Promise(r=>okReady=r);
-  const track=p=>{st.pend++;ping();p.then(()=>{st.pend--;ping()},e=>{st.pend--;const m=mapErr(e);if(m.code==='fb_perm'){st.err='fb_perm';st.ready=false}ping();toast(errMsg(m),'err')})};
+  const track=p=>{if(st.ready)netWatch(p);st.pend++;ping();p.then(()=>{st.pend--;ping()},e=>{st.pend--;const m=mapErr(e);if(m.code==='fb_perm'){st.err='fb_perm';st.ready=false}ping();toast(errMsg(m),'err')})};
   const run=f=>{track(readyP.then(f));return Promise.resolve()};
   const cache={};
   // ---- telefono nuovo: resta in attesa («ok» falso) finché un telefono approvato non lo approva ----
@@ -3430,7 +3444,7 @@ async function chSend(){
   const C=S.chat,me=realU();if(!C||!C.c||!me)return;const el=$('#ch-ta');const t=String(el?el.value:C.draft[C.c]||'').trim();if(!t)return;
   if(t.length>2000)return toast('Messaggio troppo lungo.','warn');
   const d={c:C.c,da:me.id,t,creato:now()};C.draft[C.c]='';if(el){el.value='';el.style.height=''}C.stick=true;
-  if(chFb())chCol().add(d).catch(e=>toast(e&&e.code==='permission-denied'?'La chat non è ancora attiva sul database.':'Messaggio non inviato: riprova.','err'));
+  if(chFb())netWatch(chCol().add(d)).catch(e=>toast(e&&e.code==='permission-denied'?'La chat non è ancora attiva sul database.':'Messaggio non inviato: riprova.','err'));
   else await put('messaggi',uid(),d);
   chMarkRead(C.c,d.creato);
   const to=chMembers(C.c).filter(u=>u.id!==me.id).map(u=>u.id),info=chInfo(C.c,me);
@@ -3473,7 +3487,7 @@ function chPaint(force){
     :list.map(x=>{const i=chInfo(x.c,me),l=x.last,w=l&&D().staff[l.da];return`<button type="button" class="cht-it${C.c===x.c?' on':''}" data-a="chGo" data-c="${x.c}">${chAv(i,46)}<div class="cht-ii"><div class="cht-r"><b>${esc(i.n)}</b>${l?`<time class="${x.un?'un':''}">${chDay(l.creato)==='Oggi'?chTime(l.creato):chDay(l.creato)==='Ieri'?'Ieri':new Date(l.creato).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</time>`:''}</div>
       <div class="cht-r"><span>${l?(l.da===me.id?'Tu: ':!x.c.startsWith('dm_')&&w?esc(w.nome)+': ':'')+esc(l.t):`<i>${esc(i.s)}</i>`}</span>${x.un?`<em>${x.un>99?'99+':x.un}</em>`:''}</div></div></button>`}).join('')}</div>`);
   // conversazione
-  if(!C.c){set('.cht-c',`<div class="cht-empty">${ic('chat')}<b>Messaggi tra colleghi</b><span>Scegli una chat o tocca la matita per scriverne una nuova.</span></div>`);return}
+  if(!C.c){set('.cht-c',`<div class="cht-empty">${ic('chat')}<b>Messaggi tra colleghi</b><span>Scegli una chat o tocca la matita per scriverne una nuova.</span><span>Usa questa chat in modo responsabile e solo per lavoro.</span></div>`);return}
   if(!chCan(C.c,me)){C.c=null;return chPaint(true)}
   const i=chInfo(C.c,me);const fresh=set('.cht-c',`<header class="cht-h cht-ch"><button type="button" class="icon-btn" data-a="chBack" aria-label="Torna alla lista">${ic('back')}</button>${chAv(i,40)}<div class="cht-ct"><b>${esc(i.n)}</b><span>${esc(i.s)}</span></div></header>
     <div class="cht-m" id="ch-m"></div>
@@ -3481,6 +3495,7 @@ function chPaint(force){
   if(fresh){const ta=$('#ch-ta');if(ta)ta.value=C.draft[C.c]||''}
   const ms=chAll().filter(m=>m.c===C.c).sort((a,b)=>a.creato-b.creato),other=C.c.startsWith('dm_')?chDmIds(C.c).find(id=>id!==me.id):null;
   const oRead=other?((CHAT.letti[other]||{})[C.c]||0):0;let h=ms.length>=20&&!(C.noMore&&C.noMore[C.c])?`<button type="button" class="cht-more" data-a="chMore">Messaggi precedenti</button>`:'',day='',prev=null;
+  h+=`<div class="cht-rule">${ic('chat')}Usa questa chat in modo responsabile e solo per lavoro.</div>`;
   if(!ms.length)h+=`<div class="cht-hint">Nessun messaggio. Scrivi il primo!</div>`;
   for(const m of ms){const dd=chDay(m.creato);if(dd!==day){day=dd;h+=`<div class="cht-day"><span>${dd}</span></div>`;prev=null}
     const mine=m.da===me.id,u=D().staff[m.da]||{nome:'?'},first=!prev||prev.da!==m.da||m.creato-prev.creato>5*60000;
