@@ -1,6 +1,9 @@
 # Passaggio di consegne (2026-10-04, notte)
 
-## Ultimo messaggio di Mario
+## Ultimo messaggio di Mario (arrivato nella sessione precedente, girato qui)
+«Alla fine fai un bel controllo accurato di tutte le funzioni dell'app, in modo autonomo. Mancherò per qualche ora: vai da solo, e le decisioni importanti lasciale a me per quando torno in chat, alla fine di tutto.»
+
+## Messaggio di Mario prima di questo
 «Procedi con il cambio del sottodominio Cloudflare (accetto qualche ora senza notifiche), poi procedi con tutto il resto senza fermarti. Se devi cambiare sessione fallo da solo: ho un impegno, non posso dare consensi. Fermati solo quando hai finito tutta la lista, poi fammi una lista dettagliata di tutto ciò che hai fatto.»
 
 ## Stato
@@ -19,6 +22,7 @@
 - Mauro Loi in «F&B Manager»: da confermare con Mario.
 
 ## Prossimi passi
+0. **Da fare ora, da soli: controllo completo dell'app.** Tutte le prove in `tools/` (anche quelle Firebase con l'emulatore, vedi `tools/README.md`), più un giro con Playwright su ogni schermata e ruolo (Staff, Admin Chef, Sviluppatore) a 320 e 390 px, tema chiaro e scuro. Correggere i difetti chiari (nuova versione v32: `APP_VER`, `NEWS`, `CACHE` v36, PR → squash → controllo online → riallineamento). Le scelte importanti NON prenderle: elencarle in fondo al resoconto finale come «Decisioni per Mario». Alla fine: resoconto dettagliato + prove numerate.
 1. Risposta di Mario sul sottodominio → v32 come sopra.
 2. Prove dal vero di Mario: vocale Android→iPhone, gesto indietro Android, pallino, invito con codice, v31 (In turno oggi, promemoria, consumi).
 
