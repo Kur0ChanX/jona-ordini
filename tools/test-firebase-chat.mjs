@@ -50,6 +50,16 @@ await A.click('[data-a="chBack"]');await A.waitForTimeout(300);await A.click(`.c
 ok(await B.locator('.cht-b.me .tk.rd').count()===1,'A legge: spunte blu sul telefono di B');
 const L=await A.evaluate(async()=>{const d=await fbInit().fs.doc('messaggi/letti').get({source:'server'});return d.data()});
 ok(L&&L.test_u1&&L.test_u1[dmc]>0&&!Object.keys(L).some(k=>k.includes('.')),'server: «letti» annidato per persona e chat');
+// v27: A reagisce al messaggio di B, B la vede; A la toglie (campo cancellato sul server)
+const mid=await A.evaluate(c=>CHAT.msgs.find(m=>m.c===c).id,dmc);
+await A.click(`.cht-b[data-id="${mid}"] p`,{button:'right'});await A.waitForTimeout(200);await A.click('.cht-rb [data-v="👍"]');await wait(2500);
+ok((await B.locator(`.cht-b[data-id="${mid}"] .cht-rx`).innerText()).includes('👍'),'B vede la reazione 👍 di A');
+const r1=await A.evaluate(async id=>(await fbInit().fs.doc('messaggi/'+id).get({source:'server'})).data().r,mid);
+ok(r1&&Object.values(r1).join()==='👍','server: r.<persona> = 👍');
+await A.click(`.cht-b[data-id="${mid}"] .cht-rx button`);await wait(2500);
+ok(await B.locator(`.cht-b[data-id="${mid}"] .cht-rx`).count()===0,'A la toglie: sparisce anche su B');
+const r2=await A.evaluate(async id=>(await fbInit().fs.doc('messaggi/'+id).get({source:'server'})).data().r,mid);
+ok(r2&&Object.keys(r2).length===0,'server: reazione cancellata, non «null»');
 const n=await A.evaluate(async()=>(await fbInit().fs.collection('messaggi').where('creato','>',0).get({source:'server'})).size);
 ok(n===2,'server: 2 messaggi');
 ok(A.errs.length===0&&B.errs.length===0,'nessun errore '+A.errs.concat(B.errs).join(' | '));
