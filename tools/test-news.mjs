@@ -8,7 +8,7 @@ const pg=await ctx.newPage();
 const errs=[],cerrs=[];pg.on('pageerror',e=>errs.push('pageerror: '+e.message));pg.on('console',m=>{if(m.type()==='error')cerrs.push(m.text()+' @ '+(m.location().url||''))});pg.on('requestfailed',r=>cerrs.push('requestfailed '+r.url().slice(0,80)+' '+(r.failure()||{}).errorText));
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const wait=ms=>pg.waitForTimeout(ms);
-const cnt=async()=>{const l=pg.locator('header.top .news-n');return await l.count()?+(await l.innerText()):0};
+const cnt=async()=>{const l=pg.locator('header.top .news-n');if(!await l.count())return 0;const t=await l.innerText();return t==='9+'?t:+t};
 const view=async v=>{await pg.click(`[data-a="viewAs"][data-v="${v}"]`);await wait(300);await pg.evaluate(()=>document.querySelectorAll('#toasts .toast').forEach(t=>t.remove()))};
 const openNews=async()=>{await pg.click('header.top [data-a="news"]');await wait(400)};
 const closeAll=async()=>{await pg.evaluate(()=>{while(sheets.length)closeSheet(true)});await wait(100)};
@@ -21,11 +21,20 @@ for(const [k,v] of [['nome','Mario'],['cognome','Rossi'],['username','mario'],['
 await pg.click('[data-a="setupGo"]');
 await pg.waitForSelector('.testbar');await wait(300);
 const id=await pg.evaluate(()=>realU().id);
-ok(await pg.evaluate(()=>APP_VER)===7&&await pg.evaluate(()=>NEWS[0].v)===7,'APP_VER 7, NEWS newest first');
+// conteggi attesi calcolati dai dati di NEWS (niente numeri scritti a mano)
+const RAW=await pg.evaluate(()=>NEWS.map(n=>({v:n.v,data:n.data,t:(n.tutti||[]).length,c:(n.chef||[]).length,d:Object.values(n.dev||{}).some(a=>a&&a.length)})));
+const V=RAW[0].v,LV={staff:0,gm:1,dev:2};
+const exp=r=>RAW.filter(n=>n.t||(LV[r]>=1&&n.c)||(LV[r]>=2&&n.d)).map(n=>n.v);
+const after=(r,s)=>exp(r).filter(v=>v>s).length;
+const disp=n=>n>9?'9+':n;
+const MESI=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+const day=s=>{const [y,m,d]=s.split('-').map(Number);return d+' '+MESI[m-1]+' '+y};
+const vSec=v=>pg.locator('.sheet .news-v').filter({has:pg.locator('.news-vn',{hasText:new RegExp('^Versione '+v+'$')})});
+ok(await pg.evaluate(()=>APP_VER)===V,'APP_VER = NEWS[0].v ('+V+')');
 ok(await pg.evaluate(()=>NEWS.every((n,i,a)=>!i||a[i-1].v>n.v)),'NEWS sorted newest first');
 // new profile -> counter 1 in every view
 ok(await cnt()===1,'dev new profile counter 1: '+await cnt());
-ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),id)==='6','baseline stored as APP_VER-1');
+ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),id)===String(V-1),'baseline stored as APP_VER-1');
 await view('gm');ok(await cnt()===1,'gm new profile counter 1');
 await view('staff');ok(await cnt()===1,'staff new profile counter 1');
 // counter smaller than bell's
@@ -33,16 +42,16 @@ await view('staff');ok(await cnt()===1,'staff new profile counter 1');
 await pg.screenshot({path:OUT+'h400-staff.png',clip:{x:0,y:0,width:400,height:120}});
 // staff sheet
 await openNews();
-let secs=await pg.locator('.sheet .news-v').count();ok(secs===5,'staff sees 5 versions (7,5,4,1,0): '+secs);
-const sv=await pg.locator('.sheet .news-vn').allInnerTexts();ok(sv.join()==='Versione 7,Versione 5,Versione 4,Versione 1,Versione 0','staff versions: '+sv.join());
+let secs=await pg.locator('.sheet .news-v').count();ok(secs===exp('staff').length,`staff sees ${exp('staff').length} versions: `+secs);
+const sv=await pg.locator('.sheet .news-vn').allInnerTexts();ok(sv.join()===exp('staff').map(v=>'Versione '+v).join(),'staff versions: '+sv.join());
 ok(await pg.locator('.sheet .news-dev').count()===0,'staff: no technical part');
 const stx=await pg.locator('.sheet').innerText();ok(!TECH.test(stx),'staff: no technical words'+(TECH.test(stx)?' -> '+stx.match(TECH)[0]:''));
 ok(await pg.locator('.sheet .news-new').count()===1,'staff: one "nuova" tag');
-ok((await pg.locator('.sheet .news-v').first().innerText()).includes('3 ottobre 2026'),'date formatted "3 ottobre 2026"');
+ok((await pg.locator('.sheet .news-v').first().innerText()).includes(day(RAW[0].data)),'date formatted "'+day(RAW[0].data)+'"');
 ok(stx.includes('microfono')&&!stx.includes('Consumi e costi'),'staff sees voice, not report');
 ok(await pg.locator('.sheet.tall').count()===1,'tall sheet');
 await pg.screenshot({path:OUT+'sheet-staff.png'});
-ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),id)==='7','opening marks seen (7)');
+ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),id)===String(V),'opening marks seen ('+V+')');
 ok(await cnt()===0,'counter 0 behind the sheet after opening');
 await closeAll();
 ok(await cnt()===0,'staff counter 0 after opening');
@@ -51,34 +60,34 @@ await view('dev');ok(await cnt()===0,'dev counter 0 after opening');
 ok(await pg.locator('header.top .news-btn').getAttribute('aria-label')==='Novità','aria-label without count');
 // seen=3 -> staff 3 (7,5,4), gm 4 (7,6,5,4), dev 4
 await setSeen(3);
-ok(await cnt()===4,'dev seen=3 counter 4: '+await cnt());
-ok((await pg.locator('header.top .news-btn').getAttribute('aria-label'))==='Novità, 4 da vedere','aria-label with count');
-await view('gm');ok(await cnt()===4,'gm seen=3 counter 4: '+await cnt());
-await view('staff');ok(await cnt()===3,'staff seen=3 counter 3: '+await cnt());
+ok(await cnt()===disp(after('dev',3)),'dev seen=3 counter '+after('dev',3)+': '+await cnt());
+ok((await pg.locator('header.top .news-btn').getAttribute('aria-label'))==='Novità, '+after('dev',3)+' da vedere','aria-label with count');
+await view('gm');ok(await cnt()===disp(after('gm',3)),'gm seen=3 counter '+after('gm',3)+': '+await cnt());
+await view('staff');ok(await cnt()===disp(after('staff',3)),'staff seen=3 counter '+after('staff',3)+': '+await cnt());
 // seen=1 -> staff 3 (v2 dev-only, v3 chef-only not counted), gm 5 (7,6,5,4,3), dev 6
 await setSeen(1);
-ok(await cnt()===3,'staff seen=1 counter 3: '+await cnt());
-await view('gm');ok(await cnt()===5,'gm seen=1 counter 5: '+await cnt());
-await view('dev');ok(await cnt()===6,'dev seen=1 counter 6: '+await cnt());
+ok(await cnt()===disp(after('staff',1)),'staff seen=1 counter '+after('staff',1)+': '+await cnt());
+await view('gm');ok(await cnt()===disp(after('gm',1)),'gm seen=1 counter '+after('gm',1)+': '+await cnt());
+await view('dev');ok(await cnt()===disp(after('dev',1)),'dev seen=1 counter '+after('dev',1)+': '+await cnt());
 // gm sheet
 await setSeen(3);
 await view('gm');await openNews();
-secs=await pg.locator('.sheet .news-v').count();ok(secs===7,'gm sees 7 versions (no v2): '+secs);
+secs=await pg.locator('.sheet .news-v').count();ok(secs===exp('gm').length&&!exp('gm').includes(2),`gm sees ${exp('gm').length} versions (no v2): `+secs);
 ok(await pg.locator('.sheet .news-dev').count()===0,'gm: no technical part');
 const gtx=await pg.locator('.sheet').innerText();ok(gtx.includes('Consumi e costi')&&gtx.includes('Copie automatiche'),'gm sees chef items');
-ok(await pg.locator('.sheet .news-new').count()===4,'gm: 4 "nuova" tags');
+ok(await pg.locator('.sheet .news-new').count()===after('gm',3),'gm: '+after('gm',3)+' "nuova" tags');
 await pg.screenshot({path:OUT+'sheet-gm.png'});
 await closeAll();
 // dev sheet
 await setSeen(3);
 await view('dev');await openNews();
-secs=await pg.locator('.sheet .news-v').count();ok(secs===8,'dev sees 8 versions: '+secs);
-ok(await pg.locator('.sheet .news-new').count()===4,'dev: 4 "nuova" tags');
-const h4=await pg.locator('.sheet .news-v').nth(4).locator('.news-dev h4').allInnerTexts();
+secs=await pg.locator('.sheet .news-v').count();ok(secs===exp('dev').length,`dev sees ${exp('dev').length} versions: `+secs);
+ok(await pg.locator('.sheet .news-new').count()===after('dev',3),'dev: '+after('dev',3)+' "nuova" tags');
+const h4=await vSec(3).locator('.news-dev h4').allInnerTexts();
 ok(h4.join()==='AGGIUNTE,CORREZIONI'||h4.join()==='Aggiunte,Correzioni','v3 headings: '+h4.join());
 const all4=new Set((await pg.locator('.sheet .news-dev h4').evaluateAll(es=>es.map(e=>e.textContent))));
 ok(['Aggiunte','Correzioni','Problemi risolti'].every(x=>all4.has(x)),'dev sees the three headings: '+[...all4].join(', '));
-ok(await pg.locator('.sheet .news-v').nth(5).locator('.news-dev h4').evaluateAll(es=>es.map(e=>e.textContent).join())==='Aggiunte','v2 only "Aggiunte"');
+ok(await vSec(2).locator('.news-dev h4').evaluateAll(es=>es.map(e=>e.textContent).join())==='Aggiunte','v2 only "Aggiunte"');
 ok(await pg.locator('.sheet .news-dev code').count()>20,'dev: code names rendered');
 await pg.screenshot({path:OUT+'sheet-dev.png'});
 await pg.locator('.sheet').evaluate(e=>e.scrollTop=e.scrollHeight);await wait(100);
@@ -156,10 +165,10 @@ ok(await pg.evaluate(()=>realU()&&realU().username==='anna'&&realU().ruolo==='st
 ok(await pg.locator('.testbar').count()===0,'real staff: no test bar');
 ok(await cnt()===1,'real staff new profile counter 1: '+await cnt());
 await openNews();
-ok(await pg.locator('.sheet .news-v').count()===5&&await pg.locator('.sheet .news-dev').count()===0,'real staff sheet: 5 versions, no tech');
+ok(await pg.locator('.sheet .news-v').count()===exp('staff').length&&await pg.locator('.sheet .news-dev').count()===0,`real staff sheet: ${exp('staff').length} versions, no tech`);
 await closeAll();
 ok(await cnt()===0,'real staff counter 0 after opening');
-ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),sid)==='7','real staff seen key');
+ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),sid)===String(V),'real staff seen key');
 ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),id)==='5','dev key untouched by staff');
 
 ok(!errs.length,'no pageerror '+JSON.stringify(errs));console.log('  console errors / failed requests (info):',JSON.stringify(cerrs));

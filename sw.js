@@ -1,6 +1,6 @@
 // Jona Ordini: service worker minimo per installare l'app e aprirla anche senza rete.
 // Strategia "prima la rete": prende sempre la versione più recente, usa la copia salvata solo se offline.
-const CACHE = 'jona-ordini-v16';
+const CACHE = 'jona-ordini-v17';
 const FILES = ['./', './index.html', './manifest.webmanifest', './firebase-config.js', './lib/firebase-10.14.1.js', './lib/qrcode-1.4.4.js', './jona-icon-192.png', './jona-icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -33,9 +33,11 @@ self.addEventListener('fetch', e => {
 self.addEventListener('push', e => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch (err) { d = { testo: e.data ? e.data.text() : '' }; }
+  // «URGENTE» (prodotto urgente dello staff): resta sullo schermo finché non la tocchi e vibra più a lungo.
+  const urg = /^URGENTE\b/.test(d.titolo || '');
   e.waitUntil(self.registration.showNotification(d.titolo || 'Jona Ordini', {
-    body: d.testo || '', tag: d.tag || undefined, renotify: !!d.tag,
-    icon: './jona-icon-192.png', badge: './jona-icon-192.png', vibrate: [80, 40, 80]
+    body: d.testo || '', tag: d.tag || undefined, renotify: !!d.tag, requireInteraction: urg,
+    icon: './jona-icon-192.png', badge: './jona-icon-192.png', vibrate: urg ? [300, 100, 300, 100, 300] : [80, 40, 80]
   }));
 });
 
