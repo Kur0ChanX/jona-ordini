@@ -4,7 +4,6 @@ Aggiornato: 2026-10-05 (sessione #03). Si aggiorna a ogni cambiamento: quello ch
 
 ## 1. Claude da solo (nessuna scelta di Mario)
 - `tools/test-firebase-flow` fallisce tra le 23:30 e le 24:00: sistemare la prova (non l'app).
-- Pubblicare la v35 (PR, merge, controllo online, Worker rilanciato dal workflow) se non è già fatto.
 
 ## 2. Claude, dopo la scelta o l'approvazione di Mario
 - **Link dell'app su Cloudflare Pages** (gratis, Mario ha detto sì): prima di farlo Mario deve sapere che ogni telefono va ricollegato (invito + approvazione + accesso) e le notifiche riattivate. Decidere il giorno.
