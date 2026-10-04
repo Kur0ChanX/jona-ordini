@@ -76,6 +76,34 @@ const bar=await P.evaluate(()=>{const box=document.createElement('div');box.inne
   const save=CHAT.box;CHAT.box=box;const a={paused:false,currentTime:1,duration:Infinity};ALG.pl={id:'z',a,dur:4};chAuPaint('z');const w=box.querySelector('i').style.width;CHAT.box=save;ALG.pl=null;return w});
 ok(bar==='25%','progress bar uses the message length when duration is unknown: '+bar);
 
+// 4. indietro del telefono: un passo alla volta (foglio → scheda precedente), chat (conversazione → lista → chiusa), poi esce
+const G=await mk(ANDROID);
+await G.goto('about:blank');await G.goto('http://localhost:8765/index.html');
+await G.click('[data-a="formset"][data-v="dev"]');
+for(const [k,v] of [['nome','Mario'],['cognome','Rossi'],['username','mario'],['pw','password123'],['pw2','password123']])await G.fill(`input[data-k="${k}"]`,v);
+await G.click('[data-a="setupGo"]');await G.waitForSelector('.testbar');await G.waitForTimeout(400);
+const tab=()=>G.evaluate(()=>S.tab),sh=()=>G.evaluate(()=>sheets.length),back=async()=>{await G.evaluate(()=>history.back());await G.waitForTimeout(500)};
+const t0=await tab();
+await G.click('nav [data-a="tab"][data-v="staff"]');await G.waitForTimeout(300);
+await G.click('[data-a="addProfile"]');await G.waitForTimeout(400);
+ok(await sh()===1&&await tab()==='staff','sheet open on Staff');
+await back();
+ok(await sh()===0&&await tab()==='staff'&&G.url().includes('index.html'),'back → closes only the sheet');
+await back();
+ok(await tab()===t0&&G.url().includes('index.html'),'back → previous tab ('+t0+')');
+await G.click('[data-a="chatOpen"]');await G.waitForTimeout(500);
+await G.click('[data-a="chGo"]');await G.waitForTimeout(400);
+ok(await G.evaluate(()=>!!(S.chat&&S.chat.c)),'conversation open');
+await back();
+ok(await G.evaluate(()=>!!(S.chat&&!S.chat.c&&CHAT.box)),'back → chat list');
+await back();
+ok(await G.evaluate(()=>!CHAT.box),'back → chat closed, still in the app');
+// chiusura con la X: la voce in più si toglie da sola, il gesto dopo esce dall'app
+await G.click('nav [data-a="tab"][data-v="staff"]');await G.waitForTimeout(300);await G.evaluate(()=>{NAV.tabs=[]});
+await G.click('[data-a="addProfile"]');await G.waitForTimeout(400);await G.click('.sheet [data-a="closeSheet"]');await G.waitForTimeout(600);
+ok(await G.evaluate(()=>!NAV.trap&&!NAV.skip),'closing with X removes the extra history entry');
+await back();
+ok(G.url()==='about:blank','nothing left to close → back leaves the app');
 ok(await P.evaluate(()=>NEWS[0].v===28&&APP_VER===28),'version 28 with news');
-for(const [n,pg] of [['android',A],['iphone',I],['player',P]])ok(!pg.errs.length,n+': no page errors '+pg.errs.join('; '));
+for(const [n,pg] of [['android',A],['iphone',I],['player',P],['back',G]])ok(!pg.errs.length,n+': no page errors '+pg.errs.join('; '));
 await b.close();

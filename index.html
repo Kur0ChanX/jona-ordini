@@ -1000,9 +1000,9 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
 const APP_VER=28;
 const NEWS=[
-  {v:28,data:'2026-10-04',titolo:'Vocali anche su iPhone',
-    tutti:['I vocali mandati da Android ora si ascoltano anche su iPhone. I vocali vecchi che l\'iPhone non riesce ad aprire vanno rimandati.'],
-    dev:{correzioni:['Chrome con `audio/mp4` senza codec registrava Opus dentro l\'MP4, illeggibile su iPhone: `chRec` usa MediaRecorder solo con `mp4a.40.2` (o MP4 semplice su iPhone/Safari, `chApple`), altrimenti `aacRec` (WebCodecs `AudioEncoder` AAC + intestazioni ADTS, `audio/aac`, 32 kbps), WebM/Opus per ultimo.','`chPlay` usa un solo lettore (`chAu`) sbloccato con un attimo di silenzio dentro il tocco (su iPhone il play dopo lo scaricamento veniva rifiutato); barra con `dur` del messaggio se il file non dice la durata; messaggi d\'errore distinti.']}},
+  {v:28,data:'2026-10-04',titolo:'Vocali su iPhone e tasto indietro',
+    tutti:['I vocali mandati da Android ora si ascoltano anche su iPhone. I vocali vecchi che l\'iPhone non riesce ad aprire vanno rimandati.','Il gesto «indietro» del telefono (scorrere dal bordo dello schermo) ora torna indietro di una pagina: chiude la finestra aperta, la chat o torna alla scheda di prima, invece di uscire dall\'app.'],
+    dev:{correzioni:['Chrome con `audio/mp4` senza codec registrava Opus dentro l\'MP4, illeggibile su iPhone: `chRec` usa MediaRecorder solo con `mp4a.40.2` (o MP4 semplice su iPhone/Safari, `chApple`), altrimenti `aacRec` (WebCodecs `AudioEncoder` AAC + intestazioni ADTS, `audio/aac`, 32 kbps), WebM/Opus per ultimo.','`chPlay` usa un solo lettore (`chAu`) sbloccato con un attimo di silenzio dentro il tocco (su iPhone il play dopo lo scaricamento veniva rifiutato); barra con `dur` del messaggio se il file non dice la durata; messaggi d\'errore distinti.'],aggiunte:['Indietro del telefono: `NAV` (una voce in più nella cronologia finché c\'è qualcosa da chiudere, `navSync` in `render`/`openSheet`/`closeSheet`/`chOpen`), `navBack` (foto, reazioni, registrazione, conversazione → lista, chat, `sugBack`/`impBack`, foglio, scheda precedente da `NAV.tabs`).']}},
   {v:27,data:'2026-10-04',titolo:'Reazioni ai messaggi',
     tutti:['In chat puoi rispondere a un messaggio con una faccina: tieni premuto il messaggio e scegli 👍 ❤️ 😂 ✅ 😢 o 👎. Tocca di nuovo la stessa faccina per toglierla.','Tenendo premuto un messaggio scritto puoi anche copiarne il testo.'],
     dev:{aggiunte:['Reazioni in `messaggi/<id>.r.<persona>` (solo le emoji di `CH_RE`, tolta con `FieldValue.delete()`): `chRx`, `chRb`, `chReact`, `chLp` (pressione lunga 450 ms o tasto destro, il clic dopo viene ignorato), `chCopy`. Nessuna regola nuova: `messaggi` è già scrivibile dai membri.']}},
@@ -1494,6 +1494,7 @@ function render(){
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
   for(const o of sheets)if(o.live&&o.live())paintSheet(o);
   if(!S.wallMode&&realU()){chWatch();phWatch();if(CHAT.box)chPaint()}else if(CHAT.box)chClose();
+  if(!S.tab||!realU())NAV.tabs=[];navSync();
 }
 function repaint(){render();refreshSheet()}
 function allLoaded(){return(S.loadTimeout&&S.db.kind!=='firebase')||Object.keys(COLS).every(k=>S.loaded[k])}
@@ -1941,11 +1942,11 @@ function openSheet(o){
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
   document.body.classList.add('noscroll');
   setTimeout(()=>{const f=o.el.querySelector('[autofocus]');if(f)f.focus()},280);
-  return o;
+  navSync();return o;
 }
 function paintSheet(o){const h=o.render();if(h!==o.last){paint(o.el.querySelector('.sheet'),h);o.last=h}}
 function refreshSheet(){const o=sheets[sheets.length-1];if(o)paintSheet(o)}
-function closeSheet(instant){const o=sheets.pop();if(!o)return;if(o.onClose)o.onClose();o.el.classList.remove('open');if(instant)o.el.remove();else setTimeout(()=>o.el.remove(),260);if(!sheets.length)document.body.classList.remove('noscroll')}
+function closeSheet(instant){const o=sheets.pop();if(!o)return;if(o.onClose)o.onClose();o.el.classList.remove('open');if(instant)o.el.remove();else setTimeout(()=>o.el.remove(),260);if(!sheets.length)document.body.classList.remove('noscroll');navSync()}
 function toast(msg,kind){const t=document.createElement('div');t.className='toast '+(kind||'');t.textContent=msg;$('#toasts').appendChild(t);requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('in')));setTimeout(()=>{t.classList.remove('in');setTimeout(()=>t.remove(),300)},kind==='err'?5200:3400)}
 function ask(title,text,ok,danger,input){
   return new Promise(res=>{let done=false;S.askVal=input&&input.value||'';
@@ -3662,7 +3663,7 @@ function chOpen(c){
   S.chat={c:c||null,draft:{},pick:false,stick:true};
   if(!CHAT.box){CHAT.box=document.createElement('div');CHAT.box.className='cht';CHAT.box.setAttribute('role','dialog');CHAT.box.setAttribute('aria-label','Chat');document.body.appendChild(CHAT.box);chLp(CHAT.box)}
   CHAT.last={};CHAT.box.innerHTML=`<aside class="cht-l"></aside><section class="cht-c"></section>`;document.body.classList.add('noscroll');
-  requestAnimationFrame(()=>CHAT.box&&CHAT.box.classList.add('open'));algCheck();if(isDev(realU())&&chFb())algSpace();chPaint(true);
+  requestAnimationFrame(()=>CHAT.box&&CHAT.box.classList.add('open'));algCheck();if(isDev(realU())&&chFb())algSpace();chPaint(true);navSync();
 }
 function chClose(){if(!CHAT.box)return;chRecStop(false);if(ALG.pl){ALG.pl.a.pause();ALG.pl=null}const b=CHAT.box;CHAT.box=null;S.chat=null;b.classList.remove('open');setTimeout(()=>b.remove(),250);if(!sheets.length)document.body.classList.remove('noscroll');render()}
 const CH_G={tutti:['var(--lagoon)','users'],cucina:['var(--ocra)','pot'],sala:['#5B6FA8','glass'],fb:['#8A5A9E','chart'],resp:['#B5654A','user'],altro:['var(--mirto)','msg']};
@@ -4068,7 +4069,7 @@ const A={
   pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushAll:()=>{S.pushAll=true;repaint()},pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
   photoCam:()=>{regKeep();pickFile({accept:'image/*',capture:'user'},setPhoto)},
   photoLib:()=>{regKeep();pickFile({accept:'image/*'},setPhoto)},
-  tab:d=>{if(d.v==='carrello')animPrefetch();S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
+  tab:d=>{if(d.v==='carrello')animPrefetch();if(S.tab&&S.tab!==d.v){NAV.tabs=NAV.tabs.filter(t=>t!==S.tab).slice(-9);NAV.tabs.push(S.tab)}S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
   notifs:()=>notifSheet(),
   news:()=>newsSheet(),
   meMenu:()=>meMenu(),
@@ -4330,6 +4331,27 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&CHAT.box){if(S.chat&&S.chat.c){S.chat.c=null;chPaint(true)}else chClose();return}
   if(e.key==='Enter'&&e.target&&e.target.closest&&e.target.closest('[data-form="login"]')){e.preventDefault();guard(doLogin)}
 });
+
+/* ---- indietro del telefono (gesto dal bordo o tasto): torna indietro di un passo dentro l'app invece di uscire.
+   Finché c'è qualcosa da chiudere resta una voce in più nella cronologia («trap»): il gesto la toglie, «navBack» fa un passo
+   e, se resta ancora qualcosa, la voce si rimette. Ordine: foto aperta, barra delle reazioni, conversazione → lista, chat,
+   passo indietro dentro il foglio (sugBack/impBack), foglio, scheda precedente. */
+const NAV={trap:false,skip:0,tabs:[]};
+const navVis=el=>!!(el&&el.getClientRects().length);
+const navCan=()=>!!(CHAT.box||sheets.length||NAV.tabs.length);
+function navSync(){if(NAV.skip)return;const need=navCan();
+  if(need&&!NAV.trap){try{history.pushState({jona:1},'');NAV.trap=true}catch(e){}}
+  else if(!need&&NAV.trap){NAV.trap=false;NAV.skip=1;history.back()}}
+function navBack(){
+  if(CHAT.box){const v=CHAT.box.querySelector('.cht-view');if(v)return v.remove();
+    if(CHAT.box.querySelector('.cht-rb'))return chReClose();
+    if(S.chat&&S.chat.rec)return chRecStop(false);
+    const b=CHAT.box.querySelector('[data-a="chBack"]');if(S.chat&&S.chat.c&&navVis(b))return b.click();
+    return chClose()}
+  const o=sheets[sheets.length-1];
+  if(o){const b=[...o.el.querySelectorAll('[data-a="sugBack"],[data-a="impBack"]')].find(navVis);return b?b.click():closeSheet()}
+  while(NAV.tabs.length){const t=NAV.tabs.pop();if(t&&t!==S.tab){S.tab=t;window.scrollTo(0,0);return render()}}}
+addEventListener('popstate',()=>{if(NAV.skip){NAV.skip=0;return navSync()}NAV.trap=false;guard(navBack);navSync()});
 
 /* ================= avvio ================= */
 (()=>{const h=new URLSearchParams(location.hash.slice(1));const k=h.get('k');if(!k)return;
