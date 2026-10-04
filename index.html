@@ -968,8 +968,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=22;
+const APP_VER=23;
 const NEWS=[
+  {v:23,data:'2026-10-04',titolo:'Nome utente automatico',
+    tutti:['Mentre scrivi nome e cognome, il nome utente si compila da solo (per esempio mario.loi). Puoi cambiarlo se vuoi.','Accenti e apostrofi nel nome utente vanno bene: li togliamo noi.'],
+    dev:{risolti:['Registrazione: con il nome utente vuoto o con accenti/apostrofi l\'errore diceva sempre «almeno 3 caratteri». Ora `normUser` toglie accenti e apostrofi e `checkForm` ha tre messaggi (vuoto, corto, caratteri).'],aggiunte:['`userSug`: nome.cognome senza accenti, con un numero se già usato; proposto finché il campo è vuoto o uguale alla proposta (`_uSug`), mai nella modifica di un profilo esistente.']}},
   {v:22,data:'2026-10-04',titolo:'Registrazione più semplice',
     tutti:['Dopo aver creato il profilo vedi la schermata «In attesa di approvazione»: appena Maurizio o Mario approvano, l\'app si apre da sola.','Se il telefono ricarica l\'app mentre fai la foto del profilo, i dati scritti restano.'],
     dev:{risolti:['iPhone: la foto profilo veniva aperta a grandezza piena (fino a 48 MP) e Safari ricaricava la pagina. Ora `createImageBitmap` con `resizeWidth:640`, altrimenti la strada di prima.','Modulo di registrazione salvato in `jona_reg` (senza password e foto) prima di aprire fotocamera o galleria, ripristinato all\'avvio da `regRestore` (30 min).'],aggiunte:['`screenWait` e `waitCheck`: `jona_wait` ({id,t}) dopo la registrazione; profilo attivo → `login` automatico; disattivato o cancellato → avviso.']}},
@@ -1509,7 +1512,7 @@ function profileForm(p,o={}){
   ${(f.ruolo||'staff')==='staff'&&!o.noRep?`<span class="lbl">Reparto</span><div class="seg wide">${Object.entries(REPARTI).map(([k,l])=>`<button type="button" aria-pressed="${f.reparto===k}" data-a="formset" data-k="reparto" data-v="${k}">${l}</button>`).join('')}</div>
   <label class="lbl" for="${p}-mans">Mansione</label><select class="inp" id="${p}-mans" data-ch="formsel" data-k="mansione">${MANSIONI.map(m=>`<option ${f.mansione===m?'selected':''}>${esc(m)}</option>`).join('')}</select>`:''}
   ${o.contr&&withContr(f)?orContrForm(p):''}
-  ${o.user!==false?`<label class="lbl" for="${p}-user">Nome utente</label><input class="inp" id="${p}-user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="es. marco.rossi" value="${esc(f.username||'')}" data-in="form" data-k="username">`:''}
+  ${o.user!==false?`<label class="lbl" for="${p}-user">Nome utente <span class="muted small">(serve per entrare)</span></label><input class="inp" id="${p}-user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="es. marco.rossi" value="${esc(f.username||'')}" data-in="form" data-k="username">`:''}
   <div class="two"><div><label class="lbl" for="${p}-pw">${o.pwLabel||'Password'}</label><input class="inp" id="${p}-pw" type="password" autocomplete="new-password" data-in="form" data-k="pw" value="${esc(f.pw||'')}"></div>
   <div><label class="lbl" for="${p}-pw2">Ripeti password</label><input class="inp" id="${p}-pw2" type="password" autocomplete="new-password" data-in="form" data-k="pw2" value="${esc(f.pw2||'')}"></div></div>
   <p class="muted small" style="margin:6px 0 0">Almeno 6 caratteri.</p>`;
@@ -1520,12 +1523,16 @@ function screenSetup(){
   <div class="wall-card"><h1>Primo accesso</h1><p class="muted" style="margin:0 0 4px">Crea il primo profilo di gestione. Dopo potrai aggiungere gli altri: Maurizio come amministratore, Mario come sviluppatore, e lo staff si registrerà da solo.</p>
   ${profileForm('su',{roles:['gm','dev'],noRep:true})}<div style="margin-top:22px"><button type="button" class="btn primary block big" data-a="setupGo">Crea profilo e entra</button></div></div>${localNote()}</div>`;
 }
-const normUser=s=>String(s||'').trim().toLowerCase().replace(/\s+/g,'.');
+const normUser=s=>String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’`]/g,'').replace(/\s+/g,'.');
+function userSug(f,selfId){const b=[f.nome,f.cognome].map(x=>normUser(x).replace(/[^a-z0-9.]/g,'')).filter(Boolean).join('.').replace(/\.+/g,'.').slice(0,26);if(!b)return'';
+  const used=new Set(Object.values(D().staff||{}).filter(x=>x.id!==selfId).map(x=>x.username));let u=b,n=2;while(used.has(u))u=b+n++;return u}
 function checkForm(needPw,selfId){
   const f=S.form;
   if(!String(f.nome||'').trim())return'Scrivi il nome.';
   const u=normUser(f.username);
-  if(!/^[a-z0-9._-]{3,30}$/.test(u))return'Il nome utente deve avere almeno 3 caratteri: lettere, numeri, punto o trattino.';
+  if(!u)return'Scrivi il nome utente: è quello che userai per entrare (per esempio mario.loi).';
+  if(u.length<3)return'Il nome utente deve avere almeno 3 caratteri (per esempio mario.loi).';
+  if(!/^[a-z0-9._-]{3,30}$/.test(u))return'Nel nome utente usa solo lettere, numeri, punto o trattino (massimo 30).';
   if(Object.values(D().staff).some(x=>x.username===u&&x.id!==selfId))return'Questo nome utente è già usato: scegline un altro.';
   if(needPw||f.pw){if(String(f.pw||'').length<6)return'La password deve avere almeno 6 caratteri.';if(f.pw!==f.pw2)return'Le due password non coincidono.'}
   if(withContr(f)){const o=num(f.ore);if(!(o>=1&&o<=60))return'Le ore a settimana vanno da 1 a 60.'}
@@ -3897,7 +3904,8 @@ const IN={
   q:t=>{S.q=t.value;const r=$('#results');if(r)r.innerHTML=catResults();else render()},
   login:t=>{S.login[t.dataset.k]=t.value},
   joinK:t=>{S.joinK=t.value},
-  form:t=>{S.form[t.dataset.k]=t.value},
+  form:t=>{const k=t.dataset.k,f=S.form;f[k]=t.value;
+    if((k==='nome'||k==='cognome')&&(!f.username||f.username===f._uSug)){f.username=f._uSug=userSug(f,f.id);const u=t.closest('.sheet,.wall-card');const i=u&&u.querySelector('input[data-k="username"]');if(i)i.value=f.username}},
   cnote:t=>{S.cnote=t.value},
   vtxt:t=>{if(S.voice)S.voice.txt=t.value},
   gmn:t=>{S.gmn[t.dataset.r]=t.value},
