@@ -29,7 +29,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 - TRIGGER: Lo script `.claude/hooks/handoff-check.py` segnala quando è ora di fare l'handoff (soglia 70%). Segui le sue indicazioni. Non usare altri trigger.
 
 - AZIONE AUTOMATICA:
-  1. Genera o aggiorna l'Handoff Tecnico conciso (max 800 parole) in `docs/PASSAGGIO-CONSEGNE.md` contenente:
+  1. Genera o aggiorna l'Handoff Tecnico conciso (max 1000 parole) in `docs/PASSAGGIO-CONSEGNE.md` contenente:
      - Componenti/file toccati (percorsi esatti)
      - Decisioni prese e relative motivazioni
      - Stato attuale del lavoro
