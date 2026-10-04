@@ -968,8 +968,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=18;
+const APP_VER=19;
 const NEWS=[
+  {v:19,data:'2026-10-04',titolo:'Animazione girata',
+    tutti:['Nell\'animazione dopo «Invia allo chef» ora è lo chef, a sinistra, che porge il menù JONA.'],
+    dev:{correzioni:['`media/invio-chef.mp4` invertito nel tempo (ffmpeg `reverse`) invece che specchiato, così il logo resta leggibile. Per rifarlo: `tools/anim-invio.py` e poi lo stesso `reverse`.']}},
   {v:18,data:'2026-10-04',titolo:'Fornitori più belli e animazione nuova',
     tutti:['L\'animazione dopo «Invia allo chef» è nuova: il menù JONA passa dalle tue mani a quelle dello chef.'],
     chef:['La pagina Fornitori ha schede grandi. Puoi aggiungere il logo di ogni fornitore: apri il fornitore, «Contatti e invio», «Scegli immagine», poi «Salva». Il logo compare anche negli ordini e negli invii.'],
