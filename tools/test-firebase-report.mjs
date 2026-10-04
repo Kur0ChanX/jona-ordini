@@ -13,6 +13,8 @@ await A.click('[data-a="setupGo"]');await A.waitForTimeout(1200);
 await A.evaluate(()=>{fbActivate()});await A.waitForTimeout(300);await A.click('#ask-ok');await A.waitForTimeout(8000);
 ok(await A.evaluate(()=>S.db.kind==='firebase'&&S.db.status().ready),'firebase pronto');
 // 320 ordini inviati: uno al giorno all'indietro da oggi, 10 € ciascuno
+// 320 scritture di fila sull'emulatore superano i 4 s di netWatch: senza jona_fb_lp l'app passerebbe al long polling e si ricaricherebbe a metà prova
+await A.evaluate(()=>localStorage.setItem('jona_fb_lp','1'));
 await A.evaluate(async()=>{const d0=Date.now();for(let i=0;i<320;i++){const t=d0-i*86400000-3600000;await put('ordini','old'+i,{fornitoreId:'mariano',fornitoreNome:'F.lli Mariano',stato:'inviato',creato:t,inviato:t,items:[{nome:'Riso',qta:1,unita:'kg',prezzo:10}]})}});
 for(let i=0;i<60;i++){if(await A.evaluate(()=>S.db.status().pend===0))break;await A.waitForTimeout(500)}
 console.log('A pend',await A.evaluate(()=>S.db.status().pend));
