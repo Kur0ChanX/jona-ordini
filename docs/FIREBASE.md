@@ -42,5 +42,6 @@ La configurazione non è segreta. I dati li protegge la chiave del ristorante (v
 ## Notifiche push
 - Ogni telefono le attiva da sé: foto del profilo → **Attiva le notifiche** → Consenti. L'iscrizione va nella collezione `push`.
 - Le manda il server `worker/` su Cloudflare (gratis), pubblicato dal workflow GitHub a ogni modifica di `worker/`.
+- Lo stesso server fa da tramite per Gemini (`/gemini`): con il segreto GitHub `GEMINI_API_KEY` la chiave del ristorante va nel Worker e «Chiedi a Jona» e le foto dei listini funzionano su tutti i telefoni collegati senza chiave propria. Rispondono solo i telefoni registrati in `membri`.
 - Dopo questo aggiornamento le regole vanno **incollate di nuovo** (scheda Regole → Pubblica): senza la collezione `push` le notifiche non si attivano (il resto dell'app funziona lo stesso).
 - iPhone: solo con l'app aperta dall'icona sulla schermata Home (iOS 16.4 o successivo).
