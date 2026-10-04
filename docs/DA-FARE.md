@@ -2,16 +2,18 @@
 
 Aggiornato: 2026-10-05 (sessione #04). Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
+**⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
+
 ## Riassunto: cosa manca, in ordine
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| M1 | Maurizio crea il profilo e tu lo approvi | Mario | domani |
-| M2 | Dare a Maurizio il ruolo Admin Chef | Mario | domani, dopo M1 |
-| M3 | «Oggi si ordina» arriva a Maurizio | Mario | domani, dopo M2 |
+| M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
+| M2 | Dare a Maurizio il ruolo Admin Chef | Mario | in stand-by, dopo M1 |
+| M3 | «Oggi si ordina» arriva a Maurizio | Mario | in stand-by, dopo M2 |
 | M4 | Mauro Loi: reparto «F&B Manager» | Mario | quando vuoi (2 minuti) |
 | M5 | Stampare e appendere il QR da cucina | Mario | quando vuoi |
-| M6 | Maurizio imposta le scadenze dello staff | Maurizio | dopo M2 |
+| M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M7 | Rispondermi sulla frase «Lo staff può vedere chi c'è in turno ma non…» | Mario | quando vuoi |
 | M8 | Prove dal vero della v35 | Mario | con calma |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
@@ -32,7 +34,7 @@ Niente per ora.
 
 ## 3. Mario a mano
 
-### Domani, con Maurizio (M1 → M2 → M3, in questo ordine)
+### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
 - **M1 · Profilo di Maurizio**: Maurizio crea il suo profilo con l'invito; poi tu vai in **Staff** e lo approvi.
 - **M2 · Ruolo**: sempre in **Staff**, tocca **Maurizio** e mettigli il ruolo **Admin Chef**.
 - **M3 · Promemoria ordini**: **Impostazioni** → «Oggi si ordina» arriva a → tocca **Maurizio**.
