@@ -36,9 +36,11 @@ ok(await pg.evaluate(()=>NEWS.every((n,i,a)=>!i||a[i-1].v>n.v)),'NEWS sorted new
 ok(await cnt()===1,'dev new profile counter 1: '+await cnt());
 ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),id)===String(V-1),'baseline stored as APP_VER-1');
 await view('gm');ok(await cnt()===1,'gm new profile counter 1');
-await view('staff');ok(await cnt()===1,'staff new profile counter 1');
 // counter smaller than bell's
 {const nb=await pg.locator('header.top .news-n').boundingBox(),bd=await pg.evaluate(()=>{const r=document.querySelector('.bell .dot');return r?r.getBoundingClientRect().height:18});ok(nb.height<bd,`news counter smaller than bell (${nb.height} < ${bd})`)}
+// l'ultima versione può non avere novità per lo staff (es. v20, solo chef e sviluppatore)
+const SN=exp('staff').includes(V)?1:0;
+await view('staff');ok(await cnt()===SN,'staff new profile counter '+SN);
 await pg.screenshot({path:OUT+'h400-staff.png',clip:{x:0,y:0,width:400,height:120}});
 // staff sheet
 await openNews();
@@ -46,8 +48,8 @@ let secs=await pg.locator('.sheet .news-v').count();ok(secs===exp('staff').lengt
 const sv=await pg.locator('.sheet .news-vn').allInnerTexts();ok(sv.join()===exp('staff').map(v=>'Versione '+v).join(),'staff versions: '+sv.join());
 ok(await pg.locator('.sheet .news-dev').count()===0,'staff: no technical part');
 const stx=await pg.locator('.sheet').innerText();ok(!TECH.test(stx),'staff: no technical words'+(TECH.test(stx)?' -> '+stx.match(TECH)[0]:''));
-ok(await pg.locator('.sheet .news-new').count()===1,'staff: one "nuova" tag');
-ok((await pg.locator('.sheet .news-v').first().innerText()).includes(day(RAW[0].data)),'date formatted "'+day(RAW[0].data)+'"');
+ok(await pg.locator('.sheet .news-new').count()===SN,'staff: '+SN+' "nuova" tag');
+{const d=RAW.find(n=>n.v===exp('staff')[0]).data;ok((await pg.locator('.sheet .news-v').first().innerText()).includes(day(d)),'date formatted "'+day(d)+'"')}
 ok(stx.includes('microfono')&&!stx.includes('Consumi e costi'),'staff sees voice, not report');
 ok(await pg.locator('.sheet.tall').count()===1,'tall sheet');
 await pg.screenshot({path:OUT+'sheet-staff.png'});
@@ -163,7 +165,7 @@ await wait(300);
 await pg.evaluate(()=>{S.login={u:'anna',p:'password123'};doLogin()});await wait(800);
 ok(await pg.evaluate(()=>realU()&&realU().username==='anna'&&realU().ruolo==='staff'),'logged in as real staff');
 ok(await pg.locator('.testbar').count()===0,'real staff: no test bar');
-ok(await cnt()===1,'real staff new profile counter 1: '+await cnt());
+ok(await cnt()===SN,'real staff new profile counter '+SN+': '+await cnt());
 await openNews();
 ok(await pg.locator('.sheet .news-v').count()===exp('staff').length&&await pg.locator('.sheet .news-dev').count()===0,`real staff sheet: ${exp('staff').length} versions, no tech`);
 await closeAll();

@@ -42,7 +42,8 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
      - Non sono stati usati comandi vietati/distruttivi/forzati.
   3. Se TUTTE le condizioni sono vere: apri automaticamente la nuova sessione (usando lo strumento `Create Session`) e avvisami quando è pronta, senza chiedere permesso.
   4. Se ANCHE UNA SOLA condizione è falsa: FERMATI immediatamente. Non aprire nuove sessioni. Scrivimi in 1-2 righe cosa è andato storto e attendi il mio intervento.
-  5. PROMPT MINIMALE PER NUOVA SESSIONE: Quando crei la nuova sessione, passa un prompt iniziale di MASSIMO 3 RIGHE. Dì solo alla nuova sessione di leggere `CLAUDE.md` e `docs/PASSAGGIO-CONSEGNE.md` e attendere le mie istruzioni. Non duplicare codice o dettagli.
+  5. NOMI CHIARI DELLE SESSIONI: dai sempre un titolo alla nuova sessione nel formato `▶ ATTIVA · <Progetto> · da v<versione> · <data> · prossimo: <argomento>` e rinomina quella vecchia in `✓ CHIUSA · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>` (strumento di rinomina della sessione). Così tra tante conversazioni si capisce subito quale usare.
+  6. PROMPT MINIMALE PER NUOVA SESSIONE: Quando crei la nuova sessione, passa un prompt iniziale di MASSIMO 3 RIGHE. Dì solo alla nuova sessione di leggere `CLAUDE.md` e `docs/PASSAGGIO-CONSEGNE.md` e attendere le mie istruzioni. Non duplicare codice o dettagli.
 
 
 ## DIVIETO ASSOLUTO DI COMANDI DISTRUTTIVI E FORCE PUSH (POLITICA ZERO RISCHIO)
@@ -88,7 +89,8 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - Orari del personale: `config/orari_<lunedì>` (`t` bozza, `tp` pubblicata, una riga per persona), `config/orari_tipi`, `staff.contratto`; pianificatore nella scheda Staff (Persone | Orari), voce «Orari» per lo staff. Scrittura di una persona con `t.<id>` (`LocalStore.update` capisce i punti).
 - v16: ordine suggerito in Invii (`sugStats`, meteo Open-Meteo per Porto Cervo), timbratura con QR (`config/app.timbra`, spenta di partenza; `config/timbr_<lunedì>`; `lib/jsqr-1.4.0.js`), cambi turno (`cambi.<id>` nella settimana pubblicata). Contratto modificabile solo dall'amministratore (`isGM`), lo staff non lo vede; errori dei turni salvati solo con il consenso (`ok.<persona>`).
 - v17: chat tra colleghi (collezione `messaggi`, fuori da `S.db` come le push: serve la regola con `messaggi`; `CHAT`, `chWatch`, `chPaint`; chat `tutti`, `rep_<reparto>`, `dm_<a>--<b>`) e «Chiedi a Jona» per i gestori (`jonaCtx`, `jonaAsk`, Gemini con `jona_gemini_key`).
-- Import listini: Excel/CSV, fattura XML, tabella incollata, foto lette da Gemini (chiave in `jona_gemini_key`, solo sul telefono).
+- Import listini: Excel/CSV, fattura XML, tabella incollata, foto lette da Gemini.
+- v20 Gemini: `gemCall` usa la chiave del telefono (`jona_gemini_key`) se c'è, altrimenti il Worker `/gemini` (chiave del ristorante nel segreto `GEMINI_KEY`, copiato dal segreto GitHub `GEMINI_API_KEY`; entra solo chi ha `membri/<uid>`, controllato con il gettone Firebase del telefono; 429 → attesa `retryDelay`, poi modello Lite). Solo con Firebase.
 
 ## Chiavi in localStorage
 `jona_db_v2` (dati locali), `jona_me` (profilo entrato), `jona_cart_<id>`, `jona_viewas`, `jona_theme`, `jona_key` (chiave del ristorante: segreta, mai nel codice né nei commit), `jona_member`, `jona_fb` (configurazione incollata a mano), `jona_fb_upload`, `jona_gemini_key` (segreta), `jona_rem`, `jona_bk` (giorno dell'ultima copia automatica), `jona_news_<id>` (ultima versione vista nelle Novità), `jona_push` (id dell'iscrizione push di questo telefono), `jona_push_k` (chiave pubblica usata), `jona_staffsub` (scheda Staff: `persone` o `orari`).

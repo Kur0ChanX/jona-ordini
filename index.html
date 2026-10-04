@@ -968,8 +968,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=19;
+const APP_VER=20;
 const NEWS=[
+  {v:20,data:'2026-10-04',titolo:'Gemini per tutto il ristorante',
+    chef:['«Chiedi a Jona» e le foto dei listini funzionano senza mettere la chiave Gemini su ogni telefono: basta la chiave del ristorante sul server.'],
+    dev:{aggiunte:['`/gemini` nel Worker: chiave nel segreto `GEMINI_KEY` (dal segreto GitHub `GEMINI_API_KEY`), accesso solo ai telefoni in `membri/<uid>` (gettone Firebase controllato leggendo il proprio documento), se Gemini risponde 429 aspetta il `retryDelay` e riprova, poi passa al modello Lite.','`gemCall` nell\'app: chiave del telefono se c\'è, altrimenti il server; `/salute` dice `gemini:true`.']}},
   {v:19,data:'2026-10-04',titolo:'Animazione girata',
     tutti:['Nell\'animazione dopo «Invia allo chef» ora è lo chef, a sinistra, che porge il menù JONA.'],
     dev:{correzioni:['`media/invio-chef.mp4` invertito nel tempo (ffmpeg `reverse`) invece che specchiato, così il logo resta leggibile. Per rifarlo: `tools/anim-invio.py` e poi lo stesso `reverse`.']}},
@@ -1266,7 +1269,7 @@ function subscribe(name){
     const first=!S.loaded[name];const m={};
     snap.docs.forEach(d=>{m[d.id]=Object.assign({id:d.id},d.data())});
     if(name==='notifiche'&&!first)onNewNotifs(snap);
-    if(S.db.kind==='firebase')pushWatch();
+    if(S.db.kind==='firebase'){pushWatch();gemSrvOk()}
     S.data[name]=m;S.loaded[name]=true;
     if(name==='prodotti')rebuildIndex();
     schedule();
@@ -2382,15 +2385,33 @@ function impSheet(fid){
 /* foto del listino lette da Gemini: con la chiave (salvata solo su questo telefono) o condividendole con l'app Gemini */
 const GEM_MODELS=['gemini-flash-latest','gemini-2.5-flash'];
 const gemKey=()=>ls('jona_gemini_key')||'';
-function fotoStage(I){const k=gemKey(),n=I.photos.length;
+/* senza chiave sul telefono Gemini passa dal server del ristorante (/gemini nel Worker, chiave GEMINI_KEY), solo con Firebase */
+const gemSrv={ok:null,p:null};
+function gemSrvOk(){if(gemSrv.ok!==null)return Promise.resolve(gemSrv.ok);if(!pushFb())return Promise.resolve(false);
+  return gemSrv.p||(gemSrv.p=fetch(PUSH_URL+'/salute').then(r=>r.json()).then(j=>{gemSrv.ok=!!j.gemini;if(gemSrv.ok)refreshSheet();return gemSrv.ok}).catch(()=>false).finally(()=>{gemSrv.p=null}))}
+const gemOn=()=>!!gemKey()||(!!gemSrv.ok&&pushFb());
+const gemTxt=j=>((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n').trim();
+async function gemCall(body){const k=gemKey();let last='',st=0,srv=false;
+  try{if(k){for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body)});
+        const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j)};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status;if(r.status!==404)break}}
+    else if(await gemSrvOk()){srv=true;let tok='';try{tok=await fbInit().auth.currentUser.getIdToken()}catch(e){}
+      const r=await fetch(PUSH_URL+'/gemini',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(body)});
+      const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j)};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status}
+    else return{err:'Prima inserisci la chiave Gemini.'}}
+  catch(e){return{err:'Non riesco a contattare Gemini: controlla la connessione.'}}
+  return{err:srv&&st===403?'Questo telefono non è collegato al ristorante: rientra con la chiave.'
+    :st===429?'Gemini è molto occupato adesso: riprova tra un minuto.'
+    :/key|API_KEY|permission/i.test(last)?(srv?'La chiave Gemini del ristorante non funziona: avvisa lo sviluppatore.':'La chiave Gemini non è valida: controllala.')
+    :'Gemini non ha risposto'+(last?' ('+last+')':'')+'.'}}
+function fotoStage(I){const k=gemKey(),srv=!k&&gemOn(),n=I.photos.length;
   return(I.err?`<div class="err">${esc(I.err)}</div>`:'')+`<p class="muted" style="margin-top:0">${n?n+(n===1?' foto pronta':' foto pronte'):'Nessuna foto'}. Puoi aggiungerne altre se il listino ha più pagine.</p>
   ${n?`<div class="chips">${I.photos.map((p,i)=>`<button type="button" class="chip" data-a="gemDel" data-v="${i}">${esc(p.name.slice(0,22))} ${ic('x')}</button>`).join('')}</div>`:''}
   <div class="btns" style="justify-content:flex-start;margin:10px 0 18px"><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="cam">${ic('camera')} Scatta</button><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="gal">${ic('image')} Galleria</button></div>
-  ${I.busy?`<div class="banner">Gemini sta leggendo il listino… può volerci un minuto.</div>`:k?`<button type="button" class="btn primary block big" data-a="gemGo" ${n?'':'disabled'}>${ic('sparkle')} Trascrivi con Gemini</button>`
+  ${I.busy?`<div class="banner">Gemini sta leggendo il listino… può volerci un minuto.</div>`:k||srv?`<button type="button" class="btn primary block big" data-a="gemGo" ${n?'':'disabled'}>${ic('sparkle')} Trascrivi con Gemini</button>`
   :`<button type="button" class="btn primary block big" data-a="gemShare" ${n?'':'disabled'}>${ic('sparkle')} Apri con l'app Gemini</button>
   <p class="muted small">Scegli Gemini, incolla il testo già copiato, poi torna qui e incolla la tabella che ti restituisce.</p><div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="impPaste">${ic('paste')} Incolla la risposta</button></div>`}
   <h2 class="sec">Trascrizione automatica</h2>
-  <p class="muted small" style="margin-top:0">${k?'Gemini è collegato su questo telefono.':'Con una chiave Gemini gratuita (aistudio.google.com/apikey) l\'app trascrive da sola, senza copiare e incollare. La chiave resta solo su questo telefono.'}</p>
+  <p class="muted small" style="margin-top:0">${k?'Gemini è collegato su questo telefono.':srv?'Gemini è collegato per tutto il ristorante: non serve nessuna chiave.':'Con una chiave Gemini gratuita (aistudio.google.com/apikey) l\'app trascrive da sola, senza copiare e incollare. La chiave resta solo su questo telefono.'}</p>
   <div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="gemKey">${ic('pencil')} ${k?'Cambia o togli la chiave':'Inserisci la chiave Gemini'}</button><button type="button" class="btn ghost sm" data-a="impBack">Indietro</button></div>`}
 function shrinkImg(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),im=new Image();
   im.onload=()=>{const m=2000,r=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);
@@ -2400,11 +2421,8 @@ async function gemAdd(files){const I=S.imp;if(!I)return;I.err='';for(const f of 
 const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
 async function gemRun(){const I=S.imp;if(!I||!I.photos.length||I.busy)return;I.busy=true;I.err='';refreshSheet();
   try{const parts=[{text:geminiPrompt()}];for(const p of I.photos)parts.push({inline_data:{mime_type:'image/jpeg',data:await b64(p)}});
-    let txt='',last='';
-    for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':gemKey()},body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:0}})});
-      const j=await r.json().catch(()=>({}));if(r.ok){txt=((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n');break}
-      last=(j.error&&j.error.message)||('errore '+r.status);if(r.status!==404)break}
-    I.busy=false;if(!txt.trim()){I.err=/key|API_KEY|permission/i.test(last)?'La chiave Gemini non è valida: controllala.':'Gemini non ha risposto'+(last?': '+last:'.')+' Riprova o usa l\'app Gemini.';refreshSheet();return}
+    const g=await gemCall({contents:[{parts}],generationConfig:{temperature:0}}),txt=g.txt||'';
+    I.busy=false;if(!txt){I.err=(g.err||'Gemini non ha risposto.')+' Riprova o usa l\'app Gemini.';refreshSheet();return}
     I.txt=txt;impRun('txt')}
   catch(e){I.busy=false;I.err='Non riesco a contattare Gemini. Controlla la connessione.';refreshSheet()}}
 async function gemShare(){const I=S.imp;if(!I||!I.photos.length)return;await copyText(geminiPrompt());
@@ -3233,7 +3251,7 @@ const jonaMd=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').split('\n').map(l=>
   .replace(/(?:<li>.*?<\/li>\n?)+/g,m=>'<ul>'+m.replace(/\n/g,'')+'</ul>').replace(/\n/g,'<br>');
 function jonaSheet(){
   S.jona=S.jona||{msgs:[],q:'',busy:false};
-  openSheet({cls:'tall jona-sh',live:()=>true,render:()=>{const J=S.jona,key=!!gemKey();
+  openSheet({cls:'tall jona-sh',live:()=>true,render:()=>{const J=S.jona,key=gemOn();
     return`<div class="grab"></div><div class="sh-h"><span class="jona-av">${ic('sparkle')}</span><div class="sh-t">Chiedi a Jona<div class="sh-s">Domande sui dati dell'app, a voce o scritte</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     ${!key?`<div class="jona-key">${ic('sparkle')}<div><b>Serve la chiave Gemini su questo telefono</b><span>È gratis: la crei su aistudio.google.com/apikey e la incolli qui una volta sola.</span><button type="button" class="btn primary sm" data-a="gemKey">Inserisci la chiave</button></div></div>`:''}
     <div class="jona-msgs" id="jona-msgs">${J.msgs.length?J.msgs.map(m=>`<div class="jona-m ${m.r}">${m.r==='a'?jonaMd(m.t):esc(m.t)}</div>`).join(''):`<div class="jona-tips">${JONA_TIPS.map(t=>`<button type="button" class="chip" data-a="jonaTip" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>`}
@@ -3244,18 +3262,13 @@ function jonaSheet(){
   setTimeout(()=>{const m=$('#jona-msgs');if(m)m.scrollTop=m.scrollHeight},50);
 }
 async function jonaAsk(q){
-  const J=S.jona;q=String(q||J.q||'').trim();if(!q||J.busy)return;if(!gemKey())return toast('Prima inserisci la chiave Gemini.','warn');
+  const J=S.jona;q=String(q||J.q||'').trim();if(!q||J.busy)return;if(!gemOn())return toast('Prima inserisci la chiave Gemini.','warn');
   J.msgs.push({r:'q',t:q});J.q='';J.busy=true;refreshSheet();const sc=()=>setTimeout(()=>{const m=$('#jona-msgs');if(m)m.scrollTop=m.scrollHeight},30);sc();
   const sys='Sei Jona, l\'assistente dell\'app degli ordini di cucina e sala del ristorante «'+cfg().nomeLocale+'». Rispondi in italiano semplice e breve, come a un collega in cucina. '
     +'Usa solo i dati JSON qui sotto: fai i conti con precisione (somme di prezzo × quantità, date, turni) e se i dati non bastano dillo chiaramente. Euro con la virgola (12,50 €). Puoi usare elenchi con «- » e il grassetto con **.\nDATI:\n'+jonaCtx();
   const contents=J.msgs.slice(-8).map(m=>({role:m.r==='q'?'user':'model',parts:[{text:m.t}]}));
-  let txt='',last='';
-  try{for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':gemKey()},
-      body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents,generationConfig:{temperature:0.2}})});
-    const j=await r.json().catch(()=>({}));if(r.ok){txt=((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n').trim();break}
-    last=(j.error&&j.error.message)||('errore '+r.status);if(r.status!==404)break}}
-  catch(e){last='rete'}
-  J.busy=false;J.msgs.push({r:'a',t:txt||(last==='rete'?'Non riesco a contattare Gemini: controlla la connessione.':/key|API_KEY|permission/i.test(last)?'La chiave Gemini non è valida: controllala.':'Non ho una risposta adesso'+(last?' ('+last+')':'')+'. Riprova.')});
+  const g=await gemCall({system_instruction:{parts:[{text:sys}]},contents,generationConfig:{temperature:0.2}});
+  J.busy=false;J.msgs.push({r:'a',t:g.txt||(g.err||'Non ho una risposta adesso.')+' Riprova.'});
   refreshSheet();sc();
 }
 function jonaMic(){
