@@ -70,7 +70,9 @@ Leggibilità (ha la precedenza sul risparmio di token, ma frasi corte): ogni ris
   - `👉 DA FARE TU` (passi numerati, uno per riga, pulsanti in **grassetto**)
   - `❓ DOMANDE` (numerate, una riga ciascuna)
   - `⚠️ ATTENZIONE` (solo se serve)
-Tra un blocco e l'altro una riga `───`. Frasi corte (max ~15 parole), una idea per riga, niente giri di parole, ma mai tagliare ciò che serve per capire. Parole semplici, niente gergo. Mai un paragrafo di più di 3 righe. Per i riassunti lunghi: tabella.
+Tra un blocco e l'altro una riga `───`.
+Imparare (Mario vuole crescere): quando uso un termine tecnico, scrivo il **termine corretto** e a fianco, tra parentesi, cosa significa in parole semplici (es. «**commit** (un salvataggio del lavoro con un nome)»). Spiego il termine intero la prima volta; poi basta il termine. In più, quando c'è qualcosa di utile da imparare, aggiungo un blocco `📚 IMPARI`: un solo termine per risposta, con definizione di una riga e un esempio concreto dell'app Jona Ordini. Mai lasciare Mario all'oscuro: la spiegazione deve bastargli per parlarne con un altro sviluppatore.
+ Frasi corte (max ~15 parole), una idea per riga, niente giri di parole, ma mai tagliare ciò che serve per capire. Parole semplici, niente gergo. Mai un paragrafo di più di 3 righe. Per i riassunti lunghi: tabella.
 
 Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scrivi SOLO un elenco numerato passo passo. Usa i nomi ESATTI dei pulsanti e dei menu che vedrò sullo schermo, senza inventarli o tradurli.
 
