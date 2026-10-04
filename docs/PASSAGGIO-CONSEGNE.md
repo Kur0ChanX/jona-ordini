@@ -1,10 +1,10 @@
 # Passaggio di consegne (2026-10-04, notte)
 
-## Ultimo messaggio di Mario (arrivato nella sessione precedente, girato qui)
-«Alla fine fai un bel controllo accurato di tutte le funzioni dell'app, in modo autonomo. Mancherò per qualche ora: vai da solo, e le decisioni importanti lasciale a me per quando torno in chat, alla fine di tutto.»
+## Ultimo messaggio di Mario (tornato, dopo il resoconto v32)
+«Grazie per aver fatto tutto il passaggio da solo… Come priorità inizierei a verificare se con l'iPhone ci sono problemi a inviare il messaggio vocale perché lui me l'aveva detto che c'erano problemi ancora, però non so se tu avevi aggiornato l'app o no, non so se era successo prima o dopo, quindi puoi fare un check e controllare se funziona.»
 
-## Messaggio di Mario prima di questo
-«Procedi con il cambio del sottodominio Cloudflare (accetto qualche ora senza notifiche), poi procedi con tutto il resto senza fermarti. Se devi cambiare sessione fallo da solo: ho un impegno, non posso dare consensi. Fermati solo quando hai finito tutta la lista, poi fammi una lista dettagliata di tutto ciò che hai fatto.»
+## Messaggio precedente di Mario
+«Alla fine fai un bel controllo accurato di tutte le funzioni dell'app, in modo autonomo… le decisioni importanti lasciale a me.» → FATTO (v32, resoconto con «Decisioni per Mario» già dato: sottodominio, netWatch, «In turno oggi» visibile allo staff, Mauro Loi F&B, `/invia` e inviti senza limiti).
 
 ## Stato
 - **v32 unita in main** (PR #41, squash `9ed0d26`), online verificata (`APP_VER=32`, `sw.js` `jona-ordini-v36`). Ramo riallineato. Punto 0 (controllo completo) FATTO: 20 prove locali + 12 Firebase verdi, nuovo `tools/test-giro.mjs` (ogni scheda × 3 ruoli × 320/390 px × chiaro/scuro) senza problemi. Corretti: righe delle richieste a 320 px (`gmLine` `line wrap big`), `.seg.wide` a capo sotto 360 px, `.fadd` a capo; `test-firebase-report` con `jona_fb_lp` (netWatch ricaricava a metà). `test-firebase-sync` ora passa.
@@ -23,6 +23,7 @@
 - Mauro Loi in «F&B Manager»: da confermare con Mario.
 
 ## Prossimi passi
+**PRIORITÀ ADESSO: vocali inviati da iPhone.** Un collega (probabilmente con iPhone) segnala ancora problemi a INVIARE vocali; non si sa se prima o dopo gli aggiornamenti (v28 vocali iPhone, v30 onda, v32). Da fare: rileggere registrazione/invio in `index.html` (`chRec*`, MediaRecorder: iPhone → MP4/AAC, `wfStart` AnalyserNode in v30 = possibile rottura su Safari, upload `/allegati` del Worker su `PUSH_URL`), rilanciare `tools/test-v28.mjs` e `test-firebase-allegati.mjs` simulando Safari/iOS (mimeType `audio/mp4`, niente `audio/webm`), cercare punti in cui iOS fallisce (AudioContext sospeso, permesso microfono in PWA, tipo `x-tipo` rifiutato dal Worker, file vuoto). Chiedere a Mario: modello/versione iOS, se l'app è installata in Home, cosa vede (errore? niente?) e data del problema. Correggere → v33.
 0. ~~Controllo completo~~ (fatto in v32). Testo originale: Tutte le prove in `tools/` (anche quelle Firebase con l'emulatore, vedi `tools/README.md`), più un giro con Playwright su ogni schermata e ruolo (Staff, Admin Chef, Sviluppatore) a 320 e 390 px, tema chiaro e scuro. Correggere i difetti chiari (nuova versione v32: `APP_VER`, `NEWS`, `CACHE` v36, PR → squash → controllo online → riallineamento). Le scelte importanti NON prenderle: elencarle in fondo al resoconto finale come «Decisioni per Mario». Alla fine: resoconto dettagliato + prove numerate.
 1. Risposta di Mario sul sottodominio → v32 come sopra.
 2. Prove dal vero di Mario: vocale Android→iPhone, gesto indietro Android, pallino, invito con codice, v31 (In turno oggi, promemoria, consumi).
