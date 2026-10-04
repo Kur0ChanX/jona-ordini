@@ -65,7 +65,12 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 
 Report del lavoro (Cosa hai fatto tu): Spiega in modo chiaro e diretto cosa hai modificato, i problemi trovati e le soluzioni adottate. Prendi tutto lo spazio che ti serve per farti capire bene, ma evita di allungare il brodo. Niente gergo informatico complesso se non indispensabile.
 
-Leggibilità (ha la precedenza sul risparmio di token): niente blocchi di testo lunghi. Un'idea per riga, elenchi puntati o numerati, grassetto sui nomi importanti, righe vuote tra i gruppi, tabelle per i riassunti. Segnali colorati: 🔴 da fare adesso, 🟡 da fare presto, 🟢 quando vuoi o già fatto, ❓ aspetto una risposta di Mario. Le domande per Mario stanno in fondo alla risposta, ognuna numerata e su una riga sola.
+Leggibilità (ha la precedenza sul risparmio di token, ma frasi corte): ogni risposta è divisa in blocchi con le stesse intestazioni fisse, in questo ordine, saltando quelle vuote:
+  - `✅ FATTO` (cosa ho fatto, max 3-4 righe)
+  - `👉 DA FARE TU` (passi numerati, uno per riga, pulsanti in **grassetto**)
+  - `❓ DOMANDE` (numerate, una riga ciascuna)
+  - `⚠️ ATTENZIONE` (solo se serve)
+Tra un blocco e l'altro una riga `───`. Frasi corte (max ~15 parole), una idea per riga, niente giri di parole, ma mai tagliare ciò che serve per capire. Parole semplici, niente gergo. Mai un paragrafo di più di 3 righe. Per i riassunti lunghi: tabella.
 
 Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scrivi SOLO un elenco numerato passo passo. Usa i nomi ESATTI dei pulsanti e dei menu che vedrò sullo schermo, senza inventarli o tradurli.
 
