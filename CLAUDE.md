@@ -97,6 +97,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - v27 reazioni in chat: `messaggi/<id>.r.<persona>` = una delle emoji di `CH_RE` (le altre ignorate), barra con pressione lunga (`chLp`, `chReOpen`), «Copia» del testo.
 - v30 inviti con codice: Worker `worker/invito` (link corto `invito.<WK_SUB>.workers.dev/<CODICE>`, anteprima e redirect all'app con `#i=`), nel Worker principale `/inviti` (crea, solo membri, chiave presa da `membri/<uid>.k`) e `/invito/<codice>` (tabella `inviti` nel primo D1, 7 giorni). Sottodominio Cloudflare in `WK_SUB` (index.html), `PUSH_URL` di `sw.js` e prova del workflow.
 - v31: «In turno oggi» (`orOggi`, da `tp` della settimana corrente) in «I miei orari» e Staff → Orari; promemoria ordini per giorno (`fornitori.giorniOrdine` 0=lun..6=dom, `oraPromemoria`, `promInfo` in `deadlineTick`, notifica tipo `promemoria`); «Consumi e costi» con confronto col periodo prima (`rpCmp`), secondo tocco su una barra per entrare (`rpDrill`), «Indietro» (`rpBack`), prodotto (`rpProd`).
+- v32: controllo completo; `tools/test-giro.mjs` gira ogni scheda per ruolo a 320/390 px chiaro/scuro (da rilanciare dopo modifiche all'interfaccia).
 - v20 Gemini: `gemCall` usa la chiave del telefono (`jona_gemini_key`) se c'è, altrimenti il Worker `/gemini` (chiave del ristorante nel segreto `GEMINI_KEY`, copiato dal segreto GitHub `GEMINI_API_KEY`; entra solo chi ha `membri/<uid>`, controllato con il gettone Firebase del telefono; 429 → attesa `retryDelay`, poi modello Lite). Solo con Firebase.
 
 ## Chiavi in localStorage
