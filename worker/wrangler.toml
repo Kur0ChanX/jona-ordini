@@ -6,6 +6,6 @@ workers_dev = true
 [vars]
 FB_PROJECT = "jona-ordini"
 
-# pulizia notturna di foto e vocali più vecchi di 60 giorni (i database D1 li aggiunge il workflow)
+# pulizia notturna di foto e vocali più vecchi di 60 giorni (i database D1 li aggiunge il workflow); ogni 5 minuti i promemoria ordini
 [triggers]
-crons = ["17 3 * * *"]
+crons = ["17 3 * * *", "*/5 * * * *"]
