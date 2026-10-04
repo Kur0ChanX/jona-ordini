@@ -72,7 +72,7 @@ Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scr
 
 - Se un comando Git o Bash fallisce, FERMATI immediatamente. Non tentare auto-riparazioni azzardate.
 - Non ripetere codice già fornito o informazioni già presenti in `docs/PASSAGGIO-CONSEGNE.md`.
-- ELENCO DELLE COSE DA FARE: tieni sempre aggiornato `docs/DA-FARE.md`, diviso in 3 parti: (1) Claude da solo, (2) Claude dopo la scelta o l'approvazione di Mario, (3) Mario a mano. Aggiungi ogni cosa nuova appena emerge, togli quelle fatte, e committalo insieme al lavoro. Le consegne rimandano a questo file invece di ripetere l'elenco.
+- ELENCO DELLE COSE DA FARE: tieni sempre aggiornato `docs/DA-FARE.md`, diviso in 3 parti: (1) Claude da solo, (2) Claude dopo la scelta o l'approvazione di Mario, (3) Mario a mano. Aggiungi ogni cosa nuova appena emerge, togli quelle fatte, e committalo insieme al lavoro. Le consegne rimandano a questo file invece di ripetere l'elenco. Ogni voce ha un numero fisso (M1.., D1..), un riassunto in tabella in cima in ordine di urgenza, e a Mario si mostra sempre in ordine, mai in un unico blocco continuo.
 - NUMERO PROGRESSIVO DELLE SESSIONI: ogni sessione ha un numero a due cifre (`#01`, `#02`, `#03`…) nel titolo, subito dopo `▶ ATTIVA` o `✓ CHIUSA`. Per Jona Ordini la numerazione parte da `#01` (la sessione del 04/10/2026). Il numero della sessione attuale è scritto in cima a `docs/PASSAGGIO-CONSEGNE.md` (`Sessione attuale: #NN`): all'handoff la sessione vecchia tiene il suo numero, la nuova prende quello dopo (+1) e lo aggiorna nelle consegne. Così il numero più alto è sempre l'ultima sessione.
 
 ---
