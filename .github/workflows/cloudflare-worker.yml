@@ -41,6 +41,43 @@ jobs:
           { chiama /user/tokens/verify | esito; } || { chiama "/accounts/$CF_ACCOUNT/tokens/verify" | esito; } || { echo "::error::La chiave CLOUDFLARE_API_TOKEN non è valida. Creane una nuova e incollala di nuovo nel segreto."; exit 1; }
           chiama "/accounts/$CF_ACCOUNT/workers/scripts" | esito || { echo "::error::La chiave non ha accesso a Workers su questo account. Controlla CLOUDFLARE_ACCOUNT_ID e il modello del token (Modifica Cloudflare Workers)."; exit 1; }
 
+      - name: Database di foto e vocali (Cloudflare D1)
+        working-directory: worker
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          QUANTI: "4"
+        run: |
+          # piano gratuito: 500 MB per database, 10 database per account. 4 database = circa 1,7 GB di foto e vocali.
+          python3 - <<'PY'
+          import json, os, sys, urllib.request
+          tok, acc, n = os.environ["CF_TOKEN"], os.environ["CF_ACCOUNT"], int(os.environ["QUANTI"])
+          def api(metodo, via, corpo=None):
+              r = urllib.request.Request("https://api.cloudflare.com/client/v4/accounts/%s/d1/database%s" % (acc, via), method=metodo,
+                  data=json.dumps(corpo).encode() if corpo else None, headers={"Authorization": "Bearer " + tok, "Content-Type": "application/json"})
+              try:
+                  with urllib.request.urlopen(r) as x: return json.load(x)
+              except urllib.error.HTTPError as e:
+                  return json.loads(e.read() or b"{}")
+          def avviso():
+              print("::warning::La chiave Cloudflare non può usare D1: pubblico il server SENZA foto e vocali in chat. "
+                    "Aggiungi al token CLOUDFLARE_API_TOKEN il permesso Account > D1 > Edit e rilancia questo workflow.")
+              sys.exit(0)
+          elenco = api("GET", "?per_page=100")
+          if not elenco.get("success"): avviso()
+          ids = {d["name"]: d["uuid"] for d in elenco.get("result") or []}
+          righe = ""
+          for i in range(n):
+              nome = "jona-allegati-%d" % i
+              if nome not in ids:
+                  nuovo = api("POST", "", {"name": nome})
+                  if not nuovo.get("success"): print(nuovo.get("errors")); avviso()
+                  ids[nome] = nuovo["result"]["uuid"]; print("Creato il database", nome)
+              righe += '\n[[d1_databases]]\nbinding = "ALLEGATI%d"\ndatabase_name = "%s"\ndatabase_id = "%s"\n' % (i, nome, ids[nome])
+          with open("wrangler.toml", "a") as f: f.write(righe)
+          print("Foto e vocali: %d database collegati." % n)
+          PY
+
       - name: Pubblica il Worker
         uses: cloudflare/wrangler-action@v3
         with:

@@ -1,6 +1,6 @@
 // Jona Ordini: service worker minimo per installare l'app e aprirla anche senza rete.
 // Strategia "prima la rete": prende sempre la versione più recente, usa la copia salvata solo se offline.
-const CACHE = 'jona-ordini-v29';
+const CACHE = 'jona-ordini-v30';
 const FILES = ['./', './index.html', './manifest.webmanifest', './firebase-config.js', './lib/firebase-10.14.1.js', './lib/qrcode-1.4.4.js', './jona-icon-192.png', './jona-icon-512.png', './media/invio-chef.mp4', './lib/jsqr-1.4.0.js'];
 
 self.addEventListener('install', e => {
@@ -10,7 +10,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== 'jona-allegati').map(k => caches.delete(k)))) // jona-allegati: foto e vocali della chat già scaricati
       .then(() => self.clients.claim())
   );
 });
