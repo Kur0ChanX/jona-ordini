@@ -609,6 +609,80 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
   html.staff-ui .main:not(.has-bar){padding-bottom:110px}
 }
 @media (min-width:1260px){html.staff-ui .cart-foot{margin-right:0}}
+:root{--cht-me:#D8EEEA;--cht-bg:#EAE3DB;--cht-wall:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='%23CDBDAE' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16v12M18 16v6a4 4 0 0 0 8 0v-6M22 28v16'/%3E%3Cpath d='M64 26c9 0 15 5 17 10-4 5-9 7-17 7-4 0-7-1-9-3l-6 3 2-7-2-7 6 3c2-3 5-6 9-6z'/%3E%3Ccircle cx='72' cy='33' r='1'/%3E%3Cpath d='M130 14h14l-2 12a5 5 0 0 1-10 0zM137 31v12M132 43h10'/%3E%3Cpath d='M30 120c0-15 12-25 27-25 0 15-11 27-27 25zM30 120l15-15'/%3E%3Ccircle cx='120' cy='104' r='10'/%3E%3Ccircle cx='120' cy='104' r='5'/%3E%3Cpath d='M86 158l6-6 6 6-6 6z'/%3E%3Cpath d='M150 150c4-8 12-8 16 0'/%3E%3Ccircle cx='100' cy='70' r='1.5'/%3E%3Ccircle cx='160' cy='86' r='1.5'/%3E%3Ccircle cx='40' cy='70' r='1.5'/%3E%3C/svg%3E")}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cht-me:#1E4346;--cht-bg:#1A1412;--cht-wall:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='%233A2F2B' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16v12M18 16v6a4 4 0 0 0 8 0v-6M22 28v16'/%3E%3Cpath d='M64 26c9 0 15 5 17 10-4 5-9 7-17 7-4 0-7-1-9-3l-6 3 2-7-2-7 6 3c2-3 5-6 9-6z'/%3E%3Ccircle cx='72' cy='33' r='1'/%3E%3Cpath d='M130 14h14l-2 12a5 5 0 0 1-10 0zM137 31v12M132 43h10'/%3E%3Cpath d='M30 120c0-15 12-25 27-25 0 15-11 27-27 25zM30 120l15-15'/%3E%3Ccircle cx='120' cy='104' r='10'/%3E%3Ccircle cx='120' cy='104' r='5'/%3E%3Cpath d='M86 158l6-6 6 6-6 6z'/%3E%3Cpath d='M150 150c4-8 12-8 16 0'/%3E%3Ccircle cx='100' cy='70' r='1.5'/%3E%3Ccircle cx='160' cy='86' r='1.5'/%3E%3Ccircle cx='40' cy='70' r='1.5'/%3E%3C/svg%3E")}}
+:root[data-theme="dark"]{--cht-me:#1E4346;--cht-bg:#1A1412;--cht-wall:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' fill='none' stroke='%233A2F2B' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16v12M18 16v6a4 4 0 0 0 8 0v-6M22 28v16'/%3E%3Cpath d='M64 26c9 0 15 5 17 10-4 5-9 7-17 7-4 0-7-1-9-3l-6 3 2-7-2-7 6 3c2-3 5-6 9-6z'/%3E%3Ccircle cx='72' cy='33' r='1'/%3E%3Cpath d='M130 14h14l-2 12a5 5 0 0 1-10 0zM137 31v12M132 43h10'/%3E%3Cpath d='M30 120c0-15 12-25 27-25 0 15-11 27-27 25zM30 120l15-15'/%3E%3Ccircle cx='120' cy='104' r='10'/%3E%3Ccircle cx='120' cy='104' r='5'/%3E%3Cpath d='M86 158l6-6 6 6-6 6z'/%3E%3Cpath d='M150 150c4-8 12-8 16 0'/%3E%3Ccircle cx='100' cy='70' r='1.5'/%3E%3Ccircle cx='160' cy='86' r='1.5'/%3E%3Ccircle cx='40' cy='70' r='1.5'/%3E%3C/svg%3E")}
+/* ---------- chat tra colleghi ---------- */
+.cht{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:1fr;background:var(--bg);opacity:0;transform:translateY(14px);transition:opacity .22s ease,transform .22s ease;padding-top:env(safe-area-inset-top,0px)}
+.cht.open{opacity:1;transform:none}
+.cht-l,.cht-c{min-height:0;min-width:0;display:flex;flex-direction:column;height:calc(100dvh - env(safe-area-inset-top,0px))}
+.cht-c{display:none}.cht.has-c .cht-l{display:none}.cht.has-c .cht-c{display:flex}
+@media (min-width:760px){.cht{grid-template-columns:minmax(290px,360px) 1fr}.cht-c,.cht.has-c .cht-l{display:flex}.cht-l{border-right:1px solid var(--line)}}
+.cht-h{display:flex;align-items:center;gap:10px;min-height:62px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
+.cht-h>b{flex:1;font:300 25px var(--font);padding-left:2px}
+.cht-h .icon-btn[aria-pressed="true"]{background:var(--sunk)}
+.cht-items{flex:1;overflow-y:auto;background:var(--surface);overscroll-behavior:contain}
+.cht-it{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:8px 14px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cht-it:hover,.cht-it.on{background:var(--sunk)}.cht-it:focus-visible{outline:2px solid var(--lagoon);outline-offset:-2px}
+.cht-it>.av{margin-bottom:8px}
+.cht-ii{flex:1;min-width:0;padding:6px 0 12px;border-bottom:1px solid var(--line)}
+.cht-ii>b{display:block;font:400 16.5px var(--font)}.cht-ii>span{font-size:13.5px;color:var(--muted)}
+.cht-r{display:flex;align-items:center;gap:8px}
+.cht-r b{flex:1;min-width:0;font:400 16.5px var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cht-r time{font-size:12px;color:var(--muted);flex:none}.cht-r time.un{color:var(--lagoon);font-weight:600}
+.cht-r span{flex:1;min-width:0;margin-top:2px;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cht-r span i{font-style:normal}
+.cht-r em{flex:none;min-width:22px;height:22px;padding:0 7px;border-radius:11px;background:var(--lagoon);color:var(--on-lagoon);font:600 12px/22px var(--font);font-style:normal;text-align:center}
+.cht-gav{background:var(--c)!important}.cht-gav .ic{width:52%;height:52%;color:#fff}
+.cht-sub{margin:14px 16px 4px;font-size:13px;color:var(--muted)}
+.cht-off{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:12px;padding:12px 14px;border-radius:14px;background:var(--ocra-soft);flex:none}
+.cht-off .ic{grid-row:span 2;width:22px;height:22px;color:var(--ocra)}.cht-off b{font-weight:500}.cht-off span{font-size:13.5px;color:var(--ink2)}.cht-off code{font-size:12px}
+.cht-empty{flex:1;display:grid;place-content:center;justify-items:center;gap:6px;padding:20px;text-align:center;color:var(--muted);background:var(--cht-wall),var(--cht-bg)}
+.cht-empty .ic{width:46px;height:46px;color:var(--sand)}.cht-empty b{color:var(--ink);font:400 20px var(--font)}
+.cht-ct{flex:1;min-width:0}.cht-ct b{display:block;font:400 17px/1.2 var(--font)}.cht-ct span{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cht-m{flex:1;overflow-y:auto;padding:8px 12px 14px;background:var(--cht-wall),var(--cht-bg);overscroll-behavior:contain;display:flex;flex-direction:column}
+.cht-m>:first-child{margin-top:auto}
+.cht-day{text-align:center;margin:12px 0 6px}
+.cht-day span{display:inline-block;padding:5px 12px;border-radius:9px;background:var(--surface);color:var(--ink2);font-size:12.5px;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.cht-day span::first-letter{text-transform:uppercase}
+.cht-b{display:flex;max-width:min(82%,560px);margin-top:2px}.cht-b.first{margin-top:8px}
+.cht-b.me{align-self:flex-end}.cht-b.ot{align-self:flex-start}
+.cht-b p{position:relative;margin:0;padding:6px 9px 7px 10px;border-radius:12px;font:400 15.5px/1.38 var(--font);color:var(--ink);overflow-wrap:anywhere;box-shadow:0 1px .5px rgba(0,0,0,.13)}
+.cht-b.me p{background:var(--cht-me)}.cht-b.ot p{background:var(--surface)}
+.cht-b.first.me p{border-top-right-radius:2px}.cht-b.first.ot p{border-top-left-radius:2px}
+.cht-b.first.me p::after,.cht-b.first.ot p::after{content:'';position:absolute;top:0;width:0;height:0;border-style:solid}
+.cht-b.first.me p::after{right:-7px;border-width:0 0 9px 8px;border-color:transparent transparent transparent var(--cht-me)}
+.cht-b.first.ot p::after{left:-7px;border-width:0 8px 9px 0;border-color:transparent var(--surface) transparent transparent}
+.cht-b p a{color:var(--lagoon)}
+.cht-who{display:block;font:500 13px var(--font);margin-bottom:1px}
+.cht-t{float:right;display:inline-flex;align-items:center;gap:3px;margin:8px 0 -6px 12px;font-size:11px;color:var(--muted);position:relative;top:2px;white-space:nowrap}
+.cht-t .tk{font-style:normal;font-size:11.5px;letter-spacing:-3.5px;padding-right:3px;color:var(--muted)}.cht-t .tk.rd{color:var(--lagoon)}
+.cht-t .ic.tk{width:12px;height:12px;letter-spacing:0;padding:0}
+.cht-in{display:flex;align-items:flex-end;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:var(--cht-bg);flex:none}
+.cht-in textarea{flex:1;min-width:0;resize:none;min-height:48px;max-height:140px;padding:13px 18px;border-radius:24px;border:0;background:var(--surface);color:var(--ink);font:400 16px/1.35 var(--font);box-shadow:0 1px .5px rgba(0,0,0,.12)}
+.cht-in textarea:focus{outline:2px solid var(--lagoon-soft)}
+.cht-send{width:48px;height:48px;flex:none;border:0;border-radius:50%;background:var(--lagoon);color:var(--on-lagoon);display:grid;place-items:center;box-shadow:0 2px 6px -2px rgba(0,0,0,.3)}
+.cht-send .ic{width:22px;height:22px;margin-left:-2px}.cht-send:active{transform:scale(.94)}
+.cht-more{display:block;margin:6px auto 4px;padding:7px 14px;border:0;border-radius:99px;background:var(--surface);color:var(--lagoon);font:500 13px var(--font);box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.cht-hint{align-self:center;margin:20px 0;padding:8px 14px;border-radius:10px;background:var(--ocra-soft);color:var(--ink2);font-size:13.5px}
+/* ---------- «Chiedi a Jona» ---------- */
+.ask-fab{background:var(--solid);color:var(--on-solid)}.ask-fab .ic{color:var(--ocra)}
+.sheet.jona-sh{display:flex;flex-direction:column}
+.jona-av{width:40px;height:40px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--ocra-soft);color:var(--ocra)}.jona-av .ic{width:22px;height:22px}
+.jona-key{display:flex;gap:12px;padding:12px 14px;border-radius:14px;background:var(--ocra-soft);margin:0 0 10px}.jona-key>.ic{color:var(--ocra);flex:none}
+.jona-key b{display:block;font-weight:500}.jona-key span{display:block;font-size:13.5px;color:var(--ink2);margin:2px 0 8px}
+.jona-msgs{flex:1;min-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:6px 0 12px}
+.jona-m{max-width:90%;padding:10px 14px;border-radius:18px;font-size:15.5px;line-height:1.45;overflow-wrap:anywhere}
+.jona-m.q{align-self:flex-end;background:var(--lagoon);color:var(--on-lagoon);border-bottom-right-radius:5px}
+.jona-m.a{align-self:flex-start;background:var(--sunk);border-bottom-left-radius:5px}
+.jona-m ul{margin:4px 0;padding-left:20px}.jona-m li{margin:2px 0}
+.jona-m.busy i{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--muted);animation:jdot 1s infinite ease-in-out}
+.jona-m.busy i:nth-child(2){animation-delay:.15s}.jona-m.busy i:nth-child(3){animation-delay:.3s}
+@keyframes jdot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+.jona-tips{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}.jona-tips .chip{white-space:normal;text-align:left;line-height:1.3}
+.jona-in{position:sticky;bottom:0;display:flex;align-items:flex-end;gap:6px;padding:10px 0 4px;background:var(--surface);border-top:1px solid var(--line)}
+.jona-in textarea{flex:1;min-width:0;resize:none;min-height:48px;max-height:120px;border-radius:24px;padding:12px 16px}
+.jona-send{width:48px;height:48px;flex:none;border:0;border-radius:50%;background:var(--lagoon);color:var(--on-lagoon);display:grid;place-items:center}.jona-send:disabled{opacity:.45}.jona-send .ic{width:22px;height:22px}
+.jona-note{margin:4px 0 0;font-size:12px;color:var(--muted);text-align:center}
 /* ---------- timbratura ---------- */
 .tb-card{background:var(--surface);border-radius:18px;box-shadow:var(--lift);padding:14px 16px;margin:0 0 14px;display:grid;gap:12px}
 .tb-card.on{box-shadow:inset 0 0 0 2px var(--mirto),var(--lift)}
@@ -866,15 +940,23 @@ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 
 calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="1.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M7.5 14h2M11 14h2M14.5 14h2M7.5 17h2M11 17h2"/>',
 chevl:'<path d="m14.5 5.5-6.5 6.5 6.5 6.5"/>',
 sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
-rain:'<path d="M7 15.5h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6-1.3A4.5 4.5 0 0 0 7 15.5z"/><path d="M8.5 18.5l-1 2.2M12.5 18.5l-1 2.2M16.5 18.5l-1 2.2"/>'
+rain:'<path d="M7 15.5h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6-1.3A4.5 4.5 0 0 0 7 15.5z"/><path d="M8.5 18.5l-1 2.2M12.5 18.5l-1 2.2M16.5 18.5l-1 2.2"/>',
+pot:'<path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M9 7.2c0-1.6 1.3-2.7 3-2.7s3 1.1 3 2.7"/>',
+glass:'<path d="M7 3h10l-1 7.5a4 4 0 0 1-8 0z"/><path d="M12 14.5V20M8.5 20.5h7M7.5 7h9"/>',
+msg:'<path d="M4.5 5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h-1A1.5 1.5 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5z"/><path d="M7.5 9.5h9M7.5 12.5h6"/>'
 };
 const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
 
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=16;
+const APP_VER=17;
 const NEWS=[
+  {v:17,data:'2026-10-04',titolo:'Chat tra colleghi e «Chiedi a Jona»',
+    tutti:['In alto, accanto alla campanella, c\'è la chat: scrivi a tutto lo staff, al tuo reparto o a un collega. Tocca la matita per una chat nuova. Le spunte diventano blu quando l\'altro ha letto.','Quando arriva un messaggio vedi un avviso e il numero dei messaggi nuovi sul pulsante della chat.'],
+    chef:['Il pulsante tondo con la stellina in basso a destra è «Chiedi a Jona»: fai domande sui dati dell\'app, scritte o a voce («Quanto abbiamo speso da Metro questo mese?», «Chi lavora sabato sera?»). Risponde Gemini con la chiave di questo telefono.','Nella chat vedi i gruppi di tutti i reparti.'],
+    dev:{aggiunte:['Chat: collezione `messaggi` (un documento per messaggio `{c,da,t,creato}`, `messaggi/letti` annidato per persona e chat), chat `tutti`, `rep_<reparto>`, `dm_<a>--<b>`. Parla direttamente con Firestore come le push: senza le regole nuove l\'app non si blocca e la chat spiega come attivarla. Ultimi 500 messaggi in ascolto, «Messaggi precedenti» per i vecchi. Push con `pushSend` a più persone.','«Chiedi a Jona»: `jonaCtx` (riassunto JSON di fornitori, listino, ordini, richieste, staff, orari e timbrature; contratti solo per l\'amministratore), `jonaAsk` con `system_instruction` e le ultime 8 domande, `jonaMic` per dettare.'],
+      noti:['Le regole Firestore vanno pubblicate di nuovo (collezione `messaggi`): fino ad allora la chat resta spenta.']}},
   {v:16,data:'2026-10-04',titolo:'Cambi turno, timbratura e ordine suggerito',
     tutti:['Nella voce «Orari» puoi chiedere un cambio turno a un collega: tocca «Chiedi un cambio» sotto il giorno, scegli il collega e, se vuoi, un suo giorno da fare tu. Il collega accetta o rifiuta, poi Maurizio approva e gli orari si aggiornano da soli.','Se Maurizio accende la timbratura, nella voce «Orari» trovi il pulsante «Timbra»: quando arrivi e quando finisci inquadra il QR attaccato in cucina.'],
     chef:['In Invii c\'è «Ordine suggerito»: per ogni fornitore l\'app propone le quantità guardando gli ordini degli ultimi 2 mesi, ogni quanti giorni ordini, la gente prevista e il meteo di Porto Cervo. Controlli, cambi e aggiungi all\'ordine.','Contratto, ore e pause li imposti solo tu, e lo staff non li vede più. Chi fa gli orari li usa per i controlli.','Quando un turno non rispetta una regola, l\'app chiede il consenso prima di salvare: con «Salva lo stesso» l\'errore resta segnato come accettato (bordo tratteggiato) e non blocca la pubblicazione.','I cambi turno chiesti dallo staff li trovi in Staff → Orari, con il controllo delle regole: «Approva» aggiorna gli orari pubblicati e avvisa i due.','Timbratura con QR (in Impostazioni, spenta di partenza): QR da stampare, «Cambia codice», orari timbrati nella tabella e «Presenze» in Excel per il consulente del lavoro.'],
@@ -1223,7 +1305,7 @@ async function pushPost(list,titolo,testo){
   if(!r.ok)throw new Error('invia '+r.status);
   const j=await r.json();const dead=new Set(j.scaduti||[]);try{for(const [id,p] of list)if(dead.has(p.sub.endpoint))pushCol().doc(id).delete().catch(()=>{})}catch(e){}return j}
 async function pushSend(a,titolo,testo){let list=[];try{pushWatch();const st=D().staff,mine=ls('jona_push');
-  list=Object.entries(PUSH.subs).filter(([id,p])=>{const u=st[p.u];return id!==mine&&!!u&&u.stato==='attivo'&&(p.u===a||(a==='gm'&&isGM(u))||(a==='gestori'&&isMgr(u)))});
+  list=Object.entries(PUSH.subs).filter(([id,p])=>{const u=st[p.u];return id!==mine&&!!u&&u.stato==='attivo'&&(Array.isArray(a)?a.includes(p.u):p.u===a||(a==='gm'&&isGM(u))||(a==='gestori'&&isMgr(u)))});
   if(!list.length)return;if(navigator.onLine===false)throw new Error('offline');await pushPost(list,titolo,testo)}
   catch(e){if(list.length)obxAdd({id:uid(),a,titolo,testo:testo||'',subs:list.map(([id,p])=>({id,sub:p.sub})),creato:now()})}}
 /* ================= invii in sospeso =================
@@ -1286,6 +1368,7 @@ function render(){
   document.documentElement.classList.toggle('staff-ui',!S.wallMode&&!isMgr(meU()));
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
   for(const o of sheets)if(o.live&&o.live())paintSheet(o);
+  if(!S.wallMode&&realU()){chWatch();if(CHAT.box)chPaint()}else if(CHAT.box)chClose();
 }
 function repaint(){render();refreshSheet()}
 function allLoaded(){return(S.loadTimeout&&S.db.kind!=='firebase')||Object.keys(COLS).every(k=>S.loaded[k])}
@@ -1421,7 +1504,7 @@ async function doLogin(){
   S.login={u:'',p:''};login(x.id);
 }
 function login(id){S.me=id;ls('jona_me',id);S.cart=ls('jona_cart_'+id)||[];S.tab=null;S.q='';S.cat='';window.scrollTo(0,0);render();pushSync();const u=D().staff[id];if(u)toast('Ciao '+u.nome)}
-function logout(){pushUnlink();while(sheets.length)closeSheet(true);S.me=null;ls('jona_me',null);S.cart=[];S.drafts={};S.removed={};S.gmn={};window.scrollTo(0,0);render()}
+function logout(){pushUnlink();while(sheets.length)closeSheet(true);if(CHAT.box)chClose();CHAT.seen=null;S.me=null;ls('jona_me',null);S.cart=[];S.drafts={};S.removed={};S.gmn={};window.scrollTo(0,0);render()}
 
 /* ================= shell ================= */
 const arriviCount=()=>Object.values(D().ordini).filter(o=>o.stato==='inviato'&&!o.ricevuto).length;
@@ -1442,8 +1525,9 @@ function shell(me){
   const nc=!isMgr(me)&&S.tab!=='carrello'?cartLines().length:0;
   return`<nav class="nav n${tabs.length}" aria-label="Sezioni"><div class="nav-brand"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div>${tabs.map(t=>{const b=t.b?t.b():0;return`<button type="button" data-a="tab" data-v="${t.id}" ${S.tab===t.id?'aria-current="page"':''}>${ic(t.i)}<span>${t.l}</span>${b?`<span class="badge">${b>99?'99+':b}</span>`:''}</button>`}).join('')}</nav>
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}
+  ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?'':micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -3087,6 +3171,176 @@ function orContrForm(p){
   <span class="lbl">Giorni liberi a settimana</span><div class="seg wide" role="group" aria-label="Giorni liberi">${[1,2,3].map(n=>`<button type="button" aria-pressed="${String(f.liberi)===String(n)}" data-a="formset" data-k="liberi" data-v="${n}">${n}</button>`).join('')}</div></div>`;
 }
 
+/* ================= «Chiedi a Jona» (gestori) =================
+   Domande scritte o a voce sui dati dell'app. Risponde Gemini con la chiave di questo telefono (jona_gemini_key):
+   gli mandiamo un riassunto compatto dei dati (fornitori, listino, ordini, richieste, staff, orari) e le ultime domande. */
+const JONA_TIPS=['Quanto abbiamo speso da ogni fornitore questo mese?','Chi lavora sabato sera?','Quando abbiamo ordinato l\'ultima volta il burro?','Quali prodotti sono aumentati di prezzo?','Cosa chiede più spesso la sala?'];
+function jonaCtx(){
+  const d=D(),F=d.fornitori,fn=id=>(F[id]||{}).nome||'',dt=t=>t?new Date(t).toLocaleString('it-IT',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+  const staff=Object.values(d.staff).filter(u=>u.stato!=='in_attesa').map(u=>{const c=isGM(meU())?contrOf(u):null;return[u.id,fullName(u),RUOLI[u.ruolo],REPARTI[u.reparto]||'',u.mansione||'',u.stato,c?c.ore+'h/sett, pausa '+c.pausa+' min, '+c.liberi+' liberi':'']});
+  const sn=id=>(d.staff[id]&&fullName(d.staff[id]))||id;
+  const orari=[orShift(orLun(),-1),orLun(),orShift(orLun(),1)].map(l=>{const w=orWeek(l);if(!w)return null;const t=w.tp||w.t||{};
+    return{settimana:'dal '+l,pubblicata:!!w.tp,turni:Object.fromEntries(Object.entries(t).map(([id,r])=>[sn(id),Object.fromEntries(Object.entries(r).map(([g,v])=>[OR_GGL[g],orFmt(v)]))])),
+      timbrature:tbOn()&&tbWeek(l)?Object.fromEntries(Object.entries(tbWeek(l).t||{}).map(([id,r])=>[sn(id),Object.fromEntries(Object.entries(r).map(([g,v])=>[OR_GGL[g],v]))])):undefined}}).filter(Boolean);
+  return JSON.stringify({
+    adesso:dt(now()),locale:cfg().nomeLocale,
+    fornitori:Object.values(F).map(f=>[f.nome,METODI[f.metodo]?METODI[f.metodo].l:f.metodo||'',f.categoria||'',f.oraLimite||'']),
+    listino_colonne:['prodotto','fornitore','unità','prezzo €','prezzo precedente €','categoria'],
+    listino:prods().map(p=>[p.nome,fn(p.fornitoreId),p.unita||'',p.prezzo??'',p.prezzoPrec??'',p.categoria||'']),
+    ordini_colonne:['creato','inviato','fornitore','stato','arrivato','righe: prodotto, quantità, unità, prezzo €'],
+    ordini:Object.values(d.ordini).sort((a,b)=>(b.creato||0)-(a.creato||0)).map(o=>[dt(o.creato),dt(o.inviato),fn(o.fornitoreId)||o.fornitoreNome,o.stato,o.ricevuto?dt(o.ricevuto)+(o.differenze?' con differenze':''):'',(o.items||[]).map(l=>[l.nome,l.qta,l.unita||'',l.prezzo??''])]),
+    richieste_colonne:['data','persona','reparto','stato','prodotti: nome, quantità, unità'],
+    richieste:Object.values(d.richieste).sort((a,b)=>(b.creato||0)-(a.creato||0)).slice(0,250).map(r=>[dt(r.creato),r.utenteNome,REPARTI[r.reparto]||'',r.stato,(r.items||[]).map(i=>[i.nome,i.qta,i.unita||''])]),
+    staff_colonne:['id','nome','ruolo','reparto','mansione','stato','contratto'],staff,orari});
+}
+const jonaMd=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').split('\n').map(l=>/^\s*[-*•]\s+/.test(l)?'<li>'+l.replace(/^\s*[-*•]\s+/,'')+'</li>':l).join('\n')
+  .replace(/(?:<li>.*?<\/li>\n?)+/g,m=>'<ul>'+m.replace(/\n/g,'')+'</ul>').replace(/\n/g,'<br>');
+function jonaSheet(){
+  S.jona=S.jona||{msgs:[],q:'',busy:false};
+  openSheet({cls:'tall jona-sh',live:()=>true,render:()=>{const J=S.jona,key=!!gemKey();
+    return`<div class="grab"></div><div class="sh-h"><span class="jona-av">${ic('sparkle')}</span><div class="sh-t">Chiedi a Jona<div class="sh-s">Domande sui dati dell'app, a voce o scritte</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+    ${!key?`<div class="jona-key">${ic('sparkle')}<div><b>Serve la chiave Gemini su questo telefono</b><span>È gratis: la crei su aistudio.google.com/apikey e la incolli qui una volta sola.</span><button type="button" class="btn primary sm" data-a="gemKey">Inserisci la chiave</button></div></div>`:''}
+    <div class="jona-msgs" id="jona-msgs">${J.msgs.length?J.msgs.map(m=>`<div class="jona-m ${m.r}">${m.r==='a'?jonaMd(m.t):esc(m.t)}</div>`).join(''):`<div class="jona-tips">${JONA_TIPS.map(t=>`<button type="button" class="chip" data-a="jonaTip" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>`}
+    ${J.busy?'<div class="jona-m a busy"><i></i><i></i><i></i></div>':''}</div>
+    <div class="jona-in"><textarea class="inp" id="jona-q" rows="1" placeholder="Scrivi una domanda…" data-in="jonaQ" enterkeyhint="send">${esc(J.q)}</textarea>
+    ${vSR()?`<button type="button" class="icon-btn" data-a="jonaMic" aria-label="Detta la domanda">${ic('mic')}</button>`:''}<button type="button" class="jona-send" data-a="jonaAsk" aria-label="Chiedi" ${J.busy||!key?'disabled':''}>${ic('send')}</button></div>
+    <p class="jona-note">Le domande e i dati del ristorante vengono mandati a Google Gemini per la risposta. Controlla i numeri importanti.</p>`},onClose:()=>{}});
+  setTimeout(()=>{const m=$('#jona-msgs');if(m)m.scrollTop=m.scrollHeight},50);
+}
+async function jonaAsk(q){
+  const J=S.jona;q=String(q||J.q||'').trim();if(!q||J.busy)return;if(!gemKey())return toast('Prima inserisci la chiave Gemini.','warn');
+  J.msgs.push({r:'q',t:q});J.q='';J.busy=true;refreshSheet();const sc=()=>setTimeout(()=>{const m=$('#jona-msgs');if(m)m.scrollTop=m.scrollHeight},30);sc();
+  const sys='Sei Jona, l\'assistente dell\'app degli ordini di cucina e sala del ristorante «'+cfg().nomeLocale+'». Rispondi in italiano semplice e breve, come a un collega in cucina. '
+    +'Usa solo i dati JSON qui sotto: fai i conti con precisione (somme di prezzo × quantità, date, turni) e se i dati non bastano dillo chiaramente. Euro con la virgola (12,50 €). Puoi usare elenchi con «- » e il grassetto con **.\nDATI:\n'+jonaCtx();
+  const contents=J.msgs.slice(-8).map(m=>({role:m.r==='q'?'user':'model',parts:[{text:m.t}]}));
+  let txt='',last='';
+  try{for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':gemKey()},
+      body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents,generationConfig:{temperature:0.2}})});
+    const j=await r.json().catch(()=>({}));if(r.ok){txt=((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n').trim();break}
+    last=(j.error&&j.error.message)||('errore '+r.status);if(r.status!==404)break}}
+  catch(e){last='rete'}
+  J.busy=false;J.msgs.push({r:'a',t:txt||(last==='rete'?'Non riesco a contattare Gemini: controlla la connessione.':/key|API_KEY|permission/i.test(last)?'La chiave Gemini non è valida: controllala.':'Non ho una risposta adesso'+(last?' ('+last+')':'')+'. Riprova.')});
+  refreshSheet();sc();
+}
+function jonaMic(){
+  const C=vSR();if(!C)return;let r;try{r=new C()}catch(e){return}r.lang='it-IT';r.interimResults=true;r.maxAlternatives=1;
+  toast('Parla adesso…');r.onresult=e=>{const t=[...e.results].map(x=>x[0].transcript).join(' ');S.jona.q=t;const el=$('#jona-q');if(el)el.value=t;if(e.results[e.results.length-1].isFinal)jonaAsk(t)};
+  r.onerror=()=>toast('Non ho sentito: riprova o scrivi.','warn');try{r.start()}catch(e){}
+}
+
+/* ================= chat tra colleghi =================
+   Collezione «messaggi»: un documento per messaggio {c,da,t,creato}; «messaggi/letti» = {<persona>:{<chat>:ultimo letto}}.
+   c: 'tutti' | 'rep_cucina' | 'rep_sala' | 'rep_altro' | 'dm_<idA>_<idB>' (id in ordine alfabetico).
+   Su Firebase la chat parla direttamente con Firestore (come le push): finché le regole non hanno «messaggi» l'app non si blocca
+   e la chat spiega come attivarla. Si leggono gli ultimi 500 messaggi; «Messaggi precedenti» carica i più vecchi. */
+const CHAT={on:false,err:'',msgs:[],old:[],letti:{},seen:null,retry:0,box:null,last:{}};
+const chFb=()=>!!S.db&&S.db.kind==='firebase';
+const chCol=()=>fbInit().fs.collection('messaggi');
+const chDm=(a,b)=>'dm_'+[a,b].sort().join('--'); // «--» non compare negli id (che possono avere «_»)
+const chDmIds=c=>c.slice(3).split('--');
+function chWatch(){
+  if(CHAT.on||now()<CHAT.retry||!S.db||!realU())return;
+  if(chFb()){if(!S.db.status().ready)return;CHAT.on=true;
+    CHAT.un=chCol().orderBy('creato','desc').limit(500).onSnapshot({includeMetadataChanges:true},q=>{CHAT.err='';
+      CHAT.msgs=q.docs.map(d=>Object.assign({id:d.id,pend:d.metadata.hasPendingWrites},d.data()));chNew();schedule()},
+      e=>{CHAT.err=e&&e.code||'errore';CHAT.on=false;CHAT.retry=now()+60000;schedule()});
+    chCol().doc('letti').onSnapshot(d=>{CHAT.letti=d.exists?d.data():{};schedule()},()=>{});
+  }else{CHAT.on=true;
+    S.db.collection('messaggi').orderBy('creato','desc').limit(500).onSnapshot(q=>{const all=q.docs.map(d=>Object.assign({id:d.id},d.data()));
+      const l=all.find(m=>m.id==='letti');CHAT.lettiOk=!!l;CHAT.letti=l?Object.assign({},l):{};delete CHAT.letti.id;CHAT.msgs=all.filter(m=>m.creato&&m.c);chNew();schedule()})}
+}
+// chat visibili: tutti, il proprio reparto (i gestori vedono tutti i reparti), i messaggi diretti
+const chPeople=()=>Object.values(D().staff).filter(u=>u.stato==='attivo');
+function chMembers(c){const P=chPeople();if(c==='tutti')return P;if(c.startsWith('rep_'))return P.filter(u=>isMgr(u)||(u.reparto||'altro')===c.slice(4));if(c.startsWith('dm_'))return chDmIds(c).map(id=>D().staff[id]).filter(Boolean);return[]}
+function chCan(c,me){if(c==='tutti')return true;if(c.startsWith('rep_'))return isMgr(me)||(me.reparto||'altro')===c.slice(4);if(c.startsWith('dm_'))return chDmIds(c).includes(me.id);return false}
+function chInfo(c,me){
+  if(c==='tutti')return{n:'Tutto lo staff',s:chPeople().length+' persone',g:'tutti'};
+  if(c.startsWith('rep_'))return{n:REPARTI[c.slice(4)]||c.slice(4),s:chMembers(c).map(u=>u.nome).join(', '),g:c.slice(4)};
+  const o=D().staff[chDmIds(c).find(id=>id!==me.id)]||{nome:'Profilo eliminato'};return{n:fullName(o),s:isMgr(o)?RUOLI[o.ruolo]:[o.mansione,REPARTI[o.reparto]].filter(Boolean).join(', '),u:o};
+}
+const chAll=()=>CHAT.old.length?CHAT.msgs.concat(CHAT.old.filter(o=>!CHAT.msgs.some(m=>m.id===o.id))):CHAT.msgs;
+const chRead=(me,c)=>((CHAT.letti[me.id]||{})[c])||0;
+function chList(me){
+  const by=new Map();for(const m of chAll())if(chCan(m.c,me)){const x=by.get(m.c);if(!x||m.creato>x.creato)by.set(m.c,m)}
+  const base=['tutti'].concat(isMgr(me)?Object.keys(REPARTI).map(r=>'rep_'+r).filter(c=>chMembers(c).length>1):['rep_'+(me.reparto||'altro')]);
+  const cs=[...new Set(base.concat([...by.keys()]))];
+  return cs.map(c=>({c,last:by.get(c),un:chAll().filter(m=>m.c===c&&m.da!==me.id&&m.creato>chRead(me,c)).length})).sort((a,b)=>((b.last||{}).creato||0)-((a.last||{}).creato||0));
+}
+const chUnread=me=>me?chList(me).reduce((s,x)=>s+x.un,0):0;
+// avviso in app per i messaggi nuovi di altri (non quando la chat è aperta proprio lì)
+function chNew(){
+  const me=realU();if(!me)return;const ids=new Set(CHAT.msgs.map(m=>m.id));
+  if(CHAT.seen){for(const m of CHAT.msgs)if(!CHAT.seen.has(m.id)&&m.da!==me.id&&chCan(m.c,me)&&now()-m.creato<120000&&!(S.chat&&S.chat.c===m.c&&!document.hidden)){
+    const u=D().staff[m.da]||{nome:'?'};toast(u.nome+(m.c.startsWith('dm_')?'':' · '+chInfo(m.c,me).n)+': '+m.t.slice(0,80));try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}}}
+  CHAT.seen=ids;
+}
+async function chSend(){
+  const C=S.chat,me=realU();if(!C||!C.c||!me)return;const el=$('#ch-ta');const t=String(el?el.value:C.draft[C.c]||'').trim();if(!t)return;
+  if(t.length>2000)return toast('Messaggio troppo lungo.','warn');
+  const d={c:C.c,da:me.id,t,creato:now()};C.draft[C.c]='';if(el){el.value='';el.style.height=''}C.stick=true;
+  if(chFb())chCol().add(d).catch(e=>toast(e&&e.code==='permission-denied'?'La chat non è ancora attiva sul database.':'Messaggio non inviato: riprova.','err'));
+  else await put('messaggi',uid(),d);
+  chMarkRead(C.c,d.creato);
+  const to=chMembers(C.c).filter(u=>u.id!==me.id).map(u=>u.id),info=chInfo(C.c,me);
+  if(to.length)pushSend(to,me.nome+(C.c.startsWith('dm_')?'':' · '+info.n),t.slice(0,140));
+}
+function chMarkRead(c,t){
+  const me=realU();if(!me||!c)return;t=t||now();if(chRead(me,c)>=t)return;
+  (CHAT.letti[me.id]=CHAT.letti[me.id]||{})[c]=t;const key=me.id+'.'+c;
+  if(chFb())chCol().doc('letti').update({[key]:t}).catch(e=>{if(e&&e.code==='not-found')chCol().doc('letti').set({[me.id]:{[c]:t}},{merge:true}).catch(()=>{})});
+  else (CHAT.lettiOk?upd('messaggi','letti',{[key]:t}):put('messaggi','letti',clone(CHAT.letti))).catch(()=>{});
+}
+async function chMore(){
+  const ms=chAll().filter(m=>m.c===S.chat.c);const t=ms.length?Math.min(...ms.map(m=>m.creato)):now();
+  try{let docs;if(chFb()){const q=await chCol().where('creato','<',t).orderBy('creato','desc').limit(300).get();docs=q.docs.map(d=>Object.assign({id:d.id},d.data()))}
+    else docs=await S.db.range('messaggi','creato',0,t);
+    const add=docs.filter(m=>m.c&&!chAll().some(x=>x.id===m.id));CHAT.old=CHAT.old.concat(add);if(!add.some(m=>m.c===S.chat.c))S.chat.noMore=S.chat.noMore||{},S.chat.noMore[S.chat.c]=true;chPaint(true)}
+  catch(e){toast('Non riesco a caricare i messaggi vecchi.','warn')}
+}
+
+/* ---- interfaccia: schermo intero sopra l'app, lista + conversazione (affiancate sugli schermi larghi) ---- */
+function chOpen(c){
+  S.chat={c:c||null,draft:{},pick:false,stick:true};
+  if(!CHAT.box){CHAT.box=document.createElement('div');CHAT.box.className='cht';CHAT.box.setAttribute('role','dialog');CHAT.box.setAttribute('aria-label','Chat');document.body.appendChild(CHAT.box)}
+  CHAT.last={};CHAT.box.innerHTML=`<aside class="cht-l"></aside><section class="cht-c"></section>`;document.body.classList.add('noscroll');
+  requestAnimationFrame(()=>CHAT.box&&CHAT.box.classList.add('open'));chPaint(true);
+}
+function chClose(){if(!CHAT.box)return;const b=CHAT.box;CHAT.box=null;S.chat=null;b.classList.remove('open');setTimeout(()=>b.remove(),250);if(!sheets.length)document.body.classList.remove('noscroll');render()}
+const CH_G={tutti:['var(--lagoon)','users'],cucina:['var(--ocra)','pot'],sala:['#5B6FA8','glass'],altro:['var(--mirto)','msg']};
+const chAv=(info,size)=>{if(info.u)return avatar(info.u,size);const [c,i]=CH_G[info.g]||CH_G.altro;return`<span class="av cht-gav" style="--s:${size}px;--c:${c}">${ic(i)}</span>`};
+const chTime=t=>new Date(t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+const chDay=t=>{const d=new Date(t),td=new Date();const y=new Date(td);y.setDate(td.getDate()-1);return d.toDateString()===td.toDateString()?'Oggi':d.toDateString()===y.toDateString()?'Ieri':d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})};
+function chPaint(force){
+  const B=CHAT.box,C=S.chat,me=realU();if(!B||!C||!me)return;B.classList.toggle('has-c',!!C.c);
+  const set=(sel,h)=>{if(!force&&CHAT.last[sel]===h)return false;const el=B.querySelector(sel);if(!el)return false;CHAT.last[sel]=h;paint(el,h);return true};
+  // lista
+  const list=chList(me),err=CHAT.err==='permission-denied';
+  set('.cht-l',`<header class="cht-h"><button type="button" class="icon-btn" data-a="chClose" aria-label="Chiudi la chat">${ic('x')}</button><b>Chat</b><button type="button" class="icon-btn" data-a="chPick" aria-label="Nuova chat" aria-pressed="${!!C.pick}">${ic(C.pick?'back':'pencil')}</button></header>
+    ${err?`<div class="cht-off">${ic('warn')}<b>La chat va attivata</b><span>Il database non accetta ancora i messaggi. ${isMgr(me)?'Aggiorna le regole di Firebase con il file <code>firebase/firestore.rules</code> (vedi la guida di Mario).':'Chiedi a Maurizio o a Mario di attivarla.'}</span></div>`:''}
+    <div class="cht-items">${C.pick?`<p class="cht-sub">Nuova chat con…</p>`+chPeople().filter(u=>u.id!==me.id).sort(byNome).map(u=>`<button type="button" class="cht-it" data-a="chGo" data-c="${chDm(me.id,u.id)}">${avatar(u,46)}<div class="cht-ii"><b>${esc(fullName(u))}</b><span>${esc(isMgr(u)?RUOLI[u.ruolo]:[u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</span></div></button>`).join('')
+    :list.map(x=>{const i=chInfo(x.c,me),l=x.last,w=l&&D().staff[l.da];return`<button type="button" class="cht-it${C.c===x.c?' on':''}" data-a="chGo" data-c="${x.c}">${chAv(i,46)}<div class="cht-ii"><div class="cht-r"><b>${esc(i.n)}</b>${l?`<time class="${x.un?'un':''}">${chDay(l.creato)==='Oggi'?chTime(l.creato):chDay(l.creato)==='Ieri'?'Ieri':new Date(l.creato).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</time>`:''}</div>
+      <div class="cht-r"><span>${l?(l.da===me.id?'Tu: ':!x.c.startsWith('dm_')&&w?esc(w.nome)+': ':'')+esc(l.t):`<i>${esc(i.s)}</i>`}</span>${x.un?`<em>${x.un>99?'99+':x.un}</em>`:''}</div></div></button>`}).join('')}</div>`);
+  // conversazione
+  if(!C.c){set('.cht-c',`<div class="cht-empty">${ic('chat')}<b>Messaggi tra colleghi</b><span>Scegli una chat o tocca la matita per scriverne una nuova.</span></div>`);return}
+  if(!chCan(C.c,me)){C.c=null;return chPaint(true)}
+  const i=chInfo(C.c,me);const fresh=set('.cht-c',`<header class="cht-h cht-ch"><button type="button" class="icon-btn" data-a="chBack" aria-label="Torna alla lista">${ic('back')}</button>${chAv(i,40)}<div class="cht-ct"><b>${esc(i.n)}</b><span>${esc(i.s)}</span></div></header>
+    <div class="cht-m" id="ch-m"></div>
+    <div class="cht-in"><textarea id="ch-ta" rows="1" placeholder="Scrivi un messaggio" aria-label="Messaggio" enterkeyhint="send" data-in="chTa"></textarea><button type="button" class="cht-send" data-a="chSend" aria-label="Invia">${ic('send')}</button></div><!--${C.c}-->`);
+  if(fresh){const ta=$('#ch-ta');if(ta)ta.value=C.draft[C.c]||''}
+  const ms=chAll().filter(m=>m.c===C.c).sort((a,b)=>a.creato-b.creato),other=C.c.startsWith('dm_')?chDmIds(C.c).find(id=>id!==me.id):null;
+  const oRead=other?((CHAT.letti[other]||{})[C.c]||0):0;let h=ms.length>=20&&!(C.noMore&&C.noMore[C.c])?`<button type="button" class="cht-more" data-a="chMore">Messaggi precedenti</button>`:'',day='',prev=null;
+  if(!ms.length)h+=`<div class="cht-hint">Nessun messaggio. Scrivi il primo!</div>`;
+  for(const m of ms){const dd=chDay(m.creato);if(dd!==day){day=dd;h+=`<div class="cht-day"><span>${dd}</span></div>`;prev=null}
+    const mine=m.da===me.id,u=D().staff[m.da]||{nome:'?'},first=!prev||prev.da!==m.da||m.creato-prev.creato>5*60000;
+    const tick=mine?(m.pend?ic('clock','tk'):`<i class="tk${oRead>=m.creato?' rd':''}">${other?'✓✓':'✓'}</i>`):'';
+    h+=`<div class="cht-b ${mine?'me':'ot'}${first?' first':''}"><p>${!mine&&first&&!other?`<b class="cht-who" style="color:${hue(u.id||u.nome)}">${esc(u.nome)}</b>`:''}${esc(m.t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}<span class="cht-t">${chTime(m.creato)}${tick}</span></p></div>`;prev=m}
+  const box=B.querySelector('#ch-m');if(!box)return;const near=box.scrollHeight-box.scrollTop-box.clientHeight<90;
+  if(fresh||CHAT.last['#ch-m']!==h){CHAT.last['#ch-m']=h;const top=box.scrollTop,hh=box.scrollHeight;box.innerHTML=h;
+    if(fresh||C.stick||near){box.scrollTop=box.scrollHeight;C.stick=false}else if(force)box.scrollTop=top+(box.scrollHeight-hh)}
+  if(!document.hidden&&ms.length){const lastO=ms.filter(m=>m.da!==me.id).pop();if(lastO&&lastO.creato>chRead(me,C.c))chMarkRead(C.c,lastO.creato)}
+  if(fresh){const ta=$('#ch-ta');if(ta&&matchMedia('(min-width:760px)').matches)ta.focus({preventScroll:true})}
+}
+
 /* ================= notifiche, menu, impostazioni ================= */
 /* novità: versioni visibili al ruolo mostrato (meU), ultima vista salvata per il profilo vero (realU) */
 const NEWS_DEV=[['aggiunte','Aggiunte'],['correzioni','Correzioni'],['risolti','Problemi risolti'],['noti','Problemi noti']];
@@ -3609,6 +3863,22 @@ const CH={
   fesel:t=>{S.fe[t.dataset.k]=t.value},
   pesel:t=>{S.pe[t.dataset.k]=t.value}
 };
+/* chat e «Chiedi a Jona» */
+Object.assign(A,{
+  chatOpen:()=>{while(sheets.length)closeSheet(true);chOpen()},
+  chClose:()=>chClose(),
+  chGo:d=>{Object.assign(S.chat,{c:d.c,pick:false,stick:true});chPaint(true)},
+  chBack:()=>{S.chat.c=null;chPaint(true)},
+  chPick:()=>{S.chat.pick=!S.chat.pick;chPaint(true)},
+  chSend:()=>chSend(),
+  chMore:()=>chMore(),
+  jonaOpen:()=>jonaSheet(),
+  jonaAsk:()=>jonaAsk(),
+  jonaTip:d=>jonaAsk(d.v),
+  jonaMic:()=>jonaMic()
+});
+IN.chTa=t=>{if(S.chat&&S.chat.c)S.chat.draft[S.chat.c]=t.value;t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px'};
+IN.jonaQ=t=>{if(S.jona)S.jona.q=t.value;t.style.height='auto';t.style.height=Math.min(t.scrollHeight,120)+'px'};
 /* timbratura e cambi turno */
 Object.assign(A,{
   tbScan:()=>tbScanSheet(),
@@ -3674,7 +3944,10 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t
 document.addEventListener('input',e=>{const t=e.target;const f=t.dataset&&IN[t.dataset.in];if(f)f(t)});
 document.addEventListener('change',e=>{const t=e.target;const f=t.dataset&&CH[t.dataset.ch];if(f)guard(()=>f(t))});
 document.addEventListener('keydown',e=>{
+  const tid=e.target&&e.target.id;
+  if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&(tid==='ch-ta'||tid==='jona-q')){e.preventDefault();guard(tid==='ch-ta'?chSend:()=>jonaAsk());return}
   if(e.key==='Escape'&&sheets.length){closeSheet();return}
+  if(e.key==='Escape'&&CHAT.box){if(S.chat&&S.chat.c){S.chat.c=null;chPaint(true)}else chClose();return}
   if(e.key==='Enter'&&e.target&&e.target.closest&&e.target.closest('[data-form="login"]')){e.preventDefault();guard(doLogin)}
 });
 

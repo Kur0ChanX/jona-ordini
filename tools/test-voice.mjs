@@ -184,9 +184,9 @@ ok(ce.x+ce.width<=fe.x,'1000px: cart bar does not touch mic');
 await pg.setViewportSize({width:400,height:800});await wait(300);
 // chef view: no mic
 await pg.click('[data-a="viewAs"][data-v="gm"]');await wait(400);
-ok(await pg.locator('.mic-fab').count()===0,'no mic for chef view');
+ok(await pg.locator('[data-a="voice"]').count()===0,'no mic for chef view');
 await pg.click('[data-a="viewAs"][data-v="dev"]');await wait(400);
-ok(await pg.locator('.mic-fab').count()===0,'no mic for developer view');
+ok(await pg.locator('[data-a="voice"]').count()===0,'no mic for developer view');
 ok(errs.length===0,'no pageerror at end: '+JSON.stringify(errs));
 await ctx1.close();
 // ---------- 3. senza Web Speech API: campo di testo ----------
