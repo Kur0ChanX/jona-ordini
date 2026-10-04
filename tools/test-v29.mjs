@@ -6,8 +6,8 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 const p = await b.newPage(); const errs = [];
 p.on('pageerror', e => errs.push(String(e)));
 await p.goto(URL); await p.waitForTimeout(800);
-ok(await p.evaluate(() => APP_VER) === 29, 'APP_VER 29');
-ok(await p.evaluate(() => NEWS[0].v === 29 && NEWS[0].chef.length === 2), 'novità v29 per i gestori');
+ok(await p.evaluate(() => APP_VER) >= 29, 'APP_VER 29+');
+ok(await p.evaluate(() => NEWS.find(n => n.v === 29).chef.length === 2), 'novità v29 per i gestori');
 ok(await p.locator('meta[property="og:image"]').getAttribute('content') === 'https://kur0chanx.github.io/jona-ordini/media/invito.jpg', 'og:image');
 const r = await p.request.get(URL + 'media/invito.jpg'); ok(r.ok() && (await r.body()).length > 20000, 'immagine anteprima presente');
 const t = await p.evaluate(() => inviteText('https://x.y/#k=abc'));

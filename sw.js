@@ -1,6 +1,6 @@
 // Jona Ordini: service worker minimo per installare l'app e aprirla anche senza rete.
 // Strategia "prima la rete": prende sempre la versione più recente, usa la copia salvata solo se offline.
-const CACHE = 'jona-ordini-v33';
+const CACHE = 'jona-ordini-v34';
 const FILES = ['./', './index.html', './manifest.webmanifest', './firebase-config.js', './lib/firebase-10.14.1.js', './lib/qrcode-1.4.4.js', './jona-icon-192.png', './jona-icon-512.png', './media/invio-chef.mp4', './lib/jsqr-1.4.0.js', './media/invito.jpg'];
 
 self.addEventListener('install', e => {
@@ -10,7 +10,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== 'jona-allegati').map(k => caches.delete(k)))) // jona-allegati: foto e vocali della chat già scaricati
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== 'jona-allegati' && k !== 'jona-badge').map(k => caches.delete(k)))) // jona-allegati: foto e vocali della chat già scaricati
       .then(() => self.clients.claim())
   );
 });
@@ -35,11 +35,23 @@ self.addEventListener('push', e => {
   try { d = e.data ? e.data.json() : {}; } catch (err) { d = { testo: e.data ? e.data.text() : '' }; }
   // «URGENTE» (prodotto urgente dello staff): resta sullo schermo finché non la tocchi e vibra più a lungo.
   const urg = /^URGENTE\b/.test(d.titolo || '');
-  e.waitUntil(self.registration.showNotification(d.titolo || 'Jona Ordini', {
+  e.waitUntil(Promise.all([self.registration.showNotification(d.titolo || 'Jona Ordini', {
     body: d.testo || '', tag: d.tag || undefined, renotify: !!d.tag, requireInteraction: urg,
     icon: './jona-icon-192.png', badge: './jona-icon-192.png', vibrate: urg ? [300, 100, 300, 100, 300] : [80, 40, 80]
-  }));
+  }), badgeBump()]));
 });
+
+// Pallino sull'icona: l'app scrive il numero giusto in «jona-badge», qui si aggiunge 1 per ogni push arrivata con l'app non in vista.
+async function badgeGet() { try { const r = await (await caches.open('jona-badge')).match('./badge-n'); return r ? (+(await r.text()) || 0) : 0; } catch (err) { return 0; } }
+async function badgeSet(n) {
+  n = Math.max(0, n);
+  try { await (await caches.open('jona-badge')).put('./badge-n', new Response(String(n))); } catch (err) {}
+  try { if (self.navigator.setAppBadge) await (n ? self.navigator.setAppBadge(n) : self.navigator.clearAppBadge()); } catch (err) {}
+}
+async function badgeBump() {
+  const open = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  if (!open.some(c => c.visibilityState === 'visible')) await badgeSet((await badgeGet()) + 1);
+}
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
@@ -77,7 +89,7 @@ async function obxFlush() {
       await obxTx(db, 'readwrite', s => s.delete(x.id)); left--;
     }
   } finally {
-    try { if (self.navigator.setAppBadge) await (left ? self.navigator.setAppBadge(left) : self.navigator.clearAppBadge()); } catch (err) {}
+    if (left < list.length) await badgeSet((await badgeGet()) - (list.length - left));
   }
 }
 self.addEventListener('sync', e => { if (e.tag === 'jona-outbox') e.waitUntil(obxFlush()); });

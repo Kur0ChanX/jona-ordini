@@ -72,8 +72,8 @@ await P.click('#pl',{force:true});await P.waitForTimeout(2000);
 const r2=await P.evaluate(()=>({pl:ALG.pl,toasts:window.__toasts}));
 ok(!r2.pl&&r2.toasts.some(t=>/formato che questo telefono non legge.*rimandarlo/.test(t)),'unreadable file → clear message: '+r2.toasts.join(' | '));
 // barra con la durata del messaggio quando il file non la dice (.aac)
-const bar=await P.evaluate(()=>{const box=document.createElement('div');box.innerHTML='<span data-au="z"><button class="cht-play"></button><span class="cht-bar"><i></i></span><span class="cht-dur"></span></span>';
-  const save=CHAT.box;CHAT.box=box;const a={paused:false,currentTime:1,duration:Infinity};ALG.pl={id:'z',a,dur:4};chAuPaint('z');const w=box.querySelector('i').style.width;CHAT.box=save;ALG.pl=null;return w});
+const bar=await P.evaluate(()=>{const box=document.createElement('div');box.innerHTML='<span data-au="z"><button class="cht-play"></button><span class="cht-wf">'+wfBars('')+'</span><span class="cht-dur"></span></span>';
+  const save=CHAT.box;CHAT.box=box;const a={paused:false,currentTime:1,duration:Infinity};ALG.pl={id:'z',a,dur:4};chAuPaint('z');const w=box.querySelectorAll('.cht-wf i.on').length/WF_N*100+'%';CHAT.box=save;ALG.pl=null;return w});
 ok(bar==='25%','progress bar uses the message length when duration is unknown: '+bar);
 
 // 4. indietro del telefono: un passo alla volta (foglio → scheda precedente), chat (conversazione → lista → chiusa), poi esce

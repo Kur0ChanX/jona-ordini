@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Jona Ristorante">
 <meta property="og:title" content="Benvenuto nella squadra del Jona">
-<meta property="og:description" content="Ordini, turni e chat della brigata, tutto in un'app. Tocca per entrare.">
+<meta property="og:description" content="Ordini, turni e chat della brigata, tutto in un'app.">
 <meta property="og:image" content="https://kur0chanx.github.io/jona-ordini/media/invito.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -235,6 +235,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .wall .obx{max-width:420px;width:calc(100% - 32px);box-sizing:border-box;margin:0 auto 12px}
 .sync-pill{display:inline-flex;align-items:center;gap:5px;font:500 12.5px var(--font);background:var(--ocra-soft);color:var(--ocra);padding:4px 10px;border-radius:999px;white-space:nowrap}.sync-pill .ic{width:15px;height:15px}
 .qr{display:flex;justify-content:center;margin:14px 0 0}.qr img{width:min(240px,70vw);height:auto;background:#fff;padding:10px;border-radius:12px}
+.inv-code{text-align:center;margin:14px 0 0}.inv-code b{display:block;font-size:34px;font-weight:500;letter-spacing:.18em;color:var(--ink)}
 .invite-steps{margin:0;padding-left:20px;color:var(--ink2);line-height:1.5}
 .testbar{display:flex;align-items:center;gap:10px;margin:0 0 14px}
 .seg{display:inline-flex;padding:3px;background:var(--sunk);border-radius:999px;border:1px solid var(--line);max-width:100%;overflow-x:auto;scrollbar-width:none}
@@ -694,7 +695,10 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .cht-ph>span{position:absolute;inset:auto 8px 8px;padding:5px 8px;border-radius:8px;background:rgba(0,0,0,.6);color:#fff;font-size:12.5px;text-align:center}
 .cht-au{display:flex;align-items:center;gap:10px;width:min(240px,62vw);padding:2px 0}
 .cht-play{width:40px;height:40px;flex:none;border:0;border-radius:50%;background:var(--lagoon);color:var(--on-lagoon);display:grid;place-items:center}.cht-play .ic{width:18px;height:18px}
-.cht-bar{flex:1;height:4px;border-radius:2px;background:var(--line);overflow:hidden}.cht-bar i{display:block;height:100%;background:var(--lagoon)}
+.cht-wf{flex:1;min-width:0;height:30px;display:flex;align-items:center;justify-content:space-between;gap:1.5px;cursor:pointer}
+.cht-wf i{flex:1;max-width:3px;min-height:2px;border-radius:2px;background:color-mix(in srgb,var(--lagoon) 32%,transparent);transition:background .15s,transform .15s}
+.cht-wf i.on{background:linear-gradient(180deg,#2BA3AB,var(--lagoon))}.cht-wf.old i{background:var(--line)}.cht-wf.old i.on{background:var(--lagoon)}
+.cht-wf.rec{flex:1;height:26px;cursor:default}.cht-wf.rec i{background:#D64545;opacity:.75}
 .cht-dur{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .cht-up{align-self:flex-end;margin:6px 0;padding:6px 12px;border-radius:10px;background:var(--surface);color:var(--muted);font-size:13px}
 .cht-view{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:rgba(0,0,0,.92)}.cht-view img{max-width:100%;max-height:100%;object-fit:contain}
@@ -1008,8 +1012,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=29;
+const APP_VER=30;
 const NEWS=[
+  {v:30,data:'2026-10-04',titolo:'Invito con codice, pallino sull\'icona e vocali con l\'onda',
+    chef:['L\'invito ora ha un link corto e un codice di 6 lettere (vale 7 giorni). Se il telefono nuovo chiede un codice, basta scriverlo nella schermata «Collega questo telefono».','L\'anteprima su WhatsApp non ha più il finto pulsante: si tocca il link.'],
+    tutti:['I vocali in chat mostrano la forma della voce, come su WhatsApp: barre alte dove si parla, linea piatta nel silenzio. Mentre ascolti le barre si colorano; tocca un punto per saltare lì. Mentre registri vedi le barre muoversi.','Sull\'icona dell\'app compare un pallino col numero delle cose importanti: messaggi in chat non letti, avvisi e cose da approvare. Le novità dell\'app non contano.','Su iPhone il pallino si vede con l\'app sulla schermata Home e le notifiche permesse nelle Impostazioni del telefono. Su Android dipende dal telefono: di solito compare solo con le notifiche attive.'],
+    dev:{aggiunte:['Forma d\'onda dei vocali: `wfStart`/`wfStop` (AnalyserNode sul microfono, volume ogni 100 ms), `wfCode` (40 cifre 0–9 nel campo `wf` del messaggio), `wfBars`, `chSeek` (tocco sulle barre per saltare), barre dal vivo durante la registrazione (`#ch-rw`).','Inviti con codice: Worker `invito` (link corto `invito.<WK_SUB>.workers.dev/<CODICE>` → app con `#i=`), `/inviti` e `/invito/<codice>` nel Worker principale (tabella `inviti` nel primo D1, 7 giorni); app `invNew`, `invRedeem`, `jona_icode`, `fbJoinKey` accetta il codice; link lungo `#k=` di ripiego.','`badgeCount`/`appBadge` (in `render`, `obxBadge` lo richiama), numero salvato nella cache `jona-badge` (`./badge-n`); `sw.js` lo aumenta di 1 a ogni push con l\'app non in vista e lo cala dopo l\'invio della coda.']}},
   {v:29,data:'2026-10-04',titolo:'Invito più bello',
     chef:['Impostazioni → Database centrale → Invita: «Manda l\'invito» spedisce un messaggio di benvenuto con i passi da fare, e su WhatsApp il link compare con l\'anteprima del Jona.','Nuovo pulsante «Cartolina con QR»: un\'immagine con logo e QR code da mandare o stampare (per esempio da appendere in cucina).'],
     dev:{aggiunte:['`inviteText`, `inviteCard` (canvas 1080×1350, condivisione file o download), meta Open Graph con `media/invito.jpg`.']}},
@@ -1386,7 +1394,7 @@ async function notify(a,titolo,testo,tipo,rif){const me=meU();
 /* ================= notifiche push (server: worker/, sw.js) =================
    Ogni telefono che le attiva salva la sua iscrizione in «push/<id>» e notify() avvisa anche con l'app chiusa.
    Lette e scritte direttamente su Firestore, fuori da S.db: se le regole non hanno ancora «push» l'app non si blocca. */
-const PUSH_URL='https://jona-notifiche.mario-miscera.workers.dev';
+const WK_SUB='mario-miscera',PUSH_URL='https://jona-notifiche.'+WK_SUB+'.workers.dev',INV_URL='https://invito.'+WK_SUB+'.workers.dev';
 const PUSH={subs:{},on:false,retry:0};
 const pushOk=()=>isSecureContext&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
 const pushFb=()=>!!S.db&&S.db.kind==='firebase'&&S.db.status().ready;
@@ -1454,7 +1462,14 @@ const OBX={list:[],busy:false};
 const OBX_MAX=864e5;
 function obxDb(){return obxDb.p||(obxDb.p=new Promise((res,rej)=>{const r=indexedDB.open('jona-outbox',1);r.onupgradeneeded=()=>r.result.createObjectStore('q',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>{obxDb.p=null;rej(r.error)}}))}
 async function obxTx(mode,f){const db=await obxDb();return new Promise((res,rej)=>{const t=db.transaction('q',mode);const q=f(t.objectStore('q'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})}
-function obxBadge(){try{const n=OBX.list.length;if(navigator.setAppBadge)(n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{})}catch(e){}}
+function obxBadge(){appBadge()}
+/* pallino sull'icona: chat non lette + avvisi non letti + cose da fare del ruolo (no carrello, no ordini in preparazione, no novità dell'app) + push in coda.
+   Il numero va anche nella cache «jona-badge»: sw.js lo aumenta di 1 a ogni push che arriva ad app chiusa. */
+const BADGE={n:-1};
+function badgeCount(){const me=realU();if(!me||S.wallMode)return 0;const tabs=isGM(me)?GM_TABS:isDev(me)?DEV_TABS:STAFF_TABS;let n=chUnread(me)+myNotifs(me).filter(x=>!x.letta).length;for(const t of tabs)if(t.b&&t.id!=='carrello'&&t.id!=='invii')n+=+t.b()||0;return n}
+function appBadge(){let n=0;try{n=badgeCount()+OBX.list.length}catch(e){}if(n===BADGE.n)return;BADGE.n=n;
+  try{if(navigator.setAppBadge)(n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{})}catch(e){}
+  try{caches.open('jona-badge').then(c=>c.put('./badge-n',new Response(String(n)))).catch(()=>{})}catch(e){}}
 async function obxSyncReg(){try{const st=S.db&&S.db.kind==='firebase'?S.db.status():null;if(!OBX.list.length||(st&&st.pend))return;const reg=await navigator.serviceWorker.ready;if(reg.sync)await reg.sync.register('jona-outbox')}catch(e){}}
 async function obxAdd(x){OBX.list.push(x);S.obxShown=true;obxBadge();schedule();try{await obxTx('readwrite',st=>st.put(x))}catch(e){}obxSyncReg()}
 async function obxLoad(){try{const l=await obxTx('readonly',st=>st.getAll());if(Array.isArray(l)){OBX.list=l.sort((a,b)=>a.creato-b.creato);if(l.length)S.obxShown=true}}catch(e){}obxBadge();schedule()}
@@ -1507,7 +1522,7 @@ function render(){
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
   for(const o of sheets)if(o.live&&o.live())paintSheet(o);
   if(!S.wallMode&&realU()){chWatch();phWatch();if(CHAT.box)chPaint()}else if(CHAT.box)chClose();
-  if(!S.tab||!realU())NAV.tabs=[];navSync();
+  if(!S.tab||!realU())NAV.tabs=[];navSync();appBadge();
 }
 function repaint(){render();refreshSheet()}
 function allLoaded(){return(S.loadTimeout&&S.db.kind!=='firebase')||Object.keys(COLS).every(k=>S.loaded[k])}
@@ -1587,7 +1602,7 @@ async function phReject(id){
 function screenJoin(){
   return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>Collega questo telefono</h1>
   <p class="muted" style="margin-top:0">Chiedi allo chef di mostrarti il <b>QR code</b> dell'app e inquadralo con la <b>fotocamera</b> del telefono. Oppure apri il link che ti hanno mandato su WhatsApp.</p>
-  <label class="lbl" for="join-k">Oppure scrivi il codice</label><input class="inp" id="join-k" autocapitalize="none" autocomplete="off" spellcheck="false" value="${esc(S.joinK||'')}" data-in="joinK">
+  <label class="lbl" for="join-k">Oppure scrivi il codice d'invito (6 lettere)</label><input class="inp" id="join-k" placeholder="es. K7M4QX" autocapitalize="characters" autocomplete="off" spellcheck="false" value="${esc(S.joinK||'')}" data-in="joinK">
   <div style="margin-top:18px"><button type="button" class="btn primary block big" data-a="fbJoin">Collega</button></div></div></div>`;
 }
 function syncPill(){if(!S.db||S.db.kind!=='firebase')return'';const s=S.db.status();if(s.net&&!s.err)return'';return`<span class="sync-pill">${ic('cloud')} Senza rete${s.pend?', '+s.pend+' da inviare':''}</span>`}
@@ -1597,28 +1612,35 @@ function fbRow(){
   if(!c)return isDev(realU())?`<div class="setrow"><div><b>Database centrale</b><span>Firebase non è ancora configurato</span></div><button type="button" class="btn ghost sm" data-a="fbCfgPaste">${ic('paste')} Configurazione</button></div>`:'';
   return`<div class="setrow"><div><b>Database centrale</b><span>${S.fbActive?'Già attivo: collega questo telefono con il codice':'Non attivo: i dati restano solo su questo telefono'}</span></div><div class="btns">${S.fbActive?'':`<button type="button" class="btn primary sm" data-a="fbActivate">${ic('cloud')} Attiva</button>`}<button type="button" class="btn ghost sm" data-a="fbCode">Ho un codice</button></div></div>`;
 }
-function inviteText(l){const n=cfg().nomeLocale||'Jona Ristorante';return `✨ Benvenuto nella squadra del ${n}!\n\nOrdini, turni e chat con i colleghi: da oggi è tutto in un'unica app.\n\n1️⃣ Tocca il link qui sotto\n2️⃣ Aggiungi l'app alla schermata Home\n3️⃣ Registrati con nome e foto: ti approviamo noi\n\n👉 ${l}`}
-async function inviteCard(){if(!S.qrImg){await need('qr');const q=qrcode(0,'M');q.addData(inviteLink());q.make();S.qrImg=q.createDataURL(8,4)}
+function inviteText(l,c){const n=cfg().nomeLocale||'Jona Ristorante';return `✨ Benvenuto nella squadra del ${n}!\n\nOrdini, turni e chat con i colleghi: da oggi è tutto in un'unica app.\n\n1️⃣ Tocca il link qui sotto\n2️⃣ Aggiungi l'app alla schermata Home\n3️⃣ Registrati con nome e foto: ti approviamo noi\n\n${c?`🔑 Se l'app ti chiede un codice, scrivi: *${c}* (vale 7 giorni)\n\n`:''}👉 ${l}`}
+async function inviteCard(){const inv=await invNew();if(!S.qrImg){await need('qr');const q=qrcode(0,'M');q.addData(inv.l);q.make();S.qrImg=q.createDataURL(8,4)}
   const img=src=>new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=src});
   try{await Promise.all(['200','300','500'].map(w=>document.fonts.load(w+' 40px Jost')))}catch(e){}
   const [logo,qr]=await Promise.all([img('jona-icon-512.png'),img(S.qrImg)]),W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),F=(w,z)=>w+' '+z+'px Jost, "Avenir Next", sans-serif';
   x.fillStyle='#3A2F2C';x.fillRect(0,0,W,H);x.drawImage(logo,W/2-170,10,340,340);const g=x.createRadialGradient(W,0,0,W,0,760);g.addColorStop(0,'rgba(31,127,134,.38)');g.addColorStop(1,'rgba(31,127,134,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
   x.textAlign='center';x.fillStyle='#BDB2A6';x.font=F(400,26);x.letterSpacing='8px';x.fillText('JONA RISTORANTE · PORTO CERVO',W/2,384);x.letterSpacing='0px';
   x.fillStyle='#F3EDE7';x.font=F(200,82);x.fillText('Benvenuto nella squadra',W/2,488);x.fillStyle='#D9CFC5';x.font=F(300,34);x.fillText('Ordini, turni e chat della brigata, tutto in un\'app.',W/2,548);
-  const q=470,qx=W/2-q/2,qy=626;x.fillStyle='#FFFFFF';x.beginPath();x.roundRect(qx-26,qy-26,q+52,q+52,36);x.fill();x.imageSmoothingEnabled=false;x.drawImage(qr,qx,qy,q,q);x.imageSmoothingEnabled=true;
+  const q=430,qx=W/2-q/2,qy=626;x.fillStyle='#FFFFFF';x.beginPath();x.roundRect(qx-26,qy-26,q+52,q+52,36);x.fill();x.imageSmoothingEnabled=false;x.drawImage(qr,qx,qy,q,q);x.imageSmoothingEnabled=true;
   x.fillStyle='#1F7F86';x.beginPath();x.roundRect(W/2-300,qy+q+60,600,84,42);x.fill();x.fillStyle='#FFFFFF';x.font=F(500,34);x.fillText('Inquadra con la fotocamera',W/2,qy+q+114);
   x.fillStyle='#BDB2A6';x.font=F(300,28);x.fillText('Poi aggiungi l\'app alla schermata Home e registrati',W/2,qy+q+196);
+  if(inv.c){x.font=F(300,28);const t1='Codice d\'invito  ',w1=x.measureText(t1).width;x.font=F(500,34);x.letterSpacing='6px';const w2=x.measureText(inv.c).width;x.textAlign='left';x.fillStyle='#F3EDE7';x.fillText(inv.c,W/2-(w1+w2)/2+w1,qy+q+250);x.letterSpacing='0px';x.font=F(300,28);x.fillStyle='#BDB2A6';x.fillText(t1,W/2-(w1+w2)/2,qy+q+250);x.textAlign='center'}
   const b=await new Promise(r=>c.toBlob(r,'image/png')),f=new File([b],'invito-jona.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Invito Jona'});return}catch(e){if(e&&e.name==='AbortError')return}}
   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='invito-jona.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('Cartolina salvata nei download.')}
+async function invNew(){if(S.invL)return S.invL;let r={l:inviteLink(),c:''};
+  if(S.db&&S.db.kind==='firebase'&&navigator.onLine){try{const x=await fetch(PUSH_URL+'/inviti',{method:'POST',headers:{authorization:'Bearer '+await algTok()}});const j=await x.json();if(x.ok&&/^[A-HJ-NP-Z2-9]{6}$/.test(j.codice||''))r={l:INV_URL+'/'+j.codice,c:j.codice}}catch(e){}}
+  return S.invL=r}
+async function invRedeem(c){let r;try{r=await fetch(PUSH_URL+'/invito/'+c)}catch(e){throw new Error('rete')}if(r.status===404)throw new Error('scaduto');const j=await r.json().catch(()=>({}));if(!r.ok||!/^[A-Za-z0-9]{16,64}$/.test(j.k||''))throw new Error('rete');return j.k}
 function inviteLink(){let h='k='+ls('jona_key');if(!self.JONA_FIREBASE&&fbCfg())h+='&c='+btoa(JSON.stringify(fbCfg()));return location.origin+location.pathname+'#'+h}
 async function inviteSheet(){
-  const link=inviteLink();S.qrImg='';
+  S.invL=null;S.qrImg='';
   openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Invita un telefono<div class="sh-s">Staff, Maurizio e gli altri</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <ol class="invite-steps"><li>Apri la <b>fotocamera</b> del telefono da collegare e inquadra questo codice.</li><li>Apri il link e installa l'app (Chrome: menu ⋮, «Installa app»).</li><li>Chi è nuovo si registra: tu approvi il profilo in Staff.</li></ol>
   <div class="qr">${S.qrImg?`<img src="${S.qrImg}" alt="QR code per collegare un telefono">`:'<p class="muted small">Preparo il QR code…</p>'}</div>
+  ${S.invL&&S.invL.c?`<div class="inv-code"><span class="muted small">Codice d'invito (vale 7 giorni)</span><b>${S.invL.c}</b></div>`:''}
   <div class="btns col" style="margin-top:16px"><button type="button" class="btn primary block" data-a="invShare">${ic('send')} Manda l'invito (WhatsApp…)</button><button type="button" class="btn ghost block" data-a="invCard">${ic('image')} Cartolina con QR da condividere o stampare</button><button type="button" class="btn ghost block" data-a="invCopy">${ic('copy')} Copia il link</button></div>
-  <p class="muted small">Il link apre i dati del ristorante: mandalo solo a chi lavora con voi.</p>`});
+  <p class="muted small">${S.invL&&S.invL.c?'Link e codice aprono i dati del ristorante':'Il link apre i dati del ristorante'}: mandali solo a chi lavora con voi.</p>`});
+  const link=(await invNew()).l;
   try{await need('qr');const q=qrcode(0,'M');q.addData(link);q.make();S.qrImg=q.createDataURL(8,4)}catch(e){S.qrImg=''}
   if(!S.qrImg)toast('QR code non disponibile senza rete: usa il link.','warn');refreshSheet();
 }
@@ -1632,7 +1654,9 @@ async function fbActivate(){
   await fs.doc('pubblico/stato').set({attivo:true,creato:now()});
   ls('jona_key',key);ls('jona_member',u);ls('jona_fb_upload',1);location.reload();
 }
-function fbJoinKey(v){const m=/(?:^|[#&?]k=)([A-Za-z0-9]{16,64})/.exec(String(v||'').trim());if(!m)return toast('Codice non valido: controlla di averlo scritto tutto.','warn');ls('jona_key',m[1]);ls('jona_member',null);location.reload()}
+async function fbJoinKey(v){v=String(v||'').trim();const c=/(?:^|[\/=])([A-HJ-NP-Z2-9]{6})\/?$/i.exec(v);
+  if(c&&!/[#&?]k=/.test(v)){toast('Controllo il codice…');try{const k=await invRedeem(c[1].toUpperCase());ls('jona_key',k);ls('jona_member',null);location.reload()}catch(e){toast(e.message==='scaduto'?'Codice scaduto o sbagliato: chiedi allo chef un invito nuovo.':'Senza rete non riesco a controllare il codice: riprova tra poco.','warn')}return}
+  const m=/(?:^|[#&?]k=)([A-Za-z0-9]{16,64})/.exec(String(v||'').trim());if(!m)return toast('Codice non valido: controlla di averlo scritto tutto.','warn');ls('jona_key',m[1]);ls('jona_member',null);location.reload()}
 function fbCfgParse(t){const o={};for(const k of ['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId']){const m=new RegExp('["\']?'+k+'["\']?\\s*:\\s*["\']([^"\']+)["\']').exec(t);if(m)o[k]=m[1]}return o.apiKey&&o.projectId&&o.appId?o:null}
 function avatar(u,size=44){u=u||{};const ini=((u.nome||'?').charAt(0)+(u.cognome||'').charAt(0)).toUpperCase();return`<span class="av" style="--s:${size}px;--c:${hue(u.id||u.nome)}">${u.foto?`<img src="${esc(u.foto)}" alt="">`:esc(ini)}</span>`}
 const pill=(k,l)=>`<span class="st ${k}">${esc(l)}</span>`;
@@ -3561,7 +3585,7 @@ async function chFile(tipo,blob,x){
   CHAT.up=(CHAT.up||0)+1;chPaint(true);
   try{const id=await algUp(blob);ALG.url[id]=URL.createObjectURL(blob);
     const t=tipo==='foto'?'📷 Foto':'🎤 Messaggio vocale ('+chDur(x.dur)+')';
-    const d=Object.assign({c:x.c,da:me.id,t,creato:now(),tipo,m:id},tipo==='foto'?{w:x.w,h:x.h,mini:x.mini}:{dur:x.dur});
+    const d=Object.assign({c:x.c,da:me.id,t,creato:now(),tipo,m:id},tipo==='foto'?{w:x.w,h:x.h,mini:x.mini}:Object.assign({dur:x.dur},x.wf?{wf:x.wf}:{}));
     if(S.chat)S.chat.stick=true;
     netWatch(chCol().add(d)).catch(e=>toast('Messaggio non inviato: riprova.','err'));
     chMarkRead(x.c,d.creato);chPush(x.c,me,t)}
@@ -3590,6 +3614,16 @@ function aacRec(st){
     if(enc&&enc.state==='configured')await enc.flush()}catch(e){R.err=e}
     R.state='inactive';if(out.length&&!R.err&&R.ondataavailable)R.ondataavailable({data:new Blob(out,{type:'audio/aac'})});if(R.onstop)R.onstop()})();
   R.stop=()=>{end=true;rd.cancel().catch(()=>{})};return R}
+// forma d'onda dei vocali: volume ogni 100 ms mentre si registra, poi 40 barre da 0 a 9 nel messaggio («wf»; 0 = silenzio, linea piatta)
+const WF_N=40;
+function wfStart(st,R){R.lv=[];try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const ac=new A(),an=ac.createAnalyser();an.fftSize=1024;ac.createMediaStreamSource(st).connect(an);
+  const buf=new Float32Array(an.fftSize);R.ac=ac;if(ac.state==='suspended')ac.resume().catch(()=>{});
+  R.wi=setInterval(()=>{try{an.getFloatTimeDomainData(buf);let q=0;for(let i=0;i<buf.length;i++)q+=buf[i]*buf[i];R.lv.push(Math.sqrt(q/buf.length));
+    const el=document.getElementById('ch-rw');if(el)el.innerHTML=wfBars(wfCode(R.lv.slice(-24),24),24,24)}catch(e){}},100)}catch(e){}}
+function wfStop(R){clearInterval(R.wi);if(R.ac){R.ac.close().catch(()=>{});R.ac=null}}
+function wfCode(lv,n=WF_N){if(!lv||lv.length<3)return'';const o=[];for(let i=0;i<n;i++){const a=Math.floor(i*lv.length/n),b=Math.max(a+1,Math.floor((i+1)*lv.length/n));let m=0;for(let j=a;j<b&&j<lv.length;j++)m=Math.max(m,lv[j]);o.push(m)}
+  const top=Math.max(...o);return o.map(v=>top<.008||v<.006?0:Math.max(1,Math.round(9*Math.pow(v/top,.7)))).join('')}
+function wfBars(wf,k=0,n=WF_N){const ok=new RegExp('^[0-9]{'+n+'}$').test(wf||'');let h='';for(let i=0;i<n;i++){const v=ok?+wf[i]:-1;h+=`<i${i<k?' class="on"':''} style="height:${v<0?6:v===0?2:Math.round(4+v*2.6)}px"></i>`}return h}
 async function chRec(){
   const C=S.chat;if(!C||!C.c||C.rec)return;
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder)return toast('Questo telefono non può registrare vocali.','warn');
@@ -3600,11 +3634,11 @@ async function chRec(){
   const aac=!type&&await aacOk();if(!type&&!aac)type=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(ok)||'';
   if(S.chat!==C||C.rec){st.getTracks().forEach(t=>t.stop());return}
   let mr;try{mr=aac?aacRec(st):new MediaRecorder(st,Object.assign({audioBitsPerSecond:24000},type?{mimeType:type}:{}))}catch(e){st.getTracks().forEach(t=>t.stop());return toast('Non riesco a registrare su questo telefono.','err')}
-  const R={mr,c:C.c,ch:[],t0:now(),send:false};C.rec=R;
+  const R={mr,c:C.c,ch:[],t0:now(),send:false};C.rec=R;wfStart(st,R);
   mr.ondataavailable=e=>{if(e.data&&e.data.size)R.ch.push(e.data)};
-  mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());clearInterval(R.iv);if(S.chat&&S.chat.rec===R)S.chat.rec=null;chPaint(true);
+  mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());clearInterval(R.iv);wfStop(R);if(S.chat&&S.chat.rec===R)S.chat.rec=null;chPaint(true);
     if(!R.send)return;if(R.dur<1)return toast('Vocale troppo corto.','warn');if(mr.err||!R.ch.length)return toast('Vocale non registrato: riprova.','err');
-    chFile('audio',new Blob(R.ch,{type:(mr.mimeType||type||'audio/webm').split(';')[0]}),{c:R.c,dur:R.dur})};
+    chFile('audio',new Blob(R.ch,{type:(mr.mimeType||type||'audio/webm').split(';')[0]}),{c:R.c,dur:R.dur,wf:wfCode(R.lv)})};
   mr.start(1000);
   R.iv=setInterval(()=>{const s=(now()-R.t0)/1000,el=document.getElementById('ch-rt');if(el)el.textContent=chDur(s);if(s>=120)chRecStop(true)},250);
   chPaint(true)}
@@ -3625,7 +3659,7 @@ async function chPlay(id){
     toast(e&&e.name==='NotAllowedError'?'Tocca di nuovo ▶ per ascoltare il vocale.':'Questo vocale è in un formato che questo telefono non legge: chiedi di rimandarlo dopo aver aggiornato l\'app.','warn')})}
 function chAuPaint(id){const el=CHAT.box&&CHAT.box.querySelector(`[data-au="${id}"]`);if(!el)return;const P=ALG.pl&&ALG.pl.id===id?ALG.pl:null,a=P&&P.a;
   el.querySelector('.cht-play').innerHTML=ic(a&&!a.paused?'pause':'play');
-  const du=a&&(a.duration&&isFinite(a.duration)?a.duration:P.dur);el.querySelector('.cht-bar i').style.width=(du?Math.min(100,a.currentTime/du*100):0)+'%';
+  const du=a&&(a.duration&&isFinite(a.duration)?a.duration:P.dur);const k=du?Math.round(Math.min(1,a.currentTime/du)*WF_N):0;el.querySelectorAll('.cht-wf i').forEach((b,i)=>b.classList.toggle('on',i<k));
   if(a&&a.currentTime)el.querySelector('.cht-dur').textContent=chDur(a.currentTime)}
 function chView(id){
   const show=u=>{if(!CHAT.box)return;const v=document.createElement('div');v.className='cht-view';v.dataset.a='chViewX';v.innerHTML=`<img alt="Foto" src="${u}"><button type="button" class="icon-btn" data-a="chViewX" aria-label="Chiudi">${ic('x')}</button>`;CHAT.box.appendChild(v)};
@@ -3639,7 +3673,7 @@ function chMsgBody(m,who){
   if(m.tipo==='foto'&&m.m){const u=ALG.url[m.m],w=Number(m.w)||4,h=Number(m.h)||3;
     return`<p class="cht-f">${who}<button type="button" class="cht-ph" data-a="chView" data-v="${esc(m.m)}" style="aspect-ratio:${w}/${h}" aria-label="Apri la foto"><img alt="" src="${esc(u||m.mini||'')}" data-alg="${esc(m.m)}"${u?' class="ok"':''}>${ALG.gone[m.m]?'<span>Foto non più disponibile</span>':''}</button>`}
   if(m.tipo==='audio'&&m.m){const P=ALG.pl&&ALG.pl.id===m.m?ALG.pl.a:null;
-    return`<p>${who}<span class="cht-au" data-au="${esc(m.m)}"><button type="button" class="cht-play" data-a="chPlay" data-v="${esc(m.m)}" aria-label="Ascolta il vocale">${ic(P&&!P.paused?'pause':'play')}</button><span class="cht-bar"><i style="width:0%"></i></span><span class="cht-dur">${ALG.gone[m.m]?'non più disponibile':chDur(Number(m.dur)||0)}</span></span>`}
+    return`<p>${who}<span class="cht-au" data-au="${esc(m.m)}"><button type="button" class="cht-play" data-a="chPlay" data-v="${esc(m.m)}" aria-label="Ascolta il vocale">${ic(P&&!P.paused?'pause':'play')}</button><span class="cht-wf${/^[0-9]{40}$/.test(m.wf||'')?'':' old'}" data-a="chSeek" data-v="${esc(m.m)}">${wfBars(m.wf)}</span><span class="cht-dur">${ALG.gone[m.m]?'non più disponibile':chDur(Number(m.dur)||0)}</span></span>`}
   return`<p>${who}${esc(m.t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}`}
 // reazioni: «r.<id persona>» = emoji (solo quelle di CH_RE); si aprono tenendo premuto il messaggio
 const CH_RE=['👍','❤️','😂','✅','😢','👎'];
@@ -3713,7 +3747,7 @@ function chPaint(force){
   if(!chCan(C.c,me)){C.c=null;return chPaint(true)}
   const i=chInfo(C.c,me);const fresh=set('.cht-c',`<header class="cht-h cht-ch"><button type="button" class="icon-btn" data-a="chBack" aria-label="Torna alla lista">${ic('back')}</button>${chAv(i,40)}<div class="cht-ct"><b>${esc(i.n)}</b><span>${esc(i.s)}</span></div></header>
     <div class="cht-m" id="ch-m"></div>
-    ${C.rec?`<div class="cht-in"><button type="button" class="cht-del" data-a="chRecNo" aria-label="Cancella il vocale">${ic('trash')}</button><div class="cht-rec" role="status"><i></i><b id="ch-rt">${chDur((now()-C.rec.t0)/1000)}</b><span>Registrazione…</span></div><button type="button" class="cht-send" data-a="chRecOk" aria-label="Invia il vocale">${ic('send')}</button></div>`
+    ${C.rec?`<div class="cht-in"><button type="button" class="cht-del" data-a="chRecNo" aria-label="Cancella il vocale">${ic('trash')}</button><div class="cht-rec" role="status"><i></i><b id="ch-rt">${chDur((now()-C.rec.t0)/1000)}</b><span class="cht-wf rec" id="ch-rw" aria-hidden="true">${wfBars(wfCode((C.rec.lv||[]).slice(-24),24),24,24)}</span></div><button type="button" class="cht-send" data-a="chRecOk" aria-label="Invia il vocale">${ic('send')}</button></div>`
     :`<div class="cht-in${algOn()?'':' no-alg'}">${algOn()?`<button type="button" class="cht-cam" data-a="chPhoto" aria-label="Manda una foto">${ic('camera')}</button>`:''}<textarea id="ch-ta" rows="1" placeholder="Scrivi un messaggio" aria-label="Messaggio" enterkeyhint="send" data-in="chTa"></textarea><button type="button" class="cht-send cht-snd" data-a="chSend" aria-label="Invia">${ic('send')}</button>${algOn()?`<button type="button" class="cht-send cht-mic" data-a="chRec" aria-label="Registra un vocale">${ic('mic')}</button>`:''}</div>`}<!--${C.c}${C.rec?'r':''}${algOn()?'a':''}-->`);
   if(fresh){const ta=$('#ch-ta');if(ta){ta.value=C.draft[C.c]||'';ta.parentNode.classList.toggle('has-t',!!ta.value.trim())}}
   const ms=chAll().filter(m=>m.c===C.c).sort((a,b)=>a.creato-b.creato),other=C.c.startsWith('dm_')?chDmIds(C.c).find(id=>id!==me.id):null;
@@ -4105,9 +4139,9 @@ const A={
   fbCode:async()=>{const a=await ask('Collega questo telefono','Incolla il codice o il link che ti ha mandato lo chef.','Collega',false,{label:'Codice o link',value:''});if(a)fbJoinKey(a.v)},
   fbActivate:()=>fbActivate(),
   fbInvite:()=>{closeSheet(true);inviteSheet()},
-  invShare:async()=>{const t=inviteText(inviteLink());if(navigator.share){try{await navigator.share({title:'Invito Jona',text:t});return}catch(e){if(e&&e.name==='AbortError')return}}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')},
+  invShare:async()=>{const inv=await invNew(),t=inviteText(inv.l,inv.c);if(navigator.share){try{await navigator.share({title:'Invito Jona',text:t});return}catch(e){if(e&&e.name==='AbortError')return}}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')},
   invCard:async()=>{try{await inviteCard()}catch(e){toast('Cartolina non pronta: riprova con la rete.','warn')}},
-  invCopy:()=>copyText(inviteLink()),
+  invCopy:async()=>copyText((await invNew()).l),
   fbLeave:async()=>{if(!await ask('Scollegare questo telefono?','L\'app su questo telefono non vedrà più i dati del ristorante finché non lo ricolleghi con il QR code. I dati sul database restano.','Scollega',true))return;ls('jona_key',null);ls('jona_member',null);ls('jona_fb_upload',null);try{LocalStore.load({})}catch(e){}location.reload()},
   fbCfgPaste:async()=>{const a=await ask('Configurazione Firebase','Incolla qui la configurazione dell\'app web presa da Firebase (il blocco firebaseConfig).','Salva',false,{label:'firebaseConfig',value:''});if(!a)return;const c=fbCfgParse(a.v);if(!c)return toast('Non trovo apiKey, projectId e appId: copia tutto il blocco.','warn');ls('jona_fb',c);toast('Configurazione salvata');S.fbActive=await fbPublic();refreshSheet()},
   viewAs:d=>{S.viewAs=VIEW_AS[d.v]?d.v:null;ls('jona_viewas',S.viewAs);S.cart=ls('jona_cart_'+S.me)||[];S.tab=null;window.scrollTo(0,0);render();toast(({gm:'Vedi l\'app come l\'amministratore',staff:'Vedi l\'app come lo staff'})[S.viewAs]||'Torni alla tua vista da sviluppatore')},
@@ -4277,6 +4311,9 @@ Object.assign(A,{
   chRecOk:()=>chRecStop(true),
   chRecNo:()=>chRecStop(false),
   chPlay:d=>chPlay(d.v),
+  chSeek:(d,el)=>{const P=ALG.pl,ev=window.event,bar=ev&&ev.target&&ev.target.closest&&ev.target.closest('.cht-wf i');
+    if(!P||P.id!==d.v||!bar)return chPlay(d.v);const du=P.a.duration&&isFinite(P.a.duration)?P.a.duration:P.dur;
+    if(du){P.a.currentTime=du*[...el.children].indexOf(bar)/WF_N;if(P.a.paused)P.a.play().catch(()=>{});chAuPaint(d.v)}},
   chView:d=>chView(d.v),
   chReact:d=>chReact(d.id,d.v),
   chCopy:d=>{const m=chAll().find(x=>x.id===d.id);chReClose();if(m)Promise.resolve().then(()=>navigator.clipboard.writeText(m.t)).then(()=>toast('Testo copiato.'),()=>toast('Non riesco a copiare il testo.','warn'))},
@@ -4382,7 +4419,8 @@ function navBack(){
 addEventListener('popstate',()=>{if(NAV.skip){NAV.skip=0;return navSync()}NAV.trap=false;guard(navBack);navSync()});
 
 /* ================= avvio ================= */
-(()=>{const h=new URLSearchParams(location.hash.slice(1));const k=h.get('k');if(!k)return;
+(()=>{const h=new URLSearchParams(location.hash.slice(1));const k=h.get('k'),c=h.get('i');if(!k&&!c)return;
+  if(c&&/^[A-HJ-NP-Z2-9]{6}$/i.test(c))ls('jona_icode',c.toUpperCase());
   if(h.get('c')){try{ls('jona_fb',JSON.parse(atob(h.get('c'))))}catch(e){}}
   if(/^[A-Za-z0-9]{16,64}$/.test(k)&&ls('jona_key')!==k){ls('jona_key',k);ls('jona_member',null)}
   history.replaceState(null,'',location.pathname+location.search)})();
@@ -4390,6 +4428,7 @@ async function boot(){
   applyTheme();document.documentElement.classList.add('intro');setTimeout(()=>document.documentElement.classList.remove('intro'),2600);
   $('#picker').addEventListener('change',()=>{const p=$('#picker');const fs=[...(p.files||[])];const cb=pickCb;pickCb=null;if(fs.length&&cb)guard(()=>cb(fs))});
   render();
+  const icod=ls('jona_icode');if(icod){ls('jona_icode',null);try{const k=await invRedeem(icod);if(ls('jona_key')!==k){ls('jona_key',k);ls('jona_member',null)}}catch(e){S.joinK=icod;toast(e.message==='scaduto'?'Codice d\'invito scaduto: chiedi allo chef un invito nuovo.':'Non riesco a leggere il codice: controlla la rete e tocca «Collega».','warn')}}
   const key=ls('jona_key');
   if(fbCfg()&&key){try{await need('firebase');S.db=FirebaseStore(key);render()}catch(e){S.fbLibErr=true;render();return}}
   else S.db=LocalStore;

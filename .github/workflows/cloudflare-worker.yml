@@ -87,6 +87,15 @@ jobs:
           wranglerVersion: "4"
           command: deploy
 
+      - name: Pubblica il link corto degli inviti (Worker «invito»)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker/invito
+          wranglerVersion: "4"
+          command: deploy
+
       - name: Chiave delle notifiche (solo la prima volta)
         working-directory: worker
         env:
@@ -114,3 +123,4 @@ jobs:
           sleep 5
           curl -sf https://jona-notifiche.mario-miscera.workers.dev/salute | tee /dev/stderr | grep -q '"push":true'
           curl -sf https://jona-notifiche.mario-miscera.workers.dev/chiave | grep -q '"chiave":"B'
+          curl -sf https://invito.mario-miscera.workers.dev/ABCDEF | grep -q '#i=ABCDEF'
