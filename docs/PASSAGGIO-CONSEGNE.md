@@ -1,17 +1,17 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- Online la **v12** (Scaglione 1): `APP_VER=12`, `sw.js` `CACHE=jona-ordini-v16`, `main` = `96ff6b8` (PR #20). Ramo di lavoro `backup-automatico`.
-- Notifiche push funzionanti (Xiaomi di Mario). iPhone di Maurizio da attivare (iOS ≥ 16.4, app aperta dall'icona Home). Regole Firestore con `push` già pubblicate.
-- Regole di lavoro aggiornate in `CLAUDE.md`: handoff al 70% (`.claude/hooks/handoff-check.py`, `SOGLIA = 70`), nuova sessione aperta in automatico, force push vietato.
+- Online la **v12**. Sul ramo `backup-automatico` (commit `6463841`, già su GitHub) c'è la **v13 = Scaglione 2**, NON ancora pubblicata: `APP_VER=13`, `sw.js` `CACHE=jona-ordini-v17`, voce `NEWS` v13.
+- Prove fatte: `test-staff`, `test-voice`, nuova `tools/test-scaglione2.mjs` (20 controlli) tutte verdi.
+- Prove da fare: quelle con l'emulatore Firebase (`test-firebase-approva-arrivi`, `-push`, `-flow`, `-sync`): l'emulatore stava ancora scaricando i suoi file quando la sessione è stata passata. Poi `test-news` (resta indietro, vedi rischi).
 
-## File toccati nello Scaglione 1 (v12)
+## File toccati nello Scaglione 2 (v13)
 - `index.html`:
-  - Approvazione: `reqCard` a blocchi `.fsec.fblk` per fornitore, `reqPickSheet` (azioni `rpick`/`rpadd`; righe `aggiunto:true`, `qtaOrig:0`, escluse da `rimossi`), blocco rosso `.nof` senza fornitore (`approve()` già lo blocca).
-  - Arrivo a semaforo in `receiveSheet`: `SEM`, `SEM_NEXT`, `rcvDiff`, azione `rst`, `rcvState().lines[i].st` (`''`/`ok`/`ko`/`meno`); `confirmReceipt` chiede conferma se ci sono non controllati. `ricezione.righe` invariato + motivo `nonctrl`; campo `nonControllati` sull'ordine.
-  - Invii in sospeso: `pushSend` mette in coda le push fallite (IndexedDB `jona-outbox`); `obxLoad`/`obxFlush` (online, apertura, `visibilitychange`, ogni minuto, solo a pagina visibile), `obxBar` in `shell` e `screenLogin`, `obxTick` in `render` («Arrivata ✓»), `setAppBadge`, SMS `sms:?&body=`. `notify` verso `gm`/`gestori` imposta `S.obxWait` per seguire le scritture Firestore in sospeso.
-- `sw.js`: evento `sync` (tag `jona-outbox`), non invia se c'è una finestra visibile.
-- `tools/test-firebase-approva-arrivi.mjs` (36 controlli); `test-staff/news/voice/report` nascondono da sole `firebase-config.js`; `tools/README.md`, `CLAUDE.md`.
+  - Aumento prezzi: `pctUp`, `pctS`, `rvUps` (prima di `matchProd`); banner in cima a `reviewSheet` e pill rosso «aumentato +X%, era …» sulla riga; `reviewSave` calcola gli aumenti prima di salvare, poi `notify('gm',…,'prezzi')` e `upsSheet` (riepilogo «Prezzi aumentati»). Nel listino il pill «era …» diventa rosso con la percentuale se è aumentato.
+  - Urgente: in `vCarrello` pulsante «È urgente?» (`.urg-b`, azione `curg`, campo `S.cart[i].urg`) e banner; `sendCart` mette `urgente:true` sulle righe e manda `notify('gm','URGENTE: …','urgente')`; `reqUrg` mette le richieste urgenti in cima in `vRichieste`; `reqCard` con `.panel.urg` e tag URGENTE; tag anche in `gmLine`, `bySupplier`, `itemsRO`, righe d'ordine (`L.urgente` in `approve`). CSS `.tag.urg`, `.panel.urg`, `.urg-b`. `NI` con `prezzi` e `urgente`.
+  - Controllo merce: `ricezione.righe[i]` ora ha `key` e `da` (nomi); `rcvDiffTxt`; notifica a Maurizio con «(chiesto da …)» fino a 5 righe; avviso a ogni persona che aveva chiesto prodotti mancanti/arrivati in meno (salta chi fa il controllo); `receiptView` mostra «chiesto da».
+- `sw.js`: titolo che inizia per «URGENTE» → `requireInteraction` e vibrazione lunga (il Worker non va cambiato).
+- `tools/test-scaglione2.mjs`, `tools/README.md`.
 
 ## Decisioni e motivi
 - Push in coda risolte **al momento dell'invio** (si salvano le iscrizioni): così anche `sw.js` può mandarle senza Firestore.
@@ -19,16 +19,19 @@
 - Semaforo: il tocco gira ok → ko → meno → ok (il grigio resta solo all'inizio); con «meno» la quantità proposta è `qta-1` (o metà se `qta ≤ 1`).
 - Pubblicazione senza force: dopo lo squash merge si fa `git merge origin/main` sul ramo e push normale.
 - Push: Cloudflare Worker (gratis), iscrizioni fuori da `S.db` (un `permission-denied` lì bloccherebbe l'app).
+- Urgenza riconosciuta da `sw.js` dal titolo «URGENTE»: così non serve ripubblicare il Worker (che passa solo titolo, testo, tag).
+- Urgenza per singolo prodotto (non per richiesta intera), come chiesto; la richiesta va in cima se ha almeno un prodotto urgente.
+- Avviso aumento prezzi solo per prodotti già a listino con prezzo vecchio > 0.
 
 ## Piano a scaglioni
 Metodo: 3 funzioni → prove → PR → squash merge → controllo online → scaglione successivo. A ogni versione: `APP_VER`+1, voce `NEWS`, `CACHE` in `sw.js`.
 
-**Scaglione 2 (prossimo)**
-- Avviso aumento prezzi (all'import listino o fattura: prodotti aumentati con %).
-- Urgenza sul **singolo prodotto** da parte dello staff (in cima per Maurizio, notifica importante).
-- Notifica controllo merce più ricca: prodotti mancanti con chi li aveva chiesti.
+**Scaglione 2: scritto (v13), da finire**
+1. Avviare l'emulatore (`tools/README.md`) e lanciare le prove Firebase; correggere se qualcosa non va.
+2. PR da `backup-automatico` → squash merge → controllo online → `git fetch origin main && git merge origin/main` e push normale.
+3. Dire a Mario cosa provare sul telefono (carrello «È urgente?», import di un listino con un prezzo più alto, controllo merce con un prodotto mancante).
 
-**Scaglione 3**
+**Scaglione 3 (dopo)**
 - **Più lingue** per lo staff (scelta per persona; ordini e prodotti restano in italiano).
 
 **Scaglioni 4-5: Orari del personale** (nuova sezione, grafica coerente con l'app)
