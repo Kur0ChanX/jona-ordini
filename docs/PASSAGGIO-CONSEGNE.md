@@ -1,17 +1,22 @@
-# Passaggio di consegne (2026-10-04, sera)
+# Passaggio di consegne (2026-10-04, notte)
 
 ## Stato attuale
-- Online la **v25** (`APP_VER=25`, `CACHE=jona-ordini-v29`), ramo `backup-automatico` riallineato con `main`. Prove tutte verdi.
-- Versioni di oggi: v21 primo collegamento con tempo massimo (`fbTmo`, `fb_slow`, Riprova, `jona_fb_lp`); v22 foto profilo ridotta (`fileToAvatar`), bozza `jona_reg`, attesa `jona_wait`/`screenWait`; v23 nome utente automatico (`userSug`, `normUser` senza accenti, errori chiari); v24 **telefoni approvati** e chat al ritorno in primo piano; v25 **Wi-Fi lento** (`netWatch`) e avviso «Usa questa chat in modo responsabile e solo per lavoro» (`.cht-rule`).
-- v24: telefono nuovo = `membri/<uid>.ok=false`, legge solo il suo documento e scrive `req` (profilo nuovo con `sid`+`pass`, o «ho già un profilo»). Gestori: Staff → «Telefoni da approvare» (`PH`, `phWatch`, `phApprove`, `phReject`), approvando un profilo nuovo si crea anche lo staff. `approval()` accetta solo la conferma del server. Senza `ok` = approvato (telefoni vecchi); chi attiva il database entra con `chiave/ristorante.uid`. Worker `/gemini` rifiuta `ok:false`. **Regole pubblicate da Mario.**
-- v25: scrittura non confermata in 4 s con rete accesa → long polling e ricarica solo a scritture finite, senza fogli né testo in chat (Wi-Fi UniFi dell'hotel con filtri).
-- Handoff rafforzato: `.claude/hooks/handoff-check.py` con soglia fissa 140k token (70% di 200k), avviso a ogni messaggio oltre soglia, e hook `SessionStart` «compact» in `.claude/settings.json` che rimette l'obbligo dopo una compressione. Causa del mancato passaggio: l'avviso (89%) è scattato insieme a un cambio di modello e alla compressione automatica, che l'ha cancellato; lo script poi presumeva una finestra da 1M sopra 200k token.
+- **v26** pronta (`APP_VER=26`, `CACHE=jona-ordini-v30`): foto e vocali in chat, reparti F&B Manager/Responsabile, guida «notifiche bloccate». Prove tutte verdi (nuove: `test-allegati-server` 25, `test-firebase-allegati` 22, `test-v26` 15).
+- Versioni precedenti (v21–v25: collegamento lento, foto profilo, nome utente, telefoni approvati, Wi-Fi lento) già online.
+- **Allegati (v26)**: `worker/src/index.js` `/allegati` (POST testo base64 + `x-tipo`, GET `/allegati/<db>-<id>`, GET `/allegati/spazio`, solo `membro()`), `scheduled` = pulizia oltre 60 giorni (`[triggers]` in `worker/wrangler.toml`, ore 3:17 UTC). Workflow: passo «Database di foto e vocali» crea `jona-allegati-0..3` via API e aggiunge i binding `ALLEGATI0..3` a `wrangler.toml` solo nel CI; senza permesso D1 avvisa e pubblica senza allegati. App: `ALG`, `algCheck` (`/salute` → `allegati`), `algUp`, `algGet` (cache `jona-allegati`, max 400 file), `algImg`, `chFile`, `chPhoto`, `chRec`/`chRecStop`, `chPlay`/`chAuPaint`, `chView`, `chImgs` (IntersectionObserver), `chMsgBody`, `chPush`. Tasti foto/microfono solo se `algOn()`.
+- Reparti: `REPARTI` con `fb` e `resp`; `altro` resta «Altro» (nessuna migrazione: chi è F&B Manager va spostato a mano dal profilo). Notifiche: `PUSH_DENY`, `pushDenied()`, `S.pushAll`, foglio non duplicato (`ph:1`).
 
-## Richieste di Mario da fare ora (in quest'ordine)
-1. **Allegati in chat su Cloudflare D1 (strada B scelta da Mario)**: foto e vocali salvati nel database D1 del Worker `jona-notifiche` (gratis ~5 GB, righe fino a 2 MB: verificare i limiti attuali prima). Endpoint nel Worker protetti come `/gemini` (gettone Firebase + `membri` non in attesa). Messaggio in `messaggi` con `{tipo:'foto'|'audio', m:<id>, w,h|dur, mini:<anteprima piccola>}`; file scaricato solo quando si apre. **Ottimizzazione per non saturare mai i 5 GB**: foto a 1280 px JPEG/WebP ~0,7 (≈150 KB), anteprima 64 px dentro il messaggio, vocali mono 16-24 kbps (MediaRecorder: Android webm/opus, iPhone mp4/aac → provare la riproduzione incrociata) max 2 min, pulizia automatica dei file più vecchi di 60 giorni (cron del Worker), tetto per sicurezza (es. 4 GB: oltre, cancella i più vecchi), indicatore spazio per lo sviluppatore. Il workflow deve creare il database D1 e il binding in `worker/wrangler.toml`: probabilmente serve il permesso «D1 Edit» sul token `CLOUDFLARE_API_TOKEN` (dare a Mario i passi). Chiedere a Mario se vuole anche reazioni veloci (👍 ❤️ 😂 ✅) e sticker Jona («Arrivato!», «Manca!», «Urgente», «Grazie chef»): proposti, non ancora confermati.
-2. **Mini guida «notifiche bloccate per sbaglio»**: oggi quando le notifiche sono bloccate o si vuole riattivarle esce la guida su risparmio energetico/sospensione attività (`PUSH_HELP`, `pushHelp`), che è un altro caso. Se `Notification.permission==='denied'` mostrare passi specifici per sbloccare il permesso: iPhone (app dalla Home: Impostazioni → Notifiche → Jona → Consenti), Android Chrome (lucchetto/Impostazioni sito → Notifiche → Consenti, oppure Impostazioni app → Notifiche), poi «Riprova ad attivare». Usare i nomi esatti dei menu.
-3. **Reparti**: «Altro» diventa **F&B Manager**; in registrazione aggiungere i tasti **Responsabile** e **Altro** (`REPARTI`, scelta reparto in `profileForm`, chat `rep_<reparto>`, orari per reparto). Attenzione alla chiave `altro` già usata dai profili esistenti: decidere la migrazione (proposta: chiave `altro` → etichetta «F&B Manager», nuove chiavi `resp` e `altro2` per Responsabile/Altro, oppure chiedere a Mario chi c'è oggi in «Altro»).
-4. Gemini: risposto a Mario che va bene un **account Google personale** (no aziendale), creato apposta per il ristorante. Resta da fare: chiave su aistudio.google.com → segreto GitHub `GEMINI_API_KEY` → rilanciare il workflow «Pubblica server notifiche (Cloudflare Worker)».
+## Decisioni e motivi (v26)
+- D1 gratuito = **500 MB per database** (5 GB totali, 10 database): 4 database da 440 MB ≈ 1,7 GB. Si può salire fino a 10 cambiando `QUANTI` nel workflow.
+- File salvati come **testo base64**: D1 restituisce i BLOB come liste di numeri, troppo lente per i 10 ms di CPU del piano gratuito. Decodifica sul telefono.
+- Vocali: prima MP4/AAC (iPhone e Android), poi WebM/Opus; 24 kbps, 2 minuti. Foto 1280 px WebP 0,7 (JPEG su iPhone), anteprima 40 px nel messaggio.
+- `t` del messaggio («📷 Foto», «🎤 Messaggio vocale (0:12)») per liste, avvisi e versioni vecchie dell'app.
+
+## Da fare / in sospeso
+1. **Mario**: aggiungere al token Cloudflare `CLOUDFLARE_API_TOKEN` il permesso **Account › D1 › Edit**, poi rilanciare il workflow «Pubblica server notifiche (Cloudflare Worker)» e controllare nel log «Foto e vocali: 4 database collegati».
+2. Gemini: chiave su aistudio.google.com (account Google privato va bene) → segreto GitHub `GEMINI_API_KEY` → rilanciare lo stesso workflow.
+3. Domande aperte a Mario: reazioni veloci (👍 ❤️ 😂 ✅) e sticker Jona; chi spostare in «F&B Manager».
+4. Provare sui telefoni veri il vocale iPhone → Android e viceversa.
 
 ## Idee parcheggiate (non farle finché Mario non le chiede)
 Foto della confezione → carrello, allarme quantità strana, «Rifai come martedì scorso», mancanti riordinati, risposta del fornitore dallo screenshot; codice a barre scartato. Domanda sui listini (PDF, fattura XML che aggiorna prezzi e controlla la merce, sinonimi/unità, storico prezzi, listino vecchio): proposte da fare se la riprende.
@@ -36,3 +41,4 @@ Foto della confezione → carrello, allarme quantità strana, «Rifai come marte
 - Il telefono in attesa non può mandare push ai gestori: li avvisa la lista in Staff.
 - Tutti i telefoni approvati leggono tutti i messaggi, anche privati.
 - `test-firebase-flow` fallisce tra le 23:30 e mezzanotte.
+- Foto e vocali: chiunque sia approvato può scaricarli conoscendo l'id (come per i messaggi privati).

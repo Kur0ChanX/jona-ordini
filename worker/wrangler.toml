@@ -5,3 +5,7 @@ workers_dev = true
 
 [vars]
 FB_PROJECT = "jona-ordini"
+
+# pulizia notturna di foto e vocali più vecchi di 60 giorni (i database D1 li aggiunge il workflow)
+[triggers]
+crons = ["17 3 * * *"]
