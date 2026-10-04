@@ -909,7 +909,7 @@ function ls(k,v){try{if(v===undefined){const r=localStorage.getItem(k);return r?
 function num(v){if(v==null||v==='')return null;if(typeof v==='number')return isFinite(v)?v:null;let s=String(v).replace(/[^\d,.\-]/g,'');if(!s)return null;if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');else if(s.includes(','))s=s.replace(',','.');const n=parseFloat(s);return isNaN(n)?null:Math.round(n*1000)/1000}
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const i=new Image();i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),1000)};i.onerror=()=>rej(new Error('img'));i.src=u})}
-async function fileToAvatar(file){const img=await loadImg(file);const s=Math.min(img.width,img.height);const c=document.createElement('canvas');c.width=c.height=256;c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,256,256);return c.toDataURL('image/jpeg',.8)}
+async function fileToAvatar(file){let img=null;try{img=await createImageBitmap(file,{resizeWidth:640,resizeQuality:'high'})}catch(e){}if(!img||img.width>1200){if(img&&img.close)img.close();img=await loadImg(file)}const s=Math.min(img.width,img.height);const c=document.createElement('canvas');c.width=c.height=256;c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,256,256);return c.toDataURL('image/jpeg',.8)}
 async function shrink(file,max=2000){const img=await loadImg(file);const sc=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.86))}
 async function runPool(tasks,n=6){let i=0,err=null;const w=async()=>{while(i<tasks.length){const t=tasks[i++];try{await t()}catch(e){err=err||e}}};await Promise.all(Array.from({length:Math.min(n,tasks.length)},w));if(err)throw err}
 
@@ -968,8 +968,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=21;
+const APP_VER=22;
 const NEWS=[
+  {v:22,data:'2026-10-04',titolo:'Registrazione più semplice',
+    tutti:['Dopo aver creato il profilo vedi la schermata «In attesa di approvazione»: appena Maurizio o Mario approvano, l\'app si apre da sola.','Se il telefono ricarica l\'app mentre fai la foto del profilo, i dati scritti restano.'],
+    dev:{risolti:['iPhone: la foto profilo veniva aperta a grandezza piena (fino a 48 MP) e Safari ricaricava la pagina. Ora `createImageBitmap` con `resizeWidth:640`, altrimenti la strada di prima.','Modulo di registrazione salvato in `jona_reg` (senza password e foto) prima di aprire fotocamera o galleria, ripristinato all\'avvio da `regRestore` (30 min).'],aggiunte:['`screenWait` e `waitCheck`: `jona_wait` ({id,t}) dopo la registrazione; profilo attivo → `login` automatico; disattivato o cancellato → avviso.']}},
   {v:21,data:'2026-10-04',titolo:'Nuovi telefoni: niente più attese infinite',
     chef:['Se un telefono nuovo non riesce a collegarsi, invece di restare su «Un momento…» dice cosa fare e mostra il pulsante Riprova.'],
     dev:{risolti:['Primo collegamento bloccato su iPhone: accesso e iscrizione in `membri` ora hanno un tempo massimo (`fbTmo`, 20 s); oltre, errore `fb_slow` con Riprova e, al tentativo dopo, Firestore in long polling forzato (`jona_fb_lp`).','La schermata di collegamento compare subito dopo la creazione del database (prima restava quella iniziale finché il collegamento non finiva).']}},
@@ -1404,7 +1407,7 @@ function paint(el,html){
   if(id){const n=document.getElementById(id);if(n){n.focus({preventScroll:true});try{if(s1!=null)n.setSelectionRange(s1,s2)}catch(e){}}}
 }
 function render(){
-  obxTick();const html=view();
+  obxTick();waitCheck();const html=view();
   document.documentElement.classList.toggle('on-wall',S.wallMode);
   document.documentElement.classList.toggle('staff-ui',!S.wallMode&&!isMgr(meU()));
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
@@ -1421,6 +1424,8 @@ function view(){
   if(!S.db||!allLoaded())return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Un momento…</p></div>`;
   if(!Object.keys(D().staff).length)return screenSetup();
   const me=meU();
+  const w=!me&&ls('jona_wait');const wu=w&&D().staff[w.id];
+  if(wu&&wu.stato==='in_attesa')return screenWait(wu);
   if(!me||me.stato!=='attivo')return screenLogin();
   S.wallMode=false;
   return shell(me);
@@ -1476,6 +1481,15 @@ const stepper=(a,key,q,ex='')=>`<div class="step"><button type="button" data-a="
 const localNote=()=>S.db&&S.db.kind==='locale'?`<p class="local-note">Versione di prova: i dati restano salvati su questo dispositivo.</p>`:'';
 
 /* ================= accesso ================= */
+function screenWait(u){
+  return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card" style="text-align:center">
+  <div style="display:flex;justify-content:center;margin-bottom:12px">${avatar(u,84)}</div><h1>Ciao ${esc(u.nome)}!</h1>
+  <p class="muted">Il tuo profilo è stato creato ed è <b>in attesa di approvazione</b>.</p><p class="muted">Maurizio o Mario devono approvarlo. Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>
+  <div style="margin-top:18px"><button type="button" class="btn ghost block" data-a="waitLeave">Entra con un altro profilo</button></div></div></div>`;
+}
+function waitCheck(){const w=ls('jona_wait');if(!w||S.me||!S.db||!allLoaded())return;if(S.db.kind==='firebase'&&!S.db.status().ready)return;const u=D().staff[w.id];
+  if(u&&u.stato==='attivo'){ls('jona_wait',null);setTimeout(()=>login(u.id));return}
+  if(u&&u.stato==='disattivato'||!u&&Date.now()-w.t>60000){ls('jona_wait',null);setTimeout(()=>toast('Il tuo profilo non è stato approvato. Chiedi a Maurizio.','warn'))}}
 function screenLogin(){
   const L=S.login;
   return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Ordini di cucina e sala</p>${obxBar()}
@@ -1527,12 +1541,15 @@ async function createProfile(mode){
   await put('staff',id,doc);S.form={};
   if(mode==='setup'){login(id);return}
   closeSheet();
-  if(mode==='self'){await notify('gestori','Nuovo profilo da approvare',fullName(doc)+', '+(REPARTI[doc.reparto]||''),'staff',id);toast('Profilo creato. Potrai entrare appena Maurizio o Mario lo approvano.')}
+  if(mode==='self'){await notify('gestori','Nuovo profilo da approvare',fullName(doc)+', '+(REPARTI[doc.reparto]||''),'staff',id);ls('jona_reg',null);ls('jona_wait',{id,t:Date.now()});repaint()}
   else toast('Profilo creato: comunica a '+doc.nome+' nome utente e password.');
 }
+function regKeep(){const o=sheets[sheets.length-1];if(!o||!o.reg)return;const f=Object.assign({},S.form);delete f.pw;delete f.pw2;delete f.foto;ls('jona_reg',{f,t:Date.now()})}
+function regRestore(){const d=ls('jona_reg');ls('jona_reg',null);if(!d||Date.now()-d.t>1800000||ls('jona_me'))return;
+  registerSheet('self');Object.assign(S.form,d.f);refreshSheet();toast('Il telefono ha ricaricato l\'app mentre sceglievi la foto. I tuoi dati sono ancora qui: rifai la foto e scrivi la password.','warn')}
 function registerSheet(mode){
   S.form={ruolo:'staff',reparto:'cucina',mansione:'Cameriere'};if(mode==='admin'&&isGM(meU()))Object.assign(S.form,CONTR0,{_c:true});
-  openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${mode==='admin'?'Aggiungi profilo':'Crea il tuo profilo'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  openSheet({reg:mode==='self',render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${mode==='admin'?'Aggiungi profilo':'Crea il tuo profilo'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${mode==='admin'?'':'<p class="muted" style="margin:0">Dopo la registrazione Maurizio o Mario approvano il profilo.</p>'}
   ${profileForm('rg',{roles:mode==='admin'?['staff','gm','dev']:null,contr:mode==='admin'})}
   <div style="margin-top:22px"><button type="button" class="btn primary block big" data-a="${mode==='admin'?'addGo':'regGo'}">Crea profilo</button></div>`});
@@ -3448,7 +3465,7 @@ function settingsSheet(){
   ${isDev(realU())?(()=>{const nt=testCount();return`<div class="setrow"><div><b>Dati di prova</b><span>${nt?nt+' documenti di prova nell\'app':'Fornitori, prodotti, 2 profili e 2 richieste finti, solo per le prove'}</span></div>${nt?`<button type="button" class="btn ghost sm danger" data-a="testDel" aria-label="Cancella dati di prova">${ic('trash')} Cancella</button>`:`<button type="button" class="btn ghost sm" data-a="testMake" aria-label="Crea dati di prova">${ic('plus')} Crea</button>`}</div>`})():''}
   <div class="setrow"><div><b>Notifiche già lette</b><span>${read}</span></div>${read?`<button type="button" class="btn ghost sm" data-a="notifDel">Pulisci</button>`:''}</div>`}});
 }
-async function setPhoto(fs){try{S.form.foto=await fileToAvatar(fs[0]);repaint()}catch(e){toast('Non riesco a leggere questa foto.','err')}}
+async function setPhoto(fs){ls('jona_reg',null);try{S.form.foto=await fileToAvatar(fs[0]);repaint()}catch(e){toast('Non riesco a leggere questa foto.','err')}}
 function applyTheme(){const t=ls('jona_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}
 
 /* ================= dati iniziali (solo al primo avvio) ================= */
@@ -3751,12 +3768,13 @@ const A={
   formset:d=>{S.form[d.k]=d.v;repaint()},
   setupGo:()=>createProfile('setup'),
   regGo:()=>createProfile('self'),
+  waitLeave:()=>{ls('jona_wait',null);render()},
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
   pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
-  photoCam:()=>pickFile({accept:'image/*',capture:'user'},setPhoto),
-  photoLib:()=>pickFile({accept:'image/*'},setPhoto),
+  photoCam:()=>{regKeep();pickFile({accept:'image/*',capture:'user'},setPhoto)},
+  photoLib:()=>{regKeep();pickFile({accept:'image/*'},setPhoto)},
   tab:d=>{if(d.v==='carrello')animPrefetch();S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
   notifs:()=>notifSheet(),
   news:()=>newsSheet(),
@@ -4025,6 +4043,7 @@ async function boot(){
   try{await seedIfEmpty()}catch(e){toast(errMsg(e),'err')}
   if(S.db.kind==='locale'&&fbCfg())fbPublic().then(a=>{S.fbActive=a;schedule()});
   Object.keys(COLS).forEach(subscribe);
+  regRestore();
   setTimeout(()=>{if(!allLoaded()){S.loadTimeout=true;render()}},5000);
 }
 boot();
