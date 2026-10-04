@@ -6,6 +6,8 @@
 // /allegati: foto e vocali della chat nei database D1 ALLEGATI0, ALLEGATI1… (creati dal workflow; piano gratuito: 500 MB l'uno).
 // Il telefono manda il file in base64 (testo) con il tipo in «x-tipo»: D1 restituirebbe i BLOB come liste di numeri,
 // troppo lente da convertire nei 10 ms del piano gratuito. Ogni file va nel database più vuoto; oltre il tetto si cancellano i più vecchi, e ogni notte (cron) quelli oltre 60 giorni.
+// /inviti: un telefono del ristorante chiede un codice d'invito di 6 lettere (vale 7 giorni, tabella «inviti» nel primo database D1);
+// /invito/<codice>: il telefono nuovo lo scambia con la chiave del ristorante (resta l'approvazione del telefono).
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -157,9 +159,48 @@ async function membro(request, env) {
   if (membriOk.size > 200) { membriOk.clear(); membriUid.clear(); }
   membriOk.set(tok, Math.min(exp, now + 10 * 60 * 1000));
   membriUid.set(tok, uid);
+  membriK.set(tok, (d.fields && d.fields.k && d.fields.k.stringValue) || "");
   return uid;
 }
 const membriUid = new Map();
+const membriK = new Map();
+
+const INV_ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const INV_GIORNI = 7;
+let invPronto = false;
+async function invDb(env) {
+  const d = algDbs(env)[0];
+  if (!d) return null;
+  if (!invPronto) {
+    await d[1].prepare("CREATE TABLE IF NOT EXISTS inviti (c TEXT PRIMARY KEY, k TEXT NOT NULL, scade INTEGER NOT NULL)").run();
+    invPronto = true;
+  }
+  return d[1];
+}
+async function invCrea(request, env) {
+  const uid = await membro(request, env);
+  if (!uid) return json({ errore: "Telefono non collegato al ristorante" }, 403);
+  const tok = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  const k = membriK.get(tok) || "";
+  if (!/^[A-Za-z0-9]{16,64}$/.test(k)) return json({ errore: "chiave non trovata" }, 409);
+  const db = await invDb(env);
+  if (!db) return json({ errore: "inviti non attivi sul server" }, 503);
+  const scade = Date.now() + INV_GIORNI * 864e5;
+  for (let i = 0; i < 5; i++) {
+    const c = Array.from(crypto.getRandomValues(new Uint8Array(6)), b => INV_ABC[b & 31]).join("");
+    const r = await db.prepare("INSERT OR IGNORE INTO inviti (c, k, scade) VALUES (?, ?, ?)").bind(c, k, scade).run();
+    if (r.meta && r.meta.changes) return json({ codice: c, scade });
+  }
+  return json({ errore: "riprova" }, 500);
+}
+async function invLeggi(c, env) {
+  c = String(c || "").toUpperCase();
+  if (!/^[A-HJ-NP-Z2-9]{6}$/.test(c)) return json({ errore: "codice non valido" }, 404);
+  const db = await invDb(env);
+  if (!db) return json({ errore: "inviti non attivi sul server" }, 503);
+  const r = await db.prepare("SELECT k FROM inviti WHERE c = ? AND scade > ?").bind(c, Date.now()).first();
+  return r ? json({ k: r.k }) : json({ errore: "codice scaduto o sbagliato" }, 404);
+}
 
 const attesa = j => {
   const d = ((j.error && j.error.details) || []).find(x => x && x.retryDelay);
@@ -281,6 +322,7 @@ async function algPulizia(env) {
 export default {
   async scheduled(event, env, ctx) {
     ctx.waitUntil(algPulizia(env));
+    ctx.waitUntil(invDb(env).then(db => db && db.prepare("DELETE FROM inviti WHERE scade < ?").bind(Date.now()).run()));
   },
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -289,6 +331,8 @@ export default {
       if (url.pathname === "/salute") return json({ ok: true, servizio: "jona-notifiche", push: !!env.VAPID_JWK, gemini: !!env.GEMINI_KEY, allegati: algDbs(env).length });
       if (url.pathname === "/chiave" && request.method === "GET") return json({ chiave: (await vapid(env)).pub });
       if (url.pathname === "/gemini" && request.method === "POST") return await gemini(request, env);
+      if (url.pathname === "/inviti" && request.method === "POST") return await invCrea(request, env);
+      if (url.pathname.startsWith("/invito/") && request.method === "GET") return await invLeggi(url.pathname.slice(8), env);
       if (url.pathname.startsWith("/allegati")) {
         const uid = await membro(request, env);
         if (!uid) return algErr("Telefono non collegato al ristorante", 403);

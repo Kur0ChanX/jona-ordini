@@ -25,6 +25,7 @@ Le prove Firebase impostano `localStorage.jona_fb_emu` e una configurazione fint
 
 ## Altre prove
 - `node tools/test-v28.mjs`: vocali per iPhone (Chrome Android → AAC con WebCodecs e intestazioni ADTS, codificatore finto; iPhone → MP4; mai Opus dentro l'MP4), lettore sbloccato con il silenzio dentro il tocco, barra con la durata del messaggio, messaggio per il file illeggibile; indietro del telefono un passo alla volta (foglio, scheda precedente, conversazione → lista → chat chiusa, chiusura con la X, uscita).
+- `node tools/test-inviti.mjs`: v30, inviti con codice (Worker `/inviti` e `/invito/<codice>` con D1 e Firestore finti, scadenza e pulizia, link corto del Worker `invito`; app aperta da `#i=`, codice scritto o link incollato in «Collega», testo e cartolina con il codice, link lungo in modalità locale).
 - `node tools/test-v27.mjs`: reazioni in chat (pressione lunga, tasto destro, conteggio, togliere, emoji estranee ignorate, «Copia», barra sotto il messaggio in cima, 320 px). Le reazioni tra due telefoni sono in `test-firebase-chat`.
 - `node tools/test-scaglione2.mjs`: prodotto urgente (carrello, richiesta in cima, notifica «URGENTE», riga d'ordine), controllo merce con chi aveva chiesto (notifica a Maurizio e a chi aveva chiesto), aumento prezzi all'import (avviso con percentuale, riepilogo, notifica).
 - `node tools/test-voice.mjs`: ordine a voce (parser di 35 frasi, riconoscimento vocale finto, conferma, carrello, campo di testo se il telefono non ha il riconoscimento).
