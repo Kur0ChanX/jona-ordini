@@ -374,7 +374,11 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .rp-kt span{display:block;font-size:13px;color:var(--muted)}
 .rp-kt b{display:block;font:400 22px/1.25 var(--font);color:var(--ink);overflow-wrap:anywhere}
 .rp-kt.big b{font-size:28px;font-weight:500}
-@media (max-width:520px){.rp-k{grid-template-columns:1fr 1fr}.rp-kt.big{grid-column:1/-1}}
+@media (max-width:520px){.rp-k{grid-template-columns:1fr 1fr}.rp-kt.big{grid-column:1/-1}
+.rp-cmp{display:block;font-size:13px;color:var(--muted);margin-top:2px}.rp-cmp.up::first-letter,.rp-cmp.dn::first-letter{color:var(--ink)}
+.rp-back{margin:4px 0 8px}
+button.rp-pn{all:unset;display:block;font:400 15px/1.3 var(--font);overflow-wrap:anywhere;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}button.rp-pn:focus-visible{outline:2px solid var(--lagoon);outline-offset:2px}
+.rp-chart .bk[data-df],.rp-chart .bk[data-da]{cursor:pointer}}
 .rp-note{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-size:13.5px;color:var(--ink2)}
 .rp-note .ic{width:17px;height:17px;color:var(--ocra);margin-top:1px}
 .rp-note.mu{color:var(--muted)}
@@ -899,6 +903,7 @@ button.or-pi{cursor:pointer}
 .or-my{margin:0 0 14px}
 .or-mtot{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;background:var(--surface);border-radius:18px;box-shadow:var(--lift);padding:16px 18px;margin:0 0 12px}
 .or-mtot b{font:300 34px/1 var(--font)}
+.or-now{background:var(--surface);border-radius:18px;box-shadow:var(--lift);padding:12px 14px;margin:0 0 12px}.or-nowh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.or-nowh span{color:var(--muted);font-size:14px}.or-now ul{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}.or-now li{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:12px;border-left:5px solid var(--k);background:color-mix(in srgb,var(--k) 10%,var(--surface))}.or-now li>b{flex:1;min-width:0}.or-now li>span:not(.av){font-variant-numeric:tabular-nums}.or-now li .tag{font-style:normal}.or-now li.on{background:color-mix(in srgb,var(--k) 22%,var(--surface))}
 .or-mtot span{color:var(--muted);font-size:15px}
 .or-day{display:grid;gap:8px;background:var(--surface);border-radius:18px;box-shadow:var(--lift);padding:14px 16px;margin:0 0 10px}
 .or-day.today{box-shadow:inset 0 0 0 2px var(--lagoon),var(--lift)}
@@ -1012,8 +1017,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=30;
+const APP_VER=31;
 const NEWS=[
+  {v:31,data:'2026-10-04',titolo:'Chi c\'è in turno oggi, promemoria degli ordini, consumi più comodi',
+    chef:['Nella scheda di ogni fornitore puoi scegliere i giorni in cui si ordina: in quei giorni ricevi l\'avviso «Oggi si ordina da…». Senza ora scelta arriva un\'ora prima dell\'ora limite, o alle 10:00. Se l\'ordine è già partito, niente avviso.','In «Consumi e costi» tocca due volte una barra per vedere solo quel fornitore o quel periodo; «Indietro» torna a prima. Tocca il nome di un prodotto per vedere solo quello. Sotto la spesa totale vedi quanto è cambiata rispetto al periodo prima.'],
+    tutti:['In «I miei orari» c\'è il riquadro «In turno oggi»: chi lavora oggi e a che ora, con «Adesso» per chi è già in servizio. Lo vede anche chi fa gli orari nella scheda Staff.'],
+    dev:{aggiunte:['`orOggi` (da `tp` della settimana corrente, solo persone attive) in `vMieiOrari` e `vOrari` (settimana corrente).','Promemoria per giorno: `fornitori.giorniOrdine` [0=lun..6=dom] e `oraPromemoria`, `promInfo`, ciclo in `deadlineTick` (chiave `p_<fid>` in `jona_rem`, notifica tipo `promemoria`, non ripetuta fra telefoni).','Consumi: `rpCalc(R,rng)`, `rpPrev`/`rpCmp` (confronto con lo stesso tratto del periodo prima), `rpDrill` (secondo tocco, clic o Invio; `data-df`/`data-da`/`data-db`), `rpBack` (pila `S.rp.back`), `rpProd`.']}},
   {v:30,data:'2026-10-04',titolo:'Invito con codice, pallino sull\'icona e vocali con l\'onda',
     chef:['L\'invito ora ha un link corto e un codice di 6 lettere (vale 7 giorni). Se il telefono nuovo chiede un codice, basta scriverlo nella schermata «Collega questo telefono».','L\'anteprima su WhatsApp non ha più il finto pulsante: si tocca il link.'],
     tutti:['I vocali in chat mostrano la forma della voce, come su WhatsApp: barre alte dove si parla, linea piatta nel silenzio. Mentre ascolti le barre si colorano; tocca un punto per saltare lì. Mentre registri vedi le barre muoversi.','Sull\'icona dell\'app compare un pallino col numero delle cose importanti: messaggi in chat non letti, avvisi e cose da approvare. Le novità dell\'app non contano.','Su iPhone il pallino si vede con l\'app sulla schermata Home e le notifiche permesse nelle Impostazioni del telefono. Su Android dipende dal telefono: di solito compare solo con le notifiche attive.'],
@@ -2145,6 +2154,13 @@ function dlBadge(fid){const x=dlInfo(fid);if(!x)return'';
   if(x.k==='late')return`<div class="ord-dl"><span class="st ko">${ic('clock')} Ora limite passata (${esc(x.hm)})</span></div>`;
   if(x.k==='soon')return`<div class="ord-dl"><span class="st wait">${ic('clock')} Da inviare entro le ${esc(x.hm)}, mancano ${Math.max(1,Math.ceil(x.left/60000))} min</span></div>`;
   return`<div class="ord-m">${ic('clock')} Da inviare entro le ${esc(x.hm)}</div>`}
+/* promemoria per giorno: fornitore.giorniOrdine [0=lun..6=dom] e oraPromemoria (vuota: un'ora prima dell'ora limite, altrimenti 10:00).
+   due = oggi è giorno d'ordine, l'ora è arrivata, l'ora limite non è passata e oggi non è già partito un ordine a quel fornitore */
+function promInfo(f){const gs=f&&f.giorniOrdine;if(!Array.isArray(gs)||!gs.length)return null;
+  const d=new Date(),g=(d.getDay()+6)%7,t0=new Date(d);t0.setHours(0,0,0,0);
+  const lim=orMin(f.oraLimite),at=orMin(f.oraPromemoria)??(lim!=null?Math.max(0,lim-60):600),nm=d.getHours()*60+d.getMinutes();
+  const sent=Object.values(D().ordini).some(o=>o.fornitoreId===f.id&&(o.inviato||0)>=t0.getTime());
+  return{at,due:gs.includes(g)&&nm>=at&&(lim==null||nm<lim)&&!sent}}
 async function deadlineTick(){
   if(!S.db||!allLoaded())return;const me=meU();if(!me||me.stato!=='attivo'||!isGM(me))return;
   if(S.tab==='invii')render();
@@ -2156,6 +2172,13 @@ async function deadlineTick(){
     const old=Object.values(D().notifiche).find(z=>z.tipo==='scadenza'&&z.rif===fid&&(z.creato||0)>=t0.getTime());
     if(!old)await notify('gm','Ordine a '+f.nome+' entro le '+f.oraLimite,txt,'scadenza',fid);
     if(!(old&&old.da!==me.id&&now()-(old.creato||0)<120000))toast('Ordine a '+f.nome+' entro le '+f.oraLimite+': '+txt,'warn');
+  }
+  for(const f of Object.values(D().fornitori)){const x=promInfo(f);if(!x||!x.due||rem['p_'+f.id]===td)continue;
+    rem['p_'+f.id]=td;ls('jona_rem',rem);
+    if(Object.values(D().notifiche).some(z=>z.tipo==='promemoria'&&z.rif===f.id&&(z.creato||0)>=t0.getTime()))continue;
+    const o=Object.values(D().ordini).find(z=>z.stato==='aperto'&&z.fornitoreId===f.id),n=o&&o.items?o.items.length:0;
+    const txt=(n?n+(n===1?' articolo':' articoli')+' nel carrello':'Il carrello è vuoto: prepara l\'ordine')+(f.oraLimite?', da inviare entro le '+f.oraLimite:'');
+    await notify('gm','Oggi si ordina da '+f.nome,txt,'promemoria',f.id);toast('Oggi si ordina da '+f.nome+': '+txt,'warn');
   }
   ls('jona_rem',rem);
 }
@@ -2500,7 +2523,7 @@ function vFornitori(){
   ${fs.length?`<div class="fgrid">${fs.map(f=>{const m=METODI[f.metodo],n=cnt[f.id]||0;return`<button type="button" class="fcard" data-a="fopen" data-f="${f.id}" style="--c:${fcolor(f.id)}" aria-label="${esc(f.nome)}">
     <span class="fc-top">${f.logo?`<img src="${esc(f.logo)}" alt="">`:`<b>${esc(f.nome.charAt(0))}</b>`}</span>
     <span class="fc-b"><span class="fc-n">${esc(f.nome)}</span><span class="fc-m">${m?ic(m.i)+esc(m.l):'Invio da definire'}</span>
-    <span class="fc-tags"><i>${n===1?'1 prodotto':n+' prodotti'}</i>${f.oraLimite?`<i class="t">${ic('clock')}entro le ${esc(f.oraLimite)}</i>`:''}</span></span></button>`}).join('')}</div>`:empty('store','Nessun fornitore','Aggiungi i fornitori con i loro contatti e il modo in cui vogliono ricevere gli ordini.')}`;
+    <span class="fc-tags"><i>${n===1?'1 prodotto':n+' prodotti'}</i>${f.oraLimite?`<i class="t">${ic('clock')}entro le ${esc(f.oraLimite)}</i>`:''}${(f.giorniOrdine||[]).length?`<i class="t">${ic('bell')}${f.giorniOrdine.map(g=>OR_GG[g]).join(' ')}</i>`:''}</span></span></button>`}).join('')}</div>`:empty('store','Nessun fornitore','Aggiungi i fornitori con i loro contatti e il modo in cui vogliono ricevere gli ordini.')}`;
 }
 function supSheet(fid,tab){
   S.supFid=fid;S.supTab=tab||'listino';S.supQ='';const f0=D().fornitori[fid];S.fe=clone(f0||{});delete S.fe.id;
@@ -2529,6 +2552,8 @@ function supForm(fid){
   <div class="two stack"><div>${F('whatsapp','WhatsApp','tel','+39 333 1234567','tel')}</div><div>${F('telefono','Telefono','tel','','tel')}</div></div>
   ${F('email','Email','email','ordini@fornitore.it')}${F('sito','Sito per gli ordini','url','https://')}
   ${F('oraLimite','Ora limite per ordinare (facoltativa)','time')}<p class="muted small" style="margin:6px 0 0">Es. Metro entro le 18:00. Un'ora prima l'app lo ricorda allo chef.</p>
+  <span class="lbl">Giorni in cui si ordina (promemoria)</span><div class="chips" role="group" aria-label="Giorni in cui si ordina">${OR_GG.map((l,g)=>`<button type="button" class="chip" aria-pressed="${(f.giorniOrdine||[]).includes(g)}" data-a="feDay" data-v="${g}">${l}</button>`).join('')}</div>
+  ${(f.giorniOrdine||[]).length?F('oraPromemoria','Ora del promemoria (facoltativa)','time')+`<p class="muted small" style="margin:6px 0 0">In quei giorni chi gestisce riceve un avviso «Oggi si ordina da ${esc(f.nome||'…')}». Se lasci vuota l'ora: ${f.oraLimite?'un\'ora prima dell\'ora limite':'alle 10:00'}.</p>`:''}
   <label class="lbl" for="fe-cat">Categoria principale</label><select class="inp" id="fe-cat" data-ch="fesel" data-k="categoria">${CATS.map(c=>`<option ${f.categoria===c?'selected':''}>${esc(c)}</option>`).join('')}</select>
   <label class="lbl" for="fe-note">Note (giorni di consegna, minimo d'ordine, credenziali dove sono custodite…)</label><textarea class="inp" id="fe-note" rows="3" data-in="fe" data-k="note">${esc(f.note||'')}</textarea>
   <div class="btns" style="margin-top:20px">${fid?`<button type="button" class="btn ghost danger" data-a="fdel" data-f="${fid}">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary" data-a="fsave" data-f="${fid||''}">${ic('check')} Salva</button></div>`;
@@ -2536,7 +2561,7 @@ function supForm(fid){
 function newSupSheet(){S.fe={metodo:'email',categoria:'Altro'};openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Nuovo fornitore</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>${supForm('')}`})}
 async function saveSup(fid){
   const f=S.fe;if(!String(f.nome||'').trim())return toast('Scrivi il nome del fornitore.','warn');
-  const d={nome:f.nome.trim(),metodo:f.metodo||'',referente:(f.referente||'').trim(),whatsapp:(f.whatsapp||'').trim(),telefono:(f.telefono||'').trim(),email:(f.email||'').trim(),sito:(f.sito||'').trim(),categoria:f.categoria||'Altro',note:(f.note||'').trim(),logo:f.logo||'',oraLimite:/^\d{2}:\d{2}$/.test(f.oraLimite||'')?f.oraLimite:''};
+  const d={nome:f.nome.trim(),metodo:f.metodo||'',referente:(f.referente||'').trim(),whatsapp:(f.whatsapp||'').trim(),telefono:(f.telefono||'').trim(),email:(f.email||'').trim(),sito:(f.sito||'').trim(),categoria:f.categoria||'Altro',note:(f.note||'').trim(),logo:f.logo||'',oraLimite:/^\d{2}:\d{2}$/.test(f.oraLimite||'')?f.oraLimite:'',giorniOrdine:(f.giorniOrdine||[]).filter(g=>g>=0&&g<7).sort(),oraPromemoria:(f.giorniOrdine||[]).length&&/^\d{2}:\d{2}$/.test(f.oraPromemoria||'')?f.oraPromemoria:''};
   if(d.sito&&!/^https?:\/\//i.test(d.sito))d.sito='https://'+d.sito;
   if(fid){await upd('fornitori',fid,d);toast('Fornitore salvato')}else{const id=uid();d.creato=now();await put('fornitori',id,d);closeSheet();toast('Fornitore aggiunto');supSheet(id)}
 }
@@ -2819,6 +2844,18 @@ function rpRange(R){
   const p=s=>{const x=String(s||'').split('-').map(Number);return x[0]?new Date(x[0],x[1]-1,x[2]):null};
   let a=p(R.a)||d,b=p(R.b)||d;if(b<a)[a,b]=[b,a];b=new Date(b);b.setDate(b.getDate()+1);return[T(a),T(b)];
 }
+/* confronto: stesso tratto del periodo prima (fino a oggi se il periodo non è finito) */
+function rpPrev(R,a,b){const z=new Date();z.setHours(0,0,0,0);z.setDate(z.getDate()+1);const e=Math.min(b,z.getTime());if(e<=a)return null;
+  const sh=t=>{const d=new Date(t);if(R.per==='mese'||R.per==='mesep')d.setMonth(d.getMonth()-1);else if(R.per==='anno')d.setFullYear(d.getFullYear()-1);else if(R.per==='sett')d.setDate(d.getDate()-7);else return t-(e-a);return d.getTime()};
+  return[sh(a),sh(e)]}
+function rpCmp(R,X){const r=rpPrev(R,X.a,X.b);if(!r||!(X.tot>0))return'';const P=rpCalc(R,r);if(!(P.tot>0))return'';
+  const d=Math.round((X.tot-P.tot)/P.tot*100),k=d>0?'up':d<0?'dn':'';
+  return`<span class="rp-cmp ${k}">${d>0?'▲ +'+d:d<0?'▼ '+d:'='}% rispetto a ${esc(rpRangeLabel(r[0],r[1]))} (${eur(P.tot)})</span>`}
+/* tocco sul grafico: primo tocco mostra il valore, secondo tocco (o clic, o Invio) entra nel fornitore o nel periodo; «Indietro» torna ai filtri di prima */
+function rpDrill(g){const R=rpState(),d=g.dataset;if(!d.df&&!d.da)return;
+  (R.back||(R.back=[])).push({per:R.per,a:R.a,b:R.b,fid:R.fid,q:R.q});
+  if(d.df)R.fid=d.df;else{R.per='dal';R.a=today(new Date(+d.da));R.b=today(new Date(+d.db-1))}
+  R.all=false;rpTipHide();refreshSheet()}
 const rpDay=t=>new Date(t).toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
 const rpRangeLabel=(a,b)=>rpDay(a)===rpDay(b-1)?rpDay(a):rpDay(a)+' – '+rpDay(b-1);
 const rpFname=(fid,fb)=>(D().fornitori[fid]||{}).nome||fb||'Fornitore eliminato';
@@ -2827,8 +2864,8 @@ function rpOrders(){const m=new Map(Object.values(D().ordini).map(o=>[o.id,o]));
 function rpOld(a){const os=Object.values(D().ordini);if(os.length<300||Math.min(...os.map(o=>o.creato||0))<=a)return'';
   if(S.rpOldFrom!=null&&S.rpOldFrom<=a)return S.rpOldErr?'err':'';if(S.rpOldBusy)return'load';
   S.rpOldBusy=true;S.rpOldErr=false;S.db.range('ordini','inviato',a,now()+1).then(l=>{S.rpOldList=l;S.rpOldFrom=a},()=>{S.rpOldErr=true;S.rpOldFrom=a}).finally(()=>{S.rpOldBusy=false;refreshSheet()});return'load'}
-function rpCalc(R){
-  const [a,b]=rpRange(R);const q=norm(R.q);const toks=q?q.split(' '):[];
+function rpCalc(R,rng){
+  const [a,b]=rng||rpRange(R);const q=norm(R.q);const toks=q?q.split(' '):[];
   const rows=[],miss=new Set(),oids=new Set(),G=new Map(),SP=new Map();let inP=0,nRec=0,tot=0;
   for(const o of rpOrders()){
     const t=o.inviato||0;if(o.stato!=='inviato'||t<a||t>=b)continue;const fid=o.fornitoreId||'';if(R.fid&&fid!==R.fid)continue;inP++;
@@ -2886,7 +2923,7 @@ function rpTimeSvg(bs,W,col,sup,lbl){
     const p=x.v>0&&bh>0?`<path class="bar${sup?' sup':''}" style="--c:${col}" d="M${bx},${rpF(by+bh)}V${rpF(by+r)}Q${bx},${by} ${rpF(bx+r)},${by}H${rpF(bx+bw-r)}Q${rpF(bx+bw)},${by} ${rpF(bx+bw)},${rpF(by+r)}V${rpF(by+bh)}Z"/>`:'';
     let lab='';if(i%k===0){const w=rpTw(x.lab,11.5);const lx=Math.max(gw+w/2,Math.min(W-w/2,cx));lab=`<text class="xl" x="${rpF(lx)}" y="${H-10}" text-anchor="middle">${esc(x.lab)}</text>`}
     let top1='';if(i===im&&max>0){const t=eur(x.v),w=rpTw(t,12.5);const lx=Math.max(w/2,Math.min(W-w/2,cx));top1=`<text class="vl" x="${rpF(lx)}" y="${rpF(by-7)}" text-anchor="middle">${esc(t)}</text>`}
-    return`<g class="bk" tabindex="0" role="img" aria-label="${esc(x.tl+': '+eur(x.v))}" data-tv="${esc(eur(x.v))}" data-tl="${esc(x.tl)}"><rect class="hit" x="${rpF(gw+i*slot)}" y="${top}" width="${rpF(slot)}" height="${ph}"/>${p}</g>${lab}${top1}`}).join('');
+    return`<g class="bk" tabindex="0" role="img" aria-label="${esc(x.tl+': '+eur(x.v))}" data-tv="${esc(eur(x.v))}" data-tl="${esc(x.tl+(x.v>0&&bs.length>1?' · tocca ancora per vedere solo questo':''))}"${x.v>0&&bs.length>1?` data-da="${x.s}" data-db="${x.e}"`:''}><rect class="hit" x="${rpF(gw+i*slot)}" y="${top}" width="${rpF(slot)}" height="${ph}"/>${p}</g>${lab}${top1}`}).join('');
   return s+'</svg>';
 }
 function rpSupSvg(sps,W,tot){
@@ -2895,7 +2932,7 @@ function rpSupSvg(sps,W,tot){
   s+=sps.map((x,i)=>{const y0=i*rh,by=y0+23,bh=14,w=x.c>0?Math.max(2,rpF(bwMax*x.c/max)):0,r=Math.min(4,w/2,bh/2);const nm=x.fn.length>mc?x.fn.slice(0,mc-1)+'…':x.fn;
     const pct=tot>0?Math.round(x.c/tot*100):0;const v=x.c?eur(x.c):'senza prezzi';const no=x.o.size+' '+(x.o.size===1?'ordine':'ordini');
     const p=w?`<path class="bar sup" style="--c:${fcolor(x.fid)}" d="M0,${by}H${rpF(w-r)}Q${w},${by} ${w},${by+r}V${by+bh-r}Q${w},${by+bh} ${rpF(w-r)},${by+bh}H0Z"/>`:'';
-    return`<g class="bk" tabindex="0" role="img" aria-label="${esc(x.fn+': '+v+', '+no)}" data-tv="${esc(v)}" data-tl="${esc(x.fn+' · '+no+(x.c?' · '+pct+'% della spesa':''))}"><rect class="hit" x="0" y="${y0}" width="${W}" height="${rh}"/>
+    return`<g class="bk" tabindex="0" role="img" aria-label="${esc(x.fn+': '+v+', '+no)}" data-tv="${esc(v)}" data-tl="${esc(x.fn+' · '+no+(x.c?' · '+pct+'% della spesa':'')+(x.fid?' · tocca ancora per vedere solo questo':''))}"${x.fid?` data-df="${esc(x.fid)}"`:''}><rect class="hit" x="0" y="${y0}" width="${W}" height="${rh}"/>
 <text class="nm" x="0" y="${y0+15}">${esc(nm)}<tspan class="mu" dx="6">${no}</tspan></text>${p}<text class="vl" x="${rpF(w+6)}" y="${by+11}">${esc(v)}</text></g>`}).join('');
   return s+'</svg>';
 }
@@ -2928,18 +2965,18 @@ function rpView(){
   if(!X.inP)body=empty('clock','Nessun ordine inviato in questo periodo',R.fid?'Prova un periodo più lungo o «Tutti i fornitori».':'Prova a scegliere un periodo più lungo.');
   else if(!X.rows.length)body=empty('search','Nessun prodotto trovato','Ci sono '+X.inP+' '+(X.inP===1?'ordine':'ordini')+' in questo periodo, ma nessuna riga va bene con questi filtri.');
   else{const lim=R.all?X.ps.length:50;
-    body=`<div class="rp-k"><div class="rp-kt big"><span>Spesa totale</span><b>${eur(X.tot)}</b></div><div class="rp-kt"><span>Ordini</span><b>${X.nOrd}</b></div><div class="rp-kt"><span>Prodotti diversi</span><b>${X.ps.length}</b></div>${showQ?`<div class="rp-kt"><span>Quantità totale</span><b>${fq(r3(qT))} ${esc(X.ps[0].unita)}</b></div>`:''}</div>
+    body=`<div class="rp-k"><div class="rp-kt big"><span>Spesa totale</span><b>${eur(X.tot)}</b>${rpCmp(R,X)}</div><div class="rp-kt"><span>Ordini</span><b>${X.nOrd}</b></div><div class="rp-kt"><span>Prodotti diversi</span><b>${X.ps.length}</b></div>${showQ?`<div class="rp-kt"><span>Quantità totale</span><b>${fq(r3(qT))} ${esc(X.ps[0].unita)}</b></div>`:''}</div>
     ${X.miss?`<p class="rp-note">${ic('warn')} ${X.miss} ${X.miss===1?'riga senza prezzo, esclusa':'righe senza prezzo, escluse'} dal totale.</p>`:''}
     <p class="rp-note mu">${rpQNote(X)}${R.rep?' Se più reparti chiedono lo stesso prodotto, la quantità è divisa in proporzione.':''}</p>
     ${old==='load'?`<p class="rp-note mu">Scarico gli ordini più vecchi…</p>`:old==='err'?`<p class="rp-note mu">Senza rete non riesco a scaricare gli ordini più vecchi: il periodo può essere incompleto.</p>`:''}
     ${rpChart(R,X,W)}
     <div class="rp-sec"><b>Prodotti</b><span class="muted small">${X.ps.length}, dal costo più alto</span></div>
     <div class="panel rp-tb"><table class="rp-t"><thead><tr><th>Prodotto</th><th class="n rp-qc">Quantità</th><th class="n">Costo</th></tr></thead><tbody>
-    ${X.ps.slice(0,lim).map(g=>`<tr><td><div class="rp-pn">${esc(g.nome)}</div><span class="sup" style="--c:${fcolor(g.fid)}"><i></i>${esc(g.fn)}</span><div class="rp-qi">${fq(r3(g.q))} ${esc(g.unita)}</div></td><td class="n rp-qc">${fq(r3(g.q))} ${esc(g.unita)}</td><td class="n"><b>${g.qp?eur(g.c):'—'}</b><div class="rp-m">${g.qp?'media '+eur(g.c/g.qp)+(g.unita?'/'+esc(g.unita):''):'senza prezzo'}</div>${g.qp&&g.ms.size?`<div class="rp-m">${g.ms.size===1?'1 riga':g.ms.size+' righe'} senza prezzo</div>`:''}</td></tr>`).join('')}
+    ${X.ps.slice(0,lim).map(g=>`<tr><td><button type="button" class="rp-pn" data-a="rpProd" data-v="${esc(g.nome)}" aria-label="Solo ${esc(g.nome)}">${esc(g.nome)}</button><span class="sup" style="--c:${fcolor(g.fid)}"><i></i>${esc(g.fn)}</span><div class="rp-qi">${fq(r3(g.q))} ${esc(g.unita)}</div></td><td class="n rp-qc">${fq(r3(g.q))} ${esc(g.unita)}</td><td class="n"><b>${g.qp?eur(g.c):'—'}</b><div class="rp-m">${g.qp?'media '+eur(g.c/g.qp)+(g.unita?'/'+esc(g.unita):''):'senza prezzo'}</div>${g.qp&&g.ms.size?`<div class="rp-m">${g.ms.size===1?'1 riga':g.ms.size+' righe'} senza prezzo</div>`:''}</td></tr>`).join('')}
     </tbody><tfoot><tr><td>Totale</td><td class="rp-qc"></td><td class="n"><b>${eur(X.tot)}</b></td></tr></tfoot></table></div>
     ${X.ps.length>lim?`<button type="button" class="btn ghost block" data-a="rpAll">Mostra tutti (${X.ps.length})</button>`:''}`}
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Consumi e costi<div class="sh-s">${esc(rpRangeLabel(X.a,X.b))}${R.fid?' · '+nf(R.fid):''}${R.rep?' · '+esc(REPARTI[R.rep]||R.rep):''}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${filters}<div class="rp-res">${body}</div>
+  ${filters}${(R.back||[]).length?`<button type="button" class="btn ghost sm rp-back" data-a="rpBack">${ic('chevl')} Indietro</button>`:''}<div class="rp-res">${body}</div>
   <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Chiudi</button><button type="button" class="btn primary" data-a="rpXls" ${X.rows.length?'':'disabled'}>${ic('download')} Scarica Excel</button></div>`;
 }
 function rpEntry(){return`<div class="panel"><button type="button" class="row link rp-open" data-a="rpOpen"><span class="fdot" style="--c:var(--lagoon)">${ic('chart')}</span><div class="row-i"><div class="row-t">Consumi e costi</div><div class="row-m">Quanto spendi per fornitore e prodotto, con file Excel</div></div>${ic('chev')}</button></div>`}
@@ -2975,7 +3012,9 @@ function rpTipHide(){document.querySelectorAll('.rp-tip').forEach(t=>t.hidden=tr
 const rpBk=e=>e.target&&e.target.closest?e.target.closest('.rp-chart .bk'):null;
 document.addEventListener('pointerover',e=>{const g=rpBk(e);if(g)rpTipShow(g)});
 document.addEventListener('pointerout',e=>{const g=rpBk(e);if(g&&e.pointerType==='mouse'&&!g.contains(e.relatedTarget))rpTipHide()});
-document.addEventListener('pointerdown',e=>{if(!rpBk(e))rpTipHide()});
+document.addEventListener('pointerdown',e=>{S.rpPt=e.pointerType;if(!rpBk(e)){rpTipHide();S.rpLast=''}});
+document.addEventListener('click',e=>{const g=rpBk(e);if(!g)return;const k=g.dataset.df||g.dataset.da||'';if(S.rpPt==='mouse'||(k&&S.rpLast===k)){S.rpLast='';rpDrill(g)}else S.rpLast=k});
+document.addEventListener('keydown',e=>{const g=rpBk(e);if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();rpDrill(g)}});
 document.addEventListener('focusin',e=>{const g=rpBk(e);if(g)rpTipShow(g)});
 document.addEventListener('focusout',e=>{if(rpBk(e))rpTipHide()});
 addEventListener('resize',()=>{const o=sheets[sheets.length-1];if(o&&o.rp)paintSheet(o)});
@@ -3138,7 +3177,7 @@ function vOrari(){
   <button type="button" class="icon-btn" data-a="orW" data-v="1" aria-label="Settimana dopo">${ic('chev')}</button></div>
   <div class="or-st">${st.k?pill(st.k,st.l):`<span class="st">${st.l}</span>`}${w.pub&&st.ch?`<span class="muted small">pubblicata ${ago(w.pub)}</span>`:''}</div>
   <div class="or-acts"><button type="button" class="btn ghost sm" data-a="orCopy">${ic('copy')} Copia settimana prima</button><button type="button" class="btn ghost sm" data-a="orTipi">${ic('clock')} Turni tipo</button>${tbOn()?`<button type="button" class="btn ghost sm" data-a="tbXls">${ic('sheet')} Presenze</button>`:''}${st.k==='ok'||!st.k?'':`<button type="button" class="btn primary sm" data-a="orPub">${ic('send')} ${tp?'Avvisa delle modifiche':'Pubblica'}</button>`}</div>
-  ${cmGmBox()}
+  ${cmGmBox()}${lun===cur?orOggi():''}
   ${probs.length?`<section class="or-pb ${nerr?'':nda?'w':'a'}"><button type="button" class="or-pbh" data-a="orPb" aria-expanded="${!!S.orPb}">${ic('warn')}<b>${nda?nda+' da controllare':'Errori accettati'}</b><span>${[nerr?nerr+(nerr===1?' errore':' errori'):nda?'solo avvisi':'',nacc?nacc+' accettat'+(nacc===1?'o':'i'):''].filter(Boolean).join(' · ')}</span>${ic('chev',S.orPb?'up':'dn')}</button>
   ${S.orPb?`<div class="or-pl">${probs.map(p=>`<button type="button" class="or-pi ${p.ok?'acc':p.k}" data-a="orCell" data-u="${p.u.id}" data-g="${fd(p.u,p.g)}">${avatar(p.u,28)}<span><b>${esc(p.u.nome)}</b> ${esc(p.t)}${p.ok?' <i class="or-acc">accettato</i>':''}</span></button>`).join('')}</div>`:''}</section>`
   :orAny(t)?`<div class="or-ok">${ic('check')} Tutto a posto: riposi, pause e ore controllati.</div>`:''}
@@ -3414,13 +3453,22 @@ function cmGmBox(){
 }
 
 /* staff: i miei orari (solo la copia pubblicata, solo la propria riga) */
+// «In turno oggi»: turni di oggi dalla settimana pubblicata (tp), ordinati per inizio; «adesso» se il turno è in corso
+function orOggi(){
+  const lun=orLun(),w=orWeek(lun),tp=w&&w.tp;if(!tp)return'';
+  const g=(new Date().getDay()+6)%7,n0=new Date(),nm=n0.getHours()*60+n0.getMinutes(),st=D().staff;
+  const l=Object.entries(tp).map(([id,r])=>({u:st[id],sh:orShifts((r||{})[g])})).filter(x=>x.u&&x.u.stato==='attivo'&&x.sh.length).sort((a,b)=>a.sh[0][0]-b.sh[0][0]||byNome(a.u,b.u));
+  const on=x=>x.sh.some(([a,b])=>nm>=a&&nm<b),nOn=l.filter(on).length;
+  return`<section class="or-now" aria-label="In turno oggi"><div class="or-nowh">${ic('users')}<b>In turno oggi</b><span>${l.length?l.length+(l.length===1?' persona':' persone')+(nOn?' · '+nOn+' adesso':''):'nessuno'}</span></div>
+  ${l.length?`<ul>${l.map(x=>`<li class="rep-${orRep(x.u)}${on(x)?' on':''}">${avatar(x.u,32)}<b>${esc(x.u.nome)}${x.u.cognome?' '+esc(x.u.cognome.charAt(0))+'.':''}</b><span>${x.sh.map(([a,b])=>orHMc(a)+'–'+orHMc(b)).join(', ')}</span>${on(x)?'<i class="tag gm">Adesso</i>':''}</li>`).join('')}</ul>`:''}</section>`;
+}
 function vMieiOrari(me){
   const cur=orLun(),nx=orShift(cur,1),wn=orWeek(nx);const nextOk=!!(wn&&wn.tp&&orHas(wn.tp[me.id]));
   if(S.orMy==='next'&&!nextOk)S.orMy='';
   const lun=S.orMy==='next'?nx:cur,w=orWeek(lun),r=w&&w.tp?w.tp[me.id]:null,c=contrOf(me);
   const td=lun===cur?(new Date().getDay()+6)%7:-1;
   const head=`<h1 class="vt">I miei orari</h1><p class="vsub">${orRange(lun)}</p>
-  ${tbCard(me)}${cmStaffBox(me)}
+  ${tbCard(me)}${cmStaffBox(me)}${S.orMy==='next'?'':orOggi()}
   ${nextOk?`<div class="seg wide or-my" role="group" aria-label="Settimana">${[['','Questa settimana'],['next','Prossima']].map(([k,l])=>`<button type="button" aria-pressed="${(S.orMy||'')===k}" data-a="orMy" data-v="${k}">${l}</button>`).join('')}</div>`:''}`;
   if(!orHas(r))return head+empty('calendar',w&&w.tp?'Nessun turno':'Orari non ancora pronti',w&&w.tp?'In questa settimana non hai turni.':'Quando Maurizio li pubblica ricevi un avviso.');
   return head+`<div class="or-mtot"><b>${orH(orTot(r,c))}</b><span>di lavoro in settimana</span></div>
@@ -3787,7 +3835,7 @@ function newsSheet(){
 }
 function notifSheet(){
   const me=meU();const unread=myNotifs(me).filter(n=>!n.letta);
-  const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',prezzi:'warn',urgente:'warn',orari:'calendar',cambio:'users'};
+  const NI={richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',promemoria:'bell',prezzi:'warn',urgente:'warn',orari:'calendar',cambio:'users'};
   openSheet({live:()=>true,render:()=>{const ns=myNotifs(me).slice(0,80);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${ns.length?ns.map(n=>`<div class="notif ${unread.some(x=>x.id===n.id)?'unread':''}">${ic(NI[n.tipo]||'bell')}<div><div class="nt">${esc(n.titolo)}</div>${n.testo?`<div class="nx">${esc(n.testo)}</div>`:''}<div class="nx small">${ago(n.creato)}</div></div></div>`).join(''):'<p class="muted">Nessuna notifica.</p>'}`}});
   runPool(unread.map(n=>()=>upd('notifiche',n.id,{letta:true})),4).catch(()=>{});
@@ -4194,6 +4242,8 @@ const A={
   rpOpen:()=>{if(isMgr(meU()))openReport()},
   rpPer:d=>{rpState().per=d.v;refreshSheet()},
   rpAll:()=>{rpState().all=true;refreshSheet()},
+  rpBack:()=>{const R=rpState(),b=(R.back||[]).pop();if(b){Object.assign(R,b);R.all=false;refreshSheet()}},
+  rpProd:d=>{const R=rpState();(R.back||(R.back=[])).push({per:R.per,a:R.a,b:R.b,fid:R.fid,q:R.q});R.q=d.v;R.all=false;refreshSheet()},
   rpXls:()=>rpXlsx(),
   rq2:d=>{const L=rcvState(d.o).lines[+d.i];L.arr=Math.max(0,r3(L.arr+Number(d.d)));refreshSheet()},
   rst:d=>{const L=rcvState(d.o).lines[+d.i];L.st=SEM_NEXT[L.st||''];if(L.st==='meno')L.arr=L.qta>1?r3(L.qta-1):r3(L.qta/2);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}refreshSheet()},
@@ -4206,6 +4256,7 @@ const A={
   fsave:d=>saveSup(d.f),
   fLogo:()=>pickFile({accept:'image/*'},async fs=>{try{S.fe.logo=await fileToLogo(fs[0]);refreshSheet();toast('Logo pronto: tocca «Salva»')}catch(e){toast('Non riesco a leggere questa immagine.','err')}}),
   fLogoDel:()=>{S.fe.logo='';refreshSheet()},
+  feDay:d=>{const g=+d.v,l=(S.fe.giorniOrdine||[]).slice(),i=l.indexOf(g);i<0?l.push(g):l.splice(i,1);S.fe.giorniOrdine=l.sort();refreshSheet()},
   fdel:d=>delSup(d.f),
   imp:d=>impSheet(d.f),
   impPaste:()=>{S.imp.stage='paste';S.imp.err='';refreshSheet();setTimeout(()=>{const t=$('#imp-txt');if(t)t.focus()},50)},

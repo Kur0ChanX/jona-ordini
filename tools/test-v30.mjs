@@ -17,7 +17,7 @@ await pg.goto('http://localhost:8765/index.html');
 await pg.click('[data-a="formset"][data-v="dev"]');
 for(const [k,v] of [['nome','Mario'],['cognome','Rossi'],['username','mario'],['pw','password123'],['pw2','password123']])await pg.fill(`input[data-k="${k}"]`,v);
 await pg.click('[data-a="setupGo"]');await pg.waitForSelector('.testbar');await W(300);
-ok(await pg.evaluate(()=>APP_VER===30&&NEWS[0].v===30),'version 30 with news');
+ok(await pg.evaluate(()=>APP_VER>=30&&NEWS.some(n=>n.v===30)),'version 30 with news');
 ok((await last()||0)===0,'nothing to do: no badge');
 await pg.evaluate(async()=>{await put('staff','u_luca',{nome:'Luca',cognome:'Bianchi',username:'luca',ruolo:'staff',reparto:'cucina',mansione:'Cuoco',stato:'attivo',pass:await sha('u_luca:password123'),creato:now()});
   await put('messaggi','m1',{c:'tutti',da:'u_luca',t:'Ciao',creato:Date.now()-1000});});

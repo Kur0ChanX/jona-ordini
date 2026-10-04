@@ -1,34 +1,35 @@
-# Passaggio di consegne (2026-10-04, pomeriggio)
+# Passaggio di consegne (2026-10-04, sera)
 
-## Stato attuale
-- **Online: v29** (`APP_VER=29`, `CACHE=jona-ordini-v33`), PR #37 (v27+v28) e #38 (v29) unite, ramo riallineato.
-- **Sul ramo, NON pubblicata: v30** (`APP_VER=30`, `CACHE=jona-ordini-v34`), commit «v30 in corso»:
-  - **Pallino sull'icona** (fatto, `test-v30` verde per questa parte): `badgeCount` (chat non lette + avvisi non letti + badge delle schede, senza `carrello` e `invii`) + coda push, `appBadge()` in `render`, `obxBadge` → `appBadge`; numero nella cache `jona-badge` (`./badge-n`); `sw.js`: `badgeGet`/`badgeSet`/`badgeBump` (+1 a ogni push con app non in vista), `obxFlush` cala il numero, cache `jona-badge` non cancellata. Limiti detti a Mario: iPhone solo app su Home + notifiche permesse; Android dipende dal launcher, di solito solo con notifiche.
-  - **Forma d'onda vocali** (scritta, da finire di provare): `WF_N=40`, `wfStart`/`wfStop` (AnalyserNode sul microfono ogni 100 ms, `R.lv`), `wfCode` (40 cifre 0–9, campo `wf` del messaggio, 0 = silenzio), `wfBars`, barre dal vivo `#ch-rw` durante la registrazione, `.cht-wf` al posto di `.cht-bar`, `chAuPaint` colora le barre ascoltate, `chSeek` (tocco sulle barre). `test-v28` adattato e verde.
-  - **Prova rossa**: in `test-v30` il microfono finto di Chromium (`--use-fake-device-for-media-stream`) dà livelli 0 → «live bars move» e «message gets wf» falliscono. Capire se il finto è muto con i vincoli `echoCancellation/noiseSuppression` o con `AudioContext` (sonda in scratchpad scritta male, rifarla). Se è solo il finto: in prova iniettare un flusso con `OscillatorNode` → `createMediaStreamDestination` al posto di `getUserMedia`.
-- `CLAUDE.md`: nuova regola handoff (nuova sessione solo dopo push confermato; la nuova sessione fa `git fetch` + `merge --ff-only` prima di leggere).
+## Ultimo messaggio di Mario (da eseguire SENZA fermarsi)
+«Procedi con il cambio del sottodominio Cloudflare (accetto qualche ora senza notifiche), poi procedi con tutto il resto senza fermarti. Se devi cambiare sessione fallo da solo: ho un impegno, non posso dare consensi. Fermati solo quando hai finito tutta la lista, poi fammi una lista dettagliata di tutto ciò che hai fatto.»
+Detto a Mario: il disagio, sui telefoni non ancora aggiornati, riguarda notifiche + invio foto/vocali + «Chiedi a Jona» finché non riaprono l'app; nessun dato perso.
 
-## Richieste di Mario da fare (in ordine)
-1. **Invito rifatto («fa schifo così»)**. Gli screenshot mostrano che sul suo telefono girava ancora il testo vecchio (app non aggiornata: chiudere e riaprire). L'anteprima WhatsApp con `media/invito.jpg` funziona. Vuole **nascondere «Kur0ChanX» o non avere proprio il link**. Proporre (BRAINSTORMING, 2-3 strade):
-   - a) **dominio proprio** (es. `jona.team` o `jonaristorante.app`, ~10–15 €/anno) su Cloudflare: il Worker fa da redirect `https://<dominio>/entra/<codice>` → app; l'app resta su github.io (nessun dato perso).
-   - b) **organizzazione GitHub gratuita** (es. `jona-ristorante`) e repository spostato lì → `jona-ristorante.github.io/jona-ordini`: gratis, ma cambia l'origine → i telefoni installati perdono login/dati locali e vanno ricollegati.
-   - c) **codice d'invito senza link**: cartolina/QR + codice corto di 6 lettere da scrivere nell'app (`/invito/<codice>` nel Worker che restituisce la chiave solo una volta e scade), ma serve comunque aprire l'app una volta.
-   - Rifare anche la grafica dell'invito (testo + cartolina `inviteCard`) in modo più curato; chiedere a Mario cosa non gli piace.
-2. **Finire v30** (prova forma d'onda), poi pubblicare (PR → squash → controllo online → `git fetch origin main && git merge origin/main` → push).
-3. Maurizio Lai: deve registrarsi dal link d'invito, poi Mario approva e mette amministratore (istruzioni date).
-4. «Chi c'è in turno oggi» (Orari dello staff e Staff → Orari, da `tp`).
-5. Promemoria ordini (schema prima, se dubbi).
-6. «Consumi e costi» più interattivo (skill `dataviz` prima).
-7. Mauro Loi in «F&B Manager»: da confermare.
-8. Da provare dal vero: vocale Android → iPhone, gesto indietro Android, pallino.
+## Stato
+- **v30 unita in main** (PR #39, squash `d9f038c`), ramo riallineato (merge di main, nessuna differenza). `APP_VER=30`, `CACHE=jona-ordini-v34`.
+- v30 contiene: pallino sull'icona, forma d'onda dei vocali (`test-v30` ora verde: il microfono finto di Chromium fa solo un bip al secondo, la prova gli passa un WAV con `--use-file-for-fake-audio-capture`), **inviti con codice**.
+- **Controllo online da completare**: alla chiusura il workflow Cloudflare (run 37210528836) e Pages erano in corso. Verificare: `curl https://invito.mario-miscera.workers.dev/ABCDEF` contiene `#i=ABCDEF`; `sw.js` online ha `jona-ordini-v34`; run del workflow verde (se rosso: `get_job_logs`).
 
-## Memoria per tutte le chat
-Mario vuole la regola dell'handoff (sessione nuova solo dopo il push confermato, fetch all'avvio) in tutte le chat: il contenitore cloud non conserva file utente, quindi dargli il testo da incollare in claude.ai → Impostazioni → Profilo → preferenze personali (dove c'è già la regola dei titoli). Non ancora fatto.
+## Inviti con codice (v30, fatto)
+- `worker/invito/` (Worker `invito`, nessun binding): `GET /<CODICE>` → pagina con meta Open Graph (`media/invito.jpg`) + redirect a `https://kur0chanx.github.io/jona-ordini/#i=<CODICE>`. Workflow: step «Pubblica il link corto degli inviti» + curl di prova.
+- `worker/src/index.js`: `POST /inviti` (solo membri; chiave presa da `membri/<uid>.k`, mappa `membriK`) → `{codice, scade}`; `GET /invito/<codice>` → `{k}` o 404; tabella `inviti` nel primo D1 (`invDb`), 7 giorni, pulizia nel cron. Alfabeto senza I/O/0/1.
+- `index.html`: `WK_SUB`, `PUSH_URL`, `INV_URL`; `invNew` (codice dal server, ripiego link lungo `#k=` in modalità locale/senza server), `invRedeem`, avvio con `#i=` → `jona_icode` → chiave in `boot`; `fbJoinKey` accetta codice o link corto; schermata «Collega» con «codice d'invito (6 lettere)»; testo invito con `🔑 … *CODICE*`; cartolina con QR più piccolo (430) e riga «Codice d'invito»; foglio Invita mostra il codice.
+- `media/invito.jpg` rifatta senza il finto pulsante «Tocca per entrare» (HTML + Jost locale renderizzato con Playwright; PIL non c'è). `og:description` senza «Tocca per entrare».
+- Prova `tools/test-inviti.mjs` (17 verdi). Verdi anche: test-v26..v30, news, staff, registrazione, invito-bloccato, allegati-server, gemini-server.
 
-## Prove
-`tools/README.md`. Server `python3 -m http.server 8765`. Nuove: `test-v29` (8, invito), `test-v30` (pallino verde, onda rossa come sopra). Verdi: `test-v28`, `test-v27`, `test-news`, `test-staff`, `test-v26`.
+## Lista da fare (in ordine, senza fermarsi)
+1. **Finire il controllo online della v30** (sopra).
+2. **Cambio sottodominio workers.dev** da `mario-miscera` a uno senza nome (proposto `jonaristorante`; se occupato `jona-ristorante`, `jonaportocervo`). Mario non è disponibile → farlo **dal workflow**: step opzionale che chiama `PUT /accounts/$CF_ACCOUNT/workers/subdomain` `{"subdomain":"<nuovo>"}` (prima `GET` per vedere quello attuale; se il token non ha il permesso, lasciare un avviso e NON rompere il deploy). Ordine per ridurre il buco: (a) app e `sw.js` con il nuovo `WK_SUB`/`PUSH_URL` + workflow (rinomina, poi deploy, prove curl col nuovo nome) in una sola PR; (b) dopo l'unione verificare `/salute` sul nuovo indirizzo. Nuova versione v31 (`APP_VER`, `NEWS`, `CACHE` v35). Aggiornare `CLAUDE.md` (indirizzo Worker). Se l'API rifiuta: non forzare, scrivere a Mario i passi a mano in Cloudflare (pannello **Workers & Pages** → sottodominio → **Change**: verificare i nomi esatti prima di scriverli) e tenere `mario-miscera`.
+3. Maurizio Lai: registrazione dal link d'invito, approvazione e ruolo amministratore (istruzioni già date a Mario; niente codice).
+4. **«Chi c'è in turno oggi»** in Orari dello staff e Staff → Orari, dalla settimana pubblicata `tp`.
+5. **Promemoria ordini** (scegliere da soli lo schema più semplice: per fornitore, giorno/ora, notifica push a gestori).
+6. **«Consumi e costi» più interattivo** (caricare prima la skill `dataviz`).
+7. Mauro Loi in «F&B Manager»: da confermare con Mario (solo chiedere nel resoconto).
+8. Da provare dal vero (Mario): vocale Android → iPhone, gesto indietro Android, pallino, invito con codice.
+Ogni versione: PR → squash → controllo online → `git fetch origin main && git merge origin/main` → push. Alla fine: **lista dettagliata di tutto il fatto** per Mario + istruzioni numerate per le prove.
 
 ## Rischi aperti
 - `/invia` del Worker non controlla chi chiama; tutti i telefoni approvati leggono tutti i messaggi e allegati.
-- Il link d'invito contiene la chiave del ristorante (`#k=`): chi lo ha entra (resta l'approvazione del telefono).
+- `/invito/<codice>` senza limite di tentativi (32^6 combinazioni, 7 giorni; resta l'approvazione del telefono). Il link lungo `#k=` resta solo come ripiego.
+- iPhone: l'app sulla Home ha memoria separata da Safari → al primo avvio chiede il codice (ora corto, si scrive a mano).
+- Dopo il cambio sottodominio: i link d'invito già mandati con `mario-miscera` smettono di aprirsi (il codice scritto a mano funziona ancora).
 - `test-firebase-sync` già rotto da prima; `test-firebase-flow` fallisce 23:30–24:00.
