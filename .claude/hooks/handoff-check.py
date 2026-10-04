@@ -53,6 +53,6 @@ print(json.dumps({
     "systemMessage": f"Regola {SOGLIA}%: {why}. Claude deve fare il passaggio di consegne.",
     "hookSpecificOutput": {
         "hookEventName": "UserPromptSubmit",
-        "additionalContext": f"PROTOCOLLO DI HANDOFF (CLAUDE.md) ATTIVATO: {why}. Prima di altro lavoro: rispondi al messaggio, poi aggiorna docs/PASSAGGIO-CONSEGNE.md (max 800 parole), verifica le condizioni e, se sono tutte vere, apri da solo la nuova sessione con un prompt di massimo 3 righe."
+        "additionalContext": f"PROTOCOLLO DI HANDOFF (CLAUDE.md) ATTIVATO: {why}. Prima di altro lavoro: rispondi al messaggio, poi aggiorna docs/PASSAGGIO-CONSEGNE.md (max 1000 parole), verifica le condizioni e, se sono tutte vere, apri da solo la nuova sessione con un prompt di massimo 3 righe."
     }
 }))
