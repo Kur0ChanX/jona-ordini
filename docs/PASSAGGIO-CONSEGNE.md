@@ -2,8 +2,7 @@
 
 ## Stato attuale
 - Online la **v12**. Sul ramo `backup-automatico` (commit `6463841`, già su GitHub) c'è la **v13 = Scaglione 2**, NON ancora pubblicata: `APP_VER=13`, `sw.js` `CACHE=jona-ordini-v17`, voce `NEWS` v13.
-- Prove fatte: `test-staff`, `test-voice`, nuova `tools/test-scaglione2.mjs` (20 controlli) tutte verdi.
-- Prove da fare: quelle con l'emulatore Firebase (`test-firebase-approva-arrivi`, `-push`, `-flow`, `-sync`): l'emulatore stava ancora scaricando i suoi file quando la sessione è stata passata. Poi `test-news` (resta indietro, vedi rischi).
+- Prove tutte verdi: `test-staff`, `test-voice`, `test-scaglione2`, `test-news` (riscritta: conteggi calcolati da `NEWS`, contatore «9+»), e con l'emulatore `test-firebase-approva-arrivi`, `-push`, `-flow`, `-sync`, `-backup`, `-bulk`, `-report`.
 
 ## File toccati nello Scaglione 2 (v13)
 - `index.html`:
@@ -27,7 +26,7 @@
 Metodo: 3 funzioni → prove → PR → squash merge → controllo online → scaglione successivo. A ogni versione: `APP_VER`+1, voce `NEWS`, `CACHE` in `sw.js`.
 
 **Scaglione 2: scritto (v13), da finire**
-1. Avviare l'emulatore (`tools/README.md`) e lanciare le prove Firebase; correggere se qualcosa non va.
+1. Prove Firebase: fatte, tutte verdi.
 2. PR da `backup-automatico` → squash merge → controllo online → `git fetch origin main && git merge origin/main` e push normale.
 3. Dire a Mario cosa provare sul telefono (carrello «È urgente?», import di un listino con un prezzo più alto, controllo merce con un prodotto mancante).
 
@@ -43,7 +42,6 @@ Metodo: 3 funzioni → prove → PR → squash merge → controllo online → sc
 **Idee in lista, non ancora scelte**: HACCP all'arrivo, contestazione fornitore, giorni di consegna, scorte minime, foto prodotto, prezzo migliore in approvazione, vuoti a rendere, budget per reparto, conferma del fornitore via link, ricette e costo del piatto.
 
 ## Rischi e note aperte
-- `tools/test-news.mjs` è indietro (si aspetta `APP_VER` 7, conteggi scritti a mano): da riscrivere calcolando i conteggi da `NEWS`.
 - `test-firebase-flow` fallisce tra le 23:30 e mezzanotte (ora limite «tra 30 minuti»): non è un errore dell'app.
 - `test-staff` e `test-news` vanno lanciati con `firebase-config.js` nascosto (vedi `tools/README.md`). Con l'emulatore vanno svuotati sia `demo-jona` sia `jona-ordini`.
 - Background Sync non esiste su iPhone: lì il ritentativo avviene solo ad app aperta.
