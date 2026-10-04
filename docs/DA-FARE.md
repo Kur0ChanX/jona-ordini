@@ -1,9 +1,9 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-05 (sessione #03). Si aggiorna a ogni cambiamento: quello che è fatto si toglie.
+Aggiornato: 2026-10-05 (sessione #04). Si aggiorna a ogni cambiamento: quello che è fatto si toglie.
 
 ## 1. Claude da solo (nessuna scelta di Mario)
-- `tools/test-firebase-flow` fallisce tra le 23:30 e le 24:00: sistemare la prova (non l'app).
+- (niente da fare per ora)
 
 ## 2. Claude, dopo la scelta o l'approvazione di Mario
 - **Link dell'app su Cloudflare Pages** (gratis, Mario ha detto sì): prima di farlo Mario deve sapere che ogni telefono va ricollegato (invito + approvazione + accesso) e le notifiche riattivate. Decidere il giorno.
