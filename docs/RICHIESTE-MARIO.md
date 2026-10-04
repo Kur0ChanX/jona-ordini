@@ -38,7 +38,14 @@ Fatto nella v15: il suo filmato (menù JONA, mani dello staff e dello chef) scon
 
 Proposte (da scegliere): ordine suggerito (storico + meteo + coperti), bolla letta con la foto (Gemini spunta il controllo merce e trova prezzi diversi), scadenze «da usare oggi», registro sprechi con foto e costo, timbratura con QR confrontata con gli orari (foglio presenze per il consulente), scambio turno tra colleghi con controllo regole, chi riceve la merce (incrocio orari e consegne), bacheca del servizio di oggi, checklist di apertura e chiusura, «Chiedi a Jona» (domande a voce sui dati dell'app).
 
+## Scelte di Mario sulle 10 idee e contratti (4 ottobre 2026)
+> idea 1 provedi poi 5 c'è ma attivabile o meno falla ma teniamo la off 6 10 e poi metti messaggi tra colleghi fome una chat bella stile whatsapp graficamente affascinante e in stile con il programma
+> per ora metti che chensolo maurizio può mettere contratto ore dello staff e pause perché in genere nel lavoro si fanno lre in piú non sotto contratto ed è motivo di lamentela metti queste info a disposizione per chi fà i turni orari per i calcoli delle celle e allert se qualcosa è sbagliato ma puoi bypassare dando il consenso consapevole
+> nel video attenzione il menù è fatto male si vede che è ai passa da orizzontale a verticale
+
+Cosa vuol dire: v16 = ordine suggerito (1), timbratura con QR spenta di partenza (5), scambio turno (6), contratto solo per Maurizio e nascosto allo staff, errori dei turni con «Salva lo stesso». v17 = «Chiedi a Jona» (10) e chat tra colleghi stile WhatsApp. Video: il menù generato dall'IA cambia forma durante lo scambio (fotogrammi ~25-33 e ~57-73), non si corregge tagliando: serve un video nuovo.
+
 ## Stato
-- Fatto: approvazione per fornitore, controllo arrivo a semaforo, invii in sospeso (v12); aumento prezzi, prodotto urgente, controllo merce con chi aveva chiesto (v13); orari del personale (v14); animazione invio allo chef e «È urgente» senza punto di domanda (v15).
-- In coda, in ordine: le idee nuove scelte da Mario; più lingue; notifiche in più per i ragazzi (da decidere).
+- Fatto: approvazione per fornitore, controllo arrivo a semaforo, invii in sospeso (v12); aumento prezzi, prodotto urgente, controllo merce con chi aveva chiesto (v13); orari del personale (v14); animazione invio allo chef e «È urgente» senza punto di domanda (v15); ordine suggerito, timbratura, cambi turno, contratto riservato e consenso (v16).
+- In coda, in ordine: «Chiedi a Jona» e chat tra colleghi (v17); video nuovo dello scambio del menù (da Mario); più lingue; notifiche in più per i ragazzi (da decidere).
 - Idee proposte ma non ancora scelte da Mario: riepilogo della sera per Maurizio, giorni di consegna, HACCP all'arrivo, contestazione fornitore, scorte minime, foto prodotto, prezzo migliore in approvazione, vuoti a rendere, budget per reparto, conferma del fornitore, ricette e costo del piatto.

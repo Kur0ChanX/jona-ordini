@@ -86,6 +86,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - `firebase-config.js` (`self.JONA_FIREBASE`, null = non configurato), `lib/` (Firebase compat 10.14.1 e generatore QR, locali per l'uso senza rete), `sw.js` (network-first: ogni file nuovo va in `FILES`), `manifest.webmanifest` (fullscreen).
 - Notifiche push: `worker/` (Cloudflare Worker `jona-notifiche`, `/chiave` e `/invia`, Web Push + VAPID, segreto `VAPID_JWK` creato dal workflow `.github/workflows/cloudflare-worker.yml`), iscrizioni in Firestore `push/<id>`, `notify()` → `pushSend()`, `sw.js` mostra la notifica.
 - Orari del personale: `config/orari_<lunedì>` (`t` bozza, `tp` pubblicata, una riga per persona), `config/orari_tipi`, `staff.contratto`; pianificatore nella scheda Staff (Persone | Orari), voce «Orari» per lo staff. Scrittura di una persona con `t.<id>` (`LocalStore.update` capisce i punti).
+- v16: ordine suggerito in Invii (`sugStats`, meteo Open-Meteo per Porto Cervo), timbratura con QR (`config/app.timbra`, spenta di partenza; `config/timbr_<lunedì>`; `lib/jsqr-1.4.0.js`), cambi turno (`cambi.<id>` nella settimana pubblicata). Contratto modificabile solo dall'amministratore (`isGM`), lo staff non lo vede; errori dei turni salvati solo con il consenso (`ok.<persona>`).
 - Import listini: Excel/CSV, fattura XML, tabella incollata, foto lette da Gemini (chiave in `jona_gemini_key`, solo sul telefono).
 
 ## Chiavi in localStorage

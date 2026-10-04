@@ -1,7 +1,7 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- In pubblicazione la **v15**: animazione «Inviato allo chef» + «È urgente» senza punto di domanda. `APP_VER=15`, `CACHE=jona-ordini-v19`. Online prima: v14 Orari (PR #24, squash `ff329a2`).
+- Online la **v15** (PR #25, squash `81d7022`): animazione «Inviato allo chef» + «È urgente» senza punto di domanda. `APP_VER=15`, `CACHE=jona-ordini-v19`. File online identici a quelli provati; ramo riallineato con `git merge origin/main`.
 - Prove verdi: `test-invio-anim` (14), `test-orari` (62), `test-firebase-orari` (14), `test-staff`, `test-news`, `test-scaglione2`, `test-voice`, `test-report`, `test-firebase-*`.
 - Mario deve ancora provare sul telefono v13 (urgente, prezzi, controllo merce), v14 (orari) e v15 (animazione dopo «Invia allo chef», anche su iPhone).
 
