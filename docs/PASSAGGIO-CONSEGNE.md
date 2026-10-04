@@ -1,36 +1,27 @@
 # Passaggio di consegne (2026-10-04)
 
 ## Stato attuale
-- **v12 (Scaglione 1) fatta**: `APP_VER=12`, `sw.js` `CACHE=jona-ordini-v16`. Prova: `tools/test-firebase-approva-arrivi.mjs` (36 controlli).
-  - Approvazione: `reqCard` a blocchi `.fsec.fblk` per fornitore, `reqPickSheet` (`rpick`/`rpadd`, righe `aggiunto:true`, `qtaOrig:0`), blocco rosso `.nof` senza fornitore.
-  - Arrivo a semaforo: `SEM`, `SEM_NEXT`, `rcvDiff`, azione `rst`, `rcvState().lines[i].st`; `ricezione.righe` uguale a prima + motivo `nonctrl`; campo `nonControllati` sull'ordine.
-  - Invii in sospeso: `obx*` in `index.html` (IndexedDB `jona-outbox`, `obxBar` in `shell` e `screenLogin`, `obxTick` in `render`), `sync` in `sw.js`, `setAppBadge`, SMS con `sms:?&body=`.
-- Prima della v12: v11 su `main` = `8aa1024`.
-- Notifiche push **funzionanti** (provate sul Xiaomi di Mario). iPhone di Maurizio ancora da attivare (serve iOS ≥ 16.4 e app aperta dall'icona Home).
-- Regole Firestore con la collezione `push` **già pubblicate** da Mario.
+- Online la **v12** (Scaglione 1): `APP_VER=12`, `sw.js` `CACHE=jona-ordini-v16`, `main` = `96ff6b8` (PR #20). Ramo di lavoro `backup-automatico`.
+- Notifiche push funzionanti (Xiaomi di Mario). iPhone di Maurizio da attivare (iOS ≥ 16.4, app aperta dall'icona Home). Regole Firestore con `push` già pubblicate.
+- Regole di lavoro aggiornate in `CLAUDE.md`: handoff al 70% (`.claude/hooks/handoff-check.py`, `SOGLIA = 70`), nuova sessione aperta in automatico, force push vietato.
 
-## File toccati in questa sessione
-- `worker/src/index.js`: Cloudflare Worker `jona-notifiche` (`/salute`, `/chiave`, `/invia`). Web Push RFC 8291 + VAPID RFC 8292 con WebCrypto, solo host push noti, max 50 iscrizioni a chiamata, risposta `{inviati, scaduti, errori}`.
-- `.github/workflows/cloudflare-worker.yml`: deploy con Wrangler 4. Crea il segreto `VAPID_JWK` solo se manca (se `secret list` fallisce si ferma), poi prova `/salute` e `/chiave`.
-- `index.html`: blocco «notifiche push» (`PUSH_URL`, `pushWatch`, `pushSave`, `pushSync`, `pushOn`, `pushOff`, `pushSend`, `pushTest`, `pushHelp` + `PUSH_HELP`). `notify()` chiama `pushSend()`. Pulsanti nel menu profilo (`meMenu`), `pushSync()` in `login()`, `pushUnlink()` in `logout()`, stili `.ph-*`.
-- `sw.js`: eventi `push` e `notificationclick`.
-- `firebase/firestore.rules`: aggiunta la collezione `push`.
-- `tools/test-firebase-push.mjs` (nuovo), `tools/README.md`, `docs/FIREBASE.md`, `CLAUDE.md` (regola SPIEGAZIONI PER MARIO).
+## File toccati nello Scaglione 1 (v12)
+- `index.html`:
+  - Approvazione: `reqCard` a blocchi `.fsec.fblk` per fornitore, `reqPickSheet` (azioni `rpick`/`rpadd`; righe `aggiunto:true`, `qtaOrig:0`, escluse da `rimossi`), blocco rosso `.nof` senza fornitore (`approve()` già lo blocca).
+  - Arrivo a semaforo in `receiveSheet`: `SEM`, `SEM_NEXT`, `rcvDiff`, azione `rst`, `rcvState().lines[i].st` (`''`/`ok`/`ko`/`meno`); `confirmReceipt` chiede conferma se ci sono non controllati. `ricezione.righe` invariato + motivo `nonctrl`; campo `nonControllati` sull'ordine.
+  - Invii in sospeso: `pushSend` mette in coda le push fallite (IndexedDB `jona-outbox`); `obxLoad`/`obxFlush` (online, apertura, `visibilitychange`, ogni minuto, solo a pagina visibile), `obxBar` in `shell` e `screenLogin`, `obxTick` in `render` («Arrivata ✓»), `setAppBadge`, SMS `sms:?&body=`. `notify` verso `gm`/`gestori` imposta `S.obxWait` per seguire le scritture Firestore in sospeso.
+- `sw.js`: evento `sync` (tag `jona-outbox`), non invia se c'è una finestra visibile.
+- `tools/test-firebase-approva-arrivi.mjs` (36 controlli); `test-staff/news/voice/report` nascondono da sole `firebase-config.js`; `tools/README.md`, `CLAUDE.md`.
 
 ## Decisioni e motivi
-- **Cloudflare Worker** al posto di Firebase Blaze: gratis, deploy automatico da GitHub.
-- Le iscrizioni push si leggono e scrivono **fuori da `S.db`** (Firestore diretto con errori gestiti): un `permission-denied` dentro `S.db` blocca tutta l'app (`fb_perm`).
-- Push solo con `FirebaseStore`, verso utente, `gm` o `gestori` (ruolo vero da `D().staff`), escluso il telefono di chi invia.
-- Xiaomi: la causa del rifiuto (errore 20, `AbortError`) era «Sospendi l'attività dell'app se inutilizzata». È nella guida `PUSH_HELP`.
-- Notifiche a Maurizio già esistenti: nuova richiesta (`notify('gm',…)`, riga ~1278) e controllo merce (`notify('gm',…)`, riga ~1712).
+- Push in coda risolte **al momento dell'invio** (si salvano le iscrizioni): così anche `sw.js` può mandarle senza Firestore.
+- Background Sync registrato solo se non ci sono scritture Firestore in sospeso: evita che la push arrivi prima della richiesta.
+- Semaforo: il tocco gira ok → ko → meno → ok (il grigio resta solo all'inizio); con «meno» la quantità proposta è `qta-1` (o metà se `qta ≤ 1`).
+- Pubblicazione senza force: dopo lo squash merge si fa `git merge origin/main` sul ramo e push normale.
+- Push: Cloudflare Worker (gratis), iscrizioni fuori da `S.db` (un `permission-denied` lì bloccherebbe l'app).
 
-## Piano a scaglioni (deciso con Mario)
-Metodo: 3 funzioni → test → PR → squash merge → controllo online → versione e NEWS → scaglione successivo. A ogni versione: `APP_VER`+1, voce `NEWS`, `CACHE` in `sw.js`.
-
-**Scaglione 1 (fatto, v12)**
-1. **Approvazione divisa per fornitore** (scelta 1A + regola C): in approvazione la richiesta è a blocchi colorati per fornitore; «+ Aggiungi» dentro ogni blocco cerca solo nel listino di quel fornitore. Un prodotto scritto a mano non si approva senza fornitore (già c'è il controllo in `approve()`, riga ~1397: va esteso all'aggiunta).
-2. **Controllo arrivo a semaforo** (2A): righe grandi, tocchi grigio→verde «c'è»→rosso «manca»→giallo «meno» (si apre la quantità), ordine libero, contatore «9 di 14», invio anche parziale (non toccati = «non controllato»). Resta «È arrivato tutto». Oggi c'è menu `MOTIVI` + stepper (`rcvState`, righe ~1675-1715): da sostituire con il semaforo, mantenendo il formato `ricezione.righe` usato da Storico/report (righe ~2023, ~2147).
-3. **Invii in sospeso**: coda locale delle push non partite con ritentativo su `online`, apertura app e `visibilitychange`; Background Sync in `sw.js` su Android; numero sull'icona (`navigator.setAppBadge`) finché c'è qualcosa da inviare; avviso fisso «⚠ Non ancora arrivata a Maurizio» e «Arrivata ✓» con vibrazione. SMS solo come pulsante manuale, per la richiesta rimasta in sospeso. Nota: le scritture Firestore offline partono già da sole a rete tornata (`syncPill`); mancano la push e un avviso chiaro per lo staff.
+## Piano a scaglioni
+Metodo: 3 funzioni → prove → PR → squash merge → controllo online → scaglione successivo. A ogni versione: `APP_VER`+1, voce `NEWS`, `CACHE` in `sw.js`.
 
 **Scaglione 2 (prossimo)**
 - Avviso aumento prezzi (all'import listino o fattura: prodotti aumentati con %).
@@ -53,3 +44,4 @@ Metodo: 3 funzioni → test → PR → squash merge → controllo online → ver
 - `test-firebase-flow` fallisce tra le 23:30 e mezzanotte (ora limite «tra 30 minuti»): non è un errore dell'app.
 - `test-staff` e `test-news` vanno lanciati con `firebase-config.js` nascosto (vedi `tools/README.md`). Con l'emulatore vanno svuotati sia `demo-jona` sia `jona-ordini`.
 - Background Sync non esiste su iPhone: lì il ritentativo avviene solo ad app aperta.
+- Il promemoria non conosce la finestra vera: sopra 200k token assume 1M, sotto assume 200k (forzabile con `JONA_CTX_WINDOW`). Con finestra 1M e meno di 200k usati può segnalare troppo presto.

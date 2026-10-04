@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-# Ricorda a Claude il protocollo di handoff di CLAUDE.md: >= 20 messaggi nella sessione o contesto >= 80%.
+# Ricorda a Claude il protocollo di handoff di CLAUDE.md: >= 20 messaggi nella sessione o contesto >= 70%.
+# JONA_CTX_WINDOW forza la dimensione della finestra (es. 1000000); senza, sopra 200k token si assume 1M.
 import json, os, sys
 
 MAX_PROMPTS = 20
+SOGLIA = 70  # percentuale di contesto che fa scattare l'handoff
 WINDOW = int(os.environ.get("JONA_CTX_WINDOW", "0"))
 EVERY = 5
 
@@ -40,7 +42,7 @@ if tp and os.path.exists(tp):
 
 window = WINDOW or (1_000_000 if ctx > 200_000 else 200_000)
 n, pct = st["n"], round(100 * ctx / window)
-over = n >= MAX_PROMPTS or pct >= 80
+over = n >= MAX_PROMPTS or pct >= SOGLIA
 if not over or ("last" in st and n - st["last"] < EVERY):
     sys.exit(0)
 st["last"] = n
@@ -48,9 +50,9 @@ with open(state_file, "w") as f:
     json.dump(st, f)
 why = f"{n} messaggi in questa sessione" + (f", contesto circa {pct}%" if ctx else "")
 print(json.dumps({
-    "systemMessage": f"Regola 80%: {why}. Claude deve proporre il passaggio di consegne.",
+    "systemMessage": f"Regola {SOGLIA}%: {why}. Claude deve fare il passaggio di consegne.",
     "hookSpecificOutput": {
         "hookEventName": "UserPromptSubmit",
-        "additionalContext": f"PROTOCOLLO DI HANDOFF (CLAUDE.md) ATTIVATO: {why}. Prima di altro lavoro: rispondi al messaggio, poi scrivi docs/PASSAGGIO-CONSEGNE.md, verifica le condizioni e chiedi a Mario il permesso di aprire una nuova sessione."
+        "additionalContext": f"PROTOCOLLO DI HANDOFF (CLAUDE.md) ATTIVATO: {why}. Prima di altro lavoro: rispondi al messaggio, poi aggiorna docs/PASSAGGIO-CONSEGNE.md (max 800 parole), verifica le condizioni e, se sono tutte vere, apri da solo la nuova sessione con un prompt di massimo 3 righe."
     }
 }))
