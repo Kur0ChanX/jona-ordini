@@ -22,6 +22,8 @@
 - Urgenza per singolo prodotto (non per richiesta intera), come chiesto; la richiesta va in cima se ha almeno un prodotto urgente.
 - Avviso aumento prezzi solo per prodotti già a listino con prezzo vecchio > 0.
 
+**Le richieste originali di Mario (orari, lingue, notifiche) sono parola per parola in `docs/RICHIESTE-MARIO.md`: leggerle prima di ogni scaglione.**
+
 ## Piano a scaglioni
 Metodo: 3 funzioni → prove → PR → squash merge → controllo online → scaglione successivo. A ogni versione: `APP_VER`+1, voce `NEWS`, `CACHE` in `sw.js`.
 
