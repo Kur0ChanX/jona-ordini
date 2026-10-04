@@ -13,10 +13,10 @@
 - `t` del messaggio («📷 Foto», «🎤 Messaggio vocale (0:12)») per liste, avvisi e versioni vecchie dell'app.
 
 ## Da fare / in sospeso
-1. **Mario**: aggiungere al token Cloudflare `CLOUDFLARE_API_TOKEN` il permesso **Account › D1 › Edit**, poi rilanciare il workflow «Pubblica server notifiche (Cloudflare Worker)» e controllare nel log «Foto e vocali: 4 database collegati».
-2. Gemini: chiave su aistudio.google.com (account Google privato va bene) → segreto GitHub `GEMINI_API_KEY` → rilanciare lo stesso workflow.
-3. Domande aperte a Mario: reazioni veloci (👍 ❤️ 😂 ✅) e sticker Jona; chi spostare in «F&B Manager».
-4. Provare sui telefoni veri il vocale iPhone → Android e viceversa.
+1. **Mario (in corso)**: crea un **token Cloudflare nuovo solo per Jona** (modello «Modifica Cloudflare Workers» + Account › D1 › Modifica), lo mette nel segreto GitHub `CLOUDFLARE_API_TOKEN` (il token vecchio resta per i suoi altri progetti). Poi crea la chiave Gemini (nome «Jona Ordini», con l'account Google del ristorante) → segreto `GEMINI_API_KEY` → rilancia il workflow «Pubblica server notifiche (Cloudflare Worker)». Controllo: log «Foto e vocali: 4 database collegati.» e `/salute` con `"allegati":4,"gemini":true`. Oggi `/salute` dice `allegati:0, gemini:false`.
+2. Domande aperte a Mario: reazioni veloci (👍 ❤️ 😂 ✅) e sticker Jona; chi spostare in «F&B Manager».
+3. Provare sui telefoni veri il vocale iPhone → Android e viceversa.
+4. Il repository ora è `Kur0ChanX/jona-ordini` (GitHub segnala lo spostamento, i push funzionano).
 
 ## Idee parcheggiate (non farle finché Mario non le chiede)
 Foto della confezione → carrello, allarme quantità strana, «Rifai come martedì scorso», mancanti riordinati, risposta del fornitore dallo screenshot; codice a barre scartato. Domanda sui listini (PDF, fattura XML che aggiorna prezzi e controlla la merce, sinonimi/unità, storico prezzi, listino vecchio): proposte da fare se la riprende.
