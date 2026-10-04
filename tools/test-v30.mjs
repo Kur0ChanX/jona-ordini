@@ -3,7 +3,10 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 import fs from 'fs';
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
-const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream','--autoplay-policy=no-user-gesture-required']});
+// il microfono finto di Chromium fa solo un bip al secondo: gli faccio ascoltare 4 s di «voce» (tono + rumore che sale e scende)
+const wav=(await import('os')).tmpdir()+'/jona-voce.wav';{const n=48000*4,d=Buffer.alloc(44+n*2);d.write('RIFF',0);d.writeUInt32LE(36+n*2,4);d.write('WAVEfmt ',8);d.writeUInt32LE(16,16);d.writeUInt16LE(1,20);d.writeUInt16LE(1,22);d.writeUInt32LE(48000,24);d.writeUInt32LE(96000,28);d.writeUInt16LE(2,32);d.writeUInt16LE(16,34);d.write('data',36);d.writeUInt32LE(n*2,40);
+  for(let i=0;i<n;i++){const t=i/48000,e=.5+.5*Math.sin(2*Math.PI*1.3*t),v=e*(.5*Math.sin(2*Math.PI*220*t)+.3*Math.sin(2*Math.PI*440*t)+.2*(Math.random()*2-1));d.writeInt16LE(Math.round(Math.max(-1,Math.min(1,v))*20000),44+i*2)}fs.writeFileSync(wav,d)}
+const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--use-fake-ui-for-media-stream','--use-fake-device-for-media-stream','--use-file-for-fake-audio-capture='+wav,'--autoplay-policy=no-user-gesture-required']});
 const ctx=await b.newContext({viewport:{width:390,height:800},serviceWorkers:'block'});
 await ctx.grantPermissions(['microphone'],{origin:'http://localhost:8765'});
 await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
