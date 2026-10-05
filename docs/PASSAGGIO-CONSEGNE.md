@@ -6,7 +6,8 @@ Sessione attuale: #11
 - Mario: «vai mettili al massimo li modifichiamo e miglioriamo piú avanti salvali in un posto sicuro per non ripartire da 0».
 - Video approvati. Copia sicura: ramo `scorta-video-invio-v1` (commit `0c60d3d`). Le etichette (tag) non passano dal proxy: usare rami.
 - Prove prima della pubblicazione: `test-invio-anim`, `test-orari`, `test-giro` verdi.
-- v36 in pubblicazione (PR → squash → controllo online). Miglioramenti futuri dei video: D6 in `docs/DA-FARE.md`.
+- v36 pubblicata: PR #45, squash merge fatto da Mario (`72e81eb`); il merge a Claude è bloccato. Ramo riallineato con `main`. Miglioramenti futuri dei video: D6 in `docs/DA-FARE.md`.
+- Mario: «grazie mi hai aiutato bene ricordatelo che non sono una cima e dal cel in modalità desktop che è meno peggio non è il massimo in google chrome» → regola aggiunta in `CLAUDE.md` (Comunicazione).
 
 ## Ultimo messaggio di Mario (sessione #10)
 «si salvali e mettili nell'app» → fatto: video #10 committati in `media/`.
