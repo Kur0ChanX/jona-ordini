@@ -10,38 +10,11 @@ Sessione attuale: #09
 - Sfarfallio: lista `fermo` (colore uguale ai vicini, sfocato 4, < 20); nei punti fermi la trasparenza è la mediana su 5 fotogrammi, altrove quella del fotogramma.
 - Video rifatti, `test-invio-anim` verde, anteprime su fondo scuro **da mandare a Mario** (rifarle col comando ffmpeg `alphamerge` su fondo `0x1c1c1e`; M9).
 
-## Messaggio precedente di Mario (sessione #07)
-«guarda questo fotogramma puoi migliorare il video nelle mani della ragazza la parte bianca tra le dita» (foto: video al fornitore, mani della ragazza che entrano veloci, chiazze bianche tra le dita).
-
-Messaggio successivo di Mario (arrivato nella #07 dopo l'apertura della #08): «il logo sembra storto nel menù mettilo sempre in griglia in base alla posizione del menu frame by frame» → nella versione allo chef (specchiata) il riquadro del logo incollato (`riquadri()`/`stabili()` in `tools/anim-invio.py`) è inclinato al contrario del menù. Da fare: per ogni fotogramma trovare i 4 angoli/l'inclinazione del menù e incollare il logo raddrizzato (rotazione/prospettiva) allineato ai bordi del menù specchiato. Rifare i video una sola volta (dita + logo).
-
-## Fatto in sessione #08
-- Mario: «vai con il logo». `tools/anim-invio.py`: `inclinazione()` misura l'angolo del menù dal logo (righe di testo più nette, a metà risoluzione, passi 0,5° poi 0,1°), `liscia()` (mediana 5 + gaussiana 1,5); nel video allo chef il riquadro del logo prende i punti dell'originale girati di `-2×angolo` (`map_coordinates`): stessa inclinazione del menù specchiato (provato: −2,7° contro −3,0°, −5,0° contro −4,9°).
-- Video rifatti (dita + logo), `test-invio-anim` verde (18 PASS), anteprima su fondo scuro mandata a Mario (M9).
-
-## Fatto in sessione #07 (ritocco chiesto da Mario)
-- Causa: con le mani veloci il filmato sfoca le dita sul fondo bianco; quei punti (misto pelle+bianco, minimo canali 170-249, poco colore) restavano pieni.
-- `tools/anim-invio.py`: nuova `mosso(rgb, vicini)`. Solo dove c'è movimento forte (differenza coi fotogrammi vicini, sfocata 6, > 90) e fuori da giacca (stoffa grande > 8000 punti, entro 45) e logo del menù (buchi nel marrone `mx<170`, `R-B<40`, > 30000 punti): trasparenza = quanta pelle c'è (`(SOGLIA+2-mn)/(SOGLIA+2-pelle vicina)`×1,15) e colore "smescolato" dal bianco. Fotogrammi fermi, unghie, logo e giacca: invariati (provato su fotogrammi 3, 55, 70, 79, 80).
-- Commit pushato (`Animazione invio: dita in movimento…`). **I video in `media/` NON sono ancora rifatti**: il calcolo (molto lento, ~1 min a fotogramma, 101 fotogrammi) è stato fermato per l'handoff.
-- Nota della #06 «non rifare i video»: vale per il lavoro già fatto; questo è un ritocco chiesto da Mario dopo.
-
-## Messaggio di Mario (sessione #06)
-Giacca dello chef con bordi lisci e due video (allo chef con la ragazza a sinistra, logo dritto; al fornitore con lo chef a sinistra).
-
-Messaggio successivo di Mario (dopo l'apertura della #07): «hai già fatto quasi il lavoro completo nella chat precedente non rifare tutto» → nella #07 **non rifare** i video né lo script: sono finiti e nel ramo. Solo ritocchi se Mario li chiede.
-
-→ **Fatto e committato, NON pubblicato**. Mario deve guardare l'anteprima mandata in chat #06 e dire se va bene (M9). Se va bene: chiudere la v36 (vedi sotto) e pubblicare.
-
-## Fatto in sessione #06
-- `tools/anim-invio.py`: ora crea DUE video da `tools/originale-invio.mp4` (~25 min di calcolo, serve `pip install scipy pillow`):
-  - `media/invio-chef.mp4`: specchiato e avanti nel tempo, la ragazza a sinistra porge il menù allo chef. Logo/«PORTO CERVO» del menù e ricamo della giacca rimessi dritti: `riquadri()` trova i riquadri nel fotogramma originale, `stabili()` li stabilizza (mediana su 5), poi si incolla il riquadro originale nel punto specchiato con bordo sfumato 10 punti. Leggermente inclinato al contrario del menù (pochi gradi): accettabile.
-  - `media/invio-fornitore.mp4`: invertito nel tempo, lo chef a sinistra porge il menù (come la vecchia).
-  - Giacca: entro 30 punti dalla stoffa il contorno si chiude (`CHIUDI`=14, fessure strette = pieghe bruciate) e si liscia (`LISCIO`=8, sfocatura e soglia a metà); poi buchi chiusi riempiti se attorno è stoffa (≥70%, o ≥50% se < 8000 punti). Mani, menù, vestito: contorno di prima.
-- `index.html`: `ANIM_SRC={chef,forn}`, `animUrl` per tipo, `animPrefetch(k)`, `sendAnim(k,testo)`; `markSent` precarica `forn` prima di `ask` e dopo «Sì, inviato» mostra `sendAnim('forn','Inviato a <fornitore>')`, poi il solito avviso. NEWS v36 aggiornata (tutti, chef, dev).
-- `sw.js`: aggiunto `./media/invio-fornitore.mp4` in `FILES` (CACHE resta `jona-ordini-v40`, la v36 non è ancora uscita).
-- `tools/test-invio-anim.mjs`: converte entrambi i video in WebM e prova anche `sendAnim('forn',…)`. Verde (18 PASS). `test-news` verde.
-- `CLAUDE.md` (riga media) e `docs/DA-FARE.md` (M9) aggiornati.
-- Nota: la prova `formset` in timeout di #05 (test-v35) poteva essere un errore di sintassi in pagina: ricontrollare.
+## Video dell'invio (#06-#08, riassunto)
+- `tools/anim-invio.py` crea `media/invio-chef.mp4` (specchiato, logo e ricamo incollati dritti; logo girato di `-2×inclinazione` del menù, fotogramma per fotogramma) e `media/invio-fornitore.mp4` (invertito nel tempo). Serve `pip install scipy pillow`; calcolo ~1 ora in background.
+- Giacca: contorno chiuso (`CHIUDI`) e lisciato (`LISCIO`). Dita veloci: `mosso()`. Unghie e sfarfallio: vedi sopra. Mario: logo OK.
+- `index.html`: `ANIM_SRC={chef,forn}`, `sendAnim(k,testo)`; `markSent` mostra `sendAnim('forn',…)`. `sw.js`: `invio-fornitore.mp4` in `FILES`. Prova: `node tools/test-invio-anim.mjs` (serve `python3 -m http.server 8765`).
+- Mario nella #07: «non rifare tutto», solo i ritocchi che chiede lui.
 
 ## Sessione #05
 - Domanda ancora aperta a Mario: D5 (nascondere allo staff anche le ore di ogni giorno?).
