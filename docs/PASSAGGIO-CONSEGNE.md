@@ -3,17 +3,17 @@
 Sessione attuale: #11
 
 ## Ultimo messaggio di Mario (sessione #10)
-«si salvali e mettili nell'app» → i video rifatti in #10 (ombra + pieghe) vanno committati in `media/` (se la #10 non l'ha fatto: vedi «Stato»).
+«si salvali e mettili nell'app» → fatto: video #10 committati in `media/`.
 Prima: «tra le braccia di tutte e due si vede ancora qualcosa, la giacca viene a volte molto mangiata, fa parte molto dello sfondo».
 
 ## Fatto in sessione #10
 - Cause trovate (confronto fotogrammi originale/maschera, `lost` = soggetto tolto): 1) sfondo chiaro dell'app `--bg:#EFEBE6` quasi uguale al bianco giacca → la giacca «sparisce»; 2) tra le due maniche dello chef la stoffa bruciata (248-250) era tolta come sfondo (253) → «lingua» scura.
 - `index.html` `animGL`: lo shader disegna un'ombra leggera (alfa media su 2 anelli di 4 e 8 punti, 2 punti più in basso, forza 0,3, sfumata ai bordi del filmato). Sul tema scuro non si vede. `test-invio-anim` verde, screenshot ok.
 - `tools/anim-invio.py`: `PIEGA` 251.5 e `VICINO` 50: vicino alla giacca larga (`stoffa & mn<240`, apertura 8) i punti con media dei vicini (gauss 3) sotto `PIEGA` e poco colorati restano stoffa.
-- Commit `Animazione invio: ombra leggera…` pushato. Video: calcolo completo avviato (~25 min); copie dei vecchi nello scratchpad della #10.
+- Video rifatti con la correzione e committati in `media/` (richiesta di Mario «mettili nell'app»: fatta). `test-invio-anim` 18/18 verde. Anteprime (fondo scuro e chiaro) mandate a Mario.
 
 ## Stato
-- Se `media/invio-*.mp4` NON risultano cambiati nell'ultimo commit: rilanciare `python3 tools/anim-invio.py tools/originale-invio.mp4` (serve `pip install scipy pillow`, ~25 min in background), poi `node tools/test-invio-anim.mjs` (con `python3 -m http.server 8765`), commit, anteprime a Mario su fondo chiaro (#EFEBE6) e scuro.
+- Video nell'app (sul ramo, v36 non pubblicata). Si aspetta l'ok di Mario. Per rifarli: `python3 tools/anim-invio.py tools/originale-invio.mp4` (serve `pip install scipy pillow`, ~25 min), poi `node tools/test-invio-anim.mjs` (con `python3 -m http.server 8765`).
 - Residuo noto: in alcuni fotogrammi resta una piccola macchia scura tra le maniche (zona 248-252, ambigua con lo sfondo).
 
 ## Fatto in sessione #09
@@ -45,7 +45,7 @@ Prima: «tra le braccia di tutte e due si vede ancora qualcosa, la giacca viene 
   - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
 
 ## Prossimi passi
-1. Video #10 nell'app (vedi «Stato»), anteprime a Mario, attendere il suo ok su giacca e braccia.
+1. Attendere l'ok di Mario su giacca e braccia (video #10).
 2. Con l'ok di Mario sui video: pubblicare la v36 (PR → squash → controllo online → riallineamento). Domanda aperta: pubblicare subito dopo l'ok?
 3. D4 (contratto ai Responsabili): chiesto a Mario, senza risposta; se sì, brainstorming con 2-3 strade.
 4. Il resto: `docs/DA-FARE.md`.
