@@ -63,6 +63,24 @@ def mask(rgb):  # 1 = soggetto, 0 = sfondo
         if st >= 0.7 or (st >= 0.5 and c.sum() < 8000): fg[ys, xs] |= c   # piccoli e quasi tutti nella stoffa
     return fg.astype(np.float32)
 
+def mosso(rgb, vicini):  # 1 = pieno; meno di 1 dove le dita in movimento si mescolano col bianco (il filmato le tiene chiare)
+    x = rgb.astype(np.int16); mn = x.min(2); mx = x.max(2); sat = mx - mn
+    moto = np.max([np.abs(x - v.astype(np.int16)).max(2) for v in vicini], 0)
+    moto = ndi.binary_dilation(ndi.gaussian_filter(moto.astype(np.float32), 6) > 90, structure=disk(15))   # solo le parti che si muovono veloci (mani ferme e unghie restano piene)
+    stoffa = ndi.binary_opening((mn >= 180) & (sat < 30) & (mn < SOGLIA), structure=disk(4))
+    lab, _ = ndi.label(stoffa); grandi = np.bincount(lab.ravel()) > 8000; grandi[0] = False
+    giacca = ndi.distance_transform_edt(~grandi[lab]) < 45          # la giacca resta com'è
+    scuro = (mx < 170) & (x[..., 0] - x[..., 2] < 40)                # il marrone del menù (la pelle in ombra è più rossa)
+    lab, _ = ndi.label(scuro); grandi = np.bincount(lab.ravel()) > 30000; grandi[0] = False
+    scuro = grandi[lab]                                               # le scritte chiuse nel menù restano piene
+    logo = ndi.binary_dilation(ndi.binary_fill_holes(ndi.binary_closing(scuro, structure=disk(3))) & ~scuro, structure=disk(4))
+    # pelle vicina (punti ben colorati): quanto è scura dà la misura; un punto chiaro è pelle mescolata al bianco
+    pelle = ((sat >= 45) & (mn < 200)).astype(np.float32)
+    pm = ndi.uniform_filter(mn * pelle, 41) / np.maximum(ndi.uniform_filter(pelle, 41), 1e-3)
+    pm = np.where(ndi.uniform_filter(pelle, 41) > 0.02, pm, 120)
+    f = np.clip((SOGLIA + 2 - mn) / np.maximum(SOGLIA + 2 - pm, 40) * 1.15, 0, 1)
+    return np.where(moto & ~giacca & ~logo & (sat < 45), f, 1).astype(np.float32)
+
 def riquadri(rgb):  # scritte da tenere dritte nella versione specchiata: logo del menù e ricamo sulla giacca
     x = rgb.astype(np.int16); mn = x.min(2); mx = x.max(2); R, G, B = x[..., 0], x[..., 1], x[..., 2]
     out = {}
@@ -117,9 +135,11 @@ def edges(h, w, L=0.04, R=0.03, T=0.04, B=0.05):   # il soggetto sparisce dolcem
 frames, raw, box = [], [], []
 for i in range(1, N + 1):
     rgb = np.asarray(Image.open(f'{tmp}/f{i:03d}.png').convert('RGB'))
-    frames.append(rgb.astype(np.float32) / 255); box.append(riquadri(rgb))
+    mo = mosso(rgb, [np.asarray(Image.open(f'{tmp}/f{j:03d}.png').convert('RGB')) for j in (i - 1, i + 1) if 1 <= j <= N])
+    c = rgb.astype(np.float32) / 255; fm = np.maximum(mo, 0.25)[..., None]
+    frames.append(np.where(mo[..., None] < 1, np.clip((c - (1 - fm)) / fm, 0, 1), c)); box.append(riquadri(rgb))   # togli il bianco mescolato: resta la pelle
     m = ndi.binary_erosion(mask(rgb) > 0.5, structure=disk(2)).astype(np.float32)   # via l'alone chiaro del bordo
-    raw.append(ndi.gaussian_filter(m, 1.6))
+    raw.append(ndi.gaussian_filter(m, 1.6) * ndi.gaussian_filter(mo, 1))
     print('maschera', i, 'di', N, flush=True)
 fissi = {t: stabili([b.get(t) for b in box], N) for t in ('menu', 'ricamo')}
 E = edges(*raw[0].shape)
