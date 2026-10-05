@@ -1,8 +1,16 @@
 # Passaggio di consegne (2026-10-05)
 
-Sessione attuale: #08
+Sessione attuale: #09
 
-## Ultimo messaggio di Mario (sessione #07)
+## Ultimo messaggio di Mario (sessione #08)
+«ancora flickerano vestiti di entrambi unghie ecc e seghettato logo ok» → logo OK. Fatto nella #08 (sotto): unghie e sfarfallio. Ancora aperto: «seghettato» (bordo dei vestiti a gradini). Domanda fatta a Mario e senza risposta: si riferisce al vestito nero della ragazza, alla giacca dello chef o a entrambi?
+
+## Fatto in sessione #08 (dopo il logo)
+- Unghie scure/trasparenti in certi fotogrammi: le schiariva `mosso()` (unghie chiare e poco colorate = «bianco mescolato»). Ora `mosso()` agisce solo dove nei fotogrammi vicini c'è sfondo (`bianco`, dilatato 6).
+- Sfarfallio: lista `fermo` (colore uguale ai vicini, sfocato 4, < 20); nei punti fermi la trasparenza è la mediana su 5 fotogrammi, altrove quella del fotogramma.
+- Video rifatti, `test-invio-anim` verde, anteprime su fondo scuro **da mandare a Mario** (rifarle col comando ffmpeg `alphamerge` su fondo `0x1c1c1e`; M9).
+
+## Messaggio precedente di Mario (sessione #07)
 «guarda questo fotogramma puoi migliorare il video nelle mani della ragazza la parte bianca tra le dita» (foto: video al fornitore, mani della ragazza che entrano veloci, chiazze bianche tra le dita).
 
 Messaggio successivo di Mario (arrivato nella #07 dopo l'apertura della #08): «il logo sembra storto nel menù mettilo sempre in griglia in base alla posizione del menu frame by frame» → nella versione allo chef (specchiata) il riquadro del logo incollato (`riquadri()`/`stabili()` in `tools/anim-invio.py`) è inclinato al contrario del menù. Da fare: per ogni fotogramma trovare i 4 angoli/l'inclinazione del menù e incollare il logo raddrizzato (rotazione/prospettiva) allineato ai bordi del menù specchiato. Rifare i video una sola volta (dita + logo).
@@ -57,7 +65,7 @@ Messaggio successivo di Mario (dopo l'apertura della #07): «hai già fatto quas
   - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
 
 ## Prossimi passi
-1. Sistemare il logo (sopra), poi rifare i video: `pip install scipy pillow` poi in background `python3 tools/anim-invio.py tools/originale-invio.mp4` (1-2 ore). Controllare i fotogrammi 18-26 del video al fornitore su sfondo scuro, `node tools/test-invio-anim.mjs`, commit dei due mp4, mandare l'anteprima a Mario (M9).
+1. Mandare a Mario le anteprime dei video rifatti nella #08 e chiedere del «seghettato». Se serve: contorno morbido (trasparenza graduata dal bianco) sul bordo di vestito/giacca, poi rifare i video: `pip install scipy pillow` poi in background `python3 tools/anim-invio.py tools/originale-invio.mp4` (1-2 ore). Controllare i fotogrammi 18-26 del video al fornitore su sfondo scuro, `node tools/test-invio-anim.mjs`, commit dei due mp4, mandare l'anteprima a Mario (M9).
 2. Finire la v36 (prove `test-orari`, `test-v35` sotto), chiedere D4 e D5, pubblicare (PR → squash → controllo online → riallineamento).
 3. Il resto: `docs/DA-FARE.md`.
 
