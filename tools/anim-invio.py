@@ -17,6 +17,7 @@ W, H = 720, 404
 SOGLIA = 250     # minimo dei tre canali da cui un punto è sfondo
 BUCO = 150       # zone bianche chiuse più piccole di così (in punti) restano piene: niente forellini
 CHIUDI = 14      # raggio (in punti) delle fessure chiuse vicino alla giacca
+GIRO = 1         # verso della rotazione del logo (prova: inclinazione del logo = quella del menù specchiato)
 LISCIO = 8       # quanto si liscia il contorno della giacca (in punti del filmato 1920x1080)
 tmp = tempfile.mkdtemp()
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', SRC, '-t', str(END), '-vf', 'fps=24', f'{tmp}/f%03d.png'], check=True)
@@ -127,6 +128,14 @@ def stabili(box, n):   # riquadri fotogramma per fotogramma: buchi brevi riempit
     vicino = ndi.distance_transform_edt(~ok) <= 4   # oltre 4 fotogrammi senza riquadro: niente (es. il menù di taglio)
     a = ndi.median_filter(a, size=(5, 1), mode='nearest')
     return [tuple(int(round(v)) for v in a[k]) if vicino[k] else None for k in range(n)]
+def inclinazione(rgb, b):   # gradi del menù (dalle righe del logo): l'angolo che rende più netto il profilo delle righe di testo
+    y0, y1, x0, x1 = b; t = (rgb[y0:y1:2, x0:x1:2].min(2) > 140 / 255).astype(np.float32)
+    prova = lambda angoli: max(angoli, key=lambda a: (ndi.rotate(t, a, reshape=False, order=1).sum(1) ** 2).sum())
+    a = prova(np.arange(-10, 10.01, 0.5)); return prova(np.arange(a - 0.5, a + 0.51, 0.1))
+def liscia(v):   # angoli fotogramma per fotogramma senza scatti: buchi riempiti, mediana su 5, poi media leggera
+    v = np.array(v, float); ok = ~np.isnan(v); idx = np.arange(len(v))
+    if ok.sum() < 2: return np.zeros(len(v))
+    v = np.interp(idx, idx[ok], v[ok]); return ndi.gaussian_filter1d(ndi.median_filter(v, 5, mode='nearest'), 1.5, mode='nearest')
 sm = lambda t: (lambda c: c * c * (3 - 2 * c))(np.clip(t, 0, 1))
 def edges(h, w, L=0.04, R=0.03, T=0.04, B=0.05):   # il soggetto sparisce dolcemente verso i bordi del filmato
     xs = np.linspace(0, 1, w); ys = np.linspace(0, 1, h)
@@ -142,6 +151,8 @@ for i in range(1, N + 1):
     raw.append(ndi.gaussian_filter(m, 1.6) * ndi.gaussian_filter(mo, 1))
     print('maschera', i, 'di', N, flush=True)
 fissi = {t: stabili([b.get(t) for b in box], N) for t in ('menu', 'ricamo')}
+# il logo incollato dritto va girato come il menù specchiato: il menù inclinato di +a nel filmato è inclinato di -a nello specchio
+incl = liscia([inclinazione(frames[k], b) if b else np.nan for k, b in enumerate(fissi['menu'])])
 E = edges(*raw[0].shape)
 def bordo(h, w, f=10):   # peso del riquadro incollato: pieno al centro, sfuma negli ultimi f punti
     return np.minimum(sm(np.minimum(np.arange(h), np.arange(h)[::-1]) / f)[:, None], sm(np.minimum(np.arange(w), np.arange(w)[::-1]) / f)[None, :])
@@ -168,7 +179,13 @@ for k in range(N):
         y0, y1, x0, x1 = max(b[0], 0), min(b[1], col.shape[0]), max(b[2], 0), min(b[3], X)
         if y1 - y0 < 30 or x1 - x0 < 30: continue
         p = bordo(y1 - y0, x1 - x0)[..., None]
-        sc[y0:y1, X - x1:X - x0] = p * col[y0:y1, x0:x1] + (1 - p) * sc[y0:y1, X - x1:X - x0]
+        if tipo == 'menu':   # ogni punto del riquadro specchiato prende il punto del logo originale girato di 2 volte l'angolo del menù
+            r = np.radians(2 * incl[k] * GIRO); cy, cx = (y0 + y1 - 1) / 2, (x0 + x1 - 1) / 2
+            yy, xx = np.mgrid[y0:y1, x0:x1].astype(np.float32); dy, dx = yy - cy, xx - cx
+            sy, sx = cy + dy * np.cos(r) - dx * np.sin(r), cx + dy * np.sin(r) + dx * np.cos(r)
+            src = np.stack([ndi.map_coordinates(col[..., c], [sy, sx], order=1, mode='nearest') for c in range(3)], -1)
+        else: src = col[y0:y1, x0:x1]
+        sc[y0:y1, X - x1:X - x0] = p * src + (1 - p) * sc[y0:y1, X - x1:X - x0]
     salva(sc, a[:, ::-1], f'{tmp}/chef/s{k + 1:03d}.png')
     print('fotogramma', k + 1, 'di', N, flush=True)
 for cart, nome in (('chef', 'invio-chef.mp4'), ('forn', 'invio-fornitore.mp4')):
