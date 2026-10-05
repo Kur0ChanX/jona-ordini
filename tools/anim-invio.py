@@ -19,6 +19,8 @@ BUCO = 150       # zone bianche chiuse più piccole di così (in punti) restano 
 CHIUDI = 14      # raggio (in punti) delle fessure chiuse vicino alla giacca
 LISCIO = 14      # quanto si liscia il contorno della giacca (in punti del filmato 1920x1080): via i gradini
 MORBIDO = 3.0    # sfumatura del bordo della giacca (il resto 1.6)
+PIEGA = 251.5    # stoffa bruciata sotto le maniche: media dei vicini sotto questo valore (lo sfondo sta a 253)
+VICINO = 50      # ... solo entro questi punti dalla giacca
 tmp = tempfile.mkdtemp()
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', SRC, '-t', str(END), '-vf', 'fps=24', f'{tmp}/f%03d.png'], check=True)
 N = len([f for f in os.listdir(tmp) if f.startswith('f')])
@@ -30,6 +32,10 @@ def mask(rgb):  # 1 = soggetto, 0 = sfondo
     mn = x.min(2); stoffa = (mn >= 180) & (x.max(2) - mn < 30)            # bianco-grigio della giacca
     chiaro = stoffa & (mn >= 225)   # quasi bianco: resta solo dove è largo (la giacca), via l'alone sottile attorno a mani e menù
     fg = ((mn < SOGLIA) & ~chiaro) | ndi.binary_opening(chiaro & (mn < SOGLIA), structure=disk(5))
+    # pieghe illuminate della manica (248-250, quasi come lo sfondo): con la media dei vicini restano stoffa, non «lingue» di sfondo
+    larga = ndi.binary_opening(stoffa & (mn < 240), structure=disk(8))
+    pieghe = (ndi.gaussian_filter(mn.astype(np.float32), 3) < PIEGA) & (ndi.distance_transform_edt(~larga) < VICINO) & (x.max(2) - mn < 12)
+    fg |= ndi.binary_opening(pieghe, structure=disk(3))
     fg = ndi.binary_closing(fg, structure=disk(4))   # chiude i riflessi bruciati sul bordo della giacca
     lab, n = ndi.label(~fg); bg = np.zeros_like(fg)
     bordo = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}

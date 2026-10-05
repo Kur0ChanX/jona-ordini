@@ -16,7 +16,7 @@ Aggiornato: 2026-10-05 (sessione #09). Ogni cosa ha un **numero fisso** (M1…, 
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M8 | Prove dal vero della v35 | Mario | con calma |
 | C1 | v36: pubblicare (staff vede solo gli orari, niente ore) dopo il tuo ok sui video | Claude | subito |
-| M9 | Animazioni dell'invio: Claude toglie gli artefatti tra le braccia, poi Mario riguarda | Claude, poi Mario | subito |
+| M9 | Animazioni dell'invio: Mario riguarda giacca e braccia (ombra + pieghe della manica, #10) | Mario | subito |
 | D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | con C1 |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
 | D2 | Sottodominio del Worker `mario-miscera`: cambiarlo? | Claude, dopo il tuo sì | da decidere |
@@ -34,7 +34,7 @@ Aggiornato: 2026-10-05 (sessione #09). Ogni cosa ha un **numero fisso** (M1…, 
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **M9 · Animazioni dell'invio**: bordi di giacca e vestito lisci, senza gradini (#09). Due video: allo chef (la ragazza a sinistra consegna il menù, logo dritto) e al fornitore (lo chef a sinistra consegna il menù, parte con «Sì, inviato»). Guardale e dimmi se vanno bene: escono con la v36.
+- **M9 · Animazioni dell'invio**: bordi di giacca e vestito lisci, senza gradini (#09); ombra leggera attorno alle figure e pieghe chiare della manica non più tagliate (#10). Due video: allo chef (la ragazza a sinistra consegna il menù, logo dritto) e al fornitore (lo chef a sinistra consegna il menù, parte con «Sì, inviato»). Guardale e dimmi se vanno bene: escono con la v36.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
 - **M1 · Profilo di Maurizio**: Maurizio crea il suo profilo con l'invito; poi tu vai in **Staff** e lo approvi.
