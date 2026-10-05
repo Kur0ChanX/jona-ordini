@@ -1,15 +1,22 @@
 # Passaggio di consegne (2026-10-05)
 
-Sessione attuale: #06
+Sessione attuale: #07
 
-## Ultimo messaggio di Mario (fine sessione #05)
-«va quasi bene a parte la giacca dello chef che è fatta maluccio non è scontornata bene»
+## Ultimo messaggio di Mario (sessione #06)
+«Sistema la giacca dello chef nell'animazione: bordi della giacca seghettati. E fai 2 file: uno così fatto bene e uno che la ragazza a sinistra consegna il menù allo chef a destra, stando attento a non specchiare l'immagine se no il logo viene al contrario (ti giro il logo se ti serve). Quello senza sfondo fatto bene con la ragazza a sinistra mettilo nel programma quando lo staff invia l'ordine; quello con lo chef a sinistra con sfondo scontornato bene quando lo invia al fornitore.» (Allegato: logo JONA; non è servito.)
 
-→ **Prossimo lavoro (subito)**: rifinire lo scontorno della **giacca bianca dello chef** in `media/invio-chef.mp4`. Il resto (sfondo tolto, bianco tra le braccia tolto, vestito nero della ragazza pieno, menù, mani) a Mario va bene: non peggiorarlo.
-- Filmato originale salvato in `tools/originale-invio.mp4` (1920×1080, 60 fps, 5 s; si usano i primi 4,2 s). Rifare con `python3 tools/anim-invio.py tools/originale-invio.mp4` (serve `pip install scipy`; esce già invertito nel tempo).
-- Metodo attuale (`tools/anim-invio.py`, niente IA: isnet/u2net vedevano solo il menù, birefnet va fuori memoria): sfondo = min canali ≥ 250; l'alone quasi bianco sottile si toglie con un'apertura disk(5); chiusura disk(4); zone bianche chiuse tolte salvo riflessi sulla giacca (anello ≥ 70% «stoffa»); maschera rigida, erosione disk(2), sfocatura 1,6; sfumatura ai bordi 4/3/4/5 %.
-- Probabili difetti della giacca: bordo rigido e seghettato (la giacca sfuma nel bianco: la soglia fissa taglia a gradini), pezzi di bordo luminoso persi, erosione che mangia le pieghe. Idee: trasparenza morbida solo sul bordo della giacca (proporzionale a 255 − minimo dei canali), meno erosione sulla giacca, maschera stabilizzata nel tempo solo dove non c'è movimento. Controllare ingrandito (bordo sinistro/destro della giacca, spalla, maniche, polsini) su fondo scuro e chiaro; mandare a Mario un'anteprima (sopra scuro, sotto chiaro, come in #05).
-- Dopo: `node tools/test-invio-anim.mjs` (server `python3 -m http.server 8765`), commit, e M9 di `docs/DA-FARE.md`.
+→ **Fatto e committato, NON pubblicato**. Mario deve guardare l'anteprima mandata in chat #06 e dire se va bene (M9). Se va bene: chiudere la v36 (vedi sotto) e pubblicare.
+
+## Fatto in sessione #06
+- `tools/anim-invio.py`: ora crea DUE video da `tools/originale-invio.mp4` (~25 min di calcolo, serve `pip install scipy pillow`):
+  - `media/invio-chef.mp4`: specchiato e avanti nel tempo, la ragazza a sinistra porge il menù allo chef. Logo/«PORTO CERVO» del menù e ricamo della giacca rimessi dritti: `riquadri()` trova i riquadri nel fotogramma originale, `stabili()` li stabilizza (mediana su 5), poi si incolla il riquadro originale nel punto specchiato con bordo sfumato 10 punti. Leggermente inclinato al contrario del menù (pochi gradi): accettabile.
+  - `media/invio-fornitore.mp4`: invertito nel tempo, lo chef a sinistra porge il menù (come la vecchia).
+  - Giacca: entro 30 punti dalla stoffa il contorno si chiude (`CHIUDI`=14, fessure strette = pieghe bruciate) e si liscia (`LISCIO`=8, sfocatura e soglia a metà); poi buchi chiusi riempiti se attorno è stoffa (≥70%, o ≥50% se < 8000 punti). Mani, menù, vestito: contorno di prima.
+- `index.html`: `ANIM_SRC={chef,forn}`, `animUrl` per tipo, `animPrefetch(k)`, `sendAnim(k,testo)`; `markSent` precarica `forn` prima di `ask` e dopo «Sì, inviato» mostra `sendAnim('forn','Inviato a <fornitore>')`, poi il solito avviso. NEWS v36 aggiornata (tutti, chef, dev).
+- `sw.js`: aggiunto `./media/invio-fornitore.mp4` in `FILES` (CACHE resta `jona-ordini-v40`, la v36 non è ancora uscita).
+- `tools/test-invio-anim.mjs`: converte entrambi i video in WebM e prova anche `sendAnim('forn',…)`. Verde (18 PASS). `test-news` verde.
+- `CLAUDE.md` (riga media) e `docs/DA-FARE.md` (M9) aggiornati.
+- Nota: la prova `formset` in timeout di #05 (test-v35) poteva essere un errore di sintassi in pagina: ricontrollare.
 
 ## Fatto in sessione #05
 - Animazione rifatta (commit `v36: animazione dell'invio rifatta…`): NEWS v36 aggiornata (tutti + dev), `CLAUDE.md` (riga di `media/invio-chef.mp4`), `tools/test-invio-anim.mjs` (sfondo trasparente > 30%, ora c'è la divisa), `docs/DA-FARE.md` (tolto C2, aggiunto M9). Prove verdi: `test-invio-anim`, `test-news`.
@@ -36,8 +43,8 @@ Sessione attuale: #06
   - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
 
 ## Prossimi passi
-1. Finire la v36 (prove sopra), chiedere le due scelte, pubblicare (PR → squash → controllo online → riallineamento).
-2. Video dell'invio (vedi sopra).
+1. Risposta di Mario sulle animazioni (M9); eventuali ritocchi con `tools/anim-invio.py`.
+2. Finire la v36 (prove `test-orari`, `test-v35` sotto), chiedere D4 e D5, pubblicare (PR → squash → controllo online → riallineamento).
 3. Il resto: `docs/DA-FARE.md`.
 
 ## Rischi aperti

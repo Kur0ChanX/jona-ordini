@@ -16,7 +16,7 @@ Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, 
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M8 | Prove dal vero della v35 | Mario | con calma |
 | C1 | v36: totale ore nascosto allo staff (in corso, prove da sistemare) | Claude | subito |
-| M9 | Guardare la nuova animazione dell'invio (anteprima nella chat della sessione #05) e dire se va bene | Mario | subito |
+| M9 | Guardare le due animazioni dell'invio (allo chef e al fornitore, anteprime nella chat della sessione #06) e dire se vanno bene | Mario | subito |
 | D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | con C1 |
 | D5 | Nascondere allo staff anche le ore di ogni giorno? | Claude, dopo la tua scelta | con C1 |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
@@ -35,7 +35,7 @@ Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, 
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **M9 · Animazione dell'invio**: rifatta dal filmato originale (divisa dello chef e vestito della ragazza pieni, via il bianco tra le braccia). Guardala e dimmi se va bene: esce con la v36.
+- **M9 · Animazioni dell'invio**: giacca dello chef con bordi lisci. Due video: allo chef (la ragazza a sinistra consegna il menù, logo dritto) e al fornitore (lo chef a sinistra consegna il menù, parte con «Sì, inviato»). Guardale e dimmi se vanno bene: escono con la v36.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
 - **M1 · Profilo di Maurizio**: Maurizio crea il suo profilo con l'invito; poi tu vai in **Staff** e lo approvi.
