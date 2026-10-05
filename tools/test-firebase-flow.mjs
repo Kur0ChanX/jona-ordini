@@ -28,7 +28,7 @@ await A.evaluate(async()=>{await approve('test_r1')});await A.waitForTimeout(250
 ok(await B.evaluate(()=>{const o=D().ordini['aperto_test_f1']||D().ordini['aperto_test_f2'];return !!o}),'B vede l\'ordine aperto del fornitore di prova');
 ok(await B.evaluate(()=>D().richieste.test_r1.stato==='approvata'),'B vede richiesta approvata');
 // ora limite tra 30 minuti
-await A.evaluate(async()=>{const d=new Date(Date.now()+30*60000);const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');const o=Object.values(D().ordini).find(o=>o.stato==='aperto'&&o.fornitoreId.startsWith('test_'));await upd('fornitori',o.fornitoreId,{oraLimite:hm});ls('jona_rem',null)});await A.waitForTimeout(1500);
+await A.evaluate(async()=>{const d=new Date(Date.now()+30*60000);if(d.getDate()!==new Date().getDate()){d.setTime(Date.now());d.setHours(23,59,0,0)}const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');const o=Object.values(D().ordini).find(o=>o.stato==='aperto'&&o.fornitoreId.startsWith('test_'));await upd('fornitori',o.fornitoreId,{oraLimite:hm});ls('jona_rem',null)});await A.waitForTimeout(1500);
 await A.evaluate(()=>deadlineTick());await A.waitForTimeout(2000);
 ok(await B.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='scadenza').length===1),'promemoria scadenza arrivato anche a B');
 await A.click('[data-a="tab"][data-v="invii"]');await A.waitForTimeout(500);

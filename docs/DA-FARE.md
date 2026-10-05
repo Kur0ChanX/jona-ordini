@@ -1,20 +1,63 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-05 (sessione #03). Si aggiorna a ogni cambiamento: quello che è fatto si toglie.
+Aggiornato: 2026-10-05 (sessione #11). Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
-## 1. Claude da solo (nessuna scelta di Mario)
-- `tools/test-firebase-flow` fallisce tra le 23:30 e le 24:00: sistemare la prova (non l'app).
-- Pubblicare la v35 (PR, merge, controllo online, Worker rilanciato dal workflow) se non è già fatto.
+**⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
-## 2. Claude, dopo la scelta o l'approvazione di Mario
-- **Link dell'app su Cloudflare Pages** (gratis, Mario ha detto sì): prima di farlo Mario deve sapere che ogni telefono va ricollegato (invito + approvazione + accesso) e le notifiche riattivate. Decidere il giorno.
-- **Sicurezza del Worker non fatta perché creerebbe un malus**: `/invia` senza controllo (il service worker manda le push in sospeso senza gettone: col controllo, quelle rimaste ferme più di un'ora partirebbero solo riaprendo l'app); `/promemoria` modificabile da qualsiasi telefono approvato (il server non sa quale profilo usa il telefono). Riparlarne solo se Mario lo chiede.
-- **Sottodominio Worker** `mario-miscera`: cambiarlo? (qualche ora senza notifiche).
+## Riassunto: cosa manca, in ordine
+
+| N. | Cosa | Di chi | Quando |
+|----|------|--------|--------|
+| M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
+| M2 | Dare a Maurizio il ruolo Admin Chef | Mario | in stand-by, dopo M1 |
+| M3 | «Oggi si ordina» arriva a Maurizio | Mario | in stand-by, dopo M2 |
+| M4 | Mauro Loi: reparto «F&B Manager» | Mario | quando vuoi (2 minuti) |
+| M5 | Stampare e appendere il QR da cucina | Mario | quando vuoi |
+| M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
+| M8 | Prove dal vero della v35 | Mario | con calma |
+| M10 | Prova la v36 sul telefono (orari dello staff, video dell'invio) | Mario | quando vuoi |
+| D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | da decidere |
+| D6 | Video dell'invio: migliorarli ancora (macchiolina tra le maniche) | Claude, quando lo chiedi | più avanti |
+| D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
+| D2 | Sottodominio del Worker `mario-miscera`: cambiarlo? | Claude, dopo il tuo sì | da decidere |
+| D3 | Sicurezza del Worker (`/invia`, `/promemoria`) | Claude, solo se lo chiedi | in pausa |
+
+
+---
+
+## 1. Claude da solo
+- Niente in sospeso.
+
+## 2. Claude, dopo la tua scelta o approvazione
+- **D1 · Cloudflare Pages** (gratis, hai detto sì). Prima va deciso il **giorno**, perché ogni telefono va ricollegato (invito + approvazione + accesso) e le notifiche riattivate.
+- **D2 · Sottodominio Worker**: cambiare `mario-miscera`? Costa qualche ora senza notifiche.
+- **D6 · Video dell'invio**: approvati così (#11), da migliorare più avanti. Copia sicura nel ramo `scorta-video-invio-v1` (video, script `tools/anim-invio.py`, filmato originale): si riparte da lì, non da zero.
+- **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **Maurizio**: crea il suo profilo con l'invito, Mario lo approva in Staff e gli mette il ruolo Admin Chef. Poi Impostazioni → «Oggi si ordina» arriva a → toccare **Maurizio**.
-- **QR da cucina**: Impostazioni → QR da cucina → **Crea il QR**, stamparlo e appenderlo.
-- **Scadenze per lo staff**: Maurizio le imposta in Impostazioni → Scadenze per lo staff.
-- **Mauro Loi**: Staff → Mauro Loi → Reparto «F&B Manager», svuotare Mansione, Salva.
-- **Rispondere**: come finiva la frase «Lo staff può vedere chi c'è in turno ma non…».
-- **Prove dal vero**: gesto indietro Android, pallino, invito con codice, In turno oggi, consumi, promemoria dal server, scadenze dello staff, QR da cucina (vocale iPad → Android: funziona, provato da Mario).
+- **M10 · Prova la v36**: apri l'app, se esce «App da aggiornare» tocca il banner. Da staff: «I miei orari» mostra solo inizio e fine. Manda un ordine e guarda l'animazione.
+
+### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
+- **M1 · Profilo di Maurizio**: Maurizio crea il suo profilo con l'invito; poi tu vai in **Staff** e lo approvi.
+- **M2 · Ruolo**: sempre in **Staff**, tocca **Maurizio** e mettigli il ruolo **Admin Chef**.
+- **M3 · Promemoria ordini**: **Impostazioni** → «Oggi si ordina» arriva a → tocca **Maurizio**.
+
+### Piccole cose, quando vuoi
+- **M4 · Mauro Loi**: **Staff** → **Mauro Loi** → Reparto «F&B Manager», svuota **Mansione**, **Salva**.
+- **M5 · QR da cucina**: **Impostazioni** → **QR da cucina** → **Crea il QR**, stampalo e appendilo.
+- **M6 · Scadenze dello staff**: le imposta Maurizio in **Impostazioni** → **Scadenze per lo staff** (dopo M2).
+
+### M8 · Prove dal vero della v35, con calma
+Una alla volta; dimmi solo «ok» o cosa non va:
+1. Gesto indietro su Android
+2. Pallino delle novità
+3. Invito con codice
+4. «In turno oggi»
+5. Consumi e costi
+6. Promemoria ordini dal server
+7. Scadenze dello staff (dopo M6)
+8. QR da cucina (dopo M5)
+
+Regola decisa da Mario: **il contratto (ore dovute, confronto con le ore fatte) lo vedono solo i capi servizio, mai lo staff.**
+
+Già provato e funziona: vocale da iPad verso Android.

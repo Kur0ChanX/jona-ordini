@@ -1019,8 +1019,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=35;
+const APP_VER=36;
 const NEWS=[
+  {v:36,data:'2026-10-05',titolo:'Orari: niente totale delle ore per lo staff',
+    tutti:['Nei tuoi orari vedi l\'inizio e la fine dei turni di ogni giorno. Le ore di lavoro e il totale della settimana non compaiono più.','Animazione «Inviato allo chef» rifatta: ora sei tu, a sinistra, a consegnare il menù allo chef. Bordi della giacca puliti, niente pezzi di sfondo bianco.'],
+    chef:['Quando segni un ordine come inviato al fornitore parte un\'animazione: lo chef consegna il menù.','Lo staff vede solo l\'inizio e la fine dei turni: niente ore del giorno, niente totale della settimana, né nella schermata «I miei orari» né nell\'avviso degli orari pubblicati. Il contratto e il confronto con le ore fatte restano solo per chi fa gli orari.'],
+    dev:{aggiunte:['`vMieiOrari`: tolto il riquadro `or-mtot` (totale settimana) e le ore di ogni giorno (`or-dm` resta solo per «Finisci dopo mezzanotte»); avviso `orari` senza le ore totali. Il contratto resta in `staff.contratto`, mostrato solo con `isGM`.','`media/invio-chef.mp4` rifatto dal filmato originale con `tools/anim-invio.py` nuovo: niente IA, sfondo = bianco bruciato (min canali ≥ 250), zone bianche chiuse tolte salvo i riflessi sulla giacca (anello ≥ 70% stoffa); divisa dello chef e vestito della ragazza restano pieni; contorno della giacca lisciato (sfocatura σ 7 e soglia a metà, solo entro 30 punti dalla stoffa). Lo script fa due video: `invio-chef.mp4` specchiato (ragazza a sinistra; logo del menù e ricamo della giacca rimessi dritti incollando il riquadro originale nel punto specchiato, riquadri stabilizzati con mediana su 5 fotogrammi) e `invio-fornitore.mp4` invertito nel tempo (chef a sinistra), mostrato da `markSent` con `sendAnim("forn", "Inviato a …")`.']}},
   {v:35,data:'2026-10-05',titolo:'Scadenze per lo staff e QR da cucina',
     tutti:['Se Maurizio fissa una scadenza, ti arriva un avviso sul telefono: «Richieste allo chef entro le…». Arriva anche con l\'app chiusa.','Quando c\'è una versione nuova dell\'app compare l\'avviso «App da aggiornare»: chiudi e riapri l\'app, oppure tocca «Aggiorna ora».'],
     chef:['Impostazioni → «Oggi si ordina» arriva a: scegli chi riceve il promemoria degli ordini. Se non scegli nessuno, arriva a tutti gli Admin Chef.','Impostazioni → Scadenze per lo staff: giorni, ora «Entro le», ora dell\'avviso e reparti. Puoi fare una scadenza per tutte le richieste o una per ogni fornitore.','Impostazioni → QR da cucina: un QR da stampare e appendere che non scade. Chi lo inquadra chiede di entrare e a te arriva una notifica: lo approvi in Staff.'],
@@ -1962,23 +1966,25 @@ function vMiei(me){
 }
 </script>
 <script>
-/* ================= animazione «Inviato allo chef» =================
-   media/invio-chef.mp4 è un video normale (H.264: va anche su iPhone) con due immagini una sopra l'altra:
+/* ================= animazioni dell'invio =================
+   media/invio-chef.mp4 (lo staff invia allo chef: la ragazza porge il menù) e media/invio-fornitore.mp4
+   (ordine inviato al fornitore: lo chef porge il menù) sono video normali (H.264: va anche su iPhone) con due immagini una sopra l'altra:
    sopra il colore, sotto la trasparenza in bianco e nero. WebGL le unisce su un canvas trasparente.
    Il video arriva come blob (niente richieste a pezzi nel service worker). Si salta con «riduci movimento»,
    senza WebGL o se il video non parte; un tocco la chiude. */
-const ANIM_SRC='media/invio-chef.mp4';
-let animUrl=null;
+const ANIM_SRC={chef:'media/invio-chef.mp4',forn:'media/invio-fornitore.mp4'};
+const animUrl={};
 const animOff=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
-function animPrefetch(){
-  if(!animUrl&&!animOff())animUrl=fetch(ANIM_SRC).then(r=>{if(!r.ok)throw 0;return r.blob()}).then(b=>URL.createObjectURL(b)).catch(()=>{animUrl=null;return null});
-  return animUrl||Promise.resolve(null);
+function animPrefetch(k='chef'){
+  if(!animUrl[k]&&!animOff())animUrl[k]=fetch(ANIM_SRC[k]).then(r=>{if(!r.ok)throw 0;return r.blob()}).then(b=>URL.createObjectURL(b)).catch(()=>{animUrl[k]=null;return null});
+  return animUrl[k]||Promise.resolve(null);
 }
 function animGL(cv){
   const gl=cv.getContext('webgl',{alpha:true,premultipliedAlpha:true,antialias:false,preserveDrawingBuffer:true});if(!gl)return null;
   const sh=(t,src)=>{const x=gl.createShader(t);gl.shaderSource(x,src);gl.compileShader(x);return gl.getShaderParameter(x,gl.COMPILE_STATUS)?x:null};
   const vs=sh(gl.VERTEX_SHADER,'attribute vec2 p;varying vec2 uv;void main(){uv=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}');
-  const fs=sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec2 uv;uniform sampler2D t;void main(){vec3 c=texture2D(t,vec2(uv.x,uv.y*.5)).rgb;float a=dot(texture2D(t,vec2(uv.x,.5+uv.y*.5)).rgb,vec3(.299,.587,.114));a=smoothstep(.05,.95,a);gl_FragColor=vec4(c*a,a);}');
+  // ombra leggera attorno alle figure (alfa sfocata su due anelli, un po' più in basso): sullo sfondo chiaro la giacca bianca non si confonde
+  const fs=sh(gl.FRAGMENT_SHADER,'precision mediump float;varying vec2 uv;uniform sampler2D t;float al(vec2 p){p=clamp(p,0.,1.);return smoothstep(.05,.95,dot(texture2D(t,vec2(p.x,.5+p.y*.5)).rgb,vec3(.299,.587,.114)));}void main(){vec3 c=texture2D(t,vec2(uv.x,uv.y*.5)).rgb;float a=al(uv);float s=0.;vec2 q=uv-vec2(0.,2./404.);for(int i=0;i<12;i++){float th=float(i)*.5236;vec2 d=vec2(cos(th)/720.,sin(th)/404.);s+=al(q+d*4.)+al(q+d*8.);}s=s/24.*.3*smoothstep(0.,.06,uv.x)*smoothstep(0.,.06,1.-uv.x)*smoothstep(0.,.08,uv.y)*smoothstep(0.,.08,1.-uv.y);gl_FragColor=vec4(c*a,a+(1.-a)*s);}');
   if(!vs||!fs)return null;const pr=gl.createProgram();gl.attachShader(pr,vs);gl.attachShader(pr,fs);gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return null;gl.useProgram(pr);
   gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
   const l=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(l);gl.vertexAttribPointer(l,2,gl.FLOAT,false,0,0);
@@ -1989,13 +1995,13 @@ function animGL(cv){
   draw.free=()=>{try{const x=gl.getExtension('WEBGL_lose_context');if(x)x.loseContext()}catch(e){}};
   return draw;
 }
-function sendAnim(){return new Promise(async done=>{
+function sendAnim(k='chef',testo='Inviato allo chef'){return new Promise(async done=>{
   if(animOff())return done();
-  const url=await Promise.race([animPrefetch(),new Promise(r=>setTimeout(()=>r(null),1500))]);if(!url)return done();
+  const url=await Promise.race([animPrefetch(k),new Promise(r=>setTimeout(()=>r(null),1500))]);if(!url)return done();
   const cv=document.createElement('canvas');cv.width=720;cv.height=404;let draw=null;try{draw=animGL(cv)}catch(e){}if(!draw)return done();
   const v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('muted','');v.preload='auto';v.src=url;
   const el=document.createElement('div');el.className='snd-anim';el.setAttribute('role','status');
-  el.innerHTML=`<div class="snd-stage"></div><div class="snd-cap">${ic('check')}<span>Inviato allo chef</span></div><p class="snd-hint">Tocca per continuare</p>`;
+  el.innerHTML=`<div class="snd-stage"></div><div class="snd-cap">${ic('check')}<span>${esc(testo)}</span></div><p class="snd-hint">Tocca per continuare</p>`;
   el.querySelector('.snd-stage').appendChild(cv);
   let fin=false,raf=0,shown=false;const cap=el.querySelector('.snd-cap');
   const end=()=>{if(fin)return;fin=true;cancelAnimationFrame(raf);clearTimeout(safe);v.pause();el.classList.remove('in');setTimeout(()=>{el.remove();v.removeAttribute('src');v.load();draw.free();done()},280)};
@@ -2280,6 +2286,7 @@ async function addToOrder(fid,p,q){
 }
 async function markSent(oid){
   const o=D().ordini[oid];if(!o)return;const f=forn(o.fornitoreId);
+  animPrefetch('forn');
   if(!await ask('Hai inviato l\'ordine a '+f.nome+'?','Lo sposto tra gli inviati e avviso chi aveva chiesto gli articoli.','Sì, inviato'))return;
   const meta=metaOf(o);const nid=uid();const arch=clone(o);delete arch.id;
   Object.assign(arch,{stato:'inviato',inviato:now(),inviatoDa:S.me,metodo:S.track[oid]||f.metodo||'',consegna:meta.consegna,noteFornitore:meta.note});
@@ -2287,7 +2294,7 @@ async function markSent(oid){
   const users=new Set();
   for(const rid of o.richieste||[]){const r=D().richieste[rid];if(!r)continue;users.add(r.utenteId);await upd('richieste',rid,{ordinati:Object.assign({},r.ordinati||{},{[o.fornitoreId]:now()})})}
   for(const u of users)if(u!==S.me)await notify(u,'Ordinato a '+f.nome,'I tuoi articoli sono stati ordinati'+(meta.consegna?', consegna '+fdate(new Date(meta.consegna+'T12:00').getTime()):''),'ordinato',nid);
-  delete S.ometa[oid];delete S.track[oid];toast('Ordine a '+f.nome+' segnato come inviato');
+  delete S.ometa[oid];delete S.track[oid];await sendAnim('forn','Inviato a '+f.nome);toast('Ordine a '+f.nome+' segnato come inviato');
 }
 function orderSheet(oid){
   openSheet({render:()=>{const o=D().ordini[oid];if(!o)return'<p class="muted">Ordine non più disponibile.</p>';const f=forn(o.fornitoreId);const wa=waNum(f.whatsapp);const sent=o.stato==='inviato';
@@ -3322,7 +3329,7 @@ async function orPublish(){
   const rg=orRange(lun),me=realU()||{};let n=0;
   for(const id of ids){const u=D().staff[id];if(!u||u.stato!=='attivo'||id===me.id)continue;const r=t[id],old=w.tp&&orHas(w.tp[id]);
     const nd=[0,1,2,3,4,5,6].filter(g=>orShifts((r||{})[g]).length).length;
-    const tx=old?'Cambia: '+orDiffDays(w.tp[id],r).map(g=>OR_GGL[g].toLowerCase()).join(', ')+'. Apri «Orari» per vederli.':nd?`${nd} ${nd===1?'giorno':'giorni'} di lavoro, ${orH(orTot(r,contrOf(u)))}. Apri «Orari» per vederli.`:'Apri «Orari» per vederli.';
+    const tx=old?'Cambia: '+orDiffDays(w.tp[id],r).map(g=>OR_GGL[g].toLowerCase()).join(', ')+'. Apri «Orari» per vederli.':nd?`${nd} ${nd===1?'giorno':'giorni'} di lavoro. Apri «Orari» per vederli.`:'Apri «Orari» per vederli.';
     await notify(id,(old?'Orari cambiati: ':'Orari pubblicati: ')+rg,tx,'orari',lun);n++}
   toast((first?'Orari pubblicati':'Modifiche pubblicate')+(n?': '+(n===1?'avvisata 1 persona':'avvisate '+n+' persone'):''));
 }
@@ -3532,10 +3539,10 @@ function vMieiOrari(me){
   ${tbCard(me)}${cmStaffBox(me)}${S.orMy==='next'?'':orOggi()}
   ${nextOk?`<div class="seg wide or-my" role="group" aria-label="Settimana">${[['','Questa settimana'],['next','Prossima']].map(([k,l])=>`<button type="button" aria-pressed="${(S.orMy||'')===k}" data-a="orMy" data-v="${k}">${l}</button>`).join('')}</div>`:''}`;
   if(!orHas(r))return head+empty('calendar',w&&w.tp?'Nessun turno':'Orari non ancora pronti',w&&w.tp?'In questa settimana non hai turni.':'Quando Maurizio li pubblica ricevi un avviso.');
-  return head+`<div class="or-mtot"><b>${orH(orTot(r,c))}</b><span>di lavoro in settimana</span></div>
+  return head+`
   ${[0,1,2,3,4,5,6].map(g=>{const v=r[g]||'',sh=orShifts(v);
     return`<article class="or-day${g===td?' today':''}${td>=0&&g<td?' past':''}"><div class="or-dh"><b>${OR_GGL[g]}</b><span>${orDay(lun,g).toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span>${g===td?'<span class="tag gm">Oggi</span>':''}</div>
-    ${sh.length?sh.map(([a,b])=>`<div class="or-dt rep-${orRep(me)}">${orHM(a)} – ${orHM(b)}</div>`).join('')+`<div class="or-dm">${orH(orNet(v,c))} di lavoro${sh.some(s=>s[1]>1440)?', finisci dopo mezzanotte':''}</div>`
+    ${sh.length?sh.map(([a,b])=>`<div class="or-dt rep-${orRep(me)}">${orHM(a)} – ${orHM(b)}</div>`).join('')+(sh.some(s=>s[1]>1440)?'<div class="or-dm">Finisci dopo mezzanotte</div>':'')
     :OR_ASS[v]?`<div class="or-da">${OR_ASS[v]}</div>`:'<div class="or-dn">Nessun turno</div>'}
     ${tbOn()&&tbVal(lun,me.id,g)?`<div class="or-dtb">${ic('check')} Timbrato ${esc(tbFmt(tbVal(lun,me.id,g)))}</div>`:''}
     ${sh.length&&(td<0||g>=td)?`<button type="button" class="or-cm" data-a="cmOpen" data-l="${lun}" data-g="${g}">${ic('users')} Chiedi un cambio</button>`:''}</article>`}).join('')}`;

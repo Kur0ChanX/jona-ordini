@@ -65,6 +65,15 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 
 Report del lavoro (Cosa hai fatto tu): Spiega in modo chiaro e diretto cosa hai modificato, i problemi trovati e le soluzioni adottate. Prendi tutto lo spazio che ti serve per farti capire bene, ma evita di allungare il brodo. Niente gergo informatico complesso se non indispensabile.
 
+Leggibilità (ha la precedenza sul risparmio di token, ma frasi corte): ogni risposta è divisa in blocchi con le stesse intestazioni fisse, in questo ordine, saltando quelle vuote:
+  - `✅ FATTO` (cosa ho fatto, max 3-4 righe)
+  - `👉 DA FARE TU` (passi numerati, uno per riga, pulsanti in **grassetto**)
+  - `❓ DOMANDE` (numerate, una riga ciascuna)
+  - `⚠️ ATTENZIONE` (solo se serve)
+Tra un blocco e l'altro una riga `───`.
+Imparare (Mario vuole crescere): quando uso un termine tecnico, scrivo il **termine corretto** e a fianco, tra parentesi, cosa significa in parole semplici (es. «**commit** (un salvataggio del lavoro con un nome)»). Spiego il termine intero la prima volta; poi basta il termine. In più, SOLO A VOLTE (non a ogni risposta: quando c'è un termine nuovo e utile, circa una risposta su 3-4, mai nelle risposte brevissime o di servizio), aggiungo un blocco `📚 IMPARI` breve (max 3 righe): un solo termine, con definizione di una riga e un esempio concreto dell'app Jona Ordini. Livello di Mario: esperto di computer e hardware (assemblaggio, termini generici di informatica: NON spiegarli), principiante assoluto di programmazione. I blocchi `📚 IMPARI` trattano solo programmazione (es. variabile, funzione, commit, branch, API, database, bug, deploy), dal più semplice al più avanzato, senza ripetere termini già spiegati. Mai lasciare Mario all'oscuro: la spiegazione deve bastargli per parlarne con un altro sviluppatore.
+ Frasi corte (max ~15 parole), una idea per riga, niente giri di parole, ma mai tagliare ciò che serve per capire. Parole semplici, niente gergo. Mai un paragrafo di più di 3 righe. Per i riassunti lunghi: tabella.
+
 Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scrivi SOLO un elenco numerato passo passo. Usa i nomi ESATTI dei pulsanti e dei menu che vedrò sullo schermo, senza inventarli o tradurli.
 
 
@@ -72,7 +81,7 @@ Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scr
 
 - Se un comando Git o Bash fallisce, FERMATI immediatamente. Non tentare auto-riparazioni azzardate.
 - Non ripetere codice già fornito o informazioni già presenti in `docs/PASSAGGIO-CONSEGNE.md`.
-- ELENCO DELLE COSE DA FARE: tieni sempre aggiornato `docs/DA-FARE.md`, diviso in 3 parti: (1) Claude da solo, (2) Claude dopo la scelta o l'approvazione di Mario, (3) Mario a mano. Aggiungi ogni cosa nuova appena emerge, togli quelle fatte, e committalo insieme al lavoro. Le consegne rimandano a questo file invece di ripetere l'elenco.
+- ELENCO DELLE COSE DA FARE: tieni sempre aggiornato `docs/DA-FARE.md`, diviso in 3 parti: (1) Claude da solo, (2) Claude dopo la scelta o l'approvazione di Mario, (3) Mario a mano. Aggiungi ogni cosa nuova appena emerge, togli quelle fatte, e committalo insieme al lavoro. Le consegne rimandano a questo file invece di ripetere l'elenco. Ogni voce ha un numero fisso (M1.., D1..), un riassunto in tabella in cima in ordine di urgenza, e a Mario si mostra sempre in ordine, mai in un unico blocco continuo.
 - NUMERO PROGRESSIVO DELLE SESSIONI: ogni sessione ha un numero a due cifre (`#01`, `#02`, `#03`…) nel titolo, subito dopo `▶ ATTIVA` o `✓ CHIUSA`. Per Jona Ordini la numerazione parte da `#01` (la sessione del 04/10/2026). Il numero della sessione attuale è scritto in cima a `docs/PASSAGGIO-CONSEGNE.md` (`Sessione attuale: #NN`): all'handoff la sessione vecchia tiene il suo numero, la nuova prende quello dopo (+1) e lo aggiorna nelle consegne. Così il numero più alto è sempre l'ultima sessione.
 
 ---
@@ -87,7 +96,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - Dati: interfaccia unica `S.db.collection(c).doc(id).set/update/delete` e `orderBy().limit().onSnapshot()`. Due versioni:
   - `LocalStore`: tutto in localStorage (`jona_db_v2`), solo sul telefono.
   - `FirebaseStore`: Firestore con copia offline; i prodotti stanno in `listini/<fornitore>` (campo `p.<id>`), il resto una collezione per tipo. Accesso anonimo + chiave del ristorante (`chiave/ristorante`, `membri/<uid>`, `pubblico/stato`); regole in `firebase/firestore.rules`, guida in `docs/FIREBASE.md`.
-- `media/invio-chef.mp4`: animazione dopo «Invia allo chef» (`sendAnim`): video H.264 720×808 con colore sopra e trasparenza sotto, unito con WebGL. Ricavato dal filmato di Mario: per rifarlo `python3 tools/anim-invio.py <video>` (rembg + scipy + ffmpeg).
+- `media/invio-chef.mp4` e `media/invio-fornitore.mp4`: animazioni dopo «Invia allo chef» (staff) e dopo «Sì, inviato» di un ordine al fornitore (`markSent`), con `sendAnim(k, testo)`: video H.264 720×808 con colore sopra e trasparenza sotto, unito con WebGL. Ricavati dal filmato di Mario `tools/originale-invio.mp4` (sfondo bianco): per rifarli `python3 tools/anim-invio.py tools/originale-invio.mp4` (scipy + ffmpeg, niente IA). `invio-chef` è specchiato (la ragazza a sinistra porge il menù allo chef) con logo del menù e ricamo della giacca rimessi dritti; `invio-fornitore` è invertito nel tempo (lo chef a sinistra porge il menù). Contorno della giacca lisciato; divisa e vestito restano pieni.
 - `firebase-config.js` (`self.JONA_FIREBASE`, null = non configurato), `lib/` (Firebase compat 10.14.1 e generatore QR, locali per l'uso senza rete), `sw.js` (network-first: ogni file nuovo va in `FILES`), `manifest.webmanifest` (fullscreen).
 - Notifiche push: `worker/` (Cloudflare Worker `jona-notifiche`, `/chiave` e `/invia`, Web Push + VAPID, segreto `VAPID_JWK` creato dal workflow `.github/workflows/cloudflare-worker.yml`), iscrizioni in Firestore `push/<id>`, `notify()` → `pushSend()`, `sw.js` mostra la notifica.
 - Orari del personale: `config/orari_<lunedì>` (`t` bozza, `tp` pubblicata, una riga per persona), `config/orari_tipi`, `staff.contratto`; pianificatore nella scheda Staff (Persone | Orari), voce «Orari» per lo staff. Scrittura di una persona con `t.<id>` (`LocalStore.update` capisce i punti).
