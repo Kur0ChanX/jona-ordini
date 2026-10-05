@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-05 (sessione #04). Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -14,18 +14,21 @@ Aggiornato: 2026-10-05 (sessione #04). Ogni cosa ha un **numero fisso** (M1…, 
 | M4 | Mauro Loi: reparto «F&B Manager» | Mario | quando vuoi (2 minuti) |
 | M5 | Stampare e appendere il QR da cucina | Mario | quando vuoi |
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
-| M7 | Decidere: lo staff deve vedere il totale delle ore a settimana nei suoi orari? | Mario | quando vuoi |
 | M8 | Prove dal vero della v35 | Mario | con calma |
+| C1 | v36: totale ore nascosto allo staff (in corso, prove da sistemare) | Claude | subito |
+| C2 | Video dell'invio: togliere solo lo sfondo, corpo/vestiti/menù pieni, niente pezzo bianco tra le braccia | Claude | dopo C1 |
+| D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | con C1 |
+| D5 | Nascondere allo staff anche le ore di ogni giorno? | Claude, dopo la tua scelta | con C1 |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
 | D2 | Sottodominio del Worker `mario-miscera`: cambiarlo? | Claude, dopo il tuo sì | da decidere |
 | D3 | Sicurezza del Worker (`/invia`, `/promemoria`) | Claude, solo se lo chiedi | in pausa |
 
-Claude da solo: niente da fare per ora.
 
 ---
 
 ## 1. Claude da solo
-Niente per ora.
+- **C1 · v36**: dettagli in `docs/PASSAGGIO-CONSEGNE.md`.
+- **C2 · Video dell'invio**: rifare `media/invio-chef.mp4` togliendo solo lo sfondo, fotogramma per fotogramma.
 
 ## 2. Claude, dopo la tua scelta o approvazione
 - **D1 · Cloudflare Pages** (gratis, hai detto sì). Prima va deciso il **giorno**, perché ogni telefono va ricollegato (invito + approvazione + accesso) e le notifiche riattivate.
@@ -43,7 +46,6 @@ Niente per ora.
 - **M4 · Mauro Loi**: **Staff** → **Mauro Loi** → Reparto «F&B Manager», svuota **Mansione**, **Salva**.
 - **M5 · QR da cucina**: **Impostazioni** → **QR da cucina** → **Crea il QR**, stampalo e appendilo.
 - **M6 · Scadenze dello staff**: le imposta Maurizio in **Impostazioni** → **Scadenze per lo staff** (dopo M2).
-- **M7 · Decidere**: nei suoi orari lo staff vede «X ore di lavoro in settimana» e le ore di ogni giorno. Il contratto non lo vede mai. Tenere così, o nascondere anche il totale delle ore? (Se nascosto, Claude lo fa in una prossima versione.)
 
 ### M8 · Prove dal vero della v35, con calma
 Una alla volta; dimmi solo «ok» o cosa non va:

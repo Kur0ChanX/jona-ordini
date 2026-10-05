@@ -1019,8 +1019,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=35;
+const APP_VER=36;
 const NEWS=[
+  {v:36,data:'2026-10-05',titolo:'Orari: niente totale delle ore per lo staff',
+    tutti:['Nei tuoi orari vedi i turni di ogni giorno. Il totale delle ore della settimana non compare più.'],
+    chef:['Lo staff non vede più il totale delle ore della settimana, né nella schermata «I miei orari» né nell\'avviso degli orari pubblicati. Il contratto e il confronto con le ore fatte restano solo per chi fa gli orari.'],
+    dev:{aggiunte:['`vMieiOrari`: tolto il riquadro `or-mtot` (totale settimana); avviso `orari` senza le ore totali. Il contratto resta in `staff.contratto`, mostrato solo con `isGM`.']}},
   {v:35,data:'2026-10-05',titolo:'Scadenze per lo staff e QR da cucina',
     tutti:['Se Maurizio fissa una scadenza, ti arriva un avviso sul telefono: «Richieste allo chef entro le…». Arriva anche con l\'app chiusa.','Quando c\'è una versione nuova dell\'app compare l\'avviso «App da aggiornare»: chiudi e riapri l\'app, oppure tocca «Aggiorna ora».'],
     chef:['Impostazioni → «Oggi si ordina» arriva a: scegli chi riceve il promemoria degli ordini. Se non scegli nessuno, arriva a tutti gli Admin Chef.','Impostazioni → Scadenze per lo staff: giorni, ora «Entro le», ora dell\'avviso e reparti. Puoi fare una scadenza per tutte le richieste o una per ogni fornitore.','Impostazioni → QR da cucina: un QR da stampare e appendere che non scade. Chi lo inquadra chiede di entrare e a te arriva una notifica: lo approvi in Staff.'],
@@ -3322,7 +3326,7 @@ async function orPublish(){
   const rg=orRange(lun),me=realU()||{};let n=0;
   for(const id of ids){const u=D().staff[id];if(!u||u.stato!=='attivo'||id===me.id)continue;const r=t[id],old=w.tp&&orHas(w.tp[id]);
     const nd=[0,1,2,3,4,5,6].filter(g=>orShifts((r||{})[g]).length).length;
-    const tx=old?'Cambia: '+orDiffDays(w.tp[id],r).map(g=>OR_GGL[g].toLowerCase()).join(', ')+'. Apri «Orari» per vederli.':nd?`${nd} ${nd===1?'giorno':'giorni'} di lavoro, ${orH(orTot(r,contrOf(u)))}. Apri «Orari» per vederli.`:'Apri «Orari» per vederli.';
+    const tx=old?'Cambia: '+orDiffDays(w.tp[id],r).map(g=>OR_GGL[g].toLowerCase()).join(', ')+'. Apri «Orari» per vederli.':nd?`${nd} ${nd===1?'giorno':'giorni'} di lavoro. Apri «Orari» per vederli.`:'Apri «Orari» per vederli.';
     await notify(id,(old?'Orari cambiati: ':'Orari pubblicati: ')+rg,tx,'orari',lun);n++}
   toast((first?'Orari pubblicati':'Modifiche pubblicate')+(n?': '+(n===1?'avvisata 1 persona':'avvisate '+n+' persone'):''));
 }
@@ -3532,7 +3536,7 @@ function vMieiOrari(me){
   ${tbCard(me)}${cmStaffBox(me)}${S.orMy==='next'?'':orOggi()}
   ${nextOk?`<div class="seg wide or-my" role="group" aria-label="Settimana">${[['','Questa settimana'],['next','Prossima']].map(([k,l])=>`<button type="button" aria-pressed="${(S.orMy||'')===k}" data-a="orMy" data-v="${k}">${l}</button>`).join('')}</div>`:''}`;
   if(!orHas(r))return head+empty('calendar',w&&w.tp?'Nessun turno':'Orari non ancora pronti',w&&w.tp?'In questa settimana non hai turni.':'Quando Maurizio li pubblica ricevi un avviso.');
-  return head+`<div class="or-mtot"><b>${orH(orTot(r,c))}</b><span>di lavoro in settimana</span></div>
+  return head+`
   ${[0,1,2,3,4,5,6].map(g=>{const v=r[g]||'',sh=orShifts(v);
     return`<article class="or-day${g===td?' today':''}${td>=0&&g<td?' past':''}"><div class="or-dh"><b>${OR_GGL[g]}</b><span>${orDay(lun,g).toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span>${g===td?'<span class="tag gm">Oggi</span>':''}</div>
     ${sh.length?sh.map(([a,b])=>`<div class="or-dt rep-${orRep(me)}">${orHM(a)} – ${orHM(b)}</div>`).join('')+`<div class="or-dm">${orH(orNet(v,c))} di lavoro${sh.some(s=>s[1]>1440)?', finisci dopo mezzanotte':''}</div>`

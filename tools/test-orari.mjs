@@ -167,7 +167,7 @@ ok(days[2].includes('Riposo'),'Wednesday shows Riposo (published change)');
 ok(days[3].includes('18:00 – 23:00')&&!days[3].includes('Ferie'),'unpublished draft not visible to staff');
 ok(!(await pg.locator('#app').innerText()).match(/Sara|Anna|Gino/),'staff sees only their own shifts');
 ok(await pg.locator('.or-day.today').count()===1,'today highlighted');
-ok((await pg.locator('.or-mtot').innerText()).includes('di lavoro'),'weekly total shown');
+ok(await pg.locator('.or-mtot').count()===0,'weekly total hidden from staff');
 ok(!(await pg.locator('#app').innerText()).includes('contratto'),'staff does not see contract hours');
 // settimana prossima pubblicata → compare la scelta
 await pg.evaluate(async()=>{const n=orShift(orLun(),1),w=orWeek(n);await upd('config','orari_'+n,{tp:clone(w.t),pub:now()})});await wait(300);

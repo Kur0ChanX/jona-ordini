@@ -1,41 +1,41 @@
 # Passaggio di consegne (2026-10-05)
 
-Sessione attuale: #04
+Sessione attuale: #05
 
 ## Ultimo messaggio di Mario
-«1 Non ho capito questa prova
-2 scelta A fallo quando vuoi Fai un QR code con richiesta di approvazione senza tempo con bella grafica
-A arriva solo a Maurizio ma per ora
-B puoi fare tutti e 2
-C selezioni i reparti o tutti
-D ai può decidere l'orario
-telefoni collegati non ce bisogno
-Sicurezza server falla se non crea malus
-Si va bene ma meglio che riavviarsi per le troppe modifiche segnalalo hai una versione non aggiornata potresti avere problemi o funzioni in meno si consiglia di chiudere e riaprire l'app... scrivilo bene
-cloudfire gratis va bene, domanda ma è uguale a quello che ho già o ha migliorie?
-ho provato da ipad al mio Cell e funziona l'audio e il vocale»
+«quindi nel link c'è ancora Kur0ChanX o nok c'è piú nel QRcode non ho capito bene cosa ho cambiato?»
 
-Tutto fatto nella v35, tranne le risposte, che la sessione #03 ha dato a Mario nel suo ultimo messaggio:
-- **«Non ho capito questa prova»**: è la prova automatica `tools/test-firebase-flow`, che sbaglia solo tra le 23:30 e le 24:00. È un problema della prova, non dell'app. Si sistema da soli (vedi `docs/DA-FARE.md`).
-- **Cloudflare Pages**: è la stessa app con le stesse funzioni. Cambia il link (senza «kur0chanx») e il sito è un po' più veloce. Svantaggio: ogni telefono va ricollegato (invito, approvazione, accesso) e le notifiche riattivate. Prima di farlo Mario sceglie il giorno.
+Risposta già data dalla sessione #04: non ha cambiato niente. Il link dell'app contiene ancora kur0chanx (GitHub Pages). Toglierlo è la voce D1 (Cloudflare Pages) di `docs/DA-FARE.md`. Il QR porta a `invito.mario-miscera.workers.dev`, poi all'app con kur0chanx.
 
-## Fatto in sessione #03
-- **Maurizio non compare nello Staff**: non si è ancora registrato. La schermata mandata era il telefono di Mario. Mario gli fa l'account domani. Spiegati QR (portone) e approvazione (portiere).
-- **Regola nuova** in `CLAUDE.md`: `docs/DA-FARE.md` sempre aggiornato, diviso in 3 parti (Claude da solo / dopo la scelta di Mario / Mario a mano). Le consegne rimandano lì.
-- **v35 pubblicata** (PR #44, squash `7dcdf58`, ramo riallineato con `292f1ce`). Verificata online: `APP_VER=35`, `CACHE` `jona-ordini-v39`, `/salute` ok, `/richiesta` senza gettone → 403 (Worker nuovo attivo).
-  - `index.html`: `scadL`/`scadAvv`/`scadDue`/`scadTick` (scadenze `config/app.scad`, notifica per persona `scad_<id>_<giorno>_<persona>`, toast una volta al giorno); `promDest`/`promTo` (`config/app.promA`, vuoto = tutti i `gm`); `promPlan` con `subs`, `gest`, `scad`; `deadlineTick` gira per tutti (scadenze) e poi solo per i `gm`; Impostazioni: `qfRow` (QR da cucina), `promRows`, `scSheet`/`scSave`; `inviteCard(fx)` per la cartolina del QR fisso; `phSend` chiama `/richiesta`; `banner`/`updOn` («App da aggiornare» su `controllerchange` e da `netWatch`, che non ricarica più).
-  - `worker/src/index.js`: scadenze in `promTick` (`s_<id>` in `fatto`, piano vecchio compatibile), `richiesta()` (telefono `ok:false` con `req` → push ai `gest`, una volta ogni 10 min, chiave `rq_<uid>` in `prom`), `/inviti` `{fisso, vecchio}` (50 anni), `invLeggi` con `inv_err` (20 codici sbagliati/ora per IP → 429).
-  - Prove: `tools/test-v35.mjs` (39 verdi); verdi anche `test-v34`, `test-v31`, `test-firebase-push`, `test-inviti`, `test-firebase-telefoni`, `test-firebase-wifi-lento` (aggiornata: niente ricarica, «Aggiorna ora»), `test-giro`, `test-news`, `test-v16`, `test-firebase-flow`, `test-registrazione`, `test-firebase-sync`.
-- **Decisioni**:
-  - «Telefoni collegati» non serve.
-  - «Porta aperta» scartata: solo QR fisso con approvazione.
-  - Sicurezza `/invia` e `/promemoria` non fatta perché crea un malus (spiegato in `docs/DA-FARE.md`).
-  - Vocale da iPad verso il telefono Android di Mario: funziona.
+Messaggio precedente, **ancora da fare** (v37 o insieme alla v36):
+«dovresti avere salvato il video dell'invio ordine guardalo bene frame by frame hai scontornato anche la maglietta Chef e poi tra le braccia c'è un pezzo bianco da togliere cmq elimina solo lo sfondo fatto bene il corso e vestiti e menù non farlo trasparenti fallo professionale»
+→ rifare `media/invio-chef.mp4` con `tools/anim-invio.py`: togliere SOLO lo sfondo. Corpo, vestiti (maglia da chef) e menù devono restare pieni, senza buchi trasparenti. Il pezzo bianco tra le braccia va tolto. Controllare fotogramma per fotogramma. Il filmato originale di Mario: cercarlo nel repo o in `media/`. Se non c'è, chiederlo a Mario.
+
+## Fatto in sessione #04
+- `tools/test-firebase-flow.mjs`: l'ora limite di prova si ferma alle 23:59 (prima sbagliava tra 23:30 e 24:00 UTC). Verde.
+- `docs/DA-FARE.md` riordinato: tabella in cima per urgenza, numeri fissi (M1…, D1…), Maurizio (M1, M2, M3, M6) **in stand-by**: Mario avvisa lui.
+- `CLAUDE.md`, sezione COMUNICAZIONE: risposte a blocchi fissi (✅ FATTO, 👉 DA FARE TU, ❓ DOMANDE, ⚠️ ATTENZIONE, separatori `───`), frasi corte. Termine tecnico + spiegazione tra parentesi. Blocco 📚 IMPARI solo a volte (1 risposta su 3-4), max 3 righe, solo programmazione (Mario conosce bene hardware e informatica generale). Termini già spiegati: commit, push, variabile, dato/schermata, regola di accesso.
+- Ora: usare l'ora italiana (`TZ=Europe/Rome date`); il container è in UTC.
+- **Decisioni di Mario**:
+  - Il contratto (ore dovute, confronto con le ore fatte) lo vedono solo i capi: **Chef, Responsabili e Mario**. Lo staff mai.
+  - M7: **nascondere** allo staff il totale delle ore della settimana.
+
+## Lavoro in corso: v36 (commit sul ramo, NON pubblicata)
+- `index.html`: `APP_VER=36`; voce `NEWS` v36; `vMieiOrari` senza il riquadro `or-mtot` (totale settimana); avviso «orari pubblicati» (`orPublish`) senza le ore totali.
+- `sw.js`: `CACHE` `jona-ordini-v40`.
+- `tools/test-orari.mjs`: il controllo «weekly total shown» ora verifica che il totale sia nascosto.
+- Prove: verdi `test-giro`, `test-v16`, `test-news`. **Da sistemare prima di pubblicare**:
+  - `test-orari`: FAIL «staff sees only their own shifts» (verificare se dipende dalla modifica o era già così);
+  - `test-v35`: TimeoutError alla riga 89 (`formset` dev) con l'emulatore appena riavviato. Rilanciarla dopo aver svuotato l'emulatore.
+- Ancora da decidere/fare per la v36:
+  - Le ore di ogni giorno («X di lavoro» sotto ogni turno) restano visibili allo staff. Chiedere a Mario se nascondere anche quelle (sommandole si ricava il totale).
+  - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
 
 ## Prossimi passi
-Vedi `docs/DA-FARE.md`. Prima cosa: chiedere a Mario come sono andate le prove dal vero della v35 e se Maurizio si è registrato.
+1. Finire la v36 (prove sopra), chiedere le due scelte, pubblicare (PR → squash → controllo online → riallineamento).
+2. Video dell'invio (vedi sopra).
+3. Il resto: `docs/DA-FARE.md`.
 
 ## Rischi aperti
-- Dopo questo aggiornamento chi ha l'app aperta vede «App da aggiornare» solo se il nuovo service worker subentra. Chi ha già la v34 aperta riceve la v35 alla riapertura, come sempre.
-- La copia di lavoro all'avvio della sessione può essere in «detached HEAD»: fare `git checkout <ramo>` + `merge --ff-only`, mai forzare.
-- `test-firebase-flow` fallisce tra le 23:30 e le 24:00.
+- Il ramo `ccr-4a01d00e-6ay25e` è nato in questa sessione (la #03 lavorava su `ccr-402d6602-imjwpw`). Il ramo da usare è quello indicato all'avvio della nuova sessione.
+- `test-firebase-flow` sistemata, ma la fascia 23:30-24:00 UTC (01:30-02:00 in Italia) non è stata provata dal vero.
