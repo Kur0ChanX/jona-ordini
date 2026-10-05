@@ -2,6 +2,12 @@
 
 Sessione attuale: #11
 
+## Sessione #11
+- Mario: «vai mettili al massimo li modifichiamo e miglioriamo piú avanti salvali in un posto sicuro per non ripartire da 0».
+- Video approvati. Copia sicura: ramo `scorta-video-invio-v1` (commit `0c60d3d`). Le etichette (tag) non passano dal proxy: usare rami.
+- Prove prima della pubblicazione: `test-invio-anim`, `test-orari`, `test-giro` verdi.
+- v36 in pubblicazione (PR → squash → controllo online). Miglioramenti futuri dei video: D6 in `docs/DA-FARE.md`.
+
 ## Ultimo messaggio di Mario (sessione #10)
 «si salvali e mettili nell'app» → fatto: video #10 committati in `media/`.
 Prima: «tra le braccia di tutte e due si vede ancora qualcosa, la giacca viene a volte molto mangiata, fa parte molto dello sfondo».
