@@ -17,7 +17,6 @@ W, H = 720, 404
 SOGLIA = 250     # minimo dei tre canali da cui un punto è sfondo
 BUCO = 150       # zone bianche chiuse più piccole di così (in punti) restano piene: niente forellini
 CHIUDI = 14      # raggio (in punti) delle fessure chiuse vicino alla giacca
-GIRO = 1         # verso della rotazione del logo (prova: inclinazione del logo = quella del menù specchiato)
 LISCIO = 8       # quanto si liscia il contorno della giacca (in punti del filmato 1920x1080)
 tmp = tempfile.mkdtemp()
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', SRC, '-t', str(END), '-vf', 'fps=24', f'{tmp}/f%03d.png'], check=True)
@@ -180,7 +179,7 @@ for k in range(N):
         if y1 - y0 < 30 or x1 - x0 < 30: continue
         p = bordo(y1 - y0, x1 - x0)[..., None]
         if tipo == 'menu':   # ogni punto del riquadro specchiato prende il punto del logo originale girato di 2 volte l'angolo del menù
-            r = np.radians(2 * incl[k] * GIRO); cy, cx = (y0 + y1 - 1) / 2, (x0 + x1 - 1) / 2
+            r = np.radians(-2 * incl[k]); cy, cx = (y0 + y1 - 1) / 2, (x0 + x1 - 1) / 2
             yy, xx = np.mgrid[y0:y1, x0:x1].astype(np.float32); dy, dx = yy - cy, xx - cx
             sy, sx = cy + dy * np.cos(r) - dx * np.sin(r), cx + dy * np.sin(r) + dx * np.cos(r)
             src = np.stack([ndi.map_coordinates(col[..., c], [sy, sx], order=1, mode='nearest') for c in range(3)], -1)
