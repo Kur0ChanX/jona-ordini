@@ -1,9 +1,10 @@
 # Passaggio di consegne (2026-10-05)
 
-Sessione attuale: #09
+Sessione attuale: #10
 
 ## Ultimo messaggio di Mario (sessione #09)
-«le ore complessive non si devono fare i conti ecco ma vedere gli orari si» (D5) e «tutti e 2» (il «seghettato» è sia sul vestito sia sulla giacca).
+«Ancora un po' in mezzo alle braccia di tutte e due si vede qualche artefatto, qualche cosa di strano.» → da fare (M9): zone tra le braccia (ragazza e chef, entrambi i video) dopo i ritocchi #09. Prima di toccare: estrarre fotogrammi su fondo scuro e chiaro, zoom tra braccio e corpo / braccio e menù, capire cosa si vede (sfondo bianco rimasto, bordo `lum` del vestito che prende il grigio, buchi chiusi riempiti per sbaglio). Preview veloce: `ANIM_OUT=<cartella> python3 tools/anim-invio.py tools/originale-invio.mp4 1.5` (~4 min); completo ~15 min.
+Messaggi precedenti: D5 «le ore complessive non si devono fare i conti ma vedere gli orari sì» (fatto); «seghettato» su vestito e giacca (fatto, sotto).
 
 ## Fatto in sessione #09
 - D5: in «I miei orari» lo staff vede solo inizio e fine dei turni; tolte le ore di ogni giorno (`or-dm` resta solo per «Finisci dopo mezzanotte»). Voce `NEWS` v36 aggiornata.
@@ -34,9 +35,10 @@ Sessione attuale: #09
   - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
 
 ## Prossimi passi
-1. Aspettare l'ok di Mario sui video (M9). Se va bene: pubblicare la v36 (PR → squash → controllo online → riallineamento).
-2. D4 (contratto ai Responsabili): brainstorming con Mario.
-3. Il resto: `docs/DA-FARE.md`.
+1. Sistemare gli artefatti tra le braccia (sopra), rifare i video, `node tools/test-invio-anim.mjs`, commit, anteprime su fondo scuro a Mario (comando ffmpeg `alphamerge` su `0x1c1c1e`).
+2. Con l'ok di Mario sui video: pubblicare la v36 (PR → squash → controllo online → riallineamento). Domanda aperta: pubblicare subito dopo l'ok?
+3. D4 (contratto ai Responsabili): chiesto a Mario, senza risposta; se sì, brainstorming con 2-3 strade.
+4. Il resto: `docs/DA-FARE.md`.
 
 ## Rischi aperti
 - Il ramo `ccr-4a01d00e-6ay25e` è nato in questa sessione (la #03 lavorava su `ccr-402d6602-imjwpw`). Il ramo da usare è quello indicato all'avvio della nuova sessione.
