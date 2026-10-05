@@ -7,9 +7,8 @@ Sessione attuale: #05
 
 Risposta già data dalla sessione #04: non ha cambiato niente. Il link dell'app contiene ancora kur0chanx (GitHub Pages). Toglierlo è la voce D1 (Cloudflare Pages) di `docs/DA-FARE.md`. Il QR porta a `invito.mario-miscera.workers.dev`, poi all'app con kur0chanx.
 
-Messaggio precedente, **ancora da fare** (v37 o insieme alla v36):
-«dovresti avere salvato il video dell'invio ordine guardalo bene frame by frame hai scontornato anche la maglietta Chef e poi tra le braccia c'è un pezzo bianco da togliere cmq elimina solo lo sfondo fatto bene il corso e vestiti e menù non farlo trasparenti fallo professionale»
-→ rifare `media/invio-chef.mp4` con `tools/anim-invio.py`: togliere SOLO lo sfondo. Corpo, vestiti (maglia da chef) e menù devono restare pieni, senza buchi trasparenti. Il pezzo bianco tra le braccia va tolto. Controllare fotogramma per fotogramma. Il filmato originale di Mario: cercarlo nel repo o in `media/`. Se non c'è, chiederlo a Mario.
+Ultimo messaggio di Mario in sessione #05 (video caricato in chat): «Nel video togli lo sfondo ma lascia la divisa bianca dello chef a sinistra […] togli tutto il bianco e lo sfondo ma lascia il vestito della ragazza […] togli lo sfondo bianco tra le braccia della ragazza a destra».
+→ **Fatto in #05**: `media/invio-chef.mp4` rifatto con `tools/anim-invio.py` nuovo (niente IA: le IA vedevano solo il menù). Sfondo = bianco bruciato (min canali ≥ 250); zone bianche chiuse tolte, tranne i riflessi sulla giacca (anello ≥ 70% stoffa); via l'alone chiaro sottile; sfumatura ai lati ridotta (4%/3%) per far vedere divisa e vestito. Prova `test-invio-anim` aggiornata (sfondo trasparente > 30%) e verde. Il filmato originale NON è nel repo (era in `/root/.claude/uploads/`, si perde con la sessione). Mario deve approvare l'anteprima (M9).
 
 ## Fatto in sessione #04
 - `tools/test-firebase-flow.mjs`: l'ora limite di prova si ferma alle 23:59 (prima sbagliava tra 23:30 e 24:00 UTC). Verde.

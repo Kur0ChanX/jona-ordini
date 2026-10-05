@@ -16,7 +16,7 @@ Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, 
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M8 | Prove dal vero della v35 | Mario | con calma |
 | C1 | v36: totale ore nascosto allo staff (in corso, prove da sistemare) | Claude | subito |
-| C2 | Video dell'invio: togliere solo lo sfondo, corpo/vestiti/menù pieni, niente pezzo bianco tra le braccia | Claude | dopo C1 |
+| M9 | Guardare la nuova animazione dell'invio (anteprima nella chat della sessione #05) e dire se va bene | Mario | subito |
 | D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | con C1 |
 | D5 | Nascondere allo staff anche le ore di ogni giorno? | Claude, dopo la tua scelta | con C1 |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
@@ -28,7 +28,6 @@ Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, 
 
 ## 1. Claude da solo
 - **C1 · v36**: dettagli in `docs/PASSAGGIO-CONSEGNE.md`.
-- **C2 · Video dell'invio**: rifare `media/invio-chef.mp4` togliendo solo lo sfondo, fotogramma per fotogramma.
 
 ## 2. Claude, dopo la tua scelta o approvazione
 - **D1 · Cloudflare Pages** (gratis, hai detto sì). Prima va deciso il **giorno**, perché ogni telefono va ricollegato (invito + approvazione + accesso) e le notifiche riattivate.
@@ -36,6 +35,7 @@ Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, 
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
+- **M9 · Animazione dell'invio**: rifatta dal filmato originale (divisa dello chef e vestito della ragazza pieni, via il bianco tra le braccia). Guardala e dimmi se va bene: esce con la v36.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
 - **M1 · Profilo di Maurizio**: Maurizio crea il suo profilo con l'invito; poi tu vai in **Staff** e lo approvi.

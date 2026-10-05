@@ -34,7 +34,7 @@ async function run(opts={}){
     const d=x.getImageData(0,0,o.width,o.height).data;let solid=0,clear=0;for(let i=3;i<d.length;i+=4*7){if(d[i]>240)solid++;else if(d[i]<8)clear++}const n=Math.ceil(d.length/28);
     return{corner:d[3],solid:solid/n,clear:clear/n}});
   ok(px.corner<10,'canvas corner is transparent (alpha '+px.corner+')');
-  ok(px.solid>0.08&&px.clear>0.5,'hands and menu opaque, background transparent ('+Math.round(px.solid*100)+'% / '+Math.round(px.clear*100)+'%)');
+  ok(px.solid>0.08&&px.clear>0.3,'hands and menu opaque, background transparent ('+Math.round(px.solid*100)+'% / '+Math.round(px.clear*100)+'%)');
   await pg.screenshot({path:'/tmp/invio-anim-mid.png'});
   await pg.waitForSelector('.snd-cap.in',{timeout:6000}).catch(()=>{});
   ok(await pg.locator('.snd-cap.in').count()===1,'caption «Inviato allo chef» appears near the end');

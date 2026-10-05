@@ -1022,9 +1022,9 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 const APP_VER=36;
 const NEWS=[
   {v:36,data:'2026-10-05',titolo:'Orari: niente totale delle ore per lo staff',
-    tutti:['Nei tuoi orari vedi i turni di ogni giorno. Il totale delle ore della settimana non compare più.'],
+    tutti:['Nei tuoi orari vedi i turni di ogni giorno. Il totale delle ore della settimana non compare più.','Animazione «Inviato allo chef» rifatta: si vedono la divisa dello chef e il vestito della collega, senza pezzi di sfondo bianco.'],
     chef:['Lo staff non vede più il totale delle ore della settimana, né nella schermata «I miei orari» né nell\'avviso degli orari pubblicati. Il contratto e il confronto con le ore fatte restano solo per chi fa gli orari.'],
-    dev:{aggiunte:['`vMieiOrari`: tolto il riquadro `or-mtot` (totale settimana); avviso `orari` senza le ore totali. Il contratto resta in `staff.contratto`, mostrato solo con `isGM`.']}},
+    dev:{aggiunte:['`vMieiOrari`: tolto il riquadro `or-mtot` (totale settimana); avviso `orari` senza le ore totali. Il contratto resta in `staff.contratto`, mostrato solo con `isGM`.','`media/invio-chef.mp4` rifatto dal filmato originale con `tools/anim-invio.py` nuovo: niente IA, sfondo = bianco bruciato (min canali ≥ 250), zone bianche chiuse tolte salvo i riflessi sulla giacca (anello ≥ 70% stoffa); divisa dello chef e vestito della ragazza restano pieni; inversione nel tempo dentro lo script.']}},
   {v:35,data:'2026-10-05',titolo:'Scadenze per lo staff e QR da cucina',
     tutti:['Se Maurizio fissa una scadenza, ti arriva un avviso sul telefono: «Richieste allo chef entro le…». Arriva anche con l\'app chiusa.','Quando c\'è una versione nuova dell\'app compare l\'avviso «App da aggiornare»: chiudi e riapri l\'app, oppure tocca «Aggiorna ora».'],
     chef:['Impostazioni → «Oggi si ordina» arriva a: scegli chi riceve il promemoria degli ordini. Se non scegli nessuno, arriva a tutti gli Admin Chef.','Impostazioni → Scadenze per lo staff: giorni, ora «Entro le», ora dell\'avviso e reparti. Puoi fare una scadenza per tutte le richieste o una per ogni fornitore.','Impostazioni → QR da cucina: un QR da stampare e appendere che non scade. Chi lo inquadra chiede di entrare e a te arriva una notifica: lo approvi in Staff.'],
