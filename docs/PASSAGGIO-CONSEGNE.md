@@ -1,14 +1,19 @@
 # Passaggio di consegne (2026-10-05)
 
-Sessione attuale: #05
+Sessione attuale: #06
 
-## Ultimo messaggio di Mario
-«quindi nel link c'è ancora Kur0ChanX o nok c'è piú nel QRcode non ho capito bene cosa ho cambiato?»
+## Ultimo messaggio di Mario (fine sessione #05)
+«va quasi bene a parte la giacca dello chef che è fatta maluccio non è scontornata bene»
 
-Risposta già data dalla sessione #04: non ha cambiato niente. Il link dell'app contiene ancora kur0chanx (GitHub Pages). Toglierlo è la voce D1 (Cloudflare Pages) di `docs/DA-FARE.md`. Il QR porta a `invito.mario-miscera.workers.dev`, poi all'app con kur0chanx.
+→ **Prossimo lavoro (subito)**: rifinire lo scontorno della **giacca bianca dello chef** in `media/invio-chef.mp4`. Il resto (sfondo tolto, bianco tra le braccia tolto, vestito nero della ragazza pieno, menù, mani) a Mario va bene: non peggiorarlo.
+- Filmato originale salvato in `tools/originale-invio.mp4` (1920×1080, 60 fps, 5 s; si usano i primi 4,2 s). Rifare con `python3 tools/anim-invio.py tools/originale-invio.mp4` (serve `pip install scipy`; esce già invertito nel tempo).
+- Metodo attuale (`tools/anim-invio.py`, niente IA: isnet/u2net vedevano solo il menù, birefnet va fuori memoria): sfondo = min canali ≥ 250; l'alone quasi bianco sottile si toglie con un'apertura disk(5); chiusura disk(4); zone bianche chiuse tolte salvo riflessi sulla giacca (anello ≥ 70% «stoffa»); maschera rigida, erosione disk(2), sfocatura 1,6; sfumatura ai bordi 4/3/4/5 %.
+- Probabili difetti della giacca: bordo rigido e seghettato (la giacca sfuma nel bianco: la soglia fissa taglia a gradini), pezzi di bordo luminoso persi, erosione che mangia le pieghe. Idee: trasparenza morbida solo sul bordo della giacca (proporzionale a 255 − minimo dei canali), meno erosione sulla giacca, maschera stabilizzata nel tempo solo dove non c'è movimento. Controllare ingrandito (bordo sinistro/destro della giacca, spalla, maniche, polsini) su fondo scuro e chiaro; mandare a Mario un'anteprima (sopra scuro, sotto chiaro, come in #05).
+- Dopo: `node tools/test-invio-anim.mjs` (server `python3 -m http.server 8765`), commit, e M9 di `docs/DA-FARE.md`.
 
-Ultimo messaggio di Mario in sessione #05 (video caricato in chat): «Nel video togli lo sfondo ma lascia la divisa bianca dello chef a sinistra […] togli tutto il bianco e lo sfondo ma lascia il vestito della ragazza […] togli lo sfondo bianco tra le braccia della ragazza a destra».
-→ **Fatto in #05**: `media/invio-chef.mp4` rifatto con `tools/anim-invio.py` nuovo (niente IA: le IA vedevano solo il menù). Sfondo = bianco bruciato (min canali ≥ 250); zone bianche chiuse tolte, tranne i riflessi sulla giacca (anello ≥ 70% stoffa); via l'alone chiaro sottile; sfumatura ai lati ridotta (4%/3%) per far vedere divisa e vestito. Prova `test-invio-anim` aggiornata (sfondo trasparente > 30%) e verde. Il filmato originale NON è nel repo (era in `/root/.claude/uploads/`, si perde con la sessione). Mario deve approvare l'anteprima (M9).
+## Fatto in sessione #05
+- Animazione rifatta (commit `v36: animazione dell'invio rifatta…`): NEWS v36 aggiornata (tutti + dev), `CLAUDE.md` (riga di `media/invio-chef.mp4`), `tools/test-invio-anim.mjs` (sfondo trasparente > 30%, ora c'è la divisa), `docs/DA-FARE.md` (tolto C2, aggiunto M9). Prove verdi: `test-invio-anim`, `test-news`.
+- Domanda ancora aperta a Mario: D5 (nascondere allo staff anche le ore di ogni giorno?).
 
 ## Fatto in sessione #04
 - `tools/test-firebase-flow.mjs`: l'ora limite di prova si ferma alle 23:59 (prima sbagliava tra 23:30 e 24:00 UTC). Verde.
