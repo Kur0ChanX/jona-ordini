@@ -5,6 +5,8 @@ Sessione attuale: #08
 ## Ultimo messaggio di Mario (sessione #07)
 «guarda questo fotogramma puoi migliorare il video nelle mani della ragazza la parte bianca tra le dita» (foto: video al fornitore, mani della ragazza che entrano veloci, chiazze bianche tra le dita).
 
+Messaggio successivo di Mario (arrivato nella #07 dopo l'apertura della #08): «il logo sembra storto nel menù mettilo sempre in griglia in base alla posizione del menu frame by frame» → nella versione allo chef (specchiata) il riquadro del logo incollato (`riquadri()`/`stabili()` in `tools/anim-invio.py`) è inclinato al contrario del menù. Da fare: per ogni fotogramma trovare i 4 angoli/l'inclinazione del menù e incollare il logo raddrizzato (rotazione/prospettiva) allineato ai bordi del menù specchiato. Rifare i video una sola volta (dita + logo).
+
 ## Fatto in sessione #07 (ritocco chiesto da Mario)
 - Causa: con le mani veloci il filmato sfoca le dita sul fondo bianco; quei punti (misto pelle+bianco, minimo canali 170-249, poco colore) restavano pieni.
 - `tools/anim-invio.py`: nuova `mosso(rgb, vicini)`. Solo dove c'è movimento forte (differenza coi fotogrammi vicini, sfocata 6, > 90) e fuori da giacca (stoffa grande > 8000 punti, entro 45) e logo del menù (buchi nel marrone `mx<170`, `R-B<40`, > 30000 punti): trasparenza = quanta pelle c'è (`(SOGLIA+2-mn)/(SOGLIA+2-pelle vicina)`×1,15) e colore "smescolato" dal bianco. Fotogrammi fermi, unghie, logo e giacca: invariati (provato su fotogrammi 3, 55, 70, 79, 80).
@@ -33,9 +35,7 @@ Messaggio successivo di Mario (dopo l'apertura della #07): «hai già fatto quas
 - Domanda ancora aperta a Mario: D5 (nascondere allo staff anche le ore di ogni giorno?).
 
 ## Fatto in sessione #04
-- `tools/test-firebase-flow.mjs`: l'ora limite di prova si ferma alle 23:59 (prima sbagliava tra 23:30 e 24:00 UTC). Verde.
 - `docs/DA-FARE.md` riordinato: tabella in cima per urgenza, numeri fissi (M1…, D1…), Maurizio (M1, M2, M3, M6) **in stand-by**: Mario avvisa lui.
-- `CLAUDE.md`, sezione COMUNICAZIONE: risposte a blocchi fissi (✅ FATTO, 👉 DA FARE TU, ❓ DOMANDE, ⚠️ ATTENZIONE, separatori `───`), frasi corte. Termine tecnico + spiegazione tra parentesi. Blocco 📚 IMPARI solo a volte (1 risposta su 3-4), max 3 righe, solo programmazione (Mario conosce bene hardware e informatica generale). Termini già spiegati: commit, push, variabile, dato/schermata, regola di accesso.
 - Ora: usare l'ora italiana (`TZ=Europe/Rome date`); il container è in UTC.
 - **Decisioni di Mario**:
   - Il contratto (ore dovute, confronto con le ore fatte) lo vedono solo i capi: **Chef, Responsabili e Mario**. Lo staff mai.
@@ -53,7 +53,7 @@ Messaggio successivo di Mario (dopo l'apertura della #07): «hai già fatto quas
   - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
 
 ## Prossimi passi
-1. Rifare i video: `pip install scipy pillow` poi in background `python3 tools/anim-invio.py tools/originale-invio.mp4` (1-2 ore). Controllare i fotogrammi 18-26 del video al fornitore su sfondo scuro, `node tools/test-invio-anim.mjs`, commit dei due mp4, mandare l'anteprima a Mario (M9).
+1. Sistemare il logo (sopra), poi rifare i video: `pip install scipy pillow` poi in background `python3 tools/anim-invio.py tools/originale-invio.mp4` (1-2 ore). Controllare i fotogrammi 18-26 del video al fornitore su sfondo scuro, `node tools/test-invio-anim.mjs`, commit dei due mp4, mandare l'anteprima a Mario (M9).
 2. Finire la v36 (prove `test-orari`, `test-v35` sotto), chiedere D4 e D5, pubblicare (PR → squash → controllo online → riallineamento).
 3. Il resto: `docs/DA-FARE.md`.
 
