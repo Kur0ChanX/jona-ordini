@@ -1,8 +1,17 @@
 # Passaggio di consegne (2026-10-05)
 
-Sessione attuale: #07
+Sessione attuale: #08
 
-## Ultimo messaggio di Mario (sessione #06)
+## Ultimo messaggio di Mario (sessione #07)
+«guarda questo fotogramma puoi migliorare il video nelle mani della ragazza la parte bianca tra le dita» (foto: video al fornitore, mani della ragazza che entrano veloci, chiazze bianche tra le dita).
+
+## Fatto in sessione #07 (ritocco chiesto da Mario)
+- Causa: con le mani veloci il filmato sfoca le dita sul fondo bianco; quei punti (misto pelle+bianco, minimo canali 170-249, poco colore) restavano pieni.
+- `tools/anim-invio.py`: nuova `mosso(rgb, vicini)`. Solo dove c'è movimento forte (differenza coi fotogrammi vicini, sfocata 6, > 90) e fuori da giacca (stoffa grande > 8000 punti, entro 45) e logo del menù (buchi nel marrone `mx<170`, `R-B<40`, > 30000 punti): trasparenza = quanta pelle c'è (`(SOGLIA+2-mn)/(SOGLIA+2-pelle vicina)`×1,15) e colore "smescolato" dal bianco. Fotogrammi fermi, unghie, logo e giacca: invariati (provato su fotogrammi 3, 55, 70, 79, 80).
+- Commit pushato (`Animazione invio: dita in movimento…`). **I video in `media/` NON sono ancora rifatti**: il calcolo (molto lento, ~1 min a fotogramma, 101 fotogrammi) è stato fermato per l'handoff.
+- Nota della #06 «non rifare i video»: vale per il lavoro già fatto; questo è un ritocco chiesto da Mario dopo.
+
+## Messaggio di Mario (sessione #06)
 «Sistema la giacca dello chef nell'animazione: bordi della giacca seghettati. E fai 2 file: uno così fatto bene e uno che la ragazza a sinistra consegna il menù allo chef a destra, stando attento a non specchiare l'immagine se no il logo viene al contrario (ti giro il logo se ti serve). Quello senza sfondo fatto bene con la ragazza a sinistra mettilo nel programma quando lo staff invia l'ordine; quello con lo chef a sinistra con sfondo scontornato bene quando lo invia al fornitore.» (Allegato: logo JONA; non è servito.)
 
 Messaggio successivo di Mario (dopo l'apertura della #07): «hai già fatto quasi il lavoro completo nella chat precedente non rifare tutto» → nella #07 **non rifare** i video né lo script: sono finiti e nel ramo. Solo ritocchi se Mario li chiede.
@@ -20,8 +29,7 @@ Messaggio successivo di Mario (dopo l'apertura della #07): «hai già fatto quas
 - `CLAUDE.md` (riga media) e `docs/DA-FARE.md` (M9) aggiornati.
 - Nota: la prova `formset` in timeout di #05 (test-v35) poteva essere un errore di sintassi in pagina: ricontrollare.
 
-## Fatto in sessione #05
-- Animazione rifatta (commit `v36: animazione dell'invio rifatta…`): NEWS v36 aggiornata (tutti + dev), `CLAUDE.md` (riga di `media/invio-chef.mp4`), `tools/test-invio-anim.mjs` (sfondo trasparente > 30%, ora c'è la divisa), `docs/DA-FARE.md` (tolto C2, aggiunto M9). Prove verdi: `test-invio-anim`, `test-news`.
+## Sessione #05
 - Domanda ancora aperta a Mario: D5 (nascondere allo staff anche le ore di ogni giorno?).
 
 ## Fatto in sessione #04
@@ -45,7 +53,7 @@ Messaggio successivo di Mario (dopo l'apertura della #07): «hai già fatto quas
   - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
 
 ## Prossimi passi
-1. Risposta di Mario sulle animazioni (M9); eventuali ritocchi con `tools/anim-invio.py`.
+1. Rifare i video: `pip install scipy pillow` poi in background `python3 tools/anim-invio.py tools/originale-invio.mp4` (1-2 ore). Controllare i fotogrammi 18-26 del video al fornitore su sfondo scuro, `node tools/test-invio-anim.mjs`, commit dei due mp4, mandare l'anteprima a Mario (M9).
 2. Finire la v36 (prove `test-orari`, `test-v35` sotto), chiedere D4 e D5, pubblicare (PR → squash → controllo online → riallineamento).
 3. Il resto: `docs/DA-FARE.md`.
 

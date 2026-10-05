@@ -16,7 +16,7 @@ Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, 
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M8 | Prove dal vero della v35 | Mario | con calma |
 | C1 | v36: totale ore nascosto allo staff (in corso, prove da sistemare) | Claude | subito |
-| M9 | Guardare le due animazioni dell'invio (allo chef e al fornitore, anteprime nella chat della sessione #06) e dire se vanno bene | Mario | subito |
+| M9 | Guardare le due animazioni dell'invio (anteprima nuova dopo il ritocco delle dita, sessione #08) e dire se vanno bene | Mario | subito |
 | D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | con C1 |
 | D5 | Nascondere allo staff anche le ore di ogni giorno? | Claude, dopo la tua scelta | con C1 |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
