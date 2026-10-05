@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-05 (sessione #09). Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -15,10 +15,9 @@ Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, 
 | M5 | Stampare e appendere il QR da cucina | Mario | quando vuoi |
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M8 | Prove dal vero della v35 | Mario | con calma |
-| C1 | v36: totale ore nascosto allo staff (in corso, prove da sistemare) | Claude | subito |
-| M9 | Guardare le due animazioni dell'invio (video rifatti nella #08: dita della ragazza e logo che segue il menù) e dire se vanno bene | Mario | subito |
+| C1 | v36: pubblicare (staff vede solo gli orari, niente ore) dopo il tuo ok sui video | Claude | subito |
+| M9 | Guardare le due animazioni dell'invio (rifatte nella #09: bordi di giacca e vestito lisci) e dire se vanno bene | Mario | subito |
 | D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | con C1 |
-| D5 | Nascondere allo staff anche le ore di ogni giorno? | Claude, dopo la tua scelta | con C1 |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
 | D2 | Sottodominio del Worker `mario-miscera`: cambiarlo? | Claude, dopo il tuo sì | da decidere |
 | D3 | Sicurezza del Worker (`/invia`, `/promemoria`) | Claude, solo se lo chiedi | in pausa |
@@ -35,7 +34,7 @@ Aggiornato: 2026-10-05 (sessione #05). Ogni cosa ha un **numero fisso** (M1…, 
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **M9 · Animazioni dell'invio**: giacca dello chef con bordi lisci. Due video: allo chef (la ragazza a sinistra consegna il menù, logo dritto) e al fornitore (lo chef a sinistra consegna il menù, parte con «Sì, inviato»). Guardale e dimmi se vanno bene: escono con la v36.
+- **M9 · Animazioni dell'invio**: bordi di giacca e vestito lisci, senza gradini (#09). Due video: allo chef (la ragazza a sinistra consegna il menù, logo dritto) e al fornitore (lo chef a sinistra consegna il menù, parte con «Sì, inviato»). Guardale e dimmi se vanno bene: escono con la v36.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
 - **M1 · Profilo di Maurizio**: Maurizio crea il suo profilo con l'invito; poi tu vai in **Staff** e lo approvi.

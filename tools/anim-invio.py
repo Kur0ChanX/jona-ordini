@@ -12,12 +12,13 @@ import numpy as np, scipy.ndimage as ndi
 from PIL import Image
 
 SRC = sys.argv[1]; END = float(sys.argv[2]) if len(sys.argv) > 2 else 4.2
-MEDIA = os.path.join(os.path.dirname(__file__), '..', 'media')
+MEDIA = os.environ.get('ANIM_OUT') or os.path.join(os.path.dirname(__file__), '..', 'media')   # ANIM_OUT: cartella di prova
 W, H = 720, 404
 SOGLIA = 250     # minimo dei tre canali da cui un punto è sfondo
 BUCO = 150       # zone bianche chiuse più piccole di così (in punti) restano piene: niente forellini
 CHIUDI = 14      # raggio (in punti) delle fessure chiuse vicino alla giacca
-LISCIO = 8       # quanto si liscia il contorno della giacca (in punti del filmato 1920x1080)
+LISCIO = 14      # quanto si liscia il contorno della giacca (in punti del filmato 1920x1080): via i gradini
+MORBIDO = 3.0    # sfumatura del bordo della giacca (il resto 1.6)
 tmp = tempfile.mkdtemp()
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', SRC, '-t', str(END), '-vf', 'fps=24', f'{tmp}/f%03d.png'], check=True)
 N = len([f for f in os.listdir(tmp) if f.startswith('f')])
@@ -61,7 +62,7 @@ def mask(rgb):  # 1 = soggetto, 0 = sfondo
         anello = ndi.binary_dilation(c, structure=disk(10)) & ~ndi.binary_dilation(c, structure=disk(4))
         st = stoffa[ys, xs][anello].mean()
         if st >= 0.7 or (st >= 0.5 and c.sum() < 8000): fg[ys, xs] |= c   # piccoli e quasi tutti nella stoffa
-    return fg.astype(np.float32)
+    return fg.astype(np.float32), zona
 
 def mosso(rgb, vicini):  # 1 = pieno; meno di 1 dove le dita in movimento si mescolano col bianco (il filmato le tiene chiare)
     x = rgb.astype(np.int16); mn = x.min(2); mx = x.max(2); sat = mx - mn
@@ -151,8 +152,16 @@ for i in range(1, N + 1):
     fermo.append(ndi.gaussian_filter(np.max([np.abs(rgb.astype(np.int16) - v).max(2) for v in vic], 0).astype(np.float32), 4) < 20)
     c = rgb.astype(np.float32) / 255; fm = np.maximum(mo, 0.25)[..., None]
     frames.append(np.where(mo[..., None] < 1, np.clip((c - (1 - fm)) / fm, 0, 1), c)); box.append(riquadri(rgb))   # togli il bianco mescolato: resta la pelle
-    m = ndi.binary_erosion(mask(rgb) > 0.5, structure=disk(2)).astype(np.float32)   # via l'alone chiaro del bordo
-    raw.append(ndi.gaussian_filter(m, 1.6) * ndi.gaussian_filter(mo, 1))
+    fg, zg = mask(rgb); fg = fg > 0.5
+    m = ndi.binary_erosion(fg, structure=disk(2)).astype(np.float32)   # via l'alone chiaro del bordo
+    sf = np.where(zg, ndi.gaussian_filter(m, MORBIDO), ndi.gaussian_filter(m, 1.6))   # giacca: bordo più morbido
+    # vestito nero e capelli: il bordo vero è nel filmato (grigio = nero mescolato al bianco), niente gradini della soglia
+    mn = rgb.min(2).astype(np.float32)
+    scuro = ndi.uniform_filter((rgb.max(2) < 90).astype(np.float32), 21) > 0.3
+    fascia = ndi.binary_dilation(fg, structure=disk(3)) & ~ndi.binary_erosion(fg, structure=disk(4)) & scuro & ~zg
+    lum = np.clip((SOGLIA - ndi.gaussian_filter(mn, 0.8)) / (SOGLIA - 60), 0, 1)
+    sf = np.where(fascia, lum, sf)
+    raw.append(sf * ndi.gaussian_filter(mo, 1))
     print('maschera', i, 'di', N, flush=True)
 fissi = {t: stabili([b.get(t) for b in box], N) for t in ('menu', 'ricamo')}
 # il logo incollato dritto va girato come il menù specchiato: il menù inclinato di +a nel filmato è inclinato di -a nello specchio
