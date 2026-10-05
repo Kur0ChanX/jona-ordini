@@ -5,6 +5,8 @@ Sessione attuale: #07
 ## Ultimo messaggio di Mario (sessione #06)
 «Sistema la giacca dello chef nell'animazione: bordi della giacca seghettati. E fai 2 file: uno così fatto bene e uno che la ragazza a sinistra consegna il menù allo chef a destra, stando attento a non specchiare l'immagine se no il logo viene al contrario (ti giro il logo se ti serve). Quello senza sfondo fatto bene con la ragazza a sinistra mettilo nel programma quando lo staff invia l'ordine; quello con lo chef a sinistra con sfondo scontornato bene quando lo invia al fornitore.» (Allegato: logo JONA; non è servito.)
 
+Messaggio successivo di Mario (dopo l'apertura della #07): «hai già fatto quasi il lavoro completo nella chat precedente non rifare tutto» → nella #07 **non rifare** i video né lo script: sono finiti e nel ramo. Solo ritocchi se Mario li chiede.
+
 → **Fatto e committato, NON pubblicato**. Mario deve guardare l'anteprima mandata in chat #06 e dire se va bene (M9). Se va bene: chiudere la v36 (vedi sotto) e pubblicare.
 
 ## Fatto in sessione #06
