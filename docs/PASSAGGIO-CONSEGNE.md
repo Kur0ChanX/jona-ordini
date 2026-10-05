@@ -7,6 +7,10 @@ Sessione attuale: #08
 
 Messaggio successivo di Mario (arrivato nella #07 dopo l'apertura della #08): «il logo sembra storto nel menù mettilo sempre in griglia in base alla posizione del menu frame by frame» → nella versione allo chef (specchiata) il riquadro del logo incollato (`riquadri()`/`stabili()` in `tools/anim-invio.py`) è inclinato al contrario del menù. Da fare: per ogni fotogramma trovare i 4 angoli/l'inclinazione del menù e incollare il logo raddrizzato (rotazione/prospettiva) allineato ai bordi del menù specchiato. Rifare i video una sola volta (dita + logo).
 
+## Fatto in sessione #08
+- Mario: «vai con il logo». `tools/anim-invio.py`: `inclinazione()` misura l'angolo del menù dal logo (righe di testo più nette, a metà risoluzione, passi 0,5° poi 0,1°), `liscia()` (mediana 5 + gaussiana 1,5); nel video allo chef il riquadro del logo prende i punti dell'originale girati di `-2×angolo` (`map_coordinates`): stessa inclinazione del menù specchiato (provato: −2,7° contro −3,0°, −5,0° contro −4,9°).
+- Video rifatti (dita + logo), `test-invio-anim` verde (18 PASS), anteprima su fondo scuro mandata a Mario (M9).
+
 ## Fatto in sessione #07 (ritocco chiesto da Mario)
 - Causa: con le mani veloci il filmato sfoca le dita sul fondo bianco; quei punti (misto pelle+bianco, minimo canali 170-249, poco colore) restavano pieni.
 - `tools/anim-invio.py`: nuova `mosso(rgb, vicini)`. Solo dove c'è movimento forte (differenza coi fotogrammi vicini, sfocata 6, > 90) e fuori da giacca (stoffa grande > 8000 punti, entro 45) e logo del menù (buchi nel marrone `mx<170`, `R-B<40`, > 30000 punti): trasparenza = quanta pelle c'è (`(SOGLIA+2-mn)/(SOGLIA+2-pelle vicina)`×1,15) e colore "smescolato" dal bianco. Fotogrammi fermi, unghie, logo e giacca: invariati (provato su fotogrammi 3, 55, 70, 79, 80).
