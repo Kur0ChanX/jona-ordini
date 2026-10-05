@@ -79,7 +79,9 @@ def mosso(rgb, vicini):  # 1 = pieno; meno di 1 dove le dita in movimento si mes
     pm = ndi.uniform_filter(mn * pelle, 41) / np.maximum(ndi.uniform_filter(pelle, 41), 1e-3)
     pm = np.where(ndi.uniform_filter(pelle, 41) > 0.02, pm, 120)
     f = np.clip((SOGLIA + 2 - mn) / np.maximum(SOGLIA + 2 - pm, 40) * 1.15, 0, 1)
-    return np.where(moto & ~giacca & ~logo & (sat < 45), f, 1).astype(np.float32)
+    # il bianco mescolato viene dallo sfondo: nei fotogrammi vicini lì c'è sfondo. Così le unghie (chiare, poco colorate) restano piene
+    bianco = ndi.binary_dilation(np.any([v.min(2) >= SOGLIA for v in vicini], 0), structure=disk(6))
+    return np.where(moto & bianco & ~giacca & ~logo & (sat < 45), f, 1).astype(np.float32)
 
 def riquadri(rgb):  # scritte da tenere dritte nella versione specchiata: logo del menù e ricamo sulla giacca
     x = rgb.astype(np.int16); mn = x.min(2); mx = x.max(2); R, G, B = x[..., 0], x[..., 1], x[..., 2]
@@ -140,10 +142,13 @@ def edges(h, w, L=0.04, R=0.03, T=0.04, B=0.05):   # il soggetto sparisce dolcem
     xs = np.linspace(0, 1, w); ys = np.linspace(0, 1, h)
     return (sm(ys / T) * sm((1 - ys) / B))[:, None] * (sm(xs / L) * sm((1 - xs) / R))[None, :]
 
-frames, raw, box = [], [], []
+frames, raw, box, fermo = [], [], [], []
 for i in range(1, N + 1):
     rgb = np.asarray(Image.open(f'{tmp}/f{i:03d}.png').convert('RGB'))
-    mo = mosso(rgb, [np.asarray(Image.open(f'{tmp}/f{j:03d}.png').convert('RGB')) for j in (i - 1, i + 1) if 1 <= j <= N])
+    vic = [np.asarray(Image.open(f'{tmp}/f{j:03d}.png').convert('RGB')) for j in (i - 1, i + 1) if 1 <= j <= N]
+    mo = mosso(rgb, vic)
+    # punti fermi (colore uguale ai fotogrammi vicini): lì il contorno si media nel tempo e non sfarfalla
+    fermo.append(ndi.gaussian_filter(np.max([np.abs(rgb.astype(np.int16) - v).max(2) for v in vic], 0).astype(np.float32), 4) < 20)
     c = rgb.astype(np.float32) / 255; fm = np.maximum(mo, 0.25)[..., None]
     frames.append(np.where(mo[..., None] < 1, np.clip((c - (1 - fm)) / fm, 0, 1), c)); box.append(riquadri(rgb))   # togli il bianco mescolato: resta la pelle
     m = ndi.binary_erosion(mask(rgb) > 0.5, structure=disk(2)).astype(np.float32)   # via l'alone chiaro del bordo
@@ -158,7 +163,10 @@ def bordo(h, w, f=10):   # peso del riquadro incollato: pieno al centro, sfuma n
 os.makedirs(f'{tmp}/chef'); os.makedirs(f'{tmp}/forn')
 for k in range(N):
     rgb = frames[k]
-    a = np.clip(raw[k], 0, 1)   # niente media coi fotogrammi vicini: lascerebbe scie sulle mani in movimento
+    # dove la scena è ferma: mediana del contorno su 5 fotogrammi (via lo sfarfallio di vestiti e unghie);
+    # dove si muove resta quello del fotogramma (la media lascerebbe scie sulle mani)
+    vic = [raw[j] for j in range(max(0, k - 2), min(N, k + 3))]
+    a = np.clip(np.where(fermo[k], np.median(vic, 0), raw[k]), 0, 1)
     # bordi col colore del soggetto (niente alone bianco sullo sfondo scuro dell'app)
     inner = (a > 0.95).astype(np.float32); w = ndi.uniform_filter(inner, 9)
     pc = np.stack([ndi.uniform_filter(rgb[..., c] * inner, 9) for c in range(3)], -1) / np.maximum(w, 1e-4)[..., None]
