@@ -1,10 +1,20 @@
-# Passaggio di consegne (2026-10-05)
+# Passaggio di consegne (2026-10-05, sera)
 
-Sessione attuale: #10
+Sessione attuale: #11
 
-## Ultimo messaggio di Mario (sessione #09)
-«Ancora un po' in mezzo alle braccia di tutte e due si vede qualche artefatto, qualche cosa di strano.» → da fare (M9): zone tra le braccia (ragazza e chef, entrambi i video) dopo i ritocchi #09. Prima di toccare: estrarre fotogrammi su fondo scuro e chiaro, zoom tra braccio e corpo / braccio e menù, capire cosa si vede (sfondo bianco rimasto, bordo `lum` del vestito che prende il grigio, buchi chiusi riempiti per sbaglio). Preview veloce: `ANIM_OUT=<cartella> python3 tools/anim-invio.py tools/originale-invio.mp4 1.5` (~4 min); completo ~15 min.
-Messaggi precedenti: D5 «le ore complessive non si devono fare i conti ma vedere gli orari sì» (fatto); «seghettato» su vestito e giacca (fatto, sotto).
+## Ultimo messaggio di Mario (sessione #10)
+«si salvali e mettili nell'app» → i video rifatti in #10 (ombra + pieghe) vanno committati in `media/` (se la #10 non l'ha fatto: vedi «Stato»).
+Prima: «tra le braccia di tutte e due si vede ancora qualcosa, la giacca viene a volte molto mangiata, fa parte molto dello sfondo».
+
+## Fatto in sessione #10
+- Cause trovate (confronto fotogrammi originale/maschera, `lost` = soggetto tolto): 1) sfondo chiaro dell'app `--bg:#EFEBE6` quasi uguale al bianco giacca → la giacca «sparisce»; 2) tra le due maniche dello chef la stoffa bruciata (248-250) era tolta come sfondo (253) → «lingua» scura.
+- `index.html` `animGL`: lo shader disegna un'ombra leggera (alfa media su 2 anelli di 4 e 8 punti, 2 punti più in basso, forza 0,3, sfumata ai bordi del filmato). Sul tema scuro non si vede. `test-invio-anim` verde, screenshot ok.
+- `tools/anim-invio.py`: `PIEGA` 251.5 e `VICINO` 50: vicino alla giacca larga (`stoffa & mn<240`, apertura 8) i punti con media dei vicini (gauss 3) sotto `PIEGA` e poco colorati restano stoffa.
+- Commit `Animazione invio: ombra leggera…` pushato. Video: calcolo completo avviato (~25 min); copie dei vecchi nello scratchpad della #10.
+
+## Stato
+- Se `media/invio-*.mp4` NON risultano cambiati nell'ultimo commit: rilanciare `python3 tools/anim-invio.py tools/originale-invio.mp4` (serve `pip install scipy pillow`, ~25 min in background), poi `node tools/test-invio-anim.mjs` (con `python3 -m http.server 8765`), commit, anteprime a Mario su fondo chiaro (#EFEBE6) e scuro.
+- Residuo noto: in alcuni fotogrammi resta una piccola macchia scura tra le maniche (zona 248-252, ambigua con lo sfondo).
 
 ## Fatto in sessione #09
 - D5: in «I miei orari» lo staff vede solo inizio e fine dei turni; tolte le ore di ogni giorno (`or-dm` resta solo per «Finisci dopo mezzanotte»). Voce `NEWS` v36 aggiornata.
@@ -35,7 +45,7 @@ Messaggi precedenti: D5 «le ore complessive non si devono fare i conti ma veder
   - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
 
 ## Prossimi passi
-1. Sistemare gli artefatti tra le braccia (sopra), rifare i video, `node tools/test-invio-anim.mjs`, commit, anteprime su fondo scuro a Mario (comando ffmpeg `alphamerge` su `0x1c1c1e`).
+1. Video #10 nell'app (vedi «Stato»), anteprime a Mario, attendere il suo ok su giacca e braccia.
 2. Con l'ok di Mario sui video: pubblicare la v36 (PR → squash → controllo online → riallineamento). Domanda aperta: pubblicare subito dopo l'ok?
 3. D4 (contratto ai Responsabili): chiesto a Mario, senza risposta; se sì, brainstorming con 2-3 strade.
 4. Il resto: `docs/DA-FARE.md`.
