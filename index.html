@@ -3957,9 +3957,9 @@ async function qfNew(cambia){const q=cfg().qrFisso;
   if(!navigator.onLine)return toast('Serve la connessione per creare il QR.','warn');
   try{const r=await fetch(PUSH_URL+'/inviti',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+await algTok()},body:JSON.stringify({fisso:true,vecchio:q&&q.c||''})});const j=await r.json().catch(()=>({}));
     if(!r.ok||!/^[A-HJ-NP-Z2-9]{6}$/.test(j.codice||''))throw new Error('inviti '+r.status);
-    await put('config','app',Object.assign({},cfg(),{qrFisso:{c:j.codice,creato:now()}}));toast(cambia?'QR cambiato: stampa quello nuovo':'QR da cucina pronto');await qfCard()}
+    await put('config','app',Object.assign({},cfg(),{qrFisso:{c:j.codice,creato:now()}}));toast(cambia?'QR cambiato: stampa quello nuovo':'QR da cucina pronto');await qfCard(j.codice)}
   catch(e){toast('Non riesco a creare il QR: controlla la connessione e riprova.','err')}}
-async function qfCard(){const q=cfg().qrFisso;if(!q||!q.c)return;try{await inviteCard({l:INV_URL+'/'+q.c,c:q.c})}catch(e){toast('Immagine del QR non riuscita: riprova.','err')}}
+async function qfCard(k){const q=cfg().qrFisso,c=k||q&&q.c;if(!c)return;try{await inviteCard({l:INV_URL+'/'+c,c})}catch(e){toast('Immagine del QR non riuscita: riprova.','err')}}
 function promRows(){const sel=cfg().promA||[],mg=Object.values(D().staff).filter(u=>u.stato==='attivo'&&isMgr(u)).sort((a,b)=>fullName(a).localeCompare(fullName(b)));
   return`<div class="setrow"><div><b>«Oggi si ordina» arriva a</b><span>${sel.length?'Solo ai nomi scelti':'Tutti gli Admin Chef. Tocca un nome per mandarlo solo a lui'}</span><div class="chips" role="group" aria-label="Chi riceve Oggi si ordina" style="margin-top:8px">${mg.map(u=>`<button type="button" class="chip" aria-pressed="${sel.includes(u.id)}" data-a="promA" data-v="${u.id}">${esc(fullName(u))}</button>`).join('')}</div></div></div>
   <div class="setrow"><div style="flex:1"><b>Scadenze per lo staff</b><span>Avviso sul telefono dello staff: «Richieste allo chef entro le…»</span>

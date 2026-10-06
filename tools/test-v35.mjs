@@ -143,7 +143,9 @@ await A.click('[data-a="qfNew"][data-v=""]'); const d1f = await dl; await A.wait
 ok(inviti[0] && inviti[0].fisso === true && await A.evaluate(() => cfg().qrFisso.c === 'QRCUC2'), 'Crea il QR: codice fisso salvato');
 ok(d1f && d1f.suggestedFilename() === 'qr-cucina-jona.png', 'immagine del QR da cucina pronta ' + (d1f && d1f.suggestedFilename()));
 if (d1f) await d1f.saveAs('/tmp/v35-qr-cucina.png');
+await A.evaluate(() => { const o = inviteCard; window.inviteCard = fx => { window._qfC = fx && fx.c; return o(fx) }; });
 await A.click('[data-a="qfNew"][data-v="1"]'); await A.waitForTimeout(300); await A.click('#ask-ok'); await A.waitForTimeout(1500);
+ok(await A.evaluate(() => window._qfC) === 'QRNEW2', 'Cambia QR: immagine con il codice NUOVO ' + await A.evaluate(() => window._qfC));
 ok(inviti[1] && inviti[1].vecchio === 'QRCUC2' && await A.evaluate(() => cfg().qrFisso.c === 'QRNEW2'), 'Cambia QR: manda il vecchio da cancellare');
 await A.evaluate(() => { while (sheets.length) closeSheet(true); });
 // «App da aggiornare»
