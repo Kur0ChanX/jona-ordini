@@ -120,6 +120,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 IndexedDB `jona-outbox` (store `q`): push non partite, lette sia da `index.html` (`obx*`) sia da `sw.js` (Background Sync, tag `jona-outbox`).
 
 ## Regole di lavoro
+- Niente nome del creatore (Mario Miscera, `mario-miscera`, `kur0chanx`) in link, inviti e testi che vedono gli utenti. Il nome di chi invita (utente dell'app) invece va bene. Stessa regola nel progetto RVC.
 - Ad OGNI versione cambia `CACHE` in `sw.js`.
 - Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
 - Prove: `tools/README.md` (server locale, Playwright con Chromium `/opt/pw-browsers/chromium`, emulatore Firebase con `localStorage.jona_fb_emu`).
