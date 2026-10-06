@@ -1021,8 +1021,8 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
 const APP_VER=36;
 const NEWS=[
-  {v:36,data:'2026-10-05',titolo:'Orari: niente totale delle ore per lo staff',
-    tutti:['Nei tuoi orari vedi l\'inizio e la fine dei turni di ogni giorno. Le ore di lavoro e il totale della settimana non compaiono più.','Animazione «Inviato allo chef» rifatta: ora sei tu, a sinistra, a consegnare il menù allo chef. Bordi della giacca puliti, niente pezzi di sfondo bianco.'],
+  {v:36,data:'2026-10-05',titolo:'Animazione dell\'invio rifatta',
+    tutti:['Animazione «Inviato allo chef» rifatta: ora sei tu, a sinistra, a consegnare il menù allo chef. Bordi della giacca puliti, niente pezzi di sfondo bianco.'],
     chef:['Quando segni un ordine come inviato al fornitore parte un\'animazione: lo chef consegna il menù.','Lo staff vede solo l\'inizio e la fine dei turni: niente ore del giorno, niente totale della settimana, né nella schermata «I miei orari» né nell\'avviso degli orari pubblicati. Il contratto e il confronto con le ore fatte restano solo per chi fa gli orari.'],
     dev:{aggiunte:['`vMieiOrari`: tolto il riquadro `or-mtot` (totale settimana) e le ore di ogni giorno (`or-dm` resta solo per «Finisci dopo mezzanotte»); avviso `orari` senza le ore totali. Il contratto resta in `staff.contratto`, mostrato solo con `isGM`.','`media/invio-chef.mp4` rifatto dal filmato originale con `tools/anim-invio.py` nuovo: niente IA, sfondo = bianco bruciato (min canali ≥ 250), zone bianche chiuse tolte salvo i riflessi sulla giacca (anello ≥ 70% stoffa); divisa dello chef e vestito della ragazza restano pieni; contorno della giacca lisciato (sfocatura σ 7 e soglia a metà, solo entro 30 punti dalla stoffa). Lo script fa due video: `invio-chef.mp4` specchiato (ragazza a sinistra; logo del menù e ricamo della giacca rimessi dritti incollando il riquadro originale nel punto specchiato, riquadri stabilizzati con mediana su 5 fotogrammi) e `invio-fornitore.mp4` invertito nel tempo (chef a sinistra), mostrato da `markSent` con `sendAnim("forn", "Inviato a …")`.']}},
   {v:35,data:'2026-10-05',titolo:'Scadenze per lo staff e QR da cucina',
@@ -3904,7 +3904,7 @@ function newsSheet(){
   if(u)ls('jona_news_'+u.id,APP_VER);
   openSheet({cls:'tall',render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Novità</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <p class="muted" style="margin-top:0">Cosa è cambiato nell'app, dalla versione più nuova.</p>
-  ${list.map(n=>`<section class="news-v"><div class="news-h"><span class="news-vn">Versione ${n.v}</span><span class="news-d">${newsDay(n.data)}</span>${n.v>seen?'<span class="news-new">nuova</span>':''}</div><h3 class="news-t">${esc(n.titolo)}</h3>
+  ${list.map(n=>`<section class="news-v"><div class="news-h"><span class="news-vn">Beta v${n.v}</span><span class="news-d">${newsDay(n.data)}</span>${n.v>seen?'<span class="news-new">nuova</span>':''}</div><h3 class="news-t">${esc(n.titolo)}</h3>
   ${n.it.length?`<ul class="news-ul">${n.it.map(x=>`<li>${newsTx(x)}</li>`).join('')}</ul>`:''}${n.tech.length?`<div class="news-dev">${n.tech.map(([l,a])=>`<h4>${l}</h4><ul>${a.map(x=>`<li>${newsTx(x)}</li>`).join('')}</ul>`).join('')}</div>`:''}</section>`).join('')||'<p class="muted">Nessuna novità.</p>'}`});
   render();
 }
