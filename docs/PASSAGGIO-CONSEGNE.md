@@ -30,11 +30,7 @@ Prima: «tra le braccia di tutte e due si vede ancora qualcosa, la giacca viene 
 - Residuo noto: in alcuni fotogrammi resta una piccola macchia scura tra le maniche (zona 248-252, ambigua con lo sfondo).
 
 ## Fatto in sessione #09
-- D5: in «I miei orari» lo staff vede solo inizio e fine dei turni; tolte le ore di ogni giorno (`or-dm` resta solo per «Finisci dopo mezzanotte»). Voce `NEWS` v36 aggiornata.
-- `tools/test-orari.mjs`: nuovo controllo «daily hours hidden»; «staff sees only their own shifts» guarda solo le schede dei giorni (i colleghi in «In turno oggi» sono voluti, v31). Verde.
-- `test-v35`: 39 OK, 1 errore «immagine del QR da cucina pronta» presente anche senza le modifiche (download del QR nel container: probabilmente i caratteri di Google bloccati). Non è della v36.
-- `test-giro`, `test-news`, `test-invio-anim` verdi.
-- Seghettato: `anim-invio.py` con `LISCIO` 14 e `MORBIDO` 3 (bordo della giacca più morbido, `mask()` restituisce anche la zona giacca); vestito nero/capelli: nella fascia del contorno la trasparenza viene dal grigio del filmato (`lum`). `ANIM_OUT` = cartella di prova. Calcolo completo ~15 min. Video rifatti e committati; anteprime su fondo scuro mandate a Mario.
+- D5 fatta: in «I miei orari» lo staff vede solo inizio e fine dei turni (`tools/test-orari.mjs` lo controlla). Bordi della giacca lisciati (`LISCIO`, `MORBIDO` in `anim-invio.py`).
 
 ## Video dell'invio (#06-#08, riassunto)
 - `tools/anim-invio.py` crea `media/invio-chef.mp4` (specchiato, logo e ricamo incollati dritti; logo girato di `-2×inclinazione` del menù, fotogramma per fotogramma) e `media/invio-fornitore.mp4` (invertito nel tempo). Serve `pip install scipy pillow`; calcolo ~1 ora in background.
