@@ -3,7 +3,9 @@
 Sessione attuale: #16
 
 ## Ultimo messaggio di Mario (#15)
-«A» → ha scelto: prima fa **M12** (chiave + ID del nuovo account Cloudflare nei segreti GitHub), poi si pubblica la v37 (trasloco + logo) con le prove **brevi** (5-10 min). Chiedergli a che passo di M12 è (passi già dati in #15: token con template «Edit Cloudflare Workers» + Account › D1 › Edit + Account › Cloudflare Pages › Edit, All zones; segreti `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` su https://github.com/Kur0ChanX/jona-ordini/settings/secrets/actions).
+«esce prima la schermata poi il mio logo in animazione lenta e fluida premium poi il caricamento» (arrivato dopo l'apertura di #16) → DA FARE in #16: all'avvio prima la schermata Jona, POI il logo YNOY con un'entrata più lenta e fluida, «premium», e solo dopo il caricamento/l'app. Oggi l'entrata di YNOY parte a 0,8 s e l'apertura dura 2,7 s (`S.splash`, `.intro`, `byIn`/`ynoyIn`/`ynoyShine`): allungare in modo coerente e aggiornare `tools/test-logo.mjs`. Mandare a Mario un video di anteprima.
+
+Messaggio prima: «A» → ha scelto: prima fa **M12** (chiave + ID del nuovo account Cloudflare nei segreti GitHub), poi si pubblica la v37 (trasloco + logo) con le prove **brevi** (5-10 min). Chiedergli a che passo di M12 è (passi già dati in #15: token con template «Edit Cloudflare Workers» + Account › D1 › Edit + Account › Cloudflare Pages › Edit, All zones; segreti `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` su https://github.com/Kur0ChanX/jona-ordini/settings/secrets/actions).
 
 Messaggi precedenti di #15 (in ordine):
 - «fatto» → M11 (account Cloudflare nuovo + sottodominio) fatto.
