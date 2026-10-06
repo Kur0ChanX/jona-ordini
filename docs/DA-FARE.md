@@ -19,7 +19,7 @@ Aggiornato: 2026-10-05 (sessione #12). Ogni cosa ha un **numero fisso** (M1…, 
 | D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | da decidere |
 | D6 | Video dell'invio: migliorarli ancora (macchiolina tra le maniche) | Claude, quando lo chiedi | più avanti |
 | D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
-| D2 | Togliere nome e cognome dal link d'invito (sottodominio `mario-miscera`) | Claude, Mario ha chiesto (#11) | subito (#12) |
+| D2 | Nuovi indirizzi senza nomi: app su Cloudflare Pages + sottodominio Worker nuovo (v37) | Claude, Mario ha scelto (#12) | subito (#13) |
 | D3 | Sicurezza del Worker (`/invia`, `/promemoria`) | Claude, solo se lo chiedi | in pausa |
 
 
@@ -30,7 +30,7 @@ Aggiornato: 2026-10-05 (sessione #12). Ogni cosa ha un **numero fisso** (M1…, 
 
 ## 2. Claude, dopo la tua scelta o approvazione
 - **D1 · Cloudflare Pages** (gratis, hai detto sì). Prima va deciso il **giorno**, perché ogni telefono va ricollegato (invito + approvazione + accesso) e le notifiche riattivate.
-- **D2 · Sottodominio Worker**: Mario lo vuole cambiare (#11): il link `invito.mario-miscera.workers.dev` mostra nome e cognome. Costa qualche ora senza notifiche. Prima brainstorming: nuovo nome, strade e passi a mano di Mario su Cloudflare.
+- **D2 · Trasloco indirizzi (v37)**: Mario ha scelto (#12) strada A (nuovo sottodominio Worker) + app su Cloudflare Pages (via `kur0chanx.github.io`). Telefoni in prova: solo Maurizio, Mauro, Mario: rientrano con invito nuovo. Nomi e permesso: vedi `docs/PASSAGGIO-CONSEGNE.md`.
 - **D6 · Video dell'invio**: approvati così (#11), da migliorare più avanti. Copia sicura nel ramo `scorta-video-invio-v1` (video, script `tools/anim-invio.py`, filmato originale): si riparte da lì, non da zero.
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 

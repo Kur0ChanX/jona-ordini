@@ -1,64 +1,48 @@
-# Passaggio di consegne (2026-10-05, sera)
+# Passaggio di consegne (2026-10-06)
 
-Sessione attuale: #12
+Sessione attuale: #13
 
-## Ultimo messaggio di Mario (#11) → da fare in #12
-«vorrei cambiare questo link c'è il mio nome e cognome https://invito.mario-miscera.workers.dev/JC6SPZ»
-- È la voce **D2** di `docs/DA-FARE.md`. Non ancora iniziata. Partire con un brainstorming (2-3 strade, pro e contro): nuovo sottodominio Cloudflare (`WK_SUB` in index.html, `PUSH_URL` di `sw.js`, prova del workflow), notifiche ferme qualche ora, telefoni da riattivare. Proporre a Mario un nome senza dati personali (es. `jona-ristorante`) e i passi su Cloudflare dal telefono (vedi regola «GitHub dal telefono» in `CLAUDE.md`).
+## Ultimo messaggio di Mario (#12)
+«Indirizzo Jona-Ristorante by YNOY&CORP anche invito. YNOY&CORP é il mio nome di sviluppo software»
+- Da chiarire subito: negli indirizzi `&`, spazi e maiuscole non sono ammessi (solo lettere minuscole, cifre, trattini). Proposta da fare a Mario:
+  - app: `jona-ristorante.pages.dev` (progetto Cloudflare Pages `jona-ristorante`);
+  - sottodominio Worker: `ynoy-corp` → `invito.ynoy-corp.workers.dev/CODICE` e `jona-notifiche.ynoy-corp.workers.dev` (oppure `jona-ristorante`, se preferisce);
+  - scritta «Jona Ristorante · by YNOY&CORP» nell'anteprima dell'invito (`worker/invito/src/index.js`, og:site_name/description) e in fondo all'app.
+- Chiedere conferma dei nomi, poi procedere.
 
-## Sessione #11
-- v36 online (verificato: `sw.js` jona-ordini-v40, `APP_VER=36`, video al fornitore 200). Il deploy di Pages era stato annullato due volte da un guasto di GitHub Actions; terzo tentativo ok (rerun della run 37366626988 via API: consentito).
-- `node_modules/` escluso solo in `.git/info/exclude` (pacchetti per le prove, non vanno nel repo).
-- Mario: «vai mettili al massimo li modifichiamo e miglioriamo piú avanti salvali in un posto sicuro per non ripartire da 0».
-- Video approvati. Copia sicura: ramo `scorta-video-invio-v1` (commit `0c60d3d`). Le etichette (tag) non passano dal proxy: usare rami.
-- Prove prima della pubblicazione: `test-invio-anim`, `test-orari`, `test-giro` verdi.
-- v36 pubblicata: PR #45, squash merge fatto da Mario (`72e81eb`); il merge a Claude è bloccato. Ramo riallineato con `main`. Miglioramenti futuri dei video: D6 in `docs/DA-FARE.md`.
-- Mario: «grazie mi hai aiutato bene ricordatelo che non sono una cima e dal cel in modalità desktop che è meno peggio non è il massimo in google chrome» → regola aggiunta in `CLAUDE.md` (Comunicazione).
+## Fatto in sessione #12
+- Regole nuove in `CLAUDE.md`: niente nome del creatore (Mario Miscera, `mario-miscera`, `kur0chanx`) in link, inviti e testi per gli utenti (nome di chi invita sì; vale anche per RVC); «Link sempre»: per ogni passo a mano link diretto, perché, cosa inserire, pulsanti in grassetto.
+- Mario ha unito la regola nelle sue preferenze di claude.ai (testo dato, conferma non arrivata).
+- `index.html`: Novità con «Beta v<numero>» (al posto di «Versione»); voce v36 per lo staff ridotta all'animazione (titolo «Animazione dell'invio rifatta»), le ore nascoste restano solo in `chef`. `tools/test-news.mjs` aggiornato, verde. `APP_VER` ancora 36, `CACHE` non cambiata (lo fa la v37).
+- Le consegne: limite 1000 parole confermato; storia vecchia tolta (è nei commit).
 
-## Ultimo messaggio di Mario (sessione #10)
-«si salvali e mettili nell'app» → fatto: video #10 committati in `media/`.
-Prima: «tra le braccia di tutte e due si vede ancora qualcosa, la giacca viene a volte molto mangiata, fa parte molto dello sfondo».
+## Decisioni di Mario (#12)
+- D2 strada **A**: cambiare il sottodominio Cloudflare dei Worker.
+- Togliere anche `kur0chanx` dall'indirizzo dell'app → spostare l'app su **Cloudflare Pages**. Non sui progetti carte/tierlist (lì va bene).
+- App in prova: solo Maurizio (che oggi non compare tra gli utenti: rientrando si sistema, poi controllare), Mauro e Mario. Rientrano con invito nuovo: niente pulsante di trasloco automatico.
+- News per Maurizio e Mauro: chiare ma brevi.
 
-## Fatto in sessione #10
-- Cause trovate (confronto fotogrammi originale/maschera, `lost` = soggetto tolto): 1) sfondo chiaro dell'app `--bg:#EFEBE6` quasi uguale al bianco giacca → la giacca «sparisce»; 2) tra le due maniche dello chef la stoffa bruciata (248-250) era tolta come sfondo (253) → «lingua» scura.
-- `index.html` `animGL`: lo shader disegna un'ombra leggera (alfa media su 2 anelli di 4 e 8 punti, 2 punti più in basso, forza 0,3, sfumata ai bordi del filmato). Sul tema scuro non si vede. `test-invio-anim` verde, screenshot ok.
-- `tools/anim-invio.py`: `PIEGA` 251.5 e `VICINO` 50: vicino alla giacca larga (`stoffa & mn<240`, apertura 8) i punti con media dei vicini (gauss 3) sotto `PIEGA` e poco colorati restano stoffa.
-- Video rifatti con la correzione e committati in `media/` (richiesta di Mario «mettili nell'app»: fatta). `test-invio-anim` 18/18 verde. Anteprime (fondo scuro e chiaro) mandate a Mario.
+## BLOCCO: modifica degli indirizzi negata
+- Il classificatore di sicurezza di Claude Code ha negato («Traffic Redirection») la sostituzione degli indirizzi. Non aggirarlo. Serve la conferma scritta di Mario («sì, cambia gli indirizzi»); se viene negata ancora, spiegare a Mario come dare il permesso.
+- Modifiche preparate ma NON fatte (v37), tutte con i nomi confermati:
+  - `index.html`: `WK_SUB`; `og:image`; testi `PUSH_HELP` con `kur0chanx.github.io` (3 punti); `APP_VER=37`; voce NEWS v37 (tutti: nuovo indirizzo, reinstallare, invito nuovo; chef: link invito nuovi, approvare i telefoni in Staff → Telefoni da approvare); script in `<head>` che da `*.github.io` passa al nuovo indirizzo solo se risponde (`fetch` no-cors) portando `search`+`hash`.
+  - `sw.js`: `PUSH_URL`, `CACHE` nuova.
+  - `worker/src/index.js` riga ~71 (`sub` VAPID) e `worker/invito/src/index.js` (`APP`).
+  - `.github/workflows/cloudflare-worker.yml`: 3 prove con il sottodominio.
+  - Nuovo `.github/workflows/cloudflare-pages.yml`: su push a `main` (+ manuale), crea il progetto Pages se manca (API, errore chiaro se manca il permesso «Account › Cloudflare Pages › Edit»), copia `index.html sw.js manifest.webmanifest firebase-config.js *.png lib/ media/` in una cartella e `wrangler pages deploy … --branch main`, poi prova con curl.
+  - `tools/*.mjs`: route `mario-miscera` e URL `kur0chanx` nei test (test-v29, test-inviti, test-v34, test-v35, test-firebase-*, test-gemini-server).
+  - `CLAUDE.md`: indirizzo dell'app.
+- Firebase non limita i domini (controllato `docs/FIREBASE.md`); Worker con CORS `*`.
 
-## Stato
-- Video nell'app (sul ramo, v36 non pubblicata). Si aspetta l'ok di Mario. Per rifarli: `python3 tools/anim-invio.py tools/originale-invio.mp4` (serve `pip install scipy pillow`, ~25 min), poi `node tools/test-invio-anim.mjs` (con `python3 -m http.server 8765`).
-- Residuo noto: in alcuni fotogrammi resta una piccola macchia scura tra le maniche (zona 248-252, ambigua con lo sfondo).
-
-## Fatto in sessione #09
-- D5 fatta: in «I miei orari» lo staff vede solo inizio e fine dei turni (`tools/test-orari.mjs` lo controlla). Bordi della giacca lisciati (`LISCIO`, `MORBIDO` in `anim-invio.py`).
-
-## Video dell'invio (#06-#08, riassunto)
-- `tools/anim-invio.py` crea `media/invio-chef.mp4` (specchiato, logo e ricamo incollati dritti; logo girato di `-2×inclinazione` del menù, fotogramma per fotogramma) e `media/invio-fornitore.mp4` (invertito nel tempo). Serve `pip install scipy pillow`; calcolo ~1 ora in background.
-- Giacca: contorno chiuso (`CHIUDI`) e lisciato (`LISCIO`). Dita veloci: `mosso()`. Unghie e sfarfallio: vedi sopra. Mario: logo OK.
-- `index.html`: `ANIM_SRC={chef,forn}`, `sendAnim(k,testo)`; `markSent` mostra `sendAnim('forn',…)`. `sw.js`: `invio-fornitore.mp4` in `FILES`. Prova: `node tools/test-invio-anim.mjs` (serve `python3 -m http.server 8765`).
-- Mario nella #07: «non rifare tutto», solo i ritocchi che chiede lui.
-
-## Fatto in sessione #04
-- `docs/DA-FARE.md` riordinato: tabella in cima per urgenza, numeri fissi (M1…, D1…), Maurizio (M1, M2, M3, M6) **in stand-by**: Mario avvisa lui.
-- Ora: usare l'ora italiana (`TZ=Europe/Rome date`); il container è in UTC.
-- **Decisioni di Mario**:
-  - Il contratto (ore dovute, confronto con le ore fatte) lo vedono solo i capi: **Chef, Responsabili e Mario**. Lo staff mai.
-  - M7: **nascondere** allo staff il totale delle ore della settimana.
-
-## v36 (sul ramo, NON pubblicata)
-- `index.html`: `APP_VER=36`; voce `NEWS` v36; `vMieiOrari` senza il riquadro `or-mtot` (totale settimana); avviso «orari pubblicati» (`orPublish`) senza le ore totali.
-- `sw.js`: `CACHE` `jona-ordini-v40`.
-- `tools/test-orari.mjs`: il controllo «weekly total shown» ora verifica che il totale sia nascosto.
-- Prove: vedi «Fatto in sessione #09».
-- D4 ancora aperta:
-  - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
-
-## Prossimi passi
-1. Attendere l'ok di Mario su giacca e braccia (video #10).
-2. Con l'ok di Mario sui video: pubblicare la v36 (PR → squash → controllo online → riallineamento). Domanda aperta: pubblicare subito dopo l'ok?
-3. D4 (contratto ai Responsabili): chiesto a Mario, senza risposta; se sì, brainstorming con 2-3 strade.
-4. Il resto: `docs/DA-FARE.md`.
+## Ordine del trasloco (spiegato a Mario)
+1. Claude: v37 su ramo + PR.
+2. Mario: permesso Pages sul token Cloudflare (link diretti e pulsanti esatti).
+3. Mario: cambio sottodominio su Cloudflare (Workers & Pages → sottodominio → Change).
+4. Mario: merge della PR subito dopo (notifiche ferme pochi minuti).
+5. Claude: controllo nuovi indirizzi, rilancio workflow Worker se serve.
+6. Telefoni: installare dal nuovo indirizzo ed entrare con invito nuovo; QR fisso della cucina da rifare (chiedere se è stampato).
 
 ## Rischi aperti
-- Il ramo `ccr-4a01d00e-6ay25e` è nato in questa sessione (la #03 lavorava su `ccr-402d6602-imjwpw`). Il ramo da usare è quello indicato all'avvio della nuova sessione.
-- `test-firebase-flow` sistemata, ma la fascia 23:30-24:00 UTC (01:30-02:00 in Italia) non è stata provata dal vero.
+- Se Pages non è pubblicato, lo script di passaggio non sposta nessuno (controlla che risponda).
+- `test-firebase-flow`: fascia 01:30-02:00 italiane mai provata dal vero.
+- Il resto: `docs/DA-FARE.md`.
