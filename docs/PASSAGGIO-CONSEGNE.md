@@ -3,6 +3,8 @@
 Sessione attuale: #13
 
 ## Ultimo messaggio di Mario (#12)
+«Devi aprire tu e mettere la nuova sessione passaggio di consegna autonomamente» → Claude non può: limite di catena delle sessioni (profondità 8) raggiunto. Mario apre a mano. In #13: se possibile, ricordare che dalle sessioni aperte a mano il conteggio riparte.
+
 «sì va bene, apro la nuova sessione» → nome CONFERMATO: `jona-ristorante-by-ynoycorp` (sottodominio Worker e progetto Pages). Mario conferma il cambio degli indirizzi: procedere con la v37 (vedi «BLOCCO» sotto).
 
 «La & dimentichi» → capito: togliere la `&` dall'indirizzo. Proposto `jona-ristorante-by-ynoycorp` (invito `invito.jona-ristorante-by-ynoycorp.workers.dev/CODICE`, app `jona-ristorante-by-ynoycorp.pages.dev`); scritta esatta «Jona_Ristorante By YNOY&CORP» in anteprima invito e app. Chiedere conferma (o versione corta) poi procedere.
