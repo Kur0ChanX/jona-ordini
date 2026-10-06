@@ -3,6 +3,9 @@
 Sessione attuale: #13
 
 ## Ultimo messaggio di Mario (#13)
+«A, account nuovo solo per Jona» → il vecchio account Cloudflare ospita anche `fruguponte` (altri progetti, da NON toccare): il sottodominio non si cambia lì. Jona va su un account Cloudflare nuovo (sottodominio `jona-ristorante-by-ynoy-corp`), nuovi segreti `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` in GitHub. Il codice della v37 non cambia. Foto/vocali vecchi della chat persi (D1 nuovo), chiave VAPID nuova (creata dal workflow). Passi: DA-FARE M11→M14.
+
+Prima:
 «Ricordati di fare sempre per ogni progetto in questo account e salda la regola salva token con chiusura sessione passaggio consegne e apertura sessione rinominata automaticamente; non modificarla senza il mio consenso» → regola bloccata scritta in `CLAUDE.md`; per gli altri progetti: testo dato a Mario per le preferenze di claude.ai; proposto di copiare la regola e `.claude/hooks/handoff-check.py` negli altri repository (attesa risposta).
 
 Prima:

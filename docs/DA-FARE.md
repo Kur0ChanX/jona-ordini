@@ -8,8 +8,8 @@ Aggiornato: 2026-10-06 (sessione #13). Ogni cosa ha un **numero fisso** (M1…, 
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| M11 | Permesso «Cloudflare Pages» sulla chiave Cloudflare | Mario | subito (trasloco v37) |
-| M12 | Cambio del sottodominio Cloudflare in `jona-ristorante-by-ynoy-corp` | Mario | subito, dopo M11 |
+| M11 | Account Cloudflare NUOVO solo per Jona + sottodominio `jona-ristorante-by-ynoy-corp` | Mario | subito (trasloco v37) |
+| M12 | Chiave e ID del nuovo account nei segreti GitHub | Mario | subito, dopo M11 |
 | M13 | Unire la PR della v37 | Mario | subito dopo M12 |
 | M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
@@ -28,6 +28,7 @@ Aggiornato: 2026-10-06 (sessione #13). Ogni cosa ha un **numero fisso** (M1…, 
 ---
 
 ## 1. Claude da solo
+- **Dopo M14**: far cancellare a Mario i Worker `invito` e `jona-notifiche` dal VECCHIO account (lì resta `fruguponte`, da non toccare).
 - **Dopo M13**: controllare i nuovi indirizzi (app, notifiche, invito), rilanciare il workflow del Worker se la prova fallisce.
 
 ## 2. Claude, dopo la tua scelta o approvazione
@@ -35,7 +36,7 @@ Aggiornato: 2026-10-06 (sessione #13). Ogni cosa ha un **numero fisso** (M1…, 
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **M11 → M14 · Trasloco v37**: passi con link in chat (#13). Ordine: permesso Pages sul token, cambio sottodominio, subito dopo unire la PR, poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
+- **M11 → M14 · Trasloco v37**: passi con link in chat (#13). Ordine: account Cloudflare nuovo solo per Jona (il vecchio ha `fruguponte` e altri progetti: il sottodominio è unico per account, non si tocca), sottodominio, chiave + ID nei segreti GitHub, unire la PR, poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
 - **M10 · Prova la v36**: apri l'app, se esce «App da aggiornare» tocca il banner. Da staff: «I miei orari» mostra solo inizio e fine. Manda un ordine e guarda l'animazione.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
