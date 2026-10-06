@@ -4,14 +4,16 @@ Aggiornato: 2026-10-06 (sessione #13). Ogni cosa ha un **numero fisso** (M1…, 
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
+**🔴 = blocca il lavoro nuovo** (regola di Mario: prima si chiudono queste, poi si va avanti; le rifiniture estetiche non bloccano).
+
 ## Riassunto: cosa manca, in ordine
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| M11 | Account Cloudflare NUOVO solo per Jona + sottodominio `jona-ristorante-by-ynoy-corp` | Mario | subito (trasloco v37) |
-| M12 | Chiave e ID del nuovo account nei segreti GitHub | Mario | subito, dopo M11 |
-| M13 | Unire la PR della v37 | Mario | subito dopo M12 |
-| M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
+| 🔴 M11 | Account Cloudflare NUOVO solo per Jona + sottodominio `jona-ristorante-by-ynoy-corp` | Mario | subito (trasloco v37) |
+| 🔴 M12 | Chiave e ID del nuovo account nei segreti GitHub | Mario | subito, dopo M11 |
+| 🔴 M13 | Unire la PR della v37 | Mario | subito dopo M12 |
+| 🔴 M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
 | M2 | Dare a Maurizio il ruolo Admin Chef | Mario | in stand-by, dopo M1 |
 | M3 | «Oggi si ordina» arriva a Maurizio | Mario | in stand-by, dopo M2 |
