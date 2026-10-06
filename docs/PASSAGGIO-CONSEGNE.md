@@ -1,31 +1,33 @@
 # Passaggio di consegne (2026-10-06)
 
-Sessione attuale: #14
+Sessione attuale: #15
 
-## Ultimo messaggio di Mario (#13)
-«Ora lo faccio, però prima mi hai detto che ci sono 3 errori, li vediamo dopo... non voglio trascinarmi errori, il progetto deve essere stabile, ho paura» → Mario sta facendo i passi M11→M14 (account Cloudflare nuovo). Claude ha trovato la causa dei 3 errori (vedi sotto) e stava facendo girare tutte le prove con l'emulatore.
+## Ultimo messaggio di Mario (#14)
+«puoi farmi aprire sempre i link con chrome me li apre l app claude» → risposto: non si può impostare da qui; nel browser dentro Claude toccare **⋮** → **Apri in Chrome**, oppure tenere premuto il link → **Copia link** e incollarlo in Chrome. Mario sta facendo **M11** (account Cloudflare nuovo): chiedergli a che passo è.
 
-Messaggi precedenti di #13 (in ordine):
-- «A, account nuovo solo per Jona»: il vecchio account Cloudflare ha anche `fruguponte` (usato in altri progetti, da NON toccare). Il sottodominio è uno per account → Jona va su un account Cloudflare NUOVO con sottodominio `jona-ristorante-by-ynoy-corp`. Il codice della v37 non cambia.
-- «YNOY-CORP va bene, dove si può mettere la metti»: nome `jona-ristorante-by-ynoy-corp`; `&` solo nei testi visibili («Jona_Ristorante By YNOY&CORP»).
-- «Ricordati di fare sempre per ogni progetto in questo account... regola salva token con chiusura sessione, passaggio consegne e apertura sessione rinominata automaticamente; non modificarla senza il mio consenso» → scritta come 🔒 REGOLA BLOCCATA in `CLAUDE.md`. Dato a Mario il testo per le preferenze di claude.ai (conferma non arrivata). Chiesto se copiarla negli altri repository (risposta non arrivata).
-- «La prossima volta apri tu la nuova sessione e rinominala, io non devo fare niente».
+Messaggi precedenti di #14 (in ordine):
+- «Non capisco cosa resta, guarda tutto, non voglio dimenticare cose» → dato il quadro completo.
+- «Le cose da fare in ordine di funzionalità per la tua programmazione» → ordine M11 → M12 → M13 → controllo Claude → M14 → M15 → M5; il resto non blocca.
+- «Regola: non andare avanti senza aver fatto le cose importanti per il codice, non estetica» → regola PRIMA I BLOCCHI in `CLAUDE.md`, voci 🔴 in `docs/DA-FARE.md`.
+- «Non facciamo codice superficiale, è per un hotel» → regola STABILITÀ in `CLAUDE.md` (tutte le prove prima di ogni PR, prova per ogni bug) + eccezione EMERGENZA.
+- Paura che l'app resti ferma 1 ora durante le prove → spiegato: le prove girano prima della pubblicazione, l'app in hotel non si ferma mai.
+- «Fammi un file Word con le cose da fare» → mandato `Jona-cose-da-fare.docx` (solo in chat, non nel repository; stesso contenuto di `docs/DA-FARE.md` più i passi con link di M11, M12, M13).
 
-## Fatto in sessione #13
-- **v37** sul ramo `ccr-4a01d00e-6ay25e`, **PR #46** aperta (https://github.com/Kur0ChanX/jona-ordini/pull/46), NON ancora unita:
-  - `index.html`: `WK_SUB='jona-ristorante-by-ynoy-corp'`, `og:image` e `og:site_name`, testi `PUSH_HELP`, `APP_VER=37`, NEWS v37, firma `.wall-brand` nella schermata d'ingresso, script in `<head>` che da `*.github.io` passa a `https://jona-ristorante-by-ynoy-corp.pages.dev/` solo se il manifest risponde (provato: con `#i=` passa, nuovo giù resta).
-  - `sw.js` (`PUSH_URL`, `CACHE` v41), `manifest.webmanifest` (percorsi relativi), `_headers` (CORS sul manifest), `worker/src/index.js` (`sub` VAPID), `worker/invito/src/index.js` (`APP`, firma), `.github/workflows/cloudflare-worker.yml` (prove), nuovo `.github/workflows/cloudflare-pages.yml` (crea il progetto Pages se manca, pubblica, prova), `CLAUDE.md`, test.
-- **Causa dei 3 errori nelle prove** (test-v35, test-firebase-push, test-firebase-approva-arrivi, falliti anche sul codice vecchio): con `firebase-config.js` vero, l'app usava il progetto `jona-ordini` nell'emulatore e non `demo-jona`; i dati di una prova restavano lì (la pulizia svuota solo `demo-jona`) → la prova dopo vedeva «Collega questo telefono». Corretto nei 14 test con emulatore (commit `e3e954d`): nascondono `firebase-config.js`. Solo file di prova, app non toccata.
-- Prove verdi: test-news, test-inviti, test-v29, test-giro, test-v34, test-gemini-server, test-firebase-allegati (dopo la correzione). Le altre prove con emulatore erano ancora in corso alla chiusura.
+## Fatto in sessione #14 (ramo `ccr-4a01d00e-6ay25e`, PR #46 aperta, non unita)
+- **Tutte le 36 prove** con l'emulatore: 35 riuscite subito. `firebase-bulk` e `firebase-sync` (dubbi di #13) sono ok: gli «errori» nei log sono solo siti esterni bloccati nell'ambiente di prova.
+- **Bug vero trovato da `test-v35`** e corretto (`index.html`, `qfNew`/`qfCard`): con Firebase `put` ritorna prima di aggiornare `cfg()`, quindi «Crea il QR» non creava l'immagine e «Cambia QR» stampava il codice VECCHIO. Ora `qfNew` passa `j.codice` a `qfCard(k)`. Aggiunta in `tools/test-v35.mjs` la prova «Cambia QR: immagine con il codice NUOVO». v35, inviti, giro: verdi. APP_VER/CACHE non cambiati (v37 non ancora pubblicata).
+- Nuovo `tools/prova-tutto.sh` (tutte le prove, server + emulatore, `risultati.txt`), citato in `tools/README.md`.
+- `CLAUDE.md`: regole PRIMA I BLOCCHI, STABILITÀ, EMERGENZA. `docs/DA-FARE.md`: 🔴 su M11-M14, nuova voce M15.
+- Controllato: `jona-ristorante-by-ynoy-corp.pages.dev` e i Worker nuovi non rispondono ancora (M11 non fatto). PR #46 `mergeable_state: clean`.
 
-## Prossimi passi (#14)
-1. Rifare girare TUTTE le prove con l'emulatore (`tools/README.md`; avvio: `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`; server `python3 -m http.server 8765`; svuotare `demo-jona` prima di ogni prova). Dire a Mario il risultato in chiaro: deve sapere che il progetto è stabile.
-2. Seguire Mario sui passi M11→M14 (`docs/DA-FARE.md`). Dopo il merge: controllare `https://jona-ristorante-by-ynoy-corp.pages.dev/`, `jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/salute`, `invito.jona-ristorante-by-ynoy-corp.workers.dev/ABCDEF`, workflow Actions verdi.
-3. Dopo il trasloco: Mario cancella `invito` e `jona-notifiche` dal VECCHIO account (non `fruguponte`). QR della cucina da rifare (chiesto se è stampato, nessuna risposta).
-4. Chiedere ancora: copiare la regola bloccata e `.claude/hooks/handoff-check.py` negli altri repository? Quali?
+## Prossimi passi (#15)
+1. Seguire Mario su M11 → M12 → M13 (passi con link in `docs/DA-FARE.md` e nel file Word; token: template «Edit Cloudflare Workers» + Account › D1 › Edit + Account › Cloudflare Pages › Edit; segreti `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID`).
+2. Dopo il merge: controllare app, `jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/salute`, `invito.jona-ristorante-by-ynoy-corp.workers.dev/ABCDEF`, workflow Actions verdi, collegamento Firebase dal nuovo indirizzo. Poi passi M14 e M15.
+3. Riallineare il ramo dopo lo squash merge (`git fetch origin main && git merge origin/main`, push normale).
+4. Ancora senza risposta: copiare la regola bloccata e `.claude/hooks/handoff-check.py` negli altri repository? Quali?
 
 ## Rischi aperti
-- La chiave Firebase (`apiKey` in `firebase-config.js`) potrebbe avere limiti di dominio su Google Cloud: se l'app sul nuovo indirizzo non si collega, controllare lì.
-- Nuovo account Cloudflare: foto/vocali vecchi della chat persi, chiave VAPID nuova (le iscrizioni push si rifanno comunque con il nuovo indirizzo).
-- `test-firebase-flow`: fascia 01:30-02:00 italiane mai provata dal vero.
+- Chiave Firebase (`apiKey`) con possibili limiti di dominio su Google Cloud: se l'app sul nuovo indirizzo non si collega, controllare lì.
+- Account Cloudflare nuovo: foto/vocali vecchi della chat persi, chiave VAPID nuova (notifiche da riattivare sui telefoni).
+- `test-firebase-flow` fallisce tra 23:30 e mezzanotte (noto).
 - Il resto: `docs/DA-FARE.md`.
