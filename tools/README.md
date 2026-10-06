@@ -23,6 +23,8 @@ Servono Playwright e Chromium (`/opt/pw-browsers/chromium`, già presenti nelle 
 
 Le prove Firebase impostano `localStorage.jona_fb_emu` e una configurazione finta (`projectId: demo-jona`), ma `firebase-config.js` ha la precedenza: svuota anche il progetto `jona-ordini` (stessi due `curl` con `jona-ordini` al posto di `demo-jona`). Le prove in modalità locale (`test-staff`, `test-news`, `test-voice`, `test-report`, `test-scaglione2`, `test-orari`) nascondono da sole `firebase-config.js` (`route` che risponde `self.JONA_FIREBASE=null`). `test-firebase-flow` fallisce tra le 23:30 e mezzanotte (ora limite «tra 30 minuti» cade nel giorno dopo).
 
+**Tutte insieme:** `bash tools/prova-tutto.sh [cartella]` avvia server ed emulatore, svuota l'emulatore prima di ogni prova e scrive `risultati.txt` (0 = riuscita) con un log per prova. Da fare prima di ogni PR.
+
 ## Altre prove
 - `node tools/test-giro.mjs`: v32, giro di ogni scheda e dei pulsanti in alto (avvisi, menu, chat, Novità) per Sviluppatore, Admin Chef e Staff con i dati di prova, a 320 e 390 px, tema chiaro e scuro: errori della pagina, scorrimento orizzontale, elementi fuori schermo (le tabelle degli orari scorrono di proposito), «undefined»/«NaN». Foto in `/tmp/giro-*.png`.
 - `node tools/test-v28.mjs`: vocali per iPhone (Chrome Android → AAC con WebCodecs e intestazioni ADTS, codificatore finto; iPhone → MP4; mai Opus dentro l'MP4), lettore sbloccato con il silenzio dentro il tocco, barra con la durata del messaggio, messaggio per il file illeggibile; indietro del telefono un passo alla volta (foglio, scheda precedente, conversazione → lista → chat chiusa, chiusura con la X, uscita).

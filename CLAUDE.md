@@ -129,5 +129,6 @@ IndexedDB `jona-outbox` (store `q`): push non partite, lette sia da `index.html`
 - Ad OGNI versione cambia `CACHE` in `sw.js`.
 - Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
 - Prove: `tools/README.md` (server locale, Playwright con Chromium `/opt/pw-browsers/chromium`, emulatore Firebase con `localStorage.jona_fb_emu`).
+- STABILITÀ (Mario, 06/10/2026: l'app serve a un hotel, niente codice superficiale): prima di ogni PR fai girare TUTTE le prove con `bash tools/prova-tutto.sh` (in background, ~1 ora) e apri la PR solo se sono tutte riuscite. Ogni bug corretto riceve una prova che lo avrebbe trovato. Una prova fallita non si salta né si spegne: si capisce la causa.
 - Interfaccia dello staff a prova di principiante: parole semplici, pulsanti grandi.
 - Pubblicazione: branch → PR → squash merge → controllo online → riallineamento senza force: `git fetch origin main && git merge origin/main` sul ramo, poi `git push` normale.
