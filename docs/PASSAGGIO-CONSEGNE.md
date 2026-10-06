@@ -1,8 +1,14 @@
 # Passaggio di consegne (2026-10-05, sera)
 
-Sessione attuale: #11
+Sessione attuale: #12
+
+## Ultimo messaggio di Mario (#11) → da fare in #12
+«vorrei cambiare questo link c'è il mio nome e cognome https://invito.mario-miscera.workers.dev/JC6SPZ»
+- È la voce **D2** di `docs/DA-FARE.md`. Non ancora iniziata. Partire con un brainstorming (2-3 strade, pro e contro): nuovo sottodominio Cloudflare (`WK_SUB` in index.html, `PUSH_URL` di `sw.js`, prova del workflow), notifiche ferme qualche ora, telefoni da riattivare. Proporre a Mario un nome senza dati personali (es. `jona-ristorante`) e i passi su Cloudflare dal telefono (vedi regola «GitHub dal telefono» in `CLAUDE.md`).
 
 ## Sessione #11
+- v36 online (verificato: `sw.js` jona-ordini-v40, `APP_VER=36`, video al fornitore 200). Il deploy di Pages era stato annullato due volte da un guasto di GitHub Actions; terzo tentativo ok (rerun della run 37366626988 via API: consentito).
+- `node_modules/` escluso solo in `.git/info/exclude` (pacchetti per le prove, non vanno nel repo).
 - Mario: «vai mettili al massimo li modifichiamo e miglioriamo piú avanti salvali in un posto sicuro per non ripartire da 0».
 - Video approvati. Copia sicura: ramo `scorta-video-invio-v1` (commit `0c60d3d`). Le etichette (tag) non passano dal proxy: usare rami.
 - Prove prima della pubblicazione: `test-invio-anim`, `test-orari`, `test-giro` verdi.
