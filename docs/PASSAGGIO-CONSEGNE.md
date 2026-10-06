@@ -2,7 +2,11 @@
 
 Sessione attuale: #13
 
-## Ultimo messaggio di Mario (#12)
+## Ultimo messaggio di Mario (#13)
+«La prossima volta apri tu la nuova sessione con il passaggio di consegne, le regole e il risparmio token, e la rinomini: io non devo fare niente» → all'handoff di #13 Claude crea e rinomina la sessione #14 da solo (catena ripartita da 0).
+«Per l'indirizzo metti la & commerciale dopo YNOY» → la `&` negli indirizzi web non è ammessa: proposte `jona-ristorante-by-ynoy-and-corp` / `jona-ristorante-by-ynoyandcorp`, oppure tenere `jona-ristorante-by-ynoycorp`. In attesa della scelta.
+
+## Messaggi di Mario (#12)
 «Devi aprire tu e mettere la nuova sessione passaggio di consegna autonomamente» → Claude non può: limite di catena delle sessioni (profondità 8) raggiunto. Mario apre a mano. In #13: se possibile, ricordare che dalle sessioni aperte a mano il conteggio riparte.
 
 «sì va bene, apro la nuova sessione» → nome CONFERMATO: `jona-ristorante-by-ynoycorp` (sottodominio Worker e progetto Pages). Mario conferma il cambio degli indirizzi: procedere con la v37 (vedi «BLOCCO» sotto).
