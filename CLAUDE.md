@@ -26,6 +26,8 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 
 ## PROTOCOLLO DI HANDOFF E RESET (Prevenzione Saturazione Contesto)
 
+- 🔒 REGOLA BLOCCATA (Mario, 06/10/2026): risparmio token + handoff con chiusura della sessione, consegne e apertura AUTOMATICA della nuova sessione già rinominata (Mario non deve fare niente). Vale per OGNI progetto di questo account. Non modificare, ammorbidire o togliere questa sezione senza il consenso esplicito di Mario.
+
 - TRIGGER: Lo script `.claude/hooks/handoff-check.py` segnala quando è ora di fare l'handoff (soglia 70% di 200k = 140k token, oppure 20 messaggi, oppure dopo una compressione automatica della conversazione). L'avviso si ripete a ogni messaggio finché l'handoff non è fatto: eseguilo SUBITO, prima di qualsiasi lavoro nuovo. Non usare altri trigger.
 
 - AZIONE AUTOMATICA:

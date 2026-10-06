@@ -3,6 +3,9 @@
 Sessione attuale: #13
 
 ## Ultimo messaggio di Mario (#13)
+«Ricordati di fare sempre per ogni progetto in questo account e salda la regola salva token con chiusura sessione passaggio consegne e apertura sessione rinominata automaticamente; non modificarla senza il mio consenso» → regola bloccata scritta in `CLAUDE.md`; per gli altri progetti: testo dato a Mario per le preferenze di claude.ai; proposto di copiare la regola e `.claude/hooks/handoff-check.py` negli altri repository (attesa risposta).
+
+Prima:
 «YNOY-CORP va bene, dove si può mettere la metti però» → nome definitivo `jona-ristorante-by-ynoy-corp` (sottodominio Worker e progetto Pages); la `&` solo nei testi visibili («Jona_Ristorante By YNOY&CORP»). v37 FATTA su questo ramo, PR aperta.
 Prima: «la prossima volta apri tu la nuova sessione con le consegne e la rinomini: io non devo fare niente» → all'handoff di #13 Claude crea e rinomina #14 da solo (catena ripartita da 0).
 
