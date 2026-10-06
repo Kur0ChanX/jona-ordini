@@ -1,6 +1,8 @@
 // Notifiche push con l'emulatore: servizio push del browser finto, server worker/ intercettato.
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+// firebase-config.js vero nascosto: le prove usano solo la configurazione finta (demo-jona) dell'emulatore
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const CFG={apiKey:'fake-key',authDomain:'demo-jona.firebaseapp.com',projectId:'demo-jona',appId:'1:1:web:1'};
 const KEY='B'+'A'.repeat(86);
 const sent=[];

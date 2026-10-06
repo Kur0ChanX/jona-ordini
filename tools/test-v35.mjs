@@ -75,6 +75,8 @@ Date.now = realNow;
 
 // --- parte 2: app con l'emulatore ---
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+// firebase-config.js vero nascosto: le prove usano solo la configurazione finta (demo-jona) dell'emulatore
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const CFG = { apiKey: 'fake-key', authDomain: 'demo-jona.firebaseapp.com', projectId: 'demo-jona', appId: '1:1:web:1' };
 const proms = [], invia = [], inviti = [];
 const c = await b.newContext({ viewport: { width: 390, height: 800 }, serviceWorkers: 'block' });

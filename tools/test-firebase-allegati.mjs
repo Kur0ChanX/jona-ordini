@@ -19,6 +19,8 @@ const route=async r=>{const q=r.request();const h=q.headers();hits.push(q.method
   const res=await worker.fetch(new Request(q.url().replace(/^https:\/\/[^/]+/,'https://w'),{method:q.method(),headers:h,body:['GET','HEAD','OPTIONS'].includes(q.method())?undefined:q.postDataBuffer()}),env);
   const hd={};res.headers.forEach((v,k)=>hd[k]=v);await r.fulfill({status:res.status,headers:hd,body:Buffer.from(await res.arrayBuffer())})};
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream','--autoplay-policy=no-user-gesture-required']});
+// firebase-config.js vero nascosto: le prove usano solo la configurazione finta (demo-jona) dell'emulatore
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const CFG={apiKey:'fake-key',authDomain:'demo-jona.firebaseapp.com',projectId:'demo-jona',appId:'1:1:web:1'};
 const mk=async(cfg,vw=400)=>{const c=await b.newContext({viewport:{width:vw,height:800},serviceWorkers:'block',permissions:['microphone']});
   await c.addInitScript(cfg=>{localStorage.setItem('jona_fb_emu',JSON.stringify('127.0.0.1'));if(cfg&&!localStorage.getItem('jona_fb'))localStorage.setItem('jona_fb',JSON.stringify(cfg))},cfg);
