@@ -10,7 +10,11 @@ for(const [w,h] of [[320,568],[390,844]]){
   p.on('pageerror',e=>errs.push(e.message));
   await p.goto(URL);
   await p.evaluate(()=>{const d=JSON.parse(localStorage.jona_db_v2||'{}');d.staff={a:{id:'a',nome:'Prova',ruolo:'gm',attivo:true}};localStorage.jona_db_v2=JSON.stringify(d)});
-  await p.reload();await p.waitForSelector('.wall h1');await p.waitForTimeout(1300);
+  await p.reload();await p.waitForSelector('.wall h1');
+  const an=await p.evaluate(()=>document.querySelector('.wall-by i').getAnimations().map(a=>a.animationName).sort().join());
+  ok(an==='ynoyIn,ynoyShine',`${w}px: animazione d'entrata del logo assente (${an})`);
+  await p.waitForTimeout(3600);
+  ok(!(await p.evaluate(()=>document.querySelector('.wall-by i').getAnimations().length)),`${w}px: animazione ancora in corso dopo l'entrata`);
   const r=await p.evaluate(async()=>{const e=document.querySelector('.wall-by'),i=e&&e.querySelector('i');if(!e)return null;
     const q=await fetch('media/ynoy.png');const x=e.getBoundingClientRect(),c=document.querySelector('.wall-card').getBoundingClientRect();
     return {h1:document.querySelector('.wall h1').textContent,img:q.ok&&q.headers.get('content-type'),mask:getComputedStyle(i).webkitMaskImage||getComputedStyle(i).maskImage,
