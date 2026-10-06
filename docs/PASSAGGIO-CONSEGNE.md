@@ -3,6 +3,9 @@
 Sessione attuale: #13
 
 ## Ultimo messaggio di Mario (#12)
+«La & dimentichi» → capito: togliere la `&` dall'indirizzo. Proposto `jona-ristorante-by-ynoycorp` (invito `invito.jona-ristorante-by-ynoycorp.workers.dev/CODICE`, app `jona-ristorante-by-ynoycorp.pages.dev`); scritta esatta «Jona_Ristorante By YNOY&CORP» in anteprima invito e app. Chiedere conferma (o versione corta) poi procedere.
+
+Messaggi precedenti:
 «In http e invito ovunque deve apparire Jona_Ristorante By YNOY&CORP»
 - Risposto: nell'indirizzo non sono ammessi `_`, `&`, spazi, maiuscole. Il più vicino possibile: `jona-ristorante-by-ynoy-corp` (es. `invito.jona-ristorante-by-ynoy-corp.workers.dev`, app `jona-ristorante-by-ynoy-corp.pages.dev`), oppure nome corto + scritta esatta «Jona_Ristorante By YNOY&CORP» nel titolo e nell'anteprima dell'invito e nell'app. Attendere la scelta di Mario.
 
