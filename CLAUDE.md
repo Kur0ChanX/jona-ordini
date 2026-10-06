@@ -76,6 +76,8 @@ Imparare (Mario vuole crescere): quando uso un termine tecnico, scrivo il **term
 
 GitHub dal telefono: Mario usa GitHub da Google Chrome sul telefono, in modalità desktop (scomodo) e non è esperto. Per lui: passi piccolissimi, dove scorrere, cosa toccare esattamente (es. la freccina ▾ accanto al pulsante verde), cosa deve comparire dopo, e quali pulsanti NON toccare. Il merge delle PR lo fa lui (a Claude è bloccato): dopo, Claude controlla da solo con l'API se è andato.
 
+Link sempre: per ogni cosa che Mario deve fare a mano (siti, registrazioni, chiavi API, impostazioni, GitHub, Cloudflare, Firebase…) dai il link diretto alla pagina giusta, dici perché ci va e cosa deve inserire, e scrivi in **grassetto** i pulsanti esatti da toccare. Mario è spesso sul telefono: passi brevi e chiari. Vale per tutti i progetti.
+
 Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scrivi SOLO un elenco numerato passo passo. Usa i nomi ESATTI dei pulsanti e dei menu che vedrò sullo schermo, senza inventarli o tradurli.
 
 
