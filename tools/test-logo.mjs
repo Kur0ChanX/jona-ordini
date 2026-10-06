@@ -13,7 +13,7 @@ for(const [w,h] of [[320,568],[390,844]]){
   await p.reload();await p.waitForSelector('.wall h1');
   const an=await p.evaluate(()=>document.querySelector('.wall-by i').getAnimations().map(a=>a.animationName).sort().join());
   ok(an==='ynoyIn,ynoyShine',`${w}px: animazione d'entrata del logo assente (${an})`);
-  await p.waitForTimeout(3600);
+  await p.waitForTimeout(5600);
   ok(!(await p.evaluate(()=>document.querySelector('.wall-by i').getAnimations().length)),`${w}px: animazione ancora in corso dopo l'entrata`);
   const r=await p.evaluate(async()=>{const e=document.querySelector('.wall-by'),i=e&&e.querySelector('i');if(!e)return null;
     const q=await fetch('media/ynoy.png');const x=e.getBoundingClientRect(),c=document.querySelector('.wall-card').getBoundingClientRect();
@@ -48,7 +48,7 @@ for(const salta of [false,true]){
   const st=()=>p.evaluate(()=>({wall:!!document.querySelector('.wall .wall-by'),login:!!document.querySelector('.wall h1')}));
   let s=await st();ok(s.wall&&!s.login,`apertura assente da entrato (salta=${salta})`);
   if(salta){await p.mouse.click(195,400);await p.waitForTimeout(300);s=await st();ok(!s.wall,'un tocco non salta l\'apertura')}
-  else{await p.waitForTimeout(1900);s=await st();ok(s.wall,`apertura finita troppo presto (${Date.now()-t0} ms)`);
+  else{await p.waitForTimeout(4000);s=await st();ok(s.wall,`apertura finita troppo presto (${Date.now()-t0} ms)`);
     await p.waitForTimeout(1600);s=await st();ok(!s.wall&&!s.login,'dopo l\'apertura l\'app non si apre')}
   console.log('entrato',salta?'tocco':'attesa',JSON.stringify(s));
   ok(!errs.length,`apertura: errori ${errs}`);await p.close();
