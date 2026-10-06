@@ -3,6 +3,10 @@
 Sessione attuale: #13
 
 ## Ultimo messaggio di Mario (#12)
+«In http e invito ovunque deve apparire Jona_Ristorante By YNOY&CORP»
+- Risposto: nell'indirizzo non sono ammessi `_`, `&`, spazi, maiuscole. Il più vicino possibile: `jona-ristorante-by-ynoy-corp` (es. `invito.jona-ristorante-by-ynoy-corp.workers.dev`, app `jona-ristorante-by-ynoy-corp.pages.dev`), oppure nome corto + scritta esatta «Jona_Ristorante By YNOY&CORP» nel titolo e nell'anteprima dell'invito e nell'app. Attendere la scelta di Mario.
+
+Messaggio precedente:
 «Indirizzo Jona-Ristorante by YNOY&CORP anche invito. YNOY&CORP é il mio nome di sviluppo software»
 - Da chiarire subito: negli indirizzi `&`, spazi e maiuscole non sono ammessi (solo lettere minuscole, cifre, trattini). Proposta da fare a Mario:
   - app: `jona-ristorante.pages.dev` (progetto Cloudflare Pages `jona-ristorante`);
