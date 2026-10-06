@@ -3,8 +3,14 @@
 Sessione attuale: #13
 
 ## Ultimo messaggio di Mario (#13)
-«La prossima volta apri tu la nuova sessione con il passaggio di consegne, le regole e il risparmio token, e la rinomini: io non devo fare niente» → all'handoff di #13 Claude crea e rinomina la sessione #14 da solo (catena ripartita da 0).
-«Per l'indirizzo metti la & commerciale dopo YNOY» → la `&` negli indirizzi web non è ammessa: proposte `jona-ristorante-by-ynoy-and-corp` / `jona-ristorante-by-ynoyandcorp`, oppure tenere `jona-ristorante-by-ynoycorp`. In attesa della scelta.
+«YNOY-CORP va bene, dove si può mettere la metti però» → nome definitivo `jona-ristorante-by-ynoy-corp` (sottodominio Worker e progetto Pages); la `&` solo nei testi visibili («Jona_Ristorante By YNOY&CORP»). v37 FATTA su questo ramo, PR aperta.
+Prima: «la prossima volta apri tu la nuova sessione con le consegne e la rinomini: io non devo fare niente» → all'handoff di #13 Claude crea e rinomina #14 da solo (catena ripartita da 0).
+
+## Fatto in sessione #13 (v37)
+- Tutte le modifiche elencate sotto in «BLOCCO» sono fatte (il blocco non è scattato), con il nome `jona-ristorante-by-ynoy-corp`. In più: `manifest.webmanifest` con percorsi relativi; `_headers` (CORS sul manifest, usato dallo script di passaggio); firma in `og:site_name`, anteprima invito e schermata d'ingresso (`.wall-brand`).
+- Prove verdi: test-news, test-inviti, test-v29, test-giro, test-v34, test-gemini-server; passaggio dal vecchio indirizzo provato (nuovo su → si sposta con `#i=`; nuovo giù → resta).
+- test-v35, test-firebase-push, test-firebase-approva-arrivi si bloccano all'avvio con l'emulatore ANCHE sul codice di prima (non è la v37): da capire.
+- Passi di Mario: `docs/DA-FARE.md` M11→M14.
 
 ## Messaggi di Mario (#12)
 «Devi aprire tu e mettere la nuova sessione passaggio di consegna autonomamente» → Claude non può: limite di catena delle sessioni (profondità 8) raggiunto. Mario apre a mano. In #13: se possibile, ricordare che dalle sessioni aperte a mano il conteggio riparte.
@@ -37,7 +43,7 @@ Messaggio precedente:
 - App in prova: solo Maurizio (che oggi non compare tra gli utenti: rientrando si sistema, poi controllare), Mauro e Mario. Rientrano con invito nuovo: niente pulsante di trasloco automatico.
 - News per Maurizio e Mauro: chiare ma brevi.
 
-## BLOCCO: modifica degli indirizzi negata
+## (Storico #12) Modifiche previste per la v37 — ora fatte
 - Il classificatore di sicurezza di Claude Code ha negato («Traffic Redirection») la sostituzione degli indirizzi. Non aggirarlo. Serve la conferma scritta di Mario («sì, cambia gli indirizzi»); se viene negata ancora, spiegare a Mario come dare il permesso.
 - Modifiche preparate ma NON fatte (v37), tutte con i nomi confermati:
   - `index.html`: `WK_SUB`; `og:image`; testi `PUSH_HELP` con `kur0chanx.github.io` (3 punti); `APP_VER=37`; voce NEWS v37 (tutti: nuovo indirizzo, reinstallare, invito nuovo; chef: link invito nuovi, approvare i telefoni in Staff → Telefoni da approvare); script in `<head>` che da `*.github.io` passa al nuovo indirizzo solo se risponde (`fetch` no-cors) portando `search`+`hash`.

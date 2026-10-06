@@ -8,7 +8,7 @@ p.on('pageerror', e => errs.push(String(e)));
 await p.goto(URL); await p.waitForTimeout(800);
 ok(await p.evaluate(() => APP_VER) >= 29, 'APP_VER 29+');
 ok(await p.evaluate(() => NEWS.find(n => n.v === 29).chef.length === 2), 'novità v29 per i gestori');
-ok(await p.locator('meta[property="og:image"]').getAttribute('content') === 'https://kur0chanx.github.io/jona-ordini/media/invito.jpg', 'og:image');
+ok(await p.locator('meta[property="og:image"]').getAttribute('content') === 'https://jona-ristorante-by-ynoy-corp.pages.dev/media/invito.jpg', 'og:image');
 const r = await p.request.get(URL + 'media/invito.jpg'); ok(r.ok() && (await r.body()).length > 20000, 'immagine anteprima presente');
 const t = await p.evaluate(() => inviteText('https://x.y/#k=abc'));
 ok(t.includes('Benvenuto nella squadra') && t.endsWith('👉 https://x.y/#k=abc') && t.includes('3️⃣'), 'testo invito con link in fondo');

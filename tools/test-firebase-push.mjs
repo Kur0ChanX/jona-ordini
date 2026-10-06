@@ -10,7 +10,7 @@ const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,heigh
     const sub={endpoint:'https://fcm.googleapis.com/fcm/send/'+name,keys:{p256dh:'BX',auth:'Y'},toJSON(){return{endpoint:this.endpoint,keys:this.keys}},unsubscribe:async()=>{window.__sub=null;return true}};
     Object.defineProperty(navigator,'serviceWorker',{value:{register:async()=>({}),ready:Promise.resolve({pushManager:{getSubscription:async()=>window.__sub||null,subscribe:async()=>{if(window.__fail)throw new DOMException('rifiutato','AbortError');return window.__sub=sub}}})}});
   },[cfg,name]);
-  await c.route('https://jona-notifiche.mario-miscera.workers.dev/**',async r=>{const u=r.request().url();
+  await c.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**',async r=>{const u=r.request().url();
     if(u.endsWith('/chiave'))return r.fulfill({json:{chiave:KEY}});
     if(u.endsWith('/salute'))return r.fulfill({json:{ok:true,push:true,gemini:false}});
     const body=JSON.parse(r.request().postData());sent.push({da:name,...body});

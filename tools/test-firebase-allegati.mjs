@@ -22,7 +22,7 @@ const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:[
 const CFG={apiKey:'fake-key',authDomain:'demo-jona.firebaseapp.com',projectId:'demo-jona',appId:'1:1:web:1'};
 const mk=async(cfg,vw=400)=>{const c=await b.newContext({viewport:{width:vw,height:800},serviceWorkers:'block',permissions:['microphone']});
   await c.addInitScript(cfg=>{localStorage.setItem('jona_fb_emu',JSON.stringify('127.0.0.1'));if(cfg&&!localStorage.getItem('jona_fb'))localStorage.setItem('jona_fb',JSON.stringify(cfg))},cfg);
-  await c.route('https://jona-notifiche.mario-miscera.workers.dev/**',route);
+  await c.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**',route);
   const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));return p};
 const A=await mk(CFG);
 await A.goto('http://localhost:8765/index.html');await A.waitForTimeout(3000);

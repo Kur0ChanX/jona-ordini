@@ -121,6 +121,6 @@ jobs:
       - name: Prova del server
         run: |
           sleep 5
-          curl -sf https://jona-notifiche.mario-miscera.workers.dev/salute | tee /dev/stderr | grep -q '"push":true'
-          curl -sf https://jona-notifiche.mario-miscera.workers.dev/chiave | grep -q '"chiave":"B'
-          curl -sf https://invito.mario-miscera.workers.dev/ABCDEF | grep -q '#i=ABCDEF'
+          curl -sf https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/salute | tee /dev/stderr | grep -q '"push":true'
+          curl -sf https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/chiave | grep -q '"chiave":"B'
+          curl -sf https://invito.jona-ristorante-by-ynoy-corp.workers.dev/ABCDEF | grep -q '#i=ABCDEF'
