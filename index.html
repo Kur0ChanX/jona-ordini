@@ -79,8 +79,8 @@ img{max-width:100%}
 .wall-by{margin:auto 0 -28px;padding:24px 0 env(safe-area-inset-bottom);display:flex;flex-direction:column;align-items:center;gap:9px;opacity:.8}
 .wall-by span{font:400 10px/1 var(--font);letter-spacing:.34em;text-transform:uppercase;color:#B9AEA2;padding-left:.34em}
 .wall-by i{display:block;width:136px;aspect-ratio:480/174;background:linear-gradient(100deg,#DDD3C8 42%,#FFF8EE 50%,#DDD3C8 58%) 100% 0/300% 100%;-webkit-mask:url(media/ynoy.png) center/contain no-repeat;mask:url(media/ynoy.png) center/contain no-repeat}
-.intro .wall-by span{animation:byIn 1s .9s cubic-bezier(.2,.7,.2,1) both}
-.intro .wall-by i{animation:ynoyIn 1.2s 1.05s cubic-bezier(.16,1,.3,1) both,ynoyShine 1.5s 1.7s ease-in-out both}
+.intro .wall-by span{animation:byIn .9s .8s cubic-bezier(.2,.7,.2,1) both}
+.intro .wall-by i{animation:ynoyIn 1s .95s cubic-bezier(.16,1,.3,1) both,ynoyShine 1.1s 1.45s ease-in-out both}
 @keyframes byIn{from{opacity:0;letter-spacing:.9em}}
 @keyframes ynoyIn{from{opacity:0;transform:translateY(10px) scale(.92);filter:blur(6px);clip-path:inset(0 100% 0 0)}to{opacity:1;transform:none;filter:none;clip-path:inset(0)}}
 @keyframes ynoyShine{from{background-position:100% 0}to{background-position:0 0}}
@@ -1568,6 +1568,7 @@ function repaint(){render();refreshSheet()}
 function allLoaded(){return(S.loadTimeout&&S.db.kind!=='firebase')||Object.keys(COLS).every(k=>S.loaded[k])}
 function view(){
   S.wallMode=true;
+  if(S.splash)return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Ordini di cucina e sala</p>${BY}</div>`;
   if(S.fbLibErr)return wallMsg('Serve la connessione','Per aprire l\'app la prima volta serve internet. Controlla la rete e riprova.',`<button type="button" class="btn primary block" data-a="reload">Riprova</button>`);
   if(S.db&&S.db.kind==='firebase'){const s=S.db.status();if(!s.ready)return wallFb(s)}
   if(S.db&&S.db.kind==='locale'&&fbCfg()&&ls('jona_key')==null&&!Object.keys(D().staff||{}).length&&S.loaded.staff){if(S.fbActive===undefined)return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Un momento…</p>${BY}</div>`;if(S.fbActive!==false)return screenJoin()}
@@ -4611,7 +4612,9 @@ addEventListener('popstate',()=>{if(NAV.skip){NAV.skip=0;return navSync()}NAV.tr
   if(/^[A-Za-z0-9]{16,64}$/.test(k)&&ls('jona_key')!==k){ls('jona_key',k);ls('jona_member',null)}
   history.replaceState(null,'',location.pathname+location.search)})();
 async function boot(){
-  applyTheme();document.documentElement.classList.add('intro');setTimeout(()=>document.documentElement.classList.remove('intro'),3400);
+  applyTheme();document.documentElement.classList.add('intro');setTimeout(()=>document.documentElement.classList.remove('intro'),3000);
+  /* chi è già entrato vede l'apertura fino alla fine dell'animazione (2,7 s; un tocco la salta); niente con «riduci movimento» né nelle prove automatiche */
+  if(ls('jona_me')&&!animOff()&&!navigator.webdriver){S.splash=true;const end=()=>{if(!S.splash)return;S.splash=false;removeEventListener('click',end,true);render()};addEventListener('click',end,true);setTimeout(end,2700)}
   $('#picker').addEventListener('change',()=>{const p=$('#picker');const fs=[...(p.files||[])];const cb=pickCb;pickCb=null;if(fs.length&&cb)guard(()=>cb(fs))});
   render();
   const icod=ls('jona_icode');if(icod){ls('jona_icode',null);try{const k=await invRedeem(icod);if(ls('jona_key')!==k){ls('jona_key',k);ls('jona_member',null)}}catch(e){S.joinK=icod;toast(e.message==='scaduto'?'Codice d\'invito scaduto: chiedi allo chef un invito nuovo.':'Non riesco a leggere il codice: controlla la rete e tocca «Collega».','warn')}}
