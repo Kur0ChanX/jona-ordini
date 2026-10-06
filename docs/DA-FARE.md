@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-06 (sessione #14). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-06 (sessione #15, M11 fatto). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -10,8 +10,7 @@ Aggiornato: 2026-10-06 (sessione #14). Copia in Word data a Mario in #14. Ogni c
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| 🔴 M11 | Account Cloudflare NUOVO solo per Jona + sottodominio `jona-ristorante-by-ynoy-corp` | Mario | subito (trasloco v37) |
-| 🔴 M12 | Chiave e ID del nuovo account nei segreti GitHub | Mario | subito, dopo M11 |
+| 🔴 M12 | Chiave e ID del nuovo account nei segreti GitHub | Mario | subito |
 | 🔴 M13 | Unire la PR della v37 | Mario | subito dopo M12 |
 | 🔴 M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
@@ -39,7 +38,7 @@ Aggiornato: 2026-10-06 (sessione #14). Copia in Word data a Mario in #14. Ogni c
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **M11 → M14 · Trasloco v37**: passi con link in chat (#13). Ordine: account Cloudflare nuovo solo per Jona (il vecchio ha `fruguponte` e altri progetti: il sottodominio è unico per account, non si tocca), sottodominio, chiave + ID nei segreti GitHub, unire la PR, poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
+- **M12 → M14 · Trasloco v37** (M11 account nuovo fatto in #15): chiave + ID nei segreti GitHub, unire la PR, poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
 - **M10 · Prova la v36**: apri l'app, se esce «App da aggiornare» tocca il banner. Da staff: «I miei orari» mostra solo inizio e fine. Manda un ordine e guarda l'animazione.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
