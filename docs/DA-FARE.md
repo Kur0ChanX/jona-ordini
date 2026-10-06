@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-06 (sessione #15, M11 fatto). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-06 (sessione #15, M11 fatto; logo YNOY nella PR #46). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -11,7 +11,7 @@ Aggiornato: 2026-10-06 (sessione #15, M11 fatto). Copia in Word data a Mario in 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
 | 🔴 M12 | Chiave e ID del nuovo account nei segreti GitHub | Mario | subito |
-| 🔴 M13 | Unire la PR della v37 | Mario | subito dopo M12 |
+| 🔴 M13 | Unire la PR della v37 (trasloco + logo YNOY con apertura animata; prove brevi, scelta di Mario) | Mario | subito dopo M12 |
 | 🔴 M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
