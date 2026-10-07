@@ -3,6 +3,8 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+**S1, S2, S3 FATTI E ONLINE**: v49 online (PR #59, CI verde), Worker `/errori` attivo (risponde 403 senza gettone = giusto). Prossimo: D9 scheda Richieste (proposta con immagine `docs/immagini/proposta-richieste-d9.png` già mandata, Mario non ha ancora risposto: è una scelta di aspetto, quindi va chiesta).
+
 **v48 (S1) ONLINE** (PR #58, CI verde). **S3 v49 pronta**: scatola nera (`errLog`/`errFlush` → Worker `/errori`, tabella `err` nel primo D1, `errStrip`/`errSheet` solo sviluppatore, `jona_err_vis`). Prove `test-errori` 8, `test-errori-server` 11, più legate riuscite. Il Worker si ripubblica da solo (workflow su `worker/**`). Dopo: D9 (scheda Richieste).
 
 **S1 (v48) pronta**: `syncPill` mostra «N modifiche non arrivate · Riprova» se la rete è accesa ma le scritture non sono confermate da 8 s (`PEND_MS`, `st.pendT`, `syncRetry`/`netRetry`); `phReject` con tempo massimo. Controllati gli altri punti: chat ha già lo stato «in invio» (`pend` da `hasPendingWrites`), avvisi al chef hanno già «Non ancora arrivata/Arrivata ✓» (`obxBar`), `phApprove` ha `fbTmo`. Prova nuova `tools/test-falsi-ok.mjs` (8 PASS) aggiunta alle veloci di GitHub. Prove legate riuscite. Poi: S3 scatola nera, D9.
