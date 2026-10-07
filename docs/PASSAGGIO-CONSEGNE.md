@@ -3,6 +3,8 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+«devi capire che ne capisci piú tu di me mi chiedi cose che non só mai cosa è il meglio io mi fido di te la maggior parte delle volte se tu sbagli siamo fregati» → regola «DECIDO IO SUL TECNICO» in `CLAUDE.md`. Decisione: S2 subito (workflow GitHub con prove veloci a ogni PR + giro completo settimanale), poi S1 (caccia ai «falsi ok»), poi S3 (scatola nera degli errori), poi D9. Prima Mario aveva chiesto «ok consumero molti token 1 2 3?» (stima: S2 basso, S3 medio-basso, S1 alto).
+
 «tutti questi problemi ogni volta fixati anzi fi mettere una pezza non si ouò rendere tutto stabile ho sempre l'ansia che c'è sempre un problema è lo risolvi poi si ripresenta e metti una pezza / sicuramente anche il progetto rvc ha qst problema» (citando: «Non sono riuscito a cancellare il ramo fix-hook-avvio…»).
 Risposta data (brainstorming): due famiglie di problemi — (1) ambiente/strumenti (limite 8 sessioni E12, cancellazione rami bloccata dal proxy, guasti GitHub E11, ramo vecchio all'avvio E5/E13 ora riparato dall'hook): non sono bug dell'app; (2) bug veri dell'app trovati dall'uso reale, corretti alla radice con una prova permanente. Proposta stabilità: **S1** controllo «verità della rete» in tutta l'app (ovunque l'app dice «inviato/salvato» leggendo la cache, come il bug di Maurizio), **S2** prove automatiche su GitHub a ogni PR (workflow CI con emulatore), **S3** diario degli errori dei telefoni (errori JS salvati in Firestore/Worker per vederli prima degli utenti). Consigliato S1+S2 prima di D9. Da portare anche a RVC (sessione RVC #11 `session_01NTWJZpaWY9weMSfovHruJv`) dopo la scelta di Mario.
 
