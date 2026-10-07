@@ -3,7 +3,9 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
-«non lo so» (risposta a: cosa vede Maurizio sul telefono, A attesa / B errore / C demo / D non so).
+Foto da WhatsApp del telefono di Maurizio (`docs/immagini/maurizio-richiesta-inviata.jpg`, senza testo): «Ciao Maurizio! Richiesta inviata… devono approvare questo telefono», «Nuovo profilo · nome utente maurizio.lai». Quindi Maurizio è nella schermata d'attesa (A) ma sul telefono di Mario (Admin Chef, Staff → Persone) «Telefoni da approvare» NON compare → **BUG da trovare in D8**: richiesta scritta in `membri/<uid>` (ok=false, req) ma `phWatch`/`phPend` di Mario non la mostra. Ipotesi da verificare con l'emulatore: ascolto fallito in silenzio (`PH.retry`), scrittura rimasta solo nella cache offline del telefono di Maurizio, regola `membri` che nega la lista, chiave cambiata. Nel frattempo a Mario: invito personale (aggira il problema).
+
+Prima: «non lo so» (risposta a: cosa vede Maurizio sul telefono, A attesa / B errore / C demo / D non so).
 Proposto: invito personale (Staff → **Aggiungi** → nome Maurizio → Password «La sceglie lui (invito WhatsApp)» → **Crea profilo** → manda il link): entra subito senza approvazione, aggira il problema. D8 resta da fare.
 
 Prima: «ho problemi pensaci tu in automatico»
