@@ -1,39 +1,41 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #29
+Sessione attuale: #30
 
-## Ultimo messaggio di Mario (#28), parola per parola
-«Facciamo A»
-(= sceglie la strada A per l'accesso «vetrina»: app dimostrativa con link dedicato. Da fare in #29, sotto.)
+## Ultimo messaggio di Mario (#29), parola per parola
+«si»
+(= risposta a «Parto con la D7 (app dimostrativa)?». D7 strada A fatta, vedi sotto.)
 
-## Messaggi di Mario in #28 (per non perdere le richieste)
-1. «si procedi e dimmi subito come invitare l'amministratore Maurizio Chef qual è la scelta migliore?» → risposto + v44 preparata.
-2. «si pubblica e poi vorrei creare per chi si registra un utente per far vedere l'app in che fase è ad esempio i consulenti alberghieri o i proprietari o la Resident Manager (Chiara) come posso fare? senza troppe manovre per entrare nell'app molto plug and play link dedicato per loro entrano e guardano tutte le impostazioni e le funzioni per farsi un idea del progetto magari crei un link dedicato con una bel welcome professionale per provarla» → v44 pubblicata; 3 strade proposte con immagine; scelta A.
-3. «Facciamo A».
+## Messaggi di Mario in #29
+1. «si» → D7 fatta (v45 sul ramo, non ancora pubblicata).
 
-## Fatto in #28
-- Avvio: il ramo locale era vecchio (sessione #12) e diverso da origin → rimedio E5 (`git branch -m … vecchio-locale-20261007`, `git checkout -b <ramo> --track origin/<ramo>`). Il ramo `vecchio-locale-20261007` esiste solo nel container, nessun lavoro unico (commit già in main).
-- **v44 online** (PR #53 squash `96f189d`, sito controllato: `APP_VER=44`, `CACHE` `jona-ordini-v48`, testo presente). Impostazioni → Scadenze per lo staff: «Esempio di avviso sul telefono dello staff: «Richieste allo chef entro le 18»». NEWS v44. Prove breve: `test-news` 94 PASS, `test-giro` «nessun problema». Main riunito nel ramo subito dopo.
-- `docs/DA-FARE.md`: tolta C6 (vecchia), C7 (v44 online, poi le altre cose), D7 (vetrina).
-- `docs/immagini/scelta-vetrina.png`: confronto delle 3 strade (A app dimostrativa, B profilo osservatore, C video).
+## Fatto in #29
+- Avvio: di nuovo il ramo locale era vecchio (#12) → rimedio E5: `git branch -m … vecchio-locale-sessione12`, `git checkout -b <ramo> --track origin/<ramo>`. Il ramo vecchio esiste solo nel container, niente lavoro unico.
+- **v45 «App dimostrativa»** (commit `e57f5d3` sul ramo `ccr-4a01d00e-6ay25e`, NON ancora in main):
+  - Link: `https://jona-ristorante-by-ynoy-corp.pages.dev/#demo`. La scelta resta per la scheda (sessionStorage `jona_demo`), anche se l'indirizzo perde `#demo`. Aprire `#demo` con l'app già aperta ricarica in demo (`hashchange`).
+  - `index.html`: `DEMO` e `lsK` definiti prima di `ls()`; `ls` e `LocalStore` usano chiavi «demo:» (dati, profilo, carrello, vista); `fbCfg`→null; in demo `window.fetch` verso altri siti rifiutato (tranne Open-Meteo; i font Google sono CSS, non fetch) → niente Worker, Gemini, push, inviti; `obxDb` rifiuta (niente coda invii, non tocca quella vera); `appBadge` spento.
+  - `view()`: `if(DEMO&&!meU())return screenDemo()` (benvenuto: logo, «Anteprima del progetto», «Benvenuto in Jona Ordini», 4 righe con icone, **Entra nella demo**, «Niente di quello che fai qui arriva al ristorante o ai fornitori.», firma BY).
+  - `demoGo`: `S.db.load({})` + `seedIfEmpty()` + `demoSeed()`, segna Novità già viste, `login('demo_gm')`. `demoSeed`: 6 persone (Ospite gm libero, Paolo Serra F&B libero, Luca Bianchi cuoco, Sara Conti cameriera, Giulia Marras pasticcera, Andrea Piras barman; nomi inventati), 2 richieste in attesa (una urgente) + 1 approvata con 2 ordini aperti, 24 ordini inviati in 8 settimane (l'ultimo da ricevere → Arrivi), orari della settimana pubblicati, 4 eventi agenda (uno oggi → striscia «Oggi in hotel»), `funz.agenda` accesa, 4 messaggi chat, 2 avvisi.
+  - `testBar()` in demo mostra `.demobar`: «Anteprima · Dati di esempio: niente arriva al ristorante.» + **Esci** + «Guarda l'app come» Chef / F&B Manager / Staff. `meU` usa `VIEW_AS` anche in demo. `demoOut` cancella le chiavi «demo:» e il flag, torna all'indirizzo senza hash.
+  - `APP_VER=45`, NEWS v45 (chef + dev), `sw.js` `CACHE` `jona-ordini-v49`. Nessun file nuovo dell'app (niente da aggiungere a `FILES` o al workflow).
+- Prova nuova `tools/test-demo.mjs` (30 PASS, usa il firebase-config vero; i dati «veri» si scrivono da `manifest.webmanifest` per non collegarsi a Firestore vero). Prove brevi tutte riuscite: test-demo 30, test-testbar 7, test-news 94, test-responsabile 15, test-agenda 60, test-giro «nessun problema».
+- Immagini: `docs/immagini/demo-benvenuto.png`, `docs/immagini/demo-dentro.png` (da mostrare a Mario).
+- Aggiornati: `CLAUDE.md` (riga v45), `tools/README.md`, `docs/DA-FARE.md` (D7 = manca la pubblicazione, nuova M20).
 
-## Risposta data a Mario: invitare Maurizio (scelta migliore = invito personale)
-Staff → **+ Aggiungi** → Nome Maurizio → Ruolo **Amministratore** → Tipo di contratto **Full time Responsabile** → Nome utente `maurizio.chef` → Password **La sceglie lui (invito WhatsApp)** → **Crea profilo** → «Invito pronto» → **Manda su WhatsApp**. Link monouso 7 giorni, entra senza approvazione (`registerSheet('admin')`, `createProfile`, `invMonoSend`). Mario non ha ancora detto se l'ha fatto (M1/M2/M19).
+## Decisioni e perché
+- Chiavi separate «demo:» invece di un altro sito: stesso indirizzo, zero manovre; un telefono vero che apre la demo non mescola dati.
+- Demo rifatta da zero a ogni «Entra nella demo»: ogni ospite trova dati puliti.
+- Profilo `gm` con cambio vista (non `dev`): così non vede gli strumenti dello sviluppatore.
+- «Chiedi a Jona» (Gemini) resta visibile ma non chiama la rete: accettato, da migliorare solo se Mario lo chiede (es. messaggio «non disponibile nella demo»).
 
-## Da fare in #29: D7 strada A «App dimostrativa» (scelta di Mario)
-Obiettivo: link dedicato (es. `https://jona-ristorante-by-ynoy-corp.pages.dev/#demo`), pagina di benvenuto professionale («Jona Ordini · Anteprima del progetto», logo, firma «Jona_Ristorante By YNOY&CORP», pulsante **Entra nella demo**), un tocco ed è dentro, vede tutto (viste Admin Chef / F&B / Staff, Impostazioni, funzioni come l'agenda accese), dati di esempio realistici, zero contatto con i dati veri.
-Idea tecnica (da confermare leggendo il codice, non ancora scritta niente):
-- All'avvio, se `location.hash` è `#demo` (o flag `jona_demo`): niente Firebase (forzare `LocalStore` come fanno le prove con `self.JONA_FIREBASE=null`), store su una chiave SEPARATA (es. `jona_demo_db`, non `jona_db_v2`) così un telefono vero non mescola i dati; niente push, Worker, Gemini, inviti, backup verso il server.
-- Dati: partire da `makeTestData` (riga ~3225, solo sviluppatore) o scrivere un seme dedicato più ricco (fornitori, listini, ordini in vari stati, orari pubblicati, agenda, chat finta).
-- Utente demo: profilo «Ospite» con barra di cambio vista tipo `VIEW_AS` (Admin Chef / F&B / Staff) visibile anche se non `dev`; banner fisso «Modalità dimostrativa — i dati sono di esempio» con «Esci dalla demo».
-- Attenzione: `sw.js` e `CACHE`, `APP_VER` 45, NEWS v45; aggiungere eventuali file nuovi a `FILES` e al passo «Prepara i file» del workflow Cloudflare.
-- Prova nuova `tools/test-demo.mjs` (entra da `#demo`, nessuna chiamata a Firestore/Worker, `jona_db_v2` intatto, cambio viste, uscita) + `test-giro`.
-- Niente nome del creatore nei testi visibili.
-- Prima delle prove proporre a Mario le 3 opzioni (completo/breve/subito); è una funzione isolata → consigliare breve.
+## Da fare in #30 (subito)
+1. Mostrare a Mario le 2 immagini e proporre le 3 opzioni di prove per pubblicare: (1) completo, (2) breve (GIÀ FATTA, tutte riuscite → consigliata), (3) subito. Una domanda per volta.
+2. Pubblicare: PR dal ramo → squash merge (lo fa Claude) → controllo online (`APP_VER=45`, `CACHE` v49, `#demo` mostra il benvenuto) → subito `git fetch origin main && git merge origin/main` sul ramo + push.
+3. Dare a Mario i passi M20 (aprire il link dal telefono, provarlo, mandarlo a Chiara/consulenti/proprietari) con il link pronto da copiare.
 
-## Prossimi passi (dopo D7)
-1. Chiedere a Mario a che passo è con l'invito di Maurizio.
-2. Riga «“Oggi si ordina” arriva a» più chiara: proporla con immagine prima/dopo.
+## Prossimi passi (dopo)
+1. Chiedere a Mario a che passo è con l'invito di Maurizio (passi in `docs/DA-FARE.md`, M1/M2/M19).
+2. Riga «“Oggi si ordina” arriva a» più chiara: immagine prima/dopo.
 3. Giro completo prove v42-v45: chiedere «Lo faccio partire ora o dopo?».
 4. Poi notifica del mattino «Oggi in hotel», promemoria evento dal Worker, V, W, X; poi A, C, G, H, I, J, K, O, R, U (`docs/PIANO-INVERNO.md`).
 
