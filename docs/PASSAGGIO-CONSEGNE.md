@@ -3,8 +3,10 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
-«mettila piú in vista non nascosta»
-(= la richiesta di un telefono/profilo nuovo da approvare deve essere ben visibile, non nascosta in Staff → Persone.)
+«ho problemi pensaci tu in automatico»
+(= non riesce ad aprire a mano la sessione nuova. Claude non può aprirla: limite «lineage depth 8», E12, bloccati anche promemoria e routine. Decisione: si continua nella sessione #30 con la D8.)
+
+Messaggio prima: «mettila piú in vista non nascosta» (= D8).
 
 ## Messaggi di Mario in #30
 1. «ok riscontri problemi in Generale?» → progetto in ordine; GitHub in guasto (githubstatus: Actions, Pull Requests, Webhooks rossi).
@@ -13,7 +15,8 @@ Sessione attuale: #31
 4. «2» (prove brevi, già fatte in #29) → pubblicata la v45.
 5. «metti la regola sempre in ogni progetto, quando mi mandi un link deve essere sempre cliccabile e copiabile» → regola in `CLAUDE.md` + testo da incollare nelle preferenze dell'account (https://claude.ai/settings/general). Non ha ancora detto se l'ha incollato.
 6. «Maurizio ha inviato la richiesta ma non la vedo» → spiegato dove compare + 6 passi di controllo. Non ha risposto sì/no.
-7. «mettila piú in vista non nascosta» → DA FARE in #31 (D8).
+7. «mettila piú in vista non nascosta» → D8.
+8. «ho problemi pensaci tu in automatico» → nuova sessione impossibile (E12): si continua in #30.
 
 ## Fatto in #30
 - Avvio: ramo locale vecchio (#12), `merge --ff-only` fallito → rimedio E5 (`git branch -m … scorta-locale-vecchia-12`, `git checkout -b <ramo> origin/<ramo>`).
