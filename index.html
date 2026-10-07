@@ -244,6 +244,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .obx>.ic{width:24px;height:24px;flex:none}.obx-i{flex:1 1 200px;min-width:0}.obx-i b{display:block;font-size:16px}.obx-i span{display:block;font-size:13.5px;color:var(--ink2);margin-top:2px}
 .obx-b{display:flex;gap:8px;flex-wrap:wrap}.obx-b .btn{min-height:42px}
 .wall .obx{max-width:420px;width:calc(100% - 32px);box-sizing:border-box;margin:0 auto 12px}
+.sync-pill.sync-wait{border:0;cursor:pointer;background:var(--corallo-soft);color:var(--corallo)}
 .sync-pill{display:inline-flex;align-items:center;gap:5px;font:500 12.5px var(--font);background:var(--ocra-soft);color:var(--ocra);padding:4px 10px;border-radius:999px;white-space:nowrap}.sync-pill .ic{width:15px;height:15px}
 .qr{display:flex;justify-content:center;margin:14px 0 0}.qr img{width:min(240px,70vw);height:auto;background:#fff;padding:10px;border-radius:12px}
 .inv-code{text-align:center;margin:14px 0 0}.inv-code b{display:block;font-size:34px;font-weight:500;letter-spacing:.18em;color:var(--ink)}
@@ -1062,8 +1063,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=47;
+const APP_VER=48;
 const NEWS=[
+  {v:48,data:'2026-10-07',titolo:'Modifiche non arrivate: ora si vede',
+    tutti:['Se il telefono ha internet ma la rete blocca gli invii (succede con alcuni Wi-Fi), in alto compare «modifiche non arrivate · Riprova». Prima l\'app sembrava a posto anche quando non lo era. Le modifiche non si perdono: partono appena la rete lo permette.'],
+    dev:{risolti:['`syncPill`: con la rete accesa e scritture non confermate da più di `PEND_MS` (8 s, `st.pendT` in `track`) mostra «N modifiche non arrivate · Riprova» (`syncRetry`: `netRetry` = disable/enableNetwork, `jona_fb_lp` + «App da aggiornare»); con errore «Non collegato» invece di «Senza rete».','`phReject`: rifiuto con tempo massimo e conferma.'],aggiunte:['Prova `tools/test-falsi-ok.mjs` (S1), anche nelle prove veloci su GitHub.']}},
   {v:47,data:'2026-10-07',titolo:'Schermata di apertura in ordine',
     tutti:['La schermata con il logo che compare all\'apertura e dopo «Aggiorna ora» ora sta tutta nello schermo: logo al centro e firma in basso, senza tagli.'],
     dev:{risolti:['`.wall` alta `100dvh` meno le zone sicure (`:root` ha già il padding `safe-area-inset`): prima sbordava e la firma usciva dallo schermo; `.splash .logo-full{margin-top:auto}` centra il logo.']}},
@@ -1357,7 +1361,7 @@ function FirebaseStore(key){
   addEventListener('online',()=>{st.net=true;ping()});addEventListener('offline',()=>{st.net=false;ping()});
   const mapErr=e=>({code:!e?'fb':e.code==='not-found'?'not_found':e.code==='permission-denied'?'fb_perm':e.code==='unavailable'?'fb_net':e.code?'fb':'fb',msg:e&&e.message});
   let okReady;const readyP=new Promise(r=>okReady=r);
-  const track=p=>{if(st.ready)netWatch(p);st.pend++;ping();p.then(()=>{st.pend--;ping()},e=>{st.pend--;const m=mapErr(e);if(m.code==='fb_perm'){st.err='fb_perm';st.ready=false}ping();toast(errMsg(m),'err')})};
+  const track=p=>{if(st.ready)netWatch(p);if(!st.pend){st.pendT=Date.now();setTimeout(ping,PEND_MS+100)}st.pend++;ping();p.then(()=>{if(!--st.pend)st.pendT=0;ping()},e=>{if(!--st.pend)st.pendT=0;const m=mapErr(e);if(m.code==='fb_perm'){st.err='fb_perm';st.ready=false}ping();toast(errMsg(m),'err')})};
   const run=f=>{track(readyP.then(f));return Promise.resolve()};
   const cache={};
   // ---- telefono nuovo: resta in attesa («ok» falso) finché un telefono approvato non lo approva ----
@@ -1449,7 +1453,8 @@ function FirebaseStore(key){
     prune:async keep=>{await readyP;const s=await fs.collection('backup').where('g','<',keep).get({source:'server'});for(const x of s.docs)await x.ref.delete()}
   };
   return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
-    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null,reqOk:!!st.reqOk}),
+    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),pendT:st.pendT||0,net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null,reqOk:!!st.reqOk}),
+    netRetry:()=>fs.disableNetwork().then(()=>fs.enableNetwork()),
     phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember()),
       // entrata libera (v40): con pubblico/porta aperta il telefono si approva da solo e, se nuovo, crea il suo profilo
       auto:async r=>{const p=await fs.doc('pubblico/porta').get({source:'server'});if(!p.exists||!((p.data().fino||0)>Date.now()))return false;
@@ -1767,7 +1772,7 @@ async function phApprove(id){
 }
 async function phReject(id){
   const x=PH.list.find(m=>m.id===id);if(!x)return;if(!await ask('Rifiutare questo telefono?',(x.req?x.req.nome+' non':'Il telefono non')+' potrà vedere i dati del ristorante.','Rifiuta',true))return;
-  fbInit().fs.doc('membri/'+id).delete().catch(()=>toast('Non riesco a rifiutare: controlla la connessione e riprova.','err'));
+  try{await fbTmo(fbInit().fs.doc('membri/'+id).delete(),15000);toast('Telefono rifiutato')}catch(e){toast('Rifiuto non ancora arrivato: controlla la connessione e riprova.','err')}
 }
 function screenJoin(){
   return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>Collega questo telefono</h1>
@@ -1775,7 +1780,13 @@ function screenJoin(){
   <label class="lbl" for="join-k">Oppure scrivi il codice d'invito (6 lettere)</label><input class="inp" id="join-k" placeholder="es. K7M4QX" autocapitalize="characters" autocomplete="off" spellcheck="false" value="${esc(S.joinK||'')}" data-in="joinK">
   <div style="margin-top:18px"><button type="button" class="btn primary block big" data-a="fbJoin">Collega</button></div></div></div>`;
 }
-function syncPill(){if(!S.db||S.db.kind!=='firebase')return'';const s=S.db.status();if(s.net&&!s.err)return'';return`<span class="sync-pill">${ic('cloud')} Senza rete${s.pend?', '+s.pend+' da inviare':''}</span>`}
+/* modifiche scritte sul telefono ma non ancora confermate dal server: senza rete lo dice; con la rete accesa ma bloccata (Wi-Fi con filtri)
+   dopo PEND_MS mostra «non arrivate · Riprova» invece di far credere che sia tutto salvato */
+const PEND_MS=8000;
+function syncPill(){if(!S.db||S.db.kind!=='firebase')return'';const s=S.db.status();
+  if(!s.net)return`<span class="sync-pill">${ic('cloud')} Senza rete${s.pend?', '+s.pend+' da inviare':''}</span>`;
+  if(s.pend&&s.pendT&&Date.now()-s.pendT>=PEND_MS)return`<button type="button" class="sync-pill sync-wait" data-a="syncRetry">${ic('cloud')} ${s.pend===1?'1 modifica non arrivata':s.pend+' modifiche non arrivate'} · Riprova</button>`;
+  if(s.err)return`<span class="sync-pill">${ic('cloud')} Non collegato</span>`;return''}
 function fbRow(){
   const c=fbCfg();
   if(S.db.kind==='firebase'){const s=S.db.status();return`<div class="setrow"><div><b>Database centrale</b><span>${s.ready?(s.net?'Collegato: tutti i telefoni vedono gli stessi dati':'Senza rete: le modifiche partono quando torna'):'Collegamento…'}${s.pend?', '+s.pend+' modifiche da inviare':''}</span></div><div class="btns"><button type="button" class="btn primary sm" data-a="fbInvite">${ic('qr')} Invita</button><button type="button" class="btn ghost sm danger" data-a="fbLeave">Scollega</button></div></div>`}
@@ -4684,6 +4695,7 @@ const A={
   phAgain:()=>{ls('jona_wait',null);S.db.phone.again().catch(()=>toast('Non riesco: controlla la connessione e riprova.','err'))},
   phOk:d=>phApprove(d.v),itGo:()=>itGo(),itRetry:()=>{IT.t='';schedule()},itSkip:()=>{ls('jona_itk',null);IT.t='';schedule()},
   invMono:d=>invMonoSend(d.u),invMonoGo:d=>invMonoShare(d.v),ptSet:d=>ptSet(+d.v),phNo:d=>phReject(d.v),phRetry:()=>{ls('jona_fb_lp',1);location.reload()},
+syncRetry:()=>{if(!S.db||!S.db.netRetry)return;S.db.netRetry().catch(()=>{});if(!ls('jona_fb_lp')){ls('jona_fb_lp',1);updOn()}toast('Riprovo a inviare. Se resta così, chiudi e riapri l\'app: le modifiche non si perdono.','warn')},
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
