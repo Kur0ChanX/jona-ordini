@@ -31,12 +31,16 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 - TRIGGER: Lo script `.claude/hooks/handoff-check.py` segnala quando è ora di fare l'handoff (soglia 70% di 200k = 140k token, oppure 20 messaggi, oppure dopo una compressione automatica della conversazione). L'avviso si ripete a ogni messaggio finché l'handoff non è fatto: eseguilo SUBITO, prima di qualsiasi lavoro nuovo. Non usare altri trigger.
 
 - AZIONE AUTOMATICA:
-  1. Genera o aggiorna l'Handoff Tecnico conciso (max 1000 parole) in `docs/PASSAGGIO-CONSEGNE.md` contenente:
+  1. Genera o aggiorna l'Handoff Tecnico in `docs/PASSAGGIO-CONSEGNE.md` (tetto massimo 2500 parole, non un obiettivo: di solito ne bastano 800–1500). Non riassumere troppo: meglio una riga in più che un dettaglio perso. Contenuto:
      - Componenti/file toccati (percorsi esatti)
-     - Decisioni prese e relative motivazioni
+     - Decisioni prese e relative motivazioni (anche le alternative scartate e perché)
+     - Fatti nuovi emersi (dati, nomi, numeri, preferenze dell'utente), salvati anche nei documenti del progetto
+     - File ricevuti dall'utente e dove sono salvati
      - Stato attuale del lavoro
+     - Richieste dell'utente ancora da fare e domande rimaste senza risposta
      - Prossimi passi per lo scaglione successivo
      - Eventuali blocchi o rischi aperti
+     - L'ultimo messaggio dell'utente parola per parola
   2. Verifica che TUTTE queste condizioni siano VERE:
      - `docs/PASSAGGIO-CONSEGNE.md` è stato salvato correttamente.
      - Nessun comando Git/Bash ha fallito (exit code != 0).
