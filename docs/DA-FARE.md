@@ -10,7 +10,6 @@ Aggiornato: 2026-10-06 (sessione #15, M11 fatto; logo YNOY nella PR #46). Copia 
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| 🔴 M13 | Unire la PR della v37 (trasloco + logo YNOY con apertura animata; prove brevi, scelta di Mario) | Mario | subito (M12 fatto, prove brevi riuscite) |
 | 🔴 M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
@@ -30,14 +29,14 @@ Aggiornato: 2026-10-06 (sessione #15, M11 fatto; logo YNOY nella PR #46). Copia 
 
 ## 1. Claude da solo
 - **Dopo M14**: far cancellare a Mario i Worker `invito` e `jona-notifiche` dal VECCHIO account (lì resta `fruguponte`, da non toccare).
-- **Dopo M13**: controllare i nuovi indirizzi (app, notifiche, invito), rilanciare il workflow del Worker se la prova fallisce.
+- **Fatto M13 (07/10)**: v37 online, indirizzi nuovi controllati (app, notifiche, invito). La prova del workflow del Worker era fallita solo per il sottodominio appena creato: ora riprova fino a 3 minuti (sul ramo, va con la prossima PR).
 
 ## 2. Claude, dopo la tua scelta o approvazione
 - **D6 · Video dell'invio**: approvati così (#11), da migliorare più avanti. Copia sicura nel ramo `scorta-video-invio-v1` (video, script `tools/anim-invio.py`, filmato originale): si riparte da lì, non da zero.
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **M13 → M14 · Trasloco v37** (M11 e M12 fatti): unire la PR, poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
+- **M14 · Trasloco v37** (M11, M12, M13 fatti): poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
 - **M10 · Prova la v36**: apri l'app, se esce «App da aggiornare» tocca il banner. Da staff: «I miei orari» mostra solo inizio e fine. Manda un ordine e guarda l'animazione.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
