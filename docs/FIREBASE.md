@@ -31,6 +31,7 @@ La configurazione non è segreta. I dati li protegge la chiave del ristorante (v
 ## Come funziona
 - Ogni telefono entra con un accesso anonimo e si iscrive con la **chiave del ristorante**, che sta nel link e nel QR. Senza chiave non si leggono i dati (regole in `firebase/firestore.rules`).
 - Dalla versione 24 la chiave non basta: il telefono nuovo nasce con `membri/<uid>.ok = false` e legge solo il proprio documento finché un telefono già approvato non mette `ok` a vero. I telefoni collegati prima (senza `ok`) restano approvati. Dopo l'aggiornamento della versione 24 le regole vanno **incollate di nuovo**: finché non lo fai, i telefoni nuovi restano in attesa e «Approva» dice di aggiornare le regole.
+- Dalla versione 40 c'è l'**entrata libera** (Impostazioni): per 48 ore un telefono nuovo con la chiave si approva da solo (`pubblico/porta` con `fino`, al massimo 49 ore avanti) e, se nuovo, crea il suo profilo. Servono le regole **incollate di nuovo**: finché non lo fai, «Apri per 48 ore» dice di aggiornare le regole e tutto il resto funziona come prima.
 - I dati restano anche sul telefono: senza rete l'app funziona e manda le modifiche quando la connessione torna.
 - I prodotti stanno in un documento per fornitore (`listini/<fornitore>`), così ogni apertura dell'app legge pochi documenti. Il piano gratuito (50.000 letture e 20.000 scritture al giorno) basta per il ristorante.
 - Backup: Impostazioni → Backup dei dati → Esporta / Ripristina (il ripristino vale per tutti i telefoni).

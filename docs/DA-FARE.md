@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-07 (sessione #17: C1 fatto, Mario rientrato; v38 online, v39 nella PR #48). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-07 (sessione #18: v39 online, unita da Claude; v40 «Entrata libera» pronta). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -10,7 +10,7 @@ Aggiornato: 2026-10-07 (sessione #17: C1 fatto, Mario rientrato; v38 online, v39
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| 🔴 M16 | Unire la PR #48 (v39, logo più grande) | Mario | subito |
+| 🔴 M18 | Incollare le regole nuove in Firebase (per l'entrata libera, v40) | Mario | quando la v40 è online |
 | 🔴 M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | adesso si può |
 | M17 | Telefono in attesa `ISLyK5…` (nome «Mari…», cognome «S…»): chi è? approvarlo o rifiutarlo (Staff → Telefoni da approvare) | Mario | quando vuoi |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
@@ -38,6 +38,7 @@ Aggiornato: 2026-10-07 (sessione #17: C1 fatto, Mario rientrato; v38 online, v39
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
+- **M18 · Regole v40**: Firebase → Firestore Database → **Regole** → cancella tutto, incolla `firebase/firestore.rules` → **Pubblica**. Poi Impostazioni → **Entrata libera** → **Apri per 48 ore**.
 - **M14 · Trasloco v37** (M11, M12, M13 fatti; Mario rientrato il 07/10 incollando la chiave del ristorante presa da Firebase, `chiave/ristorante` campo `v`, e approvandosi da Firebase): ora mandare gli inviti allo staff dall'app. Il QR da cucina (M5) va fatto DOPO il trasloco.
 - **M10 · Prova la v36**: apri l'app, se esce «App da aggiornare» tocca il banner. Da staff: «I miei orari» mostra solo inizio e fine. Manda un ordine e guarda l'animazione.
 

@@ -1029,8 +1029,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=39;
+const APP_VER=40;
 const NEWS=[
+  {v:40,data:'2026-10-07',titolo:'Entrata libera per 48 ore',
+    tutti:['Impostazioni → «Entrata libera»: per 48 ore chi inquadra il QR della cucina o apre un invito entra subito, senza approvazione. Poi si richiude da sola.'],
+    dev:{aggiunte:['`pubblico/porta` {fino} (al massimo 49 ore avanti, regole); `phone.auto` dopo la richiesta: `ok:true` da sé e profilo con `phStaff`; `ptRow`/`ptSet` in Impostazioni. Servono le regole nuove.']}},
   {v:39,data:'2026-10-07',titolo:'Logo di apertura più grande',
     tutti:['All\'apertura il logo «by YNOY&CORP» è più grande e più in alto, con «by» più vicino.'],
     dev:{correzioni:['`.wall-by i` 172 px, `gap` 2 px, niente spazio sopra; schermata d\'apertura con classe `splash` e `.splash .wall-by` 24 px dal fondo.']}},
@@ -1305,7 +1308,7 @@ function FirebaseStore(key){
   // ---- telefono nuovo: resta in attesa («ok» falso) finché un telefono approvato non lo approva ----
   const newMember=()=>({k:key,ok:false,creato:now(),ua:navigator.userAgent.slice(0,120)});
   const approval=u=>new Promise((res,rej)=>{let un=null;const to=setTimeout(()=>{if(un)un();rej({code:'fb_slow'})},20000);
-    un=fs.doc('membri/'+u).onSnapshot(d=>{if(!d.exists&&d.metadata.fromCache)return;clearTimeout(to);
+    un=fs.doc('membri/'+u).onSnapshot({includeMetadataChanges:true},d=>{if(!d.exists&&d.metadata.fromCache)return;clearTimeout(to);
       if(!d.exists){st.wait='no';st.req=null;ping();return}
       const x=d.data();if(x.ok===false){st.wait='attesa';st.req=x.req||null;ping();return}
       if(d.metadata.hasPendingWrites||d.metadata.fromCache)return;
@@ -1392,7 +1395,15 @@ function FirebaseStore(key){
   };
   return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
     status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null}),
-    phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember())},
+    phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember()),
+      // entrata libera (v40): con pubblico/porta aperta il telefono si approva da solo e, se nuovo, crea il suo profilo
+      auto:async r=>{const p=await fs.doc('pubblico/porta').get({source:'server'});if(!p.exists||!((p.data().fino||0)>Date.now()))return false;
+        const m=fs.doc('membri/'+st.uid);await m.update({ok:true,approvato:now(),da:'porta'});
+        if(r.nuovo){const q=await fs.collection('staff').get({source:'server'});const all={};q.docs.forEach(d=>{all[d.id]=Object.assign({},d.data(),{id:d.id})});
+          if(!all[r.sid])await fs.doc('staff/'+r.sid).set(phStaff(r,all,'porta'))}
+        await m.update({req:firebase.firestore.FieldValue.delete()}).catch(()=>{});return true},
+      porta:async fino=>{await readyP;await fs.doc('pubblico/porta').set({fino,da:realU()?realU().id:'',quando:now()})},
+      portaGet:async()=>{await readyP;const d=await fs.doc('pubblico/porta').get({source:'server'});return d.exists?d.data().fino||0:0}},
     dump:()=>clone(cache),
     load:async d=>{if(!navigator.onLine)throw{code:'fb_net'};await readyP;await loadAll(d)},
     range:async(c,f,a,b)=>{await readyP;const s=await fs.collection(c).where(f,'>=',a).where(f,'<',b).get();return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
@@ -1626,7 +1637,7 @@ async function phSend(nuovo){
     r={nuovo:true,sid,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||'',pass:await sha(sid+':'+f.pw),creato:now()};
     ls('jona_wait',{id:sid,t:Date.now()})}
   else{if(!String(f.nome||'').trim())return toast('Scrivi il nome.','warn');r={nuovo:false,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),creato:now()};ls('jona_wait',null)}
-  ls('jona_reg',null);S.db.phone.req(r).then(async()=>{await fetch(PUSH_URL+'/richiesta',{method:'POST',headers:{authorization:'Bearer '+await algTok()}}).catch(()=>{})},e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
+  ls('jona_reg',null);S.db.phone.req(r).then(async()=>{if(await S.db.phone.auto(r).catch(()=>false))return toast('Entrata libera: sei dentro!');await fetch(PUSH_URL+'/richiesta',{method:'POST',headers:{authorization:'Bearer '+await algTok()}}).catch(()=>{})},e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
 }
 /* telefoni in attesa: li vedono e li approvano i gestori (Maurizio e Mario) */
 const PH={on:false,list:[],retry:0,seen:null};
@@ -1638,10 +1649,12 @@ function phWatch(){
 }
 const phPend=()=>PH.list.filter(x=>x.req);
 const phDev=ua=>/iPhone|iPad/.test(ua||'')?'iPhone':/Android/.test(ua||'')?'Android':'telefono';
+function phStaff(r,st,da){let un=r.username||normUser(r.nome);const used=new Set(Object.values(st).filter(u=>u.id!==r.sid).map(u=>u.username));const b=un;let n=2;while(used.has(un))un=b+n++;
+  return{nome:r.nome,cognome:r.cognome||'',username:un,ruolo:'staff',reparto:r.reparto||'altro',mansione:r.mansione||'',foto:r.foto||'',stato:'attivo',pass:r.pass,creato:now(),creatoDa:da}}
 async function phApprove(id){
   const x=PH.list.find(m=>m.id===id);if(!x||!x.req)return;const r=x.req,me=realU();let msg='Telefono approvato';
-  if(r.nuovo){const st=D().staff;let un=r.username||normUser(r.nome);const used=new Set(Object.values(st).filter(u=>u.id!==r.sid).map(u=>u.username));const b=un;let n=2;while(used.has(un))un=b+n++;
-    if(!st[r.sid])await put('staff',r.sid,{nome:r.nome,cognome:r.cognome||'',username:un,ruolo:'staff',reparto:r.reparto||'altro',mansione:r.mansione||'',foto:r.foto||'',stato:'attivo',pass:r.pass,creato:now(),creatoDa:me?me.id:''});
+  if(r.nuovo){const st=D().staff,nu=phStaff(r,st,me?me.id:''),un=nu.username;
+    if(!st[r.sid])await put('staff',r.sid,nu);
     msg=r.nome+' può entrare'+(un!==r.username?' con il nome utente '+un:'')}
   try{await fbTmo(fbInit().fs.doc('membri/'+id).update({ok:true,req:firebase.firestore.FieldValue.delete(),approvato:now(),da:me?me.id:''}),15000);toast(msg)}
   catch(e){toast(e&&e.code==='permission-denied'?'Il database non lo permette ancora: aggiorna le regole (docs/FIREBASE.md).':'Approvazione non riuscita: controlla la connessione e riprova.','err')}
@@ -3955,7 +3968,7 @@ function settingsSheet(){
   <div class="btns" style="margin:4px 0 8px"><button type="button" class="btn primary sm" data-a="cfgSave">${ic('check')} Salva</button></div>
   <div class="setrow"><div><b>Timbratura con QR</b><span>${tbOn()?'Accesa: lo staff timbra dalla voce Orari':'Spenta'}</span></div><div class="seg">${[[1,'Accesa'],[0,'Spenta']].map(([k,l])=>`<button type="button" aria-pressed="${tbOn()===!!k}" data-a="tbSet" data-v="${k}">${l}</button>`).join('')}</div></div>
   ${tbOn()?`<div class="btns" style="margin:4px 0 8px"><button type="button" class="btn ghost sm" data-a="tbQr">${ic('qr')} QR da stampare</button></div>`:''}
-  ${S.db.kind==='firebase'?qfRow():''}
+  ${S.db.kind==='firebase'?qfRow()+ptRow():''}
   ${promRows()}
   <div class="setrow"><div><b>Tema</b><span>Su questo dispositivo</span></div><div class="seg">${[['auto','Auto'],['light','Chiaro'],['dark','Scuro']].map(([k,l])=>`<button type="button" aria-pressed="${th===k}" data-a="theme" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="setrow"><div><b>Backup dei dati</b><span>Salva o ripristina tutto in un file</span></div><div class="btns"><button type="button" class="btn ghost sm" data-a="bkExport">${ic('download')} Esporta</button><button type="button" class="btn ghost sm" data-a="bkImport">${ic('upload')} Ripristina</button></div></div>
@@ -3975,6 +3988,18 @@ async function qfNew(cambia){const q=cfg().qrFisso;
     if(!r.ok||!/^[A-HJ-NP-Z2-9]{6}$/.test(j.codice||''))throw new Error('inviti '+r.status);
     await put('config','app',Object.assign({},cfg(),{qrFisso:{c:j.codice,creato:now()}}));toast(cambia?'QR cambiato: stampa quello nuovo':'QR da cucina pronto');await qfCard(j.codice)}
   catch(e){toast('Non riesco a creare il QR: controlla la connessione e riprova.','err')}}
+/* entrata libera (v40): pubblico/porta {fino} aperta 48 ore da un gestore; nel frattempo i telefoni nuovi entrano senza approvazione */
+const PT={fino:0,t:0,busy:false};
+async function ptLoad(){PT.busy=true;try{PT.fino=await S.db.phone.portaGet();PT.t=now()}catch(e){PT.t=now()}PT.busy=false;schedule()}
+function ptRow(){if(!PT.busy&&now()-PT.t>60000)ptLoad();const on=PT.fino>now();
+  return`<div class="setrow"><div><b>Entrata libera</b><span>${on?'Aperta fino a '+esc(new Date(PT.fino).toLocaleString('it-IT',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))+': chi inquadra il QR o apre un invito entra subito, senza approvazione':'Chiusa: ogni telefono nuovo va approvato in Staff. Aprila quando arriva tanto personale nuovo'}</span></div>
+  <div class="btns">${on?`<button type="button" class="btn ghost sm" data-a="ptSet" data-v="0">Chiudi ora</button>`:`<button type="button" class="btn primary sm" data-a="ptSet" data-v="48">Apri per 48 ore</button>`}</div></div>`}
+async function ptSet(h){
+  if(h&&!await ask('Aprire l\'entrata libera per 48 ore?','Chi ha il QR della cucina o un invito entra subito, senza la vostra approvazione. Dopo 48 ore si richiude da sola.','Apri'))return;
+  if(!navigator.onLine)return toast('Serve la connessione.','warn');
+  const fino=h?now()+h*3600000:0;
+  try{await fbTmo(S.db.phone.porta(fino),15000);PT.fino=fino;PT.t=now();toast(h?'Entrata libera aperta per 48 ore':'Entrata libera chiusa');schedule()}
+  catch(e){toast(e&&e.code==='permission-denied'?'Il database non lo permette ancora: aggiorna le regole (docs/FIREBASE.md).':'Non riuscito: controlla la connessione e riprova.','err')}}
 async function qfCard(k){const q=cfg().qrFisso,c=k||q&&q.c;if(!c)return;try{await inviteCard({l:INV_URL+'/'+c,c})}catch(e){toast('Immagine del QR non riuscita: riprova.','err')}}
 function promRows(){const sel=cfg().promA||[],mg=Object.values(D().staff).filter(u=>u.stato==='attivo'&&isMgr(u)).sort((a,b)=>fullName(a).localeCompare(fullName(b)));
   return`<div class="setrow"><div><b>«Oggi si ordina» arriva a</b><span>${sel.length?'Solo ai nomi scelti':'Tutti gli Admin Chef. Tocca un nome per mandarlo solo a lui'}</span><div class="chips" role="group" aria-label="Chi riceve Oggi si ordina" style="margin-top:8px">${mg.map(u=>`<button type="button" class="chip" aria-pressed="${sel.includes(u.id)}" data-a="promA" data-v="${u.id}">${esc(fullName(u))}</button>`).join('')}</div></div></div>
@@ -4304,7 +4329,7 @@ const A={
   waitLeave:()=>{ls('jona_wait',null);render()},
   phNew:()=>phoneSheet(true),phOld:()=>phoneSheet(false),phSend:d=>phSend(d.v==='1'),
   phAgain:()=>{ls('jona_wait',null);S.db.phone.again().catch(()=>toast('Non riesco: controlla la connessione e riprova.','err'))},
-  phOk:d=>phApprove(d.v),phNo:d=>phReject(d.v),
+  phOk:d=>phApprove(d.v),ptSet:d=>ptSet(+d.v),phNo:d=>phReject(d.v),
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),

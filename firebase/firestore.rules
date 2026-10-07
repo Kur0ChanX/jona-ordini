@@ -9,6 +9,11 @@ service cloud.firestore {
         && exists(/databases/$(db)/documents/membri/$(request.auth.uid))
         && get(/databases/$(db)/documents/membri/$(request.auth.uid)).data.get('ok', true) != false;
     }
+    // entrata libera (v40): un gestore la apre per 48 ore in pubblico/porta {fino}
+    function portaAperta() {
+      return exists(/databases/$(db)/documents/pubblico/porta)
+        && get(/databases/$(db)/documents/pubblico/porta).data.get('fino', 0) > request.time.toMillis();
+    }
     // la chiave del ristorante: si crea una volta sola e nessuno la può leggere
     match /chiave/ristorante {
       allow create: if request.auth != null && request.resource.data.v is string && request.resource.data.v.size() >= 16
@@ -21,6 +26,13 @@ service cloud.firestore {
       allow create: if request.auth != null && exists(/databases/$(db)/documents/chiave/ristorante);
       allow update, delete: if false;
     }
+    // entrata libera: la legge chi è collegato, la cambia solo un telefono approvato e mai oltre 49 ore
+    match /pubblico/porta {
+      allow read: if request.auth != null;
+      allow create, update: if membro() && request.resource.data.fino is int
+        && request.resource.data.fino <= request.time.toMillis() + 49 * 3600 * 1000;
+      allow delete: if membro();
+    }
     // ogni telefono (accesso anonimo) si registra con la chiave e resta in attesa finché un telefono approvato non lo approva;
     // solo chi ha attivato il database entra subito. In attesa può solo scrivere la sua richiesta («req»).
     match /membri/{uid} {
@@ -30,7 +42,9 @@ service cloud.firestore {
             || get(/databases/$(db)/documents/chiave/ristorante).data.get('uid', '') == request.auth.uid);
       allow read: if request.auth != null && (request.auth.uid == uid || membro());
       allow update: if request.auth != null && ((request.auth.uid == uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['req'])) || membro());
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['req'])) || membro()
+        || (request.auth.uid == uid && portaAperta() && request.resource.data.ok == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ok', 'approvato', 'da'])));
       allow delete: if membro();
     }
     // dati dell'app
