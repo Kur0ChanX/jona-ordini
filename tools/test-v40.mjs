@@ -1,4 +1,4 @@
-// v40 (con l'emulatore): «Entrata libera» per 48 ore. Chiusa: il telefono nuovo resta in attesa. Aperta da Impostazioni:
+// v40 (con l'emulatore): invito WhatsApp monouso con profilo pronto (punto 4) e «Entrata libera» per 48 ore. Chiusa: il telefono nuovo resta in attesa. Aperta da Impostazioni:
 // il telefono nuovo entra da solo e crea il suo profilo. Regole: in attesa non apre la porta né si approva a porta chiusa,
 // nessuno la apre oltre 49 ore. Chiusa di nuovo: si torna ad approvare.
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
@@ -57,5 +57,45 @@ await nuovo(E,'Ugo','Pisu');
 ok(/Richiesta inviata/.test(await txt(E))&&await E.evaluate(()=>!S.db.status().ready),'E: porta chiusa di nuovo, resta in attesa');
 const self=await E.evaluate(async()=>{try{await fbInit().fs.doc('membri/'+fbInit().auth.currentUser.uid).update({ok:true,da:'porta'});return'scritto'}catch(e){return e.code}});
 ok(self==='permission-denied','regole: a porta chiusa non si approva da solo');
-for(const [n,p] of [['A',A],['B',B],['C',C],['E',E]])ok(p.errs.length===0,n+': nessun errore '+p.errs.join(' | '));
+// 4. invito WhatsApp monouso con profilo pronto (porta chiusa)
+await A.evaluate(()=>{closeSheet();S.tab='staff';render()});await A.waitForTimeout(500);
+await A.click('[data-a="addProfile"]');await A.waitForTimeout(300);
+ok(/La sceglie lui/.test(await txt(A,'.sheet'))&&await A.locator('.sheet input[data-k="pw"]').count()===0,'A: «Aggiungi» parte con la password scelta da lui (niente campo password)');
+for(const [k,v] of [['nome','Rita'],['cognome','Piras']])await A.locator(`.sheet input[data-k="${k}"]`).pressSequentially(v);
+await A.click('.sheet [data-a="addGo"]');await A.waitForTimeout(3000);
+ok(/Invito pronto/.test(await txt(A,'.sheet')),'A: scheda «Invito pronto»');
+const wa=await A.locator('.sheet a[href^="https://wa.me/"]').getAttribute('href');
+const msg=decodeURIComponent(wa.split('text=')[1]);
+const tk=(msg.match(/[#&]t=([A-Za-z0-9]{20,64})/)||[])[1];
+ok(!!tk&&/rita\.piras/.test(msg),'A: messaggio WhatsApp con nome utente e gettone');
+ok(await A.evaluate(()=>{const u=Object.values(D().staff).find(x=>x.username==='rita.piras');return u&&u.stato==='invitato'&&!u.pass}),'A: profilo di Rita «invitato», senza password');
+// senza gettone non si attiva il profilo né ci si approva
+const F=await mk(null);await F.goto(link);await F.waitForTimeout(5000);
+const fz=await F.evaluate(async t=>{const fs=fbInit().fs,uid=fbInit().auth.currentUser.uid;const r={};
+  try{await fs.doc('membri/'+uid).update({ok:true,da:'invito',tk:'X'.repeat(32)});r.a='scritto'}catch(e){r.a=e.code}
+  try{const b=fs.batch();b.update(fs.doc('membri/'+uid),{ok:true,da:'invito',tk:t});await b.commit();r.b='scritto'}catch(e){r.b=e.code}
+  return r},tk);
+ok(fz.a==='permission-denied'&&fz.b==='permission-denied','regole: gettone falso o senza consumare l\'invito → niente');
+// R apre il link: sceglie la password ed entra
+const R=await mk(null);await R.goto(link+'&t='+tk);await R.waitForTimeout(6000);
+ok(/Ciao Rita/.test(await txt(R))&&/rita\.piras/.test(await txt(R)),'R: «Ciao Rita!» con il nome utente');
+await R.fill('#it-pw','segreto9');await R.fill('#it-pw2','segreto9');await R.click('[data-a="itGo"]');await R.waitForTimeout(6000);
+ok(await R.evaluate(()=>S.db.status().ready&&meU()&&meU().username==='rita.piras'&&meU().stato==='attivo'),'R: entra subito come Rita');
+ok(await R.evaluate(async t=>{const fs=fbInit().fs;const m=(await fs.doc('membri/'+fbInit().auth.currentUser.uid).get({source:'server'})).data();return m.ok===true&&m.da==='invito'&&!(await fs.doc('inviti/'+t).get({source:'server'})).exists},tk),'R: membro approvato, invito consumato');
+ok(await A.evaluate(()=>{const u=Object.values(D().staff).find(x=>x.username==='rita.piras');return u&&u.stato==='attivo'&&!!u.pass}),'A: Rita attiva con la sua password');
+// G riapre lo stesso link: già usato
+const G=await mk(null);await G.goto(link+'&t='+tk);await G.waitForTimeout(6000);
+ok(/già usato/.test(await txt(G))&&await G.evaluate(()=>!S.db.status().ready),'G: lo stesso link una seconda volta → «già usato», resta fuori');
+await G.click('[data-a="itSkip"]');await G.waitForTimeout(500);
+ok(/Sono nuovo/.test(await txt(G)),'G: «Chiedi l\'approvazione» torna alla richiesta normale');
+// nuovo link: quello vecchio smette di valere
+await A.click('[data-a="addProfile"]');await A.waitForTimeout(300);
+for(const [k,v] of [['nome','Tea'],['cognome','Melis']])await A.locator(`.sheet input[data-k="${k}"]`).pressSequentially(v);
+await A.click('.sheet [data-a="addGo"]');await A.waitForTimeout(3000);
+const tk1=decodeURIComponent((await A.locator('.sheet a[href^="https://wa.me/"]').getAttribute('href')).split('text=')[1]).match(/[#&]t=([A-Za-z0-9]+)/)[1];
+const tea=await A.evaluate(()=>Object.values(D().staff).find(x=>x.username==='tea.melis').id);
+await A.evaluate(id=>{closeSheet();invMonoSend(id)},tea);await A.waitForTimeout(3000);
+const tk2=decodeURIComponent((await A.locator('.sheet a[href^="https://wa.me/"]').getAttribute('href')).split('text=')[1]).match(/[#&]t=([A-Za-z0-9]+)/)[1];
+ok(tk1!==tk2&&await A.evaluate(async([a,b])=>{const fs=fbInit().fs;return!(await fs.doc('inviti/'+a).get({source:'server'})).exists&&(await fs.doc('inviti/'+b).get({source:'server'})).exists},[tk1,tk2]),'A: «Nuovo link d\'invito» cancella quello vecchio');
+for(const [n,p] of [['A',A],['B',B],['C',C],['E',E],['F',F],['R',R],['G',G]])ok(p.errs.length===0,n+': nessun errore '+p.errs.join(' | '));
 await b.close();

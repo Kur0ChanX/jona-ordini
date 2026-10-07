@@ -14,6 +14,17 @@ service cloud.firestore {
       return exists(/databases/$(db)/documents/pubblico/porta)
         && get(/databases/$(db)/documents/pubblico/porta).data.get('fino', 0) > request.time.toMillis();
     }
+    // invito monouso (v40): inviti/<gettone> {sid, fino}; il gettone lungo nel link è il segreto
+    function invitoBuono(tk) {
+      return tk is string && tk.size() >= 20
+        && exists(/databases/$(db)/documents/inviti/$(tk))
+        && get(/databases/$(db)/documents/inviti/$(tk)).data.fino > request.time.toMillis();
+    }
+    // gettone usato in questa stessa scrittura dal telefono che entra
+    function mioInvito() {
+      return request.auth != null
+        && getAfter(/databases/$(db)/documents/membri/$(request.auth.uid)).data.get('tk', '') != '';
+    }
     // la chiave del ristorante: si crea una volta sola e nessuno la può leggere
     match /chiave/ristorante {
       allow create: if request.auth != null && request.resource.data.v is string && request.resource.data.v.size() >= 16
@@ -44,8 +55,29 @@ service cloud.firestore {
       allow update: if request.auth != null && ((request.auth.uid == uid
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['req'])) || membro()
         || (request.auth.uid == uid && portaAperta() && request.resource.data.ok == true
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ok', 'approvato', 'da'])));
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ok', 'approvato', 'da']))
+        || (request.auth.uid == uid && invitoBuono(request.resource.data.get('tk', '')) && request.resource.data.ok == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ok', 'approvato', 'da', 'tk', 'req'])
+          && !existsAfter(/databases/$(db)/documents/inviti/$(request.resource.data.tk))));
       allow delete: if membro();
+    }
+    // inviti monouso: li crea un telefono approvato (al massimo 8 giorni); si legge solo conoscendo il gettone;
+    // chi entra lo cancella nella stessa scrittura in cui si approva
+    match /inviti/{tk} {
+      allow get: if request.auth != null;
+      allow list: if membro();
+      allow create: if membro() && request.resource.data.sid is string && request.resource.data.fino is int
+        && request.resource.data.fino <= request.time.toMillis() + 8 * 24 * 3600 * 1000;
+      allow update: if false;
+      allow delete: if membro() || (mioInvito()
+        && getAfter(/databases/$(db)/documents/membri/$(request.auth.uid)).data.tk == tk);
+    }
+    // profilo creato con l'invito: chi entra con il gettone giusto mette la sua password e lo attiva, nella stessa scrittura
+    match /staff/{sid} {
+      allow update: if mioInvito() && resource.data.get('stato', '') == 'invitato'
+        && request.resource.data.stato == 'attivo'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pass', 'stato', 'attivato'])
+        && get(/databases/$(db)/documents/inviti/$(getAfter(/databases/$(db)/documents/membri/$(request.auth.uid)).data.tk)).data.sid == sid;
     }
     // dati dell'app
     match /{c}/{id} {
