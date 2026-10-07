@@ -43,7 +43,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
      - L'ultimo messaggio dell'utente parola per parola
   2. Verifica che TUTTE queste condizioni siano VERE:
      - `docs/PASSAGGIO-CONSEGNE.md` è stato salvato correttamente.
-     - Nessun comando Git/Bash ha fallito (exit code != 0).
+     - Nessun comando dell'handoff (commit, push, fetch) è fallito e nessun errore della sessione è rimasto senza soluzione.
      - Non ci sono conflitti di merge o modifiche pendenti.
      - Non sono stati usati comandi vietati/distruttivi/forzati.
      - Il commit con `docs/PASSAGGIO-CONSEGNE.md` è pushato e GitHub lo conferma: `git fetch origin <ramo>` e `git rev-parse HEAD` uguale a `git rev-parse origin/<ramo>`. Solo DOPO crea la nuova sessione (altrimenti la nuova sessione scarica le consegne vecchie).
@@ -64,7 +64,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
   - `pkill`, `kill`
 - SICUREZZA AUTOMATICA:
   - Usa ESCLUSIVAMENTE workflow Git standard, puliti e sicuri (commit normali, merge standard, push lineari).
-  - Se un comando normale o un push fallisce, NON forzare e non usare comandi pericolosi. Trova tu un'alternativa sicura. Se non esiste, FERMATI e spiegami l'intoppo in italiano semplice, proponendo le opzioni possibili.
+  - Se un comando fallisce: prima capisci il perché con comandi che leggono soltanto. Se la soluzione è un'operazione normale e sicura (es. scaricare e unire con un merge), falla e avvisami. Altrimenti FERMATI, non forzare e non usare comandi pericolosi: spiegami l'intoppo in italiano semplice, proponendo le opzioni possibili.
 
 
 ## COMUNICAZIONE
@@ -80,7 +80,7 @@ Tra un blocco e l'altro una riga `───`.
 Imparare (Mario vuole crescere): quando uso un termine tecnico, scrivo il **termine corretto** e a fianco, tra parentesi, cosa significa in parole semplici (es. «**commit** (un salvataggio del lavoro con un nome)»). Spiego il termine intero la prima volta; poi basta il termine. In più, SOLO A VOLTE (non a ogni risposta: quando c'è un termine nuovo e utile, circa una risposta su 3-4, mai nelle risposte brevissime o di servizio), aggiungo un blocco `📚 IMPARI` breve (max 3 righe): un solo termine, con definizione di una riga e un esempio concreto dell'app Jona Ordini. Livello di Mario: esperto di computer e hardware (assemblaggio, termini generici di informatica: NON spiegarli), principiante assoluto di programmazione. I blocchi `📚 IMPARI` trattano solo programmazione (es. variabile, funzione, commit, branch, API, database, bug, deploy), dal più semplice al più avanzato, senza ripetere termini già spiegati. Mai lasciare Mario all'oscuro: la spiegazione deve bastargli per parlarne con un altro sviluppatore.
  Frasi corte (max ~15 parole), una idea per riga, niente giri di parole, ma mai tagliare ciò che serve per capire. Parole semplici, niente gergo. Mai un paragrafo di più di 3 righe. Per i riassunti lunghi: tabella.
 
-GitHub dal telefono: Mario usa GitHub da Google Chrome sul telefono, in modalità desktop (scomodo) e non è esperto. Per lui: passi piccolissimi, dove scorrere, cosa toccare esattamente (es. la freccina ▾ accanto al pulsante verde), cosa deve comparire dopo, e quali pulsanti NON toccare. Il merge delle PR lo fa Claude da solo (squash), come fino alla PR #45: scelta di Mario del 07/10/2026. Se GitHub lo nega, Claude lo dice a Mario e propone l'unione automatica con un workflow.
+GitHub dal telefono: Mario usa GitHub da Google Chrome sul telefono, in modalità desktop (scomodo) e non è esperto. Per lui: passi piccolissimi, dove scorrere, cosa toccare esattamente (es. la freccina ▾ accanto al pulsante verde), cosa deve comparire dopo, e quali pulsanti NON toccare. Il merge delle PR lo fa Claude da solo (squash), come fino alla PR #45: scelta di Mario del 07/10/2026. SUBITO dopo ogni merge squash, prima di qualsiasi altra modifica, Claude unisce `main` nel ramo di lavoro con un merge normale (`git fetch origin main && git merge origin/main`) e fa il push: se lo fa dopo aver già cambiato file, nascono conflitti. Mai push forzato. Se il merge dà conflitti, FERMATI e spiegamelo. Se GitHub lo nega, Claude lo dice a Mario e propone l'unione automatica con un workflow.
 
 Link sempre: per ogni cosa che Mario deve fare a mano (siti, registrazioni, chiavi API, impostazioni, GitHub, Cloudflare, Firebase…) dai il link diretto alla pagina giusta, dici perché ci va e cosa deve inserire, e scrivi in **grassetto** i pulsanti esatti da toccare. Mario è spesso sul telefono: passi brevi e chiari. Vale per tutti i progetti.
 
@@ -89,7 +89,6 @@ Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scr
 
 ## REGOLE TRASVERSALI
 
-- Se un comando Git o Bash fallisce, FERMATI immediatamente. Non tentare auto-riparazioni azzardate.
 - Non ripetere codice già fornito o informazioni già presenti in `docs/PASSAGGIO-CONSEGNE.md`.
 - ELENCO DELLE COSE DA FARE: tieni sempre aggiornato `docs/DA-FARE.md`, diviso in 3 parti: (1) Claude da solo, (2) Claude dopo la scelta o l'approvazione di Mario, (3) Mario a mano. Aggiungi ogni cosa nuova appena emerge, togli quelle fatte, e committalo insieme al lavoro. Le consegne rimandano a questo file invece di ripetere l'elenco. Ogni voce ha un numero fisso (M1.., D1..), un riassunto in tabella in cima in ordine di urgenza, e a Mario si mostra sempre in ordine, mai in un unico blocco continuo.
 - PRIMA I BLOCCHI (Mario, 06/10/2026): non si parte con lavoro nuovo finché restano aperte cose che bloccano il codice o la stabilità (trasloco, chiavi, segreti, PR da unire, prove fallite, errori). Le rifiniture estetiche invece possono aspettare e non bloccano. In `docs/DA-FARE.md` le voci bloccanti sono segnate 🔴 e stanno in cima; se Mario chiede una cosa nuova mentre ce n'è una 🔴, glielo ricordo in una riga prima di iniziare.
