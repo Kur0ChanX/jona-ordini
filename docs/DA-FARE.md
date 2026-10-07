@@ -10,6 +10,7 @@ Aggiornato: 2026-10-07 (sessione #30: v45 online con la PR #54, D7 fatta; v46 on
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| D9 | Scheda Richieste in ordine (da approvare / gestite per giorno, ora della decisione, filtri): proposta a Mario, poi codice | Claude, dopo la tua scelta | ora |
 | M21 | Maurizio riapre l'app (si aggiorna alla v46): se compare «La richiesta non è ancora arrivata» tocca **Riprova**; poi tu lo approvi dalla striscia in cima | Mario | ora |
 | M20 | Dopo la pubblicazione: aprire `jona-ristorante-by-ynoy-corp.pages.dev/#demo` dal telefono, provarla e mandare il link a Chiara, consulenti e proprietari | Mario | ora (v45 online) |
 | C7 | Dopo D7: riga riga «“Oggi si ordina” arriva a» più chiara (prima immagine a Mario), giro completo v42-v45 (chiedere «ora o dopo?»), avvisi agenda dal Worker, A, C, G, H, I, J, K, O, R, U | Claude | ora |
