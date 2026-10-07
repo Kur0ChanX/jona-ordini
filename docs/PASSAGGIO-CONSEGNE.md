@@ -1,6 +1,6 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #31
+Sessione attuale: #32
 
 ## Ultimo messaggio di Mario (#30), parola per parola
 **v48 (S1) ONLINE** (PR #58, CI verde). **S3 v49 pronta**: scatola nera (`errLog`/`errFlush` → Worker `/errori`, tabella `err` nel primo D1, `errStrip`/`errSheet` solo sviluppatore, `jona_err_vis`). Prove `test-errori` 8, `test-errori-server` 11, più legate riuscite. Il Worker si ripubblica da solo (workflow su `worker/**`). Dopo: D9 (scheda Richieste).
