@@ -5,6 +5,14 @@ Sessione attuale: #25
 ## Ultimo messaggio di Mario (#24)
 «ok vai avanti» (dopo il mio avviso che il giro completo stava girando e poi sarebbe venuta la PR v41). Vale ancora quello di #23: «vai sii più autonomo possibile e procedi con tutto fermati se ti servo urgente per decisioni importanti problemi ecc». Leggere per intero quello che Mario scrive in «Altro».
 
+## Messaggio di Mario arrivato dopo l'apertura di #25 (risposta alla domanda sui reparti)
+«Si potrebbe scegliere mauro e maurizio creano evento o informazione o aggiornamento operativo ecc ecc e scelgono chi puó vederlo se é solo loro memo personale o da mandare ai gruppi operativi»
+→ Da fare nella v42 (ramo `v42-agenda`), prima della PR v42:
+- **Chi crea**: Maurizio (gm) e **Mauro** (Mauro Loi, reparto `fb` F&B Manager, oggi forse ruolo `staff`: controllare). Proposta: possono creare `isMgr` + staff con reparto `fb` o `resp` (funzione `agCanEdit(me)`), oppure un elenco scelto in Impostazioni.
+- **Tipo** nel modulo: Evento | Informazione | Aggiornamento operativo | Memo (campo `k` in `ev`, icona/etichetta nella lista e nella striscia).
+- **Chi lo vede** c'è già: Solo io (memo personale) | Tutti | Reparti (= gruppi operativi). Valutare se «gruppi operativi» = reparti o i gruppi della chat; chiedere a Mario in una riga se non è chiaro.
+- Domanda su «i gestori vedono tutti i reparti»: Mario non ha detto no; lasciare così salvo sua indicazione.
+
 ## Fatto in #24
 - Il ramo locale `ccr-4a01d00e-6ay25e` era di nuovo vecchio (sessione #12): rinominato `vecchio-sessione12` (solo in quel container), ramo preso da origin. Probabile anche nella prossima sessione: se `merge --ff-only` fallisce, fare lo stesso (`git branch -m` + `git checkout -b <ramo> --track origin/<ramo>`), mai reset.
 - **`test-v40` rossa era un bug vero** (non del merge): dopo «Crea profilo» `invMonoSend` leggeva `D().staff[sid]` prima che arrivasse dallo snapshot → usciva in silenzio. Corretto: `createProfile` passa il profilo (`invMonoSend(id,{...doc,id})`), `S.invM.u` per `invMonoSheet`. Prova: chiude la scheda «Invito pronto» con la X prima del secondo invito. Commit `878b4bd` sul ramo `ccr-4a01d00e-6ay25e`.
