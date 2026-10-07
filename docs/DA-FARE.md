@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-07 (sessione #18: v39 online, unita da Claude; v40 «Entrata libera» pronta). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-07 (sessione #20: v40 notifiche pronta nel ramo `hotfix-notifiche`; il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -10,6 +10,9 @@ Aggiornato: 2026-10-07 (sessione #18: v39 online, unita da Claude; v40 «Entrata
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| 🔴 C1 | Pubblicare la v40 notifiche (ramo `hotfix-notifiche`): giro completo, PR, merge da Claude | Claude | subito |
+| 🔴 C2 | Notifiche sul telefono di Mario (Oppo/OnePlus, `AbortError`): leggere l'errore esatto della v40 | Claude + Mario | dopo C1 |
+| C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | dopo C1 |
 | 🔴 M18 | Incollare le regole nuove in Firebase (per l'entrata libera, v40) | Mario | quando la v40 è online |
 | 🔴 M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | adesso si può |
 | M17 | Telefono in attesa `ISLyK5…` (nome «Mari…», cognome «S…»): chi è? approvarlo o rifiutarlo (Staff → Telefoni da approvare) | Mario | quando vuoi |
