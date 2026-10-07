@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-07 (sessione #21: v40 notifiche pronta nel ramo `hotfix-notifiche`, commit `df970ef`; il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-07 (sessione #22: v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -10,10 +10,10 @@ Aggiornato: 2026-10-07 (sessione #21: v40 notifiche pronta nel ramo `hotfix-noti
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| 🔴 C1 | Pubblicare la v40 notifiche (ramo `hotfix-notifiche`): chiedere a Mario se il giro completo parte ora o dopo, poi PR e merge da Claude | Claude | subito |
-| 🔴 C2 | Notifiche sul telefono di Mario (Oppo/OnePlus, `AbortError`): leggere l'errore esatto della v40 | Claude + Mario | dopo C1 |
-| C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | dopo C1 |
-| 🔴 M18 | Incollare le regole nuove in Firebase (per l'entrata libera, v40) | Mario | quando la v40 è online |
+| 🔴 C4 | Giro completo sulla v40 pubblicata (partito in #22): correggere ciò che fallisce | Claude | in corso |
+| C5 | Riportare `main` nel ramo `ccr-4a01d00e-6ay25e`: inviti/entrata libera diventa v41 (`APP_VER` 41, `CACHE` v45) | Claude | dopo C4 |
+| C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | dopo C4 |
+| 🔴 M18 | Incollare le regole nuove in Firebase (per l'entrata libera, v41) | Mario | quando la v41 è online |
 | 🔴 M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | adesso si può |
 | M17 | Telefono in attesa `ISLyK5…` (nome «Mari…», cognome «S…»): chi è? approvarlo o rifiutarlo (Staff → Telefoni da approvare) | Mario | quando vuoi |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
