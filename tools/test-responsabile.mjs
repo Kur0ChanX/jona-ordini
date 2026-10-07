@@ -28,7 +28,7 @@ let m=await pg.evaluate(()=>Object.values(D().staff).find(u=>u.username==='mauro
 ok(m&&JSON.stringify(m.contratto)==='{"libero":true}','saved as {libero:true}: '+JSON.stringify(m&&m.contratto));
 /* 2. fuori dal pianificatore e dai controlli */
 ok(await pg.evaluate(id=>!orPeople().some(u=>u.id===id)&&orFree(D().staff[id])&&contrOf(D().staff[id])===null,m.id),'not in planner, no contract checks');
-ok(await pg.evaluate(()=>{S.tab='staff';S.staffSub='orari';try{localStorage.jona_staffsub='orari'}catch(e){}render();return !document.querySelector('main').innerText.includes('Mauro')}),'planner view does not list Mauro');
+ok(await pg.evaluate(()=>{S.tab='staff';S.staffSub='orari';try{localStorage.jona_staffsub='orari'}catch(e){}render();const mn=document.querySelector('main').cloneNode(true);mn.querySelectorAll('.testbar').forEach(e=>e.remove());return !mn.textContent.includes('Mauro')}),'planner view does not list Mauro');
 ok(await pg.evaluate(()=>jonaCtx().includes('orario libero')),'«Chiedi a Jona» knows the free schedule');
 /* 3. «I miei orari» */
 ok(await pg.evaluate(id=>vMieiOrari(D().staff[id]).includes('Orario libero'),m.id),'«I miei orari»: «Orario libero»');

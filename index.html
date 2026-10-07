@@ -248,6 +248,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .inv-code{text-align:center;margin:14px 0 0}.inv-code b{display:block;font-size:34px;font-weight:500;letter-spacing:.18em;color:var(--ink)}
 .invite-steps{margin:0;padding-left:20px;color:var(--ink2);line-height:1.5}
 .testbar{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.testbar .seg{flex-wrap:wrap;border-radius:18px;min-width:0}
 .testbar .seg button[aria-pressed="true"]{background:var(--lagoon);color:var(--on-lagoon);font-weight:500}
 .seg{display:inline-flex;padding:3px;background:var(--sunk);border-radius:999px;border:1px solid var(--line);max-width:100%;overflow-x:auto;scrollbar-width:none}
 .seg.wide{display:flex}
@@ -1049,7 +1050,7 @@ const APP_VER=43;
 const NEWS=[
   {v:43,data:'2026-10-07',titolo:'Responsabili con orario libero',
     chef:['Staff → tocca una persona → «Contratto e orari» → «Full time Responsabile»: niente turni da pianificare e nessun controllo sulle ore. La persona non compare più negli orari.','Chi ha l\'orario libero, in «I miei orari», vede «Orario libero» invece della tabella dei turni.'],
-    dev:{aggiunte:['`staff.contratto` = `{libero:true}` (`orContr`, `orFree`); `contrOf` lo tratta come senza contratto, `orPeople` lo esclude (pianificatore, controlli, export, cambi turno). Scelta «Tipo di contratto» in `orContrForm` (`S.form.libero`).']}},
+    dev:{aggiunte:['`staff.contratto` = `{libero:true}` (`orContr`, `orFree`); `contrOf` lo tratta come senza contratto, `orPeople` lo esclude (pianificatore, controlli, export, cambi turno). Scelta «Tipo di contratto» in `orContrForm` (`S.form.libero`).','Barra Test: vista «F&B Mauro» (`VIEW_AS.fb`, staff del reparto `fb`) per provare ciò che vede l\'F&B Manager (prova `tools/test-testbar.mjs`).']}},
   {v:42,data:'2026-10-07',titolo:'Agenda dell\'hotel',
     tutti:['Se hai un evento oggi (un gruppo, un matrimonio, una consegna) in alto compare la striscia «Oggi in hotel»: toccala per vedere i dettagli.'],
     chef:['Impostazioni → «Funzioni»: accendi l\'Agenda (parte spenta). Vedi anche quante persone la usano questo mese.','Icona del calendario in alto: Oggi, Settimana e Mese. Scrivi o detta «domani ore 20 gruppo Rossi 40 coperti» e l\'evento è già compilato.','«Foto dell\'agenda»: fotografi l\'agenda di carta e Gemini legge gli eventi, tu scegli quali aggiungere.','Scegli il tipo: Evento, Informazione, Aggiornamento operativo o Memo. Poi chi lo vede: solo tu (memo personale), tutti o alcuni reparti (Cucina, Sala…). Può ripetersi ogni settimana o ogni mese.','Anche l\'F&B Manager e il Responsabile possono scrivere nell\'agenda.'],
@@ -1250,7 +1251,7 @@ async function fileToLogo(file){const img=await loadImg(file);const sc=Math.min(
 const cfg=()=>Object.assign({nomeLocale:'Jona Ristorante',luogoConsegna:''},D().config.app||{});
 const realU=()=>S.me?D().staff[S.me]:null;
 // Test per lo sviluppatore: vede l'app come l'amministratore (chef) senza cambiare il suo profilo.
-const VIEW_AS={gm:{ruolo:'gm',reparto:'cucina',mansione:'Chef'},staff:{ruolo:'staff',reparto:'cucina',mansione:'Cuoco'}};
+const VIEW_AS={gm:{ruolo:'gm',reparto:'cucina',mansione:'Chef'},staff:{ruolo:'staff',reparto:'cucina',mansione:'Cuoco'},fb:{ruolo:'staff',reparto:'fb',mansione:'F&B Manager'}};
 const meU=()=>{const u=realU();return u&&isDev(u)&&VIEW_AS[S.viewAs]?Object.assign({},u,VIEW_AS[S.viewAs]):u};
 const isGM=u=>!!u&&u.ruolo==='gm';
 const isDev=u=>!!u&&u.ruolo==='dev';
@@ -1938,7 +1939,7 @@ const micBtn=()=>`<button type="button" class="mic-fab" data-a="voice" aria-labe
 const cartBar=n=>`<div class="cartbar"><button type="button" class="btn primary big block" data-a="tab" data-v="carrello">${ic('cart')}<span>${n} ${n===1?'articolo':'articoli'} · Invia allo chef</span>${ic('chev')}</button></div>`;
 function testBar(){
   const u=realU();if(!isDev(u))return'';
-  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['staff','Staff'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
+  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['fb','F&B Mauro'],['staff','Staff'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
 }
 
 /* ================= staff: catalogo ================= */

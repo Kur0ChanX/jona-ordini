@@ -30,5 +30,12 @@ for(const t of dev)src=src.split(t).join('');
 src=src.replace(/\/\*[\s\S]*?\*\//g,'').replace(/referente:'Mario'/g,'');
 const left=[...(src.match(/.{0,40}\bMario\b.{0,20}/g)||[]),...(src.match(/.{0,40}(miscera|kur0chanx).{0,20}/gi)||[])];
 ok(left.length===0,'nessun «Mario» nei testi dell\'app: '+JSON.stringify(left));
+// v43: vista «F&B Mauro» = staff del reparto fb, che può creare in agenda; la barra sta in 320 px
+await pg.click('.testbar [data-a="viewAs"][data-v="fb"]');await pg.waitForTimeout(300);
+const fb=await pg.evaluate(()=>{const u=meU();return{r:u.ruolo,rep:u.reparto,mgr:isMgr(u),ag:agCan(u),txt:document.querySelector('.testbar [aria-pressed="true"]')?.textContent}});
+ok(fb.r==='staff'&&fb.rep==='fb'&&!fb.mgr&&fb.ag&&fb.txt==='F&B Mauro','vista F&B: staff reparto fb, crea in agenda, non gestore: '+JSON.stringify(fb));
+await pg.setViewportSize({width:320,height:700});await pg.waitForTimeout(300);
+const ov=await pg.evaluate(()=>[document.documentElement.scrollWidth,innerWidth,...[...document.querySelectorAll('.testbar [data-a="viewAs"]')].map(b=>Math.round(b.getBoundingClientRect().right))]);
+ok(ov[0]<=ov[1]&&ov.slice(2).every(r=>r<=ov[1]),'barra Test con 4 viste dentro 320 px: '+JSON.stringify(ov));
 ok(!errs.length,'nessun errore: '+errs.join(' | '));
 await b.close();

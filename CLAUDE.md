@@ -102,7 +102,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 
 ## Struttura
 - `index.html`: tutta l'app (~260 KB, righe lunghissime). Non leggerla per intero: `grep -n -o '.\{0,80\}PAROLA.\{0,200\}'` e `sed -n 'A,Bp' | cut -c1-1500`; modifiche con sostituzioni Python che controllano che il pezzo compaia una volta sola.
-- Ruoli: `staff`, `gm` (amministratore, chef), `dev` (sviluppatore). Lo sviluppatore ha la barra **Test** (`viewAs`: Admin Chef / Staff / Sviluppatore) per simulare tutto.
+- Ruoli: `staff`, `gm` (amministratore, chef), `dev` (sviluppatore). Lo sviluppatore ha la barra **Test** (`viewAs`: Admin Chef / F&B Mauro / Staff / Sviluppatore; «F&B Mauro» = staff del reparto `fb`, v43) per simulare tutto.
 - Dati: interfaccia unica `S.db.collection(c).doc(id).set/update/delete` e `orderBy().limit().onSnapshot()`. Due versioni:
   - `LocalStore`: tutto in localStorage (`jona_db_v2`), solo sul telefono.
   - `FirebaseStore`: Firestore con copia offline; i prodotti stanno in `listini/<fornitore>` (campo `p.<id>`), il resto una collezione per tipo. Accesso anonimo + chiave del ristorante (`chiave/ristorante`, `membri/<uid>`, `pubblico/stato`); regole in `firebase/firestore.rules`, guida in `docs/FIREBASE.md`.
