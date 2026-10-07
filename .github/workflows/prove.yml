@@ -1,0 +1,51 @@
+# Prove automatiche (S2): a ogni PR verso main le prove veloci; ogni lunedì all'alba tutte le prove.
+# Una PR con le prove rosse NON si unisce (regola in CLAUDE.md).
+name: Prove automatiche
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'veloce o tutto'
+        default: veloce
+concurrency:
+  group: prove-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  prove:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      TZ: Europe/Rome
+      PLAYWRIGHT_BROWSERS_PATH: /opt/pw-browsers
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Playwright e Chromium negli stessi percorsi del computer di lavoro
+        run: |
+          sudo mkdir -p /opt/node22/lib/node_modules /opt/pw-browsers /opt/pw-npm
+          sudo chown -R "$USER" /opt/node22 /opt/pw-browsers /opt/pw-npm
+          npm i --prefix /opt/pw-npm playwright@1.56.1
+          ln -sfn /opt/pw-npm/node_modules/playwright /opt/node22/lib/node_modules/playwright
+          /opt/pw-npm/node_modules/.bin/playwright install --with-deps chromium
+          ln -sfn "$(find /opt/pw-browsers -path '*chromium-*' -type f -name chrome | head -1)" /opt/pw-browsers/chromium
+          /opt/pw-browsers/chromium --version
+          sudo apt-get install -y ffmpeg >/dev/null
+      - name: Prove
+        run: bash tools/prova-ci.sh "${{ github.event_name == 'schedule' && 'tutto' || inputs.modo || 'veloce' }}" /tmp/jona-prove
+      - name: Registri delle prove
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: registri-prove
+          path: /tmp/jona-prove
+          retention-days: 14

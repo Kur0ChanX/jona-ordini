@@ -52,3 +52,5 @@ Le prove Firebase impostano `localStorage.jona_fb_emu` e una configurazione fint
 - `node tools/test-v26.mjs`: reparti nuovi in registrazione (320 px) e guida «notifiche bloccate» per iPhone e Android.
 - `node tools/test-agenda.mjs`: v42, «Funzioni» in Impostazioni (agenda spenta di partenza, conta d'uso una volta al giorno), riga veloce (`agParse` con data fissa), eventi privati/per tutti/per reparto, ricorrenze settimanali e mensili, spostamento di mese, elimina, foto con Gemini finto, striscia «Oggi in hotel», staff in sola lettura, 320 px.
 - `node tools/test-news.mjs`: Novità (contatore per ruolo, contenuto per staff/chef/sviluppatore, intestazione a 320 px, tema scuro).
+
+**Su GitHub (S2):** `tools/prova-ci.sh veloce|tutto` (usato da `.github/workflows/prove.yml`): «veloce» a ogni PR verso `main` (telefoni, v35, v40, firebase-flow, news, demo, testbar, agenda, responsabile, giro), «tutto» ogni lunedì. I registri restano 14 giorni negli artefatti del workflow. Il workflow ricrea gli stessi percorsi del computer di lavoro (`/opt/node22/lib/node_modules/playwright`, `/opt/pw-browsers/chromium`) e usa `TZ=Europe/Rome`.
