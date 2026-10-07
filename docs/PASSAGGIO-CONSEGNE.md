@@ -3,6 +3,8 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+«adesso è arrivata perfetto, una cosa ae clicco dall'app il tasto è uscita una nuova versione diventa cosí spaginata» + foto (`docs/immagini/mario-aggiorna-spaginata.jpg`): dopo «Aggiorna ora» la schermata di apertura sbordava (firma YNOY tagliata in basso). Corretto in v47: `.wall` alta 100dvh meno le zone sicure, logo centrato nella splash (`docs/immagini/splash-v47.png`). Richiesta di Maurizio ARRIVATA dopo la v46 (bug confermato risolto). Domanda aperta: cancellare il ramo remoto `fix-hook-avvio`?
+
 **Stato (dopo l'ultimo messaggio)**: v46 ONLINE (PR #55, squash `3354d88`), controllato `APP_VER=46`, `CACHE` v50. Prove legate tutte riuscite. Unito `main` nel ramo e poi `origin/fix-hook-avvio` (hook di avvio che ripara il ramo, mandato dalla sessione RVC #11, E13). Il ramo remoto `fix-hook-avvio` NON è stato cancellato: la sessione RVC dice che Mario è d'accordo, da confermare con Mario. Nuova M21 (Maurizio riapre l'app e tocca Riprova).
 
 «Se devi pubblicare la buova versione se non ci sono problemi pubblica sempre senza chiedere» → regola in `CLAUDE.md` (PUBBLICA SENZA CHIEDERE). v46 si pubblica da sola appena le prove legate sono riuscite.
