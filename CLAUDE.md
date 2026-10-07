@@ -125,6 +125,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 IndexedDB `jona-outbox` (store `q`): push non partite, lette sia da `index.html` (`obx*`) sia da `sw.js` (Background Sync, tag `jona-outbox`).
 
 ## Regole di lavoro
+- PALLINO DEL PROGETTO (Mario, 07/10/2026): i titoli delle sessioni Jona iniziano con 🟤 prima di ▶/✓ (es. `🟤 ▶ ATTIVA · #26 · Jona Ordini · …`, `🟤 ✓ CHIUSA · #25 · Jona Ordini · …`). Il 🟣 è di RVC.
 - Niente nome del creatore (Mario Miscera, `mario-miscera`, `kur0chanx`) in link, inviti e testi che vedono gli utenti. Il nome di chi invita (utente dell'app) invece va bene. Stessa regola nel progetto RVC.
 - Ad OGNI versione cambia `CACHE` in `sw.js`.
 - Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
