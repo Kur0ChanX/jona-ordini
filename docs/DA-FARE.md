@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-07 (sessione #23: merge di main nel ramo, v41 in prova; sessione #22: giro completo v40 38/38 riuscito; piano dell'inverno approvato; v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-07 (sessione #24: test-v40 corretta, giro completo v41 39/39, v42 agenda scritta nel ramo `v42-agenda`; sessione #23: merge di main nel ramo, v41 in prova; sessione #22: giro completo v40 38/38 riuscito; piano dell'inverno approvato; v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -10,8 +10,9 @@ Aggiornato: 2026-10-07 (sessione #23: merge di main nel ramo, v41 in prova; sess
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| 🔴 C5 | v41: merge di `main` fatto (`6e0baef`); manca: `test-v40` rossa dopo il merge da capire, giro completo, PR | Claude | subito |
-| C6 | Piano dell'inverno (`docs/PIANO-INVERNO.md`): passo 0 interruttori delle funzioni, poi agenda smart di Mauro, poi A, C, G, H, I, J, K, O, R, U | Claude | dopo C5 |
+| 🔴 C5 | v41: giro completo 39/39 riuscito (`878b4bd`); manca: PR → squash merge → controllo online | Claude | subito |
+| C6 | v42 interruttori + agenda: scritta e provata nel ramo `v42-agenda`; manca: unire main dopo la v41, prove, PR. Poi v43 (avvisi agenda dal Worker), A, C, G, H, I, J, K, O, R, U | Claude | dopo C5 |
+| D7 | Agenda: i gestori vedono gli eventi di tutti i reparti (scelta di Claude), va bene? | Claude, dopo la tua scelta | quando vuoi |
 | C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | quando vuoi |
 | 🔴 M18 | Incollare le regole nuove in Firebase (per l'entrata libera, v41) | Mario | quando la v41 è online |
 | M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | prima dell'apertura (staff ancora in prova) |
