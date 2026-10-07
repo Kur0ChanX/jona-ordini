@@ -8,6 +8,8 @@ Sessione attuale: #31
 
 Messaggio prima: «mettila piú in vista non nascosta» (= D8).
 
+Poi Mario ha mandato una foto (`docs/immagini/mario-staff-senza-richiesta.jpg`): vista Admin Chef, Staff → Persone, NESSUNA sezione «Telefoni da approvare»; profili: Mario (sviluppatore), Mauro Loi (F&B), Mario Test Prova (Responsabile). Quindi la richiesta di Maurizio non arriva all'app (non è solo nascosta): da capire cosa vede Maurizio sul suo telefono (schermata d'attesa? errore? demo?) e se a Mario è arrivata la notifica «chiede di entrare». Possibile anche ascolto `phWatch` fallito (lista vuota, riprova dopo 5 min, nessun avviso): in D8 mostrare un avviso se l'ascolto fallisce.
+
 ## Messaggi di Mario in #30
 1. «ok riscontri problemi in Generale?» → progetto in ordine; GitHub in guasto (githubstatus: Actions, Pull Requests, Webhooks rossi).
 2. Due foto di githubstatus (ancora gialli/rossi) → aspettato.
