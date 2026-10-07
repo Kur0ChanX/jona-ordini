@@ -133,7 +133,7 @@ html.staff-ui .news-btn .ic{width:18px;height:18px}
 @media (max-width:360px){.top{gap:6px}.top .mark{display:none}.news-btn,html.staff-ui .news-btn{width:34px;padding:0;justify-content:center}.news-l{display:none}}
 .news-v{padding:16px 2px 18px;border-top:1px solid var(--line)}
 .ph-t{font:500 16px/1.3 var(--font);margin:18px 0 6px}
-.ph-ol{margin:4px 0 8px;padding-left:24px}
+.ph-ol{margin:4px 0 8px;padding-left:24px}.pst{white-space:nowrap}.pst.off{color:var(--corallo)}.ph-err{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--corallo) 18%,transparent);word-break:break-word}
 .ph-ol li{margin:10px 0;line-height:1.5;font-size:15.5px}
 .ph-brands{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 4px}
 .ph-brands .btn{min-height:48px;white-space:normal;line-height:1.2}
@@ -248,6 +248,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .inv-code{text-align:center;margin:14px 0 0}.inv-code b{display:block;font-size:34px;font-weight:500;letter-spacing:.18em;color:var(--ink)}
 .invite-steps{margin:0;padding-left:20px;color:var(--ink2);line-height:1.5}
 .testbar{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.testbar .seg button[aria-pressed="true"]{background:var(--lagoon);color:var(--on-lagoon);font-weight:500}
 .seg{display:inline-flex;padding:3px;background:var(--sunk);border-radius:999px;border:1px solid var(--line);max-width:100%;overflow-x:auto;scrollbar-width:none}
 .seg.wide{display:flex}
 .seg.wide button{flex:1}
@@ -1029,11 +1030,14 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=40;
+const APP_VER=41;
 const NEWS=[
-  {v:40,data:'2026-10-07',titolo:'Invito WhatsApp con profilo pronto',
+  {v:41,data:'2026-10-07',titolo:'Invito WhatsApp con profilo pronto',
     tutti:['Staff → Aggiungi: crei il profilo e mandi il link su WhatsApp. Il link vale una volta sola: chi lo apre sceglie la sua password ed entra subito, senza approvazione.','Impostazioni → «Entrata libera»: per 48 ore chi inquadra il QR della cucina o apre un invito entra subito, senza approvazione. Poi si richiude da sola.'],
     dev:{aggiunte:['Invito monouso: `inviti/<gettone>` {sid, fino 7 giorni}, link `INV_URL/<codice>/<gettone>` → `#i=…&t=…` (`jona_itk`), `screenInvite`/`itGo`; `phone.tk` in un batch approva il membro (`tk`), cancella l\'invito e attiva `staff/<sid>` (stato `invitato` → `attivo`, password scelta). Gestore: `invMonoSend`, `invMonoSheet`, «Nuovo link d\'invito». Regole: `invitoBuono`, `mioInvito`, `match /inviti`, `match /staff`.','`pubblico/porta` {fino} (al massimo 49 ore avanti, regole); `phone.auto` dopo la richiesta: `ok:true` da sé e profilo con `phStaff`; `ptRow`/`ptSet` in Impostazioni. Servono le regole nuove.']}},
+  {v:40,data:'2026-10-07',titolo:'Notifiche più semplici',
+    tutti:['Se le notifiche non sono attive, in alto compare «Attiva le notifiche»: basta un tocco («Più tardi» la nasconde per 3 giorni).','I gestori vedono in Staff chi riceve gli avvisi (🟢) e chi no (🔴): si sistemano solo i telefoni in rosso.','Se le notifiche non si attivano, l\'app riprova da sola e nella guida mostra l\'errore esatto del telefono.','Guida più completa per i telefoni Oppo, Realme e OnePlus.'],
+    dev:{correzioni:['`pushOn`: se `subscribe` fallisce, toglie l\'iscrizione vecchia, aspetta 1,5 s e riprova; `S.pushErr` (nome + messaggio) mostrato in `pushHelp` (`.ph-err`).','`pushAsk`: avviso sotto `banner()` se le notifiche non sono attive (o bloccate → guida), «Più tardi» in `jona_push_ask` per 3 giorni. `vStaff`: 🟢/🔴 per profilo attivo da `PUSH.subs` (`p.u`), conteggio dei senza avvisi; `pushWatch` ridisegna con `schedule()`.','Barra Test: niente più avviso a ogni cambio vista (si accumulavano), pulsante della vista attuale colorato (`.testbar .seg`).','Testi: «Mario» sostituito con «lo sviluppatore» in tutto ciò che vedono gli utenti (prova `tools/test-testbar.mjs`).']}},
   {v:39,data:'2026-10-07',titolo:'Logo di apertura più grande',
     tutti:['All\'apertura il logo «by YNOY&CORP» è più grande e più in alto, con «by» più vicino.'],
     dev:{correzioni:['`.wall-by i` 172 px, `gap` 2 px, niente spazio sopra; schermata d\'apertura con classe `splash` e `.splash .wall-by` 24 px dal fondo.']}},
@@ -1087,14 +1091,14 @@ const NEWS=[
     dev:{risolti:['`netWatch`: scrittura non confermata in 4 s con la rete accesa → `jona_fb_lp` e ricarica dopo la conferma (solo senza fogli aperti, testo in chat o scritture in sospeso), altrimenti alla prossima apertura. Usato in `track` e in `chSend`.']}},
   {v:24,data:'2026-10-04',titolo:'Telefoni approvati e chat più svelta',
     tutti:['Quando riapri l\'app la chat si aggiorna subito, senza aspettare.'],
-    chef:['Un telefono nuovo non vede più nessun dato finché tu o Mario non lo approvate: lo trovi in Staff → «Telefoni da approvare». Con un profilo nuovo, approvando crei anche il profilo.'],
+    chef:['Un telefono nuovo non vede più nessun dato finché tu o lo sviluppatore non lo approvate: lo trovi in Staff → «Telefoni da approvare». Con un profilo nuovo, approvando crei anche il profilo.'],
     dev:{aggiunte:['`membri/<uid>.ok=false` per i telefoni nuovi, richiesta in `req` (profilo nuovo con `sid` e `pass`, o «ho già un profilo»); `screenPhone`, `phoneSheet`, `phSend`; gestori: `PH`, `phWatch`, `phApprove`, `phReject`. Regole: `membro()` vuole `ok` non falso, solo chi ha attivato (`chiave.uid`) entra senza attesa. Worker `/gemini` rifiuta `ok:false`.'],
       risolti:['Chat lenta dopo il ritorno in primo piano: `disableNetwork`/`enableNetwork` se l\'app è rimasta nascosta più di 5 s.','L\'approvazione conta solo se confermata dal server (non da una scrittura locale).']}},
   {v:23,data:'2026-10-04',titolo:'Nome utente automatico',
     tutti:['Mentre scrivi nome e cognome, il nome utente si compila da solo (per esempio mario.loi). Puoi cambiarlo se vuoi.','Accenti e apostrofi nel nome utente vanno bene: li togliamo noi.'],
     dev:{risolti:['Registrazione: con il nome utente vuoto o con accenti/apostrofi l\'errore diceva sempre «almeno 3 caratteri». Ora `normUser` toglie accenti e apostrofi e `checkForm` ha tre messaggi (vuoto, corto, caratteri).'],aggiunte:['`userSug`: nome.cognome senza accenti, con un numero se già usato; proposto finché il campo è vuoto o uguale alla proposta (`_uSug`), mai nella modifica di un profilo esistente.']}},
   {v:22,data:'2026-10-04',titolo:'Registrazione più semplice',
-    tutti:['Dopo aver creato il profilo vedi la schermata «In attesa di approvazione»: appena Maurizio o Mario approvano, l\'app si apre da sola.','Se il telefono ricarica l\'app mentre fai la foto del profilo, i dati scritti restano.'],
+    tutti:['Dopo aver creato il profilo vedi la schermata «In attesa di approvazione»: appena Maurizio o lo sviluppatore approvano, l\'app si apre da sola.','Se il telefono ricarica l\'app mentre fai la foto del profilo, i dati scritti restano.'],
     dev:{risolti:['iPhone: la foto profilo veniva aperta a grandezza piena (fino a 48 MP) e Safari ricaricava la pagina. Ora `createImageBitmap` con `resizeWidth:640`, altrimenti la strada di prima.','Modulo di registrazione salvato in `jona_reg` (senza password e foto) prima di aprire fotocamera o galleria, ripristinato all\'avvio da `regRestore` (30 min).'],aggiunte:['`screenWait` e `waitCheck`: `jona_wait` ({id,t}) dopo la registrazione; profilo attivo → `login` automatico; disattivato o cancellato → avviso.']}},
   {v:21,data:'2026-10-04',titolo:'Nuovi telefoni: niente più attese infinite',
     chef:['Se un telefono nuovo non riesce a collegarsi, invece di restare su «Un momento…» dice cosa fare e mostra il pulsante Riprova.'],
@@ -1144,7 +1148,7 @@ const NEWS=[
     tutti:['Ora l\'app ti può avvisare anche quando è chiusa. Tocca la tua foto in alto → «Attiva le notifiche» → Consenti. Con «Prova» controlli che arrivino.','Su iPhone le notifiche funzionano solo se apri l\'app dall\'icona sulla schermata Home.'],
     dev:{aggiunte:['Push con Web Push + VAPID: server in `worker/` (Cloudflare, `/chiave`, `/invia`), iscrizioni in Firestore `push/<id>` (`pushOn`, `pushSend` dentro `notify()`), `sw.js` mostra la notifica. La chiave `VAPID_JWK` la crea il workflow alla prima pubblicazione.'],noti:['Le regole Firestore vanno incollate di nuovo (nuova collezione `push`), altrimenti le notifiche non si attivano. Se chi invia è senza rete la notifica push non parte (resta quella dentro l\'app).']}},
   {v:8,data:'2026-10-03',titolo:'Database centrale pronto',
-    chef:['Il database centrale è pronto: quando Mario lo attiva, tutti i telefoni vedono gli stessi ordini. Gli altri telefoni si collegano con il QR code (Impostazioni → Database centrale → Invita).'],
+    chef:['Il database centrale è pronto: quando lo sviluppatore lo attiva, tutti i telefoni vedono gli stessi ordini. Gli altri telefoni si collegano con il QR code (Impostazioni → Database centrale → Invita).'],
     dev:{aggiunte:['`firebase-config.js` con il progetto `jona-ordini`: in Impostazioni → Database centrale compaiono Attiva e Ho un codice. Finché non si preme Attiva ogni telefono resta su `LocalStore`.']}},
   {v:7,data:'2026-10-03',titolo:'Ordine a voce e Novità',
     tutti:['Puoi ordinare con la voce: premi il microfono e di\' per esempio «4 kg pomodori da Fratelli Mariano». Poi controlli e confermi.','Nuova sezione «Novità»: qui trovi cosa cambia nell\'app a ogni aggiornamento.'],
@@ -1467,7 +1471,7 @@ const pushActive=()=>pushOk()&&Notification.permission==='granted'&&!!ls('jona_p
 const ub64u=t=>{t=t.replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(t+'='.repeat((4-t.length%4)%4)),c=>c.charCodeAt(0))};
 async function pushId(ep){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(ep));return'p'+[...new Uint8Array(h)].slice(0,12).map(b=>b.toString(16).padStart(2,'0')).join('')}
 function pushWatch(){if(PUSH.on||now()<PUSH.retry||!pushFb())return;PUSH.on=true;
-  pushCol().onSnapshot(q=>{const m={};q.docs.forEach(d=>{m[d.id]=d.data()});PUSH.subs=m;PUSH.ld=true;pushSync()},()=>{PUSH.on=false;PUSH.retry=now()+60000})}
+  pushCol().onSnapshot(q=>{const m={};q.docs.forEach(d=>{m[d.id]=d.data()});PUSH.subs=m;PUSH.ld=true;pushSync();schedule()},()=>{PUSH.on=false;PUSH.retry=now()+60000})}
 async function pushSave(sub){const me=realU();if(!me)return;const id=await pushId(sub.endpoint);
   await pushCol().doc(id).set({u:me.id,sub:JSON.parse(JSON.stringify(sub)),creato:now()});ls('jona_push',id)}
 async function pushSync(){
@@ -1481,14 +1485,19 @@ async function pushOn(){
   const {chiave}=await(await fetch(PUSH_URL+'/chiave')).json();
   const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
   if(sub&&ls('jona_push_k')!==chiave){await sub.unsubscribe();sub=null}
-  if(!sub)try{sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)})}catch(e){return fail(e&&e.name==='AbortError'?'Il telefono ha bloccato le notifiche: segui la guida per il tuo telefono.':'Non riesco ad attivare le notifiche ('+(e&&e.name||'errore')+'): segui la guida.')}
-  ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: Mario deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono');return true}
+  S.pushErr='';if(!sub){const go=()=>reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)});
+    try{sub=await go()}catch(e){
+      try{const o=await reg.pushManager.getSubscription();if(o)await o.unsubscribe()}catch(x){}
+      await new Promise(r=>setTimeout(r,1500));
+      try{sub=await go()}catch(e2){S.pushErr=(e2&&e2.name||'errore')+(e2&&e2.message?': '+e2.message:'');
+        return fail(e2&&e2.name==='AbortError'?'Il servizio notifiche di Google non risponde: segui la guida per il tuo telefono.':'Non riesco ad attivare le notifiche: segui la guida.')}}}
+  ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: lo sviluppatore deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono');schedule();return true}
 const PUSH_HELP=[
   ['iphone','iPhone',['Apri <b>Impostazioni</b> → <b>Generali</b> → <b>Info</b> e guarda <b>Versione iOS</b>: deve essere <b>16.4 o più alta</b>. Se è più bassa: <b>Impostazioni</b> → <b>Generali</b> → <b>Aggiornamento software</b>.','Apri Jona <b>solo dall\'icona sulla schermata Home</b>, non da Safari. Se l\'icona non c\'è: apri <b>Safari</b> su jona-ristorante-by-ynoy-corp.pages.dev, premi <b>Condividi</b> (il quadrato con la freccia in su) → <b>Aggiungi alla schermata Home</b> → <b>Aggiungi</b>.','Apri <b>Impostazioni</b> → <b>Notifiche</b> → <b>Jona Ordini</b> e accendi <b>Consenti notifiche</b>.','Se è accesa la <b>Full immersion</b> (la luna), le notifiche arrivano senza suono: spegnila dal Centro di Controllo.']],
   ['xiaomi','Xiaomi, Redmi, POCO',['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi <b>Informazioni app</b>.','<b>Spegni</b> l\'interruttore <b>Sospendi l\'attività dell\'app se inutilizzata</b>.','Premi <b>Notifiche</b> e accendile.','Apri <b>Impostazioni</b> del telefono → <b>App</b> → <b>Gestisci app</b> → <b>Chrome</b> → <b>Risparmio batteria</b> → scegli <b>Nessuna restrizione</b>.','Nella stessa pagina di Chrome accendi <b>Avvio automatico</b>.']],
   ['samsung','Samsung',['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi la <b>i</b> (Informazioni app).','Premi <b>Notifiche</b> e accendi <b>Consenti notifiche</b>.','Se c\'è, <b>spegni</b> <b>Sospendi attività app se non utilizzata</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b> → <b>Batteria</b> → scegli <b>Senza restrizioni</b>.']],
   ['huawei','Huawei, Honor',['Controlla se sul telefono c\'è il <b>Play Store</b>. Se <b>non c\'è</b>, le notifiche ad app chiusa non possono funzionare: gli avvisi li trovi nella <b>campanella</b> quando apri l\'app.','Se il Play Store c\'è: <b>Impostazioni</b> → <b>Batteria</b> → <b>Avvio app</b> → <b>Chrome</b> → spegni <b>Gestisci automaticamente</b> e accendi tutti gli interruttori.','Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendile.']],
-  ['oppo','Oppo, Realme, OnePlus',['Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendile.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b> → <b>Utilizzo batteria</b> → accendi <b>Consenti attività in background</b> (e <b>Avvio automatico</b>, se c\'è).']],
+  ['oppo','Oppo, Realme, OnePlus',['Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendi <b>Consenti notifiche</b> e tutte le voci sotto.','Nella stessa pagina: <b>Utilizzo batteria</b> → scegli <b>Nessuna restrizione</b> (o accendi <b>Consenti attività in background</b>).','Sempre lì: <b>spegni</b> <b>Sospendi se inutilizzata</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Gestione app</b> → <b>Chrome</b> e ripeti: <b>Notifiche</b> accese, <b>Utilizzo batteria</b> → <b>Nessuna restrizione</b>, <b>Avvio automatico</b> acceso se c\'è.','Apri il <b>Play Store</b>, cerca <b>Google Play Services</b> e <b>Chrome</b>: se vedi <b>Aggiorna</b>, premilo.','Se usi una <b>VPN</b> o un blocco pubblicità, spegnilo e riprova.']],
   ['altro','Altro telefono',['Usa <b>Chrome</b>: apri jona-ristorante-by-ynoy-corp.pages.dev in Chrome, premi i <b>tre puntini</b> in alto → <b>Aggiungi a schermata Home</b> (o <b>Installa app</b>) e apri Jona dalla nuova icona.','Controlla che sul telefono ci sia il <b>Play Store</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b>: <b>Notifiche</b> accese e <b>Batteria</b> senza restrizioni.']]];
 const PUSH_DENY={iphone:['Apri <b>Impostazioni</b> del telefono (l\'icona con l\'ingranaggio).','Premi <b>Notifiche</b>.','Scorri e premi <b>Jona Ordini</b>.','Accendi <b>Consenti notifiche</b>.','Chiudi del tutto Jona e riaprila <b>dall\'icona</b> sulla schermata Home.'],
   android:['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi <b>Informazioni app</b> (o la <b>i</b>).','Premi <b>Notifiche</b> e accendi <b>Consenti notifiche</b>.','Non trovi la voce? Apri <b>Chrome</b> → <b>tre puntini</b> in alto a destra → <b>Impostazioni</b> → <b>Impostazioni sito</b> → <b>Notifiche</b>.','Sotto <b>Bloccate</b> premi <b>jona-ristorante-by-ynoy-corp.pages.dev</b> → scegli <b>Consenti</b>.','Chiudi del tutto Jona e riaprila <b>dall\'icona</b>.']};
@@ -1500,10 +1509,11 @@ function pushHelp(){
   <p>Su questo telefono le notifiche di Jona sono <b>bloccate</b> (forse hai premuto <b>Blocca</b> o <b>Non consentire</b> per sbaglio). L'app non può chiedere di nuovo: vanno sbloccate a mano, così.</p>
   <h3 class="ph-t">${ios?'iPhone':'Android'}</h3><ol class="ph-ol">${PUSH_DENY[ios?'iphone':'android'].map(x=>`<li>${x}</li>`).join('')}</ol>
   <div class="btns col"><button type="button" class="btn primary block" data-a="pushOn">${ic('bell')} Riprova ad attivare</button><button type="button" class="btn ghost block" data-a="pushAll">Ho un altro problema</button></div>`}return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Le notifiche non arrivano?</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${S.pushErr?`<p class="ph-err">Errore del telefono: <b>${esc(S.pushErr)}</b><br>Fai una foto di questa riga e mandala a chi gestisce l'app.</p>`:''}
   <h3 class="ph-t">Prima prova così</h3><ol class="ph-ol"><li>Controlla di avere <b>internet</b>.</li><li>Chiudi del tutto Jona e riaprila <b>dall'icona</b> sulla schermata Home.</li><li>Tocca <b>la tua foto</b> → <b>Attiva le notifiche</b> → <b>Consenti</b>.</li></ol>
   <h3 class="ph-t">Non va ancora? Scegli il tuo telefono</h3><div class="ph-brands">${PUSH_HELP.map(([k,l])=>`<button type="button" class="btn ghost" aria-pressed="${k===S.pushBrand}" data-a="pushBrand" data-v="${k}">${l}</button>`).join('')}</div>
   ${g?`<h3 class="ph-t">${g[1]}</h3><ol class="ph-ol">${g[2].map(x=>`<li>${x}</li>`).join('')}</ol>
-  <p class="muted">Fatto? Premi qui sotto. Se non funziona ancora, chiedi a Mario e digli cosa c'è scritto nel messaggio rosso.</p>
+  <p class="muted">Fatto? Premi qui sotto. Se non funziona ancora, chiedi allo sviluppatore e digli cosa c'è scritto nel messaggio rosso.</p>
   ${pushActive()?'':`<div class="btns col"><button type="button" class="btn primary block" data-a="pushOn">${ic('bell')} Riprova ad attivare</button></div>`}`:''}`}});
 }
 async function pushOff(){const id=ls('jona_push');ls('jona_push',null);
@@ -1558,7 +1568,7 @@ function obxBar(){
   if(!obxWaiting())return'';const n=OBX.list.length;const gm=obxToGm();const chi=gmNome()||'chef';
   const last=[...OBX.list].reverse().find(x=>x.a==='gm'||x.a==='gestori')||S.obxMsg||{titolo:'Ti ho mandato una richiesta',testo:''};
   const sms='sms:?&body='+encodeURIComponent('Ciao '+chi+', su Jona Ordini: '+last.titolo+(last.testo?'. '+last.testo:''));
-  return`<div class="obx" role="status">${ic('warn')}<div class="obx-i"><b>${gm?'Non ancora arrivata '+esc(gmA()):(n===1?'Un avviso non ancora partito':n+' avvisi non ancora partiti')}</b><span>${navigator.onLine===false?'Manca la rete: parte da sola appena torna.':'Riprovo da solo.'} Tieni aperta l'app finché vedi «Arrivata ✓».</span></div>
+  return`<div class="obx obx-q" role="status">${ic('warn')}<div class="obx-i"><b>${gm?'Non ancora arrivata '+esc(gmA()):(n===1?'Un avviso non ancora partito':n+' avvisi non ancora partiti')}</b><span>${navigator.onLine===false?'Manca la rete: parte da sola appena torna.':'Riprovo da solo.'} Tieni aperta l'app finché vedi «Arrivata ✓».</span></div>
   <div class="obx-b"><button type="button" class="btn ghost sm" data-a="obxGo">${ic('send')} Riprova</button>${gm?`<a class="btn ghost sm" href="${esc(sms)}">${ic('chat')} Manda SMS</a>`:''}</div></div>`;
 }
 addEventListener('online',()=>obxFlush());
@@ -1607,6 +1617,8 @@ function view(){
 }
 /* v35 «App da aggiornare»: c'è una versione nuova (service worker cambiato mentre l'app era aperta) o serve il collegamento
    compatibile (netWatch). Niente riavvio automatico: lo decide la persona */
+function pushAsk(){if(S.upd||S.wallMode||!realU()||!pushOk()||!pushFb()||pushActive()||Number(ls('jona_push_ask')||0)>now())return'';const den=pushDenied();
+  return`<div class="obx push-ask" role="status">${ic('bell')}<div class="obx-i"><b>${den?'Notifiche bloccate':'Attiva le notifiche'}</b><span>${den?'Su questo telefono gli avvisi di Jona sono bloccati. Ti spiego come sbloccarli.':'Così ti arrivano gli avvisi anche con l\'app chiusa. Basta un tocco.'}</span></div><div class="obx-b"><button type="button" class="btn ghost sm" data-a="pushLater">Più tardi</button><button type="button" class="btn primary sm" data-a="${den?'pushHelp':'pushOn'}">${den?'Come fare':'Attiva'}</button></div></div>`}
 function banner(){if(!S.upd)return'';return`<div class="obx" role="status">${ic('warn')}<div class="obx-i"><b>App da aggiornare</b><span>Hai una versione non aggiornata: potresti avere problemi o funzioni in meno. Ti consigliamo di chiudere e riaprire l'app.</span></div><div class="obx-b"><button type="button" class="btn primary sm" data-a="reload">Aggiorna ora</button></div></div>`}
 function updOn(){if(S.upd)return;S.upd=1;schedule()}
 const wallMsg=(t,p,act='')=>`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>${esc(t)}</h1><p class="muted">${esc(p)}</p>${act}</div></div>`;
@@ -1648,19 +1660,19 @@ async function itGo(){
 function screenPhone(s){
   if(ls('jona_itk')&&!s.req&&s.wait!=='no')return screenInvite();
   const r=s.req,logo='<div class="logo-full" role="img" aria-label="Jona Ristorante"></div>';
-  if(s.wait==='no')return wallMsg('Richiesta non approvata','Maurizio o Mario non hanno approvato questo telefono. Se è un errore, parla con loro e chiedi di nuovo.',`<button type="button" class="btn primary block big" data-a="phAgain">Chiedi di nuovo</button>`);
+  if(s.wait==='no')return wallMsg('Richiesta non approvata','Maurizio o lo sviluppatore non hanno approvato questo telefono. Se è un errore, parla con loro e chiedi di nuovo.',`<button type="button" class="btn primary block big" data-a="phAgain">Chiedi di nuovo</button>`);
   if(r)return`<div class="wall linen">${logo}<div class="wall-card" style="text-align:center"><div style="display:flex;justify-content:center;margin-bottom:12px">${avatar(r,84)}</div>
-  <h1>Ciao ${esc(r.nome)}!</h1><p class="muted">Richiesta inviata. Maurizio o Mario devono <b>approvare questo telefono</b>.</p><p class="muted">Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>
+  <h1>Ciao ${esc(r.nome)}!</h1><p class="muted">Richiesta inviata. Maurizio o lo sviluppatore devono <b>approvare questo telefono</b>.</p><p class="muted">Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>
   ${r.nuovo?`<p class="muted small">Nuovo profilo · nome utente <b>${esc(r.username)}</b></p>`:`<p class="muted small">Hai già un profilo: dopo l'approvazione entri con il tuo nome utente e la tua password.</p>`}
   <div style="margin-top:18px"><button type="button" class="btn ghost block" data-a="${r.nuovo?'phNew':'phOld'}">Modifica la richiesta</button></div></div></div>`;
   return`<div class="wall linen">${logo}<div class="wall-card"><h1>Benvenuto!</h1>
-  <p class="muted">Prima di entrare, Maurizio o Mario devono approvare questo telefono. Dicci chi sei:</p>
+  <p class="muted">Prima di entrare, Maurizio o lo sviluppatore devono approvare questo telefono. Dicci chi sei:</p>
   <div style="margin-top:18px;display:grid;gap:12px"><button type="button" class="btn primary block big" data-a="phNew">Sono nuovo: creo il mio profilo</button><button type="button" class="btn ghost block big" data-a="phOld">Ho già un profilo</button></div></div></div>`;
 }
 function phoneSheet(nuovo){
   const r=S.db&&S.db.status().req;S.form=r&&!!r.nuovo===nuovo?Object.assign({reparto:'cucina',mansione:'Cameriere'},clone(r),{pw:'',pw2:''}):{reparto:'cucina',mansione:'Cameriere'};if(r&&r.nuovo)S.form._uSug=r.username;
   openSheet({reg:nuovo?'ph':false,render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${nuovo?'Crea il tuo profilo':'Chi sei?'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${nuovo?profileForm('ph',{}):`<p class="muted" style="margin:0">Scrivi nome e cognome, così Maurizio o Mario ti riconoscono.</p>
+  ${nuovo?profileForm('ph',{}):`<p class="muted" style="margin:0">Scrivi nome e cognome, così Maurizio o lo sviluppatore ti riconoscono.</p>
   <div class="two stack"><div><label class="lbl" for="ph-nome">Nome</label><input class="inp" id="ph-nome" autocomplete="given-name" value="${esc(S.form.nome||'')}" data-in="form" data-k="nome"></div>
   <div><label class="lbl" for="ph-cognome">Cognome</label><input class="inp" id="ph-cognome" autocomplete="family-name" value="${esc(S.form.cognome||'')}" data-in="form" data-k="cognome"></div></div>`}
   <div style="margin-top:22px"><button type="button" class="btn primary block big" data-a="phSend" data-v="${nuovo?1:0}">Chiedi l'approvazione</button></div>`});
@@ -1721,7 +1733,7 @@ async function inviteCard(fx){const inv=fx||await invNew();let qs=fx?'':S.qrImg;
   x.fillStyle='#F3EDE7';x.font=F(200,82);x.fillText('Benvenuto nella squadra',W/2,488);x.fillStyle='#D9CFC5';x.font=F(300,34);x.fillText('Ordini, turni e chat della brigata, tutto in un\'app.',W/2,548);
   const q=430,qx=W/2-q/2,qy=626;x.fillStyle='#FFFFFF';x.beginPath();x.roundRect(qx-26,qy-26,q+52,q+52,36);x.fill();x.imageSmoothingEnabled=false;x.drawImage(qr,qx,qy,q,q);x.imageSmoothingEnabled=true;
   x.fillStyle='#1F7F86';x.beginPath();x.roundRect(W/2-300,qy+q+60,600,84,42);x.fill();x.fillStyle='#FFFFFF';x.font=F(500,34);x.fillText('Inquadra con la fotocamera',W/2,qy+q+114);
-  x.fillStyle='#BDB2A6';x.font=F(300,28);x.fillText(fx?'Registrati: Maurizio o Mario approvano il tuo telefono':'Poi aggiungi l\'app alla schermata Home e registrati',W/2,qy+q+196);
+  x.fillStyle='#BDB2A6';x.font=F(300,28);x.fillText(fx?'Registrati: un gestore approva il tuo telefono':'Poi aggiungi l\'app alla schermata Home e registrati',W/2,qy+q+196);
   if(inv.c){x.font=F(300,28);const t1='Codice d\'invito  ',w1=x.measureText(t1).width;x.font=F(500,34);x.letterSpacing='6px';const w2=x.measureText(inv.c).width;x.textAlign='left';x.fillStyle='#F3EDE7';x.fillText(inv.c,W/2-(w1+w2)/2+w1,qy+q+250);x.letterSpacing='0px';x.font=F(300,28);x.fillStyle='#BDB2A6';x.fillText(t1,W/2-(w1+w2)/2,qy+q+250);x.textAlign='center'}
   const b=await new Promise(r=>c.toBlob(r,'image/png')),f=new File([b],fx?'qr-cucina-jona.png':'invito-jona.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Invito Jona'});return}catch(e){if(e&&e.name==='AbortError')return}}
@@ -1767,7 +1779,7 @@ const localNote=()=>S.db&&S.db.kind==='locale'?`<p class="local-note">Versione d
 function screenWait(u){
   return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card" style="text-align:center">
   <div style="display:flex;justify-content:center;margin-bottom:12px">${avatar(u,84)}</div><h1>Ciao ${esc(u.nome)}!</h1>
-  <p class="muted">Il tuo profilo è stato creato ed è <b>in attesa di approvazione</b>.</p><p class="muted">Maurizio o Mario devono approvarlo. Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>
+  <p class="muted">Il tuo profilo è stato creato ed è <b>in attesa di approvazione</b>.</p><p class="muted">Maurizio o lo sviluppatore devono approvarlo. Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>
   <div style="margin-top:18px"><button type="button" class="btn ghost block" data-a="waitLeave">Entra con un altro profilo</button></div></div></div>`;
 }
 function waitCheck(){const w=ls('jona_wait');if(!w||S.me||!S.db||!allLoaded())return;if(S.db.kind==='firebase'&&!S.db.status().ready)return;const u=D().staff[w.id];
@@ -1801,7 +1813,7 @@ function profileForm(p,o={}){
 function screenSetup(){
   if(!S.form.ruolo)S.form={ruolo:'gm',reparto:'cucina',mansione:'Chef'};
   return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div>
-  <div class="wall-card"><h1>Primo accesso</h1><p class="muted" style="margin:0 0 4px">Crea il primo profilo di gestione. Dopo potrai aggiungere gli altri: Maurizio come amministratore, Mario come sviluppatore, e lo staff si registrerà da solo.</p>
+  <div class="wall-card"><h1>Primo accesso</h1><p class="muted" style="margin:0 0 4px">Crea il primo profilo di gestione. Dopo potrai aggiungere gli altri: l'amministratore e lo sviluppatore, e lo staff si registrerà da solo.</p>
   ${profileForm('su',{roles:['gm','dev'],noRep:true})}<div style="margin-top:22px"><button type="button" class="btn primary block big" data-a="setupGo">Crea profilo e entra</button></div></div>${localNote()}</div>`;
 }
 const normUser=s=>String(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’`]/g,'').replace(/\s+/g,'.');
@@ -1860,7 +1872,7 @@ function registerSheet(mode){
   const invOpt=mode==='admin'&&!!S.db&&S.db.kind==='firebase';
   S.form={ruolo:'staff',reparto:'cucina',mansione:'Cameriere',_inv:invOpt?1:0};if(mode==='admin'&&isGM(meU()))Object.assign(S.form,CONTR0,{_c:true});
   openSheet({reg:mode==='self',render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${mode==='admin'?'Aggiungi profilo':'Crea il tuo profilo'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${mode==='admin'?'':'<p class="muted" style="margin:0">Dopo la registrazione Maurizio o Mario approvano il profilo.</p>'}
+  ${mode==='admin'?'':'<p class="muted" style="margin:0">Dopo la registrazione Maurizio o lo sviluppatore approvano il profilo.</p>'}
   ${profileForm('rg',{roles:mode==='admin'?['staff','gm','dev']:null,contr:mode==='admin',invOpt})}
   <div style="margin-top:22px"><button type="button" class="btn primary block big" data-a="${mode==='admin'?'addGo':'regGo'}">Crea profilo</button></div>`});
 }
@@ -1868,7 +1880,7 @@ async function doLogin(){
   const u=normUser(S.login.u),p=S.login.p;if(!u||!p)return toast('Scrivi nome utente e password.','warn');
   const x=Object.values(D().staff).find(s=>s.username===u);
   if(!x||await sha(x.id+':'+p)!==x.pass){const c=$('.login');if(c){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake')}return toast('Nome utente o password non corretti.','err')}
-  if(x.stato==='in_attesa')return toast('Il tuo profilo aspetta l\'approvazione di Maurizio o Mario.','warn');
+  if(x.stato==='in_attesa')return toast('Il tuo profilo aspetta l\'approvazione di Maurizio o dello sviluppatore.','warn');
   if(x.stato==='disattivato')return toast('Questo profilo è disattivato. Chiedi a Maurizio di riattivarlo.','warn');
   S.login={u:'',p:''};login(x.id);
 }
@@ -1896,7 +1908,7 @@ function shell(me){
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${pushAsk()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -2926,8 +2938,10 @@ function vStaff(me){
   if(S.staffSub==='orari')return`<h1 class="vt">Staff</h1><p class="vsub">Tocca una casella per mettere il turno.</p>${sw}${vOrari()}`;
   const all=Object.values(D().staff);const pend=all.filter(u=>u.stato==='in_attesa');const act=all.filter(u=>u.stato!=='in_attesa');
   const mg=act.filter(u=>isMgr(u)).sort(byNome);
-  const row=u=>`<button type="button" class="row link ${u.stato==='disattivato'?'dim':''}" data-a="sedit" data-u="${u.id}">${avatar(u,44)}<div class="row-i"><div class="row-t">${esc(fullName(u))}${isMgr(u)?` <span class="tag gm">${RUOLI[u.ruolo].toLowerCase()}</span>`:''}</div><div class="row-m">@${esc(u.username||'')}${!isMgr(u)&&u.mansione?', '+esc(u.mansione):''}${u.stato==='disattivato'?', disattivato':''}${u.stato==='invitato'?', invito non ancora usato':''}</div></div>${ic('chev')}</button>`;
-  return`<div class="vhead"><div><h1 class="vt">Staff</h1><p class="vsub">${act.filter(u=>u.stato==='attivo').length} profili attivi</p></div><button type="button" class="btn primary" data-a="addProfile">${ic('plus')} Aggiungi</button></div>${sw}
+  const pv=pushFb()&&PUSH.ld,hasP=id=>Object.values(PUSH.subs).some(p=>p.u===id),noP=pv?act.filter(u=>u.stato==='attivo'&&!hasP(u.id)).length:0;
+  const pst=u=>pv&&u.stato==='attivo'?(hasP(u.id)?' · <span class="pst on">🟢 avvisi attivi</span>':' · <span class="pst off">🔴 niente avvisi</span>'):'';
+  const row=u=>`<button type="button" class="row link ${u.stato==='disattivato'?'dim':''}" data-a="sedit" data-u="${u.id}">${avatar(u,44)}<div class="row-i"><div class="row-t">${esc(fullName(u))}${isMgr(u)?` <span class="tag gm">${RUOLI[u.ruolo].toLowerCase()}</span>`:''}</div><div class="row-m">@${esc(u.username||'')}${!isMgr(u)&&u.mansione?', '+esc(u.mansione):''}${u.stato==='disattivato'?', disattivato':''}${u.stato==='invitato'?', invito non ancora usato':''}${pst(u)}</div></div>${ic('chev')}</button>`;
+  return`<div class="vhead"><div><h1 class="vt">Staff</h1><p class="vsub">${act.filter(u=>u.stato==='attivo').length} profili attivi${noP?` · <span class="pst off">🔴 ${noP} senza avvisi</span>`:''}</p></div><button type="button" class="btn primary" data-a="addProfile">${ic('plus')} Aggiungi</button></div>${sw}
   ${phPend().length?`<h2 class="sec">Telefoni da approvare<span>${phPend().length}</span></h2><div class="panel">${phPend().map(x=>`<div class="row">${avatar(x.req,48)}<div class="row-i"><div class="row-t">${esc(fullName(x.req))}</div><div class="row-m">${x.req.nuovo?esc(['nuovo profilo',x.req.mansione,REPARTI[x.req.reparto]].filter(Boolean).join(', ')):'ha già un profilo'} · ${phDev(x.ua)}</div></div><button type="button" class="icon-btn danger" data-a="phNo" data-v="${x.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="phOk" data-v="${x.id}">Approva</button></div>`).join('')}</div>`:''}
   ${pend.length?`<h2 class="sec">Da approvare<span>${pend.length}</span></h2><div class="panel">${pend.map(u=>`<div class="row">${avatar(u,48)}<div class="row-i"><div class="row-t">${esc(fullName(u))}</div><div class="row-m">${esc([u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</div></div><button type="button" class="icon-btn danger" data-a="sno" data-u="${u.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="sok" data-u="${u.id}">Approva</button></div>`).join('')}</div>`:''}
   ${mg.length?`<h2 class="sec">Gestione<span>${mg.length}</span></h2><div class="panel">${mg.map(row).join('')}</div>`:''}
@@ -3801,7 +3815,7 @@ async function chFile(tipo,blob,x){
     netWatch(chCol().add(d)).catch(e=>toast('Messaggio non inviato: riprova.','err'));
     chMarkRead(x.c,d.creato);chPush(x.c,me,t)}
   catch(e){const nf=(tipo==='foto'?'Foto':'Vocale')+' non inviat'+(tipo==='foto'?'a':'o');
-    toast(e.status===403?'Questo telefono non è collegato al ristorante.':e.status===503?'Foto e vocali non sono ancora attivi sul server.':e.status===413?(tipo==='foto'?'Foto troppo grande.':'Vocale troppo lungo.'):e.status?nf+' (errore '+e.status+'): riprova o avvisa Mario.':nf+': controlla la connessione e riprova.','err')}
+    toast(e.status===403?'Questo telefono non è collegato al ristorante.':e.status===503?'Foto e vocali non sono ancora attivi sul server.':e.status===413?(tipo==='foto'?'Foto troppo grande.':'Vocale troppo lungo.'):e.status?nf+' (errore '+e.status+'): riprova o avvisa lo sviluppatore.':nf+': controlla la connessione e riprova.','err')}
   finally{CHAT.up--;chPaint(true)}}
 function chPhoto(){const c=S.chat&&S.chat.c;if(!c)return;
   pickFile({accept:'image/*'},async fs=>{let x;try{x=await algImg(fs[0])}catch(e){return toast('Non riesco ad aprire questa foto.','err')}chFile('foto',x.blob,Object.assign(x,{c}))})}
@@ -3955,7 +3969,7 @@ function chPaint(force){
   // lista
   const list=chList(me),err=CHAT.err==='permission-denied';
   set('.cht-l',`<header class="cht-h"><button type="button" class="icon-btn" data-a="chClose" aria-label="Chiudi la chat">${ic('x')}</button><b>Chat</b><button type="button" class="icon-btn" data-a="chPick" aria-label="Nuova chat" aria-pressed="${!!C.pick}">${ic(C.pick?'back':'pencil')}</button></header>
-    ${err?`<div class="cht-off">${ic('warn')}<b>La chat va attivata</b><span>Il database non accetta ancora i messaggi. ${isMgr(me)?'Aggiorna le regole di Firebase con il file <code>firebase/firestore.rules</code> (vedi la guida di Mario).':'Chiedi a Maurizio o a Mario di attivarla.'}</span></div>`:''}
+    ${err?`<div class="cht-off">${ic('warn')}<b>La chat va attivata</b><span>Il database non accetta ancora i messaggi. ${isMgr(me)?'Aggiorna le regole di Firebase con il file <code>firebase/firestore.rules</code> (vedi la guida dello sviluppatore).':'Chiedi a Maurizio o allo sviluppatore di attivarla.'}</span></div>`:''}
     <div class="cht-items">${C.pick?`<p class="cht-sub">Nuova chat con…</p>`+chPeople().filter(u=>u.id!==me.id).sort(byNome).map(u=>`<button type="button" class="cht-it" data-a="chGo" data-c="${chDm(me.id,u.id)}">${avatar(u,46)}<div class="cht-ii"><b>${esc(fullName(u))}</b><span>${esc(isMgr(u)?RUOLI[u.ruolo]:[u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</span></div></button>`).join('')
     :list.map(x=>{const i=chInfo(x.c,me),l=x.last,w=l&&D().staff[l.da];return`<button type="button" class="cht-it${C.c===x.c?' on':''}" data-a="chGo" data-c="${x.c}">${chAv(i,46)}<div class="cht-ii"><div class="cht-r"><b>${esc(i.n)}</b>${l?`<time class="${x.un?'un':''}">${chDay(l.creato)==='Oggi'?chTime(l.creato):chDay(l.creato)==='Ieri'?'Ieri':new Date(l.creato).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</time>`:''}</div>
       <div class="cht-r"><span>${l?(l.da===me.id?'Tu: ':!x.c.startsWith('dm_')&&w?esc(w.nome)+': ':'')+esc(l.t):`<i>${esc(i.s)}</i>`}</span>${x.un?`<em>${x.un>99?'99+':x.un}</em>`:''}</div></div></button>`}).join('')}
@@ -4394,7 +4408,7 @@ const A={
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
-  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushAll:()=>{S.pushAll=true;repaint()},pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
+  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushLater:()=>{ls('jona_push_ask',now()+3*864e5);render()},pushAll:()=>{S.pushAll=true;repaint()},pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
   photoCam:()=>{regKeep();pickFile({accept:'image/*',capture:'user'},setPhoto)},
   photoLib:()=>{regKeep();pickFile({accept:'image/*'},setPhoto)},
   tab:d=>{if(d.v==='carrello')animPrefetch();if(S.tab&&S.tab!==d.v){NAV.tabs=NAV.tabs.filter(t=>t!==S.tab).slice(-9);NAV.tabs.push(S.tab)}S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
@@ -4411,7 +4425,7 @@ const A={
   invCopy:async()=>copyText((await invNew()).l),
   fbLeave:async()=>{if(!await ask('Scollegare questo telefono?','L\'app su questo telefono non vedrà più i dati del ristorante finché non lo ricolleghi con il QR code. I dati sul database restano.','Scollega',true))return;ls('jona_key',null);ls('jona_member',null);ls('jona_fb_upload',null);try{LocalStore.load({})}catch(e){}location.reload()},
   fbCfgPaste:async()=>{const a=await ask('Configurazione Firebase','Incolla qui la configurazione dell\'app web presa da Firebase (il blocco firebaseConfig).','Salva',false,{label:'firebaseConfig',value:''});if(!a)return;const c=fbCfgParse(a.v);if(!c)return toast('Non trovo apiKey, projectId e appId: copia tutto il blocco.','warn');ls('jona_fb',c);toast('Configurazione salvata');S.fbActive=await fbPublic();refreshSheet()},
-  viewAs:d=>{S.viewAs=VIEW_AS[d.v]?d.v:null;ls('jona_viewas',S.viewAs);S.cart=ls('jona_cart_'+S.me)||[];S.tab=null;window.scrollTo(0,0);render();toast(({gm:'Vedi l\'app come l\'amministratore',staff:'Vedi l\'app come lo staff'})[S.viewAs]||'Torni alla tua vista da sviluppatore')},
+  viewAs:d=>{S.viewAs=VIEW_AS[d.v]?d.v:null;ls('jona_viewas',S.viewAs);S.cart=ls('jona_cart_'+S.me)||[];S.tab=null;window.scrollTo(0,0);render()},
   myProfile:()=>{closeSheet(true);profileSheet(S.me)},
   settings:()=>{closeSheet(true);settingsSheet()},
   qclear:()=>{S.q='';render();const q=$('#q');if(q)q.focus()},
