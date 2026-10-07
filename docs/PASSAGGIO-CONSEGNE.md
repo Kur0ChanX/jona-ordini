@@ -3,6 +3,10 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+**S1 (v48) pronta**: `syncPill` mostra «N modifiche non arrivate · Riprova» se la rete è accesa ma le scritture non sono confermate da 8 s (`PEND_MS`, `st.pendT`, `syncRetry`/`netRetry`); `phReject` con tempo massimo. Controllati gli altri punti: chat ha già lo stato «in invio» (`pend` da `hasPendingWrites`), avvisi al chef hanno già «Non ancora arrivata/Arrivata ✓» (`obxBar`), `phApprove` ha `fbTmo`. Prova nuova `tools/test-falsi-ok.mjs` (8 PASS) aggiunta alle veloci di GitHub. Prove legate riuscite. Poi: S3 scatola nera, D9.
+
+«perché mettili la stessa regola che valuti al meglio ed è autonomo no come hai fatto tu lo stesso mi chiede solo cose innerenti a cambiamenti del programma come abbiamo fatto noi» + 2 foto della sessione RVC (rifiuta le regole mandate da un'altra sessione: giusto, sicurezza). Dato a Mario il testo da incollare lui nella sessione RVC. **S2 FATTO**: PR #57 verde su GitHub (12 min) e unita (`7f62cac`), main unito nel ramo. Prossimo: S1 caccia ai «falsi ok», poi S3, poi D9.
+
 «abbiamo detto Una volta a settimana il controllo da 1 ora? va bene o consumiamo troppo? valutabe aggiorna anche rvc» → valutato: repo Jona PUBBLICO = minuti di GitHub Actions gratis e illimitati, le prove non consumano token di Claude; si tiene il giro completo settimanale + veloci a ogni PR. Mandata la valutazione a RVC (se privato: 2000 min/mese condivisi).
 
 «Puoi mettere la regola anche su RVC» → mandato alla sessione RVC #11 (`session_01NTWJZpaWY9weMSfovHruJv`) il testo delle regole: decido io sul tecnico, link cliccabili, pubblica senza chiedere, piano stabilità S1-S3. **S2 in corso**: PR #57 aperta (workflow `prove.yml` + `tools/prova-ci.sh`), primo giro su GitHub in esecuzione; se verde → squash + merge main nel ramo; se rosso → capire e correggere. Poi S1, S3, D9.

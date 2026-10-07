@@ -1,0 +1,36 @@
+// S1 (v48): modifiche non confermate dal server con la rete accesa (Wi-Fi che blocca le scritture): la pillola lo dice e «Riprova».
+import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+// firebase-config.js vero nascosto: le prove usano solo la configurazione finta (demo-jona) dell'emulatore
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
+const CFG={apiKey:'fake-key',authDomain:'demo-jona.firebaseapp.com',projectId:'demo-jona',appId:'1:1:web:1'};
+const mk=async cfg=>{const c=await b.newContext({viewport:{width:400,height:800},serviceWorkers:'block'});
+  await c.addInitScript(cfg=>{localStorage.setItem('jona_fb_emu',JSON.stringify('127.0.0.1'));if(cfg&&!localStorage.getItem('jona_fb'))localStorage.setItem('jona_fb',JSON.stringify(cfg))},cfg);
+  const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));return p};
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
+const txt=async(p,sel='#app')=>(await p.locator(sel).innerText()).replace(/\s+/g,' ');
+const A=await mk(CFG);
+await A.goto('http://localhost:8765/index.html');await A.waitForTimeout(3000);
+await A.click('[data-a="formset"][data-v="dev"]');
+for(const [k,v] of Object.entries({nome:'Mario',cognome:'Test',username:'mario',pw:'prova1234',pw2:'prova1234'}))await A.fill('input[data-k="'+k+'"]',v);
+await A.click('[data-a="setupGo"]');await A.waitForTimeout(1200);
+await A.evaluate(()=>{fbActivate()});await A.waitForTimeout(300);await A.click('#ask-ok');await A.waitForTimeout(8000);
+ok(await A.evaluate(()=>S.db.kind==='firebase'&&S.db.status().ready),'A (chi ha attivato) entra subito');
+await A.evaluate(()=>makeTestData());await A.waitForTimeout(3000);
+let t='';
+await A.evaluate(()=>{S.tab='fornitori';render()});
+ok(await A.locator('.sync-pill').count()===0,'A: con tutto salvato niente pillola');
+const blocca=r=>r.abort();await A.context().route(/Firestore\/Write\/channel/,blocca);
+await A.evaluate(()=>{const id=Object.keys(D().fornitori)[0];upd('fornitori',id,{note:'prova S1'})});
+await A.waitForTimeout(2000);
+ok(await A.locator('.sync-wait').count()===0,'A: nei primi secondi niente allarme');
+await A.waitForTimeout(8000);
+t=(await A.locator('.sync-wait').innerText().catch(()=>'')).replace(/\s+/g,' ');
+ok(/1 modifica non arrivata/.test(t)&&/Riprova/.test(t),'A (scritture bloccate): «1 modifica non arrivata · Riprova» ('+t+')');
+await A.context().unroute(/Firestore\/Write\/channel/,blocca);
+await A.click('.sync-wait');await A.waitForTimeout(6000);
+ok(await A.locator('.sync-wait').count()===0,'A: dopo «Riprova» e rete libera la pillola sparisce');
+ok(await A.evaluate(()=>!!localStorage.getItem('jona_fb_lp')&&S.upd===1),'A: «Riprova» passa al long polling e chiede di riaprire');
+ok(await A.evaluate(async()=>{const id=Object.keys(D().fornitori)[0];const d=await fbInit().fs.collection('fornitori').doc(id).get({source:'server'});return d.data().note==='prova S1'}),'A: la modifica è arrivata davvero al server');
+ok(!A.errs.length,'A: nessun errore '+A.errs.join(' | '));
+await b.close();
