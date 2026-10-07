@@ -1046,8 +1046,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=43;
+const APP_VER=44;
 const NEWS=[
+  {v:44,data:'2026-10-07',titolo:'Testo delle scadenze più chiaro',
+    chef:['Impostazioni → Scadenze per lo staff: ora c\'è un esempio completo dell\'avviso che arriva allo staff, «Richieste allo chef entro le 18».'],
+    dev:{aggiunte:['Testo della riga «Scadenze per lo staff» in Impostazioni: esempio con l\'ora invece dei puntini.']}},
   {v:43,data:'2026-10-07',titolo:'Responsabili con orario libero',
     chef:['Staff → tocca una persona → «Contratto e orari» → «Full time Responsabile»: niente turni da pianificare e nessun controllo sulle ore. La persona non compare più negli orari.','Chi ha l\'orario libero, in «I miei orari», vede «Orario libero» invece della tabella dei turni.'],
     dev:{aggiunte:['`staff.contratto` = `{libero:true}` (`orContr`, `orFree`); `contrOf` lo tratta come senza contratto, `orPeople` lo esclude (pianificatore, controlli, export, cambi turno). Scelta «Tipo di contratto» in `orContrForm` (`S.form.libero`).','Barra Test: vista «F&B Mauro» (`VIEW_AS.fb`, staff del reparto `fb`) per provare ciò che vede l\'F&B Manager (prova `tools/test-testbar.mjs`).']}},
@@ -4106,7 +4109,7 @@ async function ptSet(h){
 async function qfCard(k){const q=cfg().qrFisso,c=k||q&&q.c;if(!c)return;try{await inviteCard({l:INV_URL+'/'+c,c})}catch(e){toast('Immagine del QR non riuscita: riprova.','err')}}
 function promRows(){const sel=cfg().promA||[],mg=Object.values(D().staff).filter(u=>u.stato==='attivo'&&isMgr(u)).sort((a,b)=>fullName(a).localeCompare(fullName(b)));
   return`<div class="setrow"><div><b>«Oggi si ordina» arriva a</b><span>${sel.length?'Solo ai nomi scelti':'Tutti gli Admin Chef. Tocca un nome per mandarlo solo a lui'}</span><div class="chips" role="group" aria-label="Chi riceve Oggi si ordina" style="margin-top:8px">${mg.map(u=>`<button type="button" class="chip" aria-pressed="${sel.includes(u.id)}" data-a="promA" data-v="${u.id}">${esc(fullName(u))}</button>`).join('')}</div></div></div>
-  <div class="setrow"><div style="flex:1"><b>Scadenze per lo staff</b><span>Avviso sul telefono dello staff: «Richieste allo chef entro le…»</span>
+  <div class="setrow"><div style="flex:1"><b>Scadenze per lo staff</b><span>Esempio di avviso sul telefono dello staff: «Richieste allo chef entro le 18»</span>
   ${scadL().map(x=>`<div class="sc-row"><div><b>${esc(scadNome(x)||'Tutte le richieste')} · entro le ${esc(x.entro)}</b><span>${x.g.map(g=>OR_GG[g]).join(' ')} · avviso alle ${minHm(scadAvv(x))} · ${(x.rep||[]).length?x.rep.map(r=>REPARTI[r]||r).join(', '):'Tutto lo staff'}</span></div><button type="button" class="btn ghost sm" data-a="scEdit" data-v="${x.id}">Modifica</button></div>`).join('')}
   <div class="btns" style="margin-top:8px"><button type="button" class="btn ghost sm" data-a="scEdit" data-v="">${ic('plus')} Aggiungi scadenza</button></div></div></div>`}
 function scSheet(id){const x0=scadL().find(x=>x.id===id);S.sc=x0?clone(x0):{id:'',f:'',g:[0,1,2,3,4,5],entro:'11:00',avv:'',rep:[]};if(!Array.isArray(S.sc.rep))S.sc.rep=[];

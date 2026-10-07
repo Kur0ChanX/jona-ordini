@@ -51,7 +51,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
   3. Se TUTTE le condizioni sono vere: apri automaticamente la nuova sessione (usando lo strumento `Create Session`) e avvisami quando è pronta, senza chiedere permesso.
   4. Se ANCHE UNA SOLA condizione è falsa: FERMATI immediatamente. Non aprire nuove sessioni. Scrivimi in 1-2 righe cosa è andato storto e attendi il mio intervento.
   5. NOMI CHIARI DELLE SESSIONI: dai sempre un titolo alla nuova sessione nel formato `▶ ATTIVA · #<NN> · <Progetto> · da v<versione> · <data> · prossimo: <argomento>` e rinomina quella vecchia in `✓ CHIUSA · #<NN> · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>` (strumento di rinomina della sessione). Così tra tante conversazioni si capisce subito quale usare.
-  6. PROMPT MINIMALE PER NUOVA SESSIONE: Quando crei la nuova sessione, passa un prompt iniziale di MASSIMO 3 RIGHE. Dì solo alla nuova sessione di fare `git fetch origin <ramo> && git merge --ff-only origin/<ramo>`, poi leggere `CLAUDE.md` e `docs/PASSAGGIO-CONSEGNE.md` e attendere le mie istruzioni. Non duplicare codice o dettagli.
+  6. PROMPT MINIMALE PER NUOVA SESSIONE: Quando crei la nuova sessione, passa un prompt iniziale di MASSIMO 3 RIGHE. Dì solo alla nuova sessione di fare `git fetch origin <ramo> && git merge --ff-only origin/<ramo>`, poi leggere `CLAUDE.md`, `docs/ERRORI.md` e `docs/PASSAGGIO-CONSEGNE.md` e attendere le mie istruzioni. Se `git status` dice «HEAD detached», prima `git checkout <ramo>`. Non duplicare codice o dettagli.
 
 
 ## DIVIETO ASSOLUTO DI COMANDI DISTRUTTIVI E FORCE PUSH (POLITICA ZERO RISCHIO)
@@ -89,6 +89,9 @@ Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scr
 
 ## REGOLE TRASVERSALI
 
+- IMPARARE DAGLI ERRORI (Mario, 07/10/2026): `docs/ERRORI.md` è il diario degli errori. Lo leggo a ogni avvio. Quando un errore fa perdere tempo o lavoro aggiungo subito una riga (errore, causa, rimedio) e la committo. L'hook `.claude/hooks/avvio-check.py` (solo lettura) avvisa se la sessione è su «HEAD staccato».
+- SOLO IN CLAUDE CODE: si lavora solo nelle sessioni di Claude Code, mai nella chat normale di claude.ai. Ogni file ricevuto si salva subito nel progetto e si committa, senza aspettare l'handoff.
+- UNA DOMANDA PER VOLTA, con le scelte già pronte da toccare. Per scelte e confronti mando anche un'immagine: Mario capisce meglio vedendo.
 - Non ripetere codice già fornito o informazioni già presenti in `docs/PASSAGGIO-CONSEGNE.md`.
 - ELENCO DELLE COSE DA FARE: tieni sempre aggiornato `docs/DA-FARE.md`, diviso in 3 parti: (1) Claude da solo, (2) Claude dopo la scelta o l'approvazione di Mario, (3) Mario a mano. Aggiungi ogni cosa nuova appena emerge, togli quelle fatte, e committalo insieme al lavoro. Le consegne rimandano a questo file invece di ripetere l'elenco. Ogni voce ha un numero fisso (M1.., D1..), un riassunto in tabella in cima in ordine di urgenza, e a Mario si mostra sempre in ordine, mai in un unico blocco continuo.
 - PRIMA I BLOCCHI (Mario, 06/10/2026): non si parte con lavoro nuovo finché restano aperte cose che bloccano il codice o la stabilità (trasloco, chiavi, segreti, PR da unire, prove fallite, errori). Le rifiniture estetiche invece possono aspettare e non bloccano. In `docs/DA-FARE.md` le voci bloccanti sono segnate 🔴 e stanno in cima; se Mario chiede una cosa nuova mentre ce n'è una 🔴, glielo ricordo in una riga prima di iniziare.

@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-07 (sessione #26: v42 online con la PR #51, M18 e M4 fatti, v43 responsabili con orario libero, giro completo v42 rimandato da Mario; sessione #25: v41 online con la PR #50; v42 con tipi e F&B/Responsabile, prove legate riuscite; sessione #24: test-v40 corretta, giro completo v41 39/39, v42 agenda scritta nel ramo `v42-agenda`; sessione #23: merge di main nel ramo, v41 in prova; sessione #22: giro completo v40 38/38 riuscito; piano dell'inverno approvato; v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-07 (sessione #28: v44 pronta nel ramo, C6 tolta perché v42 e v43 sono online; consigliato a Mario l'invito personale per Maurizio; sessione #27: v43 online con la PR #52, vista «F&B Mauro» nella barra Test, diario degli errori; sessione #26: v42 online con la PR #51, M18 e M4 fatti, v43 responsabili con orario libero, giro completo v42 rimandato da Mario; sessione #25: v41 online con la PR #50; v42 con tipi e F&B/Responsabile, prove legate riuscite; sessione #24: test-v40 corretta, giro completo v41 39/39, v42 agenda scritta nel ramo `v42-agenda`; sessione #23: merge di main nel ramo, v41 in prova; sessione #22: giro completo v40 38/38 riuscito; piano dell'inverno approvato; v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -10,7 +10,7 @@ Aggiornato: 2026-10-07 (sessione #26: v42 online con la PR #51, M18 e M4 fatti, 
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| C6 | v42 interruttori + agenda (tipi Evento/Informazione/Aggiornamento operativo/Memo; scrivono anche F&B Manager e Responsabile): main unito, `test-agenda` 60/60, `test-giro` e `test-news` riusciti nel ramo `v42-agenda`; manca: giro completo (ora o dopo, chiedere a Mario), PR. Poi v43 (avvisi agenda dal Worker), A, C, G, H, I, J, K, O, R, U | Claude | subito |
+| C7 | v44 (testo «Scadenze per lo staff» con l'esempio «entro le 18»): pronta nel ramo, `test-news` e `test-giro` riuscite; manca la PR. Poi riga «“Oggi si ordina” arriva a» più chiara (prima immagine a Mario), giro completo v42-v44 (chiedere «ora o dopo?»), avvisi agenda dal Worker, A, C, G, H, I, J, K, O, R, U | Claude | subito |
 | C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | quando vuoi |
 | M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | prima dell'apertura (staff ancora in prova) |
 | M17 | Telefono in attesa `ISLyK5…` (nome «Mari…», cognome «S…»): chi è? approvarlo o rifiutarlo (Staff → Telefoni da approvare) | Mario | quando vuoi |
@@ -18,7 +18,7 @@ Aggiornato: 2026-10-07 (sessione #26: v42 online con la PR #51, M18 e M4 fatti, 
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
 | M2 | Dare a Maurizio il ruolo Admin Chef | Mario | in stand-by, dopo M1 |
 | M3 | «Oggi si ordina» arriva a Maurizio | Mario | in stand-by, dopo M2 |
-| M19 | Mauro e Maurizio: contratto «Full time Responsabile» (orario libero) | Mario | dopo la v43 online |
+| M19 | Mauro e Maurizio: contratto «Full time Responsabile» (orario libero) | Mario | ora (v43 online) |
 | M5 | Stampare e appendere il QR da cucina | Mario | quando vuoi |
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M8 | Prove dal vero della v35 | Mario | con calma |

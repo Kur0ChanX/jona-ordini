@@ -1,0 +1,16 @@
+# Diario degli errori
+
+Si legge a ogni avvio. Quando un errore fa perdere tempo o lavoro si aggiunge subito una riga.
+
+| N. | Data | Errore | Causa | Rimedio |
+|---|---|---|---|---|
+| E1 | 07/10/2026 | Sessione nuova partita su «HEAD staccato»: push rifiutato | La sessione parte su un commit, non sul ramo | All'avvio l'hook avvio-check.py avvisa; prima di lavorare git checkout <ramo> + git merge --ff-only origin/<ramo> |
+| E2 | 07/10/2026 | Tre domande insieme: Mario si perdeva | Troppe domande in un messaggio | Una domanda per volta, con le scelte pronte da toccare |
+| E3 | 07/10/2026 | Spiegazione solo a parole: Mario non capiva | Niente immagini | Per scelte e confronti mandare un'immagine (prima/dopo) |
+| E4 | 07/10/2026 | Ore perse a recuperare lavoro fatto nella chat normale di claude.ai | Lì niente si salva | Si lavora solo in Claude Code; ogni file ricevuto si salva subito nel progetto e si committa |
+| E5 | 07/10/2026 | Nuova sessione: `git merge --ff-only` fallito sul ramo di lavoro | Il ramo locale era vecchio e diverso da origin | `git branch -m <ramo> vecchio-locale-…` poi `git checkout -b <ramo> --track origin/<ramo>`; mai `reset --hard` |
+| E6 | 07/10/2026 | Mario non trovava le regole di Firebase | Il link diretto `…/firestore/rules` riporta alla home della console | Nelle istruzioni: menù a sinistra → icona **Firestore** → scheda **Regole** |
+| E7 | 07/10/2026 | Conflitti in `DA-FARE.md` e consegne unendo `main` nel ramo di lavoro | Gli stessi appunti cambiati in due rami (ramo della versione e ramo di lavoro) | Gli appunti (`DA-FARE.md`, consegne) si cambiano in un solo ramo; unire `main` subito dopo ogni squash |
+| E8 | 07/10/2026 | `test-responsabile` fallita dopo il pulsante «F&B Mauro» | La prova cercava «Mauro» in tutta la pagina, barra Test compresa | Le prove cercano i testi solo nella parte giusta della pagina, non in tutto `main` |
+| E9 | 07/10/2026 | Avvio della sessione bloccato: i comandi non partivano | Il controllo automatico dei permessi non rispondeva (guasto passeggero) | Leggere intanto le consegne, riprovare più tardi; non insistere a vuoto |
+| E10 | 2026 (noto) | `test-firebase-flow` fallisce tra le 23:30 e mezzanotte | La prova dipende dal giorno e scavalca la mezzanotte | Non è un guasto dell'app: rilanciarla fuori da quell'orario |
