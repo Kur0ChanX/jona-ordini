@@ -1,41 +1,49 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #28
+Sessione attuale: #30
 
-## Ultimo messaggio di Mario (#27), parola per parola
-«si»
-(= sì all'unione di `main` nel ramo di lavoro risolvendo i conflitti degli appunti come proposto. Fatto: commit `e0b0850`.)
+## Ultimo messaggio di Mario (#29), parola per parola
+«Tu riscontri problemi se non riscontri problemi andiamo di nessun tipo andiamo avanti»
+(= se il push ora funziona, avanti con l'handoff e la sessione nuova.)
 
-## Messaggi di Mario in #27 (per non perdere le richieste)
-1. «prova breve e aggiungi la modalità vista Mauro F&B e dimmi i link da mandare allo chef che non lo vediamo ancora nello staff» → fatto tutto (sotto).
-2. Strada C (decisa in RVC il 07/10, consenso a modificare `CLAUDE.md`, solo aggiunte): `docs/ERRORI.md`, hook `.claude/hooks/avvio-check.py` (copia ESATTA del FILE 4 di `docs/MODELLO-REGOLE.md` del repo RVC, ramo `ccr-21870003-1jtfk9`: in `main` di RVC il file non c'è), `SessionStart` startup|resume in `.claude/settings.json`, 3 regole in REGOLE TRASVERSALI, passo 6 dell'handoff con `docs/ERRORI.md` e «HEAD detached». Fatto, commit `73d5fdd`.
-3. «si» → merge di main (sopra).
+## Messaggi di Mario in #29
+1. «si» (= parti con la D7) → D7 fatta (v45 sul ramo, non ancora pubblicata).
+2. «verde» → riprovato il push delle consegne.
+3. «Tu riscontri problemi se non riscontri problemi andiamo di nessun tipo andiamo avanti» → push riprovato, handoff.
 
-## Fatto in #27
-- Avvio: la sessione è partita su HEAD staccato (diventato E1 nel diario). Il controllo automatico dei permessi non rispondeva all'inizio (E9): risolto da solo al messaggio dopo.
-- La sessione #26 ha mandato un messaggio: `test-agenda` e `test-giro` della v43 riuscite.
-- **v43 online**: PR #52 squash (`98b3180`), sito con `APP_VER=43` e «F&B Mauro» verificato. Contiene la v43 di #26 (Full time Responsabile) + la novità di #27:
-  - `index.html`: `VIEW_AS.fb={ruolo:'staff',reparto:'fb',mansione:'F&B Manager'}`, pulsante «F&B Mauro» nella barra Test (tra Admin Chef e Staff); CSS `.testbar .seg{flex-wrap:wrap;border-radius:18px;min-width:0}` perché con 4 pulsanti a 320 px l'ultimo restava fuori (prima scorreva di lato). Nota dev nella NEWS v43. Niente nuovo `APP_VER`/`CACHE` (stessa v43 non ancora pubblicata).
-  - `tools/test-testbar.mjs`: prova della vista F&B (staff, reparto fb, `agCan` vero, non gestore) e dei 4 pulsanti dentro 320 px.
-  - `tools/test-responsabile.mjs`: cercava «Mauro» in tutto `main` e trovava il pulsante della barra Test → ora ignora `.testbar` (E8). 15/15.
-  - Prove (scelta di Mario: **breve**): test-responsabile, test-testbar, test-agenda, test-giro riuscite (+ quelle di #26).
-- `CLAUDE.md`: barra Test con le 4 viste.
-- Merge di main nel ramo ccr: conflitti solo negli appunti. Il primo tentativo l'ho annullato con `git merge --abort` per la regola «FERMATI e spiegamelo» (e lo stop hook chiedeva l'albero pulito). Dopo il «si»: `DA-FARE.md` dalla versione di main, consegne da ccr, `CLAUDE.md` tenute le 3 regole nuove.
-- Strada C (sopra). Hook provato: sul ramo dice solo «Leggi docs/ERRORI.md…»; su HEAD staccato propone `git checkout ccr-4a01d00e-6ay25e && …`.
+## Fatto in #29
+- Avvio: di nuovo il ramo locale era vecchio (#12) → rimedio E5: `git branch -m … vecchio-locale-sessione12`, `git checkout -b <ramo> --track origin/<ramo>`. Il ramo vecchio esiste solo nel container, niente lavoro unico.
+- **v45 «App dimostrativa»** (commit `e57f5d3` sul ramo `ccr-4a01d00e-6ay25e`, NON ancora in main):
+  - Link: `https://jona-ristorante-by-ynoy-corp.pages.dev/#demo`. La scelta resta per la scheda (sessionStorage `jona_demo`), anche se l'indirizzo perde `#demo`. Aprire `#demo` con l'app già aperta ricarica in demo (`hashchange`).
+  - `index.html`: `DEMO` e `lsK` definiti prima di `ls()`; `ls` e `LocalStore` usano chiavi «demo:» (dati, profilo, carrello, vista); `fbCfg`→null; in demo `window.fetch` verso altri siti rifiutato (tranne Open-Meteo; i font Google sono CSS, non fetch) → niente Worker, Gemini, push, inviti; `obxDb` rifiuta (niente coda invii, non tocca quella vera); `appBadge` spento.
+  - `view()`: `if(DEMO&&!meU())return screenDemo()` (benvenuto: logo, «Anteprima del progetto», «Benvenuto in Jona Ordini», 4 righe con icone, **Entra nella demo**, «Niente di quello che fai qui arriva al ristorante o ai fornitori.», firma BY).
+  - `demoGo`: `S.db.load({})` + `seedIfEmpty()` + `demoSeed()`, segna Novità già viste, `login('demo_gm')`. `demoSeed`: 6 persone (Ospite gm libero, Paolo Serra F&B libero, Luca Bianchi cuoco, Sara Conti cameriera, Giulia Marras pasticcera, Andrea Piras barman; nomi inventati), 2 richieste in attesa (una urgente) + 1 approvata con 2 ordini aperti, 24 ordini inviati in 8 settimane (l'ultimo da ricevere → Arrivi), orari della settimana pubblicati, 4 eventi agenda (uno oggi → striscia «Oggi in hotel»), `funz.agenda` accesa, 4 messaggi chat, 2 avvisi.
+  - `testBar()` in demo mostra `.demobar`: «Anteprima · Dati di esempio: niente arriva al ristorante.» + **Esci** + «Guarda l'app come» Chef / F&B Manager / Staff. `meU` usa `VIEW_AS` anche in demo. `demoOut` cancella le chiavi «demo:» e il flag, torna all'indirizzo senza hash.
+  - `APP_VER=45`, NEWS v45 (chef + dev), `sw.js` `CACHE` `jona-ordini-v49`. Nessun file nuovo dell'app (niente da aggiungere a `FILES` o al workflow).
+- Prova nuova `tools/test-demo.mjs` (30 PASS, usa il firebase-config vero; i dati «veri» si scrivono da `manifest.webmanifest` per non collegarsi a Firestore vero). Prove brevi tutte riuscite: test-demo 30, test-testbar 7, test-news 94, test-responsabile 15, test-agenda 60, test-giro «nessun problema».
+- Fine sessione: GitHub ha rifiutato più volte il push (e anche l'API) con «Internal Server Error»; riuscito dopo che Mario ha visto lo stato verde (E11).
+- Immagini: `docs/immagini/demo-benvenuto.png`, `docs/immagini/demo-dentro.png` (da mostrare a Mario).
+- Aggiornati: `CLAUDE.md` (riga v45), `tools/README.md`, `docs/DA-FARE.md` (D7 = manca la pubblicazione, nuova M20).
 
-## Risposta già data a Mario: invitare lo chef (Maurizio)
-Non c'è un link fisso: lo crea l'app (codice di 7 giorni). Passi dati: Impostazioni → Database centrale → **Invita** → **Manda l'invito (WhatsApp…)** → Maurizio installa e si registra → Staff → Telefoni da approvare → ruolo **Admin Chef** → Contratto e orari → **Full time Responsabile**; lo stesso contratto per Mauro con la vista Admin Chef. Sono M1, M2, M19 in `docs/DA-FARE.md`. Mario non ha ancora detto a che passo è.
+## Decisioni e perché
+- Chiavi separate «demo:» invece di un altro sito: stesso indirizzo, zero manovre; un telefono vero che apre la demo non mescola dati.
+- Demo rifatta da zero a ogni «Entra nella demo»: ogni ospite trova dati puliti.
+- Profilo `gm` con cambio vista (non `dev`): così non vede gli strumenti dello sviluppatore.
+- «Chiedi a Jona» (Gemini) resta visibile ma non chiama la rete: accettato, da migliorare solo se Mario lo chiede (es. messaggio «non disponibile nella demo»).
 
-## Prossimi passi (#28)
-1. Chiedere a Mario a che passo è con l'invito di Maurizio (M1/M2/M19).
-2. Testo di «Scadenze per lo staff» in Impostazioni: «Avviso sul telefono dello staff: «Richieste allo chef entro le…»» sembra tagliato. Riscriverlo, es. «Esempio di avviso: «Richieste allo chef entro le 18»» (`grep -n -o '.\{0,80\}Richieste allo chef entro.\{0,120\}' index.html`). Sarà v44 (`APP_VER` 44, `CACHE` in `sw.js`, NEWS).
-3. Riga «“Oggi si ordina” arriva a» più chiara (es. «Ora arriva a: tutti gli Admin Chef (oggi: Mario Miscera)»): proporla a Mario prima, con un'immagine prima/dopo (regola nuova).
-4. Giro completo delle prove (v42+v43): rimandato da Mario. Chiedere «Lo faccio partire ora o dopo?».
-5. Dopo: notifica del mattino «Oggi in hotel» e promemoria prima dell'evento dal Worker, poi V, W, X; poi A, C, G, H, I, J, K, O, R, U (`docs/PIANO-INVERNO.md`).
+## Da fare in #30 (subito)
+1. Mostrare a Mario le 2 immagini e proporre le 3 opzioni di prove per pubblicare: (1) completo, (2) breve (GIÀ FATTA, tutte riuscite → consigliata), (3) subito. Una domanda per volta.
+2. Pubblicare: PR dal ramo → squash merge (lo fa Claude) → controllo online (`APP_VER=45`, `CACHE` v49, `#demo` mostra il benvenuto) → subito `git fetch origin main && git merge origin/main` sul ramo + push.
+3. Dare a Mario i passi M20 (aprire il link dal telefono, provarlo, mandarlo a Chiara/consulenti/proprietari) con il link pronto da copiare.
+
+## Prossimi passi (dopo)
+1. Chiedere a Mario a che passo è con l'invito di Maurizio (passi in `docs/DA-FARE.md`, M1/M2/M19).
+2. Riga «“Oggi si ordina” arriva a» più chiara: immagine prima/dopo.
+3. Giro completo prove v42-v45: chiedere «Lo faccio partire ora o dopo?».
+4. Poi notifica del mattino «Oggi in hotel», promemoria evento dal Worker, V, W, X; poi A, C, G, H, I, J, K, O, R, U (`docs/PIANO-INVERNO.md`).
 
 ## Rischi aperti
-- Una domanda per volta a Mario, con le scelte pronte (regola nuova, E2).
-- Il repo RVC è stato aggiunto a questa sessione solo per leggere `docs/MODELLO-REGOLE.md`; niente modificato lì.
-- Telefono in attesa `ISLyK5…` (M17). `test-firebase-flow` tra 23:30 e mezzanotte (E10). Se `AbortError` torna su Oppo/OnePlus: strada B (bot Telegram).
+- Una domanda per volta, con immagine per le scelte (E2, E3).
+- Telefono in attesa `ISLyK5…` (M17). `test-firebase-flow` tra 23:30 e mezzanotte (E10).
 - Elenco completo: `docs/DA-FARE.md`. Errori: `docs/ERRORI.md`.
 - Titoli sessioni: `🟤 ▶ ATTIVA · #NN · Jona Ordini · …` / `🟤 ✓ CHIUSA · …`.
