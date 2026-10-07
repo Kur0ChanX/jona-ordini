@@ -3,6 +3,8 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+«Puoi mettere la regola anche su RVC» → mandato alla sessione RVC #11 (`session_01NTWJZpaWY9weMSfovHruJv`) il testo delle regole: decido io sul tecnico, link cliccabili, pubblica senza chiedere, piano stabilità S1-S3. **S2 in corso**: PR #57 aperta (workflow `prove.yml` + `tools/prova-ci.sh`), primo giro su GitHub in esecuzione; se verde → squash + merge main nel ramo; se rosso → capire e correggere. Poi S1, S3, D9.
+
 «devi capire che ne capisci piú tu di me mi chiedi cose che non só mai cosa è il meglio io mi fido di te la maggior parte delle volte se tu sbagli siamo fregati» → regola «DECIDO IO SUL TECNICO» in `CLAUDE.md`. Decisione: S2 subito (workflow GitHub con prove veloci a ogni PR + giro completo settimanale), poi S1 (caccia ai «falsi ok»), poi S3 (scatola nera degli errori), poi D9. Prima Mario aveva chiesto «ok consumero molti token 1 2 3?» (stima: S2 basso, S3 medio-basso, S1 alto).
 
 «tutti questi problemi ogni volta fixati anzi fi mettere una pezza non si ouò rendere tutto stabile ho sempre l'ansia che c'è sempre un problema è lo risolvi poi si ripresenta e metti una pezza / sicuramente anche il progetto rvc ha qst problema» (citando: «Non sono riuscito a cancellare il ramo fix-hook-avvio…»).
