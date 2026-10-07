@@ -505,6 +505,10 @@ button.rp-pn{all:unset;display:block;font:400 15px/1.3 var(--font);overflow-wrap
 .checkall{display:flex;align-items:center;gap:10px;font-size:14.5px;padding:8px 0}
 .checkall input{width:20px;height:20px;accent-color:var(--lagoon)}
 .setrow{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.ph-strip{background:var(--surface);border:2px solid var(--lagoon);border-radius:14px;padding:10px 12px;margin:6px 0 14px}
+.ph-strip-h{display:flex;align-items:center;gap:8px;color:var(--lagoon);font-size:15px;margin:2px 2px 6px}
+.ph-strip .row{padding:8px 2px}
+.ph-warn{background:#F3E7D1;color:#2B2321;border-radius:12px;padding:12px 14px;text-align:left;font-size:15px}
 .ag-strip{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--lagoon-soft);color:var(--ink);border:0;border-radius:12px;padding:12px 14px;margin:6px 0 14px;font:inherit;font-size:14.5px;cursor:pointer}
 .ag-strip .ic{flex:none;color:var(--lagoon)}.ag-strip span{min-width:0;overflow-wrap:anywhere}
 .ag-q{display:flex;gap:8px;align-items:center}.ag-q .inp{flex:1;min-width:0}.ag-q .icon-btn.on{color:var(--corallo)}
@@ -1057,8 +1061,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=45;
+const APP_VER=46;
 const NEWS=[
+  {v:46,data:'2026-10-07',titolo:'Richieste di entrata ben in vista',
+    chef:['Quando un telefono nuovo chiede di entrare, la richiesta compare in cima a ogni scheda, con «Approva» e «Rifiuta». Non serve più cercarla in Staff.','Se la connessione del telefono nuovo non passa (alcune reti Wi-Fi la bloccano), lui non legge più «Richiesta inviata» ma «La richiesta non è ancora arrivata» con il pulsante «Riprova».'],
+    dev:{risolti:['Il telefono in attesa mostrava «Richiesta inviata» anche con la scrittura di `req` rimasta nella cache (Wi-Fi con filtri): ora `st.reqOk` (snapshot senza `hasPendingWrites` né `fromCache`); prima «Sto inviando…», dopo `PHS_MS` (12 s) avviso e «Riprova» (`phRetry`: `jona_fb_lp` e ricarica, la scrittura resta in coda).','`phWatch`: dopo un errore riprova in 30 s invece di 5 minuti.'],aggiunte:['`phStrip`: telefoni (`phPend`) e profili `in_attesa` in cima a ogni scheda dei gestori, con Approva/Rifiuta. Prova `tools/test-firebase-telefoni.mjs` estesa.']}},
   {v:45,data:'2026-10-07',titolo:'App dimostrativa',
     chef:['C\'è un link per far provare l\'app a chi non lavora con noi (consulenti, proprietà, direzione): jona-ristorante-by-ynoy-corp.pages.dev/#demo. Si apre una pagina di benvenuto, un tocco su «Entra nella demo» ed è dentro con dati di esempio. Può guardarla come Chef, F&B Manager o Staff. Niente di quello che fa arriva al ristorante o ai fornitori.'],
     dev:{aggiunte:['Modalità `DEMO` da `#demo` (resta per la scheda in sessionStorage `jona_demo`): `ls` e `LocalStore` usano chiavi «demo:», `fbCfg` null, `fetch` verso altri siti bloccato (tranne Open-Meteo), niente coda degli invii né pallino sull\'icona.','`screenDemo`, `demoGo` (svuota e semina: `seedIfEmpty` + `demoSeed`), `demoOut` (cancella le chiavi «demo:»), barra `.demobar` al posto della barra Test con il cambio vista. Prova `tools/test-demo.mjs`.']}},
@@ -1354,7 +1361,7 @@ function FirebaseStore(key){
   const approval=u=>new Promise((res,rej)=>{let un=null;const to=setTimeout(()=>{if(un)un();rej({code:'fb_slow'})},20000);
     un=fs.doc('membri/'+u).onSnapshot({includeMetadataChanges:true},d=>{if(!d.exists&&d.metadata.fromCache)return;clearTimeout(to);
       if(!d.exists){st.wait='no';st.req=null;ping();return}
-      const x=d.data();if(x.ok===false){st.wait='attesa';st.req=x.req||null;ping();return}
+      const x=d.data();if(x.ok===false){st.wait='attesa';st.req=x.req||null;st.reqOk=!!x.req&&!d.metadata.hasPendingWrites&&!d.metadata.fromCache;ping();return}
       if(d.metadata.hasPendingWrites||d.metadata.fromCache)return;
       un();st.wait='';st.req=null;ping();res()},e=>{clearTimeout(to);rej(e)})});
   // al ritorno in primo piano il collegamento vecchio può essere morto senza che Firestore lo sappia: lo rifà subito
@@ -1438,7 +1445,7 @@ function FirebaseStore(key){
     prune:async keep=>{await readyP;const s=await fs.collection('backup').where('g','<',keep).get({source:'server'});for(const x of s.docs)await x.ref.delete()}
   };
   return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
-    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null}),
+    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null,reqOk:!!st.reqOk}),
     phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember()),
       // entrata libera (v40): con pubblico/porta aperta il telefono si approva da solo e, se nuovo, crea il suo profilo
       auto:async r=>{const p=await fs.doc('pubblico/porta').get({source:'server'});if(!p.exists||!((p.data().fino||0)>Date.now()))return false;
@@ -1702,14 +1709,21 @@ function screenPhone(s){
   if(ls('jona_itk')&&!s.req&&s.wait!=='no')return screenInvite();
   const r=s.req,logo='<div class="logo-full" role="img" aria-label="Jona Ristorante"></div>';
   if(s.wait==='no')return wallMsg('Richiesta non approvata','Maurizio o lo sviluppatore non hanno approvato questo telefono. Se è un errore, parla con loro e chiedi di nuovo.',`<button type="button" class="btn primary block big" data-a="phAgain">Chiedi di nuovo</button>`);
+  if(r&&!s.reqOk&&!PHS.t){PHS.t=now();setTimeout(schedule,PHS_MS+100)}
+  if(r&&s.reqOk)PHS.t=0;
+  const lento=r&&!s.reqOk&&now()-PHS.t>=PHS_MS;
   if(r)return`<div class="wall linen">${logo}<div class="wall-card" style="text-align:center"><div style="display:flex;justify-content:center;margin-bottom:12px">${avatar(r,84)}</div>
-  <h1>Ciao ${esc(r.nome)}!</h1><p class="muted">Richiesta inviata. Maurizio o lo sviluppatore devono <b>approvare questo telefono</b>.</p><p class="muted">Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>
+  <h1>Ciao ${esc(r.nome)}!</h1>${s.reqOk?`<p class="muted">Richiesta inviata. Maurizio o lo sviluppatore devono <b>approvare questo telefono</b>.</p><p class="muted">Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>`
+  :lento?`<p class="ph-warn"><b>La richiesta non è ancora arrivata.</b> La connessione di questo telefono non passa. Prova a passare dal Wi-Fi ai dati mobili (o al contrario), poi tocca «Riprova».</p><div style="margin-top:14px"><button type="button" class="btn primary block big" data-a="phRetry">Riprova</button></div>`
+  :`<p class="muted">Sto inviando la richiesta…</p>`}
   ${r.nuovo?`<p class="muted small">Nuovo profilo · nome utente <b>${esc(r.username)}</b></p>`:`<p class="muted small">Hai già un profilo: dopo l'approvazione entri con il tuo nome utente e la tua password.</p>`}
   <div style="margin-top:18px"><button type="button" class="btn ghost block" data-a="${r.nuovo?'phNew':'phOld'}">Modifica la richiesta</button></div></div></div>`;
   return`<div class="wall linen">${logo}<div class="wall-card"><h1>Benvenuto!</h1>
   <p class="muted">Prima di entrare, Maurizio o lo sviluppatore devono approvare questo telefono. Dicci chi sei:</p>
   <div style="margin-top:18px;display:grid;gap:12px"><button type="button" class="btn primary block big" data-a="phNew">Sono nuovo: creo il mio profilo</button><button type="button" class="btn ghost block big" data-a="phOld">Ho già un profilo</button></div></div></div>`;
 }
+/* richiesta del telefono non confermata dal server entro PHS_MS: avviso e «Riprova» (ricarica con il long polling, la scrittura resta in coda) */
+const PHS={t:0},PHS_MS=12000;
 function phoneSheet(nuovo){
   const r=S.db&&S.db.status().req;S.form=r&&!!r.nuovo===nuovo?Object.assign({reparto:'cucina',mansione:'Cameriere'},clone(r),{pw:'',pw2:''}):{reparto:'cucina',mansione:'Cameriere'};if(r&&r.nuovo)S.form._uSug=r.username;
   openSheet({reg:nuovo?'ph':false,render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${nuovo?'Crea il tuo profilo':'Chi sei?'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
@@ -1725,7 +1739,7 @@ async function phSend(nuovo){
     r={nuovo:true,sid,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||'',pass:await sha(sid+':'+f.pw),creato:now()};
     ls('jona_wait',{id:sid,t:Date.now()})}
   else{if(!String(f.nome||'').trim())return toast('Scrivi il nome.','warn');r={nuovo:false,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),creato:now()};ls('jona_wait',null)}
-  ls('jona_reg',null);S.db.phone.req(r).then(async()=>{if(await S.db.phone.auto(r).catch(()=>false))return toast('Entrata libera: sei dentro!');await fetch(PUSH_URL+'/richiesta',{method:'POST',headers:{authorization:'Bearer '+await algTok()}}).catch(()=>{})},e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
+  ls('jona_reg',null);PHS.t=now();setTimeout(schedule,PHS_MS+100);S.db.phone.req(r).then(async()=>{if(await S.db.phone.auto(r).catch(()=>false))return toast('Entrata libera: sei dentro!');await fetch(PUSH_URL+'/richiesta',{method:'POST',headers:{authorization:'Bearer '+await algTok()}}).catch(()=>{})},e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
 }
 /* telefoni in attesa: li vedono e li approvano i gestori (Maurizio e Mario) */
 const PH={on:false,list:[],retry:0,seen:null};
@@ -1733,7 +1747,7 @@ function phWatch(){
   const me=realU();if(PH.on||now()<PH.retry||!S.db||S.db.kind!=='firebase'||!S.db.status().ready||!me||!isMgr(me))return;PH.on=true;
   fbInit().fs.collection('membri').where('ok','==',false).onSnapshot(q=>{PH.list=q.docs.map(d=>Object.assign({},d.data(),{id:d.id})).sort((a,b)=>(a.creato||0)-(b.creato||0));
     const ids=new Set(PH.list.map(x=>x.id));if(PH.seen)for(const x of PH.list)if(x.req&&!PH.seen.has(x.id+(x.req.creato||'')))toast(x.req.nome+' chiede di entrare: approvalo nella scheda Staff.');
-    PH.seen=new Set(PH.list.filter(x=>x.req).map(x=>x.id+(x.req.creato||'')));void ids;schedule()},()=>{PH.on=false;PH.retry=now()+300000;PH.list=[]});
+    PH.seen=new Set(PH.list.filter(x=>x.req).map(x=>x.id+(x.req.creato||'')));void ids;schedule()},()=>{PH.on=false;PH.retry=now()+30000;PH.list=[];setTimeout(schedule,30100)});
 }
 const phPend=()=>PH.list.filter(x=>x.req);
 const phDev=ua=>/iPhone|iPad/.test(ua||'')?'iPhone':/Android/.test(ua||'')?'Android':'telefono';
@@ -1949,7 +1963,7 @@ function shell(me){
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}${agBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${pushAsk()}${agStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${pushAsk()}${phStrip(me)}${agStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -4639,6 +4653,12 @@ async function agFotoAdd(){const P=S.agp,me=realU();if(!P||!me)return;const by={
   for(const [doc,evs] of Object.entries(by))await agPut(doc,evs);closeSheet();refreshSheet();toast(n===1?'1 evento aggiunto':n+' eventi aggiunti')}
 
 /* striscia «Oggi in hotel» e pulsante nell'intestazione */
+/* richieste da approvare (telefoni e profili) in cima a ogni scheda dei gestori, con Approva e Rifiuta */
+function phStrip(me){if(!isMgr(me)||!realU()||S.wallMode)return'';
+  const l=[...phPend().map(x=>({u:x.req,m:(x.req.nuovo?'nuovo profilo':'ha già un profilo')+' · '+phDev(x.ua),no:`data-a="phNo" data-v="${x.id}"`,ok:`data-a="phOk" data-v="${x.id}"`})),
+    ...Object.values(D().staff).filter(u=>u.stato==='in_attesa').map(u=>({u,m:'nuovo profilo',no:`data-a="sno" data-u="${u.id}"`,ok:`data-a="sok" data-u="${u.id}"`}))];
+  if(!l.length)return'';
+  return`<div class="ph-strip" role="region" aria-label="Richieste da approvare"><div class="ph-strip-h">${ic('bell')}<b>${l.length===1?'1 richiesta da approvare':l.length+' richieste da approvare'}</b></div>${l.map(x=>`<div class="row">${avatar(x.u,44)}<div class="row-i"><div class="row-t">${esc(fullName(x.u))} chiede di entrare</div><div class="row-m">${esc(x.m)}</div></div><button type="button" class="icon-btn danger" ${x.no} aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" ${x.ok}>Approva</button></div>`).join('')}</div>`}
 function agStrip(me){if(!funzOn('agenda')||!realU()||S.wallMode)return'';const l=agDay(today(),me);if(!l.length)return'';
   return`<button type="button" class="ag-strip" data-a="agOpen">${ic('calendar')}<span><b>Oggi in hotel</b> ${l.slice(0,3).map(e=>esc((e.h?e.h+' ':'')+(agK(e)!=='ev'?AG_K[agK(e)]+': ':'')+e.t)).join(' · ')}${l.length>3?' · +'+(l.length-3):''}</span></button>`}
 const agBtn=me=>funzOn('agenda')&&agCan(me)?`<button type="button" class="icon-btn" data-a="agOpen" aria-label="Agenda">${ic('calendar')}</button>`:'';
@@ -4659,7 +4679,7 @@ const A={
   phNew:()=>phoneSheet(true),phOld:()=>phoneSheet(false),phSend:d=>phSend(d.v==='1'),
   phAgain:()=>{ls('jona_wait',null);S.db.phone.again().catch(()=>toast('Non riesco: controlla la connessione e riprova.','err'))},
   phOk:d=>phApprove(d.v),itGo:()=>itGo(),itRetry:()=>{IT.t='';schedule()},itSkip:()=>{ls('jona_itk',null);IT.t='';schedule()},
-  invMono:d=>invMonoSend(d.u),invMonoGo:d=>invMonoShare(d.v),ptSet:d=>ptSet(+d.v),phNo:d=>phReject(d.v),
+  invMono:d=>invMonoSend(d.u),invMonoGo:d=>invMonoShare(d.v),ptSet:d=>ptSet(+d.v),phNo:d=>phReject(d.v),phRetry:()=>{ls('jona_fb_lp',1);location.reload()},
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
