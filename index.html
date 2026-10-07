@@ -248,6 +248,11 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .inv-code{text-align:center;margin:14px 0 0}.inv-code b{display:block;font-size:34px;font-weight:500;letter-spacing:.18em;color:var(--ink)}
 .invite-steps{margin:0;padding-left:20px;color:var(--ink2);line-height:1.5}
 .testbar{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.demobar{margin:0 0 14px;padding:10px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.demobar-t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.demobar-t span{flex:1;min-width:150px;font-size:.85rem;color:var(--muted)}
+.demobar .seg{display:flex}.demobar .seg button{flex:1}
+.demo-l{list-style:none;padding:0;margin:14px 0 18px;display:flex;flex-direction:column;gap:10px}.demo-l li{display:flex;gap:10px;align-items:flex-start}.demo-l .ic{flex:none;width:22px;height:22px;color:var(--lagoon)}
+.demo-n{text-align:center;margin:12px 0 0}
 .testbar .seg{flex-wrap:wrap;border-radius:18px;min-width:0}
 .testbar .seg button[aria-pressed="true"]{background:var(--lagoon);color:var(--on-lagoon);font-weight:500}
 .seg{display:inline-flex;padding:3px;background:var(--sunk);border-radius:999px;border:1px solid var(--line);max-width:100%;overflow-x:auto;scrollbar-width:none}
@@ -981,7 +986,13 @@ function ago(t){if(!t)return'';const d=(now()-t)/1000;if(d<60)return'adesso';if(
 const fdate=t=>t?new Date(t).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}):'';
 const today=(d=new Date())=>{return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const slug=s=>norm(s).replace(/ /g,'-')||'ordine';
-function ls(k,v){try{if(v===undefined){const r=localStorage.getItem(k);return r?JSON.parse(r):null}if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+/* v45 app dimostrativa (link …/#demo): dati, profilo e carrello su chiavi separate «demo:», niente Firebase, Worker, Gemini, push e coda degli invii.
+   Un telefono vero che apre la demo non tocca i suoi dati. La scelta resta per la scheda (sessionStorage) anche se l'indirizzo perde #demo */
+const DEMO=(()=>{const h=/^#demo\b/.test(location.hash);try{if(h)sessionStorage.setItem('jona_demo','1');return h||sessionStorage.getItem('jona_demo')==='1'}catch(e){return h}})();
+const lsK=k=>DEMO?'demo:'+k:k;
+if(DEMO){const f0=window.fetch.bind(window);window.fetch=(u,o)=>{const s=String(u&&u.url||u);return/^https?:/.test(s)&&!s.startsWith(location.origin)&&!/^https:\/\/api\.open-meteo\.com\//.test(s)?Promise.reject(new Error('demo')):f0(u,o)}}
+addEventListener('hashchange',()=>{if(/^#demo\b/.test(location.hash)&&!DEMO)location.reload()});
+function ls(k,v){k=lsK(k);try{if(v===undefined){const r=localStorage.getItem(k);return r?JSON.parse(r):null}if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
 function num(v){if(v==null||v==='')return null;if(typeof v==='number')return isFinite(v)?v:null;let s=String(v).replace(/[^\d,.\-]/g,'');if(!s)return null;if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');else if(s.includes(','))s=s.replace(',','.');const n=parseFloat(s);return isNaN(n)?null:Math.round(n*1000)/1000}
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const i=new Image();i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),1000)};i.onerror=()=>rej(new Error('img'));i.src=u})}
@@ -1046,8 +1057,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=44;
+const APP_VER=45;
 const NEWS=[
+  {v:45,data:'2026-10-07',titolo:'App dimostrativa',
+    chef:['C\'è un link per far provare l\'app a chi non lavora con noi (consulenti, proprietà, direzione): jona-ristorante-by-ynoy-corp.pages.dev/#demo. Si apre una pagina di benvenuto, un tocco su «Entra nella demo» ed è dentro con dati di esempio. Può guardarla come Chef, F&B Manager o Staff. Niente di quello che fa arriva al ristorante o ai fornitori.'],
+    dev:{aggiunte:['Modalità `DEMO` da `#demo` (resta per la scheda in sessionStorage `jona_demo`): `ls` e `LocalStore` usano chiavi «demo:», `fbCfg` null, `fetch` verso altri siti bloccato (tranne Open-Meteo), niente coda degli invii né pallino sull\'icona.','`screenDemo`, `demoGo` (svuota e semina: `seedIfEmpty` + `demoSeed`), `demoOut` (cancella le chiavi «demo:»), barra `.demobar` al posto della barra Test con il cambio vista. Prova `tools/test-demo.mjs`.']}},
   {v:44,data:'2026-10-07',titolo:'Testo delle scadenze più chiaro',
     chef:['Impostazioni → Scadenze per lo staff: ora c\'è un esempio completo dell\'avviso che arriva allo staff, «Richieste allo chef entro le 18».'],
     dev:{aggiunte:['Testo della riga «Scadenze per lo staff» in Impostazioni: esempio con l\'ora invece dei puntini.']}},
@@ -1255,7 +1269,7 @@ const cfg=()=>Object.assign({nomeLocale:'Jona Ristorante',luogoConsegna:''},D().
 const realU=()=>S.me?D().staff[S.me]:null;
 // Test per lo sviluppatore: vede l'app come l'amministratore (chef) senza cambiare il suo profilo.
 const VIEW_AS={gm:{ruolo:'gm',reparto:'cucina',mansione:'Chef'},staff:{ruolo:'staff',reparto:'cucina',mansione:'Cuoco'},fb:{ruolo:'staff',reparto:'fb',mansione:'F&B Manager'}};
-const meU=()=>{const u=realU();return u&&isDev(u)&&VIEW_AS[S.viewAs]?Object.assign({},u,VIEW_AS[S.viewAs]):u};
+const meU=()=>{const u=realU();return u&&(isDev(u)||DEMO)&&VIEW_AS[S.viewAs]?Object.assign({},u,VIEW_AS[S.viewAs]):u};
 const isGM=u=>!!u&&u.ruolo==='gm';
 const isDev=u=>!!u&&u.ruolo==='dev';
 const isMgr=u=>isGM(u)||isDev(u);
@@ -1271,7 +1285,7 @@ function rebuildIndex(){const m=new Map();for(const p of prods()){const k=gkey(p
    collection(nome).orderBy().limit().onSnapshot(). Questa versione "locale" salva sul
    dispositivo; le versioni Firebase e Google Fogli implementeranno la stessa interfaccia. */
 const LocalStore=(()=>{
-  const KEY='jona_db_v2';let data={};
+  const KEY=lsK('jona_db_v2');let data={};
   try{data=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){data={}}
   const subs=new Set();let t=null;
   const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){throw{code:'quota_exceeded'}}};
@@ -1304,7 +1318,7 @@ const LocalStore=(()=>{
    l'app funziona anche senza rete e invia le modifiche appena torna la connessione.
    I prodotti stanno in un documento per fornitore («listini/<fornitore>»): ogni apertura legge pochi documenti.
    Accesso: accesso anonimo + chiave del ristorante (link o QR); vedi firebase/firestore.rules. */
-const fbCfg=()=>self.JONA_FIREBASE||ls('jona_fb')||null;
+const fbCfg=()=>DEMO?null:self.JONA_FIREBASE||ls('jona_fb')||null;
 const FB_COLS=['staff','fornitori','config','richieste','ordini','notifiche'];
 const randKey=(n=24)=>{const a='abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';return[...crypto.getRandomValues(new Uint8Array(n))].map(x=>a[x%a.length]).join('')};
 function fbInit(){
@@ -1560,14 +1574,14 @@ async function pushSend(a,titolo,testo){let list=[];try{pushWatch();const st=D()
    L'avviso fisso resta finché le push sono in coda o la richiesta allo chef non è ancora sul database (scritture in sospeso). */
 const OBX={list:[],busy:false};
 const OBX_MAX=864e5;
-function obxDb(){return obxDb.p||(obxDb.p=new Promise((res,rej)=>{const r=indexedDB.open('jona-outbox',1);r.onupgradeneeded=()=>r.result.createObjectStore('q',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>{obxDb.p=null;rej(r.error)}}))}
+function obxDb(){if(DEMO)return Promise.reject(new Error('demo'));return obxDb.p||(obxDb.p=new Promise((res,rej)=>{const r=indexedDB.open('jona-outbox',1);r.onupgradeneeded=()=>r.result.createObjectStore('q',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>{obxDb.p=null;rej(r.error)}}))}
 async function obxTx(mode,f){const db=await obxDb();return new Promise((res,rej)=>{const t=db.transaction('q',mode);const q=f(t.objectStore('q'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)})}
 function obxBadge(){appBadge()}
 /* pallino sull'icona: chat non lette + avvisi non letti + cose da fare del ruolo (no carrello, no ordini in preparazione, no novità dell'app) + push in coda.
    Il numero va anche nella cache «jona-badge»: sw.js lo aumenta di 1 a ogni push che arriva ad app chiusa. */
 const BADGE={n:-1};
 function badgeCount(){const me=realU();if(!me||S.wallMode)return 0;const tabs=isGM(me)?GM_TABS:isDev(me)?DEV_TABS:STAFF_TABS;let n=chUnread(me)+myNotifs(me).filter(x=>!x.letta).length;for(const t of tabs)if(t.b&&t.id!=='carrello'&&t.id!=='invii')n+=+t.b()||0;return n}
-function appBadge(){let n=0;try{n=badgeCount()+OBX.list.length}catch(e){}if(n===BADGE.n)return;BADGE.n=n;
+function appBadge(){if(DEMO)return;let n=0;try{n=badgeCount()+OBX.list.length}catch(e){}if(n===BADGE.n)return;BADGE.n=n;
   try{if(navigator.setAppBadge)(n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{})}catch(e){}
   try{caches.open('jona-badge').then(c=>c.put('./badge-n',new Response(String(n)))).catch(()=>{})}catch(e){}}
 async function obxSyncReg(){try{const st=S.db&&S.db.kind==='firebase'?S.db.status():null;if(!OBX.list.length||(st&&st.pend))return;const reg=await navigator.serviceWorker.ready;if(reg.sync)await reg.sync.register('jona-outbox')}catch(e){}}
@@ -1633,6 +1647,7 @@ function view(){
   if(S.db&&S.db.kind==='firebase'){const s=S.db.status();if(!s.ready)return wallFb(s)}
   if(S.db&&S.db.kind==='locale'&&fbCfg()&&ls('jona_key')==null&&!Object.keys(D().staff||{}).length&&S.loaded.staff){if(S.fbActive===undefined)return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Un momento…</p>${BY}</div>`;if(S.fbActive!==false)return screenJoin()}
   if(!S.db||!allLoaded())return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Un momento…</p>${BY}</div>`;
+  if(DEMO&&!meU())return screenDemo();
   if(!Object.keys(D().staff).length)return screenSetup();
   const me=meU();
   const w=!me&&ls('jona_wait');const wu=w&&D().staff[w.id];
@@ -1941,7 +1956,9 @@ function shell(me){
 const micBtn=()=>`<button type="button" class="mic-fab" data-a="voice" aria-label="Ordina con la voce" title="Ordina con la voce">${ic('mic')}</button>`;
 const cartBar=n=>`<div class="cartbar"><button type="button" class="btn primary big block" data-a="tab" data-v="carrello">${ic('cart')}<span>${n} ${n===1?'articolo':'articoli'} · Invia allo chef</span>${ic('chev')}</button></div>`;
 function testBar(){
-  const u=realU();if(!isDev(u))return'';
+  const u=realU();if(DEMO&&u)return`<div class="demobar" role="region" aria-label="Anteprima"><div class="demobar-t"><b>Anteprima</b><span>Dati di esempio: niente arriva al ristorante.</span><button type="button" class="btn ghost sm" data-a="demoOut">Esci</button></div>
+  <div class="seg" role="group" aria-label="Guarda l'app come">${[['gm','Chef'],['fb','F&B Manager'],['staff','Staff']].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'gm')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
+  if(!isDev(u))return'';
   return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['fb','F&B Mauro'],['staff','Staff'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
 }
 
@@ -4133,6 +4150,66 @@ async function setPhoto(fs){ls('jona_reg',null);try{S.form.foto=await fileToAvat
 function applyTheme(){const t=ls('jona_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}
 
 /* ================= dati iniziali (solo al primo avvio) ================= */
+/* ================= app dimostrativa (v45) =================
+   Benvenuto → «Entra nella demo»: dati di esempio nuovi a ogni ingresso, profilo «Ospite» (amministratore) con la barra
+   «Guarda l'app come» (Chef / F&B Manager / Staff). «Esci» cancella le chiavi «demo:» e torna all'indirizzo normale. */
+function screenDemo(){
+  const L=[['cart','Lo staff chiede i prodotti allo chef in pochi tocchi'],['check','Lo chef approva e l\'app prepara gli ordini per fornitore'],['clock','Orari del personale, agenda e scadenze'],['msg','Chat tra colleghi e avvisi sul telefono']];
+  return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Anteprima del progetto</p>
+  <div class="wall-card demo-card"><h1>Benvenuto in Jona Ordini</h1><p class="muted">L'app degli ordini di cucina e sala del Jona Ristorante. Qui la provi con dati di esempio: tocca, cambia, prova tutto.</p>
+  <ul class="demo-l">${L.map(([i,t])=>`<li>${ic(i)}<span>${t}</span></li>`).join('')}</ul>
+  <button type="button" class="btn primary block big" data-a="demoGo">Entra nella demo</button>
+  <p class="muted small demo-n">Niente di quello che fai qui arriva al ristorante o ai fornitori.</p></div>${BY}</div>`}
+async function demoGo(){
+  try{S.db.load({});await seedIfEmpty();await demoSeed()}catch(e){return toast(errMsg(e),'err')}
+  ls('jona_news_demo_gm',APP_VER);S.viewAs=null;ls('jona_viewas',null);login('demo_gm');
+}
+function demoOut(){
+  try{for(const k of Object.keys(localStorage))if(k.startsWith('demo:'))localStorage.removeItem(k);sessionStorage.removeItem('jona_demo')}catch(e){}
+  location.replace(location.pathname);
+}
+async function demoSeed(){
+  const t=now(),H=36e5,G=864e5,P=S.db.dump().prodotti||{},F=S.db.dump().fornitori||{},jobs=[];
+  const it=(pid,qta,x)=>{const p=P[pid];return Object.assign({pid,nome:p.nome,codice:p.codice||'',unita:p.unita||'',prezzo:p.prezzo??null,fornitoreId:p.fornitoreId,fornitoreNome:(F[p.fornitoreId]||{}).nome||'',qta},x||{})};
+  const C40={ore:40,pausa:30,liberi:1};
+  const U=[['demo_gm','Ospite','','gm','cucina','Chef',{libero:true}],['demo_fb','Paolo','Serra','staff','fb','F&B Manager',{libero:true}],
+    ['demo_s1','Luca','Bianchi','staff','cucina','Cuoco',C40],['demo_s2','Sara','Conti','staff','sala','Cameriera',C40],
+    ['demo_s3','Giulia','Marras','staff','cucina','Pasticcera',C40],['demo_s4','Andrea','Piras','staff','sala','Barman',C40]];
+  for(const [id,nome,cognome,ruolo,reparto,mansione,contratto] of U)jobs.push(()=>put('staff',id,{nome,cognome,username:'demo.'+id.slice(5),ruolo,reparto,mansione,foto:'',stato:'attivo',pass:uid(),contratto,creato:t-30*G,creatoDa:'demo_gm'}));
+  const nm=id=>{const u=U.find(x=>x[0]===id);return u[1]+' '+u[2]};
+  const R=[['demo_r1','demo_s1',[it('mar05',4),it('mar12',6),it('demo05',3)],'Per il servizio di stasera','inviata',t-25*60000],
+    ['demo_r2','demo_s2',[it('demo09',2,{urgente:true}),it('demo01',3)],'','inviata',t-8*60000],
+    ['demo_r3','demo_s3',[it('mar06',10),it('mar08',6),it('demo03',1)],'Torte per il compleanno di sabato','approvata',t-3*H]];
+  for(const [id,u,items,nota,stato,cr] of R){const x=U.find(y=>y[0]===u);
+    jobs.push(()=>put('richieste',id,Object.assign({utenteId:u,utenteNome:nm(u),reparto:x[4],mansione:x[5],items,nota,stato,creato:cr},stato==='approvata'?{rimossi:[],modificata:false,notaGM:'',deciso:cr+40*60000,decisoDa:'demo_gm'}:{})))}
+  // ordini aperti dalla richiesta approvata (uno per fornitore)
+  const r3=R[2];for(const fid of [...new Set(r3[2].map(i=>i.fornitoreId))]){const its=r3[2].filter(i=>i.fornitoreId===fid);
+    jobs.push(()=>put('ordini','aperto_'+fid,{fornitoreId:fid,fornitoreNome:F[fid].nome,stato:'aperto',items:its.map(i=>({key:i.pid,pid:i.pid,nome:i.nome,codice:i.codice,unita:i.unita,prezzo:i.prezzo,qta:i.qta,da:[{n:nm('demo_s3'),r:'cucina',q:i.qta}]})),richieste:['demo_r3'],creato:r3[5],aggiornato:r3[5]}))}
+  // ordini inviati nelle ultime 8 settimane (per Arrivi, Storico, Consumi e costi): l'ultimo è ancora da ricevere
+  const OS=[['metro',['demo03','demo04','demo05','demo01']],['nieddittas',['demo07','demo08']],['pascucci',['demo09']]];
+  for(let w=0;w<8;w++)OS.forEach(([fid,pids],k)=>{const inv=t-(w*7+k*2+1)*G-3*H,q=(i)=>1+((w*3+i*5+k)%4);
+    jobs.push(()=>put('ordini','demo_o'+w+'_'+k,Object.assign({fornitoreId:fid,fornitoreNome:F[fid].nome,stato:'inviato',inviato:inv,inviatoDa:'demo_gm',metodo:F[fid].metodo||'',consegna:'',noteFornitore:'',
+      items:pids.filter(pid=>P[pid]).map((pid,i)=>({key:pid,pid,nome:P[pid].nome,codice:P[pid].codice||'',unita:P[pid].unita||'',prezzo:P[pid].prezzo??null,qta:q(i),da:[]})),richieste:[],creato:inv-H,aggiornato:inv},w||k?{ricevuto:inv+G}:{})))});
+  // orari della settimana, pubblicati
+  const lun=orLun(),V=['10:00-15:00','18:00-23:30','10:00-15:00,18:00-23:00','R'],tt={};
+  ['demo_s1','demo_s2','demo_s3','demo_s4'].forEach((id,j)=>{const r={};for(let g=0;g<7;g++)r[g]=V[(g+j)%7===6?3:(g+j)%3];tt[id]=r});
+  jobs.push(()=>put('config','orari_'+lun,{tipo:'orari',lun,t:tt,tp:clone(tt),pub:t-2*G,pubDa:'demo_gm',mod:t-2*G}));
+  // agenda e funzioni accese
+  const gd=n=>today(new Date(t+n*G)),ev={};
+  [['ev','Matrimonio Sanna, 120 coperti',2,'19:30',120,'Menù degustazione, torta a cura della pasticceria.','tutti',[]],['op','Consegna Metro anticipata alle 7',1,'07:00',0,'','rep',['cucina']],
+   ['info','Degustazione vini con la cantina',4,'17:00',25,'','tutti',[]],['ev','Pranzo di lavoro, 18 coperti',0,'13:00',18,'','tutti',[]]]
+   .forEach(([k,tit,n,h,cop,note,vis,rep],i)=>{ev['demo_e'+i]={k,t:tit,g:gd(n),h,cop,note,vis,rep,da:'demo_gm',cr:t,mod:t,r:''}});
+  const byM={};for(const [id,e] of Object.entries(ev))(byM['agenda_'+e.g.slice(0,7)]=byM['agenda_'+e.g.slice(0,7)]||{})[id]=e;
+  for(const [doc,e] of Object.entries(byM))jobs.push(()=>put('config',doc,{tipo:'agenda',e}));
+  jobs.push(()=>upd('config','app',{funz:{agenda:true}}));
+  // chat e avvisi
+  [['tutti','demo_fb','Buongiorno a tutti! Sabato matrimonio da 120: controllate l\'agenda.',3*H],['tutti','demo_s2','Ricevuto, prepariamo la sala da venerdì sera.',2.5*H],
+   ['rep_cucina','demo_s1','Chef, il pesce di Nieddittas arriva domattina?',50*60000],['rep_cucina','demo_s3','Per le torte mi servono anche le fragole, le ho chieste.',20*60000]]
+   .forEach(([c,da,m,ago],i)=>jobs.push(()=>put('messaggi','demo_m'+i,{c,da,t:m,creato:t-ago})));
+  [['demo_r1','demo_s1'],['demo_r2','demo_s2']].forEach(([rid,u],i)=>{const r=R.find(x=>x[0]===rid);const nf=new Set(r[2].map(x=>x.fornitoreId)).size,us=U.find(x=>x[0]===u);
+    jobs.push(()=>put('notifiche','demo_n'+i,{a:'gm',titolo:'Nuova richiesta da '+us[1],testo:`${REPARTI[us[4]]||''}, ${r[2].length} articoli da ${nf} ${nf===1?'fornitore':'fornitori'}`,tipo:'richiesta',rif:rid,letta:false,creato:r[5],da:u}))});
+  for(const j of jobs)await j();
+}
 async function seedIfEmpty(){
   if(!S.db.empty())return;
   const F=[['metro','Metro','sito','Secco e dispensa',{sito:'https://www.metro.it',note:'Ordine dal sito con le credenziali del locale. Listino: fattura XML o tabella da screenshot.'}],
@@ -4696,6 +4773,7 @@ const A={
   hf:d=>{S.hf.stato=d.v;render()},
   wk:d=>{S.wk=+d.v;render()},
   testMake:()=>makeTestData(),
+  demoGo:()=>demoGo(),demoOut:()=>demoOut(),
   testDel:()=>delTestData(),
   theme:d=>{ls('jona_theme',d.v==='auto'?null:d.v);applyTheme();refreshSheet()},
   cfgSave:async()=>{const n=String(S.cfgName||'').trim();if(!n)return;await put('config','app',Object.assign({},cfg(),{nomeLocale:n,luogoConsegna:String(S.cfgLuogo||'').trim()}));toast('Salvato')},
