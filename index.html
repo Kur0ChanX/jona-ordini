@@ -133,7 +133,7 @@ html.staff-ui .news-btn .ic{width:18px;height:18px}
 @media (max-width:360px){.top{gap:6px}.top .mark{display:none}.news-btn,html.staff-ui .news-btn{width:34px;padding:0;justify-content:center}.news-l{display:none}}
 .news-v{padding:16px 2px 18px;border-top:1px solid var(--line)}
 .ph-t{font:500 16px/1.3 var(--font);margin:18px 0 6px}
-.ph-ol{margin:4px 0 8px;padding-left:24px}.ph-err{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--corallo) 18%,transparent);word-break:break-word}
+.ph-ol{margin:4px 0 8px;padding-left:24px}.pst{white-space:nowrap}.pst.off{color:var(--corallo)}.ph-err{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--corallo) 18%,transparent);word-break:break-word}
 .ph-ol li{margin:10px 0;line-height:1.5;font-size:15.5px}
 .ph-brands{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 4px}
 .ph-brands .btn{min-height:48px;white-space:normal;line-height:1.2}
@@ -1031,9 +1031,9 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
 const APP_VER=40;
 const NEWS=[
-  {v:40,data:'2026-10-07',titolo:'Notifiche: secondo tentativo e errore preciso',
-    tutti:['Se le notifiche non si attivano, l\'app riprova da sola e nella guida mostra l\'errore esatto del telefono.','Guida più completa per i telefoni Oppo, Realme e OnePlus.'],
-    dev:{correzioni:['`pushOn`: se `subscribe` fallisce, toglie l\'iscrizione vecchia, aspetta 1,5 s e riprova; `S.pushErr` (nome + messaggio) mostrato in `pushHelp` (`.ph-err`).']}},
+  {v:40,data:'2026-10-07',titolo:'Notifiche più semplici',
+    tutti:['Se le notifiche non sono attive, in alto compare «Attiva le notifiche»: basta un tocco («Più tardi» la nasconde per 3 giorni).','I gestori vedono in Staff chi riceve gli avvisi (🟢) e chi no (🔴): si sistemano solo i telefoni in rosso.','Se le notifiche non si attivano, l\'app riprova da sola e nella guida mostra l\'errore esatto del telefono.','Guida più completa per i telefoni Oppo, Realme e OnePlus.'],
+    dev:{correzioni:['`pushOn`: se `subscribe` fallisce, toglie l\'iscrizione vecchia, aspetta 1,5 s e riprova; `S.pushErr` (nome + messaggio) mostrato in `pushHelp` (`.ph-err`).','`pushAsk`: avviso sotto `banner()` se le notifiche non sono attive (o bloccate → guida), «Più tardi» in `jona_push_ask` per 3 giorni. `vStaff`: 🟢/🔴 per profilo attivo da `PUSH.subs` (`p.u`), conteggio dei senza avvisi; `pushWatch` ridisegna con `schedule()`.']}},
   {v:39,data:'2026-10-07',titolo:'Logo di apertura più grande',
     tutti:['All\'apertura il logo «by YNOY&CORP» è più grande e più in alto, con «by» più vicino.'],
     dev:{correzioni:['`.wall-by i` 172 px, `gap` 2 px, niente spazio sopra; schermata d\'apertura con classe `splash` e `.splash .wall-by` 24 px dal fondo.']}},
@@ -1453,7 +1453,7 @@ const pushActive=()=>pushOk()&&Notification.permission==='granted'&&!!ls('jona_p
 const ub64u=t=>{t=t.replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(t+'='.repeat((4-t.length%4)%4)),c=>c.charCodeAt(0))};
 async function pushId(ep){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(ep));return'p'+[...new Uint8Array(h)].slice(0,12).map(b=>b.toString(16).padStart(2,'0')).join('')}
 function pushWatch(){if(PUSH.on||now()<PUSH.retry||!pushFb())return;PUSH.on=true;
-  pushCol().onSnapshot(q=>{const m={};q.docs.forEach(d=>{m[d.id]=d.data()});PUSH.subs=m;PUSH.ld=true;pushSync()},()=>{PUSH.on=false;PUSH.retry=now()+60000})}
+  pushCol().onSnapshot(q=>{const m={};q.docs.forEach(d=>{m[d.id]=d.data()});PUSH.subs=m;PUSH.ld=true;pushSync();schedule()},()=>{PUSH.on=false;PUSH.retry=now()+60000})}
 async function pushSave(sub){const me=realU();if(!me)return;const id=await pushId(sub.endpoint);
   await pushCol().doc(id).set({u:me.id,sub:JSON.parse(JSON.stringify(sub)),creato:now()});ls('jona_push',id)}
 async function pushSync(){
@@ -1473,7 +1473,7 @@ async function pushOn(){
       await new Promise(r=>setTimeout(r,1500));
       try{sub=await go()}catch(e2){S.pushErr=(e2&&e2.name||'errore')+(e2&&e2.message?': '+e2.message:'');
         return fail(e2&&e2.name==='AbortError'?'Il servizio notifiche di Google non risponde: segui la guida per il tuo telefono.':'Non riesco ad attivare le notifiche: segui la guida.')}}}
-  ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: Mario deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono');return true}
+  ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: Mario deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono');schedule();return true}
 const PUSH_HELP=[
   ['iphone','iPhone',['Apri <b>Impostazioni</b> → <b>Generali</b> → <b>Info</b> e guarda <b>Versione iOS</b>: deve essere <b>16.4 o più alta</b>. Se è più bassa: <b>Impostazioni</b> → <b>Generali</b> → <b>Aggiornamento software</b>.','Apri Jona <b>solo dall\'icona sulla schermata Home</b>, non da Safari. Se l\'icona non c\'è: apri <b>Safari</b> su jona-ristorante-by-ynoy-corp.pages.dev, premi <b>Condividi</b> (il quadrato con la freccia in su) → <b>Aggiungi alla schermata Home</b> → <b>Aggiungi</b>.','Apri <b>Impostazioni</b> → <b>Notifiche</b> → <b>Jona Ordini</b> e accendi <b>Consenti notifiche</b>.','Se è accesa la <b>Full immersion</b> (la luna), le notifiche arrivano senza suono: spegnila dal Centro di Controllo.']],
   ['xiaomi','Xiaomi, Redmi, POCO',['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi <b>Informazioni app</b>.','<b>Spegni</b> l\'interruttore <b>Sospendi l\'attività dell\'app se inutilizzata</b>.','Premi <b>Notifiche</b> e accendile.','Apri <b>Impostazioni</b> del telefono → <b>App</b> → <b>Gestisci app</b> → <b>Chrome</b> → <b>Risparmio batteria</b> → scegli <b>Nessuna restrizione</b>.','Nella stessa pagina di Chrome accendi <b>Avvio automatico</b>.']],
@@ -1599,6 +1599,8 @@ function view(){
 }
 /* v35 «App da aggiornare»: c'è una versione nuova (service worker cambiato mentre l'app era aperta) o serve il collegamento
    compatibile (netWatch). Niente riavvio automatico: lo decide la persona */
+function pushAsk(){if(S.upd||S.wallMode||!realU()||!pushOk()||!pushFb()||pushActive()||Number(ls('jona_push_ask')||0)>now())return'';const den=pushDenied();
+  return`<div class="obx push-ask" role="status">${ic('bell')}<div class="obx-i"><b>${den?'Notifiche bloccate':'Attiva le notifiche'}</b><span>${den?'Su questo telefono gli avvisi di Jona sono bloccati. Ti spiego come sbloccarli.':'Così ti arrivano gli avvisi anche con l\'app chiusa. Basta un tocco.'}</span></div><div class="obx-b"><button type="button" class="btn ghost sm" data-a="pushLater">Più tardi</button><button type="button" class="btn primary sm" data-a="${den?'pushHelp':'pushOn'}">${den?'Come fare':'Attiva'}</button></div></div>`}
 function banner(){if(!S.upd)return'';return`<div class="obx" role="status">${ic('warn')}<div class="obx-i"><b>App da aggiornare</b><span>Hai una versione non aggiornata: potresti avere problemi o funzioni in meno. Ti consigliamo di chiudere e riaprire l'app.</span></div><div class="obx-b"><button type="button" class="btn primary sm" data-a="reload">Aggiorna ora</button></div></div>`}
 function updOn(){if(S.upd)return;S.upd=1;schedule()}
 const wallMsg=(t,p,act='')=>`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>${esc(t)}</h1><p class="muted">${esc(p)}</p>${act}</div></div>`;
@@ -1834,7 +1836,7 @@ function shell(me){
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${pushAsk()}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -2864,8 +2866,10 @@ function vStaff(me){
   if(S.staffSub==='orari')return`<h1 class="vt">Staff</h1><p class="vsub">Tocca una casella per mettere il turno.</p>${sw}${vOrari()}`;
   const all=Object.values(D().staff);const pend=all.filter(u=>u.stato==='in_attesa');const act=all.filter(u=>u.stato!=='in_attesa');
   const mg=act.filter(u=>isMgr(u)).sort(byNome);
-  const row=u=>`<button type="button" class="row link ${u.stato==='disattivato'?'dim':''}" data-a="sedit" data-u="${u.id}">${avatar(u,44)}<div class="row-i"><div class="row-t">${esc(fullName(u))}${isMgr(u)?` <span class="tag gm">${RUOLI[u.ruolo].toLowerCase()}</span>`:''}</div><div class="row-m">@${esc(u.username||'')}${!isMgr(u)&&u.mansione?', '+esc(u.mansione):''}${u.stato==='disattivato'?', disattivato':''}</div></div>${ic('chev')}</button>`;
-  return`<div class="vhead"><div><h1 class="vt">Staff</h1><p class="vsub">${act.filter(u=>u.stato==='attivo').length} profili attivi</p></div><button type="button" class="btn primary" data-a="addProfile">${ic('plus')} Aggiungi</button></div>${sw}
+  const pv=pushFb()&&PUSH.ld,hasP=id=>Object.values(PUSH.subs).some(p=>p.u===id),noP=pv?act.filter(u=>u.stato==='attivo'&&!hasP(u.id)).length:0;
+  const pst=u=>pv&&u.stato==='attivo'?(hasP(u.id)?' · <span class="pst on">🟢 avvisi attivi</span>':' · <span class="pst off">🔴 niente avvisi</span>'):'';
+  const row=u=>`<button type="button" class="row link ${u.stato==='disattivato'?'dim':''}" data-a="sedit" data-u="${u.id}">${avatar(u,44)}<div class="row-i"><div class="row-t">${esc(fullName(u))}${isMgr(u)?` <span class="tag gm">${RUOLI[u.ruolo].toLowerCase()}</span>`:''}</div><div class="row-m">@${esc(u.username||'')}${!isMgr(u)&&u.mansione?', '+esc(u.mansione):''}${u.stato==='disattivato'?', disattivato':''}${pst(u)}</div></div>${ic('chev')}</button>`;
+  return`<div class="vhead"><div><h1 class="vt">Staff</h1><p class="vsub">${act.filter(u=>u.stato==='attivo').length} profili attivi${noP?` · <span class="pst off">🔴 ${noP} senza avvisi</span>`:''}</p></div><button type="button" class="btn primary" data-a="addProfile">${ic('plus')} Aggiungi</button></div>${sw}
   ${phPend().length?`<h2 class="sec">Telefoni da approvare<span>${phPend().length}</span></h2><div class="panel">${phPend().map(x=>`<div class="row">${avatar(x.req,48)}<div class="row-i"><div class="row-t">${esc(fullName(x.req))}</div><div class="row-m">${x.req.nuovo?esc(['nuovo profilo',x.req.mansione,REPARTI[x.req.reparto]].filter(Boolean).join(', ')):'ha già un profilo'} · ${phDev(x.ua)}</div></div><button type="button" class="icon-btn danger" data-a="phNo" data-v="${x.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="phOk" data-v="${x.id}">Approva</button></div>`).join('')}</div>`:''}
   ${pend.length?`<h2 class="sec">Da approvare<span>${pend.length}</span></h2><div class="panel">${pend.map(u=>`<div class="row">${avatar(u,48)}<div class="row-i"><div class="row-t">${esc(fullName(u))}</div><div class="row-m">${esc([u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</div></div><button type="button" class="icon-btn danger" data-a="sno" data-u="${u.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="sok" data-u="${u.id}">Approva</button></div>`).join('')}</div>`:''}
   ${mg.length?`<h2 class="sec">Gestione<span>${mg.length}</span></h2><div class="panel">${mg.map(row).join('')}</div>`:''}
@@ -4317,7 +4321,7 @@ const A={
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
-  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushAll:()=>{S.pushAll=true;repaint()},pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
+  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushLater:()=>{ls('jona_push_ask',now()+3*864e5);render()},pushAll:()=>{S.pushAll=true;repaint()},pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
   photoCam:()=>{regKeep();pickFile({accept:'image/*',capture:'user'},setPhoto)},
   photoLib:()=>{regKeep();pickFile({accept:'image/*'},setPhoto)},
   tab:d=>{if(d.v==='carrello')animPrefetch();if(S.tab&&S.tab!==d.v){NAV.tabs=NAV.tabs.filter(t=>t!==S.tab).slice(-9);NAV.tabs.push(S.tab)}S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},

@@ -18,7 +18,7 @@ const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,heigh
     const body=JSON.parse(r.request().postData());sent.push({da:name,...body});
     r.fulfill({json:{inviati:body.subs.length,scaduti:body.subs.filter(s=>s.endpoint.endsWith('/morto')).map(s=>s.endpoint),errori:[]}})});
   const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));return [c,p]};
-const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const [,A]=await mk(CFG,'A');
 await A.goto('http://localhost:8765/index.html');await A.waitForTimeout(3000);
@@ -33,10 +33,16 @@ await A.evaluate(async()=>{for(const d of (await fbInit().fs.collection('membri'
 await A.evaluate(()=>makeTestData());await A.waitForTimeout(3000);
 await B.fill('input[data-k="u"]','test1');await B.fill('input[data-k="p"]','prova123');await B.click('[data-a="doLogin"], .login .btn.primary');await B.waitForTimeout(1500);
 ok(await B.evaluate(()=>meU()&&meU().id==='test_u1'),'B entra come Luca (staff)');
+// v40: avviso «Attiva le notifiche» in alto finché non sono attive; «Più tardi» lo nasconde per 3 giorni
+ok(await B.isVisible('.push-ask [data-a="pushOn"]'),'avviso Attiva le notifiche in alto');
+await B.click('.push-ask [data-a="pushLater"]');await wait(300);
+ok(!await B.isVisible('.push-ask')&&await B.evaluate(()=>ls('jona_push_ask')>Date.now()+2.9*864e5),'Più tardi: avviso nascosto per 3 giorni');
+await B.evaluate(()=>{ls('jona_push_ask',null);render()});await wait(300);
+ok(await B.isVisible('.push-ask'),'avviso di nuovo visibile dopo i 3 giorni');
 // B attiva dal menu del profilo
 await B.evaluate(()=>meMenu());await B.waitForTimeout(400);
 ok(await B.isVisible('[data-a="pushOn"]'),'menu profilo: pulsante Attiva le notifiche');
-await B.click('[data-a="pushOn"]');await B.waitForTimeout(1500);
+await B.click('.sheet-wrap:last-child [data-a="pushOn"]');await B.waitForTimeout(1500);
 await B.evaluate(()=>meMenu());await B.waitForTimeout(400);
 ok(await B.isVisible('[data-a="pushTest"]')&&await B.isVisible('[data-a="pushOff"]'),'dopo l\'attivazione: Prova e Spegni');
 await B.click('[data-a="pushTest"]');await B.waitForTimeout(800);
@@ -44,6 +50,11 @@ ok(sent.some(s=>s.da==='B'&&s.subs.length===1&&s.subs[0].endpoint.endsWith('/B')
 await B.evaluate(()=>closeSheet(true));
 await A.evaluate(()=>A.pushOn());await A.waitForTimeout(1500);
 ok(await A.evaluate(()=>Object.keys(PUSH.subs).length===2),'A vede le 2 iscrizioni');
+ok(!await B.isVisible('.push-ask')&&!await A.isVisible('.push-ask'),'notifiche attive: niente avviso in alto');
+// v40: in Staff il gestore vede chi riceve gli avvisi
+await A.evaluate(()=>{S.tab='staff';S.staffSub='persone';render()});await wait(500);
+{const t=await A.innerText('#app');const luca=await A.innerText('[data-a="sedit"][data-u="test_u1"]');const others=await A.evaluate(()=>Object.values(D().staff).filter(u=>u.stato==='attivo'&&!Object.values(PUSH.subs).some(p=>p.u===u.id)).length);
+ok(/🟢 avvisi attivi/.test(luca)&&others>0&&new RegExp('🔴 '+others+' senza avvisi').test(t)&&/🔴 niente avvisi/.test(t),'Staff: Luca 🟢, gli altri 🔴 con il conteggio');}
 // A (sviluppatore) avvisa Luca: arriva solo al telefono di B
 sent.length=0;await A.evaluate(()=>notify('test_u1','Richiesta approvata','Pomodori'));await wait(1500);
 ok(sent.length===1&&sent[0].subs.length===1&&sent[0].subs[0].endpoint.endsWith('/B')&&sent[0].titolo==='Richiesta approvata','notifica a Luca → solo telefono B');
@@ -72,7 +83,7 @@ await B.evaluate(()=>A.pushOff());await wait(1500);
 // guida: il telefono rifiuta l'iscrizione → messaggio chiaro e guida aperta
 await B.evaluate(()=>{window.__fail=true;window.__tries=0;meMenu()});await wait(400);
 ok(await B.isVisible('.ph-link'),'menu: link Problemi con le notifiche');
-await B.click('[data-a="pushOn"]');await wait(3500);
+await B.click('.sheet-wrap:last-child [data-a="pushOn"]');await wait(3500);
 ok(/Le notifiche non arrivano/.test(await B.innerText('.sheet-wrap:last-child')),'errore → guida aperta');
 ok(await B.evaluate(()=>window.__tries===2),'riprovato una volta prima di arrendersi');
 ok(/AbortError: rifiutato/.test(await B.innerText('.sheet-wrap:last-child .ph-err')),'guida: errore esatto del telefono');
@@ -86,4 +97,5 @@ ok(await B.evaluate(()=>document.documentElement.scrollWidth<=360),'guida a 360 
 await B.screenshot({path:'/tmp/claude-0/-home-user-jona-ordini/13ef9fb8-91a4-5db8-b2d2-12c6e3adb38b/scratchpad/guida.png'});
 await B.evaluate(()=>{window.__fail=false});await B.click('.sheet-wrap:last-child [data-a="pushOn"]');await wait(1500);
 ok(await B.evaluate(()=>pushActive()&&!sheets.length),'Riprova ad attivare dalla guida: attive e guida chiusa');
+await A.setViewportSize({width:390,height:844});await A.evaluate(()=>{S.tab='staff';render()});await wait(400);await A.screenshot({path:process.env.SHOT_DIR?process.env.SHOT_DIR+'/staff.png':'/tmp/staff.png'});await B.evaluate(()=>{closeSheet(true);A.pushOff()});await wait(800);await B.setViewportSize({width:390,height:844});await B.screenshot({path:process.env.SHOT_DIR?process.env.SHOT_DIR+'/avviso.png':'/tmp/avviso.png'});
 console.log('errors',A.errs,B.errs);await b.close();

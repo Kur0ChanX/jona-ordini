@@ -19,7 +19,7 @@ const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,heigh
     const body=JSON.parse(r.request().postData());sent.push({da:name,...body});
     r.fulfill({json:{inviati:body.subs.length,scaduti:[],errori:[]}})});
   const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));return [c,p]};
-const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const SHOT='/tmp/claude-0/-home-user-jona-ordini/227e7e5c-730e-5e29-b544-103e6d4f1d62/scratchpad/';
 const [,A]=await mk(CFG,'A');
