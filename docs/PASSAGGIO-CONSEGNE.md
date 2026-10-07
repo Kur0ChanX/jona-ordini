@@ -3,7 +3,10 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
-«ho problemi pensaci tu in automatico»
+«non lo so» (risposta a: cosa vede Maurizio sul telefono, A attesa / B errore / C demo / D non so).
+Proposto: invito personale (Staff → **Aggiungi** → nome Maurizio → Password «La sceglie lui (invito WhatsApp)» → **Crea profilo** → manda il link): entra subito senza approvazione, aggira il problema. D8 resta da fare.
+
+Prima: «ho problemi pensaci tu in automatico»
 (= non riesce ad aprire a mano la sessione nuova. Claude non può aprirla: limite «lineage depth 8», E12, bloccati anche promemoria e routine. Decisione: si continua nella sessione #30 con la D8.)
 
 Messaggio prima: «mettila piú in vista non nascosta» (= D8).
