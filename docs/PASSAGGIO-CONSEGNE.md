@@ -3,12 +3,13 @@
 Sessione attuale: #30
 
 ## Ultimo messaggio di Mario (#29), parola per parola
-«verde»
-(= githubstatus.com mostra «Git Operations» verde dopo il guasto di GitHub che bloccava il push delle consegne.)
+«Tu riscontri problemi se non riscontri problemi andiamo di nessun tipo andiamo avanti»
+(= se il push ora funziona, avanti con l'handoff e la sessione nuova.)
 
 ## Messaggi di Mario in #29
 1. «si» (= parti con la D7) → D7 fatta (v45 sul ramo, non ancora pubblicata).
 2. «verde» → riprovato il push delle consegne.
+3. «Tu riscontri problemi se non riscontri problemi andiamo di nessun tipo andiamo avanti» → push riprovato, handoff.
 
 ## Fatto in #29
 - Avvio: di nuovo il ramo locale era vecchio (#12) → rimedio E5: `git branch -m … vecchio-locale-sessione12`, `git checkout -b <ramo> --track origin/<ramo>`. Il ramo vecchio esiste solo nel container, niente lavoro unico.
