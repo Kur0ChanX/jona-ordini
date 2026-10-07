@@ -3,6 +3,8 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+«abbiamo detto Una volta a settimana il controllo da 1 ora? va bene o consumiamo troppo? valutabe aggiorna anche rvc» → valutato: repo Jona PUBBLICO = minuti di GitHub Actions gratis e illimitati, le prove non consumano token di Claude; si tiene il giro completo settimanale + veloci a ogni PR. Mandata la valutazione a RVC (se privato: 2000 min/mese condivisi).
+
 «Puoi mettere la regola anche su RVC» → mandato alla sessione RVC #11 (`session_01NTWJZpaWY9weMSfovHruJv`) il testo delle regole: decido io sul tecnico, link cliccabili, pubblica senza chiedere, piano stabilità S1-S3. **S2 in corso**: PR #57 aperta (workflow `prove.yml` + `tools/prova-ci.sh`), primo giro su GitHub in esecuzione; se verde → squash + merge main nel ramo; se rosso → capire e correggere. Poi S1, S3, D9.
 
 «devi capire che ne capisci piú tu di me mi chiedi cose che non só mai cosa è il meglio io mi fido di te la maggior parte delle volte se tu sbagli siamo fregati» → regola «DECIDO IO SUL TECNICO» in `CLAUDE.md`. Decisione: S2 subito (workflow GitHub con prove veloci a ogni PR + giro completo settimanale), poi S1 (caccia ai «falsi ok»), poi S3 (scatola nera degli errori), poi D9. Prima Mario aveva chiesto «ok consumero molti token 1 2 3?» (stima: S2 basso, S3 medio-basso, S1 alto).
