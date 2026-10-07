@@ -120,7 +120,11 @@ jobs:
 
       - name: Prova del server
         run: |
-          sleep 5
-          curl -sf https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/salute | tee /dev/stderr | grep -q '"push":true'
-          curl -sf https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/chiave | grep -q '"chiave":"B'
-          curl -sf https://invito.jona-ristorante-by-ynoy-corp.workers.dev/ABCDEF | grep -q '#i=ABCDEF'
+          # un sottodominio appena creato può metterci qualche minuto a rispondere: riprova fino a 3 minuti
+          prova() {
+            curl -sf https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/salute | tee /dev/stderr | grep -q '"push":true' &&
+            curl -sf https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/chiave | grep -q '"chiave":"B' &&
+            curl -sf https://invito.jona-ristorante-by-ynoy-corp.workers.dev/ABCDEF | grep -q '#i=ABCDEF'
+          }
+          for i in $(seq 1 18); do sleep 10; if prova; then echo "Server a posto."; exit 0; fi; echo "Non risponde ancora ($i/18)"; done
+          echo "::error::Il server non risponde dopo 3 minuti."; exit 1
