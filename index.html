@@ -507,6 +507,9 @@ button.rp-pn{all:unset;display:block;font:400 15px/1.3 var(--font);overflow-wrap
 .checkall{display:flex;align-items:center;gap:10px;font-size:14.5px;padding:8px 0}
 .checkall input{width:20px;height:20px;accent-color:var(--lagoon)}
 .setrow{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.err-strip{background:var(--corallo-soft)}
+.err-strip .ic{color:var(--corallo)}
+.err-s{white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.35 ui-monospace,monospace;color:var(--muted);margin:6px 0 0;max-height:120px;overflow:auto}
 .ph-strip{background:var(--surface);border:2px solid var(--lagoon);border-radius:14px;padding:10px 12px;margin:6px 0 14px}
 .ph-strip-h{display:flex;align-items:center;gap:8px;color:var(--lagoon);font-size:15px;margin:2px 2px 6px}
 .ph-strip .row{padding:8px 2px}
@@ -1063,8 +1066,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=48;
+const APP_VER=49;
 const NEWS=[
+  {v:49,data:'2026-10-07',titolo:'Scatola nera degli errori',
+    tutti:['Se l\'app ha un problema su un telefono, ora lo segnala da sola allo sviluppatore (solo il messaggio dell\'errore, niente dati personali). Così si corregge prima che ve ne accorgiate.'],
+    dev:{aggiunte:['Scatola nera (S3): `errLog` raccoglie gli errori e le promesse rifiutate (stesso messaggio una volta per apertura, al massimo 30), `errFlush` li manda al Worker `/errori` (solo membri, tabella `err` nel primo D1, ultimi 2000, cron 30 giorni). Lo sviluppatore vede in cima «N errori nuovi sui telefoni» (`errStrip`, `errSheet`, `jona_err_vis`). Prove `tools/test-errori.mjs` e `tools/test-errori-server.mjs`.']}},
   {v:48,data:'2026-10-07',titolo:'Modifiche non arrivate: ora si vede',
     tutti:['Se il telefono ha internet ma la rete blocca gli invii (succede con alcuni Wi-Fi), in alto compare «modifiche non arrivate · Riprova». Prima l\'app sembrava a posto anche quando non lo era. Le modifiche non si perdono: partono appena la rete lo permette.'],
     dev:{risolti:['`syncPill`: con la rete accesa e scritture non confermate da più di `PEND_MS` (8 s, `st.pendT` in `track`) mostra «N modifiche non arrivate · Riprova» (`syncRetry`: `netRetry` = disable/enableNetwork, `jona_fb_lp` + «App da aggiornare»); con errore «Non collegato» invece di «Senza rete».','`phReject`: rifiuto con tempo massimo e conferma.'],aggiunte:['Prova `tools/test-falsi-ok.mjs` (S1), anche nelle prove veloci su GitHub.']}},
@@ -1978,7 +1984,7 @@ function shell(me){
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}${agBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${pushAsk()}${phStrip(me)}${agStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${pushAsk()}${errStrip()}${phStrip(me)}${agStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -4668,6 +4674,26 @@ async function agFotoAdd(){const P=S.agp,me=realU();if(!P||!me)return;const by={
   for(const [doc,evs] of Object.entries(by))await agPut(doc,evs);closeSheet();refreshSheet();toast(n===1?'1 evento aggiunto':n+' eventi aggiunti')}
 
 /* striscia «Oggi in hotel» e pulsante nell'intestazione */
+/* scatola nera (S3): gli errori dei telefoni vanno al Worker (/errori, primo D1); lo sviluppatore li vede in cima all'app */
+const ERR={q:[],seen:{},list:[],at:0,busy:0};
+function errLog(m,st){try{m=String(m||'').slice(0,500);if(!m||/ResizeObserver loop/.test(m))return;const k=m.slice(0,120),x=ERR.seen[k];if(x){x.n++;return}
+  if(Object.keys(ERR.seen).length>=30)return;const e={m,s:String(st||'').slice(0,1500),v:String(APP_VER),u:S.me||'',p:S.tab||'',t:Date.now(),n:1};ERR.seen[k]=e;ERR.q.push(e);setTimeout(errFlush,5000)}catch(_){}}
+addEventListener('error',e=>errLog(e.message||(e.error&&e.error.message),e.error&&e.error.stack));
+addEventListener('unhandledrejection',e=>{const r=e.reason;errLog(r&&r.message?r.message:String(r),r&&r.stack)});
+const errOk=()=>!DEMO&&S.db&&S.db.kind==='firebase'&&S.db.status().ready;
+async function errFlush(){if(!ERR.q.length||ERR.busy||!errOk())return;ERR.busy=1;const l=ERR.q.splice(0,10);
+  try{const r=await fetch(PUSH_URL+'/errori',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+await algTok()},body:JSON.stringify({e:l})});if(r.status>=500)ERR.q.unshift(...l)}
+  catch(_){ERR.q.unshift(...l)}finally{ERR.busy=0}}
+async function errLoad(){if(!errOk()||!isDev(realU()))return;ERR.at=now();
+  try{const r=await fetch(PUSH_URL+'/errori',{headers:{authorization:'Bearer '+await algTok()}});if(r.ok){ERR.list=(await r.json()).e||[];schedule()}}catch(_){}}
+setInterval(()=>{errFlush();if(now()-ERR.at>600000)errLoad()},60000);
+const errNew=()=>{const v=Number(ls('jona_err_vis')||0);return ERR.list.filter(e=>e.t>v)};
+function errStrip(){if(!isDev(realU())||S.wallMode||DEMO)return'';if(!ERR.at)setTimeout(errLoad,3000),ERR.at=1;const l=errNew();if(!l.length)return'';
+  return`<button type="button" class="ag-strip err-strip" data-a="errOpen">${ic('warn')}<span><b>${l.length===1?'1 errore nuovo':l.length+' errori nuovi'} sui telefoni</b> Tocca per vederli (solo sviluppatore)</span></button>`}
+function errSheet(){const nm=u=>{const x=D().staff[u];return x?fullName(x):(u||'?')};
+  openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Errori dei telefoni<div class="sh-s">Ultimi 100, i più recenti in alto</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${ERR.list.length?`<div class="panel">${ERR.list.map(e=>`<div class="row"><div class="row-i"><div class="row-t">${esc(e.m)}${e.n>1?` <span class="tag">×${e.n}</span>`:''}</div><div class="row-m">${esc(new Date(e.t).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))} · ${esc(nm(e.u))} · v${esc(e.v||'?')}${e.p?' · '+esc(e.p):''}</div>${e.s?`<pre class="err-s">${esc(e.s)}</pre>`:''}</div></div>`).join('')}</div>`:'<p class="muted">Nessun errore registrato.</p>'}
+  <div class="btns col" style="margin-top:14px"><button type="button" class="btn primary block" data-a="errSeen">Segna come visti</button></div>`})}
 /* richieste da approvare (telefoni e profili) in cima a ogni scheda dei gestori, con Approva e Rifiuta */
 function phStrip(me){if(!isMgr(me)||!realU()||S.wallMode)return'';
   const l=[...phPend().map(x=>({u:x.req,m:(x.req.nuovo?'nuovo profilo':'ha già un profilo')+' · '+phDev(x.ua),no:`data-a="phNo" data-v="${x.id}"`,ok:`data-a="phOk" data-v="${x.id}"`})),
@@ -4695,6 +4721,7 @@ const A={
   phAgain:()=>{ls('jona_wait',null);S.db.phone.again().catch(()=>toast('Non riesco: controlla la connessione e riprova.','err'))},
   phOk:d=>phApprove(d.v),itGo:()=>itGo(),itRetry:()=>{IT.t='';schedule()},itSkip:()=>{ls('jona_itk',null);IT.t='';schedule()},
   invMono:d=>invMonoSend(d.u),invMonoGo:d=>invMonoShare(d.v),ptSet:d=>ptSet(+d.v),phNo:d=>phReject(d.v),phRetry:()=>{ls('jona_fb_lp',1);location.reload()},
+errOpen:()=>errSheet(),errSeen:()=>{ls('jona_err_vis',now());closeSheet();schedule()},
 syncRetry:()=>{if(!S.db||!S.db.netRetry)return;S.db.netRetry().catch(()=>{});if(!ls('jona_fb_lp')){ls('jona_fb_lp',1);updOn()}toast('Riprovo a inviare. Se resta così, chiudi e riapri l\'app: le modifiche non si perdono.','warn')},
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
