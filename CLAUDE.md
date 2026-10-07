@@ -84,6 +84,8 @@ GitHub dal telefono: Mario usa GitHub da Google Chrome sul telefono, in modalit�
 
 Link sempre: per ogni cosa che Mario deve fare a mano (siti, registrazioni, chiavi API, impostazioni, GitHub, Cloudflare, Firebase…) dai il link diretto alla pagina giusta, dici perché ci va e cosa deve inserire, e scrivi in **grassetto** i pulsanti esatti da toccare. Mario è spesso sul telefono: passi brevi e chiari. Vale per tutti i progetti.
 
+Link cliccabili e copiabili (Mario, 07/10/2026, vale per OGNI progetto): ogni link si scrive intero e semplice (`https://…`), mai dentro il riquadro del codice (con le virgolette rovesciate non si può toccare). Se Mario deve copiarlo o mandarlo a qualcuno, sotto lo ripeto anche in un riquadro da copiare.
+
 Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scrivi SOLO un elenco numerato passo passo. Usa i nomi ESATTI dei pulsanti e dei menu che vedrò sullo schermo, senza inventarli o tradurli.
 
 
@@ -140,6 +142,7 @@ IndexedDB `jona-outbox` (store `q`): push non partite, lette sia da `index.html`
 - Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
 - Prove: `tools/README.md` (server locale, Playwright con Chromium `/opt/pw-browsers/chromium`, emulatore Firebase con `localStorage.jona_fb_emu`).
 - STABILITÀ (Mario, 06/10/2026: l'app serve a un hotel, niente codice superficiale): prima di ogni PR fai girare TUTTE le prove con `bash tools/prova-tutto.sh` (in background, ~1 ora) e apri la PR solo se sono tutte riuscite. Ogni bug corretto riceve una prova che lo avrebbe trovato. Una prova fallita non si salta né si spegne: si capisce la causa.
+  - PUBBLICA SENZA CHIEDERE (Mario, 07/10/2026, vale sopra la scelta delle prove qui sotto): se le prove legate + `tools/test-giro.mjs` sono tutte riuscite, pubblico da solo (PR, squash, controllo online) senza chiedere; chiedo solo se qualcosa fallisce. Il giro completo resta da chiedere («ora o dopo?»).
   - SCELTA DELLE PROVE (Mario, 06/10/2026): prima di ogni pubblicazione propongo a Mario 3 opzioni, con la mia raccomandazione: (1) **completo** con `tools/prova-tutto.sh` (~1 ora), (2) **breve** con le sole prove legate + `tools/test-giro.mjs` (5-10 minuti), (3) **subito** senza prove. Sceglie lui ogni volta; senza risposta si fa il completo. Con breve o subito il giro completo parte appena pubblicato e ciò che trova si corregge con priorità.
   - QUANDO (Mario, 07/10/2026): il giro completo si fa meno spesso, solo per cose urgenti o cambiamenti importanti di sistema che possono toccare la stabilità. Per le piccole modifiche (testi, aspetto, una funzione isolata) bastano le prove legate. Prima di far partire il giro completo chiedo sempre a Mario: «Lo faccio partire ora o dopo?».
   - EMERGENZA (l'app in uso in hotel è rotta): correggo, faccio girare solo le prove legate al problema e pubblico subito; il giro completo parte subito dopo e, se trova qualcosa, si corregge con priorità. Il giro completo gira in background con lo script e costa pochi token (leggo solo il riassunto).

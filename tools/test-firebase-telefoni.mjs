@@ -37,8 +37,20 @@ await B.click('[data-a="phNew"]');await B.waitForTimeout(300);
 for(const [k,v] of [['nome','Gianni'],['cognome','Loi']])await B.locator(`.sheet input[data-k="${k}"]`).pressSequentially(v);
 ok(await B.inputValue('.sheet input[data-k="username"]')==='gianni.loi','nome utente proposto gianni.loi');
 for(const k of ['pw','pw2'])await B.fill(`.sheet input[data-k="${k}"]`,'segreto1');
-await B.click('.sheet [data-a="phSend"]');await B.waitForTimeout(2000);
-t=await txt(B);ok(/Ciao Gianni/.test(t)&&/Richiesta inviata/.test(t),'B: «Richiesta inviata»');
+// v46: rete che blocca le scritture (Wi-Fi con filtri): niente «Richiesta inviata» finché il server non conferma
+const blocca=r=>r.abort();await B.context().route(/Firestore\/Write\/channel/,blocca);
+await B.click('.sheet [data-a="phSend"]');await B.waitForTimeout(2500);
+t=await txt(B);ok(/Sto inviando la richiesta/.test(t)&&!/Richiesta inviata/.test(t),'B (scritture bloccate): «Sto inviando», non «Richiesta inviata»');
+await B.waitForTimeout(11000);t=await txt(B);
+ok(/non è ancora arrivata/.test(t)&&await B.locator('[data-a="phRetry"]').count()===1,'B (scritture bloccate): avviso e «Riprova»');
+ok(!/chiede di entrare/.test(await txt(A,'body'))&&await A.locator('.ph-strip').count()===0,'A: niente richiesta finché non arriva');
+await B.context().unroute(/Firestore\/Write\/channel/,blocca);
+await B.click('[data-a="phRetry"]');await B.waitForTimeout(7000);
+ok(await B.evaluate(()=>!!localStorage.getItem('jona_fb_lp')),'B: «Riprova» passa al long polling');
+t=await txt(B);ok(/Ciao Gianni/.test(t)&&/Richiesta inviata/.test(t),'B: dopo «Riprova» «Richiesta inviata» (confermata dal server)');
+await A.evaluate(()=>{S.tab='richieste';render()});await A.waitForTimeout(500);
+t=await txt(A,'.ph-strip');ok(/1 richiesta da approvare/.test(t)&&/Gianni Loi chiede di entrare/.test(t)&&/Approva/.test(t),'A: richiesta in cima alla scheda Richieste con «Approva»');
+await A.evaluate(()=>{S.tab='staff';render()});await A.waitForTimeout(300);
 t=await txt(A,'body');
 ok(/Telefoni da approvare/.test(t)&&/Gianni Loi/.test(t)&&/chiede di entrare/.test(t),'A: telefono in «Telefoni da approvare» e avviso');
 ok(await A.locator('.nav [data-v="staff"] .badge').innerText()==='1','A: contatore 1 sulla scheda Staff');
@@ -46,6 +58,7 @@ await A.click('[data-a="phOk"]');await A.waitForTimeout(4000);
 ok(await A.evaluate(()=>{const u=Object.values(D().staff).find(x=>x.username==='gianni.loi');return u&&u.stato==='attivo'}),'A: approvato, profilo attivo creato');
 ok(await B.evaluate(()=>S.db.status().ready&&meU()&&meU().username==='gianni.loi'),'B: entra da solo come Gianni');
 ok(await A.evaluate(()=>phPend().length===0),'A: lista vuota');
+ok(await A.locator('.ph-strip').count()===0,'A: dopo l\'approvazione la striscia sparisce');
 
 // 2. telefono di chi ha già un profilo
 const C=await mk(null);await C.goto(link);await C.waitForTimeout(5000);

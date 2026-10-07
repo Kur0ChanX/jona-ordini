@@ -1,49 +1,64 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #30
+Sessione attuale: #31
 
-## Ultimo messaggio di Mario (#29), parola per parola
-«Tu riscontri problemi se non riscontri problemi andiamo di nessun tipo andiamo avanti»
-(= se il push ora funziona, avanti con l'handoff e la sessione nuova.)
+## Ultimo messaggio di Mario (#30), parola per parola
+«Se devi pubblicare la buova versione se non ci sono problemi pubblica sempre senza chiedere» → regola in `CLAUDE.md` (PUBBLICA SENZA CHIEDERE). v46 si pubblica da sola appena le prove legate sono riuscite.
 
-## Messaggi di Mario in #29
-1. «si» (= parti con la D7) → D7 fatta (v45 sul ramo, non ancora pubblicata).
-2. «verde» → riprovato il push delle consegne.
-3. «Tu riscontri problemi se non riscontri problemi andiamo di nessun tipo andiamo avanti» → push riprovato, handoff.
+Prima: «trova il bug non possiamo gregarce e dai non posso fare figuracce» (= niente aggiramento: trovare e correggere il bug).
 
-## Fatto in #29
-- Avvio: di nuovo il ramo locale era vecchio (#12) → rimedio E5: `git branch -m … vecchio-locale-sessione12`, `git checkout -b <ramo> --track origin/<ramo>`. Il ramo vecchio esiste solo nel container, niente lavoro unico.
-- **v45 «App dimostrativa»** (commit `e57f5d3` sul ramo `ccr-4a01d00e-6ay25e`, NON ancora in main):
-  - Link: `https://jona-ristorante-by-ynoy-corp.pages.dev/#demo`. La scelta resta per la scheda (sessionStorage `jona_demo`), anche se l'indirizzo perde `#demo`. Aprire `#demo` con l'app già aperta ricarica in demo (`hashchange`).
-  - `index.html`: `DEMO` e `lsK` definiti prima di `ls()`; `ls` e `LocalStore` usano chiavi «demo:» (dati, profilo, carrello, vista); `fbCfg`→null; in demo `window.fetch` verso altri siti rifiutato (tranne Open-Meteo; i font Google sono CSS, non fetch) → niente Worker, Gemini, push, inviti; `obxDb` rifiuta (niente coda invii, non tocca quella vera); `appBadge` spento.
-  - `view()`: `if(DEMO&&!meU())return screenDemo()` (benvenuto: logo, «Anteprima del progetto», «Benvenuto in Jona Ordini», 4 righe con icone, **Entra nella demo**, «Niente di quello che fai qui arriva al ristorante o ai fornitori.», firma BY).
-  - `demoGo`: `S.db.load({})` + `seedIfEmpty()` + `demoSeed()`, segna Novità già viste, `login('demo_gm')`. `demoSeed`: 6 persone (Ospite gm libero, Paolo Serra F&B libero, Luca Bianchi cuoco, Sara Conti cameriera, Giulia Marras pasticcera, Andrea Piras barman; nomi inventati), 2 richieste in attesa (una urgente) + 1 approvata con 2 ordini aperti, 24 ordini inviati in 8 settimane (l'ultimo da ricevere → Arrivi), orari della settimana pubblicati, 4 eventi agenda (uno oggi → striscia «Oggi in hotel»), `funz.agenda` accesa, 4 messaggi chat, 2 avvisi.
-  - `testBar()` in demo mostra `.demobar`: «Anteprima · Dati di esempio: niente arriva al ristorante.» + **Esci** + «Guarda l'app come» Chef / F&B Manager / Staff. `meU` usa `VIEW_AS` anche in demo. `demoOut` cancella le chiavi «demo:» e il flag, torna all'indirizzo senza hash.
-  - `APP_VER=45`, NEWS v45 (chef + dev), `sw.js` `CACHE` `jona-ordini-v49`. Nessun file nuovo dell'app (niente da aggiungere a `FILES` o al workflow).
-- Prova nuova `tools/test-demo.mjs` (30 PASS, usa il firebase-config vero; i dati «veri» si scrivono da `manifest.webmanifest` per non collegarsi a Firestore vero). Prove brevi tutte riuscite: test-demo 30, test-testbar 7, test-news 94, test-responsabile 15, test-agenda 60, test-giro «nessun problema».
-- Fine sessione: GitHub ha rifiutato più volte il push (e anche l'API) con «Internal Server Error»; riuscito dopo che Mario ha visto lo stato verde (E11).
-- Immagini: `docs/immagini/demo-benvenuto.png`, `docs/immagini/demo-dentro.png` (da mostrare a Mario).
-- Aggiornati: `CLAUDE.md` (riga v45), `tools/README.md`, `docs/DA-FARE.md` (D7 = manca la pubblicazione, nuova M20).
+**Bug trovato e riprodotto (emulatore)**: il telefono in attesa mostrava «Richiesta inviata» leggendo la propria cache anche se la scrittura di `req` non era arrivata al server (Wi-Fi con filtri, come in hotel). Il telefono di Mario quindi non riceveva niente. **v46 sul ramo (non ancora pubblicata)**: `st.reqOk`, «Sto inviando…» → dopo 12 s avviso + **Riprova** (`phRetry`: long polling + ricarica), `phStrip` (richieste in cima a ogni scheda dei gestori con Approva/Rifiuta = D8), `phWatch` riprova in 30 s. `APP_VER=46`, NEWS v46, `CACHE` v50. `tools/test-firebase-telefoni.mjs` estesa: 30 PASS. Prove legate in corso (v35, v40, news, demo, testbar, agenda, responsabile, firebase-flow, giro). Poi: scelta prove a Mario, PR, squash, controllo online, merge main nel ramo; dire a Mario che Maurizio deve riaprire l'app (si aggiorna) e toccare **Riprova** se compare.
 
-## Decisioni e perché
-- Chiavi separate «demo:» invece di un altro sito: stesso indirizzo, zero manovre; un telefono vero che apre la demo non mescola dati.
-- Demo rifatta da zero a ogni «Entra nella demo»: ogni ospite trova dati puliti.
-- Profilo `gm` con cambio vista (non `dev`): così non vede gli strumenti dello sviluppatore.
-- «Chiedi a Jona» (Gemini) resta visibile ma non chiama la rete: accettato, da migliorare solo se Mario lo chiede (es. messaggio «non disponibile nella demo»).
+Prima: Foto da WhatsApp del telefono di Maurizio (`docs/immagini/maurizio-richiesta-inviata.jpg`, senza testo): «Ciao Maurizio! Richiesta inviata… devono approvare questo telefono», «Nuovo profilo · nome utente maurizio.lai». Quindi Maurizio è nella schermata d'attesa (A) ma sul telefono di Mario (Admin Chef, Staff → Persone) «Telefoni da approvare» NON compare → **BUG da trovare in D8**: richiesta scritta in `membri/<uid>` (ok=false, req) ma `phWatch`/`phPend` di Mario non la mostra. Ipotesi da verificare con l'emulatore: ascolto fallito in silenzio (`PH.retry`), scrittura rimasta solo nella cache offline del telefono di Maurizio, regola `membri` che nega la lista, chiave cambiata. Nel frattempo a Mario: invito personale (aggira il problema).
 
-## Da fare in #30 (subito)
-1. Mostrare a Mario le 2 immagini e proporre le 3 opzioni di prove per pubblicare: (1) completo, (2) breve (GIÀ FATTA, tutte riuscite → consigliata), (3) subito. Una domanda per volta.
-2. Pubblicare: PR dal ramo → squash merge (lo fa Claude) → controllo online (`APP_VER=45`, `CACHE` v49, `#demo` mostra il benvenuto) → subito `git fetch origin main && git merge origin/main` sul ramo + push.
-3. Dare a Mario i passi M20 (aprire il link dal telefono, provarlo, mandarlo a Chiara/consulenti/proprietari) con il link pronto da copiare.
+Prima: «non lo so» (risposta a: cosa vede Maurizio sul telefono, A attesa / B errore / C demo / D non so).
+Proposto: invito personale (Staff → **Aggiungi** → nome Maurizio → Password «La sceglie lui (invito WhatsApp)» → **Crea profilo** → manda il link): entra subito senza approvazione, aggira il problema. D8 resta da fare.
+
+Prima: «ho problemi pensaci tu in automatico»
+(= non riesce ad aprire a mano la sessione nuova. Claude non può aprirla: limite «lineage depth 8», E12, bloccati anche promemoria e routine. Decisione: si continua nella sessione #30 con la D8.)
+
+Messaggio prima: «mettila piú in vista non nascosta» (= D8).
+
+Poi Mario ha mandato una foto (`docs/immagini/mario-staff-senza-richiesta.jpg`): vista Admin Chef, Staff → Persone, NESSUNA sezione «Telefoni da approvare»; profili: Mario (sviluppatore), Mauro Loi (F&B), Mario Test Prova (Responsabile). Quindi la richiesta di Maurizio non arriva all'app (non è solo nascosta): da capire cosa vede Maurizio sul suo telefono (schermata d'attesa? errore? demo?) e se a Mario è arrivata la notifica «chiede di entrare». Possibile anche ascolto `phWatch` fallito (lista vuota, riprova dopo 5 min, nessun avviso): in D8 mostrare un avviso se l'ascolto fallisce.
+
+## Messaggi di Mario in #30
+1. «ok riscontri problemi in Generale?» → progetto in ordine; GitHub in guasto (githubstatus: Actions, Pull Requests, Webhooks rossi).
+2. Due foto di githubstatus (ancora gialli/rossi) → aspettato.
+3. «verdi» → mandate le 2 immagini demo, chiesta la scelta delle prove.
+4. «2» (prove brevi, già fatte in #29) → pubblicata la v45.
+5. «metti la regola sempre in ogni progetto, quando mi mandi un link deve essere sempre cliccabile e copiabile» → regola in `CLAUDE.md` + testo da incollare nelle preferenze dell'account (https://claude.ai/settings/general). Non ha ancora detto se l'ha incollato.
+6. «Maurizio ha inviato la richiesta ma non la vedo» → spiegato dove compare + 6 passi di controllo. Non ha risposto sì/no.
+7. «mettila piú in vista non nascosta» → D8.
+8. «ho problemi pensaci tu in automatico» → nuova sessione impossibile (E12): si continua in #30.
+
+## Fatto in #30
+- Avvio: ramo locale vecchio (#12), `merge --ff-only` fallito → rimedio E5 (`git branch -m … scorta-locale-vecchia-12`, `git checkout -b <ramo> origin/<ramo>`).
+- **v45 «App dimostrativa» ONLINE**: PR #54 squash (commit `0a3fff1` su main), poi `git merge origin/main` nel ramo + push. Controllato online: `APP_VER=45`, `CACHE` `jona-ordini-v49`, `#demo` mostra «Benvenuto in Jona Ordini», **Entra nella demo** funziona, barra «Dati di esempio» presente.
+- `docs/DA-FARE.md`: tolta D7, M20 → «ora», C7 → «ora».
+- `CLAUDE.md`: nuova regola «Link cliccabili e copiabili» (vale per ogni progetto): link interi e semplici, mai tra virgolette rovesciate; se va copiato/inoltrato, ripeterlo sotto in un riquadro da copiare. È solo sul ramo: arriva in main con la prossima PR.
+
+## Richiesta di Maurizio non visibile: cosa si sa
+- Le richieste di telefono compaiono solo in **Staff → Persone**, in cima, sezione «Telefoni da approvare» (`phPend()`, lista `PH.list` da `phWatch()`, `index.html` ~riga 1731 e ~2988). Profili «in_attesa» in «Da approvare» (~2989).
+- `phWatch` parte solo con Firebase pronto e `realU()` gestore; se l'ascolto fallisce riprova dopo 5 minuti e la lista resta vuota (`PH.retry`).
+- Nascosta se: sotto-scheda **Orari**, barra Test su «Staff» (niente scheda Staff), app vecchia/aperta da tanto. C'è già un toast «X chiede di entrare» che sparisce subito.
+- Non verificato se Maurizio ha davvero mandato la richiesta (potrebbe aver aperto `#demo`, o essere entrato con invito → già attivo). Chiedere a Mario l'esito dei 6 passi se serve.
+
+## Da fare in #31 (subito): D8 «richieste ben in vista»
+Proposta (fare una domanda per volta, con immagine prima/dopo):
+- Riquadro fisso in cima alla **Home** dei gestori (e dello sviluppatore con qualunque vista gestore): «🔔 Maurizio chiede di entrare» con **Approva** / **Rifiuta**, uguale a quello di Staff (`phOk`/`phNo`, `sok`/`sno`).
+- Pallino col numero sulla scheda **Staff** della barra in basso.
+- Toast più lungo / avviso nella campanella con link alla scheda Staff → Persone (imposta `S.staffSub='persone'`).
+- Prova nuova (es. `tools/test-richieste.mjs` o estendere una esistente) che controlli il riquadro in Home. Poi `APP_VER=46`, NEWS v46, `CACHE` v50, scelta prove (1/2/3), PR, squash, controllo online, merge main nel ramo.
+- Intanto aiutare Mario ad approvare Maurizio (M1) appena lo vede.
 
 ## Prossimi passi (dopo)
-1. Chiedere a Mario a che passo è con l'invito di Maurizio (passi in `docs/DA-FARE.md`, M1/M2/M19).
-2. Riga «“Oggi si ordina” arriva a» più chiara: immagine prima/dopo.
-3. Giro completo prove v42-v45: chiedere «Lo faccio partire ora o dopo?».
-4. Poi notifica del mattino «Oggi in hotel», promemoria evento dal Worker, V, W, X; poi A, C, G, H, I, J, K, O, R, U (`docs/PIANO-INVERNO.md`).
+1. Chiedere a Mario se ha incollato la regola dei link nelle preferenze dell'account.
+2. M20: Mario prova `https://jona-ristorante-by-ynoy-corp.pages.dev/#demo` e lo manda a Chiara/consulenti/proprietari.
+3. C7: riga «“Oggi si ordina” arriva a» più chiara (immagine prima/dopo), giro completo v42-v46 (chiedere «Lo faccio partire ora o dopo?»), avvisi agenda dal Worker, poi `docs/PIANO-INVERNO.md`.
 
 ## Rischi aperti
-- Una domanda per volta, con immagine per le scelte (E2, E3).
+- Il ramo locale delle sessioni nuove parte spesso vecchio: rimedio E5.
+- GitHub ha avuto guasti oggi (E11): se push/PR falliscono, far guardare https://www.githubstatus.com
 - Telefono in attesa `ISLyK5…` (M17). `test-firebase-flow` tra 23:30 e mezzanotte (E10).
 - Elenco completo: `docs/DA-FARE.md`. Errori: `docs/ERRORI.md`.
 - Titoli sessioni: `🟤 ▶ ATTIVA · #NN · Jona Ordini · …` / `🟤 ✓ CHIUSA · …`.
