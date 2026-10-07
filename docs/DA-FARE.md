@@ -10,7 +10,8 @@ Aggiornato: 2026-10-06 (sessione #15, M11 fatto; logo YNOY nella PR #46). Copia 
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| 🔴 M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
+| 🔴 C1 | Come rientrano Mario e lo staff sul nuovo indirizzo (schermata «Collega questo telefono», nessun telefono collegato per l'invito) | Claude | subito |
+| 🔴 M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo C1 |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
 | M2 | Dare a Maurizio il ruolo Admin Chef | Mario | in stand-by, dopo M1 |
