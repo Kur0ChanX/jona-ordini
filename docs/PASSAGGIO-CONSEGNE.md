@@ -1,30 +1,27 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #22
+Sessione attuale: #23
 
-## Ultimo messaggio di Mario (#21)
-«quando vuoi far partire le prove automatiche chiedimi vuoi farle partire ora o dopo? le prove devi farle partire meno spesso e per cose urgenti o cambiamenti importanti di sistema dove il codice potrebbe avere problemi per la stabilità del programma»
-→ Regola nuova scritta in `CLAUDE.md` (STABILITÀ → QUANDO). **Prima cosa da fare in #22: chiedere a Mario «Il giro completo sulla v40 lo faccio partire ora o dopo?»** (la v40 tocca le notifiche: è un cambiamento importante, il giro completo serve).
+## Ultimi messaggi di Mario (#22)
+- Su «Altre idee nuove (da valutare)»: «da valutare scelgo (R) e (U) ma definire di leggere tutto» → scelte R («Il mio giorno») e U (ricerca unica). **Regola: leggere sempre per intero quello che Mario scrive in «Altro» delle domande** (in #22 si era lamentato due volte: «ti ho scritto delle cose che non hai letto», «ho perso lo schema pensiero»).
+- Poi ha approvato il piano dell'inverno.
 
-Risposte di Mario in #21:
-- Riquadro «Attiva le notifiche» anche per lo staff: «funziona sì» = va bene così.
-- «chiedi a Mario» nell'app non gli piace → «chiedi allo sviluppatore» (fatto).
-- Barra Test: cambiando vista veloce gli avvisi si accumulavano in coda → tolti, pulsante attivo colorato (fatto).
+## Fatto in #22
+- **v40 pubblicata**: PR #49 (squash, merge fatto da Claude dopo il «sì» di Mario), online `APP_VER=40`. Mario: notifiche funzionanti sul suo telefono (C1, C2 chiusi).
+- Ramo `hotfix-notifiche` riallineato a `main` (`f4ad39f`).
+- **Giro completo sulla v40: 38 prove su 38 riuscite.**
+- `CLAUDE.md` su `main` allineato (merge da Claude, regola QUANDO).
+- Spiegato a Mario perché si pubblica meno spesso (app per hotel, regola STABILITÀ, giro di 1 ora): non vuole cambiare metodo.
+- Risposto sull'offline (tabella in `docs/PIANO-INVERNO.md`).
+- **Piano dell'inverno approvato**: `docs/PIANO-INVERNO.md`. App ancora in prova (Mario e pochi altri), apertura la prossima stagione → M14 non più 🔴.
+- `docs/DA-FARE.md` aggiornato (C5, C6).
 
-## Fatto in #21 (ramo `hotfix-notifiche`, pushato, ultimo commit `df970ef`)
-- `index.html`: l'avviso della coda (`obxBar`) ha la classe `obx obx-q`; `tools/test-firebase-approva-arrivi.mjs` cerca `.obx-q` (prima confondeva il riquadro `pushAsk`, che usa `.obx`). Prova riuscita.
-- `index.html`: «Mario» → «lo sviluppatore» in tutti i testi visibili (17 punti; il poster QR dice «Registrati: un gestore approva il tuo telefono»). Restano solo note tecniche `dev` in NEWS, un commento e un dato di prova.
-- `index.html`: azione `viewAs` senza `toast`; CSS `.testbar .seg button[aria-pressed="true"]` color laguna. Nota in NEWS v40 (`dev.correzioni`).
-- Nuova prova `tools/test-testbar.mjs` (cambio vista veloce senza avvisi, pulsante colorato, nessun «Mario»/creatore nei testi). Riuscita; riuscita anche `test-news`.
-- Il giro completo è stato fermato due volte (modifiche in corso, poi chiusura sessione): **non c'è ancora un giro completo valido sul commit `df970ef`**. Nel giro interrotto le prime 6 prove (fino a `test-firebase-chat`) erano riuscite.
-
-## Prossimi passi (#22)
-1. Chiedere a Mario «ora o dopo?» per il giro completo (`git checkout hotfix-notifiche`, `bash tools/prova-tutto.sh` in background). Correggere ciò che fallisce.
-2. Tutte riuscite → PR `hotfix-notifiche` → `main` (allineare anche `CLAUDE.md` di `main`: merge fatto da Claude, regola QUANDO, chiave `jona_push_ask`) → merge squash da Claude → controllo online (`APP_VER=40`) → Mario riprova le notifiche (C2) e manda la foto della riga rossa.
-3. Riportare `main` nel ramo `ccr-4a01d00e-6ay25e`: conflitti attesi su `APP_VER`/`NEWS`/`CACHE`; il lavoro inviti/entrata libera diventa **v41** (`APP_VER` 41, `CACHE` v45, NEWS v41).
-4. Poi quanto in `docs/DA-FARE.md` (test-v40 punto 4 «Invito pronto», M18, M14, M15…).
+## Prossimi passi (#23)
+1. **C5**: riportare `main` nel ramo `ccr-4a01d00e-6ay25e` (`git fetch origin main && git merge origin/main`): conflitti attesi su `APP_VER`/`NEWS`/`CACHE`; il lavoro inviti/entrata libera diventa **v41** (`APP_VER` 41, `CACHE` v45, NEWS v41). Poi scelta delle prove a Mario e pubblicazione v41 → M18 (regole Firebase) per Mario.
+2. **C6**: piano dell'inverno, nell'ordine: passo 0 interruttori delle funzioni (`config/app.funz`, partono spente, conta d'uso Z) → agenda smart di Mauro (foto dell'agenda di carta → eventi, una riga scritta o detta, privato/condiviso, «Oggi in hotel», promemoria, V/W/X) con calendario consegne O → poi A, C, G, H, I, J, K, R, U. Una funzione per versione, piano operativo breve prima di ognuna (BRAINSTORMING → «Procediamo»).
+3. Mario potrebbe fare prove in hotel (import Excel/XML/foto, bolla, modalità aereo): aspettare le sue foto.
 
 ## Rischi aperti
-- Telefono in attesa `ISLyK5…` (M17) da approvare a mano.
-- `test-firebase-flow` fallisce tra 23:30 e mezzanotte (noto).
-- Se `AbortError` capita a molti Oppo/OnePlus: strada B (bot Telegram).
+- Telefono in attesa `ISLyK5…` (M17).
+- `test-firebase-flow` tra 23:30 e mezzanotte (noto).
+- Se `AbortError` torna su Oppo/OnePlus: strada B (bot Telegram).
