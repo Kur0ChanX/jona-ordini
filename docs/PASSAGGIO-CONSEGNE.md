@@ -1,6 +1,6 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #31
+Sessione attuale: #32
 
 ## Ultimo messaggio di Mario (#30), parola per parola
 «si» (= va bene la proposta D9). **D9 v50 pronta**: `vRichieste` con sotto-schede `S.rqSub` (Da approvare · N / Gestite), `vGestite` per giorno (`dayKey`/`dayLbl`, prime 2 aperte), filtri `S.rqF`, `reqSummary(r,who,dec)` con ora e `decisoDa`; immagine `docs/immagini/richieste-v50.png`; prova `test-richieste-gestite` 9 PASS. Trovato e corretto E14 (Worker finti delle prove senza `/errori`). Dopo la pubblicazione: lanciare il giro completo su GitHub (workflow_dispatch modo `tutto`).
