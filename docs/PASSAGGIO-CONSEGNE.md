@@ -3,11 +3,12 @@
 Sessione attuale: #30
 
 ## Ultimo messaggio di Mario (#29), parola per parola
-«si»
-(= risposta a «Parto con la D7 (app dimostrativa)?». D7 strada A fatta, vedi sotto.)
+«verde»
+(= githubstatus.com mostra «Git Operations» verde dopo il guasto di GitHub che bloccava il push delle consegne.)
 
 ## Messaggi di Mario in #29
-1. «si» → D7 fatta (v45 sul ramo, non ancora pubblicata).
+1. «si» (= parti con la D7) → D7 fatta (v45 sul ramo, non ancora pubblicata).
+2. «verde» → riprovato il push delle consegne.
 
 ## Fatto in #29
 - Avvio: di nuovo il ramo locale era vecchio (#12) → rimedio E5: `git branch -m … vecchio-locale-sessione12`, `git checkout -b <ramo> --track origin/<ramo>`. Il ramo vecchio esiste solo nel container, niente lavoro unico.
@@ -19,6 +20,7 @@ Sessione attuale: #30
   - `testBar()` in demo mostra `.demobar`: «Anteprima · Dati di esempio: niente arriva al ristorante.» + **Esci** + «Guarda l'app come» Chef / F&B Manager / Staff. `meU` usa `VIEW_AS` anche in demo. `demoOut` cancella le chiavi «demo:» e il flag, torna all'indirizzo senza hash.
   - `APP_VER=45`, NEWS v45 (chef + dev), `sw.js` `CACHE` `jona-ordini-v49`. Nessun file nuovo dell'app (niente da aggiungere a `FILES` o al workflow).
 - Prova nuova `tools/test-demo.mjs` (30 PASS, usa il firebase-config vero; i dati «veri» si scrivono da `manifest.webmanifest` per non collegarsi a Firestore vero). Prove brevi tutte riuscite: test-demo 30, test-testbar 7, test-news 94, test-responsabile 15, test-agenda 60, test-giro «nessun problema».
+- Fine sessione: GitHub ha rifiutato più volte il push (e anche l'API) con «Internal Server Error»; riuscito dopo che Mario ha visto lo stato verde (E11).
 - Immagini: `docs/immagini/demo-benvenuto.png`, `docs/immagini/demo-dentro.png` (da mostrare a Mario).
 - Aggiornati: `CLAUDE.md` (riga v45), `tools/README.md`, `docs/DA-FARE.md` (D7 = manca la pubblicazione, nuova M20).
 

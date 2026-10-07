@@ -14,3 +14,4 @@ Si legge a ogni avvio. Quando un errore fa perdere tempo o lavoro si aggiunge su
 | E8 | 07/10/2026 | `test-responsabile` fallita dopo il pulsante «F&B Mauro» | La prova cercava «Mauro» in tutta la pagina, barra Test compresa | Le prove cercano i testi solo nella parte giusta della pagina, non in tutto `main` |
 | E9 | 07/10/2026 | Avvio della sessione bloccato: i comandi non partivano | Il controllo automatico dei permessi non rispondeva (guasto passeggero) | Leggere intanto le consegne, riprovare più tardi; non insistere a vuoto |
 | E10 | 2026 (noto) | `test-firebase-flow` fallisce tra le 23:30 e mezzanotte | La prova dipende dal giorno e scavalca la mezzanotte | Non è un guasto dell'app: rilanciarla fuori da quell'orario |
+| E11 | 07/10/2026 | Push delle consegne rifiutato: «Internal Server Error» (anche dall'API) | Guasto passeggero di GitHub | Non forzare: fermarsi, far guardare a Mario githubstatus.com («Git Operations»), riprovare quando è verde |
