@@ -1841,22 +1841,22 @@ async function createProfile(mode){
   if(mode==='admin'&&withContr(f))doc.contratto=orContr(f);
   await put('staff',id,doc);S.form={};
   if(mode==='setup'){login(id);return}
-  closeSheet();if(inv)return invMonoSend(id);
+  closeSheet();if(inv)return invMonoSend(id,{...doc,id});
   if(mode==='self'){await notify('gestori','Nuovo profilo da approvare',fullName(doc)+', '+(REPARTI[doc.reparto]||''),'staff',id);ls('jona_reg',null);ls('jona_wait',{id,t:Date.now()});repaint()}
   else toast('Profilo creato: comunica a '+doc.nome+' nome utente e password.');
 }
 /* invito monouso (v40): gettone lungo in inviti/<gettone> (7 giorni), link corto con il codice per la chiave + il gettone */
-async function invMonoSend(sid){
-  const u=D().staff[sid];if(!u||!S.db||S.db.kind!=='firebase')return;
+async function invMonoSend(sid,nuovo){
+  const u=D().staff[sid]||nuovo;if(!u||!S.db||S.db.kind!=='firebase')return;
   if(!navigator.onLine)return toast('Serve internet per creare l\'invito.','warn');
   const t=randKey(32);
   try{await S.db.phone.invDel(sid);await S.db.phone.invNew(t,{sid,nome:u.nome,cognome:u.cognome||'',username:u.username,fino:Date.now()+7*864e5,da:S.me||'',creato:now()})}
   catch(e){return toast(e&&e.code==='permission-denied'?'Il database non lo permette ancora: aggiorna le regole (docs/FIREBASE.md).':'Invito non creato: controlla la connessione e riprova.','err')}
   S.invL=null;const r=await invNew();const l=r.c?r.l+'/'+t:inviteLink()+'&t='+t;
   const txt='Ciao '+u.nome+'! Ecco il tuo invito all\'app del Jona.\nTocca il link, scegli la tua password e sei dentro.\nIl tuo nome utente: '+u.username+'\nIl link vale una volta sola (7 giorni).\n'+l;
-  S.invM={sid,txt};invMonoSheet();
+  S.invM={sid,txt,u:{nome:u.nome,cognome:u.cognome||''}};invMonoSheet();
 }
-function invMonoSheet(){const m=S.invM,u=m&&D().staff[m.sid];if(!u)return;
+function invMonoSheet(){const m=S.invM,u=m&&(D().staff[m.sid]||m.u);if(!u)return;
   openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Invito pronto<div class="sh-s">${esc(fullName(u))}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <p class="muted" style="margin:0">Manda il link a ${esc(u.nome)} su WhatsApp. Vale <b>una volta sola</b> per 7 giorni: chi lo apre sceglie la password ed entra subito.</p>
   <div style="margin-top:18px;display:grid;gap:12px"><a class="btn primary block big" href="https://wa.me/?text=${encodeURIComponent(m.txt)}" target="_blank" rel="noopener">Manda su WhatsApp</a>

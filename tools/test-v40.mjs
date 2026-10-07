@@ -88,7 +88,8 @@ const G=await mk(null);await G.goto(link+'&t='+tk);await G.waitForTimeout(6000);
 ok(/già usato/.test(await txt(G))&&await G.evaluate(()=>!S.db.status().ready),'G: lo stesso link una seconda volta → «già usato», resta fuori');
 await G.click('[data-a="itSkip"]');await G.waitForTimeout(500);
 ok(/Sono nuovo/.test(await txt(G)),'G: «Chiedi l\'approvazione» torna alla richiesta normale');
-// nuovo link: quello vecchio smette di valere
+// nuovo link: quello vecchio smette di valere (prima si chiude con la X la scheda «Invito pronto» di Rita)
+await A.click('.sheet [data-a="closeSheet"].icon-btn');await A.waitForTimeout(400);
 await A.click('[data-a="addProfile"]');await A.waitForTimeout(300);
 for(const [k,v] of [['nome','Tea'],['cognome','Melis']])await A.locator(`.sheet input[data-k="${k}"]`).pressSequentially(v);
 await A.click('.sheet [data-a="addGo"]');await A.waitForTimeout(3000);
