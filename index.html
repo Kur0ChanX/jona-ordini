@@ -1550,7 +1550,7 @@ function obxBar(){
   if(!obxWaiting())return'';const n=OBX.list.length;const gm=obxToGm();const chi=gmNome()||'chef';
   const last=[...OBX.list].reverse().find(x=>x.a==='gm'||x.a==='gestori')||S.obxMsg||{titolo:'Ti ho mandato una richiesta',testo:''};
   const sms='sms:?&body='+encodeURIComponent('Ciao '+chi+', su Jona Ordini: '+last.titolo+(last.testo?'. '+last.testo:''));
-  return`<div class="obx" role="status">${ic('warn')}<div class="obx-i"><b>${gm?'Non ancora arrivata '+esc(gmA()):(n===1?'Un avviso non ancora partito':n+' avvisi non ancora partiti')}</b><span>${navigator.onLine===false?'Manca la rete: parte da sola appena torna.':'Riprovo da solo.'} Tieni aperta l'app finché vedi «Arrivata ✓».</span></div>
+  return`<div class="obx obx-q" role="status">${ic('warn')}<div class="obx-i"><b>${gm?'Non ancora arrivata '+esc(gmA()):(n===1?'Un avviso non ancora partito':n+' avvisi non ancora partiti')}</b><span>${navigator.onLine===false?'Manca la rete: parte da sola appena torna.':'Riprovo da solo.'} Tieni aperta l'app finché vedi «Arrivata ✓».</span></div>
   <div class="obx-b"><button type="button" class="btn ghost sm" data-a="obxGo">${ic('send')} Riprova</button>${gm?`<a class="btn ghost sm" href="${esc(sms)}">${ic('chat')} Manda SMS</a>`:''}</div></div>`;
 }
 addEventListener('online',()=>obxFlush());

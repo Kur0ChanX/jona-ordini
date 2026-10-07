@@ -106,26 +106,26 @@ ok(await B.evaluate(()=>Object.values(PUSH.subs).some(p=>p.u===realU().id)===fal
 down=true;sent.length=0;
 await B.evaluate(()=>notify('gestori','Nuova richiesta da Luca','Cucina, 2 articoli'));await B.waitForTimeout(1500);
 ok(await B.evaluate(()=>OBX.list.length===1),'server giù: push in coda');
-ok(await B.isVisible('.obx')&&/Non ancora arrivata allo chef/.test(await B.innerText('.obx')),'avviso fisso «Non ancora arrivata»');
-ok(/^sms:\?&body=.*Nuova%20richiesta%20da%20Luca/.test(await B.getAttribute('.obx a.btn','href')),'pulsante Manda SMS con il testo pronto');
+ok(await B.isVisible('.obx-q')&&/Non ancora arrivata allo chef/.test(await B.innerText('.obx-q')),'avviso fisso «Non ancora arrivata»');
+ok(/^sms:\?&body=.*Nuova%20richiesta%20da%20Luca/.test(await B.getAttribute('.obx-q a.btn','href')),'pulsante Manda SMS con il testo pronto');
 await B.screenshot({path:SHOT+'sospeso.png'});
 await B.reload();await B.waitForTimeout(6000);
-ok(await B.evaluate(()=>OBX.list.length===1)&&await B.isVisible('.obx'),'dopo la riapertura la coda c\'è ancora');
+ok(await B.evaluate(()=>OBX.list.length===1)&&await B.isVisible('.obx-q'),'dopo la riapertura la coda c\'è ancora');
 down=false;await B.evaluate(()=>dispatchEvent(new Event('online')));await B.waitForTimeout(1500);
 ok(sent.length===1&&sent[0].da==='B'&&sent[0].titolo==='Nuova richiesta da Luca','rete tornata: la push parte una volta sola');
-ok(await B.evaluate(()=>OBX.list.length===0)&&!await B.isVisible('.obx'),'coda vuota, avviso sparito');
+ok(await B.evaluate(()=>OBX.list.length===0)&&!await B.isVisible('.obx-q'),'coda vuota, avviso sparito');
 ok(/Arrivata ✓/.test(await B.innerText('#toasts')),'conferma «Arrivata ✓»');
 // telefono senza rete: scrittura e push in sospeso, poi partono da sole
 sent.length=0;await B.waitForTimeout(3500);
 await cb.setOffline(true);await B.waitForTimeout(500);
 await B.evaluate(()=>notify('gestori','Seconda richiesta','prova senza rete'));await B.waitForTimeout(1500);
-ok(await B.isVisible('.obx')&&await B.evaluate(()=>OBX.list.length===1),'senza rete: avviso e push in coda');
+ok(await B.isVisible('.obx-q')&&await B.evaluate(()=>OBX.list.length===1),'senza rete: avviso e push in coda');
 await B.evaluate(()=>{window.__toasts=[];new MutationObserver(m=>m.forEach(x=>x.addedNodes.forEach(n=>window.__toasts.push(n.textContent)))).observe($('#toasts'),{childList:true})});
 await cb.setOffline(false);await B.waitForTimeout(8000);
 ok(sent.length===1&&sent[0].titolo==='Seconda richiesta','rete tornata: push partita');
 ok(await A.evaluate(()=>Object.values(D().notifiche).some(n=>n.titolo==='Seconda richiesta')),'la notifica è arrivata nel database');
 const tt=await B.evaluate(()=>window.__toasts);
-ok(!await B.isVisible('.obx')&&tt.filter(t=>/Arrivata ✓/.test(t)).length===1,'avviso sparito, «Arrivata ✓» una volta: '+JSON.stringify(tt)+' '+JSON.stringify(await B.evaluate(()=>[S.obxWait,S.obxShown,S.db.status()])));
+ok(!await B.isVisible('.obx-q')&&tt.filter(t=>/Arrivata ✓/.test(t)).length===1,'avviso sparito, «Arrivata ✓» una volta: '+JSON.stringify(tt)+' '+JSON.stringify(await B.evaluate(()=>[S.obxWait,S.obxShown,S.db.status()])));
 // pulizia
 await A.evaluate(()=>{delTestData()});await A.waitForTimeout(400);await A.click('#ask-ok');await A.waitForTimeout(4000);
 ok(await A.evaluate(()=>testCount())===0,'dati di prova cancellati');
