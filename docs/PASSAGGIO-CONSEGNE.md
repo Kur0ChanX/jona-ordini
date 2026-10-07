@@ -1,28 +1,37 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #18
+Sessione attuale: #25
 
-## Ultimo messaggio di Mario (#17)
-«sì 3»: gli piace il confronto v38/v39 del logo e vuole la v39 pubblicata **subito** (senza prove). PR #48 aperta: https://github.com/Kur0ChanX/jona-ordini/pull/48 — da far unire a Mario (squash), poi controllare online.
+## Ultimo messaggio di Mario (#24)
+«ok vai avanti» (dopo il mio avviso che il giro completo stava girando e poi sarebbe venuta la PR v41). Vale ancora quello di #23: «vai sii più autonomo possibile e procedi con tutto fermati se ti servo urgente per decisioni importanti problemi ecc». Leggere per intero quello che Mario scrive in «Altro».
 
-Poi, dopo l'apertura della #18: «perché io ogni volta ti sembra normale devo andare nel sito cliccare il tasto verde per una versione aggiornata non me lo avevi mai fatto fare». Risposta data in #17: il merge è bloccato a Claude; proposte 3 strade (1 consigliata: workflow GitHub che unisce da solo le PR del ramo di Claude; 2 pubblicare direttamente dal ramo; 3 lasciare così). **Da fare in #18: aspettare la scelta di Mario e realizzarla.**
-Ultimo messaggio di Mario: «scusa prima come facevi prima dei controlli in automatico?». Verificato: fino alla PR #45 le PR le univa Claude da solo con `merge_pull_request` (GitHub MCP, account di Mario; es. #40 unita 19 s dopo l'apertura). Poi in CLAUDE.md è finito «merge bloccato a Claude». Proposto a Mario: tornare a far unire le PR a Claude (scelta 0, la più semplice). Se Mario dice sì: aggiornare la riga in CLAUDE.md («Il merge delle PR lo fa lui») e provare `merge_pull_request` sulla PR #48 (squash); se il permesso è negato, dirlo a Mario e passare all'unione automatica (1).
+## Messaggio di Mario arrivato dopo l'apertura di #25 (risposta alla domanda sui reparti)
+«Si potrebbe scegliere mauro e maurizio creano evento o informazione o aggiornamento operativo ecc ecc e scelgono chi puó vederlo se é solo loro memo personale o da mandare ai gruppi operativi»
+→ Da fare nella v42 (ramo `v42-agenda`), prima della PR v42:
+- **Chi crea**: Maurizio (gm) e **Mauro** (Mauro Loi, reparto `fb` F&B Manager, oggi forse ruolo `staff`: controllare). Proposta: possono creare `isMgr` + staff con reparto `fb` o `resp` (funzione `agCanEdit(me)`), oppure un elenco scelto in Impostazioni.
+- **Tipo** nel modulo: Evento | Informazione | Aggiornamento operativo | Memo (campo `k` in `ev`, icona/etichetta nella lista e nella striscia).
+- **Chi lo vede** c'è già: Solo io (memo personale) | Tutti | Reparti (= gruppi operativi). Valutare se «gruppi operativi» = reparti o i gruppi della chat; chiedere a Mario in una riga se non è chiaro.
+- Domanda su «i gestori vedono tutti i reparti»: Mario non ha detto no; lasciare così salvo sua indicazione.
 
-## Fatto in sessione #17
-- **Rientro di Mario (C1)**: sul nuovo indirizzo il telefono era vuoto. Soluzione: chiave del ristorante letta dalla console Firebase (`chiave/ristorante`, campo `v`), incollata in «Collega questo telefono» (`fbJoinKey` accetta anche la chiave lunga), poi `membri/<uid>.ok` messo a `true` dalla console. Funziona: Mario è dentro. In `membri` resta in attesa `ISLyK5…` (req nome «Mari…», cognome «S…», nuovo:false): non è Mario, non approvato (M17).
-- **v38 online** (PR #47 unita, controllato `APP_VER=38`, `CACHE` v42): logo YNOY senza `filter:blur` e con 8 px trasparenti attorno a `media/ynoy.png` (496×190): la riga bianca sul bordo basso su Android è sparita (confermato da Mario). Logo 155 px, entra 0,5 s prima (`byIn` .6 s, `ynoyIn` 1 s, `ynoyShine` 2,4 s), `S.splash` 4,4 s, `.intro` tolta a 4,7 s. Anche il workflow Worker con i tentativi è su `main`.
-- **v39 nella PR #48**: `.wall-by i` 172 px, `gap` 2 px, padding sopra 0; schermata d'apertura con classe `splash` e `.splash .wall-by{margin-bottom:24px}` (≈40 px più in alto). In «Accedi» resta in fondo (a 390×844 la pagina è piena: più in alto scorrerebbe). `APP_VER` 39, `CACHE` v43, Novità v39. `test-logo` e `test-news` riuscite.
-- Giro completo `tools/prova-tutto.sh` partito sulla v38: risultati in `/tmp/jona-prove` persi con questo container (prime 4 riuscite).
+## Fatto in #24
+- Il ramo locale `ccr-4a01d00e-6ay25e` era di nuovo vecchio (sessione #12): rinominato `vecchio-sessione12` (solo in quel container), ramo preso da origin. Probabile anche nella prossima sessione: se `merge --ff-only` fallisce, fare lo stesso (`git branch -m` + `git checkout -b <ramo> --track origin/<ramo>`), mai reset.
+- **`test-v40` rossa era un bug vero** (non del merge): dopo «Crea profilo» `invMonoSend` leggeva `D().staff[sid]` prima che arrivasse dallo snapshot → usciva in silenzio. Corretto: `createProfile` passa il profilo (`invMonoSend(id,{...doc,id})`), `S.invM.u` per `invMonoSheet`. Prova: chiude la scheda «Invito pronto» con la X prima del secondo invito. Commit `878b4bd` sul ramo `ccr-4a01d00e-6ay25e`.
+- `test-v40` 32/32, `test-firebase-push` 29/29 (da sole). **Giro completo sul ramo v41 (`878b4bd`): 39/39 RIUSCITE.**
+- **v42 scritta** sul ramo separato **`v42-agenda`** (commit `d43b497`, su GitHub), partito da `878b4bd`:
+  - `config/app.funz` + Impostazioni → «Funzioni» (`FUNZ`, `funzOn`, `funzSet`, `funzRows`), conta d'uso `config/uso_<AAAA-MM>` (`usoSegna`, `usoInfo`, chiave `jona_uso`).
+  - Agenda come da progetto (#23): `agOpen`, `agSheet`, `agParse`, `agMic`, `agForm`/`agSave`/`agDel`, `agFotoGo` (Gemini), `agStrip`, `agBtn`; CSS `.ag-*`. Scelta mia (chiesta a Mario, senza risposta): per reparto lo staff vede i suoi, **i gestori tutti**; «Solo io» degli altri nascosto.
+  - `APP_VER` 42, `CACHE` v46, `NEWS` v42 (chiave `chef`, non `gm`). `CLAUDE.md` e `tools/README.md` aggiornati.
+  - Prove: nuova `tools/test-agenda.mjs` 51/51; `tools/test-giro.mjs` accende l'agenda con un evento e prova `agOpen`: nessun problema (aveva trovato «Nuovo evento» fuori schermo a 320 px, corretto con `.ag-2`).
 
-## Prossimi passi (#18)
-1. Quando Mario dice «Merged» della PR #48: controllare online (`APP_VER=39`, `CACHE` v43), riallineare il ramo (`git fetch origin main && git merge origin/main`, push normale).
-2. Rilanciare `bash tools/prova-tutto.sh` in background (con v39) e dire a Mario solo il risultato; ciò che fallisce si corregge con priorità.
-3. M14: guidare Mario a mandare gli inviti allo staff (Staff → Invita) e a togliere la vecchia icona (GitHub Pages). Poi M15.
-4. Idea non fatta: logo YNOY anche in «Collega questo telefono» (`screenJoin`, ~riga 1647) — non bloccante.
-5. Ancora senza risposta: copiare la regola bloccata e `.claude/hooks/handoff-check.py` negli altri repository? Quali?
+## Prossimi passi (#25)
+1. **PR v41**: dal ramo `ccr-4a01d00e-6ay25e` verso `main` (giro completo già verde su `878b4bd`; se il ramo ha solo commit di consegne in più, non serve rifarlo). Squash merge da Claude → controllo online (https://jona-ristorante-by-ynoy-corp.pages.dev/, `APP_VER` 41) → riallineare il ramo (`git fetch origin main && git merge origin/main`, push normale).
+2. Dire a Mario di fare **M18** (regole Firebase nuove + «Apri per 48 ore» se serve), con link e passi piccoli (`docs/FIREBASE.md`).
+3. **v42**: unire `origin/main` (dopo la v41) in `v42-agenda`, rifare `test-agenda` + `test-giro` (+ `test-news`), chiedere a Mario «giro completo ora o dopo?» (è un cambio medio: interfaccia + config, niente regole), poi PR v42 → squash → controllo online. Dire a Mario come accendere l'agenda (Impostazioni → Funzioni).
+4. Dopo: v43 notifica del mattino «Oggi in hotel» e promemoria prima dell'evento dal Worker (cron, come `scadTick`), poi V, W, X; poi A, C, G, H, I, J, K, O, R, U (`docs/PIANO-INVERNO.md`).
+5. Domanda aperta a Mario: va bene che i gestori vedano gli eventi di tutti i reparti?
 
 ## Rischi aperti
-- Righe bianche: viste solo su telefoni veri, qui non si riproducono; se tornano, guardare `ynoyShine` (sfondo animato sotto la maschera).
-- Notifiche da riattivare su ogni telefono (VAPID nuova).
-- `test-firebase-flow` fallisce tra 23:30 e mezzanotte (noto).
-- Il resto: `docs/DA-FARE.md`.
+- Telefono in attesa `ISLyK5…` (M17).
+- `test-firebase-flow` tra 23:30 e mezzanotte (noto).
+- Se `AbortError` torna su Oppo/OnePlus: strada B (bot Telegram).
+- Elenco completo: `docs/DA-FARE.md`.

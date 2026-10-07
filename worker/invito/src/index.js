@@ -4,6 +4,7 @@
 
 const APP = "https://jona-ristorante-by-ynoy-corp.pages.dev/";
 const CODICE = /^[A-HJ-NP-Z2-9]{6}$/;
+const GETTONE = /^[A-Za-z0-9]{20,64}$/;
 
 const pagina = dest => `<!doctype html>
 <html lang="it"><head><meta charset="utf-8">
@@ -26,8 +27,10 @@ const pagina = dest => `<!doctype html>
 
 export default {
   async fetch(request) {
-    const c = new URL(request.url).pathname.slice(1).replace(/\/$/, "").toUpperCase();
-    const dest = CODICE.test(c) ? APP + "#i=" + c : APP;
+    // /<CODICE> oppure /<CODICE>/<GETTONE> (invito monouso: il gettone resta com'è, maiuscole e minuscole)
+    const [p, t] = new URL(request.url).pathname.slice(1).replace(/\/$/, "").split("/");
+    const c = (p || "").toUpperCase();
+    const dest = CODICE.test(c) ? APP + "#i=" + c + (GETTONE.test(t || "") ? "&t=" + t : "") : APP;
     return new Response(pagina(dest), {
       headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "referrer-policy": "no-referrer" },
     });

@@ -1030,8 +1030,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=40;
+const APP_VER=41;
 const NEWS=[
+  {v:41,data:'2026-10-07',titolo:'Invito WhatsApp con profilo pronto',
+    tutti:['Staff → Aggiungi: crei il profilo e mandi il link su WhatsApp. Il link vale una volta sola: chi lo apre sceglie la sua password ed entra subito, senza approvazione.','Impostazioni → «Entrata libera»: per 48 ore chi inquadra il QR della cucina o apre un invito entra subito, senza approvazione. Poi si richiude da sola.'],
+    dev:{aggiunte:['Invito monouso: `inviti/<gettone>` {sid, fino 7 giorni}, link `INV_URL/<codice>/<gettone>` → `#i=…&t=…` (`jona_itk`), `screenInvite`/`itGo`; `phone.tk` in un batch approva il membro (`tk`), cancella l\'invito e attiva `staff/<sid>` (stato `invitato` → `attivo`, password scelta). Gestore: `invMonoSend`, `invMonoSheet`, «Nuovo link d\'invito». Regole: `invitoBuono`, `mioInvito`, `match /inviti`, `match /staff`.','`pubblico/porta` {fino} (al massimo 49 ore avanti, regole); `phone.auto` dopo la richiesta: `ok:true` da sé e profilo con `phStaff`; `ptRow`/`ptSet` in Impostazioni. Servono le regole nuove.']}},
   {v:40,data:'2026-10-07',titolo:'Notifiche più semplici',
     tutti:['Se le notifiche non sono attive, in alto compare «Attiva le notifiche»: basta un tocco («Più tardi» la nasconde per 3 giorni).','I gestori vedono in Staff chi riceve gli avvisi (🟢) e chi no (🔴): si sistemano solo i telefoni in rosso.','Se le notifiche non si attivano, l\'app riprova da sola e nella guida mostra l\'errore esatto del telefono.','Guida più completa per i telefoni Oppo, Realme e OnePlus.'],
     dev:{correzioni:['`pushOn`: se `subscribe` fallisce, toglie l\'iscrizione vecchia, aspetta 1,5 s e riprova; `S.pushErr` (nome + messaggio) mostrato in `pushHelp` (`.ph-err`).','`pushAsk`: avviso sotto `banner()` se le notifiche non sono attive (o bloccate → guida), «Più tardi» in `jona_push_ask` per 3 giorni. `vStaff`: 🟢/🔴 per profilo attivo da `PUSH.subs` (`p.u`), conteggio dei senza avvisi; `pushWatch` ridisegna con `schedule()`.','Barra Test: niente più avviso a ogni cambio vista (si accumulavano), pulsante della vista attuale colorato (`.testbar .seg`).','Testi: «Mario» sostituito con «lo sviluppatore» in tutto ciò che vedono gli utenti (prova `tools/test-testbar.mjs`).']}},
@@ -1309,7 +1312,7 @@ function FirebaseStore(key){
   // ---- telefono nuovo: resta in attesa («ok» falso) finché un telefono approvato non lo approva ----
   const newMember=()=>({k:key,ok:false,creato:now(),ua:navigator.userAgent.slice(0,120)});
   const approval=u=>new Promise((res,rej)=>{let un=null;const to=setTimeout(()=>{if(un)un();rej({code:'fb_slow'})},20000);
-    un=fs.doc('membri/'+u).onSnapshot(d=>{if(!d.exists&&d.metadata.fromCache)return;clearTimeout(to);
+    un=fs.doc('membri/'+u).onSnapshot({includeMetadataChanges:true},d=>{if(!d.exists&&d.metadata.fromCache)return;clearTimeout(to);
       if(!d.exists){st.wait='no';st.req=null;ping();return}
       const x=d.data();if(x.ok===false){st.wait='attesa';st.req=x.req||null;ping();return}
       if(d.metadata.hasPendingWrites||d.metadata.fromCache)return;
@@ -1396,7 +1399,21 @@ function FirebaseStore(key){
   };
   return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
     status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null}),
-    phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember())},
+    phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember()),
+      // entrata libera (v40): con pubblico/porta aperta il telefono si approva da solo e, se nuovo, crea il suo profilo
+      auto:async r=>{const p=await fs.doc('pubblico/porta').get({source:'server'});if(!p.exists||!((p.data().fino||0)>Date.now()))return false;
+        const m=fs.doc('membri/'+st.uid);await m.update({ok:true,approvato:now(),da:'porta'});
+        if(r.nuovo){const q=await fs.collection('staff').get({source:'server'});const all={};q.docs.forEach(d=>{all[d.id]=Object.assign({},d.data(),{id:d.id})});
+          if(!all[r.sid])await fs.doc('staff/'+r.sid).set(phStaff(r,all,'porta'))}
+        await m.update({req:firebase.firestore.FieldValue.delete()}).catch(()=>{});return true},
+      porta:async fino=>{await readyP;await fs.doc('pubblico/porta').set({fino,da:realU()?realU().id:'',quando:now()})},
+      portaGet:async()=>{await readyP;const d=await fs.doc('pubblico/porta').get({source:'server'});return d.exists?d.data().fino||0:0},
+      // invito monouso (v40): inviti/<gettone> {sid, fino}; chi lo usa si approva, consuma l'invito e mette la sua password in un colpo solo
+      inv:async t=>{const d=await fs.doc('inviti/'+t).get({source:'server'});return d.exists?d.data():null},
+      tk:async(t,sid,pass)=>{const b=fs.batch();b.update(fs.doc('membri/'+st.uid),{ok:true,approvato:now(),da:'invito',tk:t});b.delete(fs.doc('inviti/'+t));
+        b.update(fs.doc('staff/'+sid),{pass,stato:'attivo',attivato:now()});await b.commit()},
+      invNew:async(t,d)=>{await readyP;await fs.doc('inviti/'+t).set(d)},
+      invDel:async sid=>{await readyP;const q=await fs.collection('inviti').where('sid','==',sid).get({source:'server'});for(const x of q.docs)await x.ref.delete()}},
     dump:()=>clone(cache),
     load:async d=>{if(!navigator.onLine)throw{code:'fb_net'};await readyP;await loadAll(d)},
     range:async(c,f,a,b)=>{await readyP;const s=await fs.collection(c).where(f,'>=',a).where(f,'<',b).get();return s.docs.map(d=>Object.assign({id:d.id},d.data()))},
@@ -1612,7 +1629,36 @@ function wallFb(s){
   if(s.err==='fb_slow')return wallMsg('Il collegamento non riesce','Controlla che ci sia internet (meglio il Wi-Fi o i dati attivi), poi tocca Riprova. Se non va, apri il link con Safari o Chrome, non dentro WhatsApp.',`<button type="button" class="btn primary block big" data-a="reload">Riprova</button>`);
   return wallMsg('Collegamento al ristorante…',!s.net||s.err?'Non c\'è connessione. Appena torna la rete l\'app si collega da sola.':s.step==='iscrizione'?'Registro questo telefono…':'Un momento…');
 }
+/* invito monouso (v40): il link porta già nel profilo creato dal gestore; si sceglie la password ed è subito dentro */
+const IT={t:'',st:'',d:null};
+function itLoad(){const t=ls('jona_itk');if(IT.t===t)return;IT.t=t;IT.st='load';IT.d=null;
+  S.db.phone.inv(t).then(d=>{if(IT.t!==t)return;IT.d=d;IT.st=d&&d.fino>Date.now()?'ok':'no';if(IT.st==='ok')S.form={pw:'',pw2:''};schedule()},()=>{if(IT.t!==t)return;IT.st='err';schedule()})}
+function screenInvite(){
+  itLoad();const logo='<div class="logo-full" role="img" aria-label="Jona Ristorante"></div>';
+  if(IT.st==='load')return wallMsg('Apro il tuo invito…','Un momento.');
+  if(IT.st==='err')return wallMsg('Non riesco a leggere l\'invito','Controlla che ci sia internet, poi tocca Riprova.',`<button type="button" class="btn primary block big" data-a="itRetry">Riprova</button>`);
+  if(IT.st==='no')return wallMsg('Invito già usato o scaduto','Ogni invito vale una volta sola. Chiedi un invito nuovo a chi te l\'ha mandato, oppure chiedi l\'approvazione.',`<button type="button" class="btn primary block big" data-a="itSkip">Chiedi l'approvazione</button>`);
+  const d=IT.d,f=S.form;
+  return`<div class="wall linen">${logo}<div class="wall-card"><h1>Ciao ${esc(d.nome||'')}!</h1>
+  <p class="muted">Il tuo profilo è pronto. Il tuo nome utente è <b>${esc(d.username||'')}</b>.</p>
+  <p><b>Scegli la tua password e non dimenticarla:</b> ti servirà per entrare.</p>
+  <div class="two"><div><label class="lbl" for="it-pw">Password</label><input class="inp" id="it-pw" type="password" autocomplete="new-password" data-in="form" data-k="pw" value="${esc(f.pw||'')}"></div>
+  <div><label class="lbl" for="it-pw2">Ripeti password</label><input class="inp" id="it-pw2" type="password" autocomplete="new-password" data-in="form" data-k="pw2" value="${esc(f.pw2||'')}"></div></div>
+  <p class="muted small" style="margin:6px 0 0">Almeno 6 caratteri.</p>
+  <div style="margin-top:22px"><button type="button" class="btn primary block big" data-a="itGo">Entra</button></div></div></div>`;
+}
+async function itGo(){
+  const f=S.form,d=IT.d,t=IT.t;if(!d||IT.st!=='ok')return;
+  if(String(f.pw||'').length<6)return toast('La password deve avere almeno 6 caratteri.','warn');
+  if(f.pw!==f.pw2)return toast('Le due password non coincidono.','warn');
+  IT.st='load';schedule();
+  try{await fbTmo(S.db.phone.tk(t,d.sid,await sha(d.sid+':'+f.pw)),20000)}
+  catch(e){IT.st='ok';schedule();return toast(e&&e.code==='permission-denied'?'Invito non valido: forse è già stato usato. Chiedi un invito nuovo.':'Non sono riuscito a entrare: controlla la connessione e riprova.','err')}
+  ls('jona_itk',null);IT.t='';S.form={};S.me=d.sid;ls('jona_me',d.sid);render();toast('Benvenuto '+(d.nome||'')+'!');
+  setTimeout(()=>{pushSync();notify('gestori',(d.nome||'')+' è entrato con l\'invito',[d.nome,d.cognome].filter(Boolean).join(' '),'staff',d.sid).catch(()=>{})},3000);
+}
 function screenPhone(s){
+  if(ls('jona_itk')&&!s.req&&s.wait!=='no')return screenInvite();
   const r=s.req,logo='<div class="logo-full" role="img" aria-label="Jona Ristorante"></div>';
   if(s.wait==='no')return wallMsg('Richiesta non approvata','Maurizio o lo sviluppatore non hanno approvato questo telefono. Se è un errore, parla con loro e chiedi di nuovo.',`<button type="button" class="btn primary block big" data-a="phAgain">Chiedi di nuovo</button>`);
   if(r)return`<div class="wall linen">${logo}<div class="wall-card" style="text-align:center"><div style="display:flex;justify-content:center;margin-bottom:12px">${avatar(r,84)}</div>
@@ -1638,7 +1684,7 @@ async function phSend(nuovo){
     r={nuovo:true,sid,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||'',pass:await sha(sid+':'+f.pw),creato:now()};
     ls('jona_wait',{id:sid,t:Date.now()})}
   else{if(!String(f.nome||'').trim())return toast('Scrivi il nome.','warn');r={nuovo:false,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),creato:now()};ls('jona_wait',null)}
-  ls('jona_reg',null);S.db.phone.req(r).then(async()=>{await fetch(PUSH_URL+'/richiesta',{method:'POST',headers:{authorization:'Bearer '+await algTok()}}).catch(()=>{})},e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
+  ls('jona_reg',null);S.db.phone.req(r).then(async()=>{if(await S.db.phone.auto(r).catch(()=>false))return toast('Entrata libera: sei dentro!');await fetch(PUSH_URL+'/richiesta',{method:'POST',headers:{authorization:'Bearer '+await algTok()}}).catch(()=>{})},e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
 }
 /* telefoni in attesa: li vedono e li approvano i gestori (Maurizio e Mario) */
 const PH={on:false,list:[],retry:0,seen:null};
@@ -1650,10 +1696,12 @@ function phWatch(){
 }
 const phPend=()=>PH.list.filter(x=>x.req);
 const phDev=ua=>/iPhone|iPad/.test(ua||'')?'iPhone':/Android/.test(ua||'')?'Android':'telefono';
+function phStaff(r,st,da){let un=r.username||normUser(r.nome);const used=new Set(Object.values(st).filter(u=>u.id!==r.sid).map(u=>u.username));const b=un;let n=2;while(used.has(un))un=b+n++;
+  return{nome:r.nome,cognome:r.cognome||'',username:un,ruolo:'staff',reparto:r.reparto||'altro',mansione:r.mansione||'',foto:r.foto||'',stato:'attivo',pass:r.pass,creato:now(),creatoDa:da}}
 async function phApprove(id){
   const x=PH.list.find(m=>m.id===id);if(!x||!x.req)return;const r=x.req,me=realU();let msg='Telefono approvato';
-  if(r.nuovo){const st=D().staff;let un=r.username||normUser(r.nome);const used=new Set(Object.values(st).filter(u=>u.id!==r.sid).map(u=>u.username));const b=un;let n=2;while(used.has(un))un=b+n++;
-    if(!st[r.sid])await put('staff',r.sid,{nome:r.nome,cognome:r.cognome||'',username:un,ruolo:'staff',reparto:r.reparto||'altro',mansione:r.mansione||'',foto:r.foto||'',stato:'attivo',pass:r.pass,creato:now(),creatoDa:me?me.id:''});
+  if(r.nuovo){const st=D().staff,nu=phStaff(r,st,me?me.id:''),un=nu.username;
+    if(!st[r.sid])await put('staff',r.sid,nu);
     msg=r.nome+' può entrare'+(un!==r.username?' con il nome utente '+un:'')}
   try{await fbTmo(fbInit().fs.doc('membri/'+id).update({ok:true,req:firebase.firestore.FieldValue.delete(),approvato:now(),da:me?me.id:''}),15000);toast(msg)}
   catch(e){toast(e&&e.code==='permission-denied'?'Il database non lo permette ancora: aggiorna le regole (docs/FIREBASE.md).':'Approvazione non riuscita: controlla la connessione e riprova.','err')}
@@ -1757,9 +1805,10 @@ function profileForm(p,o={}){
   <label class="lbl" for="${p}-mans">Mansione</label><select class="inp" id="${p}-mans" data-ch="formsel" data-k="mansione">${MANSIONI.map(m=>`<option ${f.mansione===m?'selected':''}>${esc(m)}</option>`).join('')}</select>`:''}
   ${o.contr&&withContr(f)?orContrForm(p):''}
   ${o.user!==false?`<label class="lbl" for="${p}-user">Nome utente <span class="muted small">(serve per entrare)</span></label><input class="inp" id="${p}-user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="es. marco.rossi" value="${esc(f.username||'')}" data-in="form" data-k="username">`:''}
-  <div class="two"><div><label class="lbl" for="${p}-pw">${o.pwLabel||'Password'}</label><input class="inp" id="${p}-pw" type="password" autocomplete="new-password" data-in="form" data-k="pw" value="${esc(f.pw||'')}"></div>
+  ${o.invOpt?`<span class="lbl">Password</span><div class="seg wide">${[[1,'La sceglie lui (invito WhatsApp)'],['','La scrivo io']].map(([k,l])=>`<button type="button" aria-pressed="${!!f._inv===!!k}" data-a="formset" data-k="_inv" data-v="${k}">${l}</button>`).join('')}</div>`:''}
+  ${o.invOpt&&f._inv?`<p class="muted small" style="margin:6px 0 0">Dopo «Crea profilo» mandi il link su WhatsApp. Il link vale una volta sola: chi lo apre sceglie la sua password ed entra subito, senza approvazione.</p>`:`<div class="two"><div><label class="lbl" for="${p}-pw">${o.pwLabel||'Password'}</label><input class="inp" id="${p}-pw" type="password" autocomplete="new-password" data-in="form" data-k="pw" value="${esc(f.pw||'')}"></div>
   <div><label class="lbl" for="${p}-pw2">Ripeti password</label><input class="inp" id="${p}-pw2" type="password" autocomplete="new-password" data-in="form" data-k="pw2" value="${esc(f.pw2||'')}"></div></div>
-  <p class="muted small" style="margin:6px 0 0">Almeno 6 caratteri.</p>`;
+  <p class="muted small" style="margin:6px 0 0">Almeno 6 caratteri.</p>`}`;
 }
 function screenSetup(){
   if(!S.form.ruolo)S.form={ruolo:'gm',reparto:'cucina',mansione:'Chef'};
@@ -1783,26 +1832,48 @@ function checkForm(needPw,selfId){
   return'';
 }
 async function createProfile(mode){
-  const e=checkForm(true);if(e)return toast(e,'warn');
+  const inv=mode==='admin'&&!!S.form._inv&&!!S.db&&S.db.kind==='firebase';
+  const e=checkForm(!inv);if(e)return toast(e,'warn');
   const f=S.form,id=uid(),ruolo=mode==='self'?'staff':(f.ruolo||'staff');
   const doc={nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),ruolo,
     reparto:ruolo==='staff'?(f.reparto||'altro'):(ruolo==='gm'?'cucina':'altro'),mansione:ruolo==='staff'?(f.mansione||''):(ruolo==='gm'?'Chef':'Sviluppatore'),
-    foto:f.foto||'',stato:mode==='self'?'in_attesa':'attivo',pass:await sha(id+':'+f.pw),creato:now(),creatoDa:S.me||''};
+    foto:f.foto||'',stato:mode==='self'?'in_attesa':inv?'invitato':'attivo',pass:inv?'':await sha(id+':'+f.pw),creato:now(),creatoDa:S.me||''};
   if(mode==='admin'&&withContr(f))doc.contratto=orContr(f);
   await put('staff',id,doc);S.form={};
   if(mode==='setup'){login(id);return}
-  closeSheet();
+  closeSheet();if(inv)return invMonoSend(id,{...doc,id});
   if(mode==='self'){await notify('gestori','Nuovo profilo da approvare',fullName(doc)+', '+(REPARTI[doc.reparto]||''),'staff',id);ls('jona_reg',null);ls('jona_wait',{id,t:Date.now()});repaint()}
   else toast('Profilo creato: comunica a '+doc.nome+' nome utente e password.');
 }
+/* invito monouso (v40): gettone lungo in inviti/<gettone> (7 giorni), link corto con il codice per la chiave + il gettone */
+async function invMonoSend(sid,nuovo){
+  const u=D().staff[sid]||nuovo;if(!u||!S.db||S.db.kind!=='firebase')return;
+  if(!navigator.onLine)return toast('Serve internet per creare l\'invito.','warn');
+  const t=randKey(32);
+  try{await S.db.phone.invDel(sid);await S.db.phone.invNew(t,{sid,nome:u.nome,cognome:u.cognome||'',username:u.username,fino:Date.now()+7*864e5,da:S.me||'',creato:now()})}
+  catch(e){return toast(e&&e.code==='permission-denied'?'Il database non lo permette ancora: aggiorna le regole (docs/FIREBASE.md).':'Invito non creato: controlla la connessione e riprova.','err')}
+  S.invL=null;const r=await invNew();const l=r.c?r.l+'/'+t:inviteLink()+'&t='+t;
+  const txt='Ciao '+u.nome+'! Ecco il tuo invito all\'app del Jona.\nTocca il link, scegli la tua password e sei dentro.\nIl tuo nome utente: '+u.username+'\nIl link vale una volta sola (7 giorni).\n'+l;
+  S.invM={sid,txt,u:{nome:u.nome,cognome:u.cognome||''}};invMonoSheet();
+}
+function invMonoSheet(){const m=S.invM,u=m&&(D().staff[m.sid]||m.u);if(!u)return;
+  openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Invito pronto<div class="sh-s">${esc(fullName(u))}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <p class="muted" style="margin:0">Manda il link a ${esc(u.nome)} su WhatsApp. Vale <b>una volta sola</b> per 7 giorni: chi lo apre sceglie la password ed entra subito.</p>
+  <div style="margin-top:18px;display:grid;gap:12px"><a class="btn primary block big" href="https://wa.me/?text=${encodeURIComponent(m.txt)}" target="_blank" rel="noopener">Manda su WhatsApp</a>
+  <button type="button" class="btn ghost block" data-a="invMonoGo" data-v="share">Condividi in un altro modo</button><button type="button" class="btn ghost block" data-a="invMonoGo" data-v="copy">Copia il messaggio</button></div>`});
+}
+async function invMonoShare(k){const m=S.invM;if(!m)return;
+  if(k==='share'&&navigator.share){try{await navigator.share({text:m.txt});return}catch(e){if(e&&e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(m.txt);toast('Messaggio copiato: incollalo su WhatsApp.')}catch(e){toast('Non riesco a copiare: usa «Manda su WhatsApp».','warn')}}
 function regKeep(){const o=sheets[sheets.length-1];if(!o||!o.reg)return;const f=Object.assign({},S.form);delete f.pw;delete f.pw2;delete f.foto;ls('jona_reg',{f,t:Date.now(),m:o.reg==='ph'?'ph':'self'})}
 function regRestore(){const d=ls('jona_reg');ls('jona_reg',null);if(!d||Date.now()-d.t>1800000||ls('jona_me'))return;
   if(d.m==='ph')phoneSheet(true);else registerSheet('self');Object.assign(S.form,d.f);refreshSheet();toast('Il telefono ha ricaricato l\'app mentre sceglievi la foto. I tuoi dati sono ancora qui: rifai la foto e scrivi la password.','warn')}
 function registerSheet(mode){
-  S.form={ruolo:'staff',reparto:'cucina',mansione:'Cameriere'};if(mode==='admin'&&isGM(meU()))Object.assign(S.form,CONTR0,{_c:true});
+  const invOpt=mode==='admin'&&!!S.db&&S.db.kind==='firebase';
+  S.form={ruolo:'staff',reparto:'cucina',mansione:'Cameriere',_inv:invOpt?1:0};if(mode==='admin'&&isGM(meU()))Object.assign(S.form,CONTR0,{_c:true});
   openSheet({reg:mode==='self',render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">${mode==='admin'?'Aggiungi profilo':'Crea il tuo profilo'}</div><button class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${mode==='admin'?'':'<p class="muted" style="margin:0">Dopo la registrazione Maurizio o lo sviluppatore approvano il profilo.</p>'}
-  ${profileForm('rg',{roles:mode==='admin'?['staff','gm','dev']:null,contr:mode==='admin'})}
+  ${profileForm('rg',{roles:mode==='admin'?['staff','gm','dev']:null,contr:mode==='admin',invOpt})}
   <div style="margin-top:22px"><button type="button" class="btn primary block big" data-a="${mode==='admin'?'addGo':'regGo'}">Crea profilo</button></div>`});
 }
 async function doLogin(){
@@ -2869,7 +2940,7 @@ function vStaff(me){
   const mg=act.filter(u=>isMgr(u)).sort(byNome);
   const pv=pushFb()&&PUSH.ld,hasP=id=>Object.values(PUSH.subs).some(p=>p.u===id),noP=pv?act.filter(u=>u.stato==='attivo'&&!hasP(u.id)).length:0;
   const pst=u=>pv&&u.stato==='attivo'?(hasP(u.id)?' · <span class="pst on">🟢 avvisi attivi</span>':' · <span class="pst off">🔴 niente avvisi</span>'):'';
-  const row=u=>`<button type="button" class="row link ${u.stato==='disattivato'?'dim':''}" data-a="sedit" data-u="${u.id}">${avatar(u,44)}<div class="row-i"><div class="row-t">${esc(fullName(u))}${isMgr(u)?` <span class="tag gm">${RUOLI[u.ruolo].toLowerCase()}</span>`:''}</div><div class="row-m">@${esc(u.username||'')}${!isMgr(u)&&u.mansione?', '+esc(u.mansione):''}${u.stato==='disattivato'?', disattivato':''}${pst(u)}</div></div>${ic('chev')}</button>`;
+  const row=u=>`<button type="button" class="row link ${u.stato==='disattivato'?'dim':''}" data-a="sedit" data-u="${u.id}">${avatar(u,44)}<div class="row-i"><div class="row-t">${esc(fullName(u))}${isMgr(u)?` <span class="tag gm">${RUOLI[u.ruolo].toLowerCase()}</span>`:''}</div><div class="row-m">@${esc(u.username||'')}${!isMgr(u)&&u.mansione?', '+esc(u.mansione):''}${u.stato==='disattivato'?', disattivato':''}${u.stato==='invitato'?', invito non ancora usato':''}${pst(u)}</div></div>${ic('chev')}</button>`;
   return`<div class="vhead"><div><h1 class="vt">Staff</h1><p class="vsub">${act.filter(u=>u.stato==='attivo').length} profili attivi${noP?` · <span class="pst off">🔴 ${noP} senza avvisi</span>`:''}</p></div><button type="button" class="btn primary" data-a="addProfile">${ic('plus')} Aggiungi</button></div>${sw}
   ${phPend().length?`<h2 class="sec">Telefoni da approvare<span>${phPend().length}</span></h2><div class="panel">${phPend().map(x=>`<div class="row">${avatar(x.req,48)}<div class="row-i"><div class="row-t">${esc(fullName(x.req))}</div><div class="row-m">${x.req.nuovo?esc(['nuovo profilo',x.req.mansione,REPARTI[x.req.reparto]].filter(Boolean).join(', ')):'ha già un profilo'} · ${phDev(x.ua)}</div></div><button type="button" class="icon-btn danger" data-a="phNo" data-v="${x.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="phOk" data-v="${x.id}">Approva</button></div>`).join('')}</div>`:''}
   ${pend.length?`<h2 class="sec">Da approvare<span>${pend.length}</span></h2><div class="panel">${pend.map(u=>`<div class="row">${avatar(u,48)}<div class="row-i"><div class="row-t">${esc(fullName(u))}</div><div class="row-m">${esc([u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</div></div><button type="button" class="icon-btn danger" data-a="sno" data-u="${u.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="sok" data-u="${u.id}">Approva</button></div>`).join('')}</div>`:''}
@@ -2882,6 +2953,7 @@ function profileSheet(id){
   S.form=Object.assign(clone(u),{pw:'',pw2:''});if(isGM(meU()))Object.assign(S.form,contrOf(u)||CONTR0,{_c:true});
   openSheet({render:()=>{const u=D().staff[id]||{};return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${self?'Il tuo profilo':esc(fullName(u))}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${profileForm('pf',{roles:mgr&&!self?['staff','gm','dev']:null,pwLabel:'Nuova password (facoltativa)',noRep:isMgr(S.form),contr:mgr})}
+  ${mgr&&!self&&u.stato==='invitato'&&S.db&&S.db.kind==='firebase'?`<div class="panel" style="margin-top:18px;padding:14px 16px"><b>Invito non ancora usato.</b> Se il link si è perso, mandane uno nuovo: quello vecchio smette di funzionare.<div style="margin-top:10px"><button type="button" class="btn primary sm" data-a="invMono" data-u="${id}">Nuovo link d'invito</button></div></div>`:''}
   <div class="btns" style="margin-top:22px">${mgr&&!self?`<button type="button" class="btn ghost danger" data-a="sdel" data-u="${id}">${ic('trash')} Elimina</button><button type="button" class="btn ghost" data-a="stoggle" data-u="${id}">${u.stato==='disattivato'?'Riattiva':'Disattiva'}</button>`:''}<button type="button" class="btn primary" data-a="psaveProfile" data-u="${id}">${ic('check')} Salva</button></div>`}});
 }
 async function saveProfile(id){
@@ -2889,6 +2961,7 @@ async function saveProfile(id){
   const d={nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||''};
   if(isMgr(meU())&&f.ruolo&&f.ruolo!==u.ruolo){if(u.ruolo==='gm'&&Object.values(D().staff).filter(x=>x.ruolo==='gm'&&x.stato==='attivo').length<2)return toast('Serve almeno un amministratore attivo.','warn');d.ruolo=f.ruolo}
   if(f.pw)d.pass=await sha(id+':'+f.pw);
+  if(f.pw&&D().staff[id]&&D().staff[id].stato==='invitato'){d.stato='attivo';S.db.kind==='firebase'&&S.db.phone.invDel(id).catch(()=>{})}
   if(isGM(meU())&&withContr(f))d.contratto=orContr(f);
   await upd('staff',id,d);closeSheet();toast('Profilo salvato');
 }
@@ -3969,7 +4042,7 @@ function settingsSheet(){
   <div class="btns" style="margin:4px 0 8px"><button type="button" class="btn primary sm" data-a="cfgSave">${ic('check')} Salva</button></div>
   <div class="setrow"><div><b>Timbratura con QR</b><span>${tbOn()?'Accesa: lo staff timbra dalla voce Orari':'Spenta'}</span></div><div class="seg">${[[1,'Accesa'],[0,'Spenta']].map(([k,l])=>`<button type="button" aria-pressed="${tbOn()===!!k}" data-a="tbSet" data-v="${k}">${l}</button>`).join('')}</div></div>
   ${tbOn()?`<div class="btns" style="margin:4px 0 8px"><button type="button" class="btn ghost sm" data-a="tbQr">${ic('qr')} QR da stampare</button></div>`:''}
-  ${S.db.kind==='firebase'?qfRow():''}
+  ${S.db.kind==='firebase'?qfRow()+ptRow():''}
   ${promRows()}
   <div class="setrow"><div><b>Tema</b><span>Su questo dispositivo</span></div><div class="seg">${[['auto','Auto'],['light','Chiaro'],['dark','Scuro']].map(([k,l])=>`<button type="button" aria-pressed="${th===k}" data-a="theme" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="setrow"><div><b>Backup dei dati</b><span>Salva o ripristina tutto in un file</span></div><div class="btns"><button type="button" class="btn ghost sm" data-a="bkExport">${ic('download')} Esporta</button><button type="button" class="btn ghost sm" data-a="bkImport">${ic('upload')} Ripristina</button></div></div>
@@ -3989,6 +4062,18 @@ async function qfNew(cambia){const q=cfg().qrFisso;
     if(!r.ok||!/^[A-HJ-NP-Z2-9]{6}$/.test(j.codice||''))throw new Error('inviti '+r.status);
     await put('config','app',Object.assign({},cfg(),{qrFisso:{c:j.codice,creato:now()}}));toast(cambia?'QR cambiato: stampa quello nuovo':'QR da cucina pronto');await qfCard(j.codice)}
   catch(e){toast('Non riesco a creare il QR: controlla la connessione e riprova.','err')}}
+/* entrata libera (v40): pubblico/porta {fino} aperta 48 ore da un gestore; nel frattempo i telefoni nuovi entrano senza approvazione */
+const PT={fino:0,t:0,busy:false};
+async function ptLoad(){PT.busy=true;try{PT.fino=await S.db.phone.portaGet();PT.t=now()}catch(e){PT.t=now()}PT.busy=false;schedule()}
+function ptRow(){if(!PT.busy&&now()-PT.t>60000)ptLoad();const on=PT.fino>now();
+  return`<div class="setrow"><div><b>Entrata libera</b><span>${on?'Aperta fino a '+esc(new Date(PT.fino).toLocaleString('it-IT',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))+': chi inquadra il QR o apre un invito entra subito, senza approvazione':'Chiusa: ogni telefono nuovo va approvato in Staff. Aprila quando arriva tanto personale nuovo'}</span></div>
+  <div class="btns">${on?`<button type="button" class="btn ghost sm" data-a="ptSet" data-v="0">Chiudi ora</button>`:`<button type="button" class="btn primary sm" data-a="ptSet" data-v="48">Apri per 48 ore</button>`}</div></div>`}
+async function ptSet(h){
+  if(h&&!await ask('Aprire l\'entrata libera per 48 ore?','Chi ha il QR della cucina o un invito entra subito, senza la vostra approvazione. Dopo 48 ore si richiude da sola.','Apri'))return;
+  if(!navigator.onLine)return toast('Serve la connessione.','warn');
+  const fino=h?now()+h*3600000:0;
+  try{await fbTmo(S.db.phone.porta(fino),15000);PT.fino=fino;PT.t=now();toast(h?'Entrata libera aperta per 48 ore':'Entrata libera chiusa');schedule()}
+  catch(e){toast(e&&e.code==='permission-denied'?'Il database non lo permette ancora: aggiorna le regole (docs/FIREBASE.md).':'Non riuscito: controlla la connessione e riprova.','err')}}
 async function qfCard(k){const q=cfg().qrFisso,c=k||q&&q.c;if(!c)return;try{await inviteCard({l:INV_URL+'/'+c,c})}catch(e){toast('Immagine del QR non riuscita: riprova.','err')}}
 function promRows(){const sel=cfg().promA||[],mg=Object.values(D().staff).filter(u=>u.stato==='attivo'&&isMgr(u)).sort((a,b)=>fullName(a).localeCompare(fullName(b)));
   return`<div class="setrow"><div><b>«Oggi si ordina» arriva a</b><span>${sel.length?'Solo ai nomi scelti':'Tutti gli Admin Chef. Tocca un nome per mandarlo solo a lui'}</span><div class="chips" role="group" aria-label="Chi riceve Oggi si ordina" style="margin-top:8px">${mg.map(u=>`<button type="button" class="chip" aria-pressed="${sel.includes(u.id)}" data-a="promA" data-v="${u.id}">${esc(fullName(u))}</button>`).join('')}</div></div></div>
@@ -4318,7 +4403,8 @@ const A={
   waitLeave:()=>{ls('jona_wait',null);render()},
   phNew:()=>phoneSheet(true),phOld:()=>phoneSheet(false),phSend:d=>phSend(d.v==='1'),
   phAgain:()=>{ls('jona_wait',null);S.db.phone.again().catch(()=>toast('Non riesco: controlla la connessione e riprova.','err'))},
-  phOk:d=>phApprove(d.v),phNo:d=>phReject(d.v),
+  phOk:d=>phApprove(d.v),itGo:()=>itGo(),itRetry:()=>{IT.t='';schedule()},itSkip:()=>{ls('jona_itk',null);IT.t='';schedule()},
+  invMono:d=>invMonoSend(d.u),invMonoGo:d=>invMonoShare(d.v),ptSet:d=>ptSet(+d.v),phNo:d=>phReject(d.v),
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
@@ -4427,7 +4513,7 @@ const A={
   sedit:d=>profileSheet(d.u),
   psaveProfile:d=>saveProfile(d.u),
   stoggle:async d=>{const u=D().staff[d.u];await upd('staff',d.u,{stato:u.stato==='disattivato'?'attivo':'disattivato'});closeSheet();toast(u.stato==='disattivato'?'Profilo riattivato':'Profilo disattivato')},
-  sdel:async d=>{const u=D().staff[d.u];if(!await ask('Eliminare il profilo di '+u.nome+'?','Le sue richieste restano nello storico.','Elimina',true))return;closeSheet();await del('staff',d.u);toast('Profilo eliminato')},
+  sdel:async d=>{const u=D().staff[d.u];if(!await ask('Eliminare il profilo di '+u.nome+'?','Le sue richieste restano nello storico.','Elimina',true))return;closeSheet();if(u.stato==='invitato'&&S.db.kind==='firebase')await S.db.phone.invDel(d.u).catch(()=>{});await del('staff',d.u);toast('Profilo eliminato')},
   endSeason:async()=>{const us=Object.values(D().staff).filter(u=>u.ruolo==='staff'&&u.stato==='attivo');if(!await ask('Disattivare '+us.length+' profili dello staff?','Restano salvati con il loro storico. A inizio stagione li riattivi uno per uno.','Disattiva',true))return;await runPool(us.map(u=>()=>upd('staff',u.id,{stato:'disattivato'})),4);toast('Staff disattivato per fine stagione')},
   hf:d=>{S.hf.stato=d.v;render()},
   wk:d=>{S.wk=+d.v;render()},
@@ -4629,6 +4715,7 @@ addEventListener('popstate',()=>{if(NAV.skip){NAV.skip=0;return navSync()}NAV.tr
 /* ================= avvio ================= */
 (()=>{const h=new URLSearchParams(location.hash.slice(1));const k=h.get('k'),c=h.get('i');if(!k&&!c)return;
   if(c&&/^[A-HJ-NP-Z2-9]{6}$/i.test(c))ls('jona_icode',c.toUpperCase());
+  if(/^[A-Za-z0-9]{20,64}$/.test(h.get('t')||''))ls('jona_itk',h.get('t'));
   if(h.get('c')){try{ls('jona_fb',JSON.parse(atob(h.get('c'))))}catch(e){}}
   if(/^[A-Za-z0-9]{16,64}$/.test(k)&&ls('jona_key')!==k){ls('jona_key',k);ls('jona_member',null)}
   history.replaceState(null,'',location.pathname+location.search)})();
