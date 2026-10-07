@@ -132,6 +132,28 @@ await pg.click('header.top [data-a="agOpen"]');await wait(300);await pg.click('[
 ok(await pg.evaluate(()=>{const s=document.querySelector('.sheet');return s.scrollWidth<=s.clientWidth+1}),'320 px: mese senza scorrimento orizzontale');
 await closeAll();
 
+// 9b. tipo (Evento | Informazione | Aggiornamento operativo | Memo) e chi crea (gestori + F&B Manager e Responsabile)
+ok(await pg.evaluate(()=>agCan({ruolo:'gm',reparto:'cucina'})&&agCan({ruolo:'dev'})&&agCan({ruolo:'staff',reparto:'fb'})&&agCan({ruolo:'staff',reparto:'resp'})&&!agCan({ruolo:'staff',reparto:'cucina'})&&!agCan({ruolo:'staff',reparto:'sala'})&&!agCan(null)),'agCan: gestore, sviluppatore, F&B e Responsabile sì; cucina, sala no');
+await pg.evaluate(()=>{VIEW_AS.staff.reparto='fb'});await view('staff');
+ok(await pg.locator('header.top [data-a="agOpen"]').count()===1,'staff F&B Manager: icona del calendario');
+await pg.click('header.top [data-a="agOpen"]');await wait(300);
+ok(await pg.locator('#ag-q').count()===1,'staff F&B Manager: può scrivere nell\'agenda');
+await pg.click('.sheet [data-a="agNew"]');await wait(300);
+ok(await pg.locator('.sheet [data-a="agfK"]').count()===4&&await pg.locator('.sheet [data-a="agfK"][data-v="ev"][aria-pressed="true"]').count()===1,'modulo: 4 tipi, Evento di partenza');
+await pg.click('.sheet [data-a="agfK"][data-v="memo"]');await wait(200);
+ok(await pg.locator('.sheet [data-a="agfSet"][data-k="vis"][data-v="io"][aria-pressed="true"]').count()===1,'Memo → «Solo io»');
+await pg.click('.sheet [data-a="agfK"][data-v="op"]');await wait(200);
+await pg.click('.sheet [data-a="agfSet"][data-k="vis"][data-v="rep"]');await wait(200);
+await pg.click('.sheet [data-a="agfRep"][data-v="cucina"]');await wait(200);
+await pg.fill('#agf-t','Lavastoviglie ferma');await pg.click('.sheet [data-a="agSave"]');await wait(500);
+ok(await pg.evaluate(()=>{const e=agAll().find(x=>x.t==='Lavastoviglie ferma');return e&&e.k==='op'&&e.vis==='rep'&&e.rep.join()==='cucina'&&e.g===today()}),'aggiornamento operativo salvato per la cucina (k=op)');
+ok(/Aggiornamento operativo/.test(await txt('.sheet'))&&/Aggiornamento operativo: Lavastoviglie ferma|\+/.test(await txt('.ag-strip')),'etichetta del tipo in lista e striscia');
+await pg.click('.sheet [data-a="agEdit"]:has-text("Lavastoviglie ferma")');await wait(300);
+ok(await pg.locator('.sheet [data-a="agfK"][data-v="op"][aria-pressed="true"]').count()===1,'modifica: il tipo resta Aggiornamento operativo');
+await closeAll();
+ok(await pg.evaluate(()=>agK({})==='ev'&&agK({k:'zz'})==='ev'),'vecchi eventi senza tipo = Evento');
+await pg.evaluate(()=>{VIEW_AS.staff.reparto='cucina'});await view('dev');await closeAll();
+
 // 10. spenta: spariscono icona e striscia
 await pg.evaluate(()=>funzSet('agenda',false));await wait(400);
 ok(await pg.locator('header.top [data-a="agOpen"]').count()===0&&await pg.locator('.ag-strip').count()===0,'spenta: spariscono icona e striscia');
