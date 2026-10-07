@@ -3,6 +3,8 @@
 Sessione attuale: #32
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+«non voglio consumare i 2000 minuti di github» → spiegato: Jona è PUBBLICO, le sue prove non toccano i 2000 minuti (valgono solo per i repo privati, come RVC). Per RVC: tenere basso l'uso dei minuti (da dire alla sessione RVC solo tramite Mario).
+
 «ma non dovevi farlo dalla regola una volta a settimana il controllo da un ora?» → spiegato: giro extra su GitHub lanciato per E14 (v49 toccava il Worker e le veloci non l'avevano visto); gratis, niente token. Chiarita la regola in `CLAUDE.md` (GIRO COMPLETO EXTRA SU GITHUB).
 
 **v50 (D9) ONLINE** (PR #60, CI verde). Lanciato su GitHub il giro completo (workflow «Prove automatiche», modo `tutto`, su main, ~1 ora): da controllare il risultato (actions_list) e correggere ciò che trova.
