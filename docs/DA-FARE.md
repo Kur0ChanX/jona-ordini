@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-07 (sessione #24: test-v40 corretta, giro completo v41 39/39, v42 agenda scritta nel ramo `v42-agenda`; sessione #23: merge di main nel ramo, v41 in prova; sessione #22: giro completo v40 38/38 riuscito; piano dell'inverno approvato; v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-07 (sessione #25: v41 online con la PR #50; v42 con tipi e F&B/Responsabile, prove legate riuscite; sessione #24: test-v40 corretta, giro completo v41 39/39, v42 agenda scritta nel ramo `v42-agenda`; sessione #23: merge di main nel ramo, v41 in prova; sessione #22: giro completo v40 38/38 riuscito; piano dell'inverno approvato; v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -10,18 +10,16 @@ Aggiornato: 2026-10-07 (sessione #24: test-v40 corretta, giro completo v41 39/39
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| 🔴 C5 | v41: giro completo 39/39 riuscito (`878b4bd`); manca: PR → squash merge → controllo online | Claude | subito |
-| C6 | v42 interruttori + agenda: scritta e provata nel ramo `v42-agenda`; manca: unire main dopo la v41, prove, PR. Poi v43 (avvisi agenda dal Worker), A, C, G, H, I, J, K, O, R, U | Claude | dopo C5 |
-| D7 | Agenda: i gestori vedono gli eventi di tutti i reparti (scelta di Claude), va bene? | Claude, dopo la tua scelta | quando vuoi |
+| C6 | v42 interruttori + agenda (tipi Evento/Informazione/Aggiornamento operativo/Memo; scrivono anche F&B Manager e Responsabile): main unito, `test-agenda` 60/60, `test-giro` e `test-news` riusciti nel ramo `v42-agenda`; manca: giro completo (ora o dopo, chiedere a Mario), PR. Poi v43 (avvisi agenda dal Worker), A, C, G, H, I, J, K, O, R, U | Claude | subito |
 | C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | quando vuoi |
-| 🔴 M18 | Incollare le regole nuove in Firebase (per l'entrata libera, v41) | Mario | quando la v41 è online |
+| 🔴 M18 | Incollare le regole nuove in Firebase (per l'entrata libera, v41) | Mario | ora (v41 online) |
 | M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | prima dell'apertura (staff ancora in prova) |
 | M17 | Telefono in attesa `ISLyK5…` (nome «Mari…», cognome «S…»): chi è? approvarlo o rifiutarlo (Staff → Telefoni da approvare) | Mario | quando vuoi |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
 | M2 | Dare a Maurizio il ruolo Admin Chef | Mario | in stand-by, dopo M1 |
 | M3 | «Oggi si ordina» arriva a Maurizio | Mario | in stand-by, dopo M2 |
-| M4 | Mauro Loi: reparto «F&B Manager» | Mario | quando vuoi (2 minuti) |
+| M4 | Mauro Loi: reparto «F&B Manager» (serve anche per scrivere nell'agenda v42) | Mario | prima della v42 |
 | M5 | Stampare e appendere il QR da cucina | Mario | quando vuoi |
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M8 | Prove dal vero della v35 | Mario | con calma |
