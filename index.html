@@ -248,6 +248,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .inv-code{text-align:center;margin:14px 0 0}.inv-code b{display:block;font-size:34px;font-weight:500;letter-spacing:.18em;color:var(--ink)}
 .invite-steps{margin:0;padding-left:20px;color:var(--ink2);line-height:1.5}
 .testbar{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.testbar .seg{flex-wrap:wrap;border-radius:18px;min-width:0}
 .testbar .seg button[aria-pressed="true"]{background:var(--lagoon);color:var(--on-lagoon);font-weight:500}
 .seg{display:inline-flex;padding:3px;background:var(--sunk);border-radius:999px;border:1px solid var(--line);max-width:100%;overflow-x:auto;scrollbar-width:none}
 .seg.wide{display:flex}
@@ -1045,8 +1046,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=42;
+const APP_VER=43;
 const NEWS=[
+  {v:43,data:'2026-10-07',titolo:'Responsabili con orario libero',
+    chef:['Staff → tocca una persona → «Contratto e orari» → «Full time Responsabile»: niente turni da pianificare e nessun controllo sulle ore. La persona non compare più negli orari.','Chi ha l\'orario libero, in «I miei orari», vede «Orario libero» invece della tabella dei turni.'],
+    dev:{aggiunte:['`staff.contratto` = `{libero:true}` (`orContr`, `orFree`); `contrOf` lo tratta come senza contratto, `orPeople` lo esclude (pianificatore, controlli, export, cambi turno). Scelta «Tipo di contratto» in `orContrForm` (`S.form.libero`).','Barra Test: vista «F&B Mauro» (`VIEW_AS.fb`, staff del reparto `fb`) per provare ciò che vede l\'F&B Manager (prova `tools/test-testbar.mjs`).']}},
   {v:42,data:'2026-10-07',titolo:'Agenda dell\'hotel',
     tutti:['Se hai un evento oggi (un gruppo, un matrimonio, una consegna) in alto compare la striscia «Oggi in hotel»: toccala per vedere i dettagli.'],
     chef:['Impostazioni → «Funzioni»: accendi l\'Agenda (parte spenta). Vedi anche quante persone la usano questo mese.','Icona del calendario in alto: Oggi, Settimana e Mese. Scrivi o detta «domani ore 20 gruppo Rossi 40 coperti» e l\'evento è già compilato.','«Foto dell\'agenda»: fotografi l\'agenda di carta e Gemini legge gli eventi, tu scegli quali aggiungere.','Scegli il tipo: Evento, Informazione, Aggiornamento operativo o Memo. Poi chi lo vede: solo tu (memo personale), tutti o alcuni reparti (Cucina, Sala…). Può ripetersi ogni settimana o ogni mese.','Anche l\'F&B Manager e il Responsabile possono scrivere nell\'agenda.'],
@@ -1247,7 +1251,7 @@ async function fileToLogo(file){const img=await loadImg(file);const sc=Math.min(
 const cfg=()=>Object.assign({nomeLocale:'Jona Ristorante',luogoConsegna:''},D().config.app||{});
 const realU=()=>S.me?D().staff[S.me]:null;
 // Test per lo sviluppatore: vede l'app come l'amministratore (chef) senza cambiare il suo profilo.
-const VIEW_AS={gm:{ruolo:'gm',reparto:'cucina',mansione:'Chef'},staff:{ruolo:'staff',reparto:'cucina',mansione:'Cuoco'}};
+const VIEW_AS={gm:{ruolo:'gm',reparto:'cucina',mansione:'Chef'},staff:{ruolo:'staff',reparto:'cucina',mansione:'Cuoco'},fb:{ruolo:'staff',reparto:'fb',mansione:'F&B Manager'}};
 const meU=()=>{const u=realU();return u&&isDev(u)&&VIEW_AS[S.viewAs]?Object.assign({},u,VIEW_AS[S.viewAs]):u};
 const isGM=u=>!!u&&u.ruolo==='gm';
 const isDev=u=>!!u&&u.ruolo==='dev';
@@ -1847,7 +1851,7 @@ function checkForm(needPw,selfId){
   if(!/^[a-z0-9._-]{3,30}$/.test(u))return'Nel nome utente usa solo lettere, numeri, punto o trattino (massimo 30).';
   if(Object.values(D().staff).some(x=>x.username===u&&x.id!==selfId))return'Questo nome utente è già usato: scegline un altro.';
   if(needPw||f.pw){if(String(f.pw||'').length<6)return'La password deve avere almeno 6 caratteri.';if(f.pw!==f.pw2)return'Le due password non coincidono.'}
-  if(withContr(f)){const o=num(f.ore);if(!(o>=1&&o<=60))return'Le ore a settimana vanno da 1 a 60.'}
+  if(withContr(f)&&!f.libero){const o=num(f.ore);if(!(o>=1&&o<=60))return'Le ore a settimana vanno da 1 a 60.'}
   return'';
 }
 async function createProfile(mode){
@@ -1935,7 +1939,7 @@ const micBtn=()=>`<button type="button" class="mic-fab" data-a="voice" aria-labe
 const cartBar=n=>`<div class="cartbar"><button type="button" class="btn primary big block" data-a="tab" data-v="carrello">${ic('cart')}<span>${n} ${n===1?'articolo':'articoli'} · Invia allo chef</span>${ic('chev')}</button></div>`;
 function testBar(){
   const u=realU();if(!isDev(u))return'';
-  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['staff','Staff'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
+  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['fb','F&B Mauro'],['staff','Staff'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
 }
 
 /* ================= staff: catalogo ================= */
@@ -2969,7 +2973,7 @@ function vStaff(me){
 }
 function profileSheet(id){
   const u=D().staff[id];if(!u)return;const mgr=isMgr(meU());const self=id===S.me;
-  S.form=Object.assign(clone(u),{pw:'',pw2:''});if(isGM(meU()))Object.assign(S.form,contrOf(u)||CONTR0,{_c:true});
+  S.form=Object.assign(clone(u),{pw:'',pw2:''});if(isGM(meU()))Object.assign(S.form,contrOf(u)||CONTR0,{_c:true,libero:orFree(u)});
   openSheet({render:()=>{const u=D().staff[id]||{};return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${self?'Il tuo profilo':esc(fullName(u))}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${profileForm('pf',{roles:mgr&&!self?['staff','gm','dev']:null,pwLabel:'Nuova password (facoltativa)',noRep:isMgr(S.form),contr:mgr})}
   ${mgr&&!self&&u.stato==='invitato'&&S.db&&S.db.kind==='firebase'?`<div class="panel" style="margin-top:18px;padding:14px 16px"><b>Invito non ancora usato.</b> Se il link si è perso, mandane uno nuovo: quello vecchio smette di funzionare.<div style="margin-top:10px"><button type="button" class="btn primary sm" data-a="invMono" data-u="${id}">Nuovo link d'invito</button></div></div>`:''}
@@ -3270,9 +3274,11 @@ const OR_GG=['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
 const OR_GGL=['Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato','Domenica'];
 const OR_TIPI0=[{id:'pranzo',n:'Pranzo',v:'10:00-15:00'},{id:'cena',n:'Cena',v:'18:00-23:30'},{id:'spezzato',n:'Spezzato',v:'10:00-15:00,18:00-23:00'},{id:'giornata',n:'Giornata',v:'09:00-17:30'}];
 const CONTR0={ore:40,pausa:30,liberi:1};
-const contrOf=u=>u&&u.contratto?Object.assign({},CONTR0,u.contratto):null;
+const contrOf=u=>u&&u.contratto&&!u.contratto.libero?Object.assign({},CONTR0,u.contratto):null;
 const withContr=f=>!!f._c&&(f.ruolo||'staff')!=='dev';
-const orContr=f=>({ore:num(f.ore),pausa:Number(f.pausa)||0,liberi:Number(f.liberi)||1});
+const orContr=f=>f.libero?{libero:true}:{ore:num(f.ore),pausa:Number(f.pausa)||0,liberi:Number(f.liberi)||1};
+// responsabili con orario libero: niente turni, niente controlli, fuori dal pianificatore
+const orFree=u=>!!(u&&u.contratto&&u.contratto.libero);
 const orDate=s=>{const [y,m,d]=String(s).split('-').map(Number);return new Date(y,m-1,d)};
 const orLun=(d=new Date())=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-(x.getDay()+6)%7);return today(x)};
 const orShift=(lun,w)=>{const d=orDate(lun);d.setDate(d.getDate()+7*w);return today(d)};
@@ -3296,7 +3302,7 @@ const orAny=t=>Object.values(t||{}).some(orHas);
 const orDiffDays=(a,b)=>{const r=[];for(let g=0;g<7;g++)if(((a||{})[g]||'')!==((b||{})[g]||''))r.push(g);return r};
 const orIds=w=>[...new Set(Object.keys(w.t||{}).concat(Object.keys(w.tp||{})))];
 const orChanged=w=>orIds(w).filter(id=>orDiffDays((w.tp||{})[id],(w.t||{})[id]).length);
-const orPeople=()=>Object.values(D().staff).filter(u=>u.stato==='attivo'&&(u.ruolo!=='dev'||u.contratto)).sort(byNome);
+const orPeople=()=>Object.values(D().staff).filter(u=>u.stato==='attivo'&&!orFree(u)&&(u.ruolo!=='dev'||u.contratto)).sort(byNome);
 const orRep=u=>REPARTI[u.reparto]?u.reparto:'altro';
 // controlli di una persona in una settimana (prev = sua riga della settimana prima): [{g,k:'err'|'warn',t}], g=-1 vale per tutta la settimana
 function orCheck(u,row,prev){
@@ -3666,6 +3672,7 @@ function vMieiOrari(me){
   const head=`<h1 class="vt">I miei orari</h1><p class="vsub">${orRange(lun)}</p>
   ${tbCard(me)}${cmStaffBox(me)}${S.orMy==='next'?'':orOggi()}
   ${nextOk?`<div class="seg wide or-my" role="group" aria-label="Settimana">${[['','Questa settimana'],['next','Prossima']].map(([k,l])=>`<button type="button" aria-pressed="${(S.orMy||'')===k}" data-a="orMy" data-v="${k}">${l}</button>`).join('')}</div>`:''}`;
+  if(orFree(me)&&!orHas(r))return head+empty('calendar','Orario libero','Sei Responsabile: niente turni fissi, organizzi tu il tuo tempo.');
   if(!orHas(r))return head+empty('calendar',w&&w.tp?'Nessun turno':'Orari non ancora pronti',w&&w.tp?'In questa settimana non hai turni.':'Quando Maurizio li pubblica ricevi un avviso.');
   return head+`
   ${[0,1,2,3,4,5,6].map(g=>{const v=r[g]||'',sh=orShifts(v);
@@ -3678,9 +3685,11 @@ function vMieiOrari(me){
 function orContrForm(p){
   const f=S.form,o=String(f.ore??'');
   return`<div class="or-cf"><div class="or-cfh">${ic('calendar')} Contratto e orari</div><p class="muted small" style="margin:2px 0 0">Li vedi solo tu e chi fa gli orari: servono per controllare i turni. La persona non li vede.</p>
+  <span class="lbl">Tipo di contratto</span><div class="seg wide" role="group" aria-label="Tipo di contratto">${[['','Ore fisse'],['1','Full time Responsabile']].map(([v,l])=>`<button type="button" aria-pressed="${!!f.libero===!!v}" data-a="formset" data-k="libero" data-v="${v}">${l}</button>`).join('')}</div>
+  ${f.libero?`<p class="muted small" style="margin:8px 0 0">Orario libero: niente turni da pianificare e nessun controllo sulle ore. Non compare negli orari.</p></div>`:`
   <label class="lbl" for="${p}-ore">Ore a settimana</label><div class="or-ore"><div class="chips" role="group" aria-label="Ore a settimana">${[40,36,30,24,20].map(n=>`<button type="button" class="chip" aria-pressed="${o===String(n)}" data-a="formset" data-k="ore" data-v="${n}">${n}</button>`).join('')}</div><input class="inp" id="${p}-ore" type="number" inputmode="numeric" min="1" max="60" value="${esc(o)}" data-in="form" data-k="ore"></div>
   <span class="lbl">Pausa nei turni oltre 6 ore (minuti)</span><div class="seg wide" role="group" aria-label="Pausa">${[[0,'No'],[15,'15'],[30,'30'],[45,'45'],[60,'60']].map(([n,l])=>`<button type="button" aria-pressed="${String(f.pausa)===String(n)}" data-a="formset" data-k="pausa" data-v="${n}">${l}</button>`).join('')}</div>
-  <span class="lbl">Giorni liberi a settimana</span><div class="seg wide" role="group" aria-label="Giorni liberi">${[1,2,3].map(n=>`<button type="button" aria-pressed="${String(f.liberi)===String(n)}" data-a="formset" data-k="liberi" data-v="${n}">${n}</button>`).join('')}</div></div>`;
+  <span class="lbl">Giorni liberi a settimana</span><div class="seg wide" role="group" aria-label="Giorni liberi">${[1,2,3].map(n=>`<button type="button" aria-pressed="${String(f.liberi)===String(n)}" data-a="formset" data-k="liberi" data-v="${n}">${n}</button>`).join('')}</div></div>`}`;
 }
 
 /* ================= «Chiedi a Jona» (gestori) =================
@@ -3689,7 +3698,7 @@ function orContrForm(p){
 const JONA_TIPS=['Quanto abbiamo speso da ogni fornitore questo mese?','Chi lavora sabato sera?','Quando abbiamo ordinato l\'ultima volta il burro?','Quali prodotti sono aumentati di prezzo?','Cosa chiede più spesso la sala?'];
 function jonaCtx(){
   const d=D(),F=d.fornitori,fn=id=>(F[id]||{}).nome||'',dt=t=>t?new Date(t).toLocaleString('it-IT',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
-  const staff=Object.values(d.staff).filter(u=>u.stato!=='in_attesa').map(u=>{const c=isGM(meU())?contrOf(u):null;return[u.id,fullName(u),RUOLI[u.ruolo],REPARTI[u.reparto]||'',u.mansione||'',u.stato,c?c.ore+'h/sett, pausa '+c.pausa+' min, '+c.liberi+' liberi':'']});
+  const staff=Object.values(d.staff).filter(u=>u.stato!=='in_attesa').map(u=>{const c=isGM(meU())?contrOf(u):null;return[u.id,fullName(u),RUOLI[u.ruolo],REPARTI[u.reparto]||'',u.mansione||'',u.stato,c?c.ore+'h/sett, pausa '+c.pausa+' min, '+c.liberi+' liberi':isGM(meU())&&orFree(u)?'Full time Responsabile, orario libero':'']});
   const sn=id=>(d.staff[id]&&fullName(d.staff[id]))||id;
   const orari=[orShift(orLun(),-1),orLun(),orShift(orLun(),1)].map(l=>{const w=orWeek(l);if(!w)return null;const t=w.tp||w.t||{};
     return{settimana:'dal '+l,pubblicata:!!w.tp,turni:Object.fromEntries(Object.entries(t).map(([id,r])=>[sn(id),Object.fromEntries(Object.entries(r).map(([g,v])=>[OR_GGL[g],orFmt(v)]))])),
