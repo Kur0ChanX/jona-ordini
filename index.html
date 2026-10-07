@@ -510,6 +510,16 @@ button.rp-pn{all:unset;display:block;font:400 15px/1.3 var(--font);overflow-wrap
 .err-strip{background:var(--corallo-soft)}
 .err-strip .ic{color:var(--corallo)}
 .err-s{white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.35 ui-monospace,monospace;color:var(--muted);margin:6px 0 0;max-height:120px;overflow:auto}
+.rq-sub{margin:4px 0 14px}
+.rq-f{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.rq-f .chip{border:1px solid var(--line);background:transparent;color:var(--ink2);border-radius:999px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+.rq-f .chip.on{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.rq-day{margin:0 0 10px}
+.rq-day>summary{display:flex;justify-content:space-between;align-items:center;list-style:none;cursor:pointer;padding:10px 4px;font-size:16px;font-weight:500}
+.rq-day>summary::-webkit-details-marker{display:none}
+.rq-day>summary::after{content:'›';margin-left:8px;color:var(--muted);transition:transform .2s}
+.rq-day[open]>summary::after{transform:rotate(90deg)}
+.rq-day>summary .muted{margin-left:auto}
 .ph-strip{background:var(--surface);border:2px solid var(--lagoon);border-radius:14px;padding:10px 12px;margin:6px 0 14px}
 .ph-strip-h{display:flex;align-items:center;gap:8px;color:var(--lagoon);font-size:15px;margin:2px 2px 6px}
 .ph-strip .row{padding:8px 2px}
@@ -1066,8 +1076,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=49;
+const APP_VER=50;
 const NEWS=[
+  {v:50,data:'2026-10-07',titolo:'Richieste in ordine',
+    chef:['Scheda Richieste: in alto «Da approvare» e «Gestite». In «Gestite» le richieste sono divise per giorno (Oggi, Ieri, …), con l\'ora della decisione e chi l\'ha presa. I filtri «Approvate» e «Rifiutate» mostrano solo quelle.'],
+    dev:{aggiunte:['`vRichieste` con sotto-schede (`S.rqSub`), `vGestite` raggruppata per giorno di `deciso` (`dayKey`, `dayLbl`, prime 2 aperte, max 300), filtro `S.rqF`; `reqSummary(r,who,dec)` mostra ora e `decisoDa`. Prova `tools/test-richieste-gestite.mjs`.']}},
   {v:49,data:'2026-10-07',titolo:'Scatola nera degli errori',
     tutti:['Se l\'app ha un problema su un telefono, ora lo segnala da sola allo sviluppatore (solo il messaggio dell\'errore, niente dati personali). Così si corregge prima che ve ne accorgiate.'],
     dev:{aggiunte:['Scatola nera (S3): `errLog` raccoglie gli errori e le promesse rifiutate (stesso messaggio una volta per apertura, al massimo 30), `errFlush` li manda al Worker `/errori` (solo membri, tabella `err` nel primo D1, ultimi 2000, cron 30 giorni). Lo sviluppatore vede in cima «N errori nuovi sui telefoni» (`errStrip`, `errSheet`, `jona_err_vis`). Prove `tools/test-errori.mjs` e `tools/test-errori-server.mjs`.']}},
@@ -2136,10 +2149,12 @@ function itemsRO(r){
   ${its.map(it=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(it.nome)}${it.urgente?' <span class="tag urg">urgente</span>':''}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice)+' ':''}${it.aggiunto?'<span class="was">aggiunto dallo chef</span>':it.qtaOrig!=null&&it.qtaOrig!==it.qta?`<span class="was">chiesti ${fq(it.qtaOrig)}, lo chef ha messo ${fq(it.qta)}</span>`:''}</div></div><b>${fq(it.qta)}</b><span class="ln-u">${esc(it.unita||'')}</span></div>`).join('')}</div>`).join('')
   +((r.rimossi&&r.rimossi.length)?`<p class="removed">Tolti dallo chef: ${esc(r.rimossi.map(x=>x.nome).join(', '))}</p>`:'');
 }
-function reqSummary(r,who){
+function reqSummary(r,who,dec){
   const [k,l]=reqStatus(r);const u=D().staff[r.utenteId]||{id:r.utenteId,nome:r.utenteNome};const n=(r.items||[]).length;
-  return`<details class="rs"><summary><div class="rs-i">${who?avatar(u,38):''}<div><div class="rs-t">${who?esc(r.utenteNome)+', ':''}${n} ${n===1?'articolo':'articoli'}</div><div class="rs-m">${ago(r.creato)}${who?', '+esc(REPARTI[r.reparto]||''):''}</div></div></div>${pill(k,l)}</summary>
-  <div class="rs-b">${r.notaGM?`<p class="gm-note"><b>Chef:</b> ${esc(r.notaGM)}</p>`:''}${r.nota?`<p class="muted small" style="margin:0 0 6px">Nota: ${esc(r.nota)}</p>`:''}${itemsRO(r)}</div></details>`;
+  const dd=dec&&D().staff[r.decisoDa],hm=dec?new Date(r.deciso).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}):'';
+  const meta=dec?`alle ${hm}${dd?' da '+esc(dd.nome):''}${r.reparto?', '+esc(REPARTI[r.reparto]||''):''}`:`${ago(r.creato)}${who?', '+esc(REPARTI[r.reparto]||''):''}`;
+  return`<details class="rs"><summary><div class="rs-i">${who?avatar(u,38):''}<div><div class="rs-t">${who?esc(r.utenteNome)+', ':''}${n} ${n===1?'articolo':'articoli'}</div><div class="rs-m">${meta}</div></div></div>${pill(k,l)}</summary>
+  <div class="rs-b">${dec?`<p class="muted small" style="margin:0 0 6px">Inviata ${esc(ago(r.creato))}</p>`:''}${r.notaGM?`<p class="gm-note"><b>Chef:</b> ${esc(r.notaGM)}</p>`:''}${r.nota?`<p class="muted small" style="margin:0 0 6px">Nota: ${esc(r.nota)}</p>`:''}${itemsRO(r)}</div></details>`;
 }
 function vMiei(me){
   const rs=Object.values(D().richieste).filter(r=>r.utenteId===me.id).sort((a,b)=>b.creato-a.creato);
@@ -2235,11 +2250,23 @@ function vRichieste(){
   else if(S.grp==='fornitore')body=bySupplier(pend);
   else if(S.grp==='reparto')body=Object.entries(REPARTI).map(([k,l])=>{const rs=pend.filter(r=>(r.reparto||'altro')===k);return rs.length?`<h2 class="sec">${l}<span>${rs.length}</span></h2>${rs.map(reqCard).join('')}`:''}).join('');
   else body=`<div style="height:12px"></div>`+pend.map(reqCard).join('');
-  const t0=new Date();t0.setHours(0,0,0,0);
-  const dec=Object.values(D().richieste).filter(r=>r.stato!=='inviata'&&(r.deciso||0)>=t0.getTime()).sort((a,b)=>b.deciso-a.deciso);
-  return`<h1 class="vt">Richieste</h1><p class="vsub">${pend.length?`${pend.length} da approvare`:'Tutto in ordine'}</p>${pend.length?seg:''}${body}
-  ${dec.length?`<h2 class="sec">Gestite oggi<span>${dec.length}</span></h2><div class="panel">${dec.map(r=>reqSummary(r,true)).join('')}</div>`:''}`;
+  const sub=S.rqSub||'da',tabs=`<div class="seg wide rq-sub" role="group" aria-label="Richieste">${[['da','Da approvare'+(pend.length?' · '+pend.length:''),'inbox'],['gestite','Gestite','clock']].map(([k,l,i])=>`<button type="button" aria-pressed="${sub===k}" data-a="rqSub" data-v="${k}">${ic(i)}${l}</button>`).join('')}</div>`;
+  const head=`<h1 class="vt">Richieste</h1><p class="vsub">${pend.length?`${pend.length} da approvare`:'Tutto in ordine'}</p>${tabs}`;
+  if(sub==='gestite')return head+vGestite();
+  return head+(pend.length?seg:'')+body;
 }
+/* D9: richieste gestite divise per giorno della decisione (Oggi, Ieri, …), con ora e chi ha deciso; filtro Approvate/Rifiutate */
+function vGestite(){
+  const f=S.rqF||'tutte',all=Object.values(D().richieste).filter(r=>r.stato!=='inviata'&&r.deciso);
+  const l=all.filter(r=>f==='tutte'||r.stato===f).sort((a,b)=>b.deciso-a.deciso).slice(0,300);
+  const chips=`<div class="rq-f" role="group" aria-label="Filtro">${[['tutte','Tutte'],['approvata','Approvate'],['rifiutata','Rifiutate']].map(([k,t])=>`<button type="button" class="chip${f===k?' on':''}" aria-pressed="${f===k}" data-a="rqF" data-v="${k}">${t}</button>`).join('')}</div>`;
+  if(!l.length)return chips+empty('clock',f==='tutte'?'Nessuna richiesta gestita':'Nessuna richiesta in questo filtro','Le richieste che approvi o rifiuti compaiono qui, divise per giorno.');
+  const g=new Map();for(const r of l){const k=dayKey(r.deciso);if(!g.has(k))g.set(k,[]);g.get(k).push(r)}
+  let i=0;return chips+[...g].map(([k,rs])=>`<details class="rq-day"${i++<2?' open':''}><summary><span>${esc(dayLbl(rs[0].deciso))}</span><span class="muted">${rs.length}</span></summary><div class="panel">${rs.map(r=>reqSummary(r,true,true)).join('')}</div></details>`).join('');
+}
+const dayKey=t=>{const d=new Date(t);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate()};
+function dayLbl(t){const d=new Date(t),o=new Date();o.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);const n=Math.round((o-x)/864e5);
+  if(n===0)return'Oggi';if(n===1)return'Ieri';const s=d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});return s.charAt(0).toUpperCase()+s.slice(1)}
 function bySupplier(pend){
   const m=new Map();
   for(const r of pend)for(const it of itemsOf(r)){const fid=it.fornitoreId||'';if(!m.has(fid))m.set(fid,new Map());const L=m.get(fid);const k=it.pid||('l:'+norm(it.nome));
@@ -4763,7 +4790,7 @@ syncRetry:()=>{if(!S.db||!S.db.netRetry)return;S.db.netRetry().catch(()=>{});if(
   vq:d=>{const r=S.voice.rows[+d.i];if(!r)return;const n=r3(r.qta+Number(d.d));if(n>0){r.qta=n;refreshSheet()}},
   vrm:d=>{S.voice.rows.splice(+d.i,1);refreshSheet()},
   vadd:()=>voiceAdd(),
-  grp:d=>{S.grp=d.v;render()},
+  grp:d=>{S.grp=d.v;render()},rqSub:d=>{S.rqSub=d.v;render()},rqF:d=>{S.rqF=d.v;render()},
   rq:d=>{const x=draft(d.r);const it=x[+d.i];it.qta=Math.max(0,r3(it.qta+Number(d.d)));render()},
   rrm:d=>{const x=draft(d.r);const [it]=x.splice(+d.i,1);if(!it.aggiunto)S.removed[d.r].push({nome:it.nome,qta:it.qtaOrig??it.qta});render()},
   rreset:d=>{delete S.drafts[d.r];delete S.removed[d.r];render()},

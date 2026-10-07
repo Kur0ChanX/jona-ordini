@@ -3,6 +3,8 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+«si» (= va bene la proposta D9). **D9 v50 pronta**: `vRichieste` con sotto-schede `S.rqSub` (Da approvare · N / Gestite), `vGestite` per giorno (`dayKey`/`dayLbl`, prime 2 aperte), filtri `S.rqF`, `reqSummary(r,who,dec)` con ora e `decisoDa`; immagine `docs/immagini/richieste-v50.png`; prova `test-richieste-gestite` 9 PASS. Trovato e corretto E14 (Worker finti delle prove senza `/errori`). Dopo la pubblicazione: lanciare il giro completo su GitHub (workflow_dispatch modo `tutto`).
+
 **S1, S2, S3 FATTI E ONLINE**: v49 online (PR #59, CI verde), Worker `/errori` attivo (risponde 403 senza gettone = giusto). Prossimo: D9 scheda Richieste (proposta con immagine `docs/immagini/proposta-richieste-d9.png` già mandata, Mario non ha ancora risposto: è una scelta di aspetto, quindi va chiesta).
 
 **v48 (S1) ONLINE** (PR #58, CI verde). **S3 v49 pronta**: scatola nera (`errLog`/`errFlush` → Worker `/errori`, tabella `err` nel primo D1, `errStrip`/`errSheet` solo sviluppatore, `jona_err_vis`). Prove `test-errori` 8, `test-errori-server` 11, più legate riuscite. Il Worker si ripubblica da solo (workflow su `worker/**`). Dopo: D9 (scheda Richieste).

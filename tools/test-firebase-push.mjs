@@ -15,6 +15,7 @@ const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,heigh
   await c.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**',async r=>{const u=r.request().url();
     if(u.endsWith('/chiave'))return r.fulfill({json:{chiave:KEY}});
     if(u.endsWith('/salute'))return r.fulfill({json:{ok:true,push:true,gemini:false}});
+    if(u.endsWith('/errori'))return r.fulfill({json:{ok:true,e:[]}});
     const body=JSON.parse(r.request().postData());sent.push({da:name,...body});
     r.fulfill({json:{inviati:body.subs.length,scaduti:body.subs.filter(s=>s.endpoint.endsWith('/morto')).map(s=>s.endpoint),errori:[]}})});
   const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));return [c,p]};
