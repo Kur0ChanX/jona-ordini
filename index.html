@@ -133,7 +133,7 @@ html.staff-ui .news-btn .ic{width:18px;height:18px}
 @media (max-width:360px){.top{gap:6px}.top .mark{display:none}.news-btn,html.staff-ui .news-btn{width:34px;padding:0;justify-content:center}.news-l{display:none}}
 .news-v{padding:16px 2px 18px;border-top:1px solid var(--line)}
 .ph-t{font:500 16px/1.3 var(--font);margin:18px 0 6px}
-.ph-ol{margin:4px 0 8px;padding-left:24px}
+.ph-ol{margin:4px 0 8px;padding-left:24px}.ph-err{margin:0 0 10px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--corallo) 18%,transparent);word-break:break-word}
 .ph-ol li{margin:10px 0;line-height:1.5;font-size:15.5px}
 .ph-brands{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 4px}
 .ph-brands .btn{min-height:48px;white-space:normal;line-height:1.2}
@@ -1029,8 +1029,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=39;
+const APP_VER=40;
 const NEWS=[
+  {v:40,data:'2026-10-07',titolo:'Notifiche: secondo tentativo e errore preciso',
+    tutti:['Se le notifiche non si attivano, l\'app riprova da sola e nella guida mostra l\'errore esatto del telefono.','Guida più completa per i telefoni Oppo, Realme e OnePlus.'],
+    dev:{correzioni:['`pushOn`: se `subscribe` fallisce, toglie l\'iscrizione vecchia, aspetta 1,5 s e riprova; `S.pushErr` (nome + messaggio) mostrato in `pushHelp` (`.ph-err`).']}},
   {v:39,data:'2026-10-07',titolo:'Logo di apertura più grande',
     tutti:['All\'apertura il logo «by YNOY&CORP» è più grande e più in alto, con «by» più vicino.'],
     dev:{correzioni:['`.wall-by i` 172 px, `gap` 2 px, niente spazio sopra; schermata d\'apertura con classe `splash` e `.splash .wall-by` 24 px dal fondo.']}},
@@ -1464,14 +1467,19 @@ async function pushOn(){
   const {chiave}=await(await fetch(PUSH_URL+'/chiave')).json();
   const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();
   if(sub&&ls('jona_push_k')!==chiave){await sub.unsubscribe();sub=null}
-  if(!sub)try{sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)})}catch(e){return fail(e&&e.name==='AbortError'?'Il telefono ha bloccato le notifiche: segui la guida per il tuo telefono.':'Non riesco ad attivare le notifiche ('+(e&&e.name||'errore')+'): segui la guida.')}
+  S.pushErr='';if(!sub){const go=()=>reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:ub64u(chiave)});
+    try{sub=await go()}catch(e){
+      try{const o=await reg.pushManager.getSubscription();if(o)await o.unsubscribe()}catch(x){}
+      await new Promise(r=>setTimeout(r,1500));
+      try{sub=await go()}catch(e2){S.pushErr=(e2&&e2.name||'errore')+(e2&&e2.message?': '+e2.message:'');
+        return fail(e2&&e2.name==='AbortError'?'Il servizio notifiche di Google non risponde: segui la guida per il tuo telefono.':'Non riesco ad attivare le notifiche: segui la guida.')}}}
   ls('jona_push_k',chiave);try{await pushSave(sub)}catch(e){return toast(e&&e.code==='permission-denied'?'Il database non accetta ancora le notifiche: Mario deve aggiornare le regole.':'Non riesco a salvare: controlla la connessione e riprova.','err')}pushWatch();toast('Notifiche attive su questo telefono');return true}
 const PUSH_HELP=[
   ['iphone','iPhone',['Apri <b>Impostazioni</b> → <b>Generali</b> → <b>Info</b> e guarda <b>Versione iOS</b>: deve essere <b>16.4 o più alta</b>. Se è più bassa: <b>Impostazioni</b> → <b>Generali</b> → <b>Aggiornamento software</b>.','Apri Jona <b>solo dall\'icona sulla schermata Home</b>, non da Safari. Se l\'icona non c\'è: apri <b>Safari</b> su jona-ristorante-by-ynoy-corp.pages.dev, premi <b>Condividi</b> (il quadrato con la freccia in su) → <b>Aggiungi alla schermata Home</b> → <b>Aggiungi</b>.','Apri <b>Impostazioni</b> → <b>Notifiche</b> → <b>Jona Ordini</b> e accendi <b>Consenti notifiche</b>.','Se è accesa la <b>Full immersion</b> (la luna), le notifiche arrivano senza suono: spegnila dal Centro di Controllo.']],
   ['xiaomi','Xiaomi, Redmi, POCO',['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi <b>Informazioni app</b>.','<b>Spegni</b> l\'interruttore <b>Sospendi l\'attività dell\'app se inutilizzata</b>.','Premi <b>Notifiche</b> e accendile.','Apri <b>Impostazioni</b> del telefono → <b>App</b> → <b>Gestisci app</b> → <b>Chrome</b> → <b>Risparmio batteria</b> → scegli <b>Nessuna restrizione</b>.','Nella stessa pagina di Chrome accendi <b>Avvio automatico</b>.']],
   ['samsung','Samsung',['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi la <b>i</b> (Informazioni app).','Premi <b>Notifiche</b> e accendi <b>Consenti notifiche</b>.','Se c\'è, <b>spegni</b> <b>Sospendi attività app se non utilizzata</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b> → <b>Batteria</b> → scegli <b>Senza restrizioni</b>.']],
   ['huawei','Huawei, Honor',['Controlla se sul telefono c\'è il <b>Play Store</b>. Se <b>non c\'è</b>, le notifiche ad app chiusa non possono funzionare: gli avvisi li trovi nella <b>campanella</b> quando apri l\'app.','Se il Play Store c\'è: <b>Impostazioni</b> → <b>Batteria</b> → <b>Avvio app</b> → <b>Chrome</b> → spegni <b>Gestisci automaticamente</b> e accendi tutti gli interruttori.','Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendile.']],
-  ['oppo','Oppo, Realme, OnePlus',['Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendile.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b> → <b>Utilizzo batteria</b> → accendi <b>Consenti attività in background</b> (e <b>Avvio automatico</b>, se c\'è).']],
+  ['oppo','Oppo, Realme, OnePlus',['Tieni premuto il dito sull\'icona di <b>Jona</b> → <b>Informazioni app</b> → <b>Notifiche</b> → accendi <b>Consenti notifiche</b> e tutte le voci sotto.','Nella stessa pagina: <b>Utilizzo batteria</b> → scegli <b>Nessuna restrizione</b> (o accendi <b>Consenti attività in background</b>).','Sempre lì: <b>spegni</b> <b>Sospendi se inutilizzata</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Gestione app</b> → <b>Chrome</b> e ripeti: <b>Notifiche</b> accese, <b>Utilizzo batteria</b> → <b>Nessuna restrizione</b>, <b>Avvio automatico</b> acceso se c\'è.','Apri il <b>Play Store</b>, cerca <b>Google Play Services</b> e <b>Chrome</b>: se vedi <b>Aggiorna</b>, premilo.','Se usi una <b>VPN</b> o un blocco pubblicità, spegnilo e riprova.']],
   ['altro','Altro telefono',['Usa <b>Chrome</b>: apri jona-ristorante-by-ynoy-corp.pages.dev in Chrome, premi i <b>tre puntini</b> in alto → <b>Aggiungi a schermata Home</b> (o <b>Installa app</b>) e apri Jona dalla nuova icona.','Controlla che sul telefono ci sia il <b>Play Store</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b>: <b>Notifiche</b> accese e <b>Batteria</b> senza restrizioni.']]];
 const PUSH_DENY={iphone:['Apri <b>Impostazioni</b> del telefono (l\'icona con l\'ingranaggio).','Premi <b>Notifiche</b>.','Scorri e premi <b>Jona Ordini</b>.','Accendi <b>Consenti notifiche</b>.','Chiudi del tutto Jona e riaprila <b>dall\'icona</b> sulla schermata Home.'],
   android:['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi <b>Informazioni app</b> (o la <b>i</b>).','Premi <b>Notifiche</b> e accendi <b>Consenti notifiche</b>.','Non trovi la voce? Apri <b>Chrome</b> → <b>tre puntini</b> in alto a destra → <b>Impostazioni</b> → <b>Impostazioni sito</b> → <b>Notifiche</b>.','Sotto <b>Bloccate</b> premi <b>jona-ristorante-by-ynoy-corp.pages.dev</b> → scegli <b>Consenti</b>.','Chiudi del tutto Jona e riaprila <b>dall\'icona</b>.']};
@@ -1483,6 +1491,7 @@ function pushHelp(){
   <p>Su questo telefono le notifiche di Jona sono <b>bloccate</b> (forse hai premuto <b>Blocca</b> o <b>Non consentire</b> per sbaglio). L'app non può chiedere di nuovo: vanno sbloccate a mano, così.</p>
   <h3 class="ph-t">${ios?'iPhone':'Android'}</h3><ol class="ph-ol">${PUSH_DENY[ios?'iphone':'android'].map(x=>`<li>${x}</li>`).join('')}</ol>
   <div class="btns col"><button type="button" class="btn primary block" data-a="pushOn">${ic('bell')} Riprova ad attivare</button><button type="button" class="btn ghost block" data-a="pushAll">Ho un altro problema</button></div>`}return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Le notifiche non arrivano?</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${S.pushErr?`<p class="ph-err">Errore del telefono: <b>${esc(S.pushErr)}</b><br>Fai una foto di questa riga e mandala a chi gestisce l'app.</p>`:''}
   <h3 class="ph-t">Prima prova così</h3><ol class="ph-ol"><li>Controlla di avere <b>internet</b>.</li><li>Chiudi del tutto Jona e riaprila <b>dall'icona</b> sulla schermata Home.</li><li>Tocca <b>la tua foto</b> → <b>Attiva le notifiche</b> → <b>Consenti</b>.</li></ol>
   <h3 class="ph-t">Non va ancora? Scegli il tuo telefono</h3><div class="ph-brands">${PUSH_HELP.map(([k,l])=>`<button type="button" class="btn ghost" aria-pressed="${k===S.pushBrand}" data-a="pushBrand" data-v="${k}">${l}</button>`).join('')}</div>
   ${g?`<h3 class="ph-t">${g[1]}</h3><ol class="ph-ol">${g[2].map(x=>`<li>${x}</li>`).join('')}</ol>
