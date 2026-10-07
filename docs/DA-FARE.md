@@ -10,8 +10,7 @@ Aggiornato: 2026-10-06 (sessione #15, M11 fatto; logo YNOY nella PR #46). Copia 
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| 🔴 M12 | Chiave e ID del nuovo account nei segreti GitHub | Mario | subito |
-| 🔴 M13 | Unire la PR della v37 (trasloco + logo YNOY con apertura animata; prove brevi, scelta di Mario) | Mario | subito dopo M12 |
+| 🔴 M13 | Unire la PR della v37 (trasloco + logo YNOY con apertura animata; prove brevi, scelta di Mario) | Mario | subito (M12 fatto, prove brevi riuscite) |
 | 🔴 M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
@@ -38,7 +37,7 @@ Aggiornato: 2026-10-06 (sessione #15, M11 fatto; logo YNOY nella PR #46). Copia 
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **M12 → M14 · Trasloco v37** (M11 account nuovo fatto in #15): chiave + ID nei segreti GitHub, unire la PR, poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
+- **M13 → M14 · Trasloco v37** (M11 e M12 fatti): unire la PR, poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
 - **M10 · Prova la v36**: apri l'app, se esce «App da aggiornare» tocca il banner. Da staff: «I miei orari» mostra solo inizio e fine. Manda un ordine e guarda l'animazione.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
