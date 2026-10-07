@@ -1,42 +1,37 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #24
+Sessione attuale: #25
 
-## Ultimo messaggio di Mario (#23)
-«vai sii più autonomo possibile e procedi con tutto fermati se ti servo urgente per decisioni importanti problemi ecc» → lavorare da soli (C5, poi C6), fermarsi solo per decisioni importanti o problemi. Regola sempre valida: leggere per intero quello che Mario scrive in «Altro».
+## Ultimo messaggio di Mario (#24)
+«ok vai avanti» (dopo il mio avviso che il giro completo stava girando e poi sarebbe venuta la PR v41). Vale ancora quello di #23: «vai sii più autonomo possibile e procedi con tutto fermati se ti servo urgente per decisioni importanti problemi ecc». Leggere per intero quello che Mario scrive in «Altro».
 
-## Fatto in #23
-- Il ramo locale `ccr-4a01d00e-6ay25e` era vecchio e diverso da origin: tenuto come `vecchio-locale-ccr` (solo in quel container), ramo rifatto da `origin/ccr-4a01d00e-6ay25e`.
-- **C5 (in corso)**: commit `6e0baef` = merge di `origin/main` (v40 notifiche) nel ramo. Conflitti risolti in `index.html`:
-  - `NEWS`: v40 di main («Notifiche più semplici») + nuova voce **v41** «Invito WhatsApp con profilo pronto» (era la v40 del ramo); `APP_VER=41`.
-  - Testo «Dopo la registrazione Maurizio o lo sviluppatore approvano» (di main) + `invOpt` (del ramo) in `profileForm`.
-  - `vStaff`: pallini 🟢/🔴 di main + «invito non ancora usato» del ramo.
-  - `sw.js`: `CACHE` `jona-ordini-v45`.
-- Prove brevi sul merge (in `/tmp/claude-0/prove`, perse col container): riuscite `test-news`, `test-testbar`, `test-inviti`, `test-staff`, `test-registrazione`, `test-firebase-telefoni`, `test-giro`.
-  - ❌ `test-firebase-push`: fallita perché l'ho disturbata io (ho cancellato l'emulatore mentre girava). **Da rifare da sola.**
-  - ❌ `test-v40`: dopo «Aggiungi» (invito monouso, punto 4) non compare la scheda «Invito pronto» (`.sheet` assente dopo `addGo`, riga 66). Forse rotta dal merge (es. `addGo` con `invOpt`/pallini). **Da capire per prima cosa**: rifarla da sola, se fallisce ancora stampare `A.errs` e i toast dopo `addGo`.
-- Non c'è ancora nessuna PR per la v41.
+## Messaggio di Mario arrivato dopo l'apertura di #25 (risposta alla domanda sui reparti)
+«Si potrebbe scegliere mauro e maurizio creano evento o informazione o aggiornamento operativo ecc ecc e scelgono chi puó vederlo se é solo loro memo personale o da mandare ai gruppi operativi»
+→ Da fare nella v42 (ramo `v42-agenda`), prima della PR v42:
+- **Chi crea**: Maurizio (gm) e **Mauro** (Mauro Loi, reparto `fb` F&B Manager, oggi forse ruolo `staff`: controllare). Proposta: possono creare `isMgr` + staff con reparto `fb` o `resp` (funzione `agCanEdit(me)`), oppure un elenco scelto in Impostazioni.
+- **Tipo** nel modulo: Evento | Informazione | Aggiornamento operativo | Memo (campo `k` in `ev`, icona/etichetta nella lista e nella striscia).
+- **Chi lo vede** c'è già: Solo io (memo personale) | Tutti | Reparti (= gruppi operativi). Valutare se «gruppi operativi» = reparti o i gruppi della chat; chiedere a Mario in una riga se non è chiaro.
+- Domanda su «i gestori vedono tutti i reparti»: Mario non ha detto no; lasciare così salvo sua indicazione.
 
-## Prossimi passi (#24)
-1. Rifare da sole `test-v40` e `test-firebase-push` (una alla volta, mai due prove insieme sull'emulatore). Correggere la causa se `test-v40` fallisce ancora.
-2. Giro completo `bash tools/prova-tutto.sh` (cambio importante: entrata libera e regole). Mario ha detto «procedi con tutto»: si può far partire senza chiedere. Poi PR v41 → squash merge (da Claude) → controllo online → riallineamento del ramo → dire a Mario di fare **M18** (regole Firebase + «Apri per 48 ore»), con link e passi.
-3. **C6 · v42 = interruttori + agenda** (progetto già studiato in #23, nessun codice scritto):
-   - **Interruttori**: `config/app.funz` {agenda:true}; `FUNZ=[{id,l,d}]`, `funzOn(k)`; Impostazioni → sezione «Funzioni» con `.seg` Accesa/Spenta (come `tbSet`), partono spente. Spenta = sparisce pulsante e striscia.
-   - **Conta d'uso (Z)**: `config/uso_<AAAA-MM>` {`<funz>.<sid>`: giorni}; al massimo una scrittura al giorno per persona (chiave nuova `jona_uso`, da aggiungere in `CLAUDE.md`). In Funzioni: «usata da N persone, M volte questo mese».
-   - **Agenda senza regole nuove**: eventi in `config/agenda_<AAAA-MM>` {tipo:'agenda', e:{<id>:ev}}, ricorrenti in `config/agenda_ric`. `ev={t,g:'AAAA-MM-GG',h:'HH:MM'|'',cop,note,vis:'io'|'tutti'|'rep',rep:[],da:sid,cr,mod,r:''|'s'|'m'}`. Scrittura `upd` con `e.<id>` se il documento esiste, altrimenti `put` (come `orari_`); cancellare = `e.<id>: null` (va bene sia in LocalStore sia in Firestore). Cambio mese = null nel vecchio + set nel nuovo. «Privato» è nascosto solo nell'interfaccia (tutti i membri possono leggere `config`, come per il resto dell'app).
-   - Chi vede: autore, `tutti`, o reparto in `rep`. Chi crea: solo `isMgr`. Staff in sola lettura.
-   - **Interfaccia**: icona `calendar` in `header.top` (data-a `agOpen`) per i gestori; striscia «Oggi in hotel» dopo `pushAsk()` in `shell` per chi ha eventi oggi (tocco → agenda). Foglio Agenda: `.seg` Oggi | Settimana | Mese, frecce ‹ ›, riga veloce «Scrivi o detta» + microfono (`vSR()`, errori `VERR`) + «Foto dell'agenda» + «Nuovo evento». Mese: griglia 7 colonne con pallini, tocco sul giorno → elenco.
-   - **Riga veloce** `agParse(testo)`: oggi/domani/dopodomani, giorni della settimana (prossimo ≥ oggi), «20», «20/10», «20 ottobre», «ore 19», «alle 19:30», «120 coperti/persone/pax/ospiti»; il resto = titolo. Apre il modulo già compilato da confermare.
-   - **Foto**: `shrinkImg` + `b64` + `gemCall` (come `gemRun`), Gemini risponde JSON [{data,ora,titolo,coperti,note}] con anno e data di oggi nel testo; elenco con spunte, «Aggiungi N eventi», scelta Solo io / Tutti.
-   - Modulo: Titolo, Data (`type=date`), Ora, Coperti, Note, Chi lo vede (Solo io | Tutti | Reparti + chip `REPARTI`), Ripeti (No | Ogni settimana | Ogni mese), Elimina, Salva.
-   - Prove: nuova `tools/test-agenda.mjs` (LocalStore: interruttore, parser, eventi privati/condivisi, ricorrenze, striscia per lo staff); in `tools/test-giro.mjs` accendere l'agenda dopo `makeTestData` e aggiungere `agOpen` ai pulsanti dell'header provati. Controllare l'header a 320 px.
-   - v42: `APP_VER` 42, `CACHE` v46, `NEWS` v42.
-   - Dopo (v43): notifica del mattino «Oggi in hotel» e promemoria prima dell'evento dal Worker (cron, come `scadTick`), poi V, W, X; poi A, C, G, H, I, J, K, O, R, U (`docs/PIANO-INVERNO.md`).
-4. Mario potrebbe fare prove in hotel (import, bolla, modalità aereo): aspettare le sue foto.
+## Fatto in #24
+- Il ramo locale `ccr-4a01d00e-6ay25e` era di nuovo vecchio (sessione #12): rinominato `vecchio-sessione12` (solo in quel container), ramo preso da origin. Probabile anche nella prossima sessione: se `merge --ff-only` fallisce, fare lo stesso (`git branch -m` + `git checkout -b <ramo> --track origin/<ramo>`), mai reset.
+- **`test-v40` rossa era un bug vero** (non del merge): dopo «Crea profilo» `invMonoSend` leggeva `D().staff[sid]` prima che arrivasse dallo snapshot → usciva in silenzio. Corretto: `createProfile` passa il profilo (`invMonoSend(id,{...doc,id})`), `S.invM.u` per `invMonoSheet`. Prova: chiude la scheda «Invito pronto» con la X prima del secondo invito. Commit `878b4bd` sul ramo `ccr-4a01d00e-6ay25e`.
+- `test-v40` 32/32, `test-firebase-push` 29/29 (da sole). **Giro completo sul ramo v41 (`878b4bd`): 39/39 RIUSCITE.**
+- **v42 scritta** sul ramo separato **`v42-agenda`** (commit `d43b497`, su GitHub), partito da `878b4bd`:
+  - `config/app.funz` + Impostazioni → «Funzioni» (`FUNZ`, `funzOn`, `funzSet`, `funzRows`), conta d'uso `config/uso_<AAAA-MM>` (`usoSegna`, `usoInfo`, chiave `jona_uso`).
+  - Agenda come da progetto (#23): `agOpen`, `agSheet`, `agParse`, `agMic`, `agForm`/`agSave`/`agDel`, `agFotoGo` (Gemini), `agStrip`, `agBtn`; CSS `.ag-*`. Scelta mia (chiesta a Mario, senza risposta): per reparto lo staff vede i suoi, **i gestori tutti**; «Solo io» degli altri nascosto.
+  - `APP_VER` 42, `CACHE` v46, `NEWS` v42 (chiave `chef`, non `gm`). `CLAUDE.md` e `tools/README.md` aggiornati.
+  - Prove: nuova `tools/test-agenda.mjs` 51/51; `tools/test-giro.mjs` accende l'agenda con un evento e prova `agOpen`: nessun problema (aveva trovato «Nuovo evento» fuori schermo a 320 px, corretto con `.ag-2`).
+
+## Prossimi passi (#25)
+1. **PR v41**: dal ramo `ccr-4a01d00e-6ay25e` verso `main` (giro completo già verde su `878b4bd`; se il ramo ha solo commit di consegne in più, non serve rifarlo). Squash merge da Claude → controllo online (https://jona-ristorante-by-ynoy-corp.pages.dev/, `APP_VER` 41) → riallineare il ramo (`git fetch origin main && git merge origin/main`, push normale).
+2. Dire a Mario di fare **M18** (regole Firebase nuove + «Apri per 48 ore» se serve), con link e passi piccoli (`docs/FIREBASE.md`).
+3. **v42**: unire `origin/main` (dopo la v41) in `v42-agenda`, rifare `test-agenda` + `test-giro` (+ `test-news`), chiedere a Mario «giro completo ora o dopo?» (è un cambio medio: interfaccia + config, niente regole), poi PR v42 → squash → controllo online. Dire a Mario come accendere l'agenda (Impostazioni → Funzioni).
+4. Dopo: v43 notifica del mattino «Oggi in hotel» e promemoria prima dell'evento dal Worker (cron, come `scadTick`), poi V, W, X; poi A, C, G, H, I, J, K, O, R, U (`docs/PIANO-INVERNO.md`).
+5. Domanda aperta a Mario: va bene che i gestori vedano gli eventi di tutti i reparti?
 
 ## Rischi aperti
-- `test-v40` rossa dopo il merge (vedi sopra): la v41 non si pubblica finché non è verde.
 - Telefono in attesa `ISLyK5…` (M17).
 - `test-firebase-flow` tra 23:30 e mezzanotte (noto).
 - Se `AbortError` torna su Oppo/OnePlus: strada B (bot Telegram).
-- Elenco completo delle cose da fare: `docs/DA-FARE.md`.
+- Elenco completo: `docs/DA-FARE.md`.
