@@ -7,7 +7,7 @@ const CFG={apiKey:'fake-key',authDomain:'demo-jona.firebaseapp.com',projectId:'d
 const mk=async(cfg)=>{const c=await b.newContext({viewport:{width:400,height:800},serviceWorkers:'block',acceptDownloads:true});
   await c.addInitScript(([cfg])=>{localStorage.setItem('jona_fb_emu',JSON.stringify('127.0.0.1'));if(cfg&&!localStorage.getItem('jona_fb'))localStorage.setItem('jona_fb',JSON.stringify(cfg))},[cfg]);
   const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));return [c,p]};
-const ok=(c,m)=>console.log((c?'PASS ':'FAIL ')+m);
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const setup=async P=>{await P.goto('http://localhost:8765/index.html');await P.waitForTimeout(3000);
   await P.click('[data-a="formset"][data-v="dev"]');
   for(const [k,v] of Object.entries({nome:'Mario',cognome:'Test',username:'mario',pw:'prova1234',pw2:'prova1234'}))await P.fill('input[data-k="'+k+'"]',v);
