@@ -68,7 +68,7 @@ async function vapidAuth(v, endpoint) {
   if (hit && hit.exp - t > 3600) return hit.h;
   const exp = t + 12 * 3600;
   const head = b64u(enc.encode(JSON.stringify({ typ: "JWT", alg: "ES256" })));
-  const body = b64u(enc.encode(JSON.stringify({ aud, exp, sub: "https://kur0chanx.github.io/jona-ordini/" })));
+  const body = b64u(enc.encode(JSON.stringify({ aud, exp, sub: "https://jona-ristorante-by-ynoy-corp.pages.dev/" })));
   const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, v.priv, enc.encode(head + "." + body));
   const h = `vapid t=${head}.${body}.${b64u(sig)}, k=${v.pub}`;
   v.jwts.set(aud, { h, exp });

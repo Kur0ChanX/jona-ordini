@@ -32,9 +32,9 @@ r = await W.fetch(new Request('https://w/inviti', { method: 'POST', headers: { a
 ok(r.status === 503, 'senza D1: 503');
 const L = (await import('../worker/invito/src/index.js')).default;
 let h = await (await L.fetch(new Request('https://invito.x.workers.dev/k7m4qx'))).text();
-ok(h.includes('location.replace("https://kur0chanx.github.io/jona-ordini/#i=K7M4QX")') && h.includes('og:image'), 'link corto → app con #i= e anteprima');
+ok(h.includes('location.replace("https://jona-ristorante-by-ynoy-corp.pages.dev/#i=K7M4QX")') && h.includes('og:image'), 'link corto → app con #i= e anteprima');
 h = await (await L.fetch(new Request('https://invito.x.workers.dev/<script>'))).text();
-ok(!h.includes('<script>"') && h.includes('location.replace("https://kur0chanx.github.io/jona-ordini/")'), 'percorso strano → solo app');
+ok(!h.includes('<script>"') && h.includes('location.replace("https://jona-ristorante-by-ynoy-corp.pages.dev/")'), 'percorso strano → solo app');
 globalThis.fetch = realFetch;
 
 // --- parte 2: app ---

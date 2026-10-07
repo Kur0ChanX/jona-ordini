@@ -1,13 +1,18 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-05 (sessione #11). Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-06 (sessione #15, M11 fatto; logo YNOY nella PR #46). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
+
+**🔴 = blocca il lavoro nuovo** (regola di Mario: prima si chiudono queste, poi si va avanti; le rifiniture estetiche non bloccano).
 
 ## Riassunto: cosa manca, in ordine
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| 🔴 M13 | Unire la PR della v37 (trasloco + logo YNOY con apertura animata; prove brevi, scelta di Mario) | Mario | subito (M12 fatto, prove brevi riuscite) |
+| 🔴 M14 | Reinstallare l'app dal nuovo indirizzo + inviti nuovi | Mario | dopo M13 |
+| M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
 | M2 | Dare a Maurizio il ruolo Admin Chef | Mario | in stand-by, dopo M1 |
 | M3 | «Oggi si ordina» arriva a Maurizio | Mario | in stand-by, dopo M2 |
@@ -18,23 +23,21 @@ Aggiornato: 2026-10-05 (sessione #11). Ogni cosa ha un **numero fisso** (M1…, 
 | M10 | Prova la v36 sul telefono (orari dello staff, video dell'invio) | Mario | quando vuoi |
 | D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | da decidere |
 | D6 | Video dell'invio: migliorarli ancora (macchiolina tra le maniche) | Claude, quando lo chiedi | più avanti |
-| D1 | Link dell'app su Cloudflare Pages | Claude, dopo la tua scelta del giorno | da decidere |
-| D2 | Sottodominio del Worker `mario-miscera`: cambiarlo? | Claude, dopo il tuo sì | da decidere |
 | D3 | Sicurezza del Worker (`/invia`, `/promemoria`) | Claude, solo se lo chiedi | in pausa |
 
 
 ---
 
 ## 1. Claude da solo
-- Niente in sospeso.
+- **Dopo M14**: far cancellare a Mario i Worker `invito` e `jona-notifiche` dal VECCHIO account (lì resta `fruguponte`, da non toccare).
+- **Dopo M13**: controllare i nuovi indirizzi (app, notifiche, invito), rilanciare il workflow del Worker se la prova fallisce.
 
 ## 2. Claude, dopo la tua scelta o approvazione
-- **D1 · Cloudflare Pages** (gratis, hai detto sì). Prima va deciso il **giorno**, perché ogni telefono va ricollegato (invito + approvazione + accesso) e le notifiche riattivate.
-- **D2 · Sottodominio Worker**: cambiare `mario-miscera`? Costa qualche ora senza notifiche.
 - **D6 · Video dell'invio**: approvati così (#11), da migliorare più avanti. Copia sicura nel ramo `scorta-video-invio-v1` (video, script `tools/anim-invio.py`, filmato originale): si riparte da lì, non da zero.
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
+- **M13 → M14 · Trasloco v37** (M11 e M12 fatti): unire la PR, poi telefoni da reinstallare con invito nuovo. Il QR da cucina (M5) va fatto DOPO il trasloco.
 - **M10 · Prova la v36**: apri l'app, se esce «App da aggiornare» tocca il banner. Da staff: «I miei orari» mostra solo inizio e fine. Manda un ordine e guarda l'animazione.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)

@@ -59,11 +59,13 @@ Date.now = realNow;
 
 // --- parte 2: app con l'emulatore ---
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+// firebase-config.js vero nascosto: le prove usano solo la configurazione finta (demo-jona) dell'emulatore
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const CFG = { apiKey: 'fake-key', authDomain: 'demo-jona.firebaseapp.com', projectId: 'demo-jona', appId: '1:1:web:1' };
 const proms = [], invia = []; let promStatus = 200;
 const c = await b.newContext({ viewport: { width: 400, height: 800 }, serviceWorkers: 'block' });
 await c.addInitScript(cfg => { localStorage.setItem('jona_fb_emu', JSON.stringify('127.0.0.1')); if (!localStorage.getItem('jona_fb')) localStorage.setItem('jona_fb', JSON.stringify(cfg)); }, CFG);
-await c.route('https://jona-notifiche.mario-miscera.workers.dev/**', async rt => { const u = rt.request().url();
+await c.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**', async rt => { const u = rt.request().url();
   if (u.endsWith('/promemoria')) { proms.push({ auth: rt.request().headers().authorization || '', body: JSON.parse(rt.request().postData()) }); return rt.fulfill({ status: promStatus, json: { ok: promStatus === 200 } }); }
   if (u.endsWith('/invia')) { invia.push(JSON.parse(rt.request().postData())); return rt.fulfill({ json: { inviati: 1, scaduti: [], errori: [] } }); }
   rt.fulfill({ json: { ok: true } }); });

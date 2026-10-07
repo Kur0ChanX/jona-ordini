@@ -5,6 +5,8 @@ import { readFileSync } from 'node:fs';
 const RULES=readFileSync(new URL('../firebase/firestore.rules',import.meta.url),'utf8');
 const setRules=async txt=>{for(const p of ['demo-jona','jona-ordini'])await fetch(`http://127.0.0.1:8080/emulator/v1/projects/${p}:securityRules`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({rules:{files:[{content:txt}]}})})};
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+// firebase-config.js vero nascosto: le prove usano solo la configurazione finta (demo-jona) dell'emulatore
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const CFG={apiKey:'fake-key',authDomain:'demo-jona.firebaseapp.com',projectId:'demo-jona',appId:'1:1:web:1'};
 const mk=async cfg=>{const c=await b.newContext({viewport:{width:400,height:800},serviceWorkers:'block'});
   await c.addInitScript(cfg=>{localStorage.setItem('jona_fb_emu',JSON.stringify('127.0.0.1'));if(cfg&&!localStorage.getItem('jona_fb'))localStorage.setItem('jona_fb',JSON.stringify(cfg))},cfg);

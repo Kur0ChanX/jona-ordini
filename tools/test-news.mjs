@@ -29,7 +29,7 @@ const after=(r,s)=>exp(r).filter(v=>v>s).length;
 const disp=n=>n>9?'9+':n;
 const MESI=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 const day=s=>{const [y,m,d]=s.split('-').map(Number);return d+' '+MESI[m-1]+' '+y};
-const vSec=v=>pg.locator('.sheet .news-v').filter({has:pg.locator('.news-vn',{hasText:new RegExp('^Versione '+v+'$')})});
+const vSec=v=>pg.locator('.sheet .news-v').filter({has:pg.locator('.news-vn',{hasText:new RegExp('^Beta v'+v+'$')})});
 ok(await pg.evaluate(()=>APP_VER)===V,'APP_VER = NEWS[0].v ('+V+')');
 ok(await pg.evaluate(()=>NEWS.every((n,i,a)=>!i||a[i-1].v>n.v)),'NEWS sorted newest first');
 // new profile -> counter 1 in every view
@@ -45,7 +45,7 @@ await pg.screenshot({path:OUT+'h400-staff.png',clip:{x:0,y:0,width:400,height:12
 // staff sheet
 await openNews();
 let secs=await pg.locator('.sheet .news-v').count();ok(secs===exp('staff').length,`staff sees ${exp('staff').length} versions: `+secs);
-const sv=await pg.locator('.sheet .news-vn').allInnerTexts();ok(sv.join()===exp('staff').map(v=>'Versione '+v).join(),'staff versions: '+sv.join());
+const sv=await pg.locator('.sheet .news-vn').allInnerTexts();ok(sv.join()===exp('staff').map(v=>'Beta v'+v).join(),'staff versions: '+sv.join());
 ok(await pg.locator('.sheet .news-dev').count()===0,'staff: no technical part');
 const stx=await pg.locator('.sheet').innerText();ok(!TECH.test(stx),'staff: no technical words'+(TECH.test(stx)?' -> '+stx.match(TECH)[0]:''));
 ok(await pg.locator('.sheet .news-new').count()===SN,'staff: '+SN+' "nuova" tag');

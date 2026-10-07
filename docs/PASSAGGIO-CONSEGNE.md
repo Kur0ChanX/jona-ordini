@@ -1,61 +1,38 @@
-# Passaggio di consegne (2026-10-05, sera)
+# Passaggio di consegne (2026-10-06)
 
-Sessione attuale: #11
+Sessione attuale: #16
 
-## Sessione #11
-- Mario: «vai mettili al massimo li modifichiamo e miglioriamo piú avanti salvali in un posto sicuro per non ripartire da 0».
-- Video approvati. Copia sicura: ramo `scorta-video-invio-v1` (commit `0c60d3d`). Le etichette (tag) non passano dal proxy: usare rami.
-- Prove prima della pubblicazione: `test-invio-anim`, `test-orari`, `test-giro` verdi.
-- v36 in pubblicazione (PR → squash → controllo online). Miglioramenti futuri dei video: D6 in `docs/DA-FARE.md`.
+## Ultimo messaggio di Mario (#15)
+«esce prima la schermata poi il mio logo in animazione lenta e fluida premium poi il caricamento» (arrivato dopo l'apertura di #16) → DA FARE in #16: all'avvio prima la schermata Jona, POI il logo YNOY con un'entrata più lenta e fluida, «premium», e solo dopo il caricamento/l'app. Oggi l'entrata di YNOY parte a 0,8 s e l'apertura dura 2,7 s (`S.splash`, `.intro`, `byIn`/`ynoyIn`/`ynoyShine`): allungare in modo coerente e aggiornare `tools/test-logo.mjs`. Mandare a Mario un video di anteprima.
+→ FATTO in #16: «by» a 1,1 s, YNOY a 1,5 s per 2 s (`ynoyIn` più morbida), riflesso a 2,9 s per 1,5 s; apertura 4,9 s, `.intro` tolta a 5,2 s; `tools/test-logo.mjs` aggiornata e riuscita; video di anteprima mandato.
 
-## Ultimo messaggio di Mario (sessione #10)
-«si salvali e mettili nell'app» → fatto: video #10 committati in `media/`.
-Prima: «tra le braccia di tutte e due si vede ancora qualcosa, la giacca viene a volte molto mangiata, fa parte molto dello sfondo».
+Messaggio prima: «A» → ha scelto: prima fa **M12** (chiave + ID del nuovo account Cloudflare nei segreti GitHub), poi si pubblica la v37 (trasloco + logo) con le prove **brevi** (5-10 min). Chiedergli a che passo di M12 è (passi già dati in #15: token con template «Edit Cloudflare Workers» + Account › D1 › Edit + Account › Cloudflare Pages › Edit, All zones; segreti `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` su https://github.com/Kur0ChanX/jona-ordini/settings/secrets/actions).
 
-## Fatto in sessione #10
-- Cause trovate (confronto fotogrammi originale/maschera, `lost` = soggetto tolto): 1) sfondo chiaro dell'app `--bg:#EFEBE6` quasi uguale al bianco giacca → la giacca «sparisce»; 2) tra le due maniche dello chef la stoffa bruciata (248-250) era tolta come sfondo (253) → «lingua» scura.
-- `index.html` `animGL`: lo shader disegna un'ombra leggera (alfa media su 2 anelli di 4 e 8 punti, 2 punti più in basso, forza 0,3, sfumata ai bordi del filmato). Sul tema scuro non si vede. `test-invio-anim` verde, screenshot ok.
-- `tools/anim-invio.py`: `PIEGA` 251.5 e `VICINO` 50: vicino alla giacca larga (`stoffa & mn<240`, apertura 8) i punti con media dei vicini (gauss 3) sotto `PIEGA` e poco colorati restano stoffa.
-- Video rifatti con la correzione e committati in `media/` (richiesta di Mario «mettili nell'app»: fatta). `test-invio-anim` 18/18 verde. Anteprime (fondo scuro e chiaro) mandate a Mario.
+Messaggi precedenti di #15 (in ordine):
+- «fatto» → M11 (account Cloudflare nuovo + sottodominio) fatto.
+- Logo YNOY&CORP (immagine allegata) «sotto l'apertura dell'app, Jona By + logo, professionale come le app moderne» → fatto.
+- «entra subito dopo con un'animazione in entrata, spessore e prestigio» → fatto.
+- «anche quando apri l'app già loggato aspetta che finisca l'animazione» → fatto (apertura 2,7 s, un tocco la salta).
+- «non lo vedo» → spiegato: non è online finché la PR #46 non è unita.
+- «un'ora per un logo non va bene» → regola nuova (vedi sotto).
+- «pubblica ora il logo» → spiegato che unire #46 prima di M12 romperebbe notifiche/chat/inviti/Gemini (`WK_SUB` nuovo); proposte A (M12 poi tutto insieme) e B (PR separata); scelta **A**.
 
-## Stato
-- Video nell'app (sul ramo, v36 non pubblicata). Si aspetta l'ok di Mario. Per rifarli: `python3 tools/anim-invio.py tools/originale-invio.mp4` (serve `pip install scipy pillow`, ~25 min), poi `node tools/test-invio-anim.mjs` (con `python3 -m http.server 8765`).
-- Residuo noto: in alcuni fotogrammi resta una piccola macchia scura tra le maniche (zona 248-252, ambigua con lo sfondo).
+## Fatto in sessione #15 (ramo `ccr-4a01d00e-6ay25e`, PR #46 aperta, non unita)
+- **Logo** `media/ynoy.png` (maschera 480×174 ricavata da `tools/originale-ynoy.jpg`, colorata via CSS). In `index.html`: costante `BY`, classi `.wall-by` (in fondo alla `.wall`, `margin-top:auto`), al posto della vecchia firma `.wall-brand`. Nella schermata d'ingresso e in «Un momento…». In `FILES` di `sw.js`. Voce `NEWS` v37 (dev) aggiornata. APP_VER/CACHE non cambiati (v37 non ancora pubblicata).
+- **Animazione** solo con `.intro` (classe tolta dopo 3,0 s): `byIn` (lettere che si stringono), `ynoyIn` (svelato da sinistra, sfocatura, scala), `ynoyShine` (riflesso). Finisce a ~2,55 s.
+- **Apertura da già entrati**: `S.splash` in `boot()` se c'è `jona_me`, per 2,7 s; un tocco la salta; spenta con «riduci movimento» (`animOff`) e con `navigator.webdriver` (le prove automatiche non la vedono).
+- **Prova nuova** `tools/test-logo.mjs` (logo, posizione, niente scorrimento a 320/390, animazioni, apertura da entrati con webdriver finto, tocco). Riuscita. Citata in `tools/README.md`.
+- `CLAUDE.md`: regola **SCELTA DELLE PROVE** (completo ~1 h / breve 5-10 min / subito; sceglie Mario ogni volta, senza risposta completo; con breve o subito il completo parte dopo la pubblicazione).
+- Giro completo avviato in #15 sull'ultimo codice: 14/37 riuscite, nessuna fallita quando la sessione è stata chiusa (risultati persi col container: in #16 non serve rifarlo prima, Mario ha scelto «breve»).
 
-## Fatto in sessione #09
-- D5: in «I miei orari» lo staff vede solo inizio e fine dei turni; tolte le ore di ogni giorno (`or-dm` resta solo per «Finisci dopo mezzanotte»). Voce `NEWS` v36 aggiornata.
-- `tools/test-orari.mjs`: nuovo controllo «daily hours hidden»; «staff sees only their own shifts» guarda solo le schede dei giorni (i colleghi in «In turno oggi» sono voluti, v31). Verde.
-- `test-v35`: 39 OK, 1 errore «immagine del QR da cucina pronta» presente anche senza le modifiche (download del QR nel container: probabilmente i caratteri di Google bloccati). Non è della v36.
-- `test-giro`, `test-news`, `test-invio-anim` verdi.
-- Seghettato: `anim-invio.py` con `LISCIO` 14 e `MORBIDO` 3 (bordo della giacca più morbido, `mask()` restituisce anche la zona giacca); vestito nero/capelli: nella fascia del contorno la trasparenza viene dal grigio del filmato (`lum`). `ANIM_OUT` = cartella di prova. Calcolo completo ~15 min. Video rifatti e committati; anteprime su fondo scuro mandate a Mario.
-
-## Video dell'invio (#06-#08, riassunto)
-- `tools/anim-invio.py` crea `media/invio-chef.mp4` (specchiato, logo e ricamo incollati dritti; logo girato di `-2×inclinazione` del menù, fotogramma per fotogramma) e `media/invio-fornitore.mp4` (invertito nel tempo). Serve `pip install scipy pillow`; calcolo ~1 ora in background.
-- Giacca: contorno chiuso (`CHIUDI`) e lisciato (`LISCIO`). Dita veloci: `mosso()`. Unghie e sfarfallio: vedi sopra. Mario: logo OK.
-- `index.html`: `ANIM_SRC={chef,forn}`, `sendAnim(k,testo)`; `markSent` mostra `sendAnim('forn',…)`. `sw.js`: `invio-fornitore.mp4` in `FILES`. Prova: `node tools/test-invio-anim.mjs` (serve `python3 -m http.server 8765`).
-- Mario nella #07: «non rifare tutto», solo i ritocchi che chiede lui.
-
-## Fatto in sessione #04
-- `docs/DA-FARE.md` riordinato: tabella in cima per urgenza, numeri fissi (M1…, D1…), Maurizio (M1, M2, M3, M6) **in stand-by**: Mario avvisa lui.
-- Ora: usare l'ora italiana (`TZ=Europe/Rome date`); il container è in UTC.
-- **Decisioni di Mario**:
-  - Il contratto (ore dovute, confronto con le ore fatte) lo vedono solo i capi: **Chef, Responsabili e Mario**. Lo staff mai.
-  - M7: **nascondere** allo staff il totale delle ore della settimana.
-
-## v36 (sul ramo, NON pubblicata)
-- `index.html`: `APP_VER=36`; voce `NEWS` v36; `vMieiOrari` senza il riquadro `or-mtot` (totale settimana); avviso «orari pubblicati» (`orPublish`) senza le ore totali.
-- `sw.js`: `CACHE` `jona-ordini-v40`.
-- `tools/test-orari.mjs`: il controllo «weekly total shown» ora verifica che il totale sia nascosto.
-- Prove: vedi «Fatto in sessione #09».
-- D4 ancora aperta:
-  - Il contratto oggi è nascosto solo nelle schermate (`isGM`). Mario vuole che lo vedano anche i **Responsabili** (reparto `resp`), che oggi non sono `gm`. Un segreto vero (regola Firestore) non è possibile così: la collezione `staff` è leggibile da tutti i membri e le regole non sanno il ruolo del telefono. Proporre a Mario le strade (brainstorming).
-
-## Prossimi passi
-1. Attendere l'ok di Mario su giacca e braccia (video #10).
-2. Con l'ok di Mario sui video: pubblicare la v36 (PR → squash → controllo online → riallineamento). Domanda aperta: pubblicare subito dopo l'ok?
-3. D4 (contratto ai Responsabili): chiesto a Mario, senza risposta; se sì, brainstorming con 2-3 strade.
-4. Il resto: `docs/DA-FARE.md`.
+## Prossimi passi (#16)
+1. Seguire Mario su M12. Poi prove **brevi**: `tools/test-logo.mjs`, `tools/test-giro.mjs`, `tools/test-news.mjs`, `tools/test-inviti.mjs` (server `python3 -m http.server 8765`). Se verdi, dare a Mario i passi per unire la PR #46 (M13, squash merge, dal telefono).
+2. Dopo il merge: controllare l'app sul nuovo indirizzo (apertura con logo), `jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/salute`, `invito.jona-ristorante-by-ynoy-corp.workers.dev/ABCDEF`, workflow Actions verdi, Firebase dal nuovo indirizzo. Subito dopo `bash tools/prova-tutto.sh` in background.
+3. Riallineare il ramo (`git fetch origin main && git merge origin/main`, push normale). Poi M14, M15.
+4. Ancora senza risposta: copiare la regola bloccata e `.claude/hooks/handoff-check.py` negli altri repository? Quali?
 
 ## Rischi aperti
-- Il ramo `ccr-4a01d00e-6ay25e` è nato in questa sessione (la #03 lavorava su `ccr-402d6602-imjwpw`). Il ramo da usare è quello indicato all'avvio della nuova sessione.
-- `test-firebase-flow` sistemata, ma la fascia 23:30-24:00 UTC (01:30-02:00 in Italia) non è stata provata dal vero.
+- Chiave Firebase (`apiKey`) con possibili limiti di dominio su Google Cloud: se l'app sul nuovo indirizzo non si collega, controllare lì.
+- Account Cloudflare nuovo: foto/vocali vecchi della chat persi, chiave VAPID nuova (notifiche da riattivare sui telefoni).
+- `test-firebase-flow` fallisce tra 23:30 e mezzanotte (noto).
+- Il resto: `docs/DA-FARE.md`.

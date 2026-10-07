@@ -1,7 +1,7 @@
 // Jona Ordini: service worker minimo per installare l'app e aprirla anche senza rete.
 // Strategia "prima la rete": prende sempre la versione più recente, usa la copia salvata solo se offline.
-const CACHE = 'jona-ordini-v40';
-const FILES = ['./', './index.html', './manifest.webmanifest', './firebase-config.js', './lib/firebase-10.14.1.js', './lib/qrcode-1.4.4.js', './jona-icon-192.png', './jona-icon-512.png', './media/invio-chef.mp4', './media/invio-fornitore.mp4', './lib/jsqr-1.4.0.js', './media/invito.jpg'];
+const CACHE = 'jona-ordini-v41';
+const FILES = ['./', './index.html', './manifest.webmanifest', './firebase-config.js', './lib/firebase-10.14.1.js', './lib/qrcode-1.4.4.js', './jona-icon-192.png', './jona-icon-512.png', './media/invio-chef.mp4', './media/invio-fornitore.mp4', './lib/jsqr-1.4.0.js', './media/invito.jpg', './media/ynoy.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -63,7 +63,7 @@ self.addEventListener('notificationclick', e => {
 
 // Invii in sospeso (index.html, IndexedDB «jona-outbox»): su Android le push non partite escono anche con l'app chiusa.
 // Se l'app è aperta in primo piano le manda lei (obxFlush), così non partono due volte.
-const PUSH_URL = 'https://jona-notifiche.mario-miscera.workers.dev';
+const PUSH_URL = 'https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev';
 const obxDb = () => new Promise((res, rej) => {
   const r = indexedDB.open('jona-outbox', 1);
   r.onupgradeneeded = () => r.result.createObjectStore('q', { keyPath: 'id' });

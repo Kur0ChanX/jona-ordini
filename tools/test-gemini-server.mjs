@@ -59,7 +59,7 @@ const ctx=await b.newContext({viewport:{width:390,height:800},serviceWorkers:'bl
 await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
 const srv={salute:0,body:null,auth:'',mode:'ok'};let direct=0;
 await ctx.route('https://generativelanguage.googleapis.com/**',r=>{direct++;r.fulfill({json:{candidates:[{content:{parts:[{text:'diretta'}]}}]}})});
-await ctx.route('https://jona-notifiche.mario-miscera.workers.dev/**',r=>{const u=r.request().url();
+await ctx.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**',r=>{const u=r.request().url();
   if(u.endsWith('/salute')){srv.salute++;return r.fulfill({json:{ok:true,push:true,gemini:true}})}
   if(u.endsWith('/gemini')){srv.body=JSON.parse(r.request().postData()||'{}');srv.auth=r.request().headers()['authorization']||'';
     if(srv.mode==='403')return r.fulfill({status:403,json:{error:{message:'Telefono non collegato al ristorante'}}});

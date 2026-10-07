@@ -1,6 +1,8 @@
 // Notifiche push con l'emulatore: servizio push del browser finto, server worker/ intercettato.
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+// firebase-config.js vero nascosto: le prove usano solo la configurazione finta (demo-jona) dell'emulatore
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const CFG={apiKey:'fake-key',authDomain:'demo-jona.firebaseapp.com',projectId:'demo-jona',appId:'1:1:web:1'};
 const KEY='B'+'A'.repeat(86);
 const sent=[];
@@ -10,7 +12,7 @@ const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,heigh
     const sub={endpoint:'https://fcm.googleapis.com/fcm/send/'+name,keys:{p256dh:'BX',auth:'Y'},toJSON(){return{endpoint:this.endpoint,keys:this.keys}},unsubscribe:async()=>{window.__sub=null;return true}};
     Object.defineProperty(navigator,'serviceWorker',{value:{register:async()=>({}),ready:Promise.resolve({pushManager:{getSubscription:async()=>window.__sub||null,subscribe:async()=>{if(window.__fail)throw new DOMException('rifiutato','AbortError');return window.__sub=sub}}})}});
   },[cfg,name]);
-  await c.route('https://jona-notifiche.mario-miscera.workers.dev/**',async r=>{const u=r.request().url();
+  await c.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**',async r=>{const u=r.request().url();
     if(u.endsWith('/chiave'))return r.fulfill({json:{chiave:KEY}});
     if(u.endsWith('/salute'))return r.fulfill({json:{ok:true,push:true,gemini:false}});
     const body=JSON.parse(r.request().postData());sent.push({da:name,...body});

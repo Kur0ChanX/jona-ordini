@@ -75,11 +75,13 @@ Date.now = realNow;
 
 // --- parte 2: app con l'emulatore ---
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+// firebase-config.js vero nascosto: le prove usano solo la configurazione finta (demo-jona) dell'emulatore
+const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const CFG = { apiKey: 'fake-key', authDomain: 'demo-jona.firebaseapp.com', projectId: 'demo-jona', appId: '1:1:web:1' };
 const proms = [], invia = [], inviti = [];
 const c = await b.newContext({ viewport: { width: 390, height: 800 }, serviceWorkers: 'block' });
 await c.addInitScript(cfg => { localStorage.setItem('jona_fb_emu', JSON.stringify('127.0.0.1')); if (!localStorage.getItem('jona_fb')) localStorage.setItem('jona_fb', JSON.stringify(cfg)); }, CFG);
-await c.route('https://jona-notifiche.mario-miscera.workers.dev/**', async rt => { const u = rt.request().url();
+await c.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**', async rt => { const u = rt.request().url();
   if (u.endsWith('/promemoria')) { proms.push(JSON.parse(rt.request().postData())); return rt.fulfill({ status: 503, json: {} }); }
   if (u.endsWith('/invia')) { invia.push(JSON.parse(rt.request().postData())); return rt.fulfill({ json: { inviati: 1, scaduti: [], errori: [] } }); }
   if (u.endsWith('/inviti')) { const bd = JSON.parse(rt.request().postData() || '{}'); inviti.push(bd); return rt.fulfill({ json: { codice: bd.fisso ? (bd.vecchio ? 'QRNEW2' : 'QRCUC2') : 'SETTE7' } }); }
@@ -141,7 +143,9 @@ await A.click('[data-a="qfNew"][data-v=""]'); const d1f = await dl; await A.wait
 ok(inviti[0] && inviti[0].fisso === true && await A.evaluate(() => cfg().qrFisso.c === 'QRCUC2'), 'Crea il QR: codice fisso salvato');
 ok(d1f && d1f.suggestedFilename() === 'qr-cucina-jona.png', 'immagine del QR da cucina pronta ' + (d1f && d1f.suggestedFilename()));
 if (d1f) await d1f.saveAs('/tmp/v35-qr-cucina.png');
+await A.evaluate(() => { const o = inviteCard; window.inviteCard = fx => { window._qfC = fx && fx.c; return o(fx) }; });
 await A.click('[data-a="qfNew"][data-v="1"]'); await A.waitForTimeout(300); await A.click('#ask-ok'); await A.waitForTimeout(1500);
+ok(await A.evaluate(() => window._qfC) === 'QRNEW2', 'Cambia QR: immagine con il codice NUOVO ' + await A.evaluate(() => window._qfC));
 ok(inviti[1] && inviti[1].vecchio === 'QRCUC2' && await A.evaluate(() => cfg().qrFisso.c === 'QRNEW2'), 'Cambia QR: manda il vecchio da cancellare');
 await A.evaluate(() => { while (sheets.length) closeSheet(true); });
 // «App da aggiornare»
@@ -156,7 +160,7 @@ const rq = [];
 const cB = await b.newContext({ viewport: { width: 390, height: 800 }, serviceWorkers: 'block' });
 const key = await A.evaluate(() => ls('jona_key'));
 await cB.addInitScript(cfg => { localStorage.setItem('jona_fb_emu', JSON.stringify('127.0.0.1')); localStorage.setItem('jona_fb', JSON.stringify(cfg)); }, CFG);
-await cB.route('https://jona-notifiche.mario-miscera.workers.dev/**', rt => { if (rt.request().url().endsWith('/richiesta')) rq.push(rt.request().headers().authorization || ''); rt.fulfill({ json: { ok: true } }); });
+await cB.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**', rt => { if (rt.request().url().endsWith('/richiesta')) rq.push(rt.request().headers().authorization || ''); rt.fulfill({ json: { ok: true } }); });
 const B = await cB.newPage(); B.on('pageerror', e => errs.push('B: ' + e.message));
 await B.goto('http://localhost:8765/index.html#k=' + key); await B.waitForTimeout(7000);
 await B.click('[data-a="phOld"]'); await B.fill('#ph-nome', 'Luca'); await B.click('[data-a="phSend"]'); await B.waitForTimeout(2500);
