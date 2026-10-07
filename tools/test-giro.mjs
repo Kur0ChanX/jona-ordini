@@ -15,6 +15,8 @@ for(const theme of ['light','dark'])for(const W of [320,390]){
  for(const [k,v] of [['nome','Mario'],['cognome','Rossi'],['username','mario'],['pw','password123'],['pw2','password123']])await pg.fill(`input[data-k="${k}"]`,v);
  await pg.click('[data-a="setupGo"]');await pg.waitForSelector('.testbar');await w(300);
  await pg.evaluate(()=>makeTestData());await w(800);
+ // v42: agenda accesa con un evento di oggi per tutti (striscia «Oggi in hotel» e icona del calendario)
+ await pg.evaluate(async()=>{await funzSet('agenda',true);await put('config','agenda_'+today().slice(0,7),{tipo:'agenda',e:{giro:{t:'Gruppo di prova con un titolo abbastanza lungo da andare a capo',g:today(),h:'20:00',cop:40,note:'',vis:'tutti',rep:[],da:realU().id,cr:now(),mod:now(),r:''}}})});await w(400);
  await pg.evaluate(()=>{localStorage.setItem('jona_theme',JSON.stringify(null))});
  const check=async name=>{{const st=await pg.evaluate(()=>[S.viewAs||'dev',S.tab,sheets.length]);if(!name.startsWith(st[0]))issues.push(`${theme} ${W} ${name}: vista cambiata ${st}`)}
   await pg.evaluate(()=>document.querySelectorAll('#toasts .toast').forEach(t=>t.remove()));
@@ -35,7 +37,7 @@ for(const theme of ['light','dark'])for(const W of [320,390]){
     const SUBSEL='main [role="tab"],main .seg button';const subs=await pg.$$eval(SUBSEL,a=>a.map((x,i)=>x.closest('.testbar')?-1:i).filter(i=>i>=0));for(const sub of subs){
       const el=(await pg.$$(SUBSEL))[sub];if(!el)continue;try{await el.click({timeout:1500});await w(350);await check(`${role}-${t}-s${sub}`)}catch(e){}
     }}
-  for(const h of ['notifs','meMenu','chatOpen','jonaOpen','news']){const l=pg.locator(`header.top [data-a="${h}"]`);if(!await l.count())continue;await l.first().click();await w(500);await check(`${role}-H${h}`);await pg.evaluate(()=>{while(sheets.length)closeSheet(true);if(typeof chClose==='function')try{chClose()}catch(e){}});await pg.keyboard.press('Escape');await w(200)}
+  for(const h of ['notifs','meMenu','chatOpen','jonaOpen','news','agOpen']){const l=pg.locator(`header.top [data-a="${h}"]`);if(!await l.count())continue;await l.first().click();await w(500);await check(`${role}-H${h}`);await pg.evaluate(()=>{while(sheets.length)closeSheet(true);if(typeof chClose==='function')try{chClose()}catch(e){}});await pg.keyboard.press('Escape');await w(200)}
  }
  if(errs.length)issues.push(`${theme} ${W} ERRORI: ${[...new Set(errs)].join(' || ')}`);
  await ctx.close();
