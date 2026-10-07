@@ -3,6 +3,8 @@
 Sessione attuale: #32
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+**v50 (D9) ONLINE** (PR #60, CI verde). Lanciato su GitHub il giro completo (workflow «Prove automatiche», modo `tutto`, su main, ~1 ora): da controllare il risultato (actions_list) e correggere ciò che trova.
+
 «si» (= va bene la proposta D9). **D9 v50 pronta**: `vRichieste` con sotto-schede `S.rqSub` (Da approvare · N / Gestite), `vGestite` per giorno (`dayKey`/`dayLbl`, prime 2 aperte), filtri `S.rqF`, `reqSummary(r,who,dec)` con ora e `decisoDa`; immagine `docs/immagini/richieste-v50.png`; prova `test-richieste-gestite` 9 PASS. Trovato e corretto E14 (Worker finti delle prove senza `/errori`). Dopo la pubblicazione: lanciare il giro completo su GitHub (workflow_dispatch modo `tutto`).
 
 **S1, S2, S3 FATTI E ONLINE**: v49 online (PR #59, CI verde), Worker `/errori` attivo (risponde 403 senza gettone = giusto). Prossimo: D9 scheda Richieste (proposta con immagine `docs/immagini/proposta-richieste-d9.png` già mandata, Mario non ha ancora risposto: è una scelta di aspetto, quindi va chiesta).
