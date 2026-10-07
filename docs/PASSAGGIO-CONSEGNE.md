@@ -1,29 +1,28 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #17
+Sessione attuale: #18
 
-## Ultimo messaggio di Mario (#16)
-Video dello schermo (07/10, 03:35): apre «Jona Ordini» dal telefono (ha DUE icone «Jona Ordini» installate), parte l'app sul nuovo indirizzo: icona Jona → «Un momento…» → **«Collega questo telefono»** (QR o codice d'invito di 6 lettere). È fuori dall'app e non ha un telefono collegato da cui creare l'invito. Da rispondere in #17: come rientra (vedi «Prossimi passi» 1).
+## Ultimo messaggio di Mario (#17)
+«sì 3»: gli piace il confronto v38/v39 del logo e vuole la v39 pubblicata **subito** (senza prove). PR #48 aperta: https://github.com/Kur0ChanX/jona-ordini/pull/48 — da far unire a Mario (squash), poi controllare online.
 
-Messaggi precedenti di #16 (in ordine): logo YNOY più lento e premium (fatto, video mandato, nessun commento di Mario sul ritmo) → M12 fatto (token nuovo con Workers + Cloudflare Pages Edit + D1 Edit, segreti GitHub aggiornati) → «Merged» della PR #46 (M13 fatto) → foto/video richiesto per M14 → video sopra.
+Poi, dopo l'apertura della #18: «perché io ogni volta ti sembra normale devo andare nel sito cliccare il tasto verde per una versione aggiornata non me lo avevi mai fatto fare». Risposta data in #17: il merge è bloccato a Claude; proposte 3 strade (1 consigliata: workflow GitHub che unisce da solo le PR del ramo di Claude; 2 pubblicare direttamente dal ramo; 3 lasciare così). **Da fare in #18: aspettare la scelta di Mario e realizzarla.**
+Ultimo messaggio di Mario: «scusa prima come facevi prima dei controlli in automatico?». Verificato: fino alla PR #45 le PR le univa Claude da solo con `merge_pull_request` (GitHub MCP, account di Mario; es. #40 unita 19 s dopo l'apertura). Poi in CLAUDE.md è finito «merge bloccato a Claude». Proposto a Mario: tornare a far unire le PR a Claude (scelta 0, la più semplice). Se Mario dice sì: aggiornare la riga in CLAUDE.md («Il merge delle PR lo fa lui») e provare `merge_pull_request` sulla PR #48 (squash); se il permesso è negato, dirlo a Mario e passare all'unione automatica (1).
 
-## Fatto in sessione #16
-- **Apertura più lenta** (`index.html`): `byIn` 1,3 s da 1,1 s; `ynoyIn` 2 s da 1,5 s (sfocatura 8px, 60% quasi nitido); `ynoyShine` 1,5 s da 2,9 s; `S.splash` 4,9 s (`setTimeout(end,4900)` in `boot()`); `.intro` tolta a 5,2 s. `tools/test-logo.mjs` aggiornata (attese 5,6 s / 4,0+1,6 s).
-- Prove brevi riuscite (logo, giro, news, inviti). **PR #46 unita** (squash, `main` 7bbe999): v37 online su https://jona-ristorante-by-ynoy-corp.pages.dev/ (APP_VER 37, apertura nuova presente). Worker controllati a mano: `/salute` ok (push, promemoria, gemini, allegati 4), `/chiave` ok (VAPID nuova), `invito…/ABCDEF` ok.
-- Workflow Worker su `main` rosso SOLO alla prova finale (sottodominio nuovo non pronto dopo 5 s). Corretto sul ramo: `.github/workflows/cloudflare-worker.yml` riprova 18×10 s (provato a mano: «Server a posto»). Va su `main` con la prossima PR.
-- Ramo riallineato con `main` (merge normale), `docs/DA-FARE.md` aggiornato (M12, M13 tolti).
-- Giro completo `tools/prova-tutto.sh` avviato dopo il merge: risultati persi con questo container → **rifarlo in #17** (in background).
+## Fatto in sessione #17
+- **Rientro di Mario (C1)**: sul nuovo indirizzo il telefono era vuoto. Soluzione: chiave del ristorante letta dalla console Firebase (`chiave/ristorante`, campo `v`), incollata in «Collega questo telefono» (`fbJoinKey` accetta anche la chiave lunga), poi `membri/<uid>.ok` messo a `true` dalla console. Funziona: Mario è dentro. In `membri` resta in attesa `ISLyK5…` (req nome «Mari…», cognome «S…», nuovo:false): non è Mario, non approvato (M17).
+- **v38 online** (PR #47 unita, controllato `APP_VER=38`, `CACHE` v42): logo YNOY senza `filter:blur` e con 8 px trasparenti attorno a `media/ynoy.png` (496×190): la riga bianca sul bordo basso su Android è sparita (confermato da Mario). Logo 155 px, entra 0,5 s prima (`byIn` .6 s, `ynoyIn` 1 s, `ynoyShine` 2,4 s), `S.splash` 4,4 s, `.intro` tolta a 4,7 s. Anche il workflow Worker con i tentativi è su `main`.
+- **v39 nella PR #48**: `.wall-by i` 172 px, `gap` 2 px, padding sopra 0; schermata d'apertura con classe `splash` e `.splash .wall-by{margin-bottom:24px}` (≈40 px più in alto). In «Accedi» resta in fondo (a 390×844 la pagina è piena: più in alto scorrerebbe). `APP_VER` 39, `CACHE` v43, Novità v39. `test-logo` e `test-news` riuscite.
+- Giro completo `tools/prova-tutto.sh` partito sulla v38: risultati in `/tmp/jona-prove` persi con questo container (prime 4 riuscite).
 
-## Prossimi passi (#17)
-1. 🔴 **Rientro di Mario sul nuovo indirizzo (blocca M14)**. Sul nuovo dominio il telefono riparte vuoto (`localStorage` diverso: niente `jona_key`, `jona_me`, `jona_member`). La schermata «Collega questo telefono» (`index.html` ~riga 1647, `fbCode` ~4313, `fbJoinKey`) accetta codice o link. Lo script in `<head>` porta da `*.github.io` al nuovo indirizzo, quindi anche la vecchia icona finisce lì: nessun telefono resta collegato per creare un invito. Opzioni da verificare e proporre a Mario (brainstorming, 2-3 strade): (a) `fbJoinKey` accetta anche la chiave del ristorante: Mario la incolla (dove l'ha salvata?); (b) link con chiave nell'hash, se previsto; (c) invito creato dal vecchio indirizzo saltando il reindirizzamento (es. parametro), oppure dal Worker. Leggere prima `fbJoinKey` e lo script di `<head>`. Poi lo stesso vale per tutto lo staff: preparare un invito/QR per tutti (M14).
-2. Il logo YNOY non c'è in «Collega questo telefono» (e in «Un momento…» la schermata dura poco). Mario vuole «prima Jona, poi il logo, poi il caricamento»: valutare `BY` anche lì (+ prova in `test-logo.mjs`). Non bloccante.
-3. Mario ha due icone «Jona Ordini»: dopo il rientro dirgli di togliere la vecchia (GitHub Pages) e tenere/installare quella nuova.
-4. Rilanciare `bash tools/prova-tutto.sh` in background; le correzioni + il workflow con i tentativi vanno in una PR nuova (prima chiedere a Mario: prove complete/brevi/subito).
-5. Poi M15 (cancellare i vecchi Worker dal vecchio account, non `fruguponte`).
-6. Ancora senza risposta: copiare la regola bloccata e `.claude/hooks/handoff-check.py` negli altri repository? Quali?
+## Prossimi passi (#18)
+1. Quando Mario dice «Merged» della PR #48: controllare online (`APP_VER=39`, `CACHE` v43), riallineare il ramo (`git fetch origin main && git merge origin/main`, push normale).
+2. Rilanciare `bash tools/prova-tutto.sh` in background (con v39) e dire a Mario solo il risultato; ciò che fallisce si corregge con priorità.
+3. M14: guidare Mario a mandare gli inviti allo staff (Staff → Invita) e a togliere la vecchia icona (GitHub Pages). Poi M15.
+4. Idea non fatta: logo YNOY anche in «Collega questo telefono» (`screenJoin`, ~riga 1647) — non bloccante.
+5. Ancora senza risposta: copiare la regola bloccata e `.claude/hooks/handoff-check.py` negli altri repository? Quali?
 
 ## Rischi aperti
-- Chiave Firebase (`apiKey`) con possibili limiti di dominio: se dal nuovo indirizzo Firebase non si collega, controllare su Google Cloud.
-- Notifiche da riattivare su ogni telefono (VAPID nuova); foto/vocali vecchi della chat persi.
+- Righe bianche: viste solo su telefoni veri, qui non si riproducono; se tornano, guardare `ynoyShine` (sfondo animato sotto la maschera).
+- Notifiche da riattivare su ogni telefono (VAPID nuova).
 - `test-firebase-flow` fallisce tra 23:30 e mezzanotte (noto).
 - Il resto: `docs/DA-FARE.md`.
