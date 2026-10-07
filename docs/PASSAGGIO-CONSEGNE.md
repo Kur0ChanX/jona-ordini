@@ -1,10 +1,13 @@
 # Passaggio di consegne (2026-10-07, fine sessione #30)
 
-Sessione attuale: #31
+Sessione attuale: #32
 
 ## Ultimo messaggio di Mario (#30), parola per parola
 «chiudi se vuoi sessione passo all'altro account cosa devo digli all'altro account oncosa vuoi digli di questa sessione/progetto»
 (= Mario passa a un altro account Claude: la sessione #31 parte lì, da questo stesso ramo.)
+
+## Sessione #32 (nuovo account, avvio 07/10 notte)
+Ramo di lavoro: `ccr-4a01d00e-6ay25e`. v50 già online su main. Giro completo (run 37694432789, `tutto`, partito 22:10 UTC) ancora in corso: da leggere. Ultimo messaggio di Mario: «Chiude la sessione l'altro account e mi dice di dirti questo non só se ti serve» (+ foto delle istruzioni di avvio per #31).
 
 ## Avvio della sessione #31 (altro account)
 - Ramo di lavoro: `ccr-4a01d00e-6ay25e` (repo `kur0chanx/jona-ordini`, pubblico). L'hook `.claude/hooks/avvio-check.py` ripara da solo il ramo (E5/E13).
