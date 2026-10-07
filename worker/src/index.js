@@ -448,11 +448,49 @@ async function algPulizia(env) {
   }
 }
 
+// ---- scatola nera (S3): errori dei telefoni del ristorante, nel primo D1; li legge lo sviluppatore nell'app ----
+const ERR_MAX = 2000, ERR_GIORNI = 30;
+let errPronto = false;
+async function errDb(env) {
+  const d = algDbs(env)[0];
+  if (!d) return null;
+  if (!errPronto) {
+    await d[1].prepare("CREATE TABLE IF NOT EXISTS err (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, uid TEXT, u TEXT, v TEXT, m TEXT NOT NULL, s TEXT, p TEXT, n INTEGER NOT NULL)").run();
+    errPronto = true;
+  }
+  return d[1];
+}
+const errTxt = (x, n) => String(x == null ? "" : x).slice(0, n);
+async function errSalva(request, env, uid) {
+  const db = await errDb(env);
+  if (!db) return json({ errore: "server senza database" }, 503);
+  const body = await request.json().catch(() => null);
+  const l = body && Array.isArray(body.e) ? body.e.slice(0, 10) : null;
+  if (!l || !l.length) return json({ errore: "richiesta non valida" }, 400);
+  const now = Date.now();
+  for (const e of l) {
+    if (!e || !e.m) continue;
+    const n = Math.max(1, Math.min(1000, Number(e.n) || 1));
+    const t = Number(e.t) > 0 && Number(e.t) <= now + 60000 ? Number(e.t) : now;
+    await db.prepare("INSERT INTO err (t, uid, u, v, m, s, p, n) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+      .bind(t, errTxt(uid, 128), errTxt(e.u, 64), errTxt(e.v, 16), errTxt(e.m, 500), errTxt(e.s, 1500), errTxt(e.p, 200), n).run();
+  }
+  await db.prepare("DELETE FROM err WHERE id NOT IN (SELECT id FROM err ORDER BY id DESC LIMIT ?)").bind(ERR_MAX).run();
+  return json({ ok: true });
+}
+async function errLeggi(env) {
+  const db = await errDb(env);
+  if (!db) return json({ e: [] });
+  const r = await db.prepare("SELECT t, u, v, m, s, p, n FROM err ORDER BY id DESC LIMIT 100").all();
+  return json({ e: r.results || [] });
+}
+
 export default {
   async scheduled(event, env, ctx) {
     if (event && event.cron === PROM_CRON) return ctx.waitUntil(promTick(env));
     ctx.waitUntil(algPulizia(env));
     ctx.waitUntil(invDb(env).then(db => db && db.prepare("DELETE FROM inviti WHERE scade < ?").bind(Date.now()).run()));
+    ctx.waitUntil(errDb(env).then(db => db && db.prepare("DELETE FROM err WHERE t < ?").bind(Date.now() - ERR_GIORNI * 864e5).run()));
   },
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -471,6 +509,12 @@ export default {
         if (url.pathname === "/allegati" && request.method === "POST") return await algSalva(request, env, uid);
         if (url.pathname === "/allegati/spazio" && request.method === "GET") return json(await algSpazio(env));
         if (request.method === "GET") return await algLeggi(url.pathname.slice(10), env);
+      }
+      if (url.pathname === "/errori") {
+        const uid = await membro(request, env);
+        if (!uid) return json({ errore: "Telefono non collegato al ristorante" }, 403);
+        if (request.method === "POST") return await errSalva(request, env, uid);
+        if (request.method === "GET") return await errLeggi(env);
       }
       if (url.pathname === "/invia" && request.method === "POST") {
         const body = await request.json().catch(() => null);

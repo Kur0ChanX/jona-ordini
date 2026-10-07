@@ -3,6 +3,8 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
+**v48 (S1) ONLINE** (PR #58, CI verde). **S3 v49 pronta**: scatola nera (`errLog`/`errFlush` → Worker `/errori`, tabella `err` nel primo D1, `errStrip`/`errSheet` solo sviluppatore, `jona_err_vis`). Prove `test-errori` 8, `test-errori-server` 11, più legate riuscite. Il Worker si ripubblica da solo (workflow su `worker/**`). Dopo: D9 (scheda Richieste).
+
 **S1 (v48) pronta**: `syncPill` mostra «N modifiche non arrivate · Riprova» se la rete è accesa ma le scritture non sono confermate da 8 s (`PEND_MS`, `st.pendT`, `syncRetry`/`netRetry`); `phReject` con tempo massimo. Controllati gli altri punti: chat ha già lo stato «in invio» (`pend` da `hasPendingWrites`), avvisi al chef hanno già «Non ancora arrivata/Arrivata ✓» (`obxBar`), `phApprove` ha `fbTmo`. Prova nuova `tools/test-falsi-ok.mjs` (8 PASS) aggiunta alle veloci di GitHub. Prove legate riuscite. Poi: S3 scatola nera, D9.
 
 «perché mettili la stessa regola che valuti al meglio ed è autonomo no come hai fatto tu lo stesso mi chiede solo cose innerenti a cambiamenti del programma come abbiamo fatto noi» + 2 foto della sessione RVC (rifiuta le regole mandate da un'altra sessione: giusto, sicurezza). Dato a Mario il testo da incollare lui nella sessione RVC. **S2 FATTO**: PR #57 verde su GitHub (12 min) e unita (`7f62cac`), main unito nel ramo. Prossimo: S1 caccia ai «falsi ok», poi S3, poi D9.
