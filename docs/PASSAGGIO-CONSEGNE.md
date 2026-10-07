@@ -5,6 +5,8 @@ Sessione attuale: #18
 ## Ultimo messaggio di Mario (#17)
 «sì 3»: gli piace il confronto v38/v39 del logo e vuole la v39 pubblicata **subito** (senza prove). PR #48 aperta: https://github.com/Kur0ChanX/jona-ordini/pull/48 — da far unire a Mario (squash), poi controllare online.
 
+Poi, dopo l'apertura della #18: «perché io ogni volta ti sembra normale devo andare nel sito cliccare il tasto verde per una versione aggiornata non me lo avevi mai fatto fare». Risposta data in #17: il merge è bloccato a Claude; proposte 3 strade (1 consigliata: workflow GitHub che unisce da solo le PR del ramo di Claude; 2 pubblicare direttamente dal ramo; 3 lasciare così). **Da fare in #18: aspettare la scelta di Mario e realizzarla.**
+
 ## Fatto in sessione #17
 - **Rientro di Mario (C1)**: sul nuovo indirizzo il telefono era vuoto. Soluzione: chiave del ristorante letta dalla console Firebase (`chiave/ristorante`, campo `v`), incollata in «Collega questo telefono» (`fbJoinKey` accetta anche la chiave lunga), poi `membri/<uid>.ok` messo a `true` dalla console. Funziona: Mario è dentro. In `membri` resta in attesa `ISLyK5…` (req nome «Mari…», cognome «S…», nuovo:false): non è Mario, non approvato (M17).
 - **v38 online** (PR #47 unita, controllato `APP_VER=38`, `CACHE` v42): logo YNOY senza `filter:blur` e con 8 px trasparenti attorno a `media/ynoy.png` (496×190): la riga bianca sul bordo basso su Android è sparita (confermato da Mario). Logo 155 px, entra 0,5 s prima (`byIn` .6 s, `ynoyIn` 1 s, `ynoyShine` 2,4 s), `S.splash` 4,4 s, `.intro` tolta a 4,7 s. Anche il workflow Worker con i tentativi è su `main`.
