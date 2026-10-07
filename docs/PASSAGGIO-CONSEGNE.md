@@ -3,7 +3,9 @@
 Sessione attuale: #31
 
 ## Ultimo messaggio di Mario (#30), parola per parola
-«trova il bug non possiamo gregarce e dai non posso fare figuracce» (= niente aggiramento: trovare e correggere il bug).
+«Se devi pubblicare la buova versione se non ci sono problemi pubblica sempre senza chiedere» → regola in `CLAUDE.md` (PUBBLICA SENZA CHIEDERE). v46 si pubblica da sola appena le prove legate sono riuscite.
+
+Prima: «trova il bug non possiamo gregarce e dai non posso fare figuracce» (= niente aggiramento: trovare e correggere il bug).
 
 **Bug trovato e riprodotto (emulatore)**: il telefono in attesa mostrava «Richiesta inviata» leggendo la propria cache anche se la scrittura di `req` non era arrivata al server (Wi-Fi con filtri, come in hotel). Il telefono di Mario quindi non riceveva niente. **v46 sul ramo (non ancora pubblicata)**: `st.reqOk`, «Sto inviando…» → dopo 12 s avviso + **Riprova** (`phRetry`: long polling + ricarica), `phStrip` (richieste in cima a ogni scheda dei gestori con Approva/Rifiuta = D8), `phWatch` riprova in 30 s. `APP_VER=46`, NEWS v46, `CACHE` v50. `tools/test-firebase-telefoni.mjs` estesa: 30 PASS. Prove legate in corso (v35, v40, news, demo, testbar, agenda, responsabile, firebase-flow, giro). Poi: scelta prove a Mario, PR, squash, controllo online, merge main nel ramo; dire a Mario che Maurizio deve riaprire l'app (si aggiorna) e toccare **Riprova** se compare.
 
