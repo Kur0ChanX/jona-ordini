@@ -1,6 +1,6 @@
 # Cose da fare (Jona Ordini)
 
-Aggiornato: 2026-10-07 (sessione #25: v41 online con la PR #50; v42 con tipi e F&B/Responsabile, prove legate riuscite; sessione #24: test-v40 corretta, giro completo v41 39/39, v42 agenda scritta nel ramo `v42-agenda`; sessione #23: merge di main nel ramo, v41 in prova; sessione #22: giro completo v40 38/38 riuscito; piano dell'inverno approvato; v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
+Aggiornato: 2026-10-07 (sessione #26: v42 online con la PR #51, M18 e M4 fatti, v43 responsabili con orario libero, giro completo v42 rimandato da Mario; sessione #25: v41 online con la PR #50; v42 con tipi e F&B/Responsabile, prove legate riuscite; sessione #24: test-v40 corretta, giro completo v41 39/39, v42 agenda scritta nel ramo `v42-agenda`; sessione #23: merge di main nel ramo, v41 in prova; sessione #22: giro completo v40 38/38 riuscito; piano dell'inverno approvato; v40 online con la PR #49, notifiche funzionanti sul telefono di Mario (C1, C2 fatti); il lavoro inviti/entrata libera diventa v41). Copia in Word data a Mario in #14. Ogni cosa ha un **numero fisso** (M1…, D1…): per dirmi «fatto M4» basta il numero. Quello che è fatto si toglie. Le cose sono in ordine: la prima è la più urgente.
 
 **⏸ Maurizio (M1, M2, M3, M6) è in stand-by: Mario avvisa lui quando è il momento. Nessuna fretta, l'app ha tutto l'inverno.**
 
@@ -12,14 +12,13 @@ Aggiornato: 2026-10-07 (sessione #25: v41 online con la PR #50; v42 con tipi e F
 |----|------|--------|--------|
 | C6 | v42 interruttori + agenda (tipi Evento/Informazione/Aggiornamento operativo/Memo; scrivono anche F&B Manager e Responsabile): main unito, `test-agenda` 60/60, `test-giro` e `test-news` riusciti nel ramo `v42-agenda`; manca: giro completo (ora o dopo, chiedere a Mario), PR. Poi v43 (avvisi agenda dal Worker), A, C, G, H, I, J, K, O, R, U | Claude | subito |
 | C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | quando vuoi |
-| 🔴 M18 | Incollare le regole nuove in Firebase (per l'entrata libera, v41) | Mario | ora (v41 online) |
 | M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | prima dell'apertura (staff ancora in prova) |
 | M17 | Telefono in attesa `ISLyK5…` (nome «Mari…», cognome «S…»): chi è? approvarlo o rifiutarlo (Staff → Telefoni da approvare) | Mario | quando vuoi |
 | M15 | Cancellare `invito` e `jona-notifiche` dal VECCHIO account Cloudflare (non `fruguponte`) | Mario | dopo M14 |
 | M1 | Maurizio crea il profilo e tu lo approvi | Mario | in stand-by |
 | M2 | Dare a Maurizio il ruolo Admin Chef | Mario | in stand-by, dopo M1 |
 | M3 | «Oggi si ordina» arriva a Maurizio | Mario | in stand-by, dopo M2 |
-| M4 | Mauro Loi: reparto «F&B Manager» (serve anche per scrivere nell'agenda v42) | Mario | prima della v42 |
+| M19 | Mauro e Maurizio: contratto «Full time Responsabile» (orario libero) | Mario | dopo la v43 online |
 | M5 | Stampare e appendere il QR da cucina | Mario | quando vuoi |
 | M6 | Maurizio imposta le scadenze dello staff | Maurizio | in stand-by, dopo M2 |
 | M8 | Prove dal vero della v35 | Mario | con calma |
@@ -40,8 +39,7 @@ Aggiornato: 2026-10-07 (sessione #25: v41 online con la PR #50; v42 con tipi e F
 - **D3 · Sicurezza del Worker**: non fatta perché crea un malus (`/invia` senza controllo: col controllo le push ferme da più di un'ora partirebbero solo riaprendo l'app; `/promemoria` modificabile da qualsiasi telefono approvato). Se ne riparla solo se lo chiedi.
 
 ## 3. Mario a mano
-- **M18 · Regole v40**: Firebase → Firestore Database → **Regole** → cancella tutto, incolla `firebase/firestore.rules` → **Pubblica**. Poi Impostazioni → **Entrata libera** → **Apri per 48 ore**.
-- **M14 · Trasloco v37** (M11, M12, M13 fatti; Mario rientrato il 07/10 incollando la chiave del ristorante presa da Firebase, `chiave/ristorante` campo `v`, e approvandosi da Firebase): ora mandare gli inviti allo staff dall'app. Il QR da cucina (M5) va fatto DOPO il trasloco.
+- **M14 · Trasloco v37** (M11, M12, M13 fatti; Mario rientrato il 07/10 incollando la chiave del ristorante presa da Firebase, `chiave/ristorante` campo `v`, e approvandosi da Firebase): ora mandare gli inviti allo staff dall'app (prima, se serve: Impostazioni → **Entrata libera** → **Apri per 48 ore**; le regole sono già pubblicate, M18 fatto il 07/10). Il QR da cucina (M5) va fatto DOPO il trasloco.
 - **M10 · Prova la v36**: apri l'app, se esce «App da aggiornare» tocca il banner. Da staff: «I miei orari» mostra solo inizio e fine. Manda un ordine e guarda l'animazione.
 
 ### ⏸ In stand-by, con Maurizio (M1 → M2 → M3, in questo ordine)
@@ -50,7 +48,7 @@ Aggiornato: 2026-10-07 (sessione #25: v41 online con la PR #50; v42 con tipi e F
 - **M3 · Promemoria ordini**: **Impostazioni** → «Oggi si ordina» arriva a → tocca **Maurizio**.
 
 ### Piccole cose, quando vuoi
-- **M4 · Mauro Loi**: **Staff** → **Mauro Loi** → Reparto «F&B Manager», svuota **Mansione**, **Salva**.
+- **M19 · Responsabili**: con la vista Admin Chef, **Staff** → tocca **Mauro Loi** → «Contratto e orari» → **Full time Responsabile** → **Salva**. Lo stesso per Maurizio quando ha il profilo (dopo M2). (M4 fatto il 07/10.)
 - **M5 · QR da cucina**: **Impostazioni** → **QR da cucina** → **Crea il QR**, stampalo e appendilo.
 - **M6 · Scadenze dello staff**: le imposta Maurizio in **Impostazioni** → **Scadenze per lo staff** (dopo M2).
 

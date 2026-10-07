@@ -1,37 +1,31 @@
 # Passaggio di consegne (2026-10-07)
 
-Sessione attuale: #25
+Sessione attuale: #26
 
-## Ultimo messaggio di Mario (#24)
-«ok vai avanti» (dopo il mio avviso che il giro completo stava girando e poi sarebbe venuta la PR v41). Vale ancora quello di #23: «vai sii più autonomo possibile e procedi con tutto fermati se ti servo urgente per decisioni importanti problemi ecc». Leggere per intero quello che Mario scrive in «Altro».
+## Ultimo messaggio di Mario (#25)
+«scusa il messaggio e foto bloccata non era per te» (una foto di un foglio arrivi dell'hotel, mandata per errore: ignorarla, non salvarla, contiene dati di clienti).
+Prima: «manca il pallino marrone sul progetto jona…» (fatto, vedi sotto), «cucina sala ecc» (= i gruppi operativi dell'agenda sono i reparti) e «vai». Vale ancora «procedi con tutto, fermati se ti servo per decisioni importanti» (#23).
 
-## Messaggio di Mario arrivato dopo l'apertura di #25 (risposta alla domanda sui reparti)
-«Si potrebbe scegliere mauro e maurizio creano evento o informazione o aggiornamento operativo ecc ecc e scelgono chi puó vederlo se é solo loro memo personale o da mandare ai gruppi operativi»
-→ Da fare nella v42 (ramo `v42-agenda`), prima della PR v42:
-- **Chi crea**: Maurizio (gm) e **Mauro** (Mauro Loi, reparto `fb` F&B Manager, oggi forse ruolo `staff`: controllare). Proposta: possono creare `isMgr` + staff con reparto `fb` o `resp` (funzione `agCanEdit(me)`), oppure un elenco scelto in Impostazioni.
-- **Tipo** nel modulo: Evento | Informazione | Aggiornamento operativo | Memo (campo `k` in `ev`, icona/etichetta nella lista e nella striscia).
-- **Chi lo vede** c'è già: Solo io (memo personale) | Tutti | Reparti (= gruppi operativi). Valutare se «gruppi operativi» = reparti o i gruppi della chat; chiedere a Mario in una riga se non è chiaro.
-- Domanda su «i gestori vedono tutti i reparti»: Mario non ha detto no; lasciare così salvo sua indicazione.
+## Fatto in #25
+- Ramo locale vecchio di nuovo: rinominato `vecchio-sessione-locale`, ramo preso da origin (stessa procedura di #24, mai reset).
+- **v41 online**: PR #50 squash (`275f4c0`), sito con `APP_VER` 41. Ramo `ccr-4a01d00e-6ay25e` riallineato a main con merge.
+- **v42 nel ramo `v42-agenda`** (ultimo commit `21d7fb4`, su GitHub):
+  - main unito (conflitti solo per lo squash: codice preso da v42, consegne/DA-FARE da main; verificato che main = base di v42 + docs).
+  - Tipo dell'evento `ev.k` (`AG_K`: ev Evento, info Informazione, op Aggiornamento operativo, memo Memo; vecchi eventi = ev, `agK`). Chip «Tipo» nel modulo (`agfK`), Memo mette «Solo io». Etichetta `.ag-k` in lista, prefisso «Tipo: » nella striscia.
+  - Chi crea/modifica: `agCan(u)` = `isMgr` o reparto `fb`/`resp` (Mauro). Usato in `agSheet` e `agBtn`. `agSee` invariato (i gestori vedono tutti i reparti: Mario non ha detto no).
+  - Le regole Firestore permettono già ai membri di scrivere `config`: niente regole nuove.
+  - NEWS v42 e `CLAUDE.md` aggiornati. `APP_VER` 42, `CACHE` v46.
+  - Prove: `test-agenda` 60/60 (9 nuove), `test-giro` nessun problema, `test-news` riuscita.
+- **Pallino 🟤**: tutte le 35 sessioni Jona con ▶/✓ rinominate con 🟤 davanti (🟣 = RVC). La #03 era rimasta «▶ ATTIVA»: corretta in CHIUSA. Regola in `CLAUDE.md` (Regole di lavoro) su questo ramo, commit `f6b01cf`.
 
-## Fatto in #24
-- Il ramo locale `ccr-4a01d00e-6ay25e` era di nuovo vecchio (sessione #12): rinominato `vecchio-sessione12` (solo in quel container), ramo preso da origin. Probabile anche nella prossima sessione: se `merge --ff-only` fallisce, fare lo stesso (`git branch -m` + `git checkout -b <ramo> --track origin/<ramo>`), mai reset.
-- **`test-v40` rossa era un bug vero** (non del merge): dopo «Crea profilo» `invMonoSend` leggeva `D().staff[sid]` prima che arrivasse dallo snapshot → usciva in silenzio. Corretto: `createProfile` passa il profilo (`invMonoSend(id,{...doc,id})`), `S.invM.u` per `invMonoSheet`. Prova: chiude la scheda «Invito pronto» con la X prima del secondo invito. Commit `878b4bd` sul ramo `ccr-4a01d00e-6ay25e`.
-- `test-v40` 32/32, `test-firebase-push` 29/29 (da sole). **Giro completo sul ramo v41 (`878b4bd`): 39/39 RIUSCITE.**
-- **v42 scritta** sul ramo separato **`v42-agenda`** (commit `d43b497`, su GitHub), partito da `878b4bd`:
-  - `config/app.funz` + Impostazioni → «Funzioni» (`FUNZ`, `funzOn`, `funzSet`, `funzRows`), conta d'uso `config/uso_<AAAA-MM>` (`usoSegna`, `usoInfo`, chiave `jona_uso`).
-  - Agenda come da progetto (#23): `agOpen`, `agSheet`, `agParse`, `agMic`, `agForm`/`agSave`/`agDel`, `agFotoGo` (Gemini), `agStrip`, `agBtn`; CSS `.ag-*`. Scelta mia (chiesta a Mario, senza risposta): per reparto lo staff vede i suoi, **i gestori tutti**; «Solo io» degli altri nascosto.
-  - `APP_VER` 42, `CACHE` v46, `NEWS` v42 (chiave `chef`, non `gm`). `CLAUDE.md` e `tools/README.md` aggiornati.
-  - Prove: nuova `tools/test-agenda.mjs` 51/51; `tools/test-giro.mjs` accende l'agenda con un evento e prova `agOpen`: nessun problema (aveva trovato «Nuovo evento» fuori schermo a 320 px, corretto con `.ag-2`).
-
-## Prossimi passi (#25)
-1. **PR v41**: dal ramo `ccr-4a01d00e-6ay25e` verso `main` (giro completo già verde su `878b4bd`; se il ramo ha solo commit di consegne in più, non serve rifarlo). Squash merge da Claude → controllo online (https://jona-ristorante-by-ynoy-corp.pages.dev/, `APP_VER` 41) → riallineare il ramo (`git fetch origin main && git merge origin/main`, push normale).
-2. Dire a Mario di fare **M18** (regole Firebase nuove + «Apri per 48 ore» se serve), con link e passi piccoli (`docs/FIREBASE.md`).
-3. **v42**: unire `origin/main` (dopo la v41) in `v42-agenda`, rifare `test-agenda` + `test-giro` (+ `test-news`), chiedere a Mario «giro completo ora o dopo?» (è un cambio medio: interfaccia + config, niente regole), poi PR v42 → squash → controllo online. Dire a Mario come accendere l'agenda (Impostazioni → Funzioni).
+## Prossimi passi (#26)
+1. Chiedere a Mario la risposta ancora aperta: **giro completo v42 ora o dopo?** (`bash tools/prova-tutto.sh` in background, ~1 ora; cambio medio). Poi PR `v42-agenda` → main, squash, controllo online (`APP_VER` 42), riallineare `ccr-4a01d00e-6ay25e` e `v42-agenda` con merge di main. Dire a Mario come accendere l'agenda: Impostazioni → Funzioni → Agenda.
+2. Nel `v42-agenda` manca la regola 🟤 di `CLAUDE.md` (sta sul ramo ccr): si unisce da sola passando da main; se c'è conflitto in `CLAUDE.md` tenere entrambe le righe.
+3. Mario: **M18** (regole Firebase nuove, passi già dati in #25: link GitHub raw → console https://console.firebase.google.com/project/jona-ordini/firestore/rules → **Pubblica**) e **M4** (Mauro → reparto F&B Manager, serve per scrivere in agenda). Chiedergli a che passo è.
 4. Dopo: v43 notifica del mattino «Oggi in hotel» e promemoria prima dell'evento dal Worker (cron, come `scadTick`), poi V, W, X; poi A, C, G, H, I, J, K, O, R, U (`docs/PIANO-INVERNO.md`).
-5. Domanda aperta a Mario: va bene che i gestori vedano gli eventi di tutti i reparti?
 
 ## Rischi aperti
-- Telefono in attesa `ISLyK5…` (M17).
-- `test-firebase-flow` tra 23:30 e mezzanotte (noto).
-- Se `AbortError` torna su Oppo/OnePlus: strada B (bot Telegram).
-- Elenco completo: `docs/DA-FARE.md`.
+- Il ramo locale nella nuova sessione potrebbe essere vecchio: se `merge --ff-only` fallisce, `git branch -m` + `git checkout -b <ramo> --track origin/<ramo>`, mai reset.
+- Telefono in attesa `ISLyK5…` (M17). `test-firebase-flow` tra 23:30 e mezzanotte (noto). Se `AbortError` torna su Oppo/OnePlus: strada B (bot Telegram).
+- Elenco completo: `docs/DA-FARE.md` (aggiornato nel ramo `v42-agenda`).
+- Titoli sessioni: `🟤 ▶ ATTIVA · #NN · Jona Ordini · …` / `🟤 ✓ CHIUSA · …`.

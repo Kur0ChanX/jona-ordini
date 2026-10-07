@@ -9,7 +9,7 @@ MAX_PROMPTS = 20
 SOGLIA = 70
 SOGLIA_TOKENS = int(os.environ.get("JONA_CTX_SOGLIA", "140000"))
 AZIONE = ("Prima di qualsiasi altro lavoro: rispondi in breve al messaggio, poi aggiorna docs/PASSAGGIO-CONSEGNE.md "
-          "(max 1000 parole, con le richieste dell'utente ancora da fare), verifica le condizioni e, se sono tutte vere, "
+          "(max 2500 parole, senza riassumere troppo: decisioni col perché, fatti nuovi, file ricevuti, richieste dell'utente ancora da fare, il suo ultimo messaggio parola per parola), verifica le condizioni e, se sono tutte vere, "
           "apri da solo la nuova sessione (titolo «▶ ATTIVA · …», prompt di massimo 3 righe) e rinomina questa in «✓ CHIUSA · …». "
           "Non iniziare lavori nuovi in questa sessione.")
 

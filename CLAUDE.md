@@ -31,15 +31,19 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 - TRIGGER: Lo script `.claude/hooks/handoff-check.py` segnala quando è ora di fare l'handoff (soglia 70% di 200k = 140k token, oppure 20 messaggi, oppure dopo una compressione automatica della conversazione). L'avviso si ripete a ogni messaggio finché l'handoff non è fatto: eseguilo SUBITO, prima di qualsiasi lavoro nuovo. Non usare altri trigger.
 
 - AZIONE AUTOMATICA:
-  1. Genera o aggiorna l'Handoff Tecnico conciso (max 1000 parole) in `docs/PASSAGGIO-CONSEGNE.md` contenente:
+  1. Genera o aggiorna l'Handoff Tecnico in `docs/PASSAGGIO-CONSEGNE.md` (tetto massimo 2500 parole, non un obiettivo: di solito ne bastano 800–1500). Non riassumere troppo: meglio una riga in più che un dettaglio perso. Contenuto:
      - Componenti/file toccati (percorsi esatti)
-     - Decisioni prese e relative motivazioni
+     - Decisioni prese e relative motivazioni (anche le alternative scartate e perché)
+     - Fatti nuovi emersi (dati, nomi, numeri, preferenze dell'utente), salvati anche nei documenti del progetto
+     - File ricevuti dall'utente e dove sono salvati
      - Stato attuale del lavoro
+     - Richieste dell'utente ancora da fare e domande rimaste senza risposta
      - Prossimi passi per lo scaglione successivo
      - Eventuali blocchi o rischi aperti
+     - L'ultimo messaggio dell'utente parola per parola
   2. Verifica che TUTTE queste condizioni siano VERE:
      - `docs/PASSAGGIO-CONSEGNE.md` è stato salvato correttamente.
-     - Nessun comando Git/Bash ha fallito (exit code != 0).
+     - Nessun comando dell'handoff (commit, push, fetch) è fallito e nessun errore della sessione è rimasto senza soluzione.
      - Non ci sono conflitti di merge o modifiche pendenti.
      - Non sono stati usati comandi vietati/distruttivi/forzati.
      - Il commit con `docs/PASSAGGIO-CONSEGNE.md` è pushato e GitHub lo conferma: `git fetch origin <ramo>` e `git rev-parse HEAD` uguale a `git rev-parse origin/<ramo>`. Solo DOPO crea la nuova sessione (altrimenti la nuova sessione scarica le consegne vecchie).
@@ -60,7 +64,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
   - `pkill`, `kill`
 - SICUREZZA AUTOMATICA:
   - Usa ESCLUSIVAMENTE workflow Git standard, puliti e sicuri (commit normali, merge standard, push lineari).
-  - Se un comando normale o un push fallisce, NON forzare e non usare comandi pericolosi. Trova tu un'alternativa sicura. Se non esiste, FERMATI e spiegami l'intoppo in italiano semplice, proponendo le opzioni possibili.
+  - Se un comando fallisce: prima capisci il perché con comandi che leggono soltanto. Se la soluzione è un'operazione normale e sicura (es. scaricare e unire con un merge), falla e avvisami. Altrimenti FERMATI, non forzare e non usare comandi pericolosi: spiegami l'intoppo in italiano semplice, proponendo le opzioni possibili.
 
 
 ## COMUNICAZIONE
@@ -76,7 +80,7 @@ Tra un blocco e l'altro una riga `───`.
 Imparare (Mario vuole crescere): quando uso un termine tecnico, scrivo il **termine corretto** e a fianco, tra parentesi, cosa significa in parole semplici (es. «**commit** (un salvataggio del lavoro con un nome)»). Spiego il termine intero la prima volta; poi basta il termine. In più, SOLO A VOLTE (non a ogni risposta: quando c'è un termine nuovo e utile, circa una risposta su 3-4, mai nelle risposte brevissime o di servizio), aggiungo un blocco `📚 IMPARI` breve (max 3 righe): un solo termine, con definizione di una riga e un esempio concreto dell'app Jona Ordini. Livello di Mario: esperto di computer e hardware (assemblaggio, termini generici di informatica: NON spiegarli), principiante assoluto di programmazione. I blocchi `📚 IMPARI` trattano solo programmazione (es. variabile, funzione, commit, branch, API, database, bug, deploy), dal più semplice al più avanzato, senza ripetere termini già spiegati. Mai lasciare Mario all'oscuro: la spiegazione deve bastargli per parlarne con un altro sviluppatore.
  Frasi corte (max ~15 parole), una idea per riga, niente giri di parole, ma mai tagliare ciò che serve per capire. Parole semplici, niente gergo. Mai un paragrafo di più di 3 righe. Per i riassunti lunghi: tabella.
 
-GitHub dal telefono: Mario usa GitHub da Google Chrome sul telefono, in modalità desktop (scomodo) e non è esperto. Per lui: passi piccolissimi, dove scorrere, cosa toccare esattamente (es. la freccina ▾ accanto al pulsante verde), cosa deve comparire dopo, e quali pulsanti NON toccare. Il merge delle PR lo fa Claude da solo (squash), come fino alla PR #45: scelta di Mario del 07/10/2026. Se GitHub lo nega, Claude lo dice a Mario e propone l'unione automatica con un workflow.
+GitHub dal telefono: Mario usa GitHub da Google Chrome sul telefono, in modalità desktop (scomodo) e non è esperto. Per lui: passi piccolissimi, dove scorrere, cosa toccare esattamente (es. la freccina ▾ accanto al pulsante verde), cosa deve comparire dopo, e quali pulsanti NON toccare. Il merge delle PR lo fa Claude da solo (squash), come fino alla PR #45: scelta di Mario del 07/10/2026. SUBITO dopo ogni merge squash, prima di qualsiasi altra modifica, Claude unisce `main` nel ramo di lavoro con un merge normale (`git fetch origin main && git merge origin/main`) e fa il push: se lo fa dopo aver già cambiato file, nascono conflitti. Mai push forzato. Se il merge dà conflitti, FERMATI e spiegamelo. Se GitHub lo nega, Claude lo dice a Mario e propone l'unione automatica con un workflow.
 
 Link sempre: per ogni cosa che Mario deve fare a mano (siti, registrazioni, chiavi API, impostazioni, GitHub, Cloudflare, Firebase…) dai il link diretto alla pagina giusta, dici perché ci va e cosa deve inserire, e scrivi in **grassetto** i pulsanti esatti da toccare. Mario è spesso sul telefono: passi brevi e chiari. Vale per tutti i progetti.
 
@@ -85,7 +89,6 @@ Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scr
 
 ## REGOLE TRASVERSALI
 
-- Se un comando Git o Bash fallisce, FERMATI immediatamente. Non tentare auto-riparazioni azzardate.
 - Non ripetere codice già fornito o informazioni già presenti in `docs/PASSAGGIO-CONSEGNE.md`.
 - ELENCO DELLE COSE DA FARE: tieni sempre aggiornato `docs/DA-FARE.md`, diviso in 3 parti: (1) Claude da solo, (2) Claude dopo la scelta o l'approvazione di Mario, (3) Mario a mano. Aggiungi ogni cosa nuova appena emerge, togli quelle fatte, e committalo insieme al lavoro. Le consegne rimandano a questo file invece di ripetere l'elenco. Ogni voce ha un numero fisso (M1.., D1..), un riassunto in tabella in cima in ordine di urgenza, e a Mario si mostra sempre in ordine, mai in un unico blocco continuo.
 - PRIMA I BLOCCHI (Mario, 06/10/2026): non si parte con lavoro nuovo finché restano aperte cose che bloccano il codice o la stabilità (trasloco, chiavi, segreti, PR da unire, prove fallite, errori). Le rifiniture estetiche invece possono aspettare e non bloccano. In `docs/DA-FARE.md` le voci bloccanti sono segnate 🔴 e stanno in cima; se Mario chiede una cosa nuova mentre ce n'è una 🔴, glielo ricordo in una riga prima di iniziare.
@@ -99,7 +102,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 
 ## Struttura
 - `index.html`: tutta l'app (~260 KB, righe lunghissime). Non leggerla per intero: `grep -n -o '.\{0,80\}PAROLA.\{0,200\}'` e `sed -n 'A,Bp' | cut -c1-1500`; modifiche con sostituzioni Python che controllano che il pezzo compaia una volta sola.
-- Ruoli: `staff`, `gm` (amministratore, chef), `dev` (sviluppatore). Lo sviluppatore ha la barra **Test** (`viewAs`: Admin Chef / Staff / Sviluppatore) per simulare tutto.
+- Ruoli: `staff`, `gm` (amministratore, chef), `dev` (sviluppatore). Lo sviluppatore ha la barra **Test** (`viewAs`: Admin Chef / F&B Mauro / Staff / Sviluppatore; «F&B Mauro» = staff del reparto `fb`, v43) per simulare tutto.
 - Dati: interfaccia unica `S.db.collection(c).doc(id).set/update/delete` e `orderBy().limit().onSnapshot()`. Due versioni:
   - `LocalStore`: tutto in localStorage (`jona_db_v2`), solo sul telefono.
   - `FirebaseStore`: Firestore con copia offline; i prodotti stanno in `listini/<fornitore>` (campo `p.<id>`), il resto una collezione per tipo. Accesso anonimo + chiave del ristorante (`chiave/ristorante`, `membri/<uid>`, `pubblico/stato`); regole in `firebase/firestore.rules`, guida in `docs/FIREBASE.md`.
@@ -119,6 +122,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 - v34 promemoria ordini dal server: l'app del gestore manda il piano (`promPlan`/`promSrv` in `deadlineTick`, solo se cambia, impronta in `jona_prom`) al Worker `/promemoria` (tabella `prom` nel primo D1); cron `*/5 * * * *` → `promTick` manda «Oggi si ordina da…» alle iscrizioni dei gestori. Con il server attivo l'app scrive solo l'avviso nella campanella (`notify(...,np)`); senza server o D1 fa come prima.
 - v35: scadenze per lo staff `config/app.scad` [{id, f fornitore o '', g, entro, avv, rep}] (Impostazioni → Scadenze per lo staff; `scadTick` scrive `scad_<id>_<giorno>_<persona>` per lo staff dei reparti scelti, il Worker le manda col cron); «Oggi si ordina» ai profili di `config/app.promA` (vuoto = tutti i `gm`; `promDest`/`promTo`); piano al Worker con `subs`, `gest` (tutti i gestori) e `scad`. QR da cucina: `config/app.qrFisso` {c}, Worker `/inviti` con `{fisso, vecchio}` (non scade); telefono in attesa → `/richiesta` → push ai `gest` (una volta ogni 10 min); `/invito/<codice>` max 20 codici sbagliati/ora per IP (`inv_err`). «App da aggiornare» (`banner`/`updOn`) su `controllerchange` e da `netWatch` (niente più ricarica automatica).
 - v42 funzioni e agenda: `config/app.funz` {agenda} (Impostazioni → «Funzioni», partono spente; `FUNZ`, `funzOn`, `funzSet`), conta d'uso `config/uso_<AAAA-MM>` {<funz>:{<persona>:giorni}}. Agenda in `config/agenda_<AAAA-MM>` e `config/agenda_ric` {e:{<id>:ev}} (`ev={k,t,g,h,cop,note,vis:'io'|'tutti'|'rep',rep,da,cr,mod,r:''|'s'|'m'}`, `k` tipo in `AG_K`: ev Evento, info, op Aggiornamento operativo, memo → «Solo io»; cancellare = `e.<id>: null`); creano `agCan` (`isMgr` o reparto `fb`/`resp`, es. Mauro), lo staff legge i suoi reparti, i gestori tutti tranne i «Solo io» degli altri. Riga veloce `agParse`, foto con `agFotoGo` (Gemini), striscia `agStrip` dopo `pushAsk`, icona `agBtn`. Prova `tools/test-agenda.mjs`.
+- v43 contratto «Full time Responsabile»: `staff.contratto={libero:true}` (`orFree`), fuori da `orPeople` (pianificatore, controlli, export, cambi turno), `contrOf` = null, «I miei orari» mostra «Orario libero». Mauro (F&B Manager) e Maurizio (Admin Chef) sono responsabili: niente orari, carta bianca.
 - v20 Gemini: `gemCall` usa la chiave del telefono (`jona_gemini_key`) se c'è, altrimenti il Worker `/gemini` (chiave del ristorante nel segreto `GEMINI_KEY`, copiato dal segreto GitHub `GEMINI_API_KEY`; entra solo chi ha `membri/<uid>`, controllato con il gettone Firebase del telefono; 429 → attesa `retryDelay`, poi modello Lite). Solo con Firebase.
 
 ## Chiavi in localStorage
@@ -126,6 +130,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 IndexedDB `jona-outbox` (store `q`): push non partite, lette sia da `index.html` (`obx*`) sia da `sw.js` (Background Sync, tag `jona-outbox`).
 
 ## Regole di lavoro
+- PALLINO DEL PROGETTO (Mario, 07/10/2026): i titoli delle sessioni Jona iniziano con 🟤 prima di ▶/✓ (es. `🟤 ▶ ATTIVA · #26 · Jona Ordini · …`, `🟤 ✓ CHIUSA · #25 · Jona Ordini · …`). Il 🟣 è di RVC.
 - Niente nome del creatore (Mario Miscera, `mario-miscera`, `kur0chanx`) in link, inviti e testi che vedono gli utenti. Il nome di chi invita (utente dell'app) invece va bene. Stessa regola nel progetto RVC.
 - Ad OGNI versione cambia `CACHE` in `sw.js`.
 - Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
