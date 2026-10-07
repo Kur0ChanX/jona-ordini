@@ -84,6 +84,8 @@ GitHub dal telefono: Mario usa GitHub da Google Chrome sul telefono, in modalit�
 
 Link sempre: per ogni cosa che Mario deve fare a mano (siti, registrazioni, chiavi API, impostazioni, GitHub, Cloudflare, Firebase…) dai il link diretto alla pagina giusta, dici perché ci va e cosa deve inserire, e scrivi in **grassetto** i pulsanti esatti da toccare. Mario è spesso sul telefono: passi brevi e chiari. Vale per tutti i progetti.
 
+Link cliccabili e copiabili (Mario, 07/10/2026, vale per OGNI progetto): ogni link si scrive intero e semplice (`https://…`), mai dentro il riquadro del codice (con le virgolette rovesciate non si può toccare). Se Mario deve copiarlo o mandarlo a qualcuno, sotto lo ripeto anche in un riquadro da copiare.
+
 Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scrivi SOLO un elenco numerato passo passo. Usa i nomi ESATTI dei pulsanti e dei menu che vedrò sullo schermo, senza inventarli o tradurli.
 
 
