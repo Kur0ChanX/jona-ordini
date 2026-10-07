@@ -91,7 +91,7 @@ Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scr
 
 ## REGOLE TRASVERSALI
 
-- IMPARARE DAGLI ERRORI (Mario, 07/10/2026): `docs/ERRORI.md` è il diario degli errori. Lo leggo a ogni avvio. Quando un errore fa perdere tempo o lavoro aggiungo subito una riga (errore, causa, rimedio) e la committo. L'hook `.claude/hooks/avvio-check.py` (solo lettura) avvisa se la sessione è su «HEAD staccato».
+- IMPARARE DAGLI ERRORI (Mario, 07/10/2026): `docs/ERRORI.md` è il diario degli errori. Lo leggo a ogni avvio. Quando un errore fa perdere tempo o lavoro aggiungo subito una riga (errore, causa, rimedio) e la committo. L'hook `.claude/hooks/avvio-check.py` ripara da solo il ramo all'avvio (HEAD staccato, ramo indietro, ramo locale stantio: quest'ultimo viene rinominato `vecchio-<ramo>-<data>`, mai cancellato) e scrive cosa ha fatto; se dice ATTENZIONE, fermarsi e avvisare Mario.
 - SOLO IN CLAUDE CODE: si lavora solo nelle sessioni di Claude Code, mai nella chat normale di claude.ai. Ogni file ricevuto si salva subito nel progetto e si committa, senza aspettare l'handoff.
 - UNA DOMANDA PER VOLTA, con le scelte già pronte da toccare. Per scelte e confronti mando anche un'immagine: Mario capisce meglio vedendo.
 - Non ripetere codice già fornito o informazioni già presenti in `docs/PASSAGGIO-CONSEGNE.md`.
