@@ -1,27 +1,20 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
-// v54: colore della barra del telefono (meta theme-color) = sfondo dell'app nel tema in uso
+// v57: schermo intero come nella v45: meta theme-color fisso, nessuna copertura in alto, nessuna richiesta di schermo intero
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const ctx=await b.newContext({viewport:{width:390,height:800},colorScheme:'dark'});
 const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
 const wait=ms=>pg.waitForTimeout(ms);
-const st=()=>pg.evaluate(()=>{document.documentElement.classList.remove('on-wall');themeBar();return ({m:document.querySelector('meta[name=theme-color]').content,bg:getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),h:getComputedStyle(document.body,'::before').height})});
 await pg.goto('http://localhost:8765/index.html');await wait(500);
-let s=await st();ok(s.m===s.bg&&s.bg==='#1E1816','scuro all\'avvio: '+s.m+' = '+s.bg);
-ok(s.h==='0px','nessuna zona fotocamera: copertura alta 0 ('+s.h+')');
-await pg.emulateMedia({colorScheme:'light'});await wait(200);
-s=await st();ok(s.m===s.bg&&s.bg==='#EFEBE6','tema del telefono chiaro: '+s.m);
-await pg.evaluate(()=>{ls('jona_theme','dark');applyTheme()});
-s=await st();ok(s.m==='#1E1816','scelto scuro nell\'app: '+s.m);
-await pg.evaluate(()=>{ls('jona_theme','light');applyTheme()});
-s=await st();ok(s.m==='#EFEBE6','scelto chiaro nell\'app: '+s.m);
+const meta=()=>pg.evaluate(()=>document.querySelector('meta[name=theme-color]').content);
+ok(await meta()==='#3A2F2C','theme-color fisso all\'avvio: '+await meta());
+await pg.evaluate(()=>{ls('jona_theme','light');applyTheme()});ok(await meta()==='#3A2F2C','tema chiaro: theme-color resta fisso');
+await pg.evaluate(()=>{ls('jona_theme','dark');applyTheme()});ok(await meta()==='#3A2F2C','tema scuro: theme-color resta fisso');
 await pg.evaluate(()=>{ls('jona_theme',null);applyTheme()});
-await pg.emulateMedia({colorScheme:'dark'});await wait(200);
-s=await st();ok(s.m==='#1E1816','automatico, telefono scuro: '+s.m);
-await pg.evaluate(()=>{document.documentElement.classList.add('on-wall');themeBar()});s={m:await pg.evaluate(()=>document.querySelector('meta[name=theme-color]').content)};ok(s.m==='#3A2F2C','schermata d\'apertura: barra color cacao '+s.m);
-await pg.evaluate(()=>{document.documentElement.classList.remove('on-wall');themeBar()});s=await st();ok(s.m==='#1E1816','tornata all\'app: '+s.m);
-ok(await pg.evaluate(()=>typeof fsTry==='undefined'),'nessuna richiesta di schermo intero (avviso di Chrome)');
+ok(await pg.evaluate(()=>getComputedStyle(document.body,'::before').content==='none'||getComputedStyle(document.body,'::before').content===''),'nessuna copertura fissa in alto');
+ok(await pg.evaluate(()=>typeof themeBar==='undefined'&&typeof fsTry==='undefined'),'niente themeBar né richiesta di schermo intero');
+ok(await pg.evaluate(()=>document.querySelector('meta[name=viewport]').content.includes('viewport-fit=cover')),'viewport-fit=cover presente');
 await pg.mouse.click(100,300);await wait(200);
 ok(!errs.length,'nessun errore: '+errs.join(' | '));
 await b.close();
