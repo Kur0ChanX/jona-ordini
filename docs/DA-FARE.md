@@ -11,7 +11,9 @@ Aggiornato: 2026-10-07 (sessione #30: v45→v50 online (PR #54-#60), S1-S3 stabi
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
 | M22 | v53 online: chiudi e riapri l'app (o tocca «App da aggiornare»), manda un ordine e guarda l'animazione nuova; dimmi se il bordo bianco su mani e polsini è sparito e se il logo B ti piace | Mario | ora |
-| C8 | Controllare il giro completo su GitHub lanciato dopo la v53 (https://github.com/Kur0ChanX/jona-ordini/actions/workflows/prove.yml) | Claude | sessione #39 |
+| M23 | Impostazioni del telefono → cerca «schermo intero» → **App a schermo intero** → Jona Ordini → **Schermo intero** (anche zona fotocamera): toglie la banda nera in alto. Dire a che passo è arrivato | Mario | ora |
+| C9 | v54 (ramo `v54-barra`): rifare test-barra + test-giro, poi PR, squash, controllo online (CACHE v58) | Claude | sessione #40 |
+| C8 | Controllare il giro completo su GitHub lanciato dopo la v53, run 37813146865 (https://github.com/Kur0ChanX/jona-ordini/actions/runs/37813146865) | Claude | sessione #40 |
 | M21 | Maurizio riapre l'app (si aggiorna alla v46): se compare «La richiesta non è ancora arrivata» tocca **Riprova**; poi tu lo approvi dalla striscia in cima | Mario | ora |
 | M20 | Dalla v52: Staff → in fondo «Versione di prova» → **Manda la versione di prova** a Chiara, consulenti e proprietari (prima provarla da https://jona-ristorante-by-ynoy-corp.pages.dev/#demo) | Mario | ora (v45 online) |
 | C7 | Dopo D7: riga riga «“Oggi si ordina” arriva a» più chiara (prima immagine a Mario), giro completo v42-v45 (chiedere «ora o dopo?»), avvisi agenda dal Worker, A, C, G, H, I, J, K, O, R, U | Claude | ora |

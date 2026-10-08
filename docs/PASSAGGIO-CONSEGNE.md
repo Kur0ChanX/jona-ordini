@@ -1,7 +1,30 @@
-# Passaggio di consegne (2026-10-08, fine sessione #38)
+# Passaggio di consegne (2026-10-08, fine sessione #39)
 
-Sessione attuale: #39
+Sessione attuale: #40
 
+## Ultimo messaggio di Mario (#39), parola per parola
+«No, no. no, non voglio pagare la batteria dal telefono, voglio l'esclusiva a schermo intero. L'esclusiva a schermo intero. Fin dove potete voi.»
+(= NON vuole la barra con ora e batteria: resta `display: fullscreen`. Risposta alla scelta A/B, `docs/img/v54-barra-scelta.png`: ha scelto A.)
+
+Messaggio prima, parola per parola: «Allora, ci sono tre cose che ci portiamo indietro da tempo per guardare a fondo. Uno è appena apri l'app, non so se è un solo mio problema, ma ancora più che ce l'ho trasformato in un programma da Chrome, che si fa diventa icona sul, sulla schermata principale del telefono. Appena l'avvio c'è una, per qualche frame c'è una banda bianca sotto che non mi piace molto. Poi, durante le schermate, quasi sempre c'è la banda nera sopra, che non mi piace, mi piace più a tutto lo schermo. E a volte quella banda nera diventa quella banda violetta, non so perché, se non lo so, ci deve essere un glitch, qualcosa, qualcosa che non stiamo valutando.»
+Screenshot salvati: `docs/img/segnalazioni/v53-avvio-banda-bianca.jpg`, `v53-banda-nera-sopra.jpg`, `v53-banda-viola-sopra.jpg` (commit `22093db`).
+
+## Fatto in #39 (08/10)
+- Analisi dei pixel (immagini 1200×2608): banda in alto alta 144 px. Nera (0,0,0) = zona fotocamera lasciata vuota dal sistema in schermo intero (`viewport-fit=cover` c'è già alla riga 5 di index.html, ma il telefono non disegna lì). Viola (31,5,18) = barra di stato che ricompare, colore scelto da Android. Banda bianca in basso all'avvio (y≥2560) = barra dei gesti durante lo splash di Chrome: non controllabile dalla pagina.
+- Errore nostro trovato: `meta theme-color` fisso `#3A2F2C` anche nel tema scuro (sfondo `--bg` `#1E1816`).
+- **v54 sul ramo `v54-barra`** (commit dopo `22093db`, pushato; NON ancora PR): `themeBar()` mette in `meta theme-color` il `--bg` del tema in uso, chiamata da `applyTheme()` e al cambio di `prefers-color-scheme`; `body::before` fisso, alto `env(safe-area-inset-top)`, colore `--bg`, z-index 25 (sopra `.top` 20, sotto la cartbar 29): se il telefono disegna nella zona fotocamera, il contenuto che scorre non si vede sopra l'intestazione. APP_VER 54, NEWS v54, CACHE `jona-ordini-v58`. Nuova prova `tools/test-barra.mjs` (7/7 riuscite; aggiunta a VELOCI in `tools/prova-ci.sh` e a `tools/README.md`). Riuscite anche test-news (94 PASS), test-logo, test-testbar. **test-giro era in corso alla chiusura: rifarlo.**
+- Manifest NON cambiato (cambiare theme_color fa rigenerare la WebAPK: inutile).
+- Scartato per ora: `requestFullscreen()` al primo tocco (potrebbe disegnare nella zona fotocamera), perché il tasto Indietro di Android uscirebbe prima dallo schermo intero (un Indietro «a vuoto»), e foto/condivisioni lo farebbero uscire. Da valutare SOLO se l'impostazione del telefono (M23) non basta.
+- A Mario: passi per l'impostazione del telefono (cercare «schermo intero» → App a schermo intero → Jona Ordini → Schermo intero; in alternativa cercare «notch» o «fotocamera frontale»). Il telefono è probabilmente Xiaomi (video Xiaomi in #32). Attesa risposta: a che passo è arrivato.
+- Giro completo su GitHub (run 37813146865 su main, partito 17:00 UTC) era ancora in corso: controllarlo. Promemoria `send_later` cancellato (avrebbe svegliato la sessione chiusa).
+
+## Da fare nella #40
+1. Controllare il giro completo: https://github.com/Kur0ChanX/jona-ordini/actions/runs/37813146865 (se rosso: causa e correzione con priorità). Avvisare Mario in una riga.
+2. Sul ramo `v54-barra`: `git merge origin/main` se serve, server `python3 -m http.server 8765`, rifare `node tools/test-barra.mjs` e `node tools/test-giro.mjs`; se riuscite pubblicare da solo (PR, «Prove automatiche» verde, squash, controllo online `sw.js` = v58, poi `git fetch origin main && git merge origin/main` nel ramo di lavoro e push).
+3. Aspettare Mario su M23. Se la banda nera resta anche con l'impostazione: proporre `requestFullscreen` al primo tocco spiegando il difetto del tasto Indietro.
+4. Poi `docs/DA-FARE.md` (M22, M21, M20, C7…).
+
+## Consegne di #38, parola per parola sotto
 ## Ultimo messaggio di Mario (#37), parola per parola
 «anche questo ecc ecc»
 (screenshot `docs/img/segnalazioni/v52-mano-bordo-bianco.jpg`: contorno bianco su tutto il bordo di sotto di dita, mano, polso, avambraccio e giù lungo il polsino.) In #38 Mario NON ha scritto messaggi: la sessione ha lavorato da sola sulle consegne.
