@@ -2,7 +2,16 @@
 
 Sessione attuale: #40
 
-## Ultimo messaggio di Mario (#39), parola per parola
+## Stato #40 (in corso)
+- Giro completo run 37813146865: ancora in corso alle 17:20 UTC.
+- v54: prove locali riuscite (test-barra 7/7, test-giro), PR #64 aperta, in attesa di «Prove automatiche».
+
+## Ultimo messaggio di Mario (arrivato nella #39 dopo l'handoff, girato alla #40), parola per parola
+«ha scritto pagare  ma volevo dire vedere
+Poi perché il programma, una volta che fai l'ordine, si può dire che esce dal profilo? Oh, non sembra molto giusta come cosa. Poi il pulsante in alto, subito, il primo che potresti toccare subito esce dal profilo, magari deve fare altro. Sembra strana come scelta.»
+(«vedere» = non vuole vedere la batteria: resta lo schermo intero. Il resto: dopo «Invia allo chef» il riquadro «Inviato allo chef» (index.html, fine di `sendToChef`) ha come primo pulsante grande «Esci dal profilo». In #40 proposto: solo «Continua»; per uscire resta foto → Esci (`meMenu`). Immagine mandata, attesa risposta.)
+
+## Messaggio precedente di Mario (#39), parola per parola
 «No, no. no, non voglio pagare la batteria dal telefono, voglio l'esclusiva a schermo intero. L'esclusiva a schermo intero. Fin dove potete voi.»
 (= NON vuole la barra con ora e batteria: resta `display: fullscreen`. Risposta alla scelta A/B, `docs/img/v54-barra-scelta.png`: ha scelto A.)
 
