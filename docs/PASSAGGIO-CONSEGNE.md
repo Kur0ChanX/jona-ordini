@@ -1,8 +1,32 @@
-# Passaggio di consegne (2026-10-08, fine sessione #34)
+# Passaggio di consegne (2026-10-08, fine sessione #35)
 
-Sessione attuale: #35
+Sessione attuale: #36
 
-## Ultimo messaggio di Mario (#34), parola per parola
+## Ultimo messaggio di Mario (#35), parola per parola
+«Logo B e la giacca  la A questa che la stai tralasciando sempre»
+(con screenshot dell'immagine a zone, salvato in `docs/img/segnalazioni/v52-giacca-scelta-A.jpg`)
+
+## Da fare SUBITO in #36 (Mario ha già scelto: niente domande)
+1. **Giacca, zona A** (Mario: «la stai tralasciando sempre» → priorità, E16). Immagine con le zone: `docs/img/segnalazioni/v52-giacca-zone.png`; screenshot originali `v52-giacca-1.jpg`, `v52-giacca-2.jpg` (stessa cartella). Zona A = il bianco SOTTO il polsino della manica in alto, a sinistra della manica bassa, SOPRA la striscia scura (fessura tra le braccia). Nell'app sembra un blocco bianco piatto che continua la striscia scura: è sfondo da togliere (la striscia scura deve proseguire fino alla giacca).
+2. **Logo B** senza «&» (v53): `python3` con `tools/logo-ynoy.py` → `mask(vB())` salvata come `media/ynoy.png` (LA 496×190: L=0, A=maschera; stesso formato di prima, il CSS non cambia). Poi togliere la «&» dai testi: `index.html` riga 13 `og:site_name` e riga ~1545 `BY` (`aria-label="By YNOY CORP"`), `worker/invito/src/index.js` righe 15 e 25, `tools/test-logo.mjs` riga 34 (`'By YNOY CORP'`) e commento riga 3, `tools/README.md` riga 31, `CLAUDE.md` riga «Firma visibile» → «Jona_Ristorante By YNOY CORP» (Mario ha chiesto lui di togliere la &: ok). Le vecchie voci di `NEWS` restano (storia).
+3. Versione: v53 con `NEWS`, `APP_VER`, `CACHE` in `sw.js`. Prove legate (`test-logo`, `test-giro`, prove dell'animazione se ci sono) → PR → «Prove automatiche» verde → squash → merge di main nel ramo → controllo online. Il Worker `invito` cambia: controllare che `.github/workflows/cloudflare-worker.yml` lo ripubblichi e poi lanciare il giro completo su GitHub (modo `tutto`), dirlo a Mario in una riga.
+4. Unione PR: se il controllo dei permessi la blocca, chiedere a Mario di scrivere «unisci la PR N» (E15).
+
+## Analisi della giacca già fatta in #35 (non rifarla)
+- `media/invio-chef.mp4` = filmato originale SPECCHIATO, fotogramma k+1 = `f(k+1)` dell'originale (non invertito). Nell'originale `tools/originale-invio.mp4` lo chef è a SINISTRA. `invio-fornitore` = invertito nel tempo, non specchiato.
+- Per lavorare: `pip install scipy`; si può eseguire la parte alta di `tools/anim-invio.py` con `exec(open(...).read().split('frames, raw, box, fermo = []')[0])` (con `sys.argv=['x','tools/originale-invio.mp4']`) e usare `mask(rgb)` su un fotogramma.
+- Vista utile: minimo dei canali con livelli 238→255 stirati a 0→255: lo sfondo vero è bianco pieno (~253-255), la stoffa bruciata è grigia con trama (247-251).
+- Visto nel fotogramma 46: il «rosso» (punti tenuti con min≥247) sta sopra la manica alta e sopra la manica bassa: per lo più stoffa bruciata (grigia nei livelli). Tra le due maniche c'è però una fessura stretta di sfondo che `CHIUDI` (=14, chiusura delle fessure < 28 px), `liscio` e le `pieghe` (`PIEGA`=251.5) riempiono. Prova fatta: togliere i punti con `gaussian(mn,1.2) ≥ 252.5` collegati allo sfondo grande → toglie solo bordini, NON basta per la zona A.
+- Da fare: trovare la zona A nell'originale (polsino della manica alta / fessura sopra la manica bassa, fotogrammi ~40-60 dove le due mani tengono il menù), misurare i suoi valori (probabilmente sfondo un po' in ombra, sotto 252) e far sì che la fessura scura continui: es. non applicare `CHIUDI`/`pieghe` dove la fessura è collegata allo sfondo tra le braccia, oppure soglia locale. Controllare con l'immagine composta su fondo scuro (come lo screenshot di Mario) e mandare a Mario un prima/dopo. Rifare i video con `python3 tools/anim-invio.py tools/originale-invio.mp4`.
+
+## Fatto in #35 (08/10)
+- Avvio ok. La sessione #34 ha aggiunto alle consegne il messaggio: «Ricordati che in GitHub RVC ha un altro account, non è quello di Kuro-chan, ma ha la mail eh, jona.ristorante@gmail.com.» → è di RVC: detto a Mario di riferirlo alla sessione RVC 🟣.
+- Mario ha guardato l'animazione: «nella giacca … dei pezzi da togliere … fanno parte dello sfondo» + 2 screenshot. Mandata immagine a zone A/B/C; scelta: A.
+- Mario: «quando esce all'inizio il mio logo … and corp … la E commerciale riesci a toglierla … lavoro ad hoc proprio come logo … non voglio che il logo sia brutto senza la E» e «vorrei togliere la & su link inviti ecc». Fatte 3 proposte con le lettere originali di CORP (`docs/img/logo-senza-e-scelta.png`, script `tools/logo-ynoy.py`: vA spostato, vB più grande ×1.22 stessa base, vC distanziato). Scelta: **B**.
+- Commit: `b75152e` (screenshot e zone), `6f21e9c` (proposte logo).
+
+## Consegne precedenti (#34)
+### Ultimo messaggio di Mario (#34), parola per parola
 «Devo guardare ancora l'animazione, ancora non ho controllato, ti offro altre due domande. Una, se la versione di prova che invierò adesso non gli chiederà nessuna registrazione né nulla, eh, perché secondo me deve essere proprio così. Eh, cosa numero due, per il, il mio progetto RVC, ehm, mi consigli di, fare un passaggio, di fargli un passaggio di consegna per applicargli quel, quelle regole a quel problema PR? E poi e tante altre cose che hai riscontrato?»
 
 Risposte già date in #34:
