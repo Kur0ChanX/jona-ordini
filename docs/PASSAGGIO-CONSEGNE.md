@@ -11,6 +11,11 @@ Sessione attuale: #33
 «è normale che nello Xiaomi 17 ultra faccia così nella parte alra facendo swipe dal basso verso l'alto?
 guarda secondo video appena clicco esce il bisnco sotto...puoi fare qlkosa? anche se dovessere essere android. terzo video l'animazione da scontornare bene es giacca bianca chef»
 
+## Fatto in #33 (08/10)
+- Video 3 (giacca): la trasparenza era piena fino ai bordi del filmato → giacca tagliata dritta. `edges` in `tools/anim-invio.py` ora a ovale squadrato (P=4, dal 70%). v51, PR #61 unita (prove verdi), online controllato. Prima/dopo: `docs/img/v51-animazione-prima-dopo.png`.
+- Video 1 (barra in alto con lo swipe): è Android in schermo intero (barre di sistema temporanee, colore scelto da HyperOS, non dall'app). Non correggibile dall'app; alternativa: `display: standalone` (barra sempre visibile col colore dell'app) → chiesto a Mario.
+- Video 2 (bianco sotto): dura 0,2 s all'apertura, durante la schermata d'avvio di Android (barra di navigazione bianca). È del sistema, non dell'app.
+
 ## Da fare SUBITO in #33 (i video non sono ancora stati guardati)
 1. Estrarre fotogrammi dai 3 video (`ffmpeg -i docs/video/<f>.mp4 -vf fps=2 …` nello scratchpad) e capire:
    - Video 1: cosa succede in alto (zona della barra di stato / notch) con lo swipe dal basso verso l'alto (gesto Home di Android, app a schermo intero `manifest` fullscreen). Rispondere a Mario se è normale (comportamento di Android) o correggibile (es. `theme-color`, `viewport-fit=cover`, zone sicure `env(safe-area-inset-*)`, colore di sfondo di `html`/`body`).
