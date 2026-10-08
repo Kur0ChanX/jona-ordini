@@ -247,7 +247,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:34px;background
 .sync-pill.sync-wait{border:0;cursor:pointer;background:var(--corallo-soft);color:var(--corallo)}
 .sync-pill{display:inline-flex;align-items:center;gap:5px;font:500 12.5px var(--font);background:var(--ocra-soft);color:var(--ocra);padding:4px 10px;border-radius:999px;white-space:nowrap}.sync-pill .ic{width:15px;height:15px}
 .qr{display:flex;justify-content:center;margin:14px 0 0}.qr img{width:min(240px,70vw);height:auto;background:#fff;padding:10px;border-radius:12px}
-.inv-code{text-align:center;margin:14px 0 0}.inv-code b{display:block;font-size:34px;font-weight:500;letter-spacing:.18em;color:var(--ink)}
+.demo-inv{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}.demo-inv p{margin:4px 0 10px}.inv-code{text-align:center;margin:14px 0 0}.inv-code b{display:block;font-size:34px;font-weight:500;letter-spacing:.18em;color:var(--ink)}
 .invite-steps{margin:0;padding-left:20px;color:var(--ink2);line-height:1.5}
 .testbar{display:flex;align-items:center;gap:10px;margin:0 0 14px}
 .demobar{margin:0 0 14px;padding:10px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
@@ -1076,8 +1076,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=51;
+const APP_VER=52;
 const NEWS=[
+  {v:52,data:'2026-10-08',titolo:'Manda la versione di prova',
+    chef:['Staff, in fondo: «Versione di prova». «Manda la versione di prova» apre WhatsApp con un messaggio pronto e il link. È per consulenti, proprietari e direzione: vedono l\'app con dati di esempio, mai i dati del ristorante. C\'è anche in Impostazioni → Database centrale → Invita.'],
+    dev:{aggiunte:['`demoLink` (indirizzo dell\'app + `#demo`), `demoText`, azioni `demoShare` (condivisione o WhatsApp) e `demoCopy`; riquadro in `vStaff` (nascosto in DEMO) e in `inviteSheet`. Prova `tools/test-demo-invito.mjs`.']}},
   {v:51,data:'2026-10-08',titolo:'Animazione più pulita',
     tutti:['L\'animazione dopo l\'invio è più pulita: la giacca dello chef e il vestito sfumano dolcemente verso i bordi, senza il taglio dritto.'],
     dev:{aggiunte:['`tools/anim-invio.py`: `edges` ora è una sfumatura a ovale squadrato (P=4, dal 70% al bordo) al posto delle fasce del 3-5%: giacca e vestito, tagliati dal filmato originale, non finiscono più con un rettangolo. Rifatti `media/invio-chef.mp4` e `media/invio-fornitore.mp4`.']}},
@@ -1835,6 +1838,9 @@ async function invNew(){if(S.invL)return S.invL;let r={l:inviteLink(),c:''};
   return S.invL=r}
 async function invRedeem(c){let r;try{r=await fetch(PUSH_URL+'/invito/'+c)}catch(e){throw new Error('rete')}if(r.status===404)throw new Error('scaduto');const j=await r.json().catch(()=>({}));if(!r.ok||!/^[A-Za-z0-9]{16,64}$/.test(j.k||''))throw new Error('rete');return j.k}
 function inviteLink(){let h='k='+ls('jona_key');if(!self.JONA_FIREBASE&&fbCfg())h+='&c='+btoa(JSON.stringify(fbCfg()));return location.origin+location.pathname+'#'+h}
+// v52 link della versione di prova per chi non lavora al ristorante (consulenti, proprietari): stesso indirizzo dell'app con #demo
+function demoLink(){return location.origin+location.pathname+'#demo'}
+function demoText(){return 'Ciao! Ecco la versione di prova di Jona Ordini, l\'app degli ordini del Jona Ristorante.\n\n'+demoLink()+'\n\nApri il link e tocca «Entra nella demo»: dentro ci sono dati di esempio, puoi guardarla come Chef, F&B Manager o Staff. Quello che fai non arriva al ristorante.'}
 async function inviteSheet(){
   S.invL=null;S.qrImg='';
   openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Invita un telefono<div class="sh-s">Staff, Maurizio e gli altri</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
@@ -1842,7 +1848,8 @@ async function inviteSheet(){
   <div class="qr">${S.qrImg?`<img src="${S.qrImg}" alt="QR code per collegare un telefono">`:'<p class="muted small">Preparo il QR code…</p>'}</div>
   ${S.invL&&S.invL.c?`<div class="inv-code"><span class="muted small">Codice d'invito (vale 7 giorni)</span><b>${S.invL.c}</b></div>`:''}
   <div class="btns col" style="margin-top:16px"><button type="button" class="btn primary block" data-a="invShare">${ic('send')} Manda l'invito (WhatsApp…)</button><button type="button" class="btn ghost block" data-a="invCard">${ic('image')} Cartolina con QR da condividere o stampare</button><button type="button" class="btn ghost block" data-a="invCopy">${ic('copy')} Copia il link</button></div>
-  <p class="muted small">${S.invL&&S.invL.c?'Link e codice aprono i dati del ristorante':'Il link apre i dati del ristorante'}: mandali solo a chi lavora con voi.</p>`});
+  <p class="muted small">${S.invL&&S.invL.c?'Link e codice aprono i dati del ristorante':'Il link apre i dati del ristorante'}: mandali solo a chi lavora con voi.</p>
+  <div class="demo-inv"><b>Per chi non lavora con voi</b><p class="muted small">Consulenti, proprietari, direzione: la versione di prova con dati di esempio. Non vede né cambia i dati del ristorante.</p><button type="button" class="btn ghost block" data-a="demoShare">${ic('send')} Manda la versione di prova</button></div>`});
   const link=(await invNew()).l;
   try{await need('qr');const q=qrcode(0,'M');q.addData(link);q.make();S.qrImg=q.createDataURL(8,4)}catch(e){S.qrImg=''}
   if(!S.qrImg)toast('QR code non disponibile senza rete: usa il link.','warn');refreshSheet();
@@ -3054,6 +3061,7 @@ function vStaff(me){
   ${pend.length?`<h2 class="sec">Da approvare<span>${pend.length}</span></h2><div class="panel">${pend.map(u=>`<div class="row">${avatar(u,48)}<div class="row-i"><div class="row-t">${esc(fullName(u))}</div><div class="row-m">${esc([u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</div></div><button type="button" class="icon-btn danger" data-a="sno" data-u="${u.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="sok" data-u="${u.id}">Approva</button></div>`).join('')}</div>`:''}
   ${mg.length?`<h2 class="sec">Gestione<span>${mg.length}</span></h2><div class="panel">${mg.map(row).join('')}</div>`:''}
   ${Object.entries(REPARTI).map(([k,l])=>{const us=act.filter(u=>!isMgr(u)&&(u.reparto||'altro')===k).sort(byNome);return us.length?`<h2 class="sec">${l}<span>${us.length}</span></h2><div class="panel">${us.map(row).join('')}</div>`:''}).join('')}
+  ${DEMO?'':`<h2 class="sec">Versione di prova</h2><div class="panel demo-box" style="padding:14px 16px"><p class="muted small" style="margin:0 0 10px">Per chi non lavora con voi (consulenti, proprietari, direzione): l'app con dati di esempio. Non vede né cambia i dati del ristorante.</p><div class="btns col"><button type="button" class="btn primary block" data-a="demoShare">${ic('send')} Manda la versione di prova</button><button type="button" class="btn ghost block" data-a="demoCopy">${ic('copy')} Copia il link</button></div></div>`}
   ${act.some(u=>u.ruolo==='staff'&&u.stato==='attivo')?`<div class="btns" style="justify-content:flex-start;margin-top:18px"><button type="button" class="btn ghost danger sm" data-a="endSeason">Fine stagione: disattiva tutto lo staff</button></div>`:''}`;
 }
 function profileSheet(id){
@@ -4768,9 +4776,10 @@ syncRetry:()=>{if(!S.db||!S.db.netRetry)return;S.db.netRetry().catch(()=>{});if(
   fbCode:async()=>{const a=await ask('Collega questo telefono','Incolla il codice o il link che ti ha mandato lo chef.','Collega',false,{label:'Codice o link',value:''});if(a)fbJoinKey(a.v)},
   fbActivate:()=>fbActivate(),
   fbInvite:()=>{closeSheet(true);inviteSheet()},
+  demoShare:async()=>{const t=demoText();if(navigator.share){try{await navigator.share({title:'Jona Ordini · versione di prova',text:t});return}catch(e){if(e&&e.name==='AbortError')return}}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')},
   invShare:async()=>{const inv=await invNew(),t=inviteText(inv.l,inv.c);if(navigator.share){try{await navigator.share({title:'Invito Jona',text:t});return}catch(e){if(e&&e.name==='AbortError')return}}window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')},
   invCard:async()=>{try{await inviteCard()}catch(e){toast('Cartolina non pronta: riprova con la rete.','warn')}},
-  invCopy:async()=>copyText((await invNew()).l),
+  invCopy:async()=>copyText((await invNew()).l),demoCopy:()=>copyText(demoLink()),
   fbLeave:async()=>{if(!await ask('Scollegare questo telefono?','L\'app su questo telefono non vedrà più i dati del ristorante finché non lo ricolleghi con il QR code. I dati sul database restano.','Scollega',true))return;ls('jona_key',null);ls('jona_member',null);ls('jona_fb_upload',null);try{LocalStore.load({})}catch(e){}location.reload()},
   fbCfgPaste:async()=>{const a=await ask('Configurazione Firebase','Incolla qui la configurazione dell\'app web presa da Firebase (il blocco firebaseConfig).','Salva',false,{label:'firebaseConfig',value:''});if(!a)return;const c=fbCfgParse(a.v);if(!c)return toast('Non trovo apiKey, projectId e appId: copia tutto il blocco.','warn');ls('jona_fb',c);toast('Configurazione salvata');S.fbActive=await fbPublic();refreshSheet()},
   viewAs:d=>{S.viewAs=VIEW_AS[d.v]?d.v:null;ls('jona_viewas',S.viewAs);S.cart=ls('jona_cart_'+S.me)||[];S.tab=null;window.scrollTo(0,0);render()},
