@@ -6,7 +6,7 @@
 #  - media/invio-fornitore.mp4 (ordine inviato al fornitore): invertito nel tempo, lo chef a sinistra porge il menù alla ragazza.
 # Maschera: lo sfondo è bianco "bruciato" (tutti i canali >= SOGLIA); la giacca dello chef è un bianco più grigio e resta piena.
 # Si toglie il bianco collegato al bordo e anche ogni zona bianca chiusa (tra le braccia, tra manica e menù);
-# restano corpo, divisa bianca, vestito nero e menù. Bordi sfumati di poco, e sfumatura verso i lati del filmato.
+# restano corpo, divisa bianca, vestito nero e menù. Bordi sfumati di poco, e sfumatura ampia verso i lati del filmato (edges).
 import os, subprocess, sys, tempfile
 import numpy as np, scipy.ndimage as ndi
 from PIL import Image
@@ -145,9 +145,12 @@ def liscia(v):   # angoli fotogramma per fotogramma senza scatti: buchi riempiti
     if ok.sum() < 2: return np.zeros(len(v))
     v = np.interp(idx, idx[ok], v[ok]); return ndi.gaussian_filter1d(ndi.median_filter(v, 5, mode='nearest'), 1.5, mode='nearest')
 sm = lambda t: (lambda c: c * c * (3 - 2 * c))(np.clip(t, 0, 1))
-def edges(h, w, L=0.04, R=0.03, T=0.04, B=0.05):   # il soggetto sparisce dolcemente verso i bordi del filmato
-    xs = np.linspace(0, 1, w); ys = np.linspace(0, 1, h)
-    return (sm(ys / T) * sm((1 - ys) / B))[:, None] * (sm(xs / L) * sm((1 - xs) / R))[None, :]
+def edges(h, w, P=4, DA=0.70, A=1.0):   # il soggetto sparisce dolcemente verso i bordi del filmato
+    # forma ovale squadrata (P=4): menù e mani al centro restano pieni; giacca e vestito, tagliati dal filmato
+    # a destra, a sinistra e in basso, sfumano dal 70% della distanza dal centro fino al bordo (niente taglio dritto)
+    xs = np.abs(np.linspace(-1, 1, w)); ys = np.abs(np.linspace(-1, 1, h))
+    r = (ys[:, None] ** P + xs[None, :] ** P) ** (1 / P)
+    return sm((A - r) / (A - DA))
 
 frames, raw, box, fermo = [], [], [], []
 for i in range(1, N + 1):
