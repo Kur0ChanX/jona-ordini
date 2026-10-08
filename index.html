@@ -1076,8 +1076,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=50;
+const APP_VER=51;
 const NEWS=[
+  {v:51,data:'2026-10-08',titolo:'Animazione più pulita',
+    tutti:['L\'animazione dopo l\'invio è più pulita: la giacca dello chef e il vestito sfumano dolcemente verso i bordi, senza il taglio dritto.'],
+    dev:{aggiunte:['`tools/anim-invio.py`: `edges` ora è una sfumatura a ovale squadrato (P=4, dal 70% al bordo) al posto delle fasce del 3-5%: giacca e vestito, tagliati dal filmato originale, non finiscono più con un rettangolo. Rifatti `media/invio-chef.mp4` e `media/invio-fornitore.mp4`.']}},
   {v:50,data:'2026-10-07',titolo:'Richieste in ordine',
     chef:['Scheda Richieste: in alto «Da approvare» e «Gestite». In «Gestite» le richieste sono divise per giorno (Oggi, Ieri, …), con l\'ora della decisione e chi l\'ha presa. I filtri «Approvate» e «Rifiutate» mostrano solo quelle.'],
     dev:{aggiunte:['`vRichieste` con sotto-schede (`S.rqSub`), `vGestite` raggruppata per giorno di `deciso` (`dayKey`, `dayLbl`, prime 2 aperte, max 300), filtro `S.rqF`; `reqSummary(r,who,dec)` mostra ora e `decisoDa`. Prova `tools/test-richieste-gestite.mjs`.']}},
