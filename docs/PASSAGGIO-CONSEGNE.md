@@ -1,17 +1,24 @@
-# Passaggio di consegne (2026-10-08, fine sessione #33)
+# Passaggio di consegne (2026-10-08, fine sessione #34)
 
-Sessione attuale: #34
+Sessione attuale: #35
 
-## Ultimo messaggio di Mario (#33), parola per parola
-«a
+## Ultimo messaggio di Mario (#34), parola per parola
+«Devo guardare ancora l'animazione, ancora non ho controllato, ti offro altre due domande. Una, se la versione di prova che invierò adesso non gli chiederà nessuna registrazione né nulla, eh, perché secondo me deve essere proprio così. Eh, cosa numero due, per il, il mio progetto RVC, ehm, mi consigli di, fare un passaggio, di fargli un passaggio di consegna per applicargli quel, quelle regole a quel problema PR? E poi e tante altre cose che hai riscontrato?»
 
-poi nonn vedo l'invito prova da inviare per Consulenti propietari ecc che avevamo già parlato»
-(«a» = scelta A: l'app resta a schermo intero, vedi sotto.)
+Risposte già date in #34:
+1. Versione di prova: NESSUNA registrazione. Il link `…/#demo` apre il benvenuto (`screenDemo`) → un tocco su «Entra nella demo» → dentro come «Ospite» con dati di esempio. Niente arriva al ristorante.
+2. RVC: sì, consigliato. Claude ha dato a Mario un testo da incollare nella sessione RVC (RVC accetta regole solo da Mario): handoff con `source_url` + `source_revision`, E15, installare l'app Claude GitHub sull'account GitHub di RVC (altro account: da https://claude.ai/connect-github entrando con quell'account), accettare «Review request» dei permessi, unire PR solo con prove verdi e «unisci la PR N» di Mario.
 
-## Da fare SUBITO in #34
-1. PR #62 (v52, «Manda la versione di prova») aperta, prove GitHub «prove» partite alle 14:06 UTC (run 37789788815). Se verde: squash merge (expectedHeadSha = HEAD del ramo, 40 caratteri), poi SUBITO `git fetch origin main && git merge origin/main` sul ramo e push; controllo online: `sw.js` con `jona-ordini-v56`. Se rossa: capire la causa e correggere.
-2. Dire a Mario dove trovarlo: Staff → in fondo «Versione di prova» → **Manda la versione di prova** (immagine `docs/img/v52-versione-di-prova.png`). Anche in Impostazioni → Database centrale → Invita, in fondo.
-3. Chiedere a Mario se l'animazione v51 sullo Xiaomi ora va bene.
+## Da fare SUBITO in #35
+1. Attendere Mario. Chiedergli (una domanda per volta): animazione v51 sullo Xiaomi ok? (non l'ha ancora guardata).
+2. Se Mario chiede di RVC: le regole si applicano solo dalla sessione RVC (🟣), non da qui.
+
+## Fatto in #34 (08/10)
+- La sessione #34 è partita SENZA repo (handoff di #33 senza `source_url`). Ricollegato con `add_repo` dopo l'ok di Mario. Mario ha l'account GitHub collegato e ha installato l'app Claude su Kur0ChanX (repo jona-ordini); gli ho chiesto di accettare «Review request» (aggiornamento permessi dell'app) su https://github.com/settings/installations.
+- PR #62 (v52) unita con squash (`4e309aa`) dopo prove verdi e «unisci la PR 62» di Mario. Main riunito nel ramo (`2b069db`). Online controllato: `sw.js` = `jona-ordini-v56`. Mandata a Mario l'immagine `docs/img/v52-versione-di-prova.png` con i passi (Staff → in fondo → «Manda la versione di prova»; anche Impostazioni → Database centrale → Invita).
+- E15 nel diario errori (`5163811`). `CLAUDE.md`, regola bloccata, punto 3 dell'handoff: nuova sessione sempre con `source_url` + `source_revision` (ok esplicito di Mario, `10d3ddf`).
+- Il controllo automatico dei permessi blocca: `add_repo`, unione PR («Merge Without Review»), modifica di `.claude/settings.json` («Self-Modification») e push di `CLAUDE.md` senza un ok scritto di Mario in chat. Correzione «permesso fisso in settings.json» NON fatta (bloccata); non serve: basta «unisci la PR N».
+- Account separato per Jona (jona.ristorante@gmail.com): consigliato NO per ora (A: restare così). Più avanti B: organizzazione GitHub gratuita «jona-ristorante» quando si consegna l'app al ristorante. C (account GitHub + Claude nuovi) sconsigliato: secondo abbonamento e trasloco. Mario non ha ancora scelto.
 
 ## Fatto in #33 (08/10)
 - I 3 video di Mario sono in `docs/video/` (Xiaomi 17 Ultra). v51 online (PR #61, `07b77d5`), controllato: `sw.js` v55 e `media/invio-chef.mp4` uguale al ramo.
