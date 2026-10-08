@@ -1,6 +1,6 @@
 import numpy as np, scipy.ndimage as ndi
 from PIL import Image, ImageDraw, ImageFont
-S='/tmp/claude-0/-home-user-jona-ordini/be8bc7b5-e2cb-58bf-a402-58a8359ee136/scratchpad'
+import os; S=os.environ.get('S','/tmp')
 ink=255-np.asarray(Image.open('tools/originale-ynoy.jpg').convert('L')).astype(np.float32)
 Y0,Y1=414,476
 def piece(x0,x1): return ink[Y0:Y1,x0:x1].copy()
@@ -23,6 +23,15 @@ def vB():  # CORP più grande, stessa base, occupa lo spazio di &CORP
 def vC():  # CORP stessa misura, lettere più distanziate da 1293 a 1573
     b=base(); L=(C,O,R,P); ws=[p.shape[1] for p in L]; gap=(1573-1293-sum(ws))/3; x=1293
     for p in L: paste(b,p,round(x)); x+=p.shape[1]+gap
+    return b
+def vB2(sx=1.18,sy=1.12):  # B scelto da Mario: un po' più piccolo (più in altezza) e centrato tra la Y e il giro
+    b=base(); ps=[]
+    for p in (C,O,RP):
+        im=Image.fromarray(p.astype(np.uint8)); ps.append(np.asarray(im.resize((round(p.shape[1]*sx),round(p.shape[0]*sy)),Image.LANCZOS)).astype(np.float32))
+    w=sum(q.shape[1] for q in ps); ym=Y1-ps[0].shape[0]//2
+    L=1150+np.where(b[ym,1150:1420]>60)[0].max(); R=1420+np.where(b[ym,1420:1700]>60)[0].min()
+    x=round((L+R-w)/2)
+    for q in ps: paste(b,q,x,Y1-q.shape[0]); x+=q.shape[1]
     return b
 def mask(b):
     a=np.clip(b,0,255); c=a[191:747,149:1683]

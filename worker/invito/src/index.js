@@ -12,7 +12,7 @@ const pagina = dest => `<!doctype html>
 <title>Benvenuto nella squadra del Jona</title>
 <meta name="robots" content="noindex">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Jona_Ristorante By YNOY&amp;CORP">
+<meta property="og:site_name" content="Jona_Ristorante By YNOY CORP">
 <meta property="og:title" content="Benvenuto nella squadra del Jona">
 <meta property="og:description" content="Ordini, turni e chat della brigata, tutto in un'app.">
 <meta property="og:image" content="${APP}media/invito.jpg">
@@ -22,7 +22,7 @@ const pagina = dest => `<!doctype html>
 <meta name="twitter:card" content="summary_large_image">
 <meta http-equiv="refresh" content="0;url=${dest}">
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#3A2F2C;color:#F3EDE7;font:300 20px system-ui,sans-serif}a{color:#9fd3d7}</style>
-</head><body><p>Apro l'app del Jona… <a href="${dest}">tocca qui se non si apre</a></p><p style="font-size:13px;opacity:.6">Jona_Ristorante By YNOY&amp;CORP</p>
+</head><body><p>Apro l'app del Jona… <a href="${dest}">tocca qui se non si apre</a></p><p style="font-size:13px;opacity:.6">Jona_Ristorante By YNOY CORP</p>
 <script>location.replace(${JSON.stringify(dest)})</script></body></html>`;
 
 export default {
