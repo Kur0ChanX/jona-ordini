@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Jona Ordini">
 <meta name="description" content="Ordini, turni e chat della brigata del Jona Ristorante, tutto in un'app.">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Jona_Ristorante By YNOY&amp;CORP">
+<meta property="og:site_name" content="Jona_Ristorante By YNOY CORP">
 <meta property="og:title" content="Benvenuto nella squadra del Jona">
 <meta property="og:description" content="Ordini, turni e chat della brigata, tutto in un'app.">
 <meta property="og:image" content="https://jona-ristorante-by-ynoy-corp.pages.dev/media/invito.jpg">
@@ -1076,8 +1076,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=52;
+const APP_VER=53;
 const NEWS=[
+  {v:53,data:'2026-10-08',titolo:'Logo nuovo e animazione più pulita',
+    tutti:['Il logo all\'apertura ora è «by YNOY CORP», senza la «&». Nell\'animazione dell\'invio, tra le braccia dello chef non resta più un pezzo di sfondo bianco.'],
+    dev:{correzioni:['`media/ynoy.png` rifatto da `tools/logo-ynoy.py` (`vB2`: CORP più grande, un po\' più basso, centrato tra la Y e il giro). «&» tolta da `og:site_name`, `BY` e dalla pagina del Worker `invito`. `tools/anim-invio.py`: `ombra()` allunga la fessura di sfondo tra le braccia dove è in ombra (`OMBRA`=245), video rifatti.']}},
   {v:52,data:'2026-10-08',titolo:'Manda la versione di prova',
     chef:['Staff, in fondo: «Versione di prova». «Manda la versione di prova» apre WhatsApp con un messaggio pronto e il link. È per consulenti, proprietari e direzione: vedono l\'app con dati di esempio, mai i dati del ristorante. C\'è anche in Impostazioni → Database centrale → Invita.'],
     dev:{aggiunte:['`demoLink` (indirizzo dell\'app + `#demo`), `demoText`, azioni `demoShare` (condivisione o WhatsApp) e `demoCopy`; riquadro in `vStaff` (nascosto in DEMO) e in `inviteSheet`. Prova `tools/test-demo-invito.mjs`.']}},
@@ -1542,7 +1545,7 @@ async function notify(a,titolo,testo,tipo,rif,np){const me=meU();
 /* ================= notifiche push (server: worker/, sw.js) =================
    Ogni telefono che le attiva salva la sua iscrizione in «push/<id>» e notify() avvisa anche con l'app chiusa.
    Lette e scritte direttamente su Firestore, fuori da S.db: se le regole non hanno ancora «push» l'app non si blocca. */
-const BY='<div class="wall-by" role="img" aria-label="By YNOY&amp;CORP"><span>by</span><i></i></div>';
+const BY='<div class="wall-by" role="img" aria-label="By YNOY CORP"><span>by</span><i></i></div>';
 const WK_SUB='jona-ristorante-by-ynoy-corp',PUSH_URL='https://jona-notifiche.'+WK_SUB+'.workers.dev',INV_URL='https://invito.'+WK_SUB+'.workers.dev';
 const PUSH={subs:{},on:false,retry:0};
 const pushOk=()=>isSecureContext&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;

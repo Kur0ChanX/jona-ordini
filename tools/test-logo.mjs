@@ -1,6 +1,6 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 import { readFileSync } from 'node:fs';
-// Logo «by YNOY&CORP» in fondo alla schermata d'ingresso: c'è, l'immagine si carica, sta in basso, niente scorrimento a 320 e 390 px; il service worker la tiene per l'uso senza rete
+// Logo «by YNOY CORP» in fondo alla schermata d'ingresso: c'è, l'immagine si carica, sta in basso, niente scorrimento a 320 e 390 px; il service worker la tiene per l'uso senza rete
 const URL='http://localhost:8765/', bad=[];
 const ok=(c,m)=>{if(!c)bad.push(m)};
 ok(/'\.\/media\/ynoy\.png'/.test(readFileSync('sw.js','utf8')),'sw.js: media/ynoy.png manca in FILES');
@@ -31,7 +31,7 @@ for(const [w,h] of [[320,568],[390,844]]){
   ok(r.fondo<=40,`${w}px: logo non in fondo (${r.fondo} px dal fondo)`);
   ok(r.sw===w,`${w}px: scorrimento orizzontale (${r.sw})`);
   if(w===390)ok(r.sh===h,`390px: la pagina scorre in verticale (${r.sh})`);
-  ok(r.lbl==='By YNOY&CORP'&&r.testo==='by',`${w}px: etichetta o testo sbagliati`);
+  ok(r.lbl==='By YNOY CORP'&&r.testo==='by',`${w}px: etichetta o testo sbagliati`);
   ok(!errs.length,`${w}px: errori ${errs}`);
   ok(!(await p.locator('.wall-brand').count()),`${w}px: vecchia firma ancora presente`);
   await p.close();
