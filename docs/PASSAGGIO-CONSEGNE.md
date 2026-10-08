@@ -2,7 +2,13 @@
 
 Sessione attuale: #41
 
-## Ultimo messaggio di Mario (#40), parola per parola
+## Ultimo messaggio di Mario (#40, arrivato dopo la chiusura), parola per parola
+«risolvi questo.subito guarda sotto il messaggio schermo intero»
+Screenshot salvato: `docs/img/segnalazioni/v53-avviso-schermo-intero.jpg` (vista Staff, tema scuro, in basso un riquadro viola di Chrome: «jona-ristorante-by-ynoy-corp.pages.dev: per uscire dalla modalità a schermo intero, trascina»; dietro, in basso, una fascia grigia più chiara dello sfondo).
+Primo controllo in #40: l'app NON chiama mai `requestFullscreen` (grep vuoto). Quindi l'avviso è di Chrome: compare quando si apre un'app web in `display: fullscreen`, e mostra il nome del sito. Probabile che l'icona sia una scorciatoia di Chrome e non un'app installata (WebAPK): in quel caso Chrome mostra l'avviso a ogni apertura. Da verificare: Impostazioni del telefono → App → cercare «Jona Ordini» (se c'è = WebAPK). Rimedi da valutare: reinstallare da Chrome con «Installa app» (non «Aggiungi a schermata Home»); controllare che il manifest soddisfi l'installazione WebAPK. Non disponibile: togliere l'avviso dal codice (lo disegna Chrome). La fascia grigia in basso = zona dei gesti di Android sotto il riquadro: da controllare se resta senza avviso.
+**Da fare per primo nella #41**, insieme al punto 3 (priorità di Mario: urgente, «subito»).
+
+## Messaggio di Mario prima (#40), parola per parola
 «Appena puoi pubblicami il programma senza consenso e in automatico in priorità lo schermo intero come se fosse tutto continuativo senza, senza bande di colori diversi come se fosse tutto schermo sia nell'immagine di apertura dell'app sia dentro l'app»
 (= PRIORITÀ: schermo intero continuo, nessuna banda di colore diverso, né nella schermata di apertura né dentro l'app. Pubblicare da solo, senza chiedere.)
 
