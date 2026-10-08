@@ -9,6 +9,10 @@ Risposte già date in #34:
 1. Versione di prova: NESSUNA registrazione. Il link `…/#demo` apre il benvenuto (`screenDemo`) → un tocco su «Entra nella demo» → dentro come «Ospite» con dati di esempio. Niente arriva al ristorante.
 2. RVC: sì, consigliato. Claude ha dato a Mario un testo da incollare nella sessione RVC (RVC accetta regole solo da Mario): handoff con `source_url` + `source_revision`, E15, installare l'app Claude GitHub sull'account GitHub di RVC (altro account: da https://claude.ai/connect-github entrando con quell'account), accettare «Review request» dei permessi, unire PR solo con prove verdi e «unisci la PR N» di Mario.
 
+## Messaggio di Mario arrivato dopo l'apertura di #35 (parola per parola)
+«Ricordati che in GitHub RVC ha un altro account, non è quello di Kuro-chan, ma ha la mail eh, jona.ristorante@gmail.com.»
+Fatto: l'account GitHub di RVC è quello con la mail jona.ristorante@gmail.com (non Kur0ChanX). L'app Claude GitHub per RVC va installata entrando su GitHub con quell'account. Salvato anche in `docs/DA-FARE.md`? No: è di RVC, va detto alla sessione RVC.
+
 ## Da fare SUBITO in #35
 1. Attendere Mario. Chiedergli (una domanda per volta): animazione v51 sullo Xiaomi ok? (non l'ha ancora guardata).
 2. Se Mario chiede di RVC: le regole si applicano solo dalla sessione RVC (🟣), non da qui.
