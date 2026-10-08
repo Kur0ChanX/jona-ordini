@@ -11,7 +11,7 @@ Aggiornato: 2026-10-07 (sessione #30: v45→v50 online (PR #54-#60), S1-S3 stabi
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
 | M21 | Maurizio riapre l'app (si aggiorna alla v46): se compare «La richiesta non è ancora arrivata» tocca **Riprova**; poi tu lo approvi dalla striscia in cima | Mario | ora |
-| M20 | Dopo la pubblicazione: aprire `jona-ristorante-by-ynoy-corp.pages.dev/#demo` dal telefono, provarla e mandare il link a Chiara, consulenti e proprietari | Mario | ora (v45 online) |
+| M20 | Dalla v52: Staff → in fondo «Versione di prova» → **Manda la versione di prova** a Chiara, consulenti e proprietari (prima provarla da https://jona-ristorante-by-ynoy-corp.pages.dev/#demo) | Mario | ora (v45 online) |
 | C7 | Dopo D7: riga riga «“Oggi si ordina” arriva a» più chiara (prima immagine a Mario), giro completo v42-v45 (chiedere «ora o dopo?»), avvisi agenda dal Worker, A, C, G, H, I, J, K, O, R, U | Claude | ora |
 | C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | quando vuoi |
 | M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | prima dell'apertura (staff ancora in prova) |

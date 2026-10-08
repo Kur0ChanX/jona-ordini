@@ -1,24 +1,26 @@
-# Passaggio di consegne (2026-10-07, fine sessione #30)
+# Passaggio di consegne (2026-10-08, fine sessione #33)
 
-Sessione attuale: #33
+Sessione attuale: #34
 
-## Ultimo messaggio di Mario (#30), parola per parola
-«chiudi se vuoi sessione passo all'altro account cosa devo digli all'altro account oncosa vuoi digli di questa sessione/progetto»
-(= Mario passa a un altro account Claude: la sessione #31 parte lì, da questo stesso ramo.)
+## Ultimo messaggio di Mario (#33), parola per parola
+«a
 
-## Ultimo messaggio di Mario (#32), parola per parola
-3 video registrati sullo Xiaomi 17 Ultra (Android), salvati in `docs/video/`: `mario-xiaomi-swipe-alto.mp4`, `mario-xiaomi-bianco-sotto.mp4`, `mario-xiaomi-animazione-giacca.mp4`.
-«è normale che nello Xiaomi 17 ultra faccia così nella parte alra facendo swipe dal basso verso l'alto?
-guarda secondo video appena clicco esce il bisnco sotto...puoi fare qlkosa? anche se dovessere essere android. terzo video l'animazione da scontornare bene es giacca bianca chef»
+poi nonn vedo l'invito prova da inviare per Consulenti propietari ecc che avevamo già parlato»
+(«a» = scelta A: l'app resta a schermo intero, vedi sotto.)
 
-## Da fare SUBITO in #33 (i video non sono ancora stati guardati)
-1. Estrarre fotogrammi dai 3 video (`ffmpeg -i docs/video/<f>.mp4 -vf fps=2 …` nello scratchpad) e capire:
-   - Video 1: cosa succede in alto (zona della barra di stato / notch) con lo swipe dal basso verso l'alto (gesto Home di Android, app a schermo intero `manifest` fullscreen). Rispondere a Mario se è normale (comportamento di Android) o correggibile (es. `theme-color`, `viewport-fit=cover`, zone sicure `env(safe-area-inset-*)`, colore di sfondo di `html`/`body`).
-   - Video 2: «appena clicco esce il bianco sotto»: capire quale tocco/schermata; probabile sfondo bianco di `html` o barra di navigazione di Android, tastiera, o `100vh`/`100dvh` (vedi v47 `.wall`). Correggere anche se è un problema di Android.
-   - Video 3: animazione dell'invio (`media/invio-chef.mp4` / `invio-fornitore.mp4`, `sendAnim`, unione WebGL): contorno della giacca bianca dello chef non pulito sullo Xiaomi. Script `tools/anim-invio.py` (scipy+ffmpeg) da ritoccare (soglia/contorno del bianco, giacca piena), poi rifare i video. Mandare a Mario immagini prima/dopo.
-2. Poi versione v51 (APP_VER, NEWS, CACHE in `sw.js`), prove legate + `tools/test-giro.mjs`, PR, squash, controllo online, merge main nel ramo.
+## Da fare SUBITO in #34
+1. PR #62 (v52, «Manda la versione di prova») aperta, prove GitHub «prove» partite alle 14:06 UTC (run 37789788815). Se verde: squash merge (expectedHeadSha = HEAD del ramo, 40 caratteri), poi SUBITO `git fetch origin main && git merge origin/main` sul ramo e push; controllo online: `sw.js` con `jona-ordini-v56`. Se rossa: capire la causa e correggere.
+2. Dire a Mario dove trovarlo: Staff → in fondo «Versione di prova» → **Manda la versione di prova** (immagine `docs/img/v52-versione-di-prova.png`). Anche in Impostazioni → Database centrale → Invita, in fondo.
+3. Chiedere a Mario se l'animazione v51 sullo Xiaomi ora va bene.
 
-## Stato a fine #32
+## Fatto in #33 (08/10)
+- I 3 video di Mario sono in `docs/video/` (Xiaomi 17 Ultra). v51 online (PR #61, `07b77d5`), controllato: `sw.js` v55 e `media/invio-chef.mp4` uguale al ramo.
+- Video 3 (giacca): la trasparenza era piena fino ai bordi del filmato → giacca tagliata dritta. `edges` in `tools/anim-invio.py` ora a ovale squadrato (P=4, dal 70%). v51, PR #61 unita (prove verdi), online controllato. Prima/dopo: `docs/img/v51-animazione-prima-dopo.png`.
+- Video 1 (barra in alto con lo swipe): è Android in schermo intero (barre di sistema temporanee, colore scelto da HyperOS, non dall'app). Non correggibile dall'app; alternativa: `display: standalone` (barra sempre visibile col colore dell'app) → Mario ha scelto **A: resta a schermo intero**.
+- v52: «Versione di prova» in fondo a Staff → Persone e nel foglio Invita (`demoShare`/`demoCopy`/`demoLink`/`demoText`), prova `tools/test-demo-invito.mjs` (anche nelle veloci di `prova-ci.sh`). Mario: «non vedo l'invito prova da inviare per Consulenti propietari ecc».
+- Video 2 (bianco sotto): dura 0,2 s all'apertura, durante la schermata d'avvio di Android (barra di navigazione bianca). È del sistema, non dell'app.
+
+## Stato a fine #32 (superato: v51 online, v52 in PR #62)
 - Ramo di lavoro: `ccr-4a01d00e-6ay25e`. v50 online su main (`1824a71`).
 - Giro completo su GitHub (run 37694432789, modo `tutto`, su main dopo la v50): **VERDE** (22:11→22:34 UTC).
 - Mario non ha ancora detto se ha provato la scheda Richieste → Gestite (v50).
@@ -51,10 +53,6 @@ Altro: E12 (limite di 8 sessioni a catena: Claude non può aprire la sessione nu
 - Link sempre interi e cliccabili, ripetuti in un riquadro se vanno copiati.
 - Giro completo extra su GitHub solo dopo modifiche al Worker o se le veloci si lasciano sfuggire qualcosa; dirlo in una riga. Jona è pubblico: non tocca i 2000 minuti GitHub (Mario non vuole consumarli; valgono per i repo privati come RVC).
 - RVC (altra sessione, 🟣): accetta regole solo da Mario; Mario ha avuto il testo da incollare lì.
-
-## Da controllare subito in #31
-1. Giro completo lanciato su GitHub alle ~22:10 (workflow «Prove automatiche», modo `tutto`, su main dopo la v50): leggere il risultato (`actions_list` del workflow `prove.yml`) e correggere ciò che fallisce (priorità).
-2. Chiedere a Mario se ha provato la v50 (scheda Richieste → Gestite).
 
 ## Prossimi passi (vedi `docs/DA-FARE.md`)
 - M21: Maurizio approvato? Dargli il ruolo Admin Chef (M2), «Oggi si ordina» (M3), contratto Responsabile (M19).
