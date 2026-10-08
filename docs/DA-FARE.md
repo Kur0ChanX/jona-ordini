@@ -13,10 +13,12 @@ Aggiornato: 2026-10-07 (sessione #30: v45→v50 online (PR #54-#60), S1-S3 stabi
 | M22 | v53 online: chiudi e riapri l'app (o tocca «App da aggiornare»), manda un ordine e guarda l'animazione nuova; dimmi se il bordo bianco su mani e polsini è sparito e se il logo B ti piace | Mario | ora |
 | M23 | Impostazioni del telefono → cerca «schermo intero» → **App a schermo intero** → Jona Ordini → **Schermo intero** (anche zona fotocamera): toglie la banda nera in alto. Dire a che passo è arrivato | Mario | ora |
 | M24 | v55 online: chiudi e riapri l'app, tocca una volta lo schermo e guarda se la banda nera/viola in alto e quella bianca in basso sono sparite; dimmi com'è (la banda bianca dell'avvio resta se la barra dei gesti è del telefono) | Mario | ora (appena la v55 è online) |
+| M25 | v58 online: l'icona dell'agenda (calendario) si vede solo come Admin Chef, F&B Mauro o Sviluppatore, NON come «Staff». Provala: nuovo evento con ora fra 40 minuti, un avviso e due cose da fare; chiudi l'app e aspetta l'avviso | Mario | ora (appena la v58 è online) |
+| D11 | Agenda passo B (dopo la prova di Mauro): ripetizioni complete, conferma di lettura, appunti veloci dalla home, coperti → ordine suggerito | Claude, dopo la tua scelta | dopo M25 |
 | D10 | Riquadro «Inviato allo chef»: togliere «Esci dal profilo», solo «Continua» (immagine mandata, attesa risposta di Mario) | Claude, dopo la tua scelta | sessione #41 |
 | M21 | Maurizio riapre l'app (si aggiorna alla v46): se compare «La richiesta non è ancora arrivata» tocca **Riprova**; poi tu lo approvi dalla striscia in cima | Mario | ora |
 | M20 | Dalla v52: Staff → in fondo «Versione di prova» → **Manda la versione di prova** a Chiara, consulenti e proprietari (prima provarla da https://jona-ristorante-by-ynoy-corp.pages.dev/#demo) | Mario | ora (v45 online) |
-| C7 | Dopo D7: riga riga «“Oggi si ordina” arriva a» più chiara (prima immagine a Mario), giro completo v42-v45 (chiedere «ora o dopo?»), avvisi agenda dal Worker, A, C, G, H, I, J, K, O, R, U | Claude | ora |
+| C7 | Dopo D7: riga riga «“Oggi si ordina” arriva a» più chiara (prima immagine a Mario), giro completo v42-v45 (chiedere «ora o dopo?»), A, C, G, H, I, J, K, O, R, U | Claude | ora |
 | C3 | `test-firebase-bulk` e `test-firebase-sync` non controllano niente (solo `console.log`): aggiungere i controlli | Claude | quando vuoi |
 | M14 | Inviti nuovi allo staff dall'app (Staff → Invita) + togliere la vecchia icona | Mario | prima dell'apertura (staff ancora in prova) |
 | M17 | Telefono in attesa `ISLyK5…` (nome «Mari…», cognome «S…»): chi è? approvarlo o rifiutarlo (Staff → Telefoni da approvare) | Mario | quando vuoi |
