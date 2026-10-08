@@ -3,14 +3,16 @@
 Sessione attuale: #38
 
 ## Ultimo messaggio di Mario (#37), parola per parola
-«l'ho segnato in rosso male ma per farti capire dove ti dimentichi»
-(con screenshot salvato in `docs/img/segnalazioni/v52-avambraccio-bordo-bianco.jpg`: riga rossa lungo il BORDO DI SOTTO dell'avambraccio basso (quello che tiene il menù in basso) e giù lungo il bordo del polsino/manica bassa: lì c'è un contorno bianco di sfondo che resta)
+«anche questo ecc ecc»
+(con screenshot salvato in `docs/img/segnalazioni/v52-mano-bordo-bianco.jpg`: è l'anteprima di #37 della mano bassa (fotogramma ~40) con righe rosse lungo TUTTO il bordo di sotto di dita, mano, polso e avambraccio, giù lungo il polsino, e un segnetto tra pollice e indice: lì c'è il contorno bianco. Vuol dire: il bordo bianco va tolto su tutti i contorni di pelle, non solo dove ha segnato («ecc ecc»).)
+
+Messaggio prima: «l'ho segnato in rosso male ma per farti capire dove ti dimentichi» (screenshot `docs/img/segnalazioni/v52-avambraccio-bordo-bianco.jpg`: riga rossa lungo il bordo di sotto dell'avambraccio basso e giù lungo il polsino basso).
 
 ## Messaggi di Mario in #37 (parola per parola)
 1. (screenshot `docs/img/segnalazioni/v52-giacca-A-punta.jpg`, punta bianca della fessura cerchiata) «guarda qui c'è ancora pubblica subito dopo» → è il video vecchio (v52); la correzione `ombra` toglie quella punta. Vuole che si pubblichi subito dopo la correzione.
 2. «molto meglio non perfetto ma molto meglio e non fare solo questo frame inviato controlla se c'è altro tra le 2 braccia dello chef principalmente è lí» → fatto controllo su 12 fotogrammi (sotto).
 3. «poi nell'avambraccio e mano nessuno contorno sfondo bianco come normale che sia» → VUOLE: su avambraccio e mano NESSUN contorno bianco di sfondo (come è normale). Da correggere.
-4. «l'ho segnato in rosso male ma per farti capire dove ti dimentichi» (screenshot sopra) → da correggere.
+4. «l'ho segnato in rosso male ma per farti capire dove ti dimentichi» e 5. «anche questo ecc ecc» (screenshot sopra) → da correggere.
 
 ## Fatto in #37 (08/10)
 - Avvio ok, ramo allineato. `pip install scipy` (va rifatto nella nuova sessione).
