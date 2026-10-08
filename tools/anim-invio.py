@@ -21,7 +21,7 @@ LISCIO = 14      # quanto si liscia il contorno della giacca (in punti del filma
 MORBIDO = 3.0    # sfumatura del bordo della giacca (il resto 1.6)
 PIEGA = 251.5    # stoffa bruciata sotto le maniche: media dei vicini sotto questo valore (lo sfondo sta a 253)
 VICINO = 50      # ... solo entro questi punti dalla giacca
-OMBRA = 245      # sfondo in ombra nella fessura tra le braccia (zona A): da qui in su, se è una striscia collegata alla fessura
+OMBRA = 250      # fessura tra le braccia (zona A) riempita dalle chiusure: si riapre da qui in su (245-248 entrava nella manica, fotogrammi ~56-64)
 tmp = tempfile.mkdtemp()
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', SRC, '-t', str(END), '-vf', 'fps=24', f'{tmp}/f%03d.png'], check=True)
 N = len([f for f in os.listdir(tmp) if f.startswith('f')])
