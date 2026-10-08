@@ -12,6 +12,7 @@
 // nel primo database D1); ogni 5 minuti (cron) il server manda «Oggi si ordina da …» anche con l'app chiusa su tutti i telefoni.
 // Dalla v35 il piano porta anche le scadenze per lo staff («Richieste allo chef entro le…», con le iscrizioni dello staff scelto)
 // e le iscrizioni dei gestori («gest») per /richiesta: un telefono in attesa avvisa i gestori che chiede di entrare.
+// /agenda (v58): chi scrive in agenda manda gli avvisi dei prossimi 2 giorni con le iscrizioni di chi li riceve; il cron li manda una volta sola (chiavi «ag» e «agfatto» in «prom»).
 // /inviti con {fisso:true}: codice del «QR da cucina» che non scade (il vecchio, se indicato, viene cancellato).
 // /invito/<codice>: al massimo INV_ERR codici sbagliati all'ora per indirizzo IP.
 
@@ -270,6 +271,39 @@ async function promSalva(request, env) {
   await promPut(db, "piano", { tz, forn, subs, gest, scad, agg: Date.now() });
   return json({ ok: true, fornitori: forn.length, telefoni: subs.length, scadenze: scad.length });
 }
+// agenda (v58): il telefono di chi scrive in agenda manda gli avvisi dei prossimi 2 giorni {k, at (ms), t, x, subs}; il cron li manda una volta sola
+async function agSalva(request, env) {
+  if (!(await membro(request, env))) return json({ errore: "Telefono non collegato al ristorante" }, 403);
+  const db = await promDb(env);
+  if (!db) return json({ errore: "avvisi non attivi sul server" }, 503);
+  const b = await request.json().catch(() => null);
+  if (!b || !Array.isArray(b.ev)) return json({ errore: "richiesta non valida" }, 400);
+  const lista = v => (Array.isArray(v) ? v : []).filter(validSub).slice(0, MAX_SUBS);
+  const ev = b.ev.slice(0, 120).map(x => ({
+    k: String(x && x.k || "").slice(0, 80),
+    at: Number.isFinite(x && x.at) ? Math.round(x.at) : 0,
+    t: String(x && x.t || "").slice(0, 80),
+    x: String(x && x.x || "").slice(0, 80),
+    subs: lista(x && x.subs),
+  })).filter(x => x.k && x.at > 0 && x.t && x.subs.length);
+  await promPut(db, "ag", { ev, agg: Date.now() });
+  return json({ ok: true, avvisi: ev.length });
+}
+async function agTickSrv(env, t = Date.now()) {
+  const db = await promDb(env);
+  if (!db) return;
+  const ag = await promGet(db, "ag");
+  if (!ag || !Array.isArray(ag.ev)) return;
+  const fatto = await promGet(db, "agfatto") || {};
+  let cambiato = false;
+  for (const k in fatto) if (fatto[k] < t - 2 * 864e5) { delete fatto[k]; cambiato = true; }
+  for (const x of ag.ev) {
+    if (x.at > t || x.at < t - 20 * 60000 || fatto[x.k]) continue;
+    fatto[x.k] = t; cambiato = true;
+    await send(env, { titolo: x.t, testo: x.x, tag: "ag_" + x.k, subs: x.subs });
+  }
+  if (cambiato) await promPut(db, "agfatto", fatto);
+}
 const promHm = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 async function promTick(env, t = Date.now()) {
   const db = await promDb(env);
@@ -487,7 +521,7 @@ async function errLeggi(env) {
 
 export default {
   async scheduled(event, env, ctx) {
-    if (event && event.cron === PROM_CRON) return ctx.waitUntil(promTick(env));
+    if (event && event.cron === PROM_CRON) return ctx.waitUntil(promTick(env).then(() => agTickSrv(env)));
     ctx.waitUntil(algPulizia(env));
     ctx.waitUntil(invDb(env).then(db => db && db.prepare("DELETE FROM inviti WHERE scade < ?").bind(Date.now()).run()));
     ctx.waitUntil(errDb(env).then(db => db && db.prepare("DELETE FROM err WHERE t < ?").bind(Date.now() - ERR_GIORNI * 864e5).run()));
@@ -503,6 +537,7 @@ export default {
       if (url.pathname.startsWith("/invito/") && request.method === "GET") return await invLeggi(url.pathname.slice(8), env, request.headers.get("cf-connecting-ip") || "");
       if (url.pathname === "/richiesta" && request.method === "POST") return await richiesta(request, env);
       if (url.pathname === "/promemoria" && request.method === "POST") return await promSalva(request, env);
+      if (url.pathname === "/agenda" && request.method === "POST") return await agSalva(request, env);
       if (url.pathname.startsWith("/allegati")) {
         const uid = await membro(request, env);
         if (!uid) return algErr("Telefono non collegato al ristorante", 403);
