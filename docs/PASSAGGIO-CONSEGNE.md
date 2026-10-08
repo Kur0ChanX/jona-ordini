@@ -1,42 +1,33 @@
-# Passaggio di consegne (2026-10-08, fine sessione #37)
+# Passaggio di consegne (2026-10-08, fine sessione #38)
 
-Sessione attuale: #38
+Sessione attuale: #39
 
 ## Ultimo messaggio di Mario (#37), parola per parola
 «anche questo ecc ecc»
-(con screenshot salvato in `docs/img/segnalazioni/v52-mano-bordo-bianco.jpg`: è l'anteprima di #37 della mano bassa (fotogramma ~40) con righe rosse lungo TUTTO il bordo di sotto di dita, mano, polso e avambraccio, giù lungo il polsino, e un segnetto tra pollice e indice: lì c'è il contorno bianco. Vuol dire: il bordo bianco va tolto su tutti i contorni di pelle, non solo dove ha segnato («ecc ecc»).)
+(screenshot `docs/img/segnalazioni/v52-mano-bordo-bianco.jpg`: contorno bianco su tutto il bordo di sotto di dita, mano, polso, avambraccio e giù lungo il polsino.) In #38 Mario NON ha scritto messaggi: la sessione ha lavorato da sola sulle consegne.
 
-Messaggio prima: «l'ho segnato in rosso male ma per farti capire dove ti dimentichi» (screenshot `docs/img/segnalazioni/v52-avambraccio-bordo-bianco.jpg`: riga rossa lungo il bordo di sotto dell'avambraccio basso e giù lungo il polsino basso).
+## Fatto in #38 (08/10)
+- **Bordo bianco su mani, avambracci e polsini** (commit `df1c2a7`, `tools/anim-invio.py`). Causa trovata sul video vero (non sull'anteprima): (1) sul polsino basso la stoffa più chiara (243+) attaccata allo sfondo diventava una striscia bianca sullo sfondo scuro; (2) sulla pelle restava una riga chiara di 1 punto: fuori dal soggetto il colore era il bianco del filmato e il ridimensionamento 1920→720 (Lanczos) lo faceva entrare nel bordo. Correzioni:
+  - `polsino(rgb, fg, zg)`: nella zona giacca toglie la fascia di stoffa chiara (minimo dei canali sfocato ≥243) entro `STOFFA`=14 punti dallo sfondo, poi contorno lisciato (gaussiana 3).
+  - `pulisci(c, fg, zg)`: fascia di `PELLE`=7 punti sul bordo di mani/braccia (fuori giacca): il chiaro in più rispetto alla pelle piena vicina (finestra 31) è bianco e si toglie (c=(c-t)/(1-t), t max 0,9).
+  - Colore fuori dal bordo = colore del bordo più vicino (`distance_transform_edt(..., return_indices=True)`), non più il bianco.
+  - Bordo morbido della giacca stretto di `RIENTRA`=3 punti in più prima della sfumatura.
+  - Nuova variabile `ANIM_SOLO=40-60` per rifare solo alcuni fotogrammi (prove veloci, ~1 min per 5 fotogrammi).
+- Video rifatti (101 fotogrammi, ~55 min), controllati 12 fotogrammi (10-101) su fondo scuro: niente buchi, zona A pulita. Prima/dopo `docs/img/v53-giacca-prima-dopo.png` (fotogrammi 40, 64, 88 mano/polsino e 96 zona A), mandato a Mario. Script del composito era nello scratchpad (`comp.py`: estrae fotogramma n con `select=eq(n\,n-1)`, metà alta colore, metà bassa alfa, su fondo (30,26,24)).
+- Prove legate riuscite: test-invio-anim, test-logo, test-news, test-inviti, test-demo-invito, test-giro.
+- **v53 pubblicata**: PR #63 (logo B senza «&», animazione) con «Prove automatiche» verde, unita con squash (`453df42`). Main riunito nel ramo (`2051074`). Online controllato: `sw.js` = `jona-ordini-v57`, `media/invio-chef.mp4` uguale al repo.
+- Giro completo su GitHub lanciato (workflow `prove.yml`, modo `tutto`, su main) perché è cambiato il Worker `invito` (E14). **Da controllare nella #39**: https://github.com/Kur0ChanX/jona-ordini/actions/workflows/prove.yml — se rosso, capire la causa e correggere con priorità.
 
-## Messaggi di Mario in #37 (parola per parola)
-1. (screenshot `docs/img/segnalazioni/v52-giacca-A-punta.jpg`, punta bianca della fessura cerchiata) «guarda qui c'è ancora pubblica subito dopo» → è il video vecchio (v52); la correzione `ombra` toglie quella punta. Vuole che si pubblichi subito dopo la correzione.
-2. «molto meglio non perfetto ma molto meglio e non fare solo questo frame inviato controlla se c'è altro tra le 2 braccia dello chef principalmente è lí» → fatto controllo su 12 fotogrammi (sotto).
-3. «poi nell'avambraccio e mano nessuno contorno sfondo bianco come normale che sia» → VUOLE: su avambraccio e mano NESSUN contorno bianco di sfondo (come è normale). Da correggere.
-4. «l'ho segnato in rosso male ma per farti capire dove ti dimentichi» e 5. «anche questo ecc ecc» (screenshot sopra) → da correggere.
+## Da fare nella #39
+1. Controllare il risultato del giro completo (sopra). Avvisare Mario in una riga.
+2. Chiedere a Mario se l'animazione nuova gli va bene (prima/dopo già mandato; deve aggiornare l'app: si chiude e riapre, o «App da aggiornare»). Se segnala altri punti: segnare le zone sul SUO screenshot (E16) e controllare il video vero su 12 fotogrammi (E17).
+3. Mario non ha ancora detto se il logo B gli piace (non ha obiettato).
+4. Poi `docs/DA-FARE.md` (M21, M20, C7…).
 
-## Fatto in #37 (08/10)
-- Avvio ok, ramo allineato. `pip install scipy` (va rifatto nella nuova sessione).
-- Script del prima/dopo pronto (va ricreato, era nello scratchpad): estrae fotogrammi con ffmpeg `select=eq(n\,N-1)`, metà alta colore, metà bassa alfa (720×808), compone su fondo (30,26,24); ritaglio zona A in 720 px `(480,130,700,350)` ingrandito ×2, più scena intera ridotta. Prima = `git show 33f896f:media/invio-chef.mp4`.
-- Controllo zona tra le braccia (anteprima della maschera: `exec(open('tools/anim-invio.py').read().split('frames, raw, box, fermo = []')[0])` con `sys.argv=['x','tools/originale-invio.mp4']`, poi `mask(rgb)` sui fotogrammi `{tmp}/f%03d.png`, composto e specchiato `[:, ::-1]`, ritaglio in 1920×1080 `(1150,450,1850,950)`). Con `OMBRA=245` (versione di #36) nei fotogrammi ~56-64 la parte scura entrava nella manica bassa (buco a cuneo, oltre la fine vera della fessura); con 248 restava un buco staccato nel 64; con **250** tutti i fotogrammi 40-96 sono puliti e la fessura finisce dove finisce nell'originale (controllato col filmato originale a livelli 215→255: la fessura bianca vera finisce con un taglio dritto). Commit `a858c52`: `OMBRA = 250`.
-- Screenshot di Mario salvati e committati: `v52-giacca-A-punta.jpg`, `v52-avambraccio-bordo-bianco.jpg`.
-- I video NON sono ancora rifatti nel repo: la sessione #37 li stava rifacendo nello scratchpad (si perdono).
-
-## Da fare SUBITO in #38
-1. **Bordo bianco su avambraccio e mano** (messaggi 3 e 4): nell'anteprima semplice (alfa con gaussiana 2, SENZA erosione) si vede un bordino chiaro attorno a mani e avambracci; nel video vero (v52) di solito è più pulito grazie a `binary_erosion(disk(2))`, `mosso` (toglie il bianco mescolato alla pelle) e sfumatura 1.6, MA Mario vede ancora un contorno bianco sul bordo di sotto dell'avambraccio basso e lungo il polsino basso (vedi screenshot). Controllare SUL VIDEO GENERATO (non sull'anteprima della maschera), fotogrammi ~40-101, zoom sui bordi della pelle. Strade possibili: erosione più forte solo sui bordi della pelle (punti con `sat>=45`, fuori da `zona` giacca), oppure «decontaminare» il colore del bordo (togliere il bianco: c=(c-(1-a))/a come in `mosso`) su una fascia di 3-4 punti attorno a pelle e polsino. Attenzione a non mangiare dita e unghie. Polsino: è stoffa (zona giacca, bordo morbido `MORBIDO`=3): lì il bordo sfumato verso il bianco crea l'alone → bordo un po' più stretto sul lato verso lo sfondo.
-2. Rifare i video: `ANIM_OUT=<scratchpad>/anim python3 tools/anim-invio.py tools/originale-invio.mp4` in background (~45 min, 101 fotogrammi). Controllare: zona A (fotogrammi 85-101), zona tra le braccia (40-101), bordi di avambraccio/mano (40-101).
-3. Prima/dopo per Mario → `docs/img/v53-giacca-prima-dopo.png` (zona A + bordo dell'avambraccio, prima/dopo), SendUserFile.
-4. Mario ha detto «pubblica subito dopo»: copiare i video in `media/`, prove legate (`test-invio-anim`, `test-logo`, `test-news`, `test-inviti`, `test-giro`) → PR verso main → «Prove automatiche» verde → squash → `git fetch origin main && git merge origin/main`, push → controllo online (`sw.js` = `jona-ordini-v57`). Il Worker `invito` cambia (testo senza «&»): dopo, giro completo su GitHub (modo `tutto`) e dirlo in una riga (E14). Se l'unione della PR è bloccata dai permessi: Mario scrive «unisci la PR N» (E15).
-
-## Consegne di #36
-
-## Fatto in #36 (08/10)
-- **Logo B (v53)**, commit `65dff36`: `tools/logo-ynoy.py` nuova `vB2(sx=1.18, sy=1.12)` (prima B era ×1.22 uniforme): CORP un po' più piccolo e più basso, base invariata, centrato orizzontalmente tra la Y e il giro alla metà dell'altezza di CORP (circa 17 punti dell'originale più a destra). `media/ynoy.png` rifatto (LA 496×190, stesso formato). Prima/dopo mandato a Mario: `docs/img/v53-logo-b-prima-dopo.png`. Mario non ha ancora detto se gli piace (non ha obiettato).
-- «&» tolta: `index.html` (`og:site_name`, `BY` aria-label «By YNOY CORP»), `worker/invito/src/index.js` righe 15 e 25, `tools/test-logo.mjs`, `tools/README.md`, `CLAUDE.md` («Firma visibile «Jona_Ristorante By YNOY CORP» (senza «&», scelta di Mario v53)»). Vecchie voci NEWS lasciate (storia).
-- **v53 già preparata** nello stesso commit: `APP_VER=53`, voce NEWS v53 («Logo nuovo e animazione più pulita»), `CACHE` `jona-ordini-v57`.
-- Prove riuscite (server locale): `test-logo`, `test-news`, `test-inviti`. Da fare: `test-invio-anim`, `test-giro` (dopo i video).
-- **Giacca zona A**, commit `d25fa6b`: causa trovata. Il punto A NON era nello stesso posto dell'immagine a zone di #35: nello screenshot di Mario è a destra della punta della fessura scura tra le braccia (sopra la manica bassa), dove la fessura finisce di colpo. Nell'originale la fessura di sfondo continua fino al corpo, ma lì lo sfondo è in OMBRA (minimo dei canali 246-249, lo sfondo vero è 253-255): la soglia `SOGLIA`=250 la prende per stoffa e `CHIUDI`/`liscio` la riempiono. Correzione: nuova funzione `ombra(rgb, fg)` in `tools/anim-invio.py`, chiamata alla fine di `mask()` (`fg &= ~ombra(...)`), costante `OMBRA = 245`. Allunga lo sfondo SOLO partendo da fessure strette (sfondo largo meno di ~44 punti: niente erosione dei bordi esterni della giacca), su punti con media ≥245, più chiari dei vicini (top-hat 41 px ≥ 2,5), poco colorati (sat < 14); poi chiusura, riempimento e contorno lisciato (gaussiana 6), limitato a ≥243.
-- Provato su fotogrammi 22-100: nei fotogrammi 82-101 la fessura arriva al corpo in modo naturale (è il caso di Mario). Nei fotogrammi ~46-64 (passaggio del menù) la zona tolta è un po' irregolare sopra la manica bassa: da guardare nel prima/dopo; se brutta, alzare la soglia o limitare `ombra` ai fotogrammi/zone dove la fessura è lunga. Scartate: misura della trama (deviazione standard ~1-1,6 sia sullo sfondo in ombra sia sulla stoffa bruciata: non le distingue); prima versione senza il limite «fessure strette» (mangiava i bordi esterni della manica, fotogramma 22).
-- Video NON ancora rifatti nel repo (`media/*.mp4` sono ancora quelli della v52).
+## Consegne di #37 e #36 (riassunto)
+- #37: `OMBRA = 250` (commit `a858c52`): con 245/248 la parte scura entrava nella manica bassa nei fotogrammi ~56-64. Controllo tra le braccia su fotogrammi 40-96 pulito.
+- #36: logo B (`tools/logo-ynoy.py` `vB2(sx=1.18, sy=1.12)`, `media/ynoy.png`), «&» tolta (index.html `og:site_name` e aria-label, `worker/invito/src/index.js`, prove, CLAUDE.md); funzione `ombra()` per la zona A (fessura tra le braccia in ombra 246-249 riempita da `CHIUDI`/`pieghe`). Scartate: misura della trama, `ombra` senza limite «fessure strette».
+- Analisi (#35): `invio-chef` = originale SPECCHIATO; `invio-fornitore` = invertito nel tempo. Per lavorare: `pip install scipy`; parte alta dello script con `exec(open('tools/anim-invio.py').read().split('frames, raw, box, fermo = []')[0])` e `sys.argv=['x','tools/originale-invio.mp4']`.
 
 ## Consegne precedenti (#35)
 
