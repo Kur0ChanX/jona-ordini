@@ -12,7 +12,7 @@ Aggiornato: 2026-10-07 (sessione #30: v45→v50 online (PR #54-#60), S1-S3 stabi
 |----|------|--------|--------|
 | M22 | v53 online: chiudi e riapri l'app (o tocca «App da aggiornare»), manda un ordine e guarda l'animazione nuova; dimmi se il bordo bianco su mani e polsini è sparito e se il logo B ti piace | Mario | ora |
 | M23 | Impostazioni del telefono → cerca «schermo intero» → **App a schermo intero** → Jona Ordini → **Schermo intero** (anche zona fotocamera): toglie la banda nera in alto. Dire a che passo è arrivato | Mario | ora |
-| C10 | 🔴 PRIORITÀ di Mario: schermo intero continuo, nessuna banda di colore diverso, né all'apertura né dentro l'app; pubblicare da solo (piano in consegne #41, punto 3) | Claude | sessione #41 |
+| M24 | v55 online: chiudi e riapri l'app, tocca una volta lo schermo e guarda se la banda nera/viola in alto e quella bianca in basso sono sparite; dimmi com'è (la banda bianca dell'avvio resta se la barra dei gesti è del telefono) | Mario | ora (appena la v55 è online) |
 | D10 | Riquadro «Inviato allo chef»: togliere «Esci dal profilo», solo «Continua» (immagine mandata, attesa risposta di Mario) | Claude, dopo la tua scelta | sessione #41 |
 | M21 | Maurizio riapre l'app (si aggiorna alla v46): se compare «La richiesta non è ancora arrivata» tocca **Riprova**; poi tu lo approvi dalla striscia in cima | Mario | ora |
 | M20 | Dalla v52: Staff → in fondo «Versione di prova» → **Manda la versione di prova** a Chiara, consulenti e proprietari (prima provarla da https://jona-ristorante-by-ynoy-corp.pages.dev/#demo) | Mario | ora (v45 online) |
