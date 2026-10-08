@@ -21,6 +21,7 @@ LISCIO = 14      # quanto si liscia il contorno della giacca (in punti del filma
 MORBIDO = 3.0    # sfumatura del bordo della giacca (il resto 1.6)
 PIEGA = 251.5    # stoffa bruciata sotto le maniche: media dei vicini sotto questo valore (lo sfondo sta a 253)
 VICINO = 50      # ... solo entro questi punti dalla giacca
+OMBRA = 245      # sfondo in ombra nella fessura tra le braccia (zona A): da qui in su, se è una striscia collegata alla fessura
 tmp = tempfile.mkdtemp()
 subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', SRC, '-t', str(END), '-vf', 'fps=24', f'{tmp}/f%03d.png'], check=True)
 N = len([f for f in os.listdir(tmp) if f.startswith('f')])
@@ -68,7 +69,21 @@ def mask(rgb):  # 1 = soggetto, 0 = sfondo
         anello = ndi.binary_dilation(c, structure=disk(10)) & ~ndi.binary_dilation(c, structure=disk(4))
         st = stoffa[ys, xs][anello].mean()
         if st >= 0.7 or (st >= 0.5 and c.sum() < 8000): fg[ys, xs] |= c   # piccoli e quasi tutti nella stoffa
+    fg &= ~ombra(rgb, fg)
     return fg.astype(np.float32), zona
+
+def ombra(rgb, fg):   # zona A di Mario: la fessura di sfondo tra le braccia continua fino al corpo, in ombra (246-249)
+    # e le chiusure sopra la riempiono. Si allunga solo da fessure strette (non dallo sfondo largo attorno alla giacca),
+    # su punti chiari, poco colorati e più chiari dei vicini (striscia), poi il contorno si liscia.
+    g = ndi.gaussian_filter(rgb.min(2).astype(np.float32), 2); x = rgb.astype(np.int16)
+    cand = (g >= OMBRA) & (g - ndi.grey_opening(g, size=(41, 41)) >= 2.5) & (x.max(2) - x.min(2) < 14)
+    bg = ~fg; d = ndi.distance_transform_edt(bg)
+    fess = bg & ~(ndi.distance_transform_edt(~(d > 22)) <= 26)   # sfondo largo meno di ~44 punti
+    cresce = ndi.binary_propagation(fess & ndi.binary_dilation(cand, iterations=2), mask=cand | fess) & ~bg
+    cresce = ndi.binary_fill_holes(ndi.binary_closing(cresce | bg, structure=disk(4))) & ~bg & ndi.binary_dilation(cresce, iterations=6)
+    s = ndi.gaussian_filter(ndi.binary_closing(cresce | bg, structure=disk(10)).astype(np.float32), 6) > 0.5
+    s &= ~bg & (g >= OMBRA - 2) & ndi.binary_dilation(cresce, iterations=12)
+    lab, _ = ndi.label(s); k = np.unique(lab[cresce & s]); return np.isin(lab, k[k > 0])
 
 def mosso(rgb, vicini):  # 1 = pieno; meno di 1 dove le dita in movimento si mescolano col bianco (il filmato le tiene chiare)
     x = rgb.astype(np.int16); mn = x.min(2); mx = x.max(2); sat = mx - mn
