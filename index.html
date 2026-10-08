@@ -1077,8 +1077,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=55;
+const APP_VER=56;
 const NEWS=[
+  {v:56,data:'2026-10-08',titolo:'Via l\'avviso dello schermo intero',
+    tutti:['Tolto il messaggio «per uscire dalla modalità a schermo intero, trascina» che compariva in basso dopo il primo tocco.'],
+    dev:{correzioni:['Rimosso `fsTry()` (v55): `requestFullscreen` fa mostrare a Chrome un avviso di sistema che la pagina non può nascondere. Resta `display: fullscreen` del manifest e `themeBar()`.']}},
   {v:55,data:'2026-10-08',titolo:'Schermo intero continuo',
     tutti:['Nell\'app installata, al primo tocco lo schermo diventa tutto intero, senza barre. Anche all\'apertura il colore in alto è lo stesso della schermata.'],
     dev:{correzioni:['`fsTry()`: al primo tocco (e dopo ogni uscita) `requestFullscreen({navigationUI:\'hide\'})`, solo se l\'app è installata. `themeBar()` usa `#3A2F2C` sulla schermata d\'apertura (`on-wall`) e `--bg` nel resto, richiamata da `render()`.']}},
@@ -4233,9 +4236,6 @@ async function setPhoto(fs){ls('jona_reg',null);try{S.form.foto=await fileToAvat
 function applyTheme(){const t=ls('jona_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme;themeBar()}
 // barra di Android (quando ricompare) dello stesso colore dello sfondo dell'app
 function themeBar(){const m=document.querySelector('meta[name=theme-color]'),c=document.documentElement.classList.contains('on-wall')?'#3A2F2C':getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();if(m&&c&&m.content!==c)m.content=c}
-// schermo intero continuo: al primo tocco (e dopo ogni uscita) chiede il vero schermo intero, senza barre; se il telefono non lo permette resta com'è
-function fsTry(){try{if(document.fullscreenElement||!document.fullscreenEnabled||!(matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches))return;const p=document.documentElement.requestFullscreen({navigationUI:'hide'});if(p&&p.catch)p.catch(()=>{})}catch(e){}}
-document.addEventListener('pointerup',fsTry,{passive:true});
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',themeBar)}catch(e){}
 
 /* ================= dati iniziali (solo al primo avvio) ================= */

@@ -21,7 +21,7 @@ await pg.emulateMedia({colorScheme:'dark'});await wait(200);
 s=await st();ok(s.m==='#1E1816','automatico, telefono scuro: '+s.m);
 await pg.evaluate(()=>{document.documentElement.classList.add('on-wall');themeBar()});s={m:await pg.evaluate(()=>document.querySelector('meta[name=theme-color]').content)};ok(s.m==='#3A2F2C','schermata d\'apertura: barra color cacao '+s.m);
 await pg.evaluate(()=>{document.documentElement.classList.remove('on-wall');themeBar()});s=await st();ok(s.m==='#1E1816','tornata all\'app: '+s.m);
-ok(await pg.evaluate(()=>typeof fsTry==='function'),'fsTry presente e nessun errore al tocco');
+ok(await pg.evaluate(()=>typeof fsTry==='undefined'),'nessuna richiesta di schermo intero (avviso di Chrome)');
 await pg.mouse.click(100,300);await wait(200);
 ok(!errs.length,'nessun errore: '+errs.join(' | '));
 await b.close();
