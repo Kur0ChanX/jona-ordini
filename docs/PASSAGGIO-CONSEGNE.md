@@ -1,19 +1,31 @@
-# Passaggio di consegne (2026-10-08, fine sessione #36)
+# Passaggio di consegne (2026-10-08, fine sessione #37)
 
-Sessione attuale: #37
+Sessione attuale: #38
 
-## Ultimo messaggio di Mario (#36), parola per parola
-«ok aspetto il prima/dopo della giacca»
+## Ultimo messaggio di Mario (#37), parola per parola
+«l'ho segnato in rosso male ma per farti capire dove ti dimentichi»
+(con screenshot salvato in `docs/img/segnalazioni/v52-avambraccio-bordo-bianco.jpg`: riga rossa lungo il BORDO DI SOTTO dell'avambraccio basso (quello che tiene il menù in basso) e giù lungo il bordo del polsino/manica bassa: lì c'è un contorno bianco di sfondo che resta)
 
-## Messaggi di Mario in #36 (parola per parola)
-1. «si il logo fallo pocchissimo piú piccolo ma poco in altezza e accentralo nello spazio quindi pochi pixel piú a testra» → fatto (sotto).
-2. «ok aspetto il prima/dopo della giacca» → da fare SUBITO in #37.
+## Messaggi di Mario in #37 (parola per parola)
+1. (screenshot `docs/img/segnalazioni/v52-giacca-A-punta.jpg`, punta bianca della fessura cerchiata) «guarda qui c'è ancora pubblica subito dopo» → è il video vecchio (v52); la correzione `ombra` toglie quella punta. Vuole che si pubblichi subito dopo la correzione.
+2. «molto meglio non perfetto ma molto meglio e non fare solo questo frame inviato controlla se c'è altro tra le 2 braccia dello chef principalmente è lí» → fatto controllo su 12 fotogrammi (sotto).
+3. «poi nell'avambraccio e mano nessuno contorno sfondo bianco come normale che sia» → VUOLE: su avambraccio e mano NESSUN contorno bianco di sfondo (come è normale). Da correggere.
+4. «l'ho segnato in rosso male ma per farti capire dove ti dimentichi» (screenshot sopra) → da correggere.
 
-## Da fare SUBITO in #37
-1. **Rifare i video** (la sessione #36 li stava rifacendo nel suo contenitore, che non passa alla nuova): `pip install scipy`, poi `python3 tools/anim-invio.py tools/originale-invio.mp4` in background (LENTO: ~1 fotogramma ogni 20-30 s, 101 fotogrammi, ~40-50 min). Scrive `media/invio-chef.mp4` e `media/invio-fornitore.mp4`. Per non toccare `media/` durante le prove si può usare `ANIM_OUT=<scratchpad>`.
-2. **Prima/dopo per Mario** (lo sta aspettando): fotogrammi ~85-101 di `invio-chef` (lo chef da solo tiene il menù, come nel suo screenshot `docs/img/segnalazioni/v52-giacca-scelta-A.jpg`), composti su fondo scuro (30,26,24) con l'alfa della metà bassa del video (720×808: sopra colore, sotto alfa). Prima = `git show 33f896f:media/invio-chef.mp4`; dopo = video nuovo. Ritaglio della zona A (in 720 px: x 500-680, y 150-330 circa) ingrandito, e anche la scena intera. Salvarlo in `docs/img/v53-giacca-prima-dopo.png` e mandarlo con SendUserFile.
-3. Se Mario approva: committare i video, prove legate (`test-invio-anim`, `test-logo`, `test-news`, `test-inviti`, `test-giro`) → PR verso main → «Prove automatiche» verde → squash → `git fetch origin main && git merge origin/main` sul ramo, push → controllo online (`sw.js` = `jona-ordini-v57`). Il Worker `invito` cambia (testo senza «&»): il workflow `cloudflare-worker.yml` lo ripubblica da solo al push su main (percorso `worker/**`); dopo, giro completo su GitHub (workflow «Prove automatiche», modo `tutto`) e dirlo a Mario in una riga (E14).
-4. Unione della PR: se il controllo dei permessi la blocca, chiedere a Mario di scrivere «unisci la PR N» (E15).
+## Fatto in #37 (08/10)
+- Avvio ok, ramo allineato. `pip install scipy` (va rifatto nella nuova sessione).
+- Script del prima/dopo pronto (va ricreato, era nello scratchpad): estrae fotogrammi con ffmpeg `select=eq(n\,N-1)`, metà alta colore, metà bassa alfa (720×808), compone su fondo (30,26,24); ritaglio zona A in 720 px `(480,130,700,350)` ingrandito ×2, più scena intera ridotta. Prima = `git show 33f896f:media/invio-chef.mp4`.
+- Controllo zona tra le braccia (anteprima della maschera: `exec(open('tools/anim-invio.py').read().split('frames, raw, box, fermo = []')[0])` con `sys.argv=['x','tools/originale-invio.mp4']`, poi `mask(rgb)` sui fotogrammi `{tmp}/f%03d.png`, composto e specchiato `[:, ::-1]`, ritaglio in 1920×1080 `(1150,450,1850,950)`). Con `OMBRA=245` (versione di #36) nei fotogrammi ~56-64 la parte scura entrava nella manica bassa (buco a cuneo, oltre la fine vera della fessura); con 248 restava un buco staccato nel 64; con **250** tutti i fotogrammi 40-96 sono puliti e la fessura finisce dove finisce nell'originale (controllato col filmato originale a livelli 215→255: la fessura bianca vera finisce con un taglio dritto). Commit `a858c52`: `OMBRA = 250`.
+- Screenshot di Mario salvati e committati: `v52-giacca-A-punta.jpg`, `v52-avambraccio-bordo-bianco.jpg`.
+- I video NON sono ancora rifatti nel repo: la sessione #37 li stava rifacendo nello scratchpad (si perdono).
+
+## Da fare SUBITO in #38
+1. **Bordo bianco su avambraccio e mano** (messaggi 3 e 4): nell'anteprima semplice (alfa con gaussiana 2, SENZA erosione) si vede un bordino chiaro attorno a mani e avambracci; nel video vero (v52) di solito è più pulito grazie a `binary_erosion(disk(2))`, `mosso` (toglie il bianco mescolato alla pelle) e sfumatura 1.6, MA Mario vede ancora un contorno bianco sul bordo di sotto dell'avambraccio basso e lungo il polsino basso (vedi screenshot). Controllare SUL VIDEO GENERATO (non sull'anteprima della maschera), fotogrammi ~40-101, zoom sui bordi della pelle. Strade possibili: erosione più forte solo sui bordi della pelle (punti con `sat>=45`, fuori da `zona` giacca), oppure «decontaminare» il colore del bordo (togliere il bianco: c=(c-(1-a))/a come in `mosso`) su una fascia di 3-4 punti attorno a pelle e polsino. Attenzione a non mangiare dita e unghie. Polsino: è stoffa (zona giacca, bordo morbido `MORBIDO`=3): lì il bordo sfumato verso il bianco crea l'alone → bordo un po' più stretto sul lato verso lo sfondo.
+2. Rifare i video: `ANIM_OUT=<scratchpad>/anim python3 tools/anim-invio.py tools/originale-invio.mp4` in background (~45 min, 101 fotogrammi). Controllare: zona A (fotogrammi 85-101), zona tra le braccia (40-101), bordi di avambraccio/mano (40-101).
+3. Prima/dopo per Mario → `docs/img/v53-giacca-prima-dopo.png` (zona A + bordo dell'avambraccio, prima/dopo), SendUserFile.
+4. Mario ha detto «pubblica subito dopo»: copiare i video in `media/`, prove legate (`test-invio-anim`, `test-logo`, `test-news`, `test-inviti`, `test-giro`) → PR verso main → «Prove automatiche» verde → squash → `git fetch origin main && git merge origin/main`, push → controllo online (`sw.js` = `jona-ordini-v57`). Il Worker `invito` cambia (testo senza «&»): dopo, giro completo su GitHub (modo `tutto`) e dirlo in una riga (E14). Se l'unione della PR è bloccata dai permessi: Mario scrive «unisci la PR N» (E15).
+
+## Consegne di #36
 
 ## Fatto in #36 (08/10)
 - **Logo B (v53)**, commit `65dff36`: `tools/logo-ynoy.py` nuova `vB2(sx=1.18, sy=1.12)` (prima B era ×1.22 uniforme): CORP un po' più piccolo e più basso, base invariata, centrato orizzontalmente tra la Y e il giro alla metà dell'altezza di CORP (circa 17 punti dell'originale più a destra). `media/ynoy.png` rifatto (LA 496×190, stesso formato). Prima/dopo mandato a Mario: `docs/img/v53-logo-b-prima-dopo.png`. Mario non ha ancora detto se gli piace (non ha obiettato).
@@ -68,17 +80,6 @@ Fatto: l'account GitHub di RVC è quello con la mail jona.ristorante@gmail.com (
 - Video 1 (barra in alto con lo swipe): è Android in schermo intero (barre di sistema temporanee, colore scelto da HyperOS, non dall'app). Non correggibile dall'app; alternativa: `display: standalone` (barra sempre visibile col colore dell'app) → Mario ha scelto **A: resta a schermo intero**.
 - v52: «Versione di prova» in fondo a Staff → Persone e nel foglio Invita (`demoShare`/`demoCopy`/`demoLink`/`demoText`), prova `tools/test-demo-invito.mjs` (anche nelle veloci di `prova-ci.sh`). Mario: «non vedo l'invito prova da inviare per Consulenti propietari ecc».
 - Video 2 (bianco sotto): dura 0,2 s all'apertura, durante la schermata d'avvio di Android (barra di navigazione bianca). È del sistema, non dell'app.
-
-## Fatto in #30 (tutto online, ogni PR con «Prove automatiche» verde)
-| Versione | PR | Cosa |
-|---|---|---|
-| v45 | #54 | App dimostrativa `…/#demo` |
-| v46 | #55 | BUG richiesta di Maurizio: il telefono in attesa scriveva «Richiesta inviata» leggendo la sua cache (Wi-Fi con filtri). Ora `st.reqOk`, «Sto inviando…», dopo 12 s «Riprova» (`phRetry`, long polling). Richieste in cima a ogni scheda dei gestori (`phStrip`, Approva/Rifiuta). `phWatch` riprova in 30 s. Maurizio poi è arrivato ed è stato approvato. |
-| v47 | #56 | Splash dentro lo schermo (`.wall` = 100dvh meno zone sicure, logo centrato); hook di avvio da RVC |
-| S2 | #57 | Prove su GitHub: `.github/workflows/prove.yml` + `tools/prova-ci.sh` (veloci a ogni PR verso main, tutte ogni lunedì 3:17, anche a mano con modo `tutto`) |
-| v48 S1 | #58 | `syncPill`: «N modifiche non arrivate · Riprova» se la rete è accesa ma le scritture non sono confermate da 8 s (`PEND_MS`, `syncRetry`); `phReject` con tempo massimo. Prova `test-falsi-ok` |
-| v49 S3 | #59 | Scatola nera: `errLog`/`errFlush` → Worker `/errori` (tabella `err` nel primo D1, 2000 righe, cron 30 giorni); striscia «N errori nuovi sui telefoni» solo sviluppatore (`errStrip`/`errSheet`, `jona_err_vis`). Prove `test-errori`, `test-errori-server` |
-| v50 D9 | #60 | Scheda Richieste: «Da approvare · N» / «Gestite» (`S.rqSub`), gestite per giorno della decisione con ora e chi ha deciso (`vGestite`, `dayKey`, `dayLbl`, `reqSummary(r,who,dec)`), filtri `S.rqF`. Prova `test-richieste-gestite` |
 
 Altro: E12 (limite di 8 sessioni a catena: Claude non può aprire la sessione nuova), E14 (Worker finti delle prove senza `/errori`: corretti `test-firebase-approva-arrivi` e `test-firebase-push`). Ramo remoto `fix-hook-avvio` già unito ma non cancellabile da qui (proxy): Mario può cancellarlo da https://github.com/Kur0ChanX/jona-ordini/branches (non urgente).
 
