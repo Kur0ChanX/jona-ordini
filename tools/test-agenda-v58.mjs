@@ -59,7 +59,7 @@ await pg.evaluate(() => settingsSheet()); await wait(300); await pg.click('.shee
 await pg.evaluate(() => { while (sheets.length) closeSheet(true); }); await wait(150);
 
 // nuovo evento: avviso di partenza 30 minuti, lista di cose da fare
-const t0 = await pg.evaluate(() => { const d = new Date(Date.now() + 40 * 60000); return { g: today(d), h: String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'), ora: d.getHours() * 60 + d.getMinutes() }; });
+const t0 = { g: await pg.evaluate(() => today()), h: '23:59' };   // sempre oggi (la prova può girare vicino a mezzanotte)
 await pg.evaluate(() => agOpen()); await wait(300); await pg.click('[data-a="agNew"]'); await wait(300);
 ok(await pg.locator('.sheet [data-a="agfAv"][data-v="30"][aria-pressed="true"]').count() === 1, 'nuovo evento: avviso di partenza «30 min prima»');
 await pg.fill('#agf-t', 'Matrimonio Rossi'); await pg.fill('#agf-g', t0.g); await pg.fill('#agf-h', t0.h);
@@ -80,10 +80,10 @@ tt = await txt('.sheet'); ok(/1\/3 fatte/.test(tt) && await pg.locator('.sheet .
 ok(await pg.evaluate(() => agAll().find(x => x.t === 'Matrimonio Rossi').cl[0].ok === true), 'spunta salvata nell\'evento');
 
 // avvisi calcolati
-const inst = await pg.evaluate(t => { const n = Date.now(); return agInst(n, n + 48 * 36e5).map(a => ({ m: a.m, dt: Math.round((a.at - n) / 60000) })); }, 0);
-ok(inst.length === 1 && inst[0].m === 30 && Math.abs(inst[0].dt + 40 - 40 - (40 - 30)) <= 1 || inst.length === 2, 'avvisi dei prossimi 2 giorni calcolati: ' + JSON.stringify(inst));
-const sempio = await pg.evaluate(() => { const e = { id: 'x', g: '2026-10-10', h: '19:00', av: [60, 1440] }; return [agTs(e.g, e.h, 60), agTs(e.g, '', 0), agTs(e.g, e.h, 1440)].map(v => new Date(v).toISOString().slice(0, 16)); });
-ok(new Date(sempio[0]).getHours() === 18 && new Date(sempio[1]).getHours() === 9 && new Date(sempio[2]).getDate() === 9, 'orari degli avvisi: 1 ora prima = 18:00, senza ora = 09:00, 1 giorno prima = giorno prima');
+const inst = await pg.evaluate(() => { const n = Date.now(); return agInst(n - 864e5, n + 48 * 36e5).filter(a => a.t === 'Matrimonio Rossi').map(a => a.m); });
+ok(inst.join() === '0,30'.split(',').reverse().join() || inst.slice().sort((x, y) => x - y).join() === '0,30', 'avvisi dell\'evento calcolati: ' + JSON.stringify(inst));
+const sempio = await pg.evaluate(() => { const g = '2026-10-10', h = '19:00'; return [agTs(g, h, 60), agTs(g, '', 0), agTs(g, h, 1440)].map(v => { const d = new Date(v); return d.getDate() * 100 + d.getHours(); }); });
+ok(sempio[0] === 1018 && sempio[1] === 1009 && sempio[2] === 919, 'orari degli avvisi: 1 ora prima = 18:00, senza ora = 09:00, 1 giorno prima = giorno prima ' + sempio.join());
 ok(await pg.evaluate(() => agAvTxt(0, '19:00') === 'Adesso · 19:00' && agAvTxt(30) === 'Tra 30 minuti' && agAvTxt(60) === 'Tra 1 ora' && agAvTxt(1440, '19:00') === 'Domani alle 19:00'), 'testi degli avvisi');
 
 // avviso a schermo e nella campanella: evento con avviso già scattato 5 minuti fa
@@ -91,10 +91,10 @@ await pg.evaluate(async () => { const me = realU(), d = new Date(Date.now() + 25
   await agPut('agenda_' + today(d).slice(0, 7), { zz1: { k: 'ev', t: 'Consegna vini', g: today(d), h: String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'), cop: 0, note: '', vis: 'tutti', rep: [], da: me.id, cr: 1, mod: 1, r: '', av: [30], cl: [] } }); });
 await wait(300);
 await pg.evaluate(() => agTick(meU())); await wait(600);
-const n1 = await pg.evaluate(() => Object.values(D().notifiche).filter(n => n.tipo === 'agenda').map(n => n.titolo + '|' + n.testo));
+const n1 = await pg.evaluate(() => Object.values(D().notifiche).filter(n => n.tipo === 'agenda' && n.titolo === 'Consegna vini').map(n => n.titolo + '|' + n.testo));
 ok(n1.length === 1 && /Consegna vini\|Tra 30 minuti/.test(n1[0]), 'avviso scattato: notifica nella campanella ' + JSON.stringify(n1));
 await pg.evaluate(() => agTick(meU())); await wait(400);
-ok(await pg.evaluate(() => Object.values(D().notifiche).filter(n => n.tipo === 'agenda').length) === 1, 'secondo giro: niente doppione');
+ok(await pg.evaluate(() => Object.values(D().notifiche).filter(n => n.tipo === 'agenda' && n.titolo === 'Consegna vini').length) === 1, 'secondo giro: niente doppione');
 // piano per il server: senza Firebase non parte, ma il piano contiene solo chi ha iscrizioni
 const pl = await pg.evaluate(() => JSON.parse(agPlan()));
 ok(Array.isArray(pl.ev) && pl.ev.length === 0, 'piano per il server vuoto senza iscrizioni push');
