@@ -1,10 +1,28 @@
 # Passaggio di consegne (2026-10-07, fine sessione #30)
 
-Sessione attuale: #32
+Sessione attuale: #33
 
 ## Ultimo messaggio di Mario (#30), parola per parola
 «chiudi se vuoi sessione passo all'altro account cosa devo digli all'altro account oncosa vuoi digli di questa sessione/progetto»
 (= Mario passa a un altro account Claude: la sessione #31 parte lì, da questo stesso ramo.)
+
+## Ultimo messaggio di Mario (#32), parola per parola
+3 video registrati sullo Xiaomi 17 Ultra (Android), salvati in `docs/video/`: `mario-xiaomi-swipe-alto.mp4`, `mario-xiaomi-bianco-sotto.mp4`, `mario-xiaomi-animazione-giacca.mp4`.
+«è normale che nello Xiaomi 17 ultra faccia così nella parte alra facendo swipe dal basso verso l'alto?
+guarda secondo video appena clicco esce il bisnco sotto...puoi fare qlkosa? anche se dovessere essere android. terzo video l'animazione da scontornare bene es giacca bianca chef»
+
+## Da fare SUBITO in #33 (i video non sono ancora stati guardati)
+1. Estrarre fotogrammi dai 3 video (`ffmpeg -i docs/video/<f>.mp4 -vf fps=2 …` nello scratchpad) e capire:
+   - Video 1: cosa succede in alto (zona della barra di stato / notch) con lo swipe dal basso verso l'alto (gesto Home di Android, app a schermo intero `manifest` fullscreen). Rispondere a Mario se è normale (comportamento di Android) o correggibile (es. `theme-color`, `viewport-fit=cover`, zone sicure `env(safe-area-inset-*)`, colore di sfondo di `html`/`body`).
+   - Video 2: «appena clicco esce il bianco sotto»: capire quale tocco/schermata; probabile sfondo bianco di `html` o barra di navigazione di Android, tastiera, o `100vh`/`100dvh` (vedi v47 `.wall`). Correggere anche se è un problema di Android.
+   - Video 3: animazione dell'invio (`media/invio-chef.mp4` / `invio-fornitore.mp4`, `sendAnim`, unione WebGL): contorno della giacca bianca dello chef non pulito sullo Xiaomi. Script `tools/anim-invio.py` (scipy+ffmpeg) da ritoccare (soglia/contorno del bianco, giacca piena), poi rifare i video. Mandare a Mario immagini prima/dopo.
+2. Poi versione v51 (APP_VER, NEWS, CACHE in `sw.js`), prove legate + `tools/test-giro.mjs`, PR, squash, controllo online, merge main nel ramo.
+
+## Stato a fine #32
+- Ramo di lavoro: `ccr-4a01d00e-6ay25e`. v50 online su main (`1824a71`).
+- Giro completo su GitHub (run 37694432789, modo `tutto`, su main dopo la v50): **VERDE** (22:11→22:34 UTC).
+- Mario non ha ancora detto se ha provato la scheda Richieste → Gestite (v50).
+- La sessione #31 (altro account) è chiusa; #32 è stata la prima sul nuovo account.
 
 ## Sessione #32 (nuovo account, avvio 07/10 notte)
 Ramo di lavoro: `ccr-4a01d00e-6ay25e`. v50 già online su main. Giro completo (run 37694432789, `tutto`, partito 22:10 UTC) ancora in corso: da leggere. Ultimo messaggio di Mario: «Chiude la sessione l'altro account e mi dice di dirti questo non só se ti serve» (+ foto delle istruzioni di avvio per #31).
