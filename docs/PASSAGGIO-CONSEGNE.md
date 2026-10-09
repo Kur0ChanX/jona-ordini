@@ -38,7 +38,7 @@ Messaggio arrivato da un'altra sessione (RVC #28, `session_0134ut54jXS5mPGLRM7Qn
 ## Prossimo lavoro (#47)
 1. D15: aprire la PR da `claude/v63-listini-prova` verso `main` (titolo «v63: via i prodotti di prova»), iscriversi, con «Prove automatiche» verdi → squash → controllo online (versione 63) → merge di `main` nel ramo consegne (prima risolvere D16).
 2. Dire a Mario i passi M26 (Impostazioni → Prodotti di prova → Elimina) e chiedere se dopo vede ancora prodotti finti.
-3. D16: attende il «sì» di Mario (domanda già fatta in #46).
+3. D16 CHIUSA in #47: Mario «lascia com è adesso» → tenuta l'immagine A/B/C, `main` (v62) unito nel ramo consegne (commit `c109ffd`).
 4. D17 ponte RVC: rispondere alla sessione RVC #29 (`session_012YP8hknRTGPF6chZDGPEbV`) con send_message: cosa può dare Jona e cosa le serve, con i nomi dei campi già usati. Spunti: Jona dà `agenda_<AAAA-MM>` (eventi `ev={k,t,g,h,cop,note,vis,rep}`, coperti), orari/turni `config/orari_<lunedì>.tp`, staff `staff` (nome, reparto); a Jona servono ospiti/camere presenti, partenze, allergie, eventi della struttura (→ coperti e ordine suggerito `sugStats`). Tecnica da valutare: Worker Cloudflare con chiave condivisa (le due app hanno Firebase separati). Solo progetto, niente codice.
 5. Poi D14 (prova Android di Mario) e il resto di `docs/DA-FARE.md`.
 
