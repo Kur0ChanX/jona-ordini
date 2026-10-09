@@ -1,56 +1,39 @@
-# Passaggio di consegne (2026-10-09, fine sessione #41)
+# Passaggio di consegne (2026-10-09, fine sessione #42)
 
-Sessione attuale: #42
+Sessione attuale: #43
 
-## Ultimo messaggio di Mario (#41), parola per parola
-«@"/root/.claude/uploads/5641e3e6-bae9-5537-b086-21ef8921bee1/6ca1fe3e-Screenrecorder-2026-10-09-05-29-13-867.mp4" vedi c'è la barra nera sopra nella schermata di avvio poi dentro l'app uguale ma che strano se tocco le notifiche si mette a schermo intero come vorrei riesci a dare un controllo accurato per trovare una soluzione senza che chrone mi faccia  uscire l'avviso che è a schermo intero ogni volta che tocco un tasto.
+## Ultimo messaggio di Mario (#42), parola per parola
+«il mio logo fa' un effetto contrario soarisce veloce e si avvia subito  l'app con l'animazione logo netflix dai per capirci e il logo Jona quando arriva nella sua posizione della pagina deve dare un senso di appoggio pesantezza colpo non animazioni banali le voglio elaborate»
+(Risposta non ancora data nel merito: la #43 rifà l'animazione, vedi sotto.)
 
+Messaggio prima: «puoi fare un effetto nel logo jona che arriva zommato e si posiziona nel suo posto come se dovesse arrivare dal davanti allo schermo e poi il mio logo va via nello schermo commandosi e sparendo hai capito l'idea? prova»
 
-una volta finito nell'agenda di mauro ricordati che può inviare gli allerts in base a gli eventi o suoi appunti ai ragazzi singoli o per posizione cucina sala tutti solo per lui come memo solo a Maurizio ecc ecc studia un modo per far vedere l'evento all'interessato in modo che non si dimentichi senza influire troppo negativamente sull'esperienza dell'app»
-(Fatto tutto e pubblicato: v60 per la banda nera, v61 per l'agenda alla persona giusta. Risposta a Mario non ancora mandata: la manda la #42 con il riassunto qui sotto, se Mario chiede.)
+## Stato
+- Online: **v61** (`sw.js` CACHE `jona-ordini-v65`). Nessuna PR aperta.
+- Ramo `claude/v62-logo` (da `main`, pushato, commit `6917c4f`), **NON pubblicato**: v62 = prima prova dell'apertura + tolto `cutoutFix()`. `APP_VER=62`, NEWS v62, CACHE `jona-ordini-v66`. Prove legate verdi (test-apertura-v62, test-barra, test-logo, test-news, test-giro, con `TZ=Europe/Rome`).
+- Anteprima mandata: `docs/img/v62-apertura.mp4` (sul ramo v62). Mario: NON va bene così (ultimo messaggio).
 
-Messaggi prima (#41), in breve: «no tieni pure il giro extra» (il giro completo extra su GitHub dopo modifiche al Worker RESTA); «si mettilo una possibilità di vederla poi per mese giorno settimana deve sostituire la sua agenda cartacea…» (→ v59); «L'agenda è attiva… volevo un'agenda super smart per Mauro… con alerts… prendi spunto dai programmi di agende serie» (→ v58, scelta «A · Giornata + avvisi»); «giro completo era una volta a settimana ricordi?» (spiegato: lunedì automatico + extra solo dopo il Worker).
+## D13 — apertura da rifare (prossimo lavoro)
+Cosa c'è ora nel ramo v62 (index.html, CSS dopo `@keyframes ynoyShine`): `.intro .splash .logo-full` → `jonaIn` (scala 3,4 → 1, 1,3 s); `.wall-sub` da 0,9 s; firma `.wall-by` entra 1,1-2,3 s (`byIn`/`ynoyIn`/`ynoyShine`) e `byOut` (scala 0,05, 3,5-4,3 s); `.splash{overflow:hidden}`. Fine apertura: `setTimeout(end,4400)` in `S.splash` (riga ~5239 «if(ls('jona_me')&&!animOff()…»), `.intro` tolta a 4700.
+Cosa vuole Mario:
+- JONA: arriva e si posa con **peso, appoggio, colpo** (impatto): es. arrivo veloce da grande, schiacciamento all'impatto (scala 0,96 / leggero squash), piccolo rimbalzo, scossa della pagina, onda d'urto/polvere o ombra che si allarga sotto, bagliore. «Non banali, elaborate».
+- Firma YNOY: effetto «contrario», **come il logo Netflix**: arriva/si accende e poi sparisce veloce zoomando VERSO chi guarda (si ingrandisce e passa attraverso lo schermo), e l'app parte subito dopo (accorciare il tempo totale dopo l'uscita).
+- Attenzione: niente `filter:blur` su elementi con maschera (`.logo-full`, `.wall-by i`): righe bianche su Android (nota v53). Ombre/onde con elementi separati o pseudo-elementi senza maschera. `overflow:hidden` sulla `.splash` per lo zoom.
+- Metodo: video d'anteprima con `tools/video-apertura.mjs` (uso: `node tools/video-apertura.mjs <cartella>`, server su 8765; Playwright, `navigator.webdriver` finto false, `setTimeout` 4400/4700 ignorati, animazioni ferme con `getAnimations()` e `currentTime` a 30 fps, poi `ffmpeg` → mp4 780 px) + foglio di 10 fotogrammi da guardare PRIMA di mandare (E17). Aggiornare `tools/test-apertura-v62.mjs` (controlla gli stati a istanti fissi, non dipende dai tempi; nomi delle animazioni `jonaIn`/`byOut` da adeguare) e NEWS v62. Poi chiedere a Mario «ti piace?» (aspetto = sua scelta) e pubblicare: PR da `claude/v62-logo`, squash, controllo online, merge di `main` nel ramo di lavoro.
 
-## Fatto in #41 (08-09/10): v54 → v61 online
-| Versione | PR | Cosa | CACHE |
-|---|---|---|---|
-| v54 | #64 | barra in tinta (poi tolta in v57) | v58 |
-| v55 | #65 | `requestFullscreen` al primo tocco → Chrome mostrava l'avviso «per uscire… trascina» | v59 |
-| v56 | #66 | tolto `requestFullscreen` (avviso di sistema, non nascondibile) | v60 |
-| v57 | #67 | tolti `themeBar()` e `body::before` della v54 (Mario: «com'era nella v45»); manifest e viewport identici dalla v37 | v61 |
-| v58 | #68 | agenda: avvisi `ev.av` (0/15/30/60/120/1440 min, senza ora = 09:00, di partenza 30), push dal Worker `/agenda` + cron `agTickSrv`, «Cose da fare» `ev.cl` con spunta, evento successivo evidenziato | v62 |
-| v59 | #69 | agenda per pianificare: Giorno a ore 7-23 con «Appunti del giorno» personali (`config/agnote_<AAAA-MM>`, `n.d<AAAAMMGG>.<persona>`), «Sposta a domani i non fatti», ora vuota → evento, Settimana/Mese toccabili, «Torna a oggi», scorrimento col dito, Invio | v63 |
-| v60 | #70 | `cutoutFix()`: prova per la banda nera (vedi sotto) | v64 |
-| v61 | #71 | agenda alla persona giusta: `vis:'pers'` + `per:[id]`, «Avvisa subito», `visto.<persona>` (valido se ≥ `mod`), «visto da x/y», striscia «Per te in agenda» + «Ok, visto», appunto → informazione (`agNtSend`) | v65 |
-- Online controllato: `sw.js` = `jona-ordini-v65`. Giro completo su GitHub dopo la v58 (Worker): verde.
-- Prove nuove: `tools/test-agenda-v58.mjs` (26), `test-agenda-v59.mjs` (30), `test-agenda-v61.mjs` (22), tutte in VELOCI di `tools/prova-ci.sh` e in `tools/README.md`; `test-barra.mjs` riscritta (v57+v60); `test-agenda.mjs` aggiornata (prima «Per te in agenda», poi «Ok, visto»).
-- Immagini mandate: `docs/img/v59-agenda.png`, `docs/img/v61-agenda-destinatari.png`. Segnalazioni: `docs/img/segnalazioni/v56-video-*.jpg`, `v59-zona-fotocamera-prima-dopo-tendina.png`.
-- Errore nuovo E18 (`docs/ERRORI.md`): prova che dipendeva dall'ora → rossa su GitHub (fuso Roma). Rimedio: date fisse e prove nuove anche con `TZ=Europe/Rome`.
+## Banda nera in alto — CHIUSA
+- Causa trovata: con `display: fullscreen` Chrome mette apposta il nero nella zona fotocamera (`LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT`); `viewport-fit=cover` vale solo con la richiesta di schermo intero (avviso di Chrome). Fonte: https://github.com/whisper-money/whisper-money/pull/1080
+- Scelta A/B mandata (`docs/img/v62-barra-scelta.png`): Mario voleva «B senza orario e batteria» → impossibile dall'app.
+- Telefono di Mario: **Xiaomi 17 Ultra** (HyperOS). Impostazioni › Notifiche e barra di stato › **Notch nelle singole app** (scelte «Automatico» / «Mostra sempre il notch»): messo Jona Ordini su «Mostra sempre il notch» → nessun cambiamento. Mario: «per ora lo lascio così». Confermato che nemmeno nella sola schermata d'apertura si può.
+- Screenshot di Mario salvati: `docs/img/segnalazioni/v62-ricerca-*.jpg`, `v62-notch-*.jpg`, `v62-notch-dopo.jpg`.
+- `cutoutFix()` tolto nel ramo v62 (C8 in `docs/DA-FARE.md`, si chiude con la pubblicazione della v62).
 
-## Banda nera in alto (zona fotocamera) — stato
-- Analisi del video del 09/10: all'avvio la finestra è spostata in basso di 144 px (zona sicura 0, nero del sistema). Tirando giù la tendina delle notifiche Android ridisegna la finestra e l'app usa la zona fotocamera (zona sicura 144, colore dell'app): quindi il telefono LO PERMETTE, si applica in ritardo.
-- v60 `cutoutFix()` (index.html, prima di `applyTheme`): solo app installata `display-mode: fullscreen`, se `env(safe-area-inset-top)`=0 → `viewport-fit` `auto` e dopo 150 ms di nuovo `cover`, al `load` (+300 ms) e al ritorno in primo piano. NON verificata sul telefono: aspettiamo M24.
-- Se non basta, idee successive (decide Claude): ripetere il cambio più tardi (es. dopo 1-2 s o alla chiusura della schermata d'apertura), oppure provare con `<meta name="theme-color">` cambiato una volta all'avvio; MAI `requestFullscreen` (avviso di Chrome, v55-v56). M23 (impostazione del telefono) resta un'alternativa.
-- Reinstallare l'icona: Mario ha scelto di provarci (passi mandati); esito non detto.
-
-## Agenda di Mauro — come funziona ora
-- Icona calendario solo per `agCan` (gestori, sviluppatore, reparti `fb`/`resp`); con la vista «Staff» non c'è (Mario non la vedeva per questo).
-- Avvisi: `agTick` ogni minuto in `deadlineTick` (avviso + notifica `ag_<id>_<at>_<persona>`); `agSrv`/`agPlan` → Worker `/agenda` dal telefono di chi può scrivere (serve aprire l'app dopo aver scritto); il cron manda una volta sola (finestra 20 min).
-- Destinatari: `agDest(e)`; per `rep` solo i reparti scelti; `pers` solo le persone scelte (anche i gestori non lo vedono).
-- Mario chiede in #41 di prendere spunto dalle agende serie: altre idee in D11 di `docs/DA-FARE.md`.
-
-## Da fare nella #42
-1. Rispondere a Mario (se non l'ha già avuto): v60 e v61 online, cosa provare (M24, M25 in `docs/DA-FARE.md`), l'immagine `docs/img/v61-agenda-destinatari.png` è già stata mandata.
-2. Attendere l'esito di M24 (banda nera) e M25 (prova di Mauro); poi D11 o il passo successivo per la banda nera.
-3. D10 (riquadro «Inviato allo chef»: solo «Continua»): Mario non ha ancora risposto; richiederlo una volta.
-4. Poi `docs/DA-FARE.md` (M22, M21, M20, C7…).
-
-## Regole confermate in #41
-- Giro completo extra su GitHub dopo modifiche al Worker: RESTA (Mario 09/10).
-- Pubblicare da solo con prove legate + test-giro verdi (fatto per v54-v61).
+## Da fare nella #43 (ordine)
+1. D13: rifare l'apertura come sopra, anteprima a Mario, poi pubblicare la v62.
+2. Chiedere l'esito di M25 (prova dell'agenda con Mauro); la domanda era stata fatta, senza risposta.
+3. D10 (riquadro «Inviato allo chef»: solo «Continua»): ancora senza risposta.
+4. Poi `docs/DA-FARE.md`.
 
 ## Rischi aperti
-- `cutoutFix` può far vedere un piccolo scatto all'avvio (solo se il telefono era nel modo nero): da chiedere a Mario.
-- «Avvisa subito» manda una notifica per persona: con «Tutti» e molto staff sono molte scritture (ok per il piano gratuito con lo staff del Jona).
-- Server locale e emulatore si spengono a ogni riavvio del contenitore (`tools/README.md`).
-- Titoli: `🟤 ▶ ATTIVA · #42 · Jona Ordini · da v61 · …`.
+- Server locale ed emulatore si spengono a ogni riavvio del contenitore (`tools/README.md`).
+- Titolo nuova sessione: `🟤 ▶ ATTIVA · #43 · Jona Ordini · da v61 · 09/10/2026 · prossimo: apertura logo v62`.
