@@ -1,58 +1,50 @@
-# Passaggio di consegne (2026-10-09, fine sessione #46)
+# Passaggio di consegne (2026-10-09, fine sessione #47)
 
-Sessione attuale: #47
+Sessione attuale: #48
 
-## Ultimo messaggio di Mario (#46), parola per parola
-«Ho caricato 2 listini per mariano visto che sono veri cancella tutti i vecchi finti listini da tutti i fornitori»
+## Ultimo messaggio di Mario (#47), parola per parola
+«i prodotti finti che hai messo tu devi cancellarli tu»
 
-Messaggi prima (#46), parola per parola, in ordine:
-- «vai» (unire la PR #72 dopo le prove verdi)
+Messaggi prima (#47), parola per parola, in ordine:
+- «rimanda immagine a b c per scegliere o domanda»
+- «lascia com è adesso» (risposta su D16: immagine)
+- «ok avvisami quando è online» (la v63)
 
-Domanda rimasta senza risposta (fatta da Claude in #46): «Per l'immagine in conflitto: va bene tenere le bozze A, B e C e rinominare quella vecchia?» (vedi D16).
-
-Messaggio arrivato da un'altra sessione (RVC #28, `session_0134ut54jXS5mPGLRM7Qnbj9`), con le parole di Mario: «dai la possibilità di lasciare un ponte con l'app Jona per informazioni condivise Jona è il ristorante di questa struttura quindi possono essere 2 app che lavorano a stretto contatto, comunicalo anche a jona e organizzatevi». Salvato come D17. Non ancora risposto.
+Promesse fatte a Mario e ancora da mantenere: **avvisarlo quando la v63 è online**. Gli ho detto «Tu non devi fare niente».
 
 ## Stato
-- Online: **v62** (PR #72 unita con squash, commit `4cd2fca` su `main`; controllato `APP_VER=62` e CACHE `jona-ordini-v66` sul sito). Iscrizione alla PR #72 tolta.
-- **v63 pronta sul ramo `claude/v63-listini-prova`** (commit `f7fdfe6`, pushato, NIENTE PR ancora). Lavorata nella cartella `/home/user/v63` (worktree, sparisce col contenitore: nella nuova sessione `git worktree add ../v63 claude/v63-listini-prova`).
-- Ramo consegne `claude/sessione-41-consegne-p7tepk`: `main` (v62) NON ancora unito per un conflitto su un'immagine (D16). Merge annullato con `git merge --abort`: nessun lavoro perso, niente a metà.
+- Online: **v62**.
+- **PR #73 «v63: via i prodotti di prova»** aperta: https://github.com/Kur0ChanX/jona-ordini/pull/73 (ramo `claude/v63-listini-prova`, ultimo commit `30caa1c`, pushato e confermato). Le «Prove automatiche» ripartono sul nuovo commit. Questa sessione era iscritta alla PR: l'iscrizione la toglie questa sessione; **la nuova sessione deve iscriversi** (`subscribe_pr_activity` Kur0ChanX/jona-ordini 73).
+- Ramo consegne `claude/sessione-41-consegne-p7tepk`: `main` (v62) unito (commit `c109ffd`), D16 chiusa.
+- Cartella `/home/user/v63` = worktree del ramo v63 (sparisce col contenitore: `git worktree add ../v63 claude/v63-listini-prova`).
 
-## Fatto in #46
-1. PR #72 (v62): «Prove automatiche» verdi (06:46 UTC) → squash merge → v62 online verificata.
-2. Merge di `main` nel ramo consegne: **conflitto add/add** su `docs/img/v62-uscita-scelta.png`. Le due immagini hanno lo stesso nome ma contenuto diverso:
-   - ramo consegne (commit `7c07e3f`): bozze ferme A «Tutto insieme» / B «Si cancella al contrario» / C «JONA prima, poi la firma» (quella da cui Mario ha scelto la C);
-   - `main` (arrivata col ramo v62): vecchie uscite bocciate A polvere / B vecchia TV / C taglio di luce.
-   Per regola (conflitto → fermarsi) ho chiesto a Mario. Proposta: tenere A/B/C con il nome attuale, salvare quella di `main` come `docs/img/v62-uscita-scelta-vecchia.png` (`git show origin/main:docs/img/v62-uscita-scelta.png > …`), poi chiudere il merge e push.
-3. **v63 «Prodotti di prova»** (richiesta di Mario sopra). Perché così:
-   - Claude non può entrare nel Firestore vero (nessuna credenziale). E cancellare dati veri è irreversibile: la cancellazione la fa Mario dal telefono con un tocco, dopo aver visto i numeri.
-   - Prodotti finti = quelli di `seedIfEmpty`: i 10 `demo01..demo10` (`demo:true`; Metro, Dolpa, Nieddittas, Pascucci) e i 19 `mar01..mar19` di F.lli Mariano (senza prezzo).
-   - Un import di listino (`reviewSave`) scrive `caricatoDa:S.me`; se trova lo stesso prodotto (`matchProd`) lo aggiorna con `upd`. Quindi un `marNN` aggiornato dal listino vero ha `caricatoDa` e **resta**. I prodotti scritti a mano (`saveProd`) hanno id `uid()` casuale e restano.
-   - Regola: `const fintoP=p=>!!p.demo||(/^mar\d\d$/.test(p.id)&&!p.caricatoDa);` (subito prima di `seedIfEmpty`).
-   - Impostazioni: la riga «Prodotti di esempio» diventa «Prodotti di prova» («N prodotti finti messi all'inizio»); `demoDel` cancella tutti i `fintoP`, la conferma `ask` mostra il conto per fornitore («F.lli Mariano: 14 · Metro: 5 …. Restano i prodotti caricati da voi.»).
-   - Il carrello regge prodotti cancellati (`cartLines` filtra quelli mancanti).
-   - Scartato: script che cancella dal server (serve accesso e rischio alto); cancellare anche prodotti importati prima di oggi (non sappiamo quali sono di prova: se Mario ne vede ancora di finti, li toglie a mano o si decide insieme).
-   - `APP_VER=63`, `sw.js` CACHE `jona-ordini-v67`, NEWS v63 (parte `chef` + `dev`).
-   - Prova nuova `tools/test-listini-prova.mjs` (riuscita), aggiunta in testa a `VELOCI` di `tools/prova-ci.sh`.
-   - Prove veloci locali (`TZ=Europe/Rome bash tools/prova-ci.sh veloce`) in corso al momento dell'handoff: le prime 13 riuscite (listini-prova, apertura-v62, barra, agenda-v58/59/61, demo-invito, richieste-gestite, errori, errori-server, falsi-ok, firebase-telefoni, v35). Il giro si interrompe con questa sessione: la nuova sessione deve rifarlo (oppure basta il controllo «Prove automatiche» della PR, che fa lo stesso giro veloce) + `test-firebase-bulk` e `test-v16`.
+## Fatto in #47
+1. D16 chiusa: Mario «lascia com è adesso» → nel ramo consegne resta `docs/img/v62-uscita-scelta.png` con le bozze A/B/C (quella del ramo consegne); la versione di `main` (vecchie uscite polvere/TV/taglio) NON è stata salvata a parte (resta nella cronologia di git). Merge con `git checkout --ours`, commit `c109ffd`, poi `bdb17d1` (DA-FARE).
+2. Arrivato messaggio dalla sessione #46 (`session_012mgHQaR4WnuUgrwW2kdMVw`): giro veloce locale della v63 su `f7fdfe6` TUTTE RIUSCITE (21) + `test-firebase-bulk` e `test-v16`.
+3. Aperta PR #73.
+4. **Richiesta di Mario: cancellare io i prodotti finti, non lui a mano.** Claude non ha accesso al Firestore vero, quindi la cancellazione la fa l'app da sola, una volta. Aggiunto alla v63 (commit `30caa1c`):
+   - `fintoP` più stretto: `!!p.demo || (/^mar\d\d$/.test(p.id) && !p.caricatoDa && p.prezzo==null)` (i `marNN` del seed hanno `prezzo:null`; uno con prezzo scritto a mano resta).
+   - `provaVia()` subito dopo `fintoP`: parte da `deadlineTick` (ogni minuto e al ritorno in primo piano). Condizioni: non `DEMO`, `S.db.kind==='firebase'`, `config/app.provaVia` assente, utente vero (`realU`, non `viewAs`) attivo `gm` o `dev`. Con `jona_fb_emu` (prove con emulatore) non fa niente salvo `localStorage.jona_t_provavia` (così le altre prove tengono i prodotti di prova). Legge i prodotti dal server con il nuovo `S.db.prodServer()` (FirebaseStore, `listini` con `source:'server'`): niente cancellazioni sbagliate da una copia vecchia del telefono. Cancella con `runPool`+`del`, poi scrive `config/app.provaVia=now()` e un toast. Senza rete: errore preso, riprova al giro dopo.
+   - Scartato: anche in modalità locale (rompeva le prove locali che usano i prodotti di prova; il ristorante usa Firebase). Il pulsante manuale «Prodotti di prova → Elimina» resta.
+   - NEWS v63 riscritta (chef: spariscono da soli; dev: `provaVia`, `prodServer`).
+   - Prova nuova `tools/test-firebase-provavia.mjs` (emulatore): RIUSCITA (7 PASS). `test-listini-prova` rilanciata: riuscita. Aggiunta in `VELOCI` di `tools/prova-ci.sh` (dopo `test-listini-prova`).
+   - Il giro veloce locale completo NON è stato rifatto sul nuovo commit: basta il controllo «Prove automatiche» della PR (stesso giro veloce). Se è rosso: capire la causa, correggere.
 
-## Prossimo lavoro (#47)
-1. D15: aprire la PR da `claude/v63-listini-prova` verso `main` (titolo «v63: via i prodotti di prova»), iscriversi, con «Prove automatiche» verdi → squash → controllo online (versione 63) → merge di `main` nel ramo consegne (prima risolvere D16).
-2. Dire a Mario i passi M26 (Impostazioni → Prodotti di prova → Elimina) e chiedere se dopo vede ancora prodotti finti.
-3. D16 CHIUSA in #47: Mario «lascia com è adesso» → tenuta l'immagine A/B/C, `main` (v62) unito nel ramo consegne (commit `c109ffd`).
-4. D17 ponte RVC: rispondere alla sessione RVC #29 (`session_012YP8hknRTGPF6chZDGPEbV`) con send_message: cosa può dare Jona e cosa le serve, con i nomi dei campi già usati. Spunti: Jona dà `agenda_<AAAA-MM>` (eventi `ev={k,t,g,h,cop,note,vis,rep}`, coperti), orari/turni `config/orari_<lunedì>.tp`, staff `staff` (nome, reparto); a Jona servono ospiti/camere presenti, partenze, allergie, eventi della struttura (→ coperti e ordine suggerito `sugStats`). Tecnica da valutare: Worker Cloudflare con chiave condivisa (le due app hanno Firebase separati). Solo progetto, niente codice.
-5. Poi D14 (prova Android di Mario) e il resto di `docs/DA-FARE.md`.
+## Prossimo lavoro (#48)
+1. Iscriversi alla PR #73; con «Prove automatiche» verdi → squash merge → controllo online (APP_VER 63, CACHE `jona-ordini-v67` su https://jona-ristorante-by-ynoy-corp.pages.dev/) → subito `git fetch origin main && git merge origin/main` nel ramo consegne + push.
+2. **Avvisare Mario che la v63 è online**: apre l'app (o tocca «App da aggiornare»), i prodotti finti spariscono da soli; chiedergli se ne vede ancora (M26).
+3. D17 ponte RVC: rispondere alla sessione RVC attiva (#29, `session_012YP8hknRTGPF6chZDGPEbV`) con send_message: cosa dà Jona (agenda `agenda_<AAAA-MM>` con `ev={k,t,g,h,cop,note,vis,rep}`, coperti; orari `config/orari_<lunedì>.tp`; `staff` nome/reparto) e cosa serve a Jona (ospiti/camere presenti, partenze, allergie, eventi della struttura → coperti e `sugStats`). Tecnica da valutare: Worker Cloudflare con chiave condivisa (Firebase separati). Solo progetto, niente codice.
+4. Poi D14 (prova Android di Mario) e il resto di `docs/DA-FARE.md`.
 
 ## Strumenti
-- Server: `python3 -m http.server 8765` nella cartella del ramo da provare; prove da `tools/` o con `bash tools/prova-ci.sh veloce <cartella risultati>` (avvia anche emulatore).
+- Server: `python3 -m http.server 8765` nella cartella del ramo; emulatore `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`; svuotarlo prima di ogni prova Firebase (vedi `tools/prova-ci.sh`).
 - Prove con `TZ=Europe/Rome` (E18).
 
 ## Ancora da chiedere
-- Esito di M25 (prova dell'agenda con Mauro): senza risposta.
+- Esito di M25 (agenda con Mauro): senza risposta.
 - D10 (riquadro «Inviato allo chef»: solo «Continua»): senza risposta.
-- Il resto in `docs/DA-FARE.md`.
 
 ## Rischi aperti
-- Server locale ed emulatore si spengono a ogni riavvio del contenitore.
+- La pulizia automatica è irreversibile sui dati veri: la regola è stretta (solo `demo` e `marNN` mai caricati e senza prezzo) e legge dal server. Se Mario ha caricato i listini sotto un fornitore diverso da `mariano`, i `marNN` vecchi vengono tolti: è quello che vuole.
 - Maschera SVG su Android non ancora verificata su un telefono vero.
-- Se Mario ha caricato i listini in un nome di fornitore diverso da `mariano` (es. un fornitore nuovo), i `marNN` vecchi non vengono aggiornati e sono cancellati come finti: è quello che vuole.
-- Titolo nuova sessione: `🟤 ▶ ATTIVA · #47 · Jona Ordini · da v62 · 09/10/2026 · prossimo: pubblicare v63 (prodotti di prova)`.
+- Titolo nuova sessione: `🟤 ▶ ATTIVA · #48 · Jona Ordini · da v62 · 09/10/2026 · prossimo: pubblicare v63 (pulizia automatica prodotti di prova)`.
