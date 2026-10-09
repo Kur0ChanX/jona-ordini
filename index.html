@@ -96,17 +96,18 @@ img{max-width:100%}
 .intro .splash{animation:jShake .5s .55s linear both}
 .intro .splash .logo-full{transform-origin:50% 88%;animation:jonaIn 1.2s linear both}
 .intro .splash .jsh{animation:jShadow 1.2s linear both}
-.intro .splash .jhit,.intro .splash .wall-by span{animation:jAway .4s 3.4s cubic-bezier(.5,0,.75,0) forwards}
+.intro .splash .jhit{animation:jAway .35s 3.25s cubic-bezier(.5,0,.75,0) forwards}
+.intro .splash .wall-by>span{animation:yAway .3s 3.48s ease-in-out forwards}
 .intro .splash .jrg{animation:jRing .9s .55s cubic-bezier(.1,.7,.25,1) forwards}
 .intro .splash .jrg+.jrg{animation-duration:1.15s;animation-delay:.63s}
 .intro .splash .jpb{animation:jPb var(--t) var(--d) cubic-bezier(.1,.75,.3,1) forwards}
-.intro .splash .wall-sub{animation:rise .7s 1s cubic-bezier(.2,.7,.2,1) both,jAway .4s 3.4s cubic-bezier(.5,0,.75,0) forwards}
+.intro .splash .wall-sub{animation:rise .7s 1s cubic-bezier(.2,.7,.2,1) both,jAway .35s 3.25s cubic-bezier(.5,0,.75,0) forwards}
 @keyframes jonaIn{0%{opacity:0;transform:scale(4.2);animation-timing-function:cubic-bezier(.55,0,.95,.5)}16%{opacity:1}46%{transform:none;animation-timing-function:cubic-bezier(.2,.8,.4,1)}53%{transform:translateY(2%) scale(1.1,.84)}67%{transform:translateY(-2%) scale(.96,1.05)}81%{transform:scale(1.02,.98)}100%{opacity:1;transform:none}}
 @keyframes jShadow{0%{opacity:0;transform:scale(.15);animation-timing-function:cubic-bezier(.55,0,.95,.5)}46%{opacity:.75;transform:scale(1);animation-timing-function:ease-out}53%{opacity:1;transform:scaleX(1.3)}100%{opacity:.5;transform:none}}
 @keyframes jRing{0%{opacity:.9;transform:scale(.45);border-width:3px}100%{opacity:0;transform:scale(2.6);border-width:.5px}}
 @keyframes jPb{0%{opacity:0;transform:none}10%{opacity:var(--o)}60%{opacity:calc(var(--o)*.7)}100%{opacity:0;transform:translate(var(--x),var(--y))}}
 @keyframes jShake{0%,100%{transform:none}12%{transform:translate(0,7px)}28%{transform:translate(-4px,-3px)}44%{transform:translate(3px,2px)}62%{transform:translate(-2px,-1px)}80%{transform:translate(1px,0)}}
-/* firma: prima «BY» (le due lettere cadono una alla volta), poi YNOY si scrive come a mano, tratto dopo tratto nell'ordine della scrittura (SVG: tratti di tools/ynoy-tratti.py che scoprono il logo), poi il riflesso; esce insieme a JONA */
+/* firma: prima «BY» (le due lettere cadono una alla volta), poi YNOY si scrive come a mano, tratto dopo tratto nell'ordine della scrittura (SVG: tratti di tools/ynoy-tratti.py che scoprono il logo), poi il riflesso; esce per ultima: prima sfuma JONA (3,25-3,6 s), poi BY e YNOY (3,48-3,78 s) */
 .splash .wall-by{opacity:1}
 .splash .wall-by span{color:#B9AEA2}
 .splash .wall-by em{display:inline-block;font-style:normal;opacity:0}
@@ -118,11 +119,12 @@ img{max-width:100%}
 .intro .splash .wall-by em{animation:byDrop .55s .85s cubic-bezier(.3,1.6,.5,1) both}
 .intro .splash .wall-by em+em{animation-delay:1s}
 .intro .splash .y0{animation:yShow 0s 2.80s both,ynoyShine .55s 2.80s ease-in-out both}
-.intro .splash .yn{animation:jAway .4s 3.4s cubic-bezier(.5,0,.75,0) forwards}
+.intro .splash .yn{animation:yAway .3s 3.48s ease-in-out forwards}
 @keyframes byDrop{0%{opacity:0;transform:translateY(-26px) rotate(-25deg)}60%{opacity:1}100%{opacity:1;transform:none}}
 @keyframes yStroke{from{stroke-dashoffset:var(--o)}to{stroke-dashoffset:0}}
 @keyframes yShow{from{opacity:0}to{opacity:1}}
 @keyframes jAway{to{opacity:0;transform:scale(.93)}}
+@keyframes yAway{to{opacity:0;transform:scale(1.03)}}
 
 .wall-groups{width:100%;max-width:760px}
 .wall h2{font:400 14px var(--font);letter-spacing:.08em;color:#A3978D;margin:38px 0 16px;text-align:center}
