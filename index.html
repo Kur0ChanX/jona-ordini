@@ -1090,8 +1090,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=59;
+const APP_VER=60;
 const NEWS=[
+  {v:60,data:'2026-10-09',titolo:'Prova per togliere la banda nera in alto',
+    tutti:['All\'apertura l\'app prova a usare anche la zona della fotocamera, senza la banda nera e senza l\'avviso «schermo intero» di Chrome.'],
+    dev:{correzioni:['`cutoutFix()`: se l\'app è installata a schermo intero e `env(safe-area-inset-top)` vale 0, `viewport-fit` passa ad `auto` e dopo 150 ms torna a `cover`, così Chrome riapplica la modalità della zona fotocamera e Android ridisegna la finestra (come quando si tira giù la tendina delle notifiche, video di Mario del 09/10). Al caricamento e al ritorno in primo piano.']}},
   {v:59,data:'2026-10-09',titolo:'Agenda per pianificare giorni e settimane',
     tutti:['Agenda: scorri col dito a destra e a sinistra per cambiare giorno, settimana o mese.'],
     chef:['Vista «Giorno» come un\'agenda di carta: in alto i tuoi «Appunti del giorno» (li vedi solo tu) con la spunta e «Sposta a domani i non fatti»; poi le ore dalle 7 alle 23: tocca un\'ora vuota per segnare un evento a quell\'ora.','«Settimana»: tocca un giorno per aprirlo, «+» per un evento in quel giorno; vedi anche quanti appunti restano.','«Mese»: tocca un giorno e poi «apri il giorno». «Torna a oggi» quando sei su un altro periodo.'],
@@ -4258,6 +4261,14 @@ async function scSave(del){const x=S.sc,l=(Array.isArray(cfg().scad)?cfg().scad:
   else if(!await ask('Eliminare questa scadenza?','Lo staff non riceverà più questo avviso.','Elimina',true))return;
   await put('config','app',Object.assign({},cfg(),{scad:l}));closeSheet();toast(del?'Scadenza eliminata':'Scadenza salvata')}
 async function setPhoto(fs){ls('jona_reg',null);try{S.form.foto=await fileToAvatar(fs[0]);repaint()}catch(e){toast('Non riesco a leggere questa foto.','err')}}
+/* v60 zona della fotocamera: su alcuni Android (Xiaomi) l'app installata parte con la zona della fotocamera nera finché la finestra
+   non si ridisegna (succede tirando giù le notifiche). Se la zona sicura in alto è 0, cambio viewport-fit avanti e indietro:
+   Chrome riapplica la modalità «notch» e la finestra si ridisegna. Niente schermo intero di Chrome, quindi niente avviso. */
+function cutoutFix(){try{if(!matchMedia('(display-mode: fullscreen)').matches)return false;const m=document.querySelector('meta[name=viewport]');if(!m||!/viewport-fit=cover/.test(m.content))return false;
+  const p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:1px;height:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';document.body.appendChild(p);const h=p.getBoundingClientRect().height;p.remove();
+  if(h>0)return false;const c=m.content;m.content=c.replace('viewport-fit=cover','viewport-fit=auto');setTimeout(()=>{m.content=c},150);return true}catch(e){return false}}
+addEventListener('load',()=>setTimeout(cutoutFix,300));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(cutoutFix,300)});
 function applyTheme(){const t=ls('jona_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme}
 
 /* ================= dati iniziali (solo al primo avvio) ================= */
