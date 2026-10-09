@@ -116,6 +116,9 @@ ok(/Usata da 1 persona, 1 volta questo mese/.test(await txt('.sheet')),'Impostaz
 await closeAll();
 
 // 9. striscia «Oggi in hotel» e staff in sola lettura
+// v61: prima «Per te in agenda» (eventi scritti da altri e non ancora visti), poi «Ok, visto» → «Oggi in hotel»
+ok(/Per te in agenda/.test(await txt('.ag-strip')),'v61: striscia «Per te in agenda» per gli eventi scritti da altri');
+await pg.click('.ag-strip [data-a="agVistoOk"]');await wait(500);
 ok(/Oggi in hotel 09:00 Riunione settimanale · 11:00 Solo sala · 12:00 Solo cucina · \+/.test(await txt('.ag-strip')),'striscia «Oggi in hotel» per il gestore');
 await view('staff');
 ok(await pg.locator('header.top [data-a="agOpen"]').count()===0,'staff: niente icona del calendario');
