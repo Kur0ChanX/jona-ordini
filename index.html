@@ -98,25 +98,58 @@ img{max-width:100%}
 .intro .splash .logo-full{transform-origin:50% 88%;animation:jonaIn 1.2s linear both}
 .intro .splash .jsh{animation:jShadow 1.2s linear both}
 .intro .splash .jfl{animation:jFlash .8s .55s cubic-bezier(.2,.7,.3,1) forwards}
-.intro .splash .jhit{animation:jAway .4s 3.1s cubic-bezier(.5,0,.75,0) forwards}
+.intro .splash .jhit,.intro .splash .wall-by span{animation:jAway .4s 3.4s cubic-bezier(.5,0,.75,0) forwards}
 .intro .splash .jrg{animation:jRing .9s .55s cubic-bezier(.1,.7,.25,1) forwards}
 .intro .splash .jrg+.jrg{animation-duration:1.15s;animation-delay:.63s}
 .intro .splash .jd{animation:jDust .85s .55s cubic-bezier(.1,.8,.3,1) forwards}
-.intro .splash .wall-sub{animation:rise .7s 1s cubic-bezier(.2,.7,.2,1) both,jAway .4s 3.1s cubic-bezier(.5,0,.75,0) forwards}
-.intro .splash .wall-by{transform-origin:50% 66%;will-change:transform;animation:byOut .75s 2.75s linear forwards}
-.intro .splash .wall-by span{animation:byIn .9s .9s cubic-bezier(.22,1,.36,1) both}
-.intro .splash .wall-by i{animation:ynoyIn 1s 1s cubic-bezier(.22,1,.36,1) both,ynoyShine .8s 1.9s cubic-bezier(.45,0,.25,1) both}
-.splash::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 88%,rgba(237,230,223,.45),rgba(237,230,223,0) 65%);opacity:0}
-.intro .splash::after{animation:byFlash .45s 3.15s ease-out both}
+.intro .splash .wall-sub{animation:rise .7s 1s cubic-bezier(.2,.7,.2,1) both,jAway .4s 3.4s cubic-bezier(.5,0,.75,0) forwards}
 @keyframes jonaIn{0%{opacity:0;transform:scale(4.2);animation-timing-function:cubic-bezier(.55,0,.95,.5)}16%{opacity:1}46%{transform:none;animation-timing-function:cubic-bezier(.2,.8,.4,1)}53%{transform:translateY(2%) scale(1.1,.84)}67%{transform:translateY(-2%) scale(.96,1.05)}81%{transform:scale(1.02,.98)}100%{opacity:1;transform:none}}
 @keyframes jShadow{0%{opacity:0;transform:scale(.15);animation-timing-function:cubic-bezier(.55,0,.95,.5)}46%{opacity:.75;transform:scale(1);animation-timing-function:ease-out}53%{opacity:1;transform:scaleX(1.3)}100%{opacity:.5;transform:none}}
 @keyframes jFlash{0%{opacity:0;transform:scale(.5)}15%{opacity:1}100%{opacity:0;transform:scale(1.4)}}
 @keyframes jRing{0%{opacity:.9;transform:scale(.45);border-width:3px}100%{opacity:0;transform:scale(2.6);border-width:.5px}}
 @keyframes jDust{0%{opacity:1;transform:none}60%{opacity:.7}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(.3)}}
 @keyframes jShake{0%,100%{transform:none}12%{transform:translate(0,7px)}28%{transform:translate(-4px,-3px)}44%{transform:translate(3px,2px)}62%{transform:translate(-2px,-1px)}80%{transform:translate(1px,0)}}
-@keyframes byOut{0%{opacity:.8;transform:none;animation-timing-function:cubic-bezier(.3,0,.5,1)}20%{opacity:.95;transform:scale(.88);animation-timing-function:cubic-bezier(.75,0,1,.55)}72%{opacity:1}100%{opacity:0;transform:scale(16)}}
+/* firma: prima «BY» (le due lettere cadono una alla volta), poi YNOY si scrive da sinistra con la punta di luce, poi esce da solo (BY resta e sfuma con JONA) */
+.splash .wall-by{opacity:1}
+.splash .wall-by span{color:#B9AEA2}
+.splash .wall-by em{display:inline-block;font-style:normal;opacity:0}
+.splash .yn{position:relative;width:172px;aspect-ratio:496/190}
+.splash .yn>i{position:absolute;inset:0;width:auto}
+.splash .yn>.y0{-webkit-mask:url(media/ynoy.png) center/contain no-repeat,linear-gradient(90deg,#000 40%,transparent 60%) 100% 0/250% 100% no-repeat;-webkit-mask-composite:source-in;mask:url(media/ynoy.png) center/contain no-repeat,linear-gradient(90deg,#000 40%,transparent 60%) 100% 0/250% 100% no-repeat;mask-composite:intersect}
+.splash .yn>.yp{background:#DDD3C8;opacity:0}
+.splash .yn>b{position:absolute;pointer-events:none;opacity:0}
+.splash .pen{width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:radial-gradient(closest-side,#fff,rgba(255,240,220,.7) 35%,rgba(255,240,220,0))}
+.splash .ycut{left:-14%;width:128%;top:52.5%;height:3px;margin-top:-1.5px;border-radius:2px;background:linear-gradient(90deg,rgba(255,248,238,0),#fff 45%,#fff 55%,rgba(255,248,238,0));transform-origin:0 50%}
+.splash .yn>.ydot{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:radial-gradient(closest-side,#fff,rgba(255,248,238,.6) 40%,rgba(255,248,238,0))}
+.intro .splash .wall-by em{animation:byDrop .55s .85s cubic-bezier(.3,1.6,.5,1) both}
+.intro .splash .wall-by em+em{animation-delay:1s}
+.intro .splash .y0{animation:yWrite 1.2s 1.25s cubic-bezier(.45,.05,.55,.95) both,ynoyShine .55s 2.5s ease-in-out both}
+.intro .splash .pen{animation:yPen 1.2s 1.25s cubic-bezier(.45,.05,.55,.95) both}
+@keyframes byDrop{0%{opacity:0;transform:translateY(-26px) rotate(-25deg)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes yWrite{from{-webkit-mask-position:center,100% 0;mask-position:center,100% 0}to{-webkit-mask-position:center,0 0;mask-position:center,0 0}}
+@keyframes yPen{0%{opacity:0;left:0;top:72%}8%{opacity:1;left:6%;top:86%}25%{left:24%;top:80%}45%{left:46%;top:64%}65%{left:66%;top:52%}82%{left:84%;top:36%}92%{opacity:1}100%{opacity:0;left:100%;top:28%}}
+@keyframes yShow{to{opacity:1}}
+@keyframes yHide{to{opacity:0}}
+/* uscita A: YNOY si sgretola in polvere, da sinistra verso destra */
+.intro .splash.ea .y0{animation:yWrite 1.2s 1.25s cubic-bezier(.45,.05,.55,.95) both,ynoyShine .55s 2.5s ease-in-out both,yHide 0s 3.05s forwards}
+.intro .splash.ea .yp{animation:yShow 0s 3.05s forwards,yDust .7s calc(3.05s + var(--d)) cubic-bezier(.5,0,.9,.6) forwards}
+@keyframes yDust{0%{opacity:1;transform:none}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(var(--r)) scale(.4)}}
+/* uscita B: si spegne come una vecchia TV (riga di luce, punto, lampo) */
+.intro .splash.eb .yn{transform-origin:50% 55%;animation:yTv .45s 3.05s cubic-bezier(.6,0,.4,1) forwards}
+.intro .splash.eb .yw{background:#FFF8EE;animation:yShow .15s 3.05s forwards}
+.intro .splash.eb .ydot{animation:yDot .4s 3.45s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes yTv{0%{transform:none}50%{transform:scale(1.05,.04)}100%{transform:scale(0,.04)}}
+@keyframes yDot{0%{opacity:1;transform:scale(.4)}30%{opacity:1;transform:scale(1.3)}100%{opacity:0;transform:scale(.1)}}
+/* uscita C: un taglio di luce lo divide in due e le metà scivolano via */
+.intro .splash.ec .y0{animation:yWrite 1.2s 1.25s cubic-bezier(.45,.05,.55,.95) both,ynoyShine .55s 2.5s ease-in-out both,yHide 0s 3.2s forwards}
+.intro .splash.ec .ycut{transform:rotate(-7.6deg) scaleX(0);animation:yCut .45s 3.05s cubic-bezier(.7,0,.2,1) forwards}
+.intro .splash.ec .yh1{clip-path:polygon(0 0,100% 0,100% 35%,0 70%);animation:yShow 0s 3.2s forwards,yH1 .55s 3.22s cubic-bezier(.5,0,.8,.4) forwards}
+.intro .splash.ec .yh2{clip-path:polygon(0 70%,100% 35%,100% 100%,0 100%);animation:yShow 0s 3.2s forwards,yH2 .55s 3.22s cubic-bezier(.5,0,.8,.4) forwards}
+@keyframes yCut{0%{opacity:1;transform:rotate(-7.6deg) scaleX(0)}40%{opacity:1;transform:rotate(-7.6deg) scaleX(1)}100%{opacity:0;transform:rotate(-7.6deg) scaleX(1)}}
+@keyframes yH1{0%{opacity:1;transform:none}100%{opacity:0;transform:translate(-46px,-40px) rotate(-9deg)}}
+@keyframes yH2{0%{opacity:1;transform:none}100%{opacity:0;transform:translate(46px,40px) rotate(9deg)}}
 @keyframes jAway{to{opacity:0;transform:scale(.93)}}
-@keyframes byFlash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+
 .wall-groups{width:100%;max-width:760px}
 .wall h2{font:400 14px var(--font);letter-spacing:.08em;color:#A3978D;margin:38px 0 16px;text-align:center}
 .faces{display:flex;flex-wrap:wrap;justify-content:center;gap:24px 14px}
@@ -1761,7 +1794,7 @@ function repaint(){render();refreshSheet()}
 function allLoaded(){return(S.loadTimeout&&S.db.kind!=='firebase')||Object.keys(COLS).every(k=>S.loaded[k])}
 function view(){
   S.wallMode=true;
-  if(S.splash)return`<div class="wall linen splash"><div class="jhit"><i class="jfl"></i><i class="jsh"></i><i class="jrg"></i><i class="jrg"></i><b class="jd" style="--x:-150px;--y:-22px"></b><b class="jd" style="--x:-118px;--y:-48px"></b><b class="jd" style="--x:-92px;--y:-12px"></b><b class="jd" style="--x:-64px;--y:-58px"></b><b class="jd" style="--x:-40px;--y:-30px"></b><b class="jd" style="--x:-14px;--y:-66px"></b><b class="jd" style="--x:16px;--y:-62px"></b><b class="jd" style="--x:42px;--y:-28px"></b><b class="jd" style="--x:70px;--y:-54px"></b><b class="jd" style="--x:96px;--y:-14px"></b><b class="jd" style="--x:122px;--y:-44px"></b><b class="jd" style="--x:154px;--y:-20px"></b><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div><p class="wall-sub">Ordini di cucina e sala</p>${BY}</div>`;
+  if(S.splash){const ESCI=self.JONA_ESCI||'ec';return`<div class="wall linen splash ${ESCI}"><div class="jhit"><i class="jfl"></i><i class="jsh"></i><i class="jrg"></i><i class="jrg"></i><b class="jd" style="--x:-150px;--y:-22px"></b><b class="jd" style="--x:-118px;--y:-48px"></b><b class="jd" style="--x:-92px;--y:-12px"></b><b class="jd" style="--x:-64px;--y:-58px"></b><b class="jd" style="--x:-40px;--y:-30px"></b><b class="jd" style="--x:-14px;--y:-66px"></b><b class="jd" style="--x:16px;--y:-62px"></b><b class="jd" style="--x:42px;--y:-28px"></b><b class="jd" style="--x:70px;--y:-54px"></b><b class="jd" style="--x:96px;--y:-14px"></b><b class="jd" style="--x:122px;--y:-44px"></b><b class="jd" style="--x:154px;--y:-20px"></b><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div><p class="wall-sub">Ordini di cucina e sala</p><div class="wall-by" role="img" aria-label="By YNOY CORP"><span><em>b</em><em>y</em></span><div class="yn"><i class="y0"></i>${ESCI==='ea'?'<i class="yp" style="clip-path:inset(0.00% 90% 66.67% 0%);--d:0ms;--x:68px;--y:-70px;--r:-40deg"></i><i class="yp" style="clip-path:inset(0.00% 80% 66.67% 10%);--d:32ms;--x:78px;--y:-144px;--r:7deg"></i><i class="yp" style="clip-path:inset(0.00% 70% 66.67% 20%);--d:64ms;--x:88px;--y:-118px;--r:-26deg"></i><i class="yp" style="clip-path:inset(0.00% 60% 66.67% 30%);--d:96ms;--x:98px;--y:-92px;--r:21deg"></i><i class="yp" style="clip-path:inset(0.00% 50% 66.67% 40%);--d:128ms;--x:108px;--y:-166px;--r:-12deg"></i><i class="yp" style="clip-path:inset(0.00% 40% 66.67% 50%);--d:160ms;--x:118px;--y:-140px;--r:35deg"></i><i class="yp" style="clip-path:inset(0.00% 30% 66.67% 60%);--d:192ms;--x:128px;--y:-114px;--r:2deg"></i><i class="yp" style="clip-path:inset(0.00% 20% 66.67% 70%);--d:224ms;--x:138px;--y:-88px;--r:-31deg"></i><i class="yp" style="clip-path:inset(0.00% 10% 66.67% 80%);--d:256ms;--x:148px;--y:-162px;--r:16deg"></i><i class="yp" style="clip-path:inset(0.00% 0% 66.67% 90%);--d:288ms;--x:158px;--y:-136px;--r:-17deg"></i><i class="yp" style="clip-path:inset(33.33% 90% 33.33% 0%);--d:18ms;--x:86px;--y:-76px;--r:-11deg"></i><i class="yp" style="clip-path:inset(33.33% 80% 33.33% 10%);--d:50ms;--x:96px;--y:-150px;--r:36deg"></i><i class="yp" style="clip-path:inset(33.33% 70% 33.33% 20%);--d:82ms;--x:106px;--y:-124px;--r:3deg"></i><i class="yp" style="clip-path:inset(33.33% 60% 33.33% 30%);--d:114ms;--x:116px;--y:-98px;--r:-30deg"></i><i class="yp" style="clip-path:inset(33.33% 50% 33.33% 40%);--d:146ms;--x:126px;--y:-72px;--r:17deg"></i><i class="yp" style="clip-path:inset(33.33% 40% 33.33% 50%);--d:178ms;--x:136px;--y:-146px;--r:-16deg"></i><i class="yp" style="clip-path:inset(33.33% 30% 33.33% 60%);--d:210ms;--x:146px;--y:-120px;--r:31deg"></i><i class="yp" style="clip-path:inset(33.33% 20% 33.33% 70%);--d:242ms;--x:156px;--y:-94px;--r:-2deg"></i><i class="yp" style="clip-path:inset(33.33% 10% 33.33% 80%);--d:274ms;--x:166px;--y:-168px;--r:-35deg"></i><i class="yp" style="clip-path:inset(33.33% 0% 33.33% 90%);--d:306ms;--x:176px;--y:-142px;--r:12deg"></i><i class="yp" style="clip-path:inset(66.67% 90% 0.00% 0%);--d:36ms;--x:104px;--y:-82px;--r:18deg"></i><i class="yp" style="clip-path:inset(66.67% 80% 0.00% 10%);--d:68ms;--x:114px;--y:-156px;--r:-15deg"></i><i class="yp" style="clip-path:inset(66.67% 70% 0.00% 20%);--d:100ms;--x:124px;--y:-130px;--r:32deg"></i><i class="yp" style="clip-path:inset(66.67% 60% 0.00% 30%);--d:132ms;--x:134px;--y:-104px;--r:-1deg"></i><i class="yp" style="clip-path:inset(66.67% 50% 0.00% 40%);--d:164ms;--x:144px;--y:-78px;--r:-34deg"></i><i class="yp" style="clip-path:inset(66.67% 40% 0.00% 50%);--d:196ms;--x:154px;--y:-152px;--r:13deg"></i><i class="yp" style="clip-path:inset(66.67% 30% 0.00% 60%);--d:228ms;--x:164px;--y:-126px;--r:-20deg"></i><i class="yp" style="clip-path:inset(66.67% 20% 0.00% 70%);--d:260ms;--x:174px;--y:-100px;--r:27deg"></i><i class="yp" style="clip-path:inset(66.67% 10% 0.00% 80%);--d:292ms;--x:184px;--y:-74px;--r:-6deg"></i><i class="yp" style="clip-path:inset(66.67% 0% 0.00% 90%);--d:324ms;--x:194px;--y:-148px;--r:-39deg"></i>':ESCI==='ec'?'<i class="yp yh1"></i><i class="yp yh2"></i><b class="ycut"></b>':'<i class="yp yw"></i><b class="ydot"></b>'}<b class="pen"></b></div></div></div>`;}
   if(S.fbLibErr)return wallMsg('Serve la connessione','Per aprire l\'app la prima volta serve internet. Controlla la rete e riprova.',`<button type="button" class="btn primary block" data-a="reload">Riprova</button>`);
   if(S.db&&S.db.kind==='firebase'){const s=S.db.status();if(!s.ready)return wallFb(s)}
   if(S.db&&S.db.kind==='locale'&&fbCfg()&&ls('jona_key')==null&&!Object.keys(D().staff||{}).length&&S.loaded.staff){if(S.fbActive===undefined)return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Un momento…</p>${BY}</div>`;if(S.fbActive!==false)return screenJoin()}
@@ -5263,9 +5296,9 @@ addEventListener('popstate',()=>{if(NAV.skip){NAV.skip=0;return navSync()}NAV.tr
   if(/^[A-Za-z0-9]{16,64}$/.test(k)&&ls('jona_key')!==k){ls('jona_key',k);ls('jona_member',null)}
   history.replaceState(null,'',location.pathname+location.search)})();
 async function boot(){
-  applyTheme();document.documentElement.classList.add('intro');setTimeout(()=>document.documentElement.classList.remove('intro'),3800);
+  applyTheme();document.documentElement.classList.add('intro');setTimeout(()=>document.documentElement.classList.remove('intro'),4100);
   /* chi è già entrato vede l'apertura fino alla fine dell'animazione (4,4 s; un tocco la salta); niente con «riduci movimento» né nelle prove automatiche */
-  if(ls('jona_me')&&!animOff()&&!navigator.webdriver){S.splash=true;const end=()=>{if(!S.splash)return;S.splash=false;removeEventListener('click',end,true);render()};addEventListener('click',end,true);setTimeout(end,3500)}
+  if(ls('jona_me')&&!animOff()&&!navigator.webdriver){S.splash=true;const end=()=>{if(!S.splash)return;S.splash=false;removeEventListener('click',end,true);render()};addEventListener('click',end,true);setTimeout(end,3800)}
   $('#picker').addEventListener('change',()=>{const p=$('#picker');const fs=[...(p.files||[])];const cb=pickCb;pickCb=null;if(fs.length&&cb)guard(()=>cb(fs))});
   render();
   const icod=ls('jona_icode');if(icod){ls('jona_icode',null);try{const k=await invRedeem(icod);if(ls('jona_key')!==k){ls('jona_key',k);ls('jona_member',null)}}catch(e){S.joinK=icod;toast(e.message==='scaduto'?'Codice d\'invito scaduto: chiedi allo chef un invito nuovo.':'Non riesco a leggere il codice: controlla la rete e tocca «Collega».','warn')}}
