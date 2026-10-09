@@ -1130,8 +1130,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=62;
+const APP_VER=63;
 const NEWS=[
+  {v:63,data:'2026-10-09',titolo:'Via i prodotti di prova',
+    chef:['I prodotti finti messi all\'inizio spariscono da soli da tutti i fornitori, la prima volta che un gestore apre l\'app. Restano solo i prodotti caricati da voi con i listini o scritti a mano.','Se in futuro ne ricompaiono: Impostazioni → «Prodotti di prova» → «Elimina».'],
+    dev:{aggiunte:['`fintoP(p)`: prodotto di prova = `p.demo` oppure id `mar01`..`mar19` di `seedIfEmpty` mai toccato da un import (`caricatoDa` assente) e senza prezzo. `provaVia` (da `deadlineTick`, solo con Firebase, gestore o sviluppatore veri, non in demo né con l\'emulatore salvo `jona_t_provavia`) li cancella una volta sola leggendo i listini dal server (`S.db.prodServer`) e segna `config/app.provaVia`. `demoDel` li cancella tutti, con l\'elenco per fornitore nella conferma. Prova `tools/test-listini-prova.mjs`.']}},
   {v:62,data:'2026-10-09',titolo:'Nuova apertura dell\'app',
     tutti:['All\'apertura il logo Jona cade da davanti allo schermo e si posa con un colpo; poi la firma YNOY si scrive come a mano, resta un attimo da sola e l\'app parte.'],
     dev:{aggiunte:['Schermata d\'apertura (`.splash`, solo con `.intro`): `jonaIn` 1,2 s (scala 4,2 → 1 in 0,55 s in accelerazione, poi schiacciamento 1,1×0,84, rimbalzo e assestamento); al colpo (0,55 s) `jShake` sulla `.splash`, dentro `.jhit` ombra `jShadow`, due onde `jRing` e 34 granelli rasoterra `.jpb`/`jPb` (valori fissi nell\'HTML, niente `filter:blur`). Firma: «b» e «y» cadono (`byDrop` 0,85/1 s), YNOY si scrive tratto dopo tratto 1,2-2,8 s (SVG `.ywr`: 19 tratti di `tools/ynoy-tratti.py` in una maschera sul logo, `yStroke`), poi `.y0` col riflesso `ynoyShine` da 2,8 s. Uscita: `jAway` su JONA e sottotitolo 3,25-3,6 s, poi `yAway` su BY e YNOY 3,48-3,78 s. `S.splash` 3,8 s, `.intro` tolta a 4,1 s. La schermata d\'ingresso con i profili non cambia.'],correzioni:['Tolto `cutoutFix()` (v60): con «schermo intero» Chrome mette di proposito il nero nella zona fotocamera (`viewport-fit=cover` vale solo con la richiesta di schermo intero); non serviva.']}},
@@ -1565,6 +1568,7 @@ function FirebaseStore(key){
     prune:async keep=>{await readyP;const s=await fs.collection('backup').where('g','<',keep).get({source:'server'});for(const x of s.docs)await x.ref.delete()}
   };
   return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
+    prodServer:async()=>{await readyP;const l=await fs.collection('listini').get({source:'server'});const m={};l.docs.forEach(x=>Object.assign(m,(x.data()||{}).p||{}));return m},
     status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),pendT:st.pendT||0,net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null,reqOk:!!st.reqOk}),
     netRetry:()=>fs.disableNetwork().then(()=>fs.enableNetwork()),
     phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember()),
@@ -2532,6 +2536,7 @@ async function promSrv(){if(!pushFb())return false;pushWatch();if(!PUSH.ld)retur
   catch(e){promSrv.retry=now()+15*60000;return last.h===h&&now()-(last.t||0)<864e5}finally{promSrv.busy=0}}
 async function deadlineTick(){
   if(!S.db||!allLoaded())return;const me=meU();if(!me||me.stato!=='attivo')return;
+  provaVia().catch(e=>console.warn(e));
   await agTick(me).catch(e=>console.warn(e));if(agCan(me))agSrv().catch(()=>{});
   const sp=await scadTick(me);if(!isGM(me))return;
   if(S.tab==='invii')render();
@@ -4243,7 +4248,7 @@ function meMenu(){
 }
 function settingsSheet(){
   S.cfgName=cfg().nomeLocale;S.cfgLuogo=cfg().luogoConsegna||'';
-  openSheet({live:()=>true,render:()=>{const demo=prods().filter(p=>p.demo).length;const read=Object.values(D().notifiche).filter(n=>n.letta).length;const th=ls('jona_theme')||'auto';
+  openSheet({live:()=>true,render:()=>{const demo=prods().filter(fintoP).length;const read=Object.values(D().notifiche).filter(n=>n.letta).length;const th=ls('jona_theme')||'auto';
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Impostazioni</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${fbRow()}
   <div class="setrow"><div><b>Nome del locale</b><span>Compare negli ordini ai fornitori</span><input class="inp" id="cfg-name" style="margin-top:8px" value="${esc(S.cfgName)}" data-in="cfgName"></div></div>
@@ -4257,7 +4262,7 @@ function settingsSheet(){
   <div class="setrow"><div><b>Tema</b><span>Su questo dispositivo</span></div><div class="seg">${[['auto','Auto'],['light','Chiaro'],['dark','Scuro']].map(([k,l])=>`<button type="button" aria-pressed="${th===k}" data-a="theme" data-v="${k}">${l}</button>`).join('')}</div></div>
   <div class="setrow"><div><b>Backup dei dati</b><span>Salva o ripristina tutto in un file</span></div><div class="btns"><button type="button" class="btn ghost sm" data-a="bkExport">${ic('download')} Esporta</button><button type="button" class="btn ghost sm" data-a="bkImport">${ic('upload')} Ripristina</button></div></div>
   ${S.db.backup?`<div class="setrow"><div><b>Copie automatiche</b><span>Ogni giorno una copia di tutto, restano ${BK_DAYS} giorni</span></div><button type="button" class="btn ghost sm" data-a="bkList">${ic('download')} Vedi</button></div>`:''}
-  <div class="setrow"><div><b>Prodotti di esempio</b><span>${demo?demo+' prodotti demo nel catalogo':'Nessuno'}</span></div>${demo?`<button type="button" class="btn ghost sm danger" data-a="demoDel">Elimina</button>`:''}</div>
+  <div class="setrow"><div><b>Prodotti di prova</b><span>${demo?(demo===1?'1 prodotto finto':demo+' prodotti finti')+' messi all\'inizio':'Nessuno'}</span></div>${demo?`<button type="button" class="btn ghost sm danger" data-a="demoDel">Elimina</button>`:''}</div>
   ${isDev(realU())?(()=>{const nt=testCount();return`<div class="setrow"><div><b>Dati di prova</b><span>${nt?nt+' documenti di prova nell\'app':'Fornitori, prodotti, 2 profili e 2 richieste finti, solo per le prove'}</span></div>${nt?`<button type="button" class="btn ghost sm danger" data-a="testDel" aria-label="Cancella dati di prova">${ic('trash')} Cancella</button>`:`<button type="button" class="btn ghost sm" data-a="testMake" aria-label="Crea dati di prova">${ic('plus')} Crea</button>`}</div>`})():''}
   <div class="setrow"><div><b>Notifiche già lette</b><span>${read}</span></div>${read?`<button type="button" class="btn ghost sm" data-a="notifDel">Pulisci</button>`:''}</div>`}});
 }
@@ -4374,6 +4379,17 @@ async function demoSeed(){
     jobs.push(()=>put('notifiche','demo_n'+i,{a:'gm',titolo:'Nuova richiesta da '+us[1],testo:`${REPARTI[us[4]]||''}, ${r[2].length} articoli da ${nf} ${nf===1?'fornitore':'fornitori'}`,tipo:'richiesta',rif:rid,letta:false,creato:r[5],da:u}))});
   for(const j of jobs)await j();
 }
+// Prodotti finti di partenza: i «demo» e i 19 di F.lli Mariano di seedIfEmpty mai aggiornati da un listino caricato.
+const fintoP=p=>!!p.demo||(/^mar\d\d$/.test(p.id)&&!p.caricatoDa&&p.prezzo==null);
+// v63: una volta sola, il primo gestore che apre l'app cancella i prodotti di prova (letti dal server, non dalla copia del telefono)
+async function provaVia(){
+  if(DEMO||!S.db||S.db.kind!=='firebase'||provaVia.on||cfg().provaVia)return;const u=realU();if(!u||u.stato!=='attivo'||!(isGM(u)||isDev(u)))return;
+  if(localStorage.getItem('jona_fb_emu')&&!localStorage.getItem('jona_t_provavia'))return;
+  provaVia.on=1;
+  try{const m=S.db.prodServer?await S.db.prodServer():D().prodotti;const ds=Object.keys(m).map(id=>Object.assign({},m[id],{id})).filter(fintoP);
+    if(ds.length)await runPool(ds.map(p=>()=>del('prodotti',p.id)));
+    await put('config','app',Object.assign({},cfg(),{provaVia:now()}));if(ds.length)toast(ds.length===1?'1 prodotto di prova eliminato':ds.length+' prodotti di prova eliminati')}
+  catch(e){console.warn(e)}finally{provaVia.on=0}}
 async function seedIfEmpty(){
   if(!S.db.empty())return;
   const F=[['metro','Metro','sito','Secco e dispensa',{sito:'https://www.metro.it',note:'Ordine dal sito con le credenziali del locale. Listino: fattura XML o tabella da screenshot.'}],
@@ -5080,7 +5096,9 @@ syncRetry:()=>{if(!S.db||!S.db.netRetry)return;S.db.netRetry().catch(()=>{});if(
   bkDown:async d=>{try{const j=await S.db.backup.get(d.v);saveBlob('backup_jona_'+d.v+'.json',new Blob([JSON.stringify(j)],{type:'application/json'}))}catch(e){toast(errMsg(e.code==='not_found'?e:{code:'fb_net'}),'err')}},
   bkRest:async d=>{if(!await ask('Ripristinare la copia del '+fdate(new Date(d.v+'T12:00').getTime())+'?','Tutti i dati attuali verranno sostituiti su tutti i telefoni.','Ripristina',true))return;
     try{const j=await S.db.backup.get(d.v);await S.db.load(j.dati);closeSheet();toast('Copia ripristinata')}catch(e){toast(errMsg(e.code==='not_found'?e:{code:'fb_net'}),'err')}},
-  demoDel:async()=>{const ds=prods().filter(p=>p.demo);if(!await ask('Eliminare '+ds.length+' prodotti di esempio?','','Elimina',true))return;await runPool(ds.map(p=>()=>del('prodotti',p.id)));toast('Prodotti demo eliminati')},
+  demoDel:async()=>{const ds=prods().filter(fintoP);if(!ds.length)return;const by={};for(const p of ds){const n=forn(p.fornitoreId).nome;by[n]=(by[n]||0)+1}
+    if(!await ask('Eliminare '+(ds.length===1?'1 prodotto di prova':ds.length+' prodotti di prova')+'?',Object.entries(by).map(([n,c])=>n+': '+c).join(' · ')+'. Restano i prodotti caricati da voi.','Elimina',true))return;
+    await runPool(ds.map(p=>()=>del('prodotti',p.id)));toast('Prodotti di prova eliminati')},
   notifDel:async()=>{const ns=Object.values(D().notifiche).filter(n=>n.letta);await runPool(ns.map(n=>()=>del('notifiche',n.id)));toast('Notifiche pulite')}
 };
 const IN={
