@@ -1,41 +1,50 @@
-# Passaggio di consegne (2026-10-09, fine sessione #45)
+# Passaggio di consegne (2026-10-09, fine sessione #46)
 
-Sessione attuale: #46
+Sessione attuale: #47
 
-## Ultimo messaggio di Mario (#45), parola per parola
-«si»
-(risposta a «Ti va bene l'uscita C? Con il sì aggiorno le prove e le Novità, e se passano pubblico la v62»)
+## Ultimo messaggio di Mario (#46), parola per parola
+«Ho caricato 2 listini per mariano visto che sono veri cancella tutti i vecchi finti listini da tutti i fornitori»
 
-Messaggi prima (#45), parola per parola, in ordine:
-- «si» (parti con la variante B del colpo)
-- «si» (variante B nel codice vero: va bene)
-- «C» (uscita di YNOY: prima sfuma JONA, poi la firma)
-- «si» (uscita C va bene → prove e pubblicazione)
+Messaggi prima (#46), parola per parola, in ordine:
+- «vai» (unire la PR #72 dopo le prove verdi)
+
+Domanda rimasta senza risposta (fatta da Claude in #46): «Per l'immagine in conflitto: va bene tenere le bozze A, B e C e rinominare quella vecchia?» (vedi D16).
+
+Messaggio arrivato da un'altra sessione (RVC #28, `session_0134ut54jXS5mPGLRM7Qnbj9`), con le parole di Mario: «dai la possibilità di lasciare un ponte con l'app Jona per informazioni condivise Jona è il ristorante di questa struttura quindi possono essere 2 app che lavorano a stretto contatto, comunicalo anche a jona e organizzatevi». Salvato come D17. Non ancora risposto.
 
 ## Stato
-- Online: **v61**. **PR #72** aperta da `claude/v62-logo` verso `main`: https://github.com/Kur0ChanX/jona-ordini/pull/72 (ultimo commit `a43c650`). Al momento dell'handoff il controllo «Prove automatiche» (`prove`) era in corso.
-- `APP_VER=62`, `sw.js` CACHE `jona-ordini-v66`, NEWS v62 riscritta.
-- Prove locali con `TZ=Europe/Rome` tutte riuscite: test-apertura-v62, test-logo, test-barra, test-news, test-giro.
-- `main` era già tutto dentro il ramo v62 (nessun conflitto).
+- Online: **v62** (PR #72 unita con squash, commit `4cd2fca` su `main`; controllato `APP_VER=62` e CACHE `jona-ordini-v66` sul sito). Iscrizione alla PR #72 tolta.
+- **v63 pronta sul ramo `claude/v63-listini-prova`** (commit `f7fdfe6`, pushato, NIENTE PR ancora). Lavorata nella cartella `/home/user/v63` (worktree, sparisce col contenitore: nella nuova sessione `git worktree add ../v63 claude/v63-listini-prova`).
+- Ramo consegne `claude/sessione-41-consegne-p7tepk`: `main` (v62) NON ancora unito per un conflitto su un'immagine (D16). Merge annullato con `git merge --abort`: nessun lavoro perso, niente a metà.
 
-## Fatto in #45 (ramo `claude/v62-logo`)
-- **Colpo di JONA, variante B** (commit `c7b5138`): tolti `.jfl`/`jFlash` e i 12 `.jd`/`jDust`; messi 34 `<b class="jpb" style="--x;--y;--s;--o;--t;--d;margin-left">` con valori fissi nell'HTML (stessa formula `sin(i*k)` di `tools/colpo-varianti.mjs`), CSS `.splash .jpb{left:50%;bottom:-6%;…#EDE6DF}`, `.intro .splash .jpb{animation:jPb var(--t) var(--d) …}`, keyframe `jPb`. Onde `.jrg` e ombra invariate. Anteprime: `docs/img/v62-colpo-b.mp4`, `v62-colpo-b-fotogrammi.png`.
-- **Uscita C** (commit `df03c42`), scelta da Mario tra A (tutto insieme), B (cancellata al contrario), C (JONA prima, poi firma); bozze ferme in `docs/img/v62-uscita-scelta.png` (ramo consegne), script `tools/uscite-ynoy.mjs` (ramo consegne). Codice: `.jhit` e `.wall-sub` `jAway .35s 3.25s`; `.wall-by>span` e `.yn` `yAway .3s 3.48s ease-in-out` (keyframe `yAway{to{opacity:0;transform:scale(1.03)}}`). Durata totale invariata (`S.splash` 3,8 s, `.intro` tolta a 4,1 s). Anteprima: `docs/img/v62-uscita-c.mp4`, `v62-uscita-c-fotogrammi.png`.
-- Commento CSS in cima al blocco v62 aggiornato (niente più «vola verso chi guarda»).
-- **NEWS v62** riscritta (commit `a43c650`): per tutti «il logo Jona cade… poi la firma YNOY si scrive come a mano, resta un attimo da sola e l'app parte»; parte dev con granelli, tratti SVG, uscita C.
-- **`tools/test-apertura-v62.mjs`** riscritta: controlla 19 tratti, 34 granelli, niente `.jfl`/`.jd`; prima del colpo niente onde/granelli e YNOY non scritto; a 2,4 s primo tratto fatto e ultimo no; a 3 s tutto visibile e `.y0`=1; a 3,61 s JONA sfumata e firma >0,5 (sta già sfumando: è voluto); a 3,79 s firma sfumata. La soglia 0,8 iniziale era sbagliata (la firma parte a 3,48 s), corretta a 0,5.
+## Fatto in #46
+1. PR #72 (v62): «Prove automatiche» verdi (06:46 UTC) → squash merge → v62 online verificata.
+2. Merge di `main` nel ramo consegne: **conflitto add/add** su `docs/img/v62-uscita-scelta.png`. Le due immagini hanno lo stesso nome ma contenuto diverso:
+   - ramo consegne (commit `7c07e3f`): bozze ferme A «Tutto insieme» / B «Si cancella al contrario» / C «JONA prima, poi la firma» (quella da cui Mario ha scelto la C);
+   - `main` (arrivata col ramo v62): vecchie uscite bocciate A polvere / B vecchia TV / C taglio di luce.
+   Per regola (conflitto → fermarsi) ho chiesto a Mario. Proposta: tenere A/B/C con il nome attuale, salvare quella di `main` come `docs/img/v62-uscita-scelta-vecchia.png` (`git show origin/main:docs/img/v62-uscita-scelta.png > …`), poi chiudere il merge e push.
+3. **v63 «Prodotti di prova»** (richiesta di Mario sopra). Perché così:
+   - Claude non può entrare nel Firestore vero (nessuna credenziale). E cancellare dati veri è irreversibile: la cancellazione la fa Mario dal telefono con un tocco, dopo aver visto i numeri.
+   - Prodotti finti = quelli di `seedIfEmpty`: i 10 `demo01..demo10` (`demo:true`; Metro, Dolpa, Nieddittas, Pascucci) e i 19 `mar01..mar19` di F.lli Mariano (senza prezzo).
+   - Un import di listino (`reviewSave`) scrive `caricatoDa:S.me`; se trova lo stesso prodotto (`matchProd`) lo aggiorna con `upd`. Quindi un `marNN` aggiornato dal listino vero ha `caricatoDa` e **resta**. I prodotti scritti a mano (`saveProd`) hanno id `uid()` casuale e restano.
+   - Regola: `const fintoP=p=>!!p.demo||(/^mar\d\d$/.test(p.id)&&!p.caricatoDa);` (subito prima di `seedIfEmpty`).
+   - Impostazioni: la riga «Prodotti di esempio» diventa «Prodotti di prova» («N prodotti finti messi all'inizio»); `demoDel` cancella tutti i `fintoP`, la conferma `ask` mostra il conto per fornitore («F.lli Mariano: 14 · Metro: 5 …. Restano i prodotti caricati da voi.»).
+   - Il carrello regge prodotti cancellati (`cartLines` filtra quelli mancanti).
+   - Scartato: script che cancella dal server (serve accesso e rischio alto); cancellare anche prodotti importati prima di oggi (non sappiamo quali sono di prova: se Mario ne vede ancora di finti, li toglie a mano o si decide insieme).
+   - `APP_VER=63`, `sw.js` CACHE `jona-ordini-v67`, NEWS v63 (parte `chef` + `dev`).
+   - Prova nuova `tools/test-listini-prova.mjs` (riuscita), aggiunta in testa a `VELOCI` di `tools/prova-ci.sh`.
+   - Prove veloci locali (`TZ=Europe/Rome bash tools/prova-ci.sh veloce`) in corso al momento dell'handoff: le prime 13 riuscite (listini-prova, apertura-v62, barra, agenda-v58/59/61, demo-invito, richieste-gestite, errori, errori-server, falsi-ok, firebase-telefoni, v35). Il giro si interrompe con questa sessione: la nuova sessione deve rifarlo (oppure basta il controllo «Prove automatiche» della PR, che fa lo stesso giro veloce) + `test-firebase-bulk` e `test-v16`.
 
-## Prossimo lavoro (#46)
-1. Iscriversi alla PR #72 (`subscribe_pr_activity`) e controllare «Prove automatiche». Se verde: squash merge da Claude, controllo online (https://jona-ristorante-by-ynoy-corp.pages.dev/ con versione 62), poi SUBITO `git fetch origin main && git merge origin/main` sul ramo consegne e push. Se rosso: capire la causa e correggere sul ramo `claude/v62-logo` (E14, E18).
-2. Dopo la pubblicazione: la v62 non tocca il Worker → niente giro completo extra su GitHub; chiedere a Mario «giro completo sul computer: ora o dopo?» solo se serve (piccola modifica di aspetto: bastano le prove legate).
-3. Chiedere a Mario di provarla su Android: righe o riquadri strani intorno a YNOY (maschera SVG, nota v53).
-4. Poi le domande ancora aperte (sotto) e `docs/DA-FARE.md`.
+## Prossimo lavoro (#47)
+1. D15: aprire la PR da `claude/v63-listini-prova` verso `main` (titolo «v63: via i prodotti di prova»), iscriversi, con «Prove automatiche» verdi → squash → controllo online (versione 63) → merge di `main` nel ramo consegne (prima risolvere D16).
+2. Dire a Mario i passi M26 (Impostazioni → Prodotti di prova → Elimina) e chiedere se dopo vede ancora prodotti finti.
+3. D16: attende il «sì» di Mario (domanda già fatta in #46).
+4. D17 ponte RVC: rispondere alla sessione RVC #29 (`session_012YP8hknRTGPF6chZDGPEbV`) con send_message: cosa può dare Jona e cosa le serve, con i nomi dei campi già usati. Spunti: Jona dà `agenda_<AAAA-MM>` (eventi `ev={k,t,g,h,cop,note,vis,rep}`, coperti), orari/turni `config/orari_<lunedì>.tp`, staff `staff` (nome, reparto); a Jona servono ospiti/camere presenti, partenze, allergie, eventi della struttura (→ coperti e ordine suggerito `sugStats`). Tecnica da valutare: Worker Cloudflare con chiave condivisa (le due app hanno Firebase separati). Solo progetto, niente codice.
+5. Poi D14 (prova Android di Mario) e il resto di `docs/DA-FARE.md`.
 
-## Strumenti (ramo consegne)
-- Lavorare sul ramo v62 in una cartella a parte: `git worktree add ../v62 claude/v62-logo` (fatto in #45 in `/home/user/v62`, sparisce col contenitore).
-- Server: `python3 -m http.server 8765` dentro la cartella del ramo da provare (si spegne a ogni riavvio).
-- `tools/video-apertura.mjs <cartella>` (lanciare da `tools/`), `tools/colpo-varianti.mjs`, `tools/uscite-ynoy.mjs <cartella>` (bozze ferme A/B/C a 4 momenti).
-- Foglio di fotogrammi con ffmpeg: `select='not(mod(n\,3))',crop=…,scale=390:-1,tile=3x4` con `-frames:v 1`.
+## Strumenti
+- Server: `python3 -m http.server 8765` nella cartella del ramo da provare; prove da `tools/` o con `bash tools/prova-ci.sh veloce <cartella risultati>` (avvia anche emulatore).
+- Prove con `TZ=Europe/Rome` (E18).
 
 ## Ancora da chiedere
 - Esito di M25 (prova dell'agenda con Mauro): senza risposta.
@@ -45,4 +54,5 @@ Messaggi prima (#45), parola per parola, in ordine:
 ## Rischi aperti
 - Server locale ed emulatore si spengono a ogni riavvio del contenitore.
 - Maschera SVG su Android non ancora verificata su un telefono vero.
-- Titolo nuova sessione: `🟤 ▶ ATTIVA · #46 · Jona Ordini · da v61 · 09/10/2026 · prossimo: unire PR #72 (v62)`.
+- Se Mario ha caricato i listini in un nome di fornitore diverso da `mariano` (es. un fornitore nuovo), i `marNN` vecchi non vengono aggiornati e sono cancellati come finti: è quello che vuole.
+- Titolo nuova sessione: `🟤 ▶ ATTIVA · #47 · Jona Ordini · da v62 · 09/10/2026 · prossimo: pubblicare v63 (prodotti di prova)`.
