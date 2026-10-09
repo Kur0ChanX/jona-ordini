@@ -12,8 +12,8 @@ Aggiornato: 2026-10-07 (sessione #30: v45→v50 online (PR #54-#60), S1-S3 stabi
 |----|------|--------|--------|
 | M22 | v53 online: chiudi e riapri l'app (o tocca «App da aggiornare»), manda un ordine e guarda l'animazione nuova; dimmi se il bordo bianco su mani e polsini è sparito e se il logo B ti piace | Mario | ora |
 | M23 | Impostazioni del telefono → cerca «schermo intero» → **App a schermo intero** → Jona Ordini → **Schermo intero** (anche zona fotocamera): toglie la banda nera in alto. Dire a che passo è arrivato | Mario | ora |
-| M24 | v55 online: chiudi e riapri l'app, tocca una volta lo schermo e guarda se la banda nera/viola in alto e quella bianca in basso sono sparite; dimmi com'è (la banda bianca dell'avvio resta se la barra dei gesti è del telefono) | Mario | ora (appena la v55 è online) |
-| M25 | v59 online: agenda come Admin Chef o F&B Mauro (NON «Staff»). Prova: «Giorno» con «Appunti del giorno» e un evento toccando un'ora vuota; «Settimana» e «Mese»; scorri col dito. Poi falla provare a Mauro e dimmi cosa manca per lasciare l'agenda di carta | Mario | ora (appena la v59 è online) |
+| M24 | v60 online: chiudi l'app dalle app recenti e riaprila. Guarda se la banda nera in alto c'è ancora all'apertura e dentro l'app, SENZA tirare giù le notifiche. Dimmi com'è | Mario | ora |
+| M25 | v61 online: agenda come Admin Chef o F&B Mauro (NON «Staff»). Prova «Giorno» con gli appunti, un evento per «Persone» (es. solo Maurizio) con «Avvisa subito», «visto da». Poi falla provare a Mauro e dimmi cosa manca per lasciare l'agenda di carta | Mario | ora |
 | D11 | Agenda passo B (dopo la prova di Mauro): ripetizioni complete, conferma di lettura, appunti veloci dalla home, coperti → ordine suggerito | Claude, dopo la tua scelta | dopo M25 |
 | D10 | Riquadro «Inviato allo chef»: togliere «Esci dal profilo», solo «Continua» (immagine mandata, attesa risposta di Mario) | Claude, dopo la tua scelta | sessione #41 |
 | M21 | Maurizio riapre l'app (si aggiorna alla v46): se compare «La richiesta non è ancora arrivata» tocca **Riprova**; poi tu lo approvi dalla striscia in cima | Mario | ora |
