@@ -36,7 +36,7 @@ for(const [w,h] of [[320,568],[390,844]]){
   ok(!(await p.locator('.wall-brand').count()),`${w}px: vecchia firma ancora presente`);
   await p.close();
 }
-// già entrato: l'apertura resta fino alla fine dell'animazione, poi l'app; un tocco la salta (navigator.webdriver finto a false, altrimenti l'apertura è spenta nelle prove)
+// già entrato: l'apertura resta fino alla fine dell'animazione, poi l'app; un tocco la salta (v62: dura 3,5 s) (navigator.webdriver finto a false, altrimenti l'apertura è spenta nelle prove)
 for(const salta of [false,true]){
   const p=await b.newPage({viewport:{width:390,height:844}}),errs=[];
   p.on('pageerror',e=>errs.push(e.message));
@@ -48,7 +48,7 @@ for(const salta of [false,true]){
   const st=()=>p.evaluate(()=>({wall:!!document.querySelector('.wall .wall-by'),login:!!document.querySelector('.wall h1')}));
   let s=await st();ok(s.wall&&!s.login,`apertura assente da entrato (salta=${salta})`);
   if(salta){await p.mouse.click(195,400);await p.waitForTimeout(300);s=await st();ok(!s.wall,'un tocco non salta l\'apertura')}
-  else{await p.waitForTimeout(4000);s=await st();ok(s.wall,`apertura finita troppo presto (${Date.now()-t0} ms)`);
+  else{await p.waitForTimeout(3000);s=await st();ok(s.wall,`apertura finita troppo presto (${Date.now()-t0} ms)`);
     await p.waitForTimeout(1600);s=await st();ok(!s.wall&&!s.login,'dopo l\'apertura l\'app non si apre')}
   console.log('entrato',salta?'tocco':'attesa',JSON.stringify(s));
   ok(!errs.length,`apertura: errori ${errs}`);await p.close();
