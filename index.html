@@ -525,7 +525,7 @@ button.rp-pn{all:unset;display:block;font:400 15px/1.3 var(--font);overflow-wrap
 .ph-strip .row{padding:8px 2px}
 .ph-warn{background:#F3E7D1;color:#2B2321;border-radius:12px;padding:12px 14px;text-align:left;font-size:15px}
 .ag-strip{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--lagoon-soft);color:var(--ink);border:0;border-radius:12px;padding:12px 14px;margin:6px 0 14px;font:inherit;font-size:14.5px;cursor:pointer}
-.ag-strip .ic{flex:none;color:var(--lagoon)}.ag-strip span{min-width:0;overflow-wrap:anywhere}
+.ag-strip .ic{flex:none;color:var(--lagoon)}.ag-nuovo{background:var(--ocra-soft)}.ag-nuovo .ic{color:var(--ocra)}.ag-st-t{flex:1;min-width:0;background:transparent;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;overflow-wrap:anywhere}.ag-nuovo .btn{flex:none}.ag-visti{margin:10px 0 0}.chips.ag-wrap{flex-wrap:wrap;overflow:visible}.ag-strip span{min-width:0;overflow-wrap:anywhere}
 .ag-q{display:flex;gap:8px;align-items:center}.ag-q .inp{flex:1;min-width:0}.ag-q .icon-btn.on{color:var(--corallo)}
 .ag-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 6px}.ag-nav b{text-align:center;font-weight:500}.ag-nav .icon-btn{font-size:22px}
 .ag-dt{font-size:13px;color:var(--muted);margin:12px 0 4px}.ag-dt.oggi{color:var(--lagoon);font-weight:600}
@@ -1090,8 +1090,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=60;
+const APP_VER=61;
 const NEWS=[
+  {v:61,data:'2026-10-09',titolo:'Agenda: avvisi alla persona giusta',
+    tutti:['Se qualcuno ti segna qualcosa in agenda, in alto compare «Per te in agenda»: toccalo per vedere i dettagli, poi «Ok, visto».'],
+    chef:['Agenda: «Chi lo vede» ora ha anche «Persone»: scegli una o più persone (es. solo Maurizio). Gli avvisi arrivano solo a loro.','«Avvisa subito»: appena salvi, chi lo vede riceve la notifica. Poi ricevono anche gli avvisi all\'ora scelta.','Nella riga dell\'evento vedi «visto da 3/5»; aprendolo vedi chi l\'ha visto e chi non ancora.','Negli «Appunti del giorno» la freccia manda l\'appunto a qualcuno come informazione in agenda.'],
+    dev:{aggiunte:['`ev.vis` anche `pers` con `ev.per` [id]; `agSee` lo capisce. `agDest` (destinatari attivi tranne chi scrive), `ev.visto.<persona>` = ora di «Ok, visto», valido se ≥ `ev.mod` (le spunte delle cose da fare non cambiano `mod`). `agNuovi`/`agStrip` («Per te in agenda», prossimi 7 giorni), `agVistoOk`, `agOpenG`, `agNtSend`. «Avvisa subito» (`agf.subito`): notifiche tipo `agenda` + `pushSend` ai destinatari.']}},
   {v:60,data:'2026-10-09',titolo:'Prova per togliere la banda nera in alto',
     tutti:['All\'apertura l\'app prova a usare anche la zona della fotocamera, senza la banda nera e senza l\'avviso «schermo intero» di Chrome.'],
     dev:{correzioni:['`cutoutFix()`: se l\'app è installata a schermo intero e `env(safe-area-inset-top)` vale 0, `viewport-fit` passa ad `auto` e dopo 150 ms torna a `cover`, così Chrome riapplica la modalità della zona fotocamera e Android ridisegna la finestra (come quando si tira giù la tendina delle notifiche, video di Mario del 09/10). Al caricamento e al ritorno in primo piano.']}},
@@ -4653,7 +4657,11 @@ const agGet=id=>agAll().find(e=>e.id===id)||null;
 /* creano e modificano: gestori, sviluppatore e staff dei reparti F&B Manager e Responsabile */
 const agCan=u=>isMgr(u)||(!!u&&['fb','resp'].includes(u.reparto));
 const AG_K={ev:'Evento',info:'Informazione',op:'Aggiornamento operativo',memo:'Memo'},agK=e=>AG_K[e&&e.k]?e.k:'ev';
-const agSee=(e,me)=>!!me&&(e.da===me.id||e.vis==='tutti'||(e.vis==='rep'&&(isMgr(me)||(e.rep||[]).includes(me.reparto))));
+const agSee=(e,me)=>!!me&&(e.da===me.id||e.vis==='tutti'||(e.vis==='rep'&&(isMgr(me)||(e.rep||[]).includes(me.reparto)))||(e.vis==='pers'&&(e.per||[]).includes(me.id)));
+/* v61 destinatari: chi lo vede (tranne chi l'ha scritto) e chi ha toccato «Ok, visto» dopo l'ultima modifica */
+const agDest=e=>e.vis==='io'?[]:Object.values(D().staff).filter(u=>u&&u.stato==='attivo'&&u.id!==e.da&&(e.vis==='rep'?(e.rep||[]).includes(u.reparto)||(e.per||[]).includes(u.id):agSee(e,u)));
+const agVisto=(e,id)=>!!(e.visto&&e.visto[id]>=(e.mod||0));
+const agVisLbl=e=>e.vis==='tutti'?'Tutti':e.vis==='rep'?(e.rep||[]).map(r=>REPARTI[r]||r).join(', '):e.vis==='pers'?(e.per||[]).map(id=>{const u=D().staff[id];return u?u.nome||fullName(u):'?'}).join(', '):'Solo io';
 const agOnDay=(e,g)=>e.r==='s'?e.g<=g&&agWd(e.g)===agWd(g):e.r==='m'?e.g<=g&&agD(e.g).getDate()===agD(g).getDate():e.g===g;
 const agDay=(g,me)=>agAll().filter(e=>agSee(e,me)&&agOnDay(e,g)).sort((a,b)=>(a.h||'99').localeCompare(b.h||'99')||a.t.localeCompare(b.t));
 /* v58 avvisi: minuti prima dell'evento (senza ora = le 09:00), «cose da fare» per evento (cl) */
@@ -4713,9 +4721,9 @@ function agParse(txt,base=new Date()){let s=' '+String(txt||'').replace(/\s+/g,'
   return{t:t?t[0].toUpperCase()+t.slice(1):'',g:g||oggi,h,cop}}
 
 function agOpen(){if(!funzOn('agenda'))return;S.ag={v:'oggi',g:today(),sel:'',q:'',nt:''};usoSegna('agenda');openSheet({cls:'tall',live:()=>true,render:agSheet,onClose:()=>agMicStop()})}
-function agEvH(e,me,mgr,next){const vis=e.vis==='tutti'?'Tutti':e.vis==='rep'?(e.rep||[]).map(r=>REPARTI[r]||r).join(', '):'Solo io';
+function agEvH(e,me,mgr,next){const vis=agVisLbl(e),dst=mgr&&e.vis!=='io'?agDest(e):[],vst=dst.filter(u=>agVisto(e,u.id)).length;
   const k=agK(e),av=agAvLbl(e.av),cl=Array.isArray(e.cl)?e.cl:[],fatte=cl.filter(x=>x.ok).length;
-  const inner=`<span class="ag-h">${e.h?esc(e.h):'—'}</span><span class="ag-b">${k!=='ev'?`<span class="ag-k ag-k-${k}">${AG_K[k]}</span>`:''}<b>${esc(e.t)}</b><span class="muted small">${e.cop?esc(e.cop)+' coperti · ':''}${esc(vis)}${e.r?' · ogni '+(e.r==='s'?'settimana':'mese'):''}${av?' · avviso '+esc(av):''}${cl.length?' · '+fatte+'/'+cl.length+' fatte':''}${e.note?' · '+esc(e.note):''}</span></span>`;
+  const inner=`<span class="ag-h">${e.h?esc(e.h):'—'}</span><span class="ag-b">${k!=='ev'?`<span class="ag-k ag-k-${k}">${AG_K[k]}</span>`:''}<b>${esc(e.t)}</b><span class="muted small">${e.cop?esc(e.cop)+' coperti · ':''}${esc(vis)}${e.r?' · ogni '+(e.r==='s'?'settimana':'mese'):''}${av?' · avviso '+esc(av):''}${cl.length?' · '+fatte+'/'+cl.length+' fatte':''}${dst.length?' · visto da '+vst+'/'+dst.length:''}${e.note?' · '+esc(e.note):''}</span></span>`;
   const main=mgr?`<button type="button" class="ag-ev" data-a="agEdit" data-v="${e.id}">${inner}</button>`:`<div class="ag-ev">${inner}</div>`;
   const lst=cl.length?`<div class="ag-cl">${cl.map((x,i)=>{const b=`<span class="ag-bx">${x.ok?ic('check'):''}</span><span class="ag-ct${x.ok?' ok':''}">${esc(x.t)}</span>`;
     return mgr?`<button type="button" class="ag-ck" aria-pressed="${!!x.ok}" data-a="agCk" data-v="${e.id}|${i}">${b}</button>`:`<div class="ag-ck">${b}</div>`}).join('')}</div>`:'';
@@ -4723,7 +4731,7 @@ function agEvH(e,me,mgr,next){const vis=e.vis==='tutti'?'Tutti':e.vis==='rep'?(e
 function agList(g,me,mgr){const l=agDay(g,me),hm=agHm(),nx=g===today()?l.findIndex(e=>e.h&&e.h>=hm):-1;return l.length?l.map((e,i)=>agEvH(e,me,mgr,i===nx)).join(''):`<p class="muted small ag-vuoto">Niente in agenda.</p>`}
 function agNotesH(g){const u=realU(),l=agNotes(g,u),todo=l.filter(x=>!x.ok).length;
   return`<div class="ag-sec">Appunti del giorno <span class="muted small">· li vedi solo tu</span></div>
-  ${l.map((x,i)=>`<div class="ag-ntr"><button type="button" class="ag-ck" aria-pressed="${!!x.ok}" data-a="agNtCk" data-v="${i}"><span class="ag-bx">${x.ok?ic('check'):''}</span><span class="ag-ct${x.ok?' ok':''}">${esc(x.t)}</span></button><button type="button" class="icon-btn" data-a="agNtDel" data-v="${i}" aria-label="Togli ${esc(x.t)}">${ic('x')}</button></div>`).join('')}
+  ${l.map((x,i)=>`<div class="ag-ntr"><button type="button" class="ag-ck" aria-pressed="${!!x.ok}" data-a="agNtCk" data-v="${i}"><span class="ag-bx">${x.ok?ic('check'):''}</span><span class="ag-ct${x.ok?' ok':''}">${esc(x.t)}</span></button><button type="button" class="icon-btn" data-a="agNtSend" data-v="${i}" aria-label="Manda a qualcuno: ${esc(x.t)}">${ic('send')}</button><button type="button" class="icon-btn" data-a="agNtDel" data-v="${i}" aria-label="Togli ${esc(x.t)}">${ic('x')}</button></div>`).join('')}
   <div class="ag-q"><input class="inp" id="ag-nt" data-in="agNt" value="${esc(S.ag.nt||'')}" placeholder="Scrivi un appunto" aria-label="Nuovo appunto" enterkeyhint="done"><button type="button" class="btn ghost sm" data-a="agNtAdd">${ic('plus')} Aggiungi</button></div>
   ${todo?`<button type="button" class="btn ghost sm ag-mv" data-a="agNtMove">Sposta a domani i non fatti (${todo})</button>`:''}`}
 /* Giorno: appunti, «Tutto il giorno» e le ore dalle 7 alle 23 (tocca un'ora vuota per un evento nuovo) */
@@ -4770,7 +4778,7 @@ function agMic(){const C=vSR();if(!C)return;if(agRec){agMicStop();refreshSheet()
 function agQuick(){const q=String(S.ag.q||'').trim();if(!q)return toast('Scrivi o detta l\'evento, es. «domani ore 20 gruppo Rossi».','warn');
   const p=agParse(q);S.ag.q='';agForm(Object.assign({vis:'tutti',k:'ev'},p))}
 function agForm(e){S.agf=Object.assign({t:'',g:S.ag?S.ag.sel||S.ag.g:today(),h:'',cop:'',note:'',vis:'tutti',rep:[],r:'',k:'ev'},e||{});S.agf.cop=S.agf.cop?String(S.agf.cop):'';
-  S.agf.av=e&&(e.id||Array.isArray(e.av))?agAvOk(e.av):[30];S.agf.cl=Array.isArray(e&&e.cl)?e.cl.map(x=>({t:String(x.t||''),ok:!!x.ok})):[];S.agf.clt='';
+  S.agf.av=e&&(e.id||Array.isArray(e.av))?agAvOk(e.av):[30];S.agf.per=Array.isArray(e&&e.per)?e.per.slice():[];S.agf.subito=!(e&&e.id);S.agf.cl=Array.isArray(e&&e.cl)?e.cl.map(x=>({t:String(x.t||''),ok:!!x.ok})):[];S.agf.clt='';
   openSheet({render:()=>{const f=S.agf;
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica evento':'Nuovo evento'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <span class="lbl">Tipo</span><div class="chips" role="group" aria-label="Tipo">${Object.entries(AG_K).map(([k,l])=>`<button type="button" class="chip" aria-pressed="${f.k===k}" data-a="agfK" data-v="${k}">${l}</button>`).join('')}</div>
@@ -4778,26 +4786,35 @@ function agForm(e){S.agf=Object.assign({t:'',g:S.ag?S.ag.sel||S.ag.g:today(),h:'
   <div class="ag-2"><label><span class="lbl">Data</span><input type="date" class="inp" id="agf-g" data-in="agf" data-k="g" value="${esc(f.g)}"></label><label><span class="lbl">Ora</span><input type="time" class="inp" id="agf-h" data-in="agf" data-k="h" value="${esc(f.h)}"></label></div>
   <label class="lbl" for="agf-c">Coperti</label><input class="inp" id="agf-c" inputmode="numeric" data-in="agf" data-k="cop" value="${esc(f.cop)}" placeholder="Facoltativo">
   <label class="lbl" for="agf-n">Note</label><textarea class="inp" id="agf-n" rows="2" data-in="agf" data-k="note">${esc(f.note)}</textarea>
-  <span class="lbl">Chi lo vede</span><div class="seg wide">${[['io','Solo io'],['tutti','Tutti'],['rep','Reparti']].map(([k,l])=>`<button type="button" aria-pressed="${f.vis===k}" data-a="agfSet" data-k="vis" data-v="${k}">${l}</button>`).join('')}</div>
+  <span class="lbl">Chi lo vede e riceve gli avvisi</span><div class="chips ag-wrap" role="group" aria-label="Chi lo vede">${[['io','Solo io'],['tutti','Tutti'],['rep','Reparti'],['pers','Persone']].map(([k,l])=>`<button type="button" class="chip" aria-pressed="${f.vis===k}" data-a="agfSet" data-k="vis" data-v="${k}">${l}</button>`).join('')}</div>
+  ${f.vis==='pers'?`<div class="chips ag-wrap" role="group" aria-label="Persone">${agPersL().map(u=>`<button type="button" class="chip" aria-pressed="${f.per.includes(u.id)}" data-a="agfPer" data-v="${u.id}">${esc(fullName(u))}</button>`).join('')||'<span class="muted small">Nessun altro profilo attivo.</span>'}</div>`:''}
   ${f.vis==='rep'?`<div class="chips" role="group" aria-label="Reparti">${Object.entries(REPARTI).map(([k,l])=>`<button type="button" class="chip" aria-pressed="${f.rep.includes(k)}" data-a="agfRep" data-v="${k}">${esc(l)}</button>`).join('')}</div>`:''}
+  ${f.vis!=='io'?`<span class="lbl">Avvisa subito</span><div class="seg wide">${[[1,'Sì, appena salvo'],[0,'No']].map(([v,l])=>`<button type="button" aria-pressed="${!!f.subito===!!v}" data-a="agfSub" data-v="${v}">${l}</button>`).join('')}</div>`:''}
+  ${f.id?agVistoH(f.id):''}
   <span class="lbl">Ripeti</span><div class="seg wide">${[['','No'],['s','Ogni settimana'],['m','Ogni mese']].map(([k,l])=>`<button type="button" aria-pressed="${f.r===k}" data-a="agfSet" data-k="r" data-v="${k}">${l}</button>`).join('')}</div>
-  <span class="lbl">Avvisi</span><div class="chips" role="group" aria-label="Avvisi">${AG_AV.map(([m,l])=>`<button type="button" class="chip" aria-pressed="${f.av.includes(m)}" data-a="agfAv" data-v="${m}">${l}</button>`).join('')}</div>
+  <span class="lbl">Avvisi</span><div class="chips ag-wrap" role="group" aria-label="Avvisi">${AG_AV.map(([m,l])=>`<button type="button" class="chip" aria-pressed="${f.av.includes(m)}" data-a="agfAv" data-v="${m}">${l}</button>`).join('')}</div>
   <p class="muted small" style="margin:4px 0 0">L\'avviso arriva anche con l\'app chiusa. Senza ora arriva alle 09:00.</p>
   <span class="lbl">Cose da fare</span>${f.cl.map((x,i)=>`<div class="ag-ci"><span class="ag-ct">${esc(x.t)}</span><button type="button" class="icon-btn" data-a="agClDel" data-v="${i}" aria-label="Togli ${esc(x.t)}">${ic('x')}</button></div>`).join('')}
   <div class="ag-q"><input class="inp" id="agf-cl" data-in="agf" data-k="clt" value="${esc(f.clt)}" placeholder="Es. ordinare i fiori" aria-label="Nuova cosa da fare" enterkeyhint="done"><button type="button" class="btn ghost sm" data-a="agClAdd">${ic('plus')} Aggiungi</button></div>
   <div class="sheet-foot btns" style="margin-top:18px">${f.id?`<button type="button" class="btn ghost danger" data-a="agDel">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary big" data-a="agSave">${ic('check')} Salva</button></div>`}})}
+const agPersL=()=>{const me=realU();return Object.values(D().staff).filter(u=>u&&u.stato==='attivo'&&(!me||u.id!==me.id)).sort((a,b)=>fullName(a).localeCompare(fullName(b)))};
+function agVistoH(id){const e=agGet(id);if(!e||e.vis==='io')return'';const d=agDest(e);if(!d.length)return'';const si=d.filter(u=>agVisto(e,u.id)),no=d.filter(u=>!agVisto(e,u.id));
+  return`<p class="muted small ag-visti"><b>Visto da ${si.length} su ${d.length}</b>${si.length?' · '+esc(si.map(fullName).join(', ')):''}${no.length?`<br>Non ancora: ${esc(no.map(fullName).join(', '))}`:''}</p>`}
 async function agPut(doc,evs){const d=D().config[doc];
   if(d)await upd('config',doc,Object.fromEntries(Object.entries(evs).map(([id,e])=>['e.'+id,e])));
   else await put('config',doc,{tipo:doc==='agenda_ric'?'agenda_ric':'agenda',e:evs})}
 async function agSave(){const f=S.agf,me=realU();if(!f||!me)return;const t=f.t.trim();
   if(!t)return toast('Scrivi il titolo.','warn');if(!/^\d{4}-\d{2}-\d{2}$/.test(f.g||''))return toast('Scegli la data.','warn');
-  if(f.vis==='rep'&&!f.rep.length)return toast('Scegli almeno un reparto.','warn');
+  if(f.vis==='rep'&&!f.rep.length)return toast('Scegli almeno un reparto.','warn');if(f.vis==='pers'&&!f.per.length)return toast('Scegli almeno una persona.','warn');
   const cop=f.cop===''?0:num(f.cop);if(cop==null||cop<0)return toast('I coperti devono essere un numero.','warn');
   const old=f.id?agGet(f.id):null,id=f.id||uid();
-  const ev={k:AG_K[f.k]?f.k:'ev',t,g:f.g,h:/^\d{2}:\d{2}$/.test(f.h||'')?f.h:'',cop:Math.round(cop),note:String(f.note||'').trim(),vis:f.vis,rep:f.vis==='rep'?f.rep.slice():[],da:old?old.da:me.id,cr:old?old.cr:now(),mod:now(),r:f.r||'',av:agAvOk(f.av),cl:(f.cl||[]).concat(String(f.clt||'').trim()?[{t:f.clt,ok:false}]:[]).map(x=>({t:String(x.t||'').trim().slice(0,80),ok:!!x.ok})).filter(x=>x.t).slice(0,30)};
+  const ev={k:AG_K[f.k]?f.k:'ev',t,g:f.g,h:/^\d{2}:\d{2}$/.test(f.h||'')?f.h:'',cop:Math.round(cop),note:String(f.note||'').trim(),vis:f.vis,rep:f.vis==='rep'?f.rep.slice():[],per:f.vis==='pers'?f.per.slice():[],visto:old&&old.visto?old.visto:{},da:old?old.da:me.id,cr:old?old.cr:now(),mod:now(),r:f.r||'',av:agAvOk(f.av),cl:(f.cl||[]).concat(String(f.clt||'').trim()?[{t:f.clt,ok:false}]:[]).map(x=>({t:String(x.t||'').trim().slice(0,80),ok:!!x.ok})).filter(x=>x.t).slice(0,30)};
   const doc=ev.r?'agenda_ric':'agenda_'+ev.g.slice(0,7);
   if(old&&old.doc!==doc)await upd('config',old.doc,{['e.'+id]:null});
-  await agPut(doc,{[id]:ev});closeSheet();if(S.ag){S.ag.g=ev.g;if(S.ag.v==='mese')S.ag.sel=ev.g}refreshSheet();toast('Evento salvato')}
+  await agPut(doc,{[id]:ev});
+  if(f.subito&&ev.vis!=='io'){const ds=agDest(Object.assign({id},ev)).map(u=>u.id),tt=(f.id?'Cambiato in agenda: ':'Nuovo in agenda: ')+t,tx=agCap(agLbl(ev.g))+(ev.h?' alle '+ev.h:'');
+    if(ds.length){for(const a of ds)await put('notifiche',uid(),{a,titolo:tt,testo:tx,tipo:'agenda',rif:id,letta:false,creato:now(),da:me.id});pushSend(ds,tt,tx).catch(()=>{})}}
+  closeSheet();if(S.ag){S.ag.g=ev.g;if(S.ag.v==='mese')S.ag.sel=ev.g}refreshSheet();toast('Evento salvato')}
 async function agDel(){const f=S.agf,old=f&&f.id?agGet(f.id):null;if(!old)return closeSheet();
   if(!await ask('Eliminare l\'evento?','«'+old.t+'» sparisce dall\'agenda'+(old.r?' per tutte le ripetizioni':'')+'.','Elimina',true))return;
   await upd('config',old.doc,{['e.'+old.id]:null});closeSheet();refreshSheet();toast('Evento eliminato')}
@@ -4854,7 +4871,13 @@ function phStrip(me){if(!isMgr(me)||!realU()||S.wallMode)return'';
     ...Object.values(D().staff).filter(u=>u.stato==='in_attesa').map(u=>({u,m:'nuovo profilo',no:`data-a="sno" data-u="${u.id}"`,ok:`data-a="sok" data-u="${u.id}"`}))];
   if(!l.length)return'';
   return`<div class="ph-strip" role="region" aria-label="Richieste da approvare"><div class="ph-strip-h">${ic('bell')}<b>${l.length===1?'1 richiesta da approvare':l.length+' richieste da approvare'}</b></div>${l.map(x=>`<div class="row">${avatar(x.u,44)}<div class="row-i"><div class="row-t">${esc(fullName(x.u))} chiede di entrare</div><div class="row-m">${esc(x.m)}</div></div><button type="button" class="icon-btn danger" ${x.no} aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" ${x.ok}>Approva</button></div>`).join('')}</div>`}
-function agStrip(me){if(!funzOn('agenda')||!realU()||S.wallMode)return'';const l=agDay(today(),me);if(!l.length)return'';
+/* eventi dei prossimi 7 giorni scritti da altri per me e non ancora visti (o cambiati dopo «Ok, visto») */
+function agNuovi(me){const r=realU();if(!me||!r)return[];const out=[],vis=new Set(),t=today();
+  for(let i=0;i<7;i++){const g=agAdd(t,i);for(const e of agDay(g,me)){if(vis.has(e.id)||e.da===r.id||e.vis==='io'||agVisto(e,r.id))continue;vis.add(e.id);out.push(Object.assign({},e,{gg:g}))}}
+  return out}
+function agStrip(me){if(!funzOn('agenda')||!realU()||S.wallMode)return'';
+  const nv=agNuovi(me);if(nv.length)return`<div class="ag-strip ag-nuovo">${ic('calendar')}<button type="button" class="ag-st-t" data-a="agOpenG" data-v="${nv[0].gg}"><b>Per te in agenda</b> ${nv.slice(0,2).map(e=>esc((e.gg===today()?'oggi':e.gg===agAdd(today(),1)?'domani':agLbl(e.gg))+(e.h?' '+e.h:'')+' · '+e.t)).join(' — ')}${nv.length>2?' — +'+(nv.length-2):''}</button><button type="button" class="btn primary sm" data-a="agVistoOk">Ok, visto</button></div>`;
+  const l=agDay(today(),me);if(!l.length)return'';
   return`<button type="button" class="ag-strip" data-a="agOpen">${ic('calendar')}<span><b>Oggi in hotel</b> ${l.slice(0,3).map(e=>esc((e.h?e.h+' ':'')+(agK(e)!=='ev'?AG_K[agK(e)]+': ':'')+e.t)).join(' · ')}${l.length>3?' · +'+(l.length-3):''}</span></button>`}
 const agBtn=me=>funzOn('agenda')&&agCan(me)?`<button type="button" class="icon-btn" data-a="agOpen" aria-label="Agenda">${ic('calendar')}</button>`:'';
 
@@ -4868,13 +4891,17 @@ const A={
     S.ag.nt='';await agNotesPut(g,u,l.concat([{t,ok:false}]));refreshSheet();const i=$('#ag-nt');if(i)i.focus()},
   agNtCk:async d=>{const u=realU(),g=S.ag.g,l=agNotes(g,u).map(x=>({t:x.t,ok:!!x.ok}));if(!l[+d.v])return;l[+d.v].ok=!l[+d.v].ok;await agNotesPut(g,u,l);refreshSheet()},
   agNtDel:async d=>{const u=realU(),g=S.ag.g,l=agNotes(g,u).slice();if(!l[+d.v])return;l.splice(+d.v,1);await agNotesPut(g,u,l);refreshSheet()},
+  agNtSend:d=>{const x=agNotes(S.ag.g,realU())[+d.v];if(x)agForm({t:x.t,k:'info',g:S.ag.g,h:'',vis:'pers',per:[],av:[]})},
+  agVistoOk:async()=>{const me=realU(),l=agNuovi(meU());if(!me)return;const by={};for(const e of l)(by[e.doc]=by[e.doc]||{})['e.'+e.id+'.visto.'+me.id]=now();
+    for(const [doc,x] of Object.entries(by))await upd('config',doc,x);render()},
+  agOpenG:d=>{agOpen();if(S.ag){S.ag.g=d.v;refreshSheet()}},
   agNtMove:async()=>{const u=realU(),g=S.ag.g,d2=agAdd(g,1),l=agNotes(g,u),no=l.filter(x=>!x.ok);if(!no.length)return;
     await agNotesPut(d2,u,agNotes(d2,u).concat(no.map(x=>({t:x.t,ok:false}))));await agNotesPut(g,u,l.filter(x=>x.ok));refreshSheet();toast(no.length+(no.length===1?' appunto spostato':' appunti spostati')+' a '+agLbl(d2))},agGo:d=>agGo(+d.v),agSel:d=>{S.ag.sel=S.ag.sel===d.v?'':d.v;refreshSheet()},
-  agQuick:()=>agQuick(),agMic:()=>agMic(),agNew:()=>agForm(),agEdit:d=>{const e=agGet(d.v);if(e)agForm({id:e.id,k:agK(e),t:e.t,g:e.g,h:e.h||'',cop:e.cop||'',note:e.note||'',vis:e.vis||'io',rep:(e.rep||[]).slice(),r:e.r||'',av:e.av||[],cl:e.cl||[]})},
-  agfSet:d=>{S.agf[d.k]=d.v;refreshSheet()},agfAv:d=>{const l=S.agf.av,m=+d.v,i=l.indexOf(m);if(i<0)l.push(m);else l.splice(i,1);refreshSheet()},
+  agQuick:()=>agQuick(),agMic:()=>agMic(),agNew:()=>agForm(),agEdit:d=>{const e=agGet(d.v);if(e)agForm({id:e.id,k:agK(e),t:e.t,g:e.g,h:e.h||'',cop:e.cop||'',note:e.note||'',vis:e.vis||'io',rep:(e.rep||[]).slice(),per:(e.per||[]).slice(),r:e.r||'',av:e.av||[],cl:e.cl||[]})},
+  agfSet:d=>{S.agf[d.k]=d.v;refreshSheet()},agfPer:d=>{const l=S.agf.per,i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},agfSub:d=>{S.agf.subito=d.v==='1';refreshSheet()},agfAv:d=>{const l=S.agf.av,m=+d.v,i=l.indexOf(m);if(i<0)l.push(m);else l.splice(i,1);refreshSheet()},
   agClAdd:()=>{const f=S.agf,t=String(f.clt||'').trim();if(!t)return toast('Scrivi la cosa da fare.','warn');if(f.cl.length>=30)return toast('Al massimo 30 cose da fare.','warn');f.cl.push({t:t.slice(0,80),ok:false});f.clt='';refreshSheet()},
   agClDel:d=>{S.agf.cl.splice(+d.v,1);refreshSheet()},
-  agCk:async d=>{const [id,i]=String(d.v).split('|'),e=agGet(id);if(!e||!agCan(realU()))return;const cl=(Array.isArray(e.cl)?e.cl:[]).map(x=>({t:x.t,ok:!!x.ok}));if(!cl[+i])return;cl[+i].ok=!cl[+i].ok;const ev=Object.assign({},e);delete ev.id;delete ev.doc;ev.cl=cl;ev.mod=now();await agPut(e.doc,{[id]:ev});refreshSheet()},agfK:d=>{const f=S.agf;f.k=d.v;if(d.v==='memo')f.vis='io';refreshSheet()},agfRep:d=>{const l=S.agf.rep;const i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},
+  agCk:async d=>{const [id,i]=String(d.v).split('|'),e=agGet(id);if(!e||!agCan(realU()))return;const cl=(Array.isArray(e.cl)?e.cl:[]).map(x=>({t:x.t,ok:!!x.ok}));if(!cl[+i])return;cl[+i].ok=!cl[+i].ok;const ev=Object.assign({},e);delete ev.id;delete ev.doc;ev.cl=cl;await agPut(e.doc,{[id]:ev});refreshSheet()},agfK:d=>{const f=S.agf;f.k=d.v;if(d.v==='memo')f.vis='io';refreshSheet()},agfRep:d=>{const l=S.agf.rep;const i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},
   agSave:()=>agSave(),agDel:()=>agDel(),agFoto:()=>agFoto(),agPT:d=>{const e=S.agp.l[+d.v];if(e){e.on=!e.on;refreshSheet()}},agPV:d=>{S.agp.vis=d.v;refreshSheet()},agPAdd:()=>agFotoAdd(),
   register:()=>registerSheet('self'),
   addProfile:()=>registerSheet('admin'),
