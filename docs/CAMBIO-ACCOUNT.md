@@ -25,7 +25,7 @@ Il lavoro non vive nell'account Claude: vive su **GitHub**. Tutti e due gli acco
 
 1. Entra su https://claude.ai con l'account Hotmail. Serve un piano **Pro** o **Max** (Claude Code non c'è nel piano gratuito).
 2. Collega GitHub: https://claude.ai/connect-github → accedi con lo stesso GitHub di sempre (Kur0ChanX). Poi apri https://claude.ai/code → **nuova sessione** → nella scelta del repository devono comparire `jona-ordini` e `RVC`.
-3. Preferenze personali: https://claude.ai/settings/profile → campo delle preferenze personali → cancella quello che c'è e incolla il testo del riquadro «Preferenze» qui sotto → **Salva**.
+3. Preferenze personali: menu (tocca il tuo nome in basso) → **Impostazioni** → scheda **Account** → campo **Istruzioni per Claude** → cancella quello che c'è e incolla il testo del riquadro «Preferenze» qui sotto. Fallo in **tutti e due** gli account.
 4. Memoria (vedi «Unire le due memorie» sotto).
 5. Connettori, solo se li usi: https://claude.ai/settings/connectors → collega gli stessi dell'account Gmail.
 6. Nella prima sessione Hotmail scrivi a Claude: «ricrea le routine dell'altro account» (Claude legge l'elenco in fondo a questa pagina).
@@ -59,15 +59,23 @@ La memoria è personale: **non** va salvata in questo progetto (il repository è
 ## Preferenze (testo da incollare in tutti e due gli account)
 
 ```
-Quando mi spieghi qualcosa da fare a mano (siti, registrazioni, chiavi API, impostazioni): dammi sempre il link diretto alla pagina, dimmi perché ci vado e cosa inserire. Passi numerati e piccoli, un'azione per passo, nomi esatti dei pulsanti in grassetto, testo da copiare già pronto. Sono spesso sul telefono e principiante di programmazione. Alla fine chiedimi a che passo sono arrivato, senza essere prolisso.
+COME PARLARMI
+- Rispondi in italiano, con frasi corte e parole semplici. Niente poemi: attenzione ai token, ma sii chiaro.
+- Sono esperto di computer e hardware, ma principiante di programmazione. Sono spesso sul telefono.
+- Scrivi gli orari sempre in ora italiana (sono a Olbia).
+- Quando mi spieghi qualcosa da fare a mano (siti, registrazioni, chiavi API, impostazioni): dammi sempre il link diretto alla pagina, dimmi perché ci vado e cosa inserire. Passi numerati e piccoli, un'azione per passo, nomi esatti dei pulsanti in grassetto, testo da copiare già pronto. Link scritti interi, mai dentro i riquadri di codice. Alla fine chiedimi a che passo sono arrivato, senza essere prolisso.
+- Le scelte tecniche le decidi tu: scegli la strada più sicura e stabile e spiegami in breve perché. Chiedimi solo gusti, soldi, cose che posso fare solo io e cose rischiose. Una domanda per volta.
 
-Nel passaggio di consegne apri la nuova sessione solo dopo che GitHub ha confermato il push delle consegne (stesso commit in locale e su origin). Appena parte, la nuova sessione scarica l'ultima versione del ramo (git fetch + merge --ff-only) prima di leggere le consegne. Le consegne devono contenere anche il mio ultimo messaggio.
+PASSAGGIO DI CONSEGNE
+- Apri la nuova sessione solo dopo che GitHub ha confermato il push delle consegne (stesso commit in locale e su origin). Appena parte, la nuova sessione scarica l'ultima versione del ramo (git fetch + merge --ff-only) prima di leggere le consegne. Le consegne devono contenere anche il mio ultimo messaggio.
+- A ogni passaggio crea un ramo nuovo con il numero della nuova sessione (es. claude/jona-sessione-56, claude/rvc-sessione-50).
+- Titoli delle sessioni: «<pallino> ▶ ATTIVA · #<NN> · <Progetto> · da v<versione> · <data> · prossimo: <argomento>». Rinomina quella vecchia in «<pallino> ✓ CHIUSA · #<NN> · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>». Pallino: Jona 🟤, RVC 🟢.
+- REGOLA BLOCCATA (vale per ogni progetto): risparmia token. Quando il contesto si riempie fai da solo il passaggio di consegne: salva le consegne, fai il push e controlla che GitHub lo confermi. Poi apri tu la nuova sessione, già rinominata, e rinomina quella vecchia. Io non devo fare niente. Non modificare questa regola senza il mio consenso esplicito.
 
-Quando apri una nuova sessione per un passaggio di consegne, dalle sempre un titolo chiaro nel formato «▶ ATTIVA · <Progetto> · da v<versione> · <data> · prossimo: <argomento>» e rinomina quella vecchia in «✓ CHIUSA · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>».
-
-REGOLA BLOCCATA (vale per ogni progetto): risparmia token. Quando il contesto si riempie fai da solo il passaggio di consegne: salva le consegne, fai il push e controlla che GitHub lo confermi. Poi apri tu la nuova sessione, già rinominata, e rinomina quella vecchia. Io non devo fare niente. Non modificare questa regola senza il mio consenso esplicito.
-
-CAMBIO ACCOUNT: ho due account Claude. Quando scrivo «cambio account» (o il limite settimanale sta per finire) fai il passaggio di consegne fino al push confermato, ma NON aprire la nuova sessione: dammi il prompt da incollare nell'altro account. Un solo account alla volta per progetto. Quando il limite settimanale è in avviso, fai commit e push dopo ogni passo finito: se i token finiscono di colpo, su GitHub c'è già tutto.
+CAMBIO ACCOUNT
+- Ho due account Claude (Gmail e Hotmail), tutti e due Pro. Quando scrivo «cambio account» (o il limite settimanale sta per finire) fai il passaggio di consegne fino al push confermato, ma NON aprire la nuova sessione: dammi il prompt da incollare nell'altro account, con il ramo esatto.
+- Un solo account alla volta per progetto. Jona e RVC passano insieme.
+- Quando il limite settimanale è in avviso, fai commit e push dopo ogni passo finito: se i token finiscono di colpo, su GitHub c'è già tutto.
 ```
 
 ## Prompt per la prima sessione nel nuovo account
@@ -82,3 +90,21 @@ Poi attendi le mie istruzioni.
 ## Routine dell'account Gmail (da ricreare in Hotmail)
 - «Punto ogni 5 ore»: promemoria che si ripete ogni 5 ore (risponde solo «.» e si riprogramma con `send_later` tra 300 minuti). Va ricreato in una sessione dell'account nuovo.
 - «Aggiorna abbonamenti Tier List JRPG»: spenta, lunedì 8:47. Legata all'artifact della tier list dell'account Gmail: ricrearla solo se la tier list viene ripubblicata nell'account nuovo.
+
+## Stato — catena «Servizio account» (sessioni di servizio, separate da Jona)
+Sessione attuale: #02 (ramo `claude/servizio-sessione-02`). Pallino ⚪. Questa catena tratta SOLO il cambio account e cose generali dell'account Claude, non il codice di Jona o RVC (scelta di Mario, 10/10/2026: «sono due argomenti diversi»).
+
+Fatto nella #01 (10/10/2026):
+- Guida (questo file), regola «CAMBIO ACCOUNT» in CLAUDE.md di Jona; chiesto a RVC #49 di aggiungerla al suo CLAUDE.md.
+- Copia di 4 artifact (RVC Prototipo, Visita Villa Carola, Raccoon Tier, Tier List RPG) mandata a Mario come file. L'«Accordo sul software» è un documento Claude Docs: Mario lo esporta in PDF da Gmail.
+- Preferenze: le «Istruzioni per Claude» di Gmail e Hotmail erano identiche. Dato a Mario il testo unico del riquadro «Preferenze» qui sopra, da incollare in tutti e due gli account (Impostazioni → Account → Istruzioni per Claude).
+- Hotmail è Pro (confermato da Mario). Limite settimanale Gmail in avviso: torna mercoledì 14/10 alle 12:00.
+- Errore della #01: aveva passato il tema alla sessione Jona #55 invece di aprire una sessione di servizio. Avvisata la #55 che il tema non è suo (deve solo unire il ramo per la guida e la regola).
+
+Ancora da fare:
+1. Mario conferma di aver incollato il testo unico in tutti e due gli account.
+2. Memoria dei due account (Personalizzazione o Impostazioni → Capacità): unirle se Mario incolla i testi.
+3. Il giorno del cambio: Mario scrive «cambio account» nelle sessioni attive di Jona e RVC.
+4. Ricreare la routine «Punto ogni 5 ore» nell'account Hotmail quando ci si passa.
+
+Ultimo messaggio di Mario (parola per parola): «Ripeto. Non dovevi passare a Giona Ordini, dovevi creare una nuova sezione perché sono due argomenti diversi. Uno sono gli ordini, sto programmando per un programma e questa invece è una discussione generica sul passaggio di account. Quindi dovevi creare una, un numero, cosa ne so, due di questa chat, tipo servizio o qualcosa. Se l'è denominata tu così.»
