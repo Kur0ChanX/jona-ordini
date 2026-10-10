@@ -1130,8 +1130,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=65;
+const APP_VER=66;
 const NEWS=[
+  {v:66,data:'2026-10-10',titolo:'Foto delle fatture: prodotti completi',
+    chef:['Con le foto di fatture e bolle (per esempio DAC) ogni prodotto arriva completo: unità, prezzo e categoria al posto giusto.','I nomi restano come sulla carta, anche con le virgolette (per esempio GAMBERO ROSSO "VERITAS").'],
+    dev:{correzioni:['`splitLine`: una virgoletta dentro un nome (GAMBERO ROSSO"VERITAS"3"35/50PZ, tre virgolette) apriva una cella tra virgolette e univa nel nome unità, prezzo e categoria; le virgolette sparivano anche dai nomi. Ora contano solo se racchiudono tutta la cella; virgoletta mai chiusa → divisione semplice. Prova `tools/test-virgolette.mjs`.','`geminiPrompt`: fatture e bolle (solo righe prodotto, prezzo unitario, U.M.), descrizione copiata con le virgolette.']}},
   {v:65,data:'2026-10-10',titolo:'Foto dei listini: Gemini più affidabile',
     chef:['Con più foto Gemini le legge una per volta: ogni foto ci mette meno e non si blocca più con «errore 524».','Se Gemini è lento o occupato riprova da solo. Se una foto non passa, quelle già lette restano: un nuovo tocco su «Trascrivi con Gemini» legge solo le mancanti.'],
     dev:{correzioni:['Errore 524 sulle foto (DAC, 2 foto): la richiesta a `/gemini` superava i 100 s di Cloudflare. Worker: tempo massimo `GEM_BUDGET` 85 s e `GEM_TRY_MS` 45 s per modello (`AbortSignal.timeout`, anche sulla lettura della risposta), poi il modello dopo (Lite); fuori tempo → 504 in JSON invece del 524 di Cloudflare.','`gemRun`: una richiesta per foto, avanzamento `I.prog`, seconda prova dopo `GEM_PAUSA` per 429/502/503/504/524 (`GEM_RETRY`), risultati per foto in `I.gres` (WeakMap), tabelle unite con `gemJoin` (intestazione ripetuta e recinti di codice tolti). `gemCall` restituisce anche `st` e un messaggio per 502/504/524.']}},
@@ -2976,7 +2979,7 @@ async function saveProd(pid){
 
 /* ================= importazione listini ================= */
 const TEMPLATE_HEAD='fornitore;codice;nome;unita;prezzo;categoria';
-const geminiPrompt=()=>`Leggi il listino prezzi nelle immagini e restituisci SOLO una tabella in testo semplice, senza altro testo prima o dopo.
+const geminiPrompt=()=>`Leggi il listino prezzi (o la fattura, o la bolla) nelle immagini e restituisci SOLO una tabella in testo semplice, senza altro testo prima o dopo.
 Usa il punto e virgola come separatore e questa prima riga di intestazione, identica:
 ${TEMPLATE_HEAD}
 Regole:
@@ -2987,6 +2990,8 @@ Regole:
 - unita: kg, pz, l, conf, cartone, cassa, mazzo... se deducibile, altrimenti vuoto;
 - prezzo: solo il numero con la virgola per i decimali, senza simbolo €, vuoto se manca;
 - categoria: una tra ${CATS.join(', ')};
+- fattura o bolla: solo le righe dei prodotti (niente vettore, trasporto, indirizzi, totali); prezzo = prezzo unitario (colonna PREZZO), non l'importo della riga; unita dalla colonna U.M. (K. o KG = kg, PZ = pz), anche se è attaccata alla descrizione;
+- copia la descrizione com'è, virgolette comprese, e non usare il punto e virgola dentro le celle;
 - non inventare dati che non ci sono.`;
 function impSheet(fid){
   S.imp={fid:fid||'',stage:'pick',err:'',txt:'',photos:[]};
@@ -3070,12 +3075,20 @@ async function gemShare(){const I=S.imp;if(!I||!I.photos.length)return;await cop
 const PICK={xls:{accept:'.xlsx,.xls,.csv,.ods,.tsv,.txt',k:'xls'},xml:{accept:'.xml,.p7m,text/xml,application/xml',k:'xml'}};
 let pickCb=null;
 function pickFile(o,cb){const p=$('#picker');p.value='';p.accept=o.accept||'';if(o.capture)p.setAttribute('capture',o.capture);else p.removeAttribute('capture');p.multiple=!!o.multiple;pickCb=cb;p.click()}
-function splitLine(l,dl){if(dl==='|')return l.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|');const out=[];let cur='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){cur+='"';i++}else q=!q}else if(ch===dl&&!q){out.push(cur);cur=''}else cur+=ch}out.push(cur);return out}
+// v66: le virgolette contano solo se racchiudono tutta la cella (CSV); quelle dentro un nome (GAMBERO ROSSO"VERITAS"3"35/50PZ) restano
+// e non uniscono più le celle dopo. Virgoletta aperta e mai chiusa: la riga si divide senza badare alle virgolette.
+function splitLine(l,dl){if(dl==='|')return l.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|');const out=[];let cur='',q=false;
+  for(let i=0;i<l.length;i++){const ch=l[i];
+    if(q){if(ch!=='"')cur+=ch;else if(l[i+1]==='"'){cur+='"';i++}else{let j=i+1;while(l[j]===' ')j++;if(j>=l.length||l[j]===dl)q=false;else cur+='"'}}
+    else if(ch==='"'&&!cur.trim()){q=true;cur=''}
+    else if(ch===dl){out.push(cur);cur=''}else cur+=ch}
+  if(q)return l.split(dl);out.push(cur);return out}
 function parseTable(txt){
   const lines=String(txt||'').replace(/^```\w*|```$/gm,'').split(/\r?\n/).map(l=>l.trim()).filter(l=>l&&!/^\|?[\s:|-]{3,}\|?$/.test(l));
   if(!lines.length)return[];const h=lines[0];
   const dl=h.includes('\t')?'\t':h.includes('|')?'|':((h.match(/;/g)||[]).length>=(h.match(/,/g)||[]).length?';':',');
-  return lines.map(l=>splitLine(l,dl).map(c=>c.trim()));
+  const n=splitLine(h,dl).length,uq=c=>/^\s*".*"\s*$/.test(c)?c.trim().slice(1,-1).replace(/""/g,'"'):c;
+  return lines.map(l=>{let r=splitLine(l,dl);if(r.length<n&&dl!=='|'){const r2=l.split(dl);if(r2.length===n)r=r2.map(uq)}return r.map(c=>c.trim())});
 }
 function mapRows(rows){
   for(let h=0;h<Math.min(rows.length,20);h++){
