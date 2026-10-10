@@ -1,5 +1,7 @@
-# Ultimo messaggio di Mario (10/10/2026 18:54 ora italiana)
+# Ultimo messaggio di Mario (10/10/2026 19:10 ora italiana)
 
-git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
-Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #66).
-Poi attendi le mie istruzioni.
+limite settinanale forse è del vecchio account
+
+poi
+
+Ti ricordi di creare un ponte con l'app RVC magari mettiamo un icona per condividere alcuni informazioni o mandare informazioni dei clienti al All'hotel o necessità del Ristorante Jona all hotel
