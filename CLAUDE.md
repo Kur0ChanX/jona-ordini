@@ -71,6 +71,8 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
 
 ## COMUNICAZIONE
 
+RISPOSTE CORTE (Mario, 10/10/2026, vale per OGNI progetto): «non scrivere poemi, attenzione ai token, ma sii chiaro». Report e analisi brevi, solo l'essenziale. ECCEZIONE: le guide da fare a mano (siti, registrazioni, impostazioni) possono essere lunghe quanto serve, con link e passi molto chiari.
+
 Report del lavoro (Cosa hai fatto tu): Spiega in modo chiaro e diretto cosa hai modificato, i problemi trovati e le soluzioni adottate. Prendi tutto lo spazio che ti serve per farti capire bene, ma evita di allungare il brodo. Niente gergo informatico complesso se non indispensabile.
 
 Leggibilità (ha la precedenza sul risparmio di token, ma frasi corte): ogni risposta è divisa in blocchi con le stesse intestazioni fisse, in questo ordine, saltando quelle vuote:
