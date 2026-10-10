@@ -10,6 +10,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| M38 | Script del Drive: risponde ancora v1 (11/10, #74). In Apps Script: controlla che il codice sia v2, **Salva**, poi **Esegui il deployment** → **Gestisci deployment** → matita → Versione **Nuova versione** → **Esegui il deployment** (URL uguale). Serve per ordinare `Jona/Loghi` (spostare 7 file vecchi in `Vecchi`, YNOY CORP) | Mario | quando vuoi |
 | M33 | v71 online (18:53): riapri l'app e guarda se il logo JONA all'apertura ora è nitido | Mario | ora |
 | M31 | Scegliere la miglioria del logo: Ovvia (logo più grande all'apertura), Furba (lune che cadono con rimbalzo), Geniale (4 lune come segno di attesa nell'app, consigliata), Nessuna | Mario | quando vuoi |
 | D29 | Ottimizzare l'app per Android, iPhone, Mac e Windows (Mario #60, strada 2 «Furba» #64). **v72 online (#67, PR #83)**: campi a 16 px (niente zoom su iPhone, prova `test-campi-16`), giro con WebKit e su computer 1280/1440 su GitHub. Resta solo (b) barra di stato su iPhone installata: non toccata (zona in alto già cambiata e tolta in v54); si guarda solo con una foto da un iPhone con l'app installata | Claude da solo | ora |
