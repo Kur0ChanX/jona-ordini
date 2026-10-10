@@ -1130,8 +1130,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=66;
+const APP_VER=67;
 const NEWS=[
+  {v:67,data:'2026-10-10',titolo:'Foto delle fatture: lettura più precisa',
+    chef:['Le foto delle fatture (DAC, Mariano, Nieddittas…) vengono lette con più attenzione: codici con lo zero davanti, prezzi con tutti i decimali, unità giuste (K. diventa kg, CF conf, CT cartone).','Se quantità × prezzo non dà l\'importo scritto sulla fattura, la riga è segnata in rosso «da controllare»: forse una cifra è stata letta male.','Le spese di consegna e trasporto non finiscono più nel listino come prodotti.'],
+    dev:{aggiunte:['`geminiPrompt` con `GEM_HEAD` (+`quantita;importo`, solo per il controllo `rigaNonTorna`): fornitore = chi vende, codici come testo, righe di continuazione, asterischi, sconti, PESO NETTO.','`mapRows`: colonna «prezzo» preferita a «importo», colonne quantità e importo. `normUnita`, `pulisciNome` (solo testo incollato/Gemini), `isSpesa` (riga non selezionata). Prova `tools/test-fatture.mjs` con le trascrizioni delle foto di Mario.']}},
   {v:66,data:'2026-10-10',titolo:'Foto delle fatture: prodotti completi',
     chef:['Con le foto di fatture e bolle (per esempio DAC) ogni prodotto arriva completo: unità, prezzo e categoria al posto giusto.','I nomi restano come sulla carta, anche con le virgolette (per esempio GAMBERO ROSSO "VERITAS").'],
     dev:{correzioni:['`splitLine`: una virgoletta dentro un nome (GAMBERO ROSSO"VERITAS"3"35/50PZ, tre virgolette) apriva una cella tra virgolette e univa nel nome unità, prezzo e categoria; le virgolette sparivano anche dai nomi. Ora contano solo se racchiudono tutta la cella; virgoletta mai chiusa → divisione semplice. Prova `tools/test-virgolette.mjs`.','`geminiPrompt`: fatture e bolle (solo righe prodotto, prezzo unitario, U.M.), descrizione copiata con le virgolette.']}},
@@ -2979,20 +2982,25 @@ async function saveProd(pid){
 
 /* ================= importazione listini ================= */
 const TEMPLATE_HEAD='fornitore;codice;nome;unita;prezzo;categoria';
+// v67: due colonne in più (quantita, importo) servono solo al controllo quantità × prezzo = importo, non si salvano
+const GEM_HEAD=TEMPLATE_HEAD+';quantita;importo';
 const geminiPrompt=()=>`Leggi il listino prezzi (o la fattura, o la bolla) nelle immagini e restituisci SOLO una tabella in testo semplice, senza altro testo prima o dopo.
 Usa il punto e virgola come separatore e questa prima riga di intestazione, identica:
-${TEMPLATE_HEAD}
+${GEM_HEAD}
 Regole:
-- una riga per prodotto;
-- fornitore: il nome del fornitore del listino;
-- codice: il codice articolo se c'è, altrimenti vuoto;
-- nome: la descrizione del prodotto con formato o peso;
-- unita: kg, pz, l, conf, cartone, cassa, mazzo... se deducibile, altrimenti vuoto;
-- prezzo: solo il numero con la virgola per i decimali, senza simbolo €, vuoto se manca;
+- una riga per prodotto, nello stesso ordine del foglio, senza saltarne nessuno;
+- fornitore: chi vende, scritto in alto col logo (es. DAC, F.lli Mariano, Nieddittas), mai il cliente o il destinatario della merce;
+- codice: il codice articolo copiato com'è, zeri davanti compresi (040 resta 040), altrimenti vuoto;
+- nome: la descrizione del prodotto com'è, con formato o peso, virgolette comprese; togli solo i puntini di riempimento e i segni # o * attaccati;
+- se la descrizione continua sulla riga sotto senza codice né prezzo (es. ECOLABEL, CLASSE A, il nome scientifico, ALLEVATO FRANCIA), non è un prodotto nuovo: lasciala fuori o aggiungila al nome sopra solo se serve a capire il prodotto;
+- unita: dalla colonna U.M. se c'è (K. o KG = kg, PZ = pz, CF = conf, CT = cartone, LT = l), anche se è attaccata alla descrizione (##PZ, ##K.); altrimenti kg, pz, l, conf, cartone, cassa, mazzo... se deducibile, altrimenti vuoto;
+- prezzo: il prezzo unitario (colonna PREZZO), non l'importo della riga; solo il numero con la virgola, tutti i decimali scritti (4,988), senza simbolo €, vuoto se manca; se c'è uno sconto in percentuale sulla riga, il prezzo già scontato;
 - categoria: una tra ${CATS.join(', ')};
-- fattura o bolla: solo le righe dei prodotti (niente vettore, trasporto, indirizzi, totali); prezzo = prezzo unitario (colonna PREZZO), non l'importo della riga; unita dalla colonna U.M. (K. o KG = kg, PZ = pz), anche se è attaccata alla descrizione;
-- copia la descrizione com'è, virgolette comprese, e non usare il punto e virgola dentro le celle;
-- non inventare dati che non ci sono.`;
+- quantita: la quantità su cui è calcolato l'importo (colonna QUANTITÀ, o PESO NETTO se c'è), vuota in un listino;
+- importo: l'importo della riga (IMPORTO o IMPORTO NETTO), vuoto in un listino;
+- fattura o bolla: solo le righe dei prodotti; niente intestazioni, indirizzi, righe di asterischi (** o ****), totali, IVA; le spese (consegna, trasporto, imballo, contributi) mettile pure: l'app le riconosce;
+- non usare il punto e virgola dentro le celle;
+- non inventare dati che non ci sono: una cifra che non si legge bene lasciala vuota.`;
 function impSheet(fid){
   S.imp={fid:fid||'',stage:'pick',err:'',txt:'',photos:[]};
   openSheet({cls:'tall',render:()=>{const I=S.imp,f=I.fid?forn(I.fid):null;
@@ -3053,9 +3061,9 @@ const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(S
 // v65: una foto per volta (ogni richiesta resta sotto i 100 s di Cloudflare), una seconda prova se Gemini è lento o occupato,
 // le foto già lette restano in I.gres: un nuovo tocco legge solo quelle mancanti.
 const GEM_RETRY=/^(429|502|503|504|524)$/;
-function gemJoin(a){const hd=l=>l.replace(/\s/g,'').toLowerCase();let H=hd(TEMPLATE_HEAD),first=true;
+function gemJoin(a){const hd=l=>l.replace(/\s/g,'').toLowerCase();let H=[hd(GEM_HEAD),hd(TEMPLATE_HEAD)],first=true;
   return a.map(t=>{const rs=String(t).split('\n').filter(l=>!/^\s*```/.test(l));const i=rs.findIndex(l=>l.trim());
-    if(i>=0){if(first)H=[H,hd(rs[i])];else if([].concat(H).includes(hd(rs[i])))rs.splice(i,1)}first=false;return rs.join('\n')}).join('\n')}
+    if(i>=0){if(first)H=H.concat(hd(rs[i]));else if([].concat(H).includes(hd(rs[i])))rs.splice(i,1)}first=false;return rs.join('\n')}).join('\n')}
 async function gemRun(){const I=S.imp;if(!I||!I.photos.length||I.busy)return;I.busy=true;I.err='';I.prog='';refreshSheet();
   try{I.gres=I.gres||new WeakMap();const n=I.photos.length,out=[];
     for(let i=0;i<n;i++){const p=I.photos[i];if(I.gres.has(p)){out.push(I.gres.get(p));continue}
@@ -3094,10 +3102,10 @@ function mapRows(rows){
   for(let h=0;h<Math.min(rows.length,20);h++){
     const r=(rows[h]||[]).map(c=>norm(c));const find=(re,not=[])=>r.findIndex((c,i)=>!not.includes(i)&&re.test(c));
     const iN=find(/^nome|descr|prodott|articol|denomin/);if(iN<0)continue;
-    const iP=find(/prezz|listino|euro|importo|costo|^eur/,[iN]);
+    const iP0=find(/prezz/,[iN]),iP=iP0>=0?iP0:find(/listino|euro|importo|costo|^eur/,[iN]);
     const iC=find(/^cod|codice|^art$|sku|ean|^rif/,[iN]);const iU=find(/^u ?m$|^unita|misura/,[iN]);const iK=find(/categ|famiglia/,[iN]);const iF=find(/fornit|ditta|supplier/,[iN]);
-    if(iP<0&&iC<0&&iU<0)continue;
-    const items=rows.slice(h+1).map(row=>({fornitore:iF>=0?String(row[iF]??'').trim():'',nome:String(row[iN]??'').trim(),codice:iC>=0?String(row[iC]??'').trim():'',unita:iU>=0?String(row[iU]??'').trim():'',prezzo:iP>=0?num(row[iP]):null,categoria:iK>=0?String(row[iK]??'').trim():''})).filter(i=>i.nome);
+    if(iP<0&&iC<0&&iU<0)continue;const iQ=find(/^quant|^qta|^q ta$/,[iN,iP]),iI=iP0>=0?find(/^importo|^totale/,[iN,iP,iQ]):-1;
+    const items=rows.slice(h+1).map(row=>({fornitore:iF>=0?String(row[iF]??'').trim():'',nome:String(row[iN]??'').trim(),codice:iC>=0?String(row[iC]??'').trim():'',unita:iU>=0?String(row[iU]??'').trim():'',prezzo:iP>=0?num(row[iP]):null,categoria:iK>=0?String(row[iK]??'').trim():'',q:iQ>=0?num(row[iQ]):null,imp:iI>=0?num(row[iI]):null})).filter(i=>i.nome);
     if(items.length)return items;
   }
   return null;
@@ -3109,6 +3117,15 @@ function parseFatturaPA(t){
   const items=[...d.getElementsByTagNameNS('*','DettaglioLinee')].map(l=>({fornitore:fn,nome:g(l,'Descrizione'),codice:g(l,'CodiceValore'),unita:g(l,'UnitaMisura'),prezzo:num(g(l,'PrezzoUnitario')),categoria:''})).filter(i=>i.nome&&i.prezzo>0);
   return items;
 }
+// v67: unità scritte come nelle fatture (K., KG, PZ, CF, CT, LT, NR…) diventano quelle dell'app
+const UNITA={k:'kg',kg:'kg',kgm:'kg',kgs:'kg',chili:'kg',pz:'pz',pzz:'pz',pezzi:'pz',pezzo:'pz',nr:'pz',n:'pz',cf:'conf',conf:'conf',confezione:'conf',ct:'cartone',crt:'cartone',cartone:'cartone',lt:'l',l:'l',litro:'l',litri:'l',bt:'bottiglia',bott:'bottiglia',mz:'mazzo',mazzo:'mazzo',cs:'cassa',cassa:'cassa',vs:'vaschetta',vasc:'vaschetta'};
+const normUnita=u=>{const t=String(u??'').trim();return UNITA[t.toLowerCase().replace(/[^a-z]/g,'')]||t};
+// nomi letti dalle foto: via i segni ## e ** e i puntini di riempimento (OLIO 5 LT "PET"....##PZ)
+const pulisciNome=n=>String(n??'').replace(/#+\s*(pz|k\.?|kg|cf|ct|lt?)?\s*$/i,'').replace(/[#*]+/g,' ').replace(/\.{3,}/g,' ').replace(/\s*\.{2,}\s*$/,'').replace(/\s{2,}/g,' ').trim();
+// spese della fattura (consegna, trasporto, imballo…): non sono prodotti da listino
+const isSpesa=n=>/^(spese?|consegna|trasporto|contributo|contributi|cauzione|imballo|imballaggio|imballaggi|nolo|porto|addebito|bancale|pallet)\b/.test(norm(n));
+// quantità × prezzo deve dare l'importo della riga (arrotondamenti e cali ammessi): se no la riga va controllata
+const rigaNonTorna=it=>it.q>0&&it.imp>0&&it.prezzo>0&&Math.abs(it.q*it.prezzo-it.imp)>Math.max(.06,it.imp*.015);
 function guessSupplier(name){const n=norm(name);if(!n)return'';const fs=Object.values(D().fornitori);
   return(fs.find(f=>norm(f.nome)===n)||fs.find(f=>n.includes(norm(f.nome))||norm(f.nome).includes(n))||fs.find(f=>norm(f.nome).split(' ').some(w=>w.length>3&&n.includes(w)))||{}).id||''}
 async function impRun(kind,files){
@@ -3123,9 +3140,9 @@ async function impRun(kind,files){
     else if(kind==='txt'){items=mapRows(parseTable(I.txt));fonte='Tabella incollata'}
     if(!items||!items.length){I.stage=kind==='txt'?'paste':'pick';I.err='Non trovo le colonne. Serve almeno una riga di intestazione con "nome" e una tra "prezzo", "codice" o "unita".';refreshSheet();return}
     const def=I.fid;
-    const rows=items.map(it=>{const fid=guessSupplier(it.fornitore)||def;const f=fid?forn(fid):null;
-      return{fid,nome:it.nome.slice(0,160),codice:String(it.codice||'').slice(0,40),unita:String(it.unita||'').slice(0,20),prezzo:it.prezzo,
-        categoria:CATS.includes(it.categoria)?it.categoria:((f&&f.categoria)||'Altro'),catF:CATS.includes(it.categoria),fnome:it.fornitore,sel:!!fid}});
+    const rows=items.map(it=>{const fid=guessSupplier(it.fornitore)||def;const f=fid?forn(fid):null;const nome=(kind==='txt'?pulisciNome(it.nome):it.nome)||it.nome,spesa=isSpesa(nome);
+      return{fid,nome:nome.slice(0,160),codice:String(it.codice||'').slice(0,40),unita:normUnita(it.unita).slice(0,20),prezzo:it.prezzo,
+        categoria:CATS.includes(it.categoria)?it.categoria:((f&&f.categoria)||'Altro'),catF:CATS.includes(it.categoria),fnome:it.fornitore,sel:!!fid&&!spesa,spesa,q:it.q,imp:it.imp}});
     rvDup(rows).forEach((d,i)=>{if(d)rows[i].sel=false});
     S.rev={fonte,items:rows};closeSheet();reviewSheet();
   }catch(e){I.stage='pick';I.err=errMsg(e);refreshSheet()}
@@ -3154,15 +3171,17 @@ function rvDup(items){const byC={},byN={},ex={},out=[];
     out.push(r)});return out}
 function reviewSheet(){
   openSheet({cls:'tall',render:()=>{const R=S.rev;if(!R)return'<p class="muted">Niente da importare.</p>';const ns=R.items.filter(i=>i.sel).length;const fs=Object.values(D().fornitori).sort(byNome);
-  const miss=R.items.filter(i=>!i.fid).length;const ups=rvUps(R.items);const dd=rvDup(R.items),nd=k=>dd.filter(d=>d&&d[k]!=null).length,tw=nd('twin'),sm=nd('sim'),ex=nd('ex');
+  const miss=R.items.filter(i=>!i.fid).length;const ups=rvUps(R.items);const chk=i=>rigaNonTorna({q:i.q,imp:i.imp,prezzo:num(i.prezzo)}),nchk=R.items.filter(chk).length,nsp=R.items.filter(i=>i.spesa).length;const dd=rvDup(R.items),nd=k=>dd.filter(d=>d&&d[k]!=null).length,tw=nd('twin'),sm=nd('sim'),ex=nd('ex');
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Controlla e salva<div class="sh-s">${R.items.length} prodotti, da ${esc(R.fonte)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <p class="muted" style="margin:0">Correggi quello che serve. Se un prodotto esiste già nel listino del fornitore, aggiorno nome e prezzo.</p>
   ${miss?`<div class="err">${miss===1?'Una riga':miss+' righe'} senza fornitore riconosciuto: scegli il fornitore${R.items.length>1?' (puoi applicarlo a tutte con il menu qui sotto)':''}.</div><select class="inp" id="rv-all-f" data-ch="rvallf" aria-label="Fornitore per le righe senza fornitore"><option value="">Assegna un fornitore alle righe mancanti…</option>${fs.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')}</select>`:''}
   ${ups.length?`<div class="banner dup" role="note">${ic('warn')}<div><b>${ups.length===1?'1 prodotto costa di più':ups.length+' prodotti costano di più'}</b> rispetto al listino:<ul>${ups.slice(0,8).map(u=>`<li>${esc(u.nome)}: ${eur(u.old)} → ${eur(u.nw)} <b>${pctS(u.pc)}</b></li>`).join('')}</ul>${ups.length>8?`…e altri ${ups.length-8}, segnati in rosso qui sotto.`:''}</div></div>`:''}
   ${tw+sm+ex?`<div class="banner dup" id="rv-dup" role="note">${ic('warn')}<div><b>Prodotti doppi</b><ul>${tw?`<li>${tw===1?'1 riga uguale':tw+' righe uguali'} in tutto a un'altra: non la carico due volte.</li>`:''}${ex?`<li>${ex===1?'1 riga uguale':ex+' righe uguali'} in tutto a un prodotto già a listino: la salto.</li>`:''}${sm?`<li>${sm===1?'1 riga simile':sm+' righe simili'} a un'altra (stesso prodotto, ma qualcosa cambia): le ho tolte. Spunta quelle da tenere.</li>`:''}</ul></div></div>`:''}
+  ${nchk?`<div class="banner dup" id="rv-chk" role="note">${ic('warn')}<div><b>${nchk===1?'1 riga da controllare':nchk+' righe da controllare'}</b>: quantità × prezzo non dà l'importo scritto sulla fattura. Forse una cifra è stata letta male: confronta con la foto.</div></div>`:''}
+  ${nsp?`<div class="banner dup" id="rv-spese" role="note">${ic('warn')}<div><b>${nsp===1?'1 spesa':nsp+' spese'}</b> (consegna, trasporto…) non sono prodotti: non le carico. Spuntale se vuoi tenerle.</div></div>`:''}
   <label class="checkall"><input type="checkbox" id="rvall" data-ch="rvall" ${ns===R.items.length-tw?'checked':''}> Seleziona tutti</label>
   <div>${R.items.map((it,i)=>{const ex=prods().filter(p=>p.fornitoreId===it.fid);const m=it.fid&&matchProd(ex,it),d=dd[i];
-    const st=d&&d.twin!=null?pill('','uguale alla riga '+(d.twin+1)+': non la carico due volte'):d&&d.sim!=null?pill('wait','simile alla riga '+(d.sim+1)+', cambia: '+d.dif.join(', ')):d&&d.ex?pill('','uguale, già a listino'):!it.fid?pill('ko','fornitore mancante'+(it.fnome?': '+it.fnome:'')):m?(num(it.prezzo)!==m.prezzo?(pctUp(m.prezzo,num(it.prezzo))?pill('ko','aumentato '+pctS(pctUp(m.prezzo,num(it.prezzo)))+', era '+eur(m.prezzo)):pill('wait','prezzo attuale '+(m.prezzo!=null?eur(m.prezzo):'vuoto'))):pill('','già a listino')):ex.some(p=>norm(p.nome)===norm(it.nome))?pill('wait','nuovo: stesso nome di uno già a listino, codice diverso'):pill('ok','nuovo');const id=`rv-${i}`;
+    const st=(chk(it)?pill('ko','da controllare: '+fq(it.q)+' × '+fq(num(it.prezzo))+' € non fa '+eur(it.imp)):'')+(it.spesa?pill('','spesa, non è un prodotto: non la carico'):'')+(d&&d.twin!=null?pill('','uguale alla riga '+(d.twin+1)+': non la carico due volte'):d&&d.sim!=null?pill('wait','simile alla riga '+(d.sim+1)+', cambia: '+d.dif.join(', ')):d&&d.ex?pill('','uguale, già a listino'):!it.fid?pill('ko','fornitore mancante'+(it.fnome?': '+it.fnome:'')):m?(num(it.prezzo)!==m.prezzo?(pctUp(m.prezzo,num(it.prezzo))?pill('ko','aumentato '+pctS(pctUp(m.prezzo,num(it.prezzo)))+', era '+eur(m.prezzo)):pill('wait','prezzo attuale '+(m.prezzo!=null?eur(m.prezzo):'vuoto'))):pill('','già a listino')):ex.some(p=>norm(p.nome)===norm(it.nome))?pill('wait','nuovo: stesso nome di uno già a listino, codice diverso'):pill('ok','nuovo'));const id=`rv-${i}`;
     return`<div class="rv ${it.sel?'':'off'}"><input type="checkbox" class="rv-c" id="${id}-s" data-ch="rvsel" data-i="${i}" ${it.sel?'checked':''} ${it.fid&&!(d&&d.twin!=null)?'':'disabled'} aria-label="Seleziona ${esc(it.nome)}"><div class="rv-f">
     <select class="inp sm" id="${id}-f" data-ch="rvf" data-i="${i}" aria-label="Fornitore"><option value="">Fornitore…</option>${fs.map(f=>`<option value="${f.id}" ${it.fid===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}</select>
     <input class="inp sm" id="${id}-n" value="${esc(it.nome)}" data-in="rv" data-i="${i}" data-k="nome" aria-label="Nome">
