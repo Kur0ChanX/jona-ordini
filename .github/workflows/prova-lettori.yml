@@ -1,9 +1,10 @@
-# Prova dei lettori di foto (D22): parte da sola a ogni push sul ramo claude/prova-lettori
-# (un workflow nuovo non si può lanciare a mano finché non è su main). Non tocca app né Worker.
+# Prova dei lettori di foto (D22): parte con una PR di prova (bozza, da non unire) che cambia questi file.
+# I push dalla sessione non fanno partire i workflow e uno nuovo non si lancia a mano finché non è su main.
+# Non tocca app né Worker.
 name: Prova lettori foto
 on:
-  push:
-    branches: [claude/prova-lettori]
+  pull_request:
+    branches: [main]
     paths: [tools/prova-lettori.py, .github/workflows/prova-lettori.yml]
 permissions:
   contents: read
