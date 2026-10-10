@@ -1,41 +1,41 @@
-# Passaggio di consegne (2026-10-10, fine sessione #61)
+# Passaggio di consegne (2026-10-10, fine sessione #62)
 
-Sessione attuale: #62
+Sessione attuale: #63
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (ramo unico e permanente da #61, nome in `.claude/ramo-di-lavoro.txt`; l'hook di avvio ci passa da solo). App online: **v69** (main `76c3416`, online dalle 14:07 del 10/10, controllato: `APP_VER=69`, CACHE `jona-ordini-v73`).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v69** (main `76c3416`). **v70 pronta sul ramo, NON ancora pubblicata** (primo lavoro di #63).
 
-## Ultimo messaggio di Mario (#61), parola per parola
-«Si applica la regola in modo permanente e rinnominala vhe sia visibile esempio Jovan Ramo definitivo o qlkosa di meglio o del genere»
-→ Fatto (ramo `claude/jona-ramo-definitivo`). Poi v69 pubblicata e comunicata con i passi di prova. Gli ho chiesto se ha cambiato la riga nelle preferenze personali (vedi sotto): **risposta non ancora arrivata**.
+## Ultimi messaggi di Mario (#62), parola per parola
+1. «prima aggiorna il mio logo con questa coda il resto tieni il tuo e rifai l'animazione anche vettoriale e inviami poi i file aggiornati valuta migliorie e valuto» (con il disegno `docs/img/logo/ynoy-coda-mario-2026-10-10.jpg`)
+2. «ricordati il tuo nuovo quello dell'app questo in foto ho fatto screenshot prendilo come riferimento gli altri con la & eliminali» (screenshot dell'apertura: `docs/img/logo/riferimento-app-2026-10-10.jpg`)
+→ Fatto (sotto). Gli ho mandato i file e chiesto quale miglioria preferisce (M31): **risposta non ancora arrivata**. La sua domanda precedente («Parto con D29?») è rimasta senza risposta: il logo è venuto prima.
 
-## Fatto in #61
-1. Scorta `origin/scorta/claude/jona-sessione-61` unita (conteneva solo `docs/ULTIMO-MESSAGGIO.md`).
-2. **v69 pubblicata**: `test-firebase-approva-arrivi` rifatta con l'emulatore (36 PASS, 0 FAIL; le righe «errors … navigator.serviceWorker.addEventListener» vengono dal serviceWorker finto della prova, non dall'app). `test-giro` già verde in #60 (messaggio della sessione #60). PR #80 → «Prove automatiche» verde → squash `76c3416` → online verificato. Main unito nel ramo definitivo: conflitti solo negli appunti (CLAUDE.md, CAMBIO-ACCOUNT, DA-FARE, ERRORI, consegne) perché lo squash rifaceva le stesse righe: tenuta la versione del ramo (più nuova); file dell'app identici a main.
-3. **Meno controlli doppi** (Mario: «Secondo me fai troppi controlli poi non sò sei tu l'esperto», poi «si» a scriverlo): riga in CLAUDE.md sotto STABILITÀ. Sul computer di lavoro solo le prove legate alla modifica (+ `test-giro` se cambia l'aspetto); il resto alle prove automatiche di GitHub (gratis, zero token). Niente prove rifatte due volte.
-4. **Ramo unico permanente** (proposta arrivata da RVC #52 via sessione #60; Mario: sì, permanente, nome visibile):
-   - `.claude/ramo-di-lavoro.txt` = `claude/jona-ramo-definitivo`.
-   - `.claude/hooks/avvio-check.py`: `ramo_di_lavoro()` legge prima quel file (ha la precedenza sul ramo attuale). Provato: partendo da `claude/jona-sessione-61` passa da solo al ramo definitivo.
-   - CLAUDE.md: «RAMO NUOVO A OGNI HANDOFF» sostituita da «RAMO DEFINITIVO, UNICO E PERMANENTE» (all'handoff niente ramo nuovo; `source_revision` = ramo definitivo); RAMI IN ORDINE e CAMBIO ACCOUNT aggiornate. Restano solo i rami delle versioni per le PR (`claude/jona-v<NN>-<argomento>`). I vecchi `claude/jona-sessione-<NN>` restano su GitHub, non si toccano.
-   - `docs/CAMBIO-ACCOUNT.md`: ramo fisso ovunque, e testo delle preferenze aggiornato.
-   - Mandato a RVC #52 (`session_01JsFRVrgkAm7xSebe2EK7op`) l'esito, con invito ad allineare il CAMBIO-ACCOUNT di RVC.
-5. DA-FARE: D24 segnata ✅ online.
+## Fatto in #62
+- All'avvio: scorta unita (solo `docs/ULTIMO-MESSAGGIO.md`, era un avviso GitHub della PR #80 già unita).
+- **v70, logo YNOY con la coda nuova** (commit `b39b8cf` + `7f7f0e6`, pushati):
+  - Il disegno di Mario è lo stesso logo con coda diversa (punta a forcella sotto lo svolazzo + 4 lune al posto dei trattini e dello svolazzo sottile). Allineato al logo dell'app con OpenCV ECC (corrispondenza 0,9986 sulle lettere), coda presa dal disegno da y≥497 e x<800 (la Y finisce a y 494), sfumata 760-800 sullo svolazzo. CORP resta quello dell'app (senza «&», v53).
+  - **`media/ynoy.svg`** = nuovo originale vettoriale (potrace a 3×, 16 contorni, evenodd, viewBox 496×190 nelle stesse coordinate della maschera). Nota: `potracer` traccia i pixel False → si passa l'inchiostro negato.
+  - `tools/logo-ynoy.py` riscritto: dal vettoriale fa `media/ynoy.png` (ora 992×380, più nitido) e `docs/img/logo/ynoy-2000.png` (serve `pip install cairosvg`). Scala nuova 0,304 (era 0,313) perché le lune scendono più in basso: logo largo **177 px** (era 172) in `.wall-by i` e `.splash .yn`.
+  - `tools/ynoy-tratti.py`: coordinate dei tratti convertite + coda nuova (tratto `S` fino alla punta, punta della forcella, 4 tratti `K` per le lune; la luna piena ha un giro stretto). 73 pixel scoperti su 50897.
+  - **`tools/ynoy-html.py`** (nuovo): mette i tratti nella maschera `#ywm` di `index.html` (durata 0,03 s + 0,000647 s/unità, scalati 1,2-2,8 s; `--o`=100+100·(w/2+0,3)/len) e scrive `docs/img/logo/ynoy-animazione.svg` (animazione vettoriale autonoma).
+  - Tolti (richiesta di Mario): `tools/originale-ynoy.jpg`, `docs/img/logo-senza-e-scelta.png`, `docs/img/v53-logo-b-prima-dopo.png` (restano nella storia git). Nelle Novità vecchie «YNOY&CORP» → «YNOY CORP».
+  - `APP_VER=70`, voce NEWS v70, `CACHE` `jona-ordini-v74`. `tools/test-apertura-v62.mjs`: 22 tratti (era 19). README aggiornato.
+  - Prove: `test-logo` OK, `test-apertura-v62` 28 PASS, `test-giro` «nessun problema».
+  - Mandati a Mario: `v70-prima-dopo.png`, `v70-apertura-app.mp4`, `ynoy-animazione.mp4`, `media/ynoy.svg`, `ynoy-animazione.svg`, `ynoy-2000.png` (tutti in `docs/img/logo/` tranne lo svg).
+
+## Prossimi passi (#63)
+1. **Pubblicare v70** (D30), senza chiedere (regola PUBBLICA SEMPRE IN AUTOMATICO): ramo `claude/jona-v70-logo-coda` da `claude/jona-ramo-definitivo` → PR verso main → «Prove automatiche» verde → squash → controllo online `APP_VER=70` → `git fetch origin main && git merge origin/main` nel ramo definitivo + push. Avvisare Mario in una riga.
+2. Aspettare la scelta di Mario sulla miglioria (M31). Proposte: Ovvia = logo più grande all'apertura (le lune sul telefono sono ~2 mm); Furba = le 4 lune cadono una dopo l'altra con rimbalzo (come «BY»); **Geniale (consigliata)** = le 4 lune come segno di attesa nell'app (Gemini che legge le foto, salvataggi); Nessuna.
+3. Poi D29 (ottimizzazione Android/iPhone/Mac/Windows, piano in `docs/DA-FARE.md`).
 
 ## Da fare per Mario (aperto)
-- Cambiare nelle **preferenze personali** (https://claude.ai/settings/general, in tutti e due gli account Gmail e Hotmail) la riga «- A ogni passaggio crea un ramo nuovo…» con:
-  «- Si lavora sempre su un ramo unico per progetto (Jona: claude/jona-ramo-definitivo; RVC: il suo ramo fisso). Niente rami nuovi a ogni passaggio.»
-  Finché non lo fa, le preferenze dicono ancora «ramo nuovo»: vale CLAUDE.md (scelta più recente di Mario, 10/10 #61).
-- Provare la v69: vista Admin Chef, richiesta con un prodotto venduto da 2 fornitori (stessa unità, almeno 1% in meno) → riga verde «Da … costa … in meno» → **Passa**.
+- Riga del ramo nelle preferenze personali dei due account (testo in consegne #61 / `docs/CAMBIO-ACCOUNT.md`).
+- Provare v69 (riga verde «costa … in meno» → **Passa**) e v70 (riaprire l'app, guardare l'apertura).
+- Elenco completo: `docs/DA-FARE.md`.
 
-## Prossimo lavoro: D29 (ultimo messaggio di Mario in #60)
-«ottimizza l'app sia per telefoni Android, sia per iPhone, sia per Mac, computer Mac e computer Windows.» Dettagli e proposta in `docs/DA-FARE.md` (D29): verificare l'esistente (PWA, `test-giro` 320/390, barra laterale larga), poi giro con WebKit (Safari) se installabile senza download pesanti e Chromium a 1280/1440; controllare zona sicura iPhone, `apple-touch-icon`, `apple-mobile-web-app-*`, push su iPhone (solo app installata, iOS 16.4+), tastiera che copre i campi, mouse/rotellina, `type=date/time` su Safari. Proporre 3 strade (ovvia/furba/geniale) con immagine, poi fare. Mario non ha segnalato guasti: è una raccomandazione generale. Prove: solo quelle legate (regola nuova).
-
-## Note tecniche utili
-- Emulatore Firebase: `npx firebase-tools@13 emulators:start --only firestore,auth --project demo-jona` (Java c'è; primo avvio scarica il jar, ~2 min). Svuotarlo per `demo-jona` e `jona-ordini` prima di ogni prova (curl in `tools/README.md`). Server: `python3 -m http.server 8765`.
-- Il controllo dei permessi a volte blocca modifiche a CLAUDE.md o a `.claude/` («Self-Modification»): serve un sì esplicito di Mario in chat, poi riprovare.
-
-## Ancora aperto (da prima)
-- Email dei servizi di Jona, M26, M25, D10: senza risposta. In attesa: M27, M28, M29/M30. D23, D25, D26 da fare. Elenco completo in `docs/DA-FARE.md`.
+## Note tecniche
+- Strumenti installati con pip in #62 (non restano nel contenitore nuovo): scikit-image, opencv-python-headless, potracer, cairosvg.
+- Video dell'apertura: server `python3 -m http.server 8765`, `node tools/video-apertura.mjs <cartella>` (117 fotogrammi), poi ffmpeg.
 
 ## Rischi aperti
-- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00 (ora italiana): commit+push dopo ogni passo.
-- Gemini Flash sovraccarico (503) nelle ore di punta: catena Flash-Lite → Cloudflare.
+- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00: commit+push dopo ogni passo.
+- Android: maschera SVG intorno a YNOY (D14) mai provata da Mario; la v70 usa lo stesso metodo.
