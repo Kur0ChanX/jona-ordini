@@ -1,17 +1,27 @@
-# Passaggio di consegne (2026-10-10, fine sessione #51)
+# Passaggio di consegne (2026-10-10, fine sessione #52)
 
-Sessione attuale: #52
+Sessione attuale: #53
 
-## Messaggio di Mario arrivato nella #51 DOPO l'handoff (parola per parola)
-«nelle sessioni Progetto jona e RVC cambia il pallino colorato all'inizio con RVC Verde colore del progetto e in jona marrone colore bel progetto. poi quando crei un nuovo ramo nominalo in modo vhe lo riconosco esempio il numero successivo della sessione cosí quando dopo 8 volte che lo gai tu in automatico quando avvio io la nuova sessione teovo subito il ramo che devo mettere senza complicazioni metti un nome che jon ti crea problemi e che capisco subito io che è il nuovo»
-Fatto dalla #51: CLAUDE.md → RVC 🟢 (non più 🟣), Jona resta 🟤; regola «ramo nuovo a ogni handoff» `claude/jona-sessione-<NN>` (RVC `claude/rvc-sessione-<NN>`). Creato e pushato `claude/jona-sessione-52`: **la #52 passa a quel ramo** (`git fetch origin claude/jona-sessione-52 && git checkout claude/jona-sessione-52`) e da ora lavora lì. **Da fare dalla #52**: dire la regola (pallino verde + nome del ramo) alla sessione RVC attiva (`list_sessions`, `send_message`), perché la #51 non può toccare il repo RVC; rinominare in 🟢 la sessione RVC attiva.
+Ramo di lavoro: `claude/jona-sessione-53` (regola nuova: un ramo per sessione; all'handoff della #53 → `claude/jona-sessione-54`).
 
-## Ultimo messaggio di Mario (#51), parola per parola
-«Mi consigli altre alternative a gemini o soluzioni in generale valuto tutto però free al momento, magari è nostro collo di bottiglia nel senso puoi ortimizzarti quanto vuoi secondo me ma se gemini legge male o meno siamo fregati no?»
+## Ultimo messaggio di Mario (#52), parola per parola
+«controlla la migliore app per il nostro progetto e valuta i limiti imposti per caricamento foto
 
-Risposta data in #51 (in breve, modalità BRAINSTORMING): vedi «Alternative a Gemini» sotto. Ho chiuso con UNA domanda a Mario: **riceve le fatture elettroniche XML (cassetto fiscale dell'Agenzia delle Entrate o dal commercialista)?** Risposta ancora da avere.
+Metti come regola su Claude di cercare una soluzione smart se serve»
 
-Messaggi prima (#50, arrivati alla #51 tramite la #50): «ti mando altre foto per correzzioni nella lettura e ottimizzazioni per leggere tutti i dati prezzi codice nome ecc ecc in modo perfetto fai un bel lavoro attento ai dettagli e valuta prossimi errori in fatture o listini» (6 foto, sotto) e «su queste 2 foto ha trovato solo questo puoi risolvere?».
+- Seconda parte FATTA in #52: regola «SOLUZIONE SMART» in `CLAUDE.md` (REGOLE TRASVERSALI, prima di «UNA DOMANDA PER VOLTA»).
+- Prima parte DA FARE in #53 (non iniziata per l'handoff obbligatorio): vedi «Prossimo lavoro» punto 1.
+
+Messaggio prima (#52): «non sò» (alla domanda «ricevi le fatture XML?») e «non sò se possiamo integrare chat gpt se la versione gratuita è migliore di gemini o se ci permette le api di caricare diverse foto e leggerle o possiamo metterle entrambe nel caso... non saprei aspetto la tua analisi».
+
+## Fatto in #52
+- **v67 online**: PR #77 verde (run 38030681005), squash `e66274c`, sito controllato (APP_VER=67, CACHE `jona-ordini-v71`). `main` unito nel ramo consegne (`1c05b06`), pushato. Disiscritto dalla PR #77, controllo di sicurezza cancellato.
+- Arrivato dalla #51 (messaggio tra sessioni) la regola di Mario: pallino RVC 🟢 (prima 🟣), Jona 🟤; ramo nuovo a ogni handoff `claude/jona-sessione-<NN>` / `claude/rvc-sessione-<NN>` (già in CLAUDE.md, commit `a00f3cb`). Passato al ramo `claude/jona-sessione-52`. Rinominata la sessione RVC attiva in «🟢 ▶ ATTIVA · #47 · RVC …» (`session_011dwxsZScU2sWWPEAApFT3X`) e mandata la regola con il messaggio di Mario parola per parola (consegnato; quella sessione era ferma su una domanda a Mario). Le sessioni RVC chiuse restano 🟣 (non richiesto rinominarle).
+- Analisi ChatGPT/alternative (BRAINSTORMING) mandata a Mario con immagine `docs/img/scelte/lettura-fatture-3-strade.png`: A XML (consigliata), B Gemini + secondo lettore gratis (Mistral o Groq, riga rossa se non coincidono), C ChatGPT (app gratis non collegabile; API OpenAI solo a pagamento, pochi centesimi a foto, non legge meglio di Gemini in modo dimostrato). Dato a Mario il testo da mandare al commercialista per avere gli XML (M28). Domanda aperta: «preparo intanto la strada B? Sì / No» — Mario ha risposto col messaggio sopra (= valuta tu la migliore e i limiti).
+- Ricerca web fatta (fonti non ufficiali e in disaccordo): limiti gratuiti di Gemini Flash dichiarati tra ~100 e 1500 richieste/giorno, Pro tolto dal gratis ad aprile 2026; Mistral e Gemini non pubblicano più i limiti gratuiti (aspettarsi 429); OCR.space 25.000 richieste/mese gratis (OCR semplice, non tabelle); OpenAI: niente piano gratuito confermato. Da verificare sulle pagine ufficiali.
+- `docs/DA-FARE.md`: D21 chiusa; nuove D22 (scelta strada lettura fatture) e M28 (commercialista → XML).
+
+## Consegne precedenti (#51), ancora valide
 
 ## File ricevuti (#50, già committati)
 - `docs/img/listini/`: `dac-fattura-054851-2026-09-01-pag1.jpg` (pag. 1 di 2, «SEGUE»), `dac-fattura-054851-2026-09-01.jpg` (pag. 2), `dac-fattura-252792-2026-09-08.jpg`, `dac-fattura-057162-2026-09-08.jpg`, `dac-fattura-065742-2026-10-06.jpg`, `dac-fattura-269380-2026-09-23.jpg`, `mariano-fattura-13960-2026-09-08.jpg` (F.lli Mariano, 24 righe), `nieddittas-fattura-5274-2026-09-22.jpg` (3 molluschi + consegna CDS).
@@ -46,16 +56,15 @@ Gemini non è l'unico punto debole: con la v67 una lettura sbagliata dei numeri 
 3. **Controlli in più senza IA**: somma delle righe = totale della fattura; prezzo molto diverso dall'ultimo a listino (es. +/- 40%) → avviso; foto fatte bene (foglio piatto, luce, pagina intera). OCR sul telefono (Tesseract.js) scartato come lettore principale: con tabelle fotografate legge peggio di Gemini.
 Raccomandazione data: XML come strada principale per le fatture, Gemini + controlli per listini di carta e WhatsApp. Per CLAUDE.md, alla scelta mandare a Mario un'immagine di confronto (non fatto in #51 per l'handoff obbligatorio).
 
-## Prossimo lavoro (#52), in ordine
-1. D21: PR #77. «Prove automatiche» verdi → squash, controllo online (`curl -sL https://jona-ristorante-by-ynoy-corp.pages.dev/` APP_VER 67, `sw.js` CACHE v71), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Se rosse: capire la causa e correggere.
-2. Avvisare Mario «v67 online» → M27 (rifare l'import delle fatture, guardare righe rosse, mandare screenshot di «Controlla e salva»).
-3. Aspettare la risposta sulla domanda XML; poi proporre il lavoro scelto (immagine di confronto delle 3 strade, una domanda per volta).
-4. Chiedere se vede v64-v67 nelle Novità (vista Sviluppatore o Admin Chef, E21).
-5. Poi `docs/DA-FARE.md` (D17 ponte RVC, D14…).
+## Prossimo lavoro (#53), in ordine
+1. **Richiesta di Mario**: «la migliore app per il nostro progetto e i limiti per il caricamento foto». Modalità SOLUZIONE SMART: controllare sulle pagine UFFICIALI (oggi) piano gratuito e limiti di: Gemini (Flash e Flash-Lite: richieste/minuto, /giorno, dimensione immagini), Mistral (OCR / Pixtral, piano «Experiment»), Groq (modelli vision Llama), OpenRouter (modelli `:free` con vision), Cloudflare Workers AI (modelli vision, neuroni gratis al giorno: vantaggio, già nel nostro Worker), OpenAI (per completezza, a pagamento). Per ognuno: foto per richiesta, peso massimo, richieste/giorno, serve carta?, dati usati per addestramento? Poi stimare il nostro uso (quante foto/settimana) e proporre UNA scelta con immagine di confronto (tabella colorata, come `lettura-fatture-3-strade.png`). Se possibile provare davvero sulle 8 foto in `docs/img/listini/` confrontando con le trascrizioni a mano di `tools/test-fatture.mjs` (serve una chiave: Cloudflare Workers AI si può usare dal Worker senza account nuovo).
+2. Aspettare: screenshot di «Controlla e salva» con la v67 (M27) e risposta del commercialista (M28).
+3. Chiedere se vede v64-v67 nelle Novità (vista Sviluppatore o Admin Chef, E21).
+4. Poi `docs/DA-FARE.md` (D17 ponte RVC, D14…).
 
 ## Ancora da chiedere
-- Domanda XML (sopra). M26 (prodotti finti spariti?), M25, D10: senza risposta.
+- M26 (prodotti finti spariti?), M25, D10: senza risposta.
 
 ## Rischi aperti
-- Gemini vero non provato con il prompt v67 (niente chiave qui): può ancora sbagliare cifre o unità; la riga rossa lo segnala solo se quantità e importo sono letti.
-- Server di prova `python3 -m http.server 8765` acceso nel contenitore della #51 (innocuo).
+- Gemini vero non provato con il prompt v67 (niente chiave qui).
+- Limiti gratuiti dei servizi IA cambiano spesso: ogni scelta va riverificata sulle pagine ufficiali.
