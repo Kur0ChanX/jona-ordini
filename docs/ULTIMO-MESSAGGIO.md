@@ -1,5 +1,5 @@
-# Ultimo messaggio di Mario (10/10/2026 ~17:50 ora italiana)
+# Ultimo messaggio di Mario (10/10/2026 18:06 ora italiana)
 
-2
-
-(scelta della strada 2 «Furba» per D29)
+git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
+Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #65).
+Poi attendi le mie istruzioni.
