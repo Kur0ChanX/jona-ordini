@@ -9,6 +9,7 @@ import datetime, json, os, subprocess, sys
 
 CWD = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
 FILE_MSG = "docs/ULTIMO-MESSAGGIO.md"
+AVVISI_DI_SISTEMA = ("<task-notification", "<system-reminder", "<wake ", "[SYSTEM NOTIFICATION")
 
 
 def run(*args, env=None, inp=None, timeout=30):
@@ -35,8 +36,8 @@ def ora_italiana():
 
 def salva_msg(dati, gitdir):
     testo = str(dati.get("prompt") or "").strip()
-    if not testo:
-        return
+    if not testo or testo.startswith(AVVISI_DI_SISTEMA):
+        return  # avvisi automatici (GitHub, promemoria): non sono messaggi di Mario
     with open(os.path.join(gitdir, "scorta-msg.md"), "w", encoding="utf-8") as f:
         f.write(f"# Ultimo messaggio di Mario ({ora_italiana()} ora italiana)\n\n{testo}\n")
 

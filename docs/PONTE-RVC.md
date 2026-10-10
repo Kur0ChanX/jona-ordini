@@ -1,7 +1,6 @@
 # Ponte Jona ↔ RVC (D17 di Jona, C18 di RVC)
 
-Copia del file `docs/PONTE-JONA.md` del repo RVC (`RVC-Operation-by-YNOY-CORP/RVC`, ramo `claude/rvc-ramo-definitivo`, commit `e72394f`), presa nella sessione Jona #67. In fondo la parte di Jona (§7). Se i due file non coincidono, vale l'ultimo accordo scritto in entrambi.
-
+Copia del file `docs/PONTE-JONA.md` del repo RVC (`RVC-Operation-by-YNOY-CORP/RVC`, ramo `claude/rvc-ramo-definitivo`, commit `afa8b8b`), aggiornata nella sessione Jona #67. In fondo la parte di Jona (§7). Se i due file non coincidono, vale l'ultimo accordo scritto in entrambi.
 
 Stato: **proposta** (sessione #30, 09/10/2026). Fase di progetto: niente codice vero finché Mario non lo chiede.
 Jona Ordini (`Kur0ChanX/jona-ordini`) è l'app del ristorante Jona di Villa Carola. RVC è il gestionale dei reparti dell'hotel.
@@ -41,27 +40,41 @@ I nomi dei campi definitivi arrivano dalla sessione Jona #47 (send_message): fin
 
 Proposta di Claude: P1, P2, P3, P4. **Scelta di Mario (#30, 09/10/2026)**: «p1 p4 p5 p7», poi chiarito «si segnalano vassoi da ritirare da p1 a p4 no addebiti per ora» → prima versione con **P1, P3, P4, P5, P7**. **P2 addebiti: no per ora**. P6 biancheria: fuori.
 
-## 4. Forma dei messaggi (provvisoria, da allineare con Jona #47)
+## 4. Forma dei messaggi (allineata con Jona #67, 10/10/2026)
 
 ```
 {
-  id: "uuid",              // numero unico
-  tipo: "addebito",        // presenze | addebito | vassoio | guasto | richiesta | biancheria | evento
+  id: "uuid",                 // numero unico, creato sul telefono (niente doppioni se si rimanda)
+  tipo: "...",                // vedi elenco sotto
   da: "jona" | "rvc",
   struttura: "villa-carola",
-  camera: "104",
-  quando: "2026-10-09T12:30:00Z",
+  camera: "104" | null,
+  quando: "2026-10-09T12:30:00Z",   // ora del tocco sul telefono
   chi: "id della persona",
-  dati: { ... },           // dipende dal tipo
-  stato: "inviato" | "ricevuto" | "fatto" | "annullato"
+  dati: { ... },              // dipende dal tipo
+  stato: "inviato" | "arrivato" | "visto" | "fatto" | "annullato"
 }
 ```
+
+Tipi (stessi nomi nelle due app):
+| Tipo | Da | Dati | In RVC va a | In Jona |
+|---|---|---|---|---|
+| `oggi` | rvc | camere, ospiti, arrivi, partenze (solo numeri, niente nomi) | — | «Oggi in hotel» |
+| `richiesta` | rvc | sottotipo (`colazione`, `torta`, `cena-tardi`, `benvenuto`, `speciale`, `altro`), giorno, ora, persone, nota | — | messaggio «Richiesta» |
+| `vassoio` | rvc | camera | — | «Ritira vassoio» |
+| `guasto` | jona | dove, cosa, urgente, foto | Manutenzione | tasto «🔧 Guasto» |
+| `evento` | jona | giorno, ora, persone, dove | Porter · HK aree comuni | tasto «📅 Evento» |
+| `richiesta-ospite` | jona | camera, cosa, ora | Ricevimento | tasto «🛎 Richiesta ospite» |
+| `serve-a-noi` | jona | cosa, per quando | Ricevimento e Chiara (linguetta «🍽️ Ristorante»; possono girarlo ai Porter) | tasto «📦 Serve a noi» |
+| `testo` | tutte e due | testo libero, camera facoltativa | linguetta «🍽️ Ristorante» | chat «Messaggi con l'hotel» |
+
+Stati: `inviato` (partito dal telefono) → `arrivato` (l'altra app l'ha ricevuto) → `visto` (qualcuno l'ha aperto: «Ho letto») → `fatto`. Si mostra solo quello che conferma il server (regola S1). Niente addebiti, niente allergie o salute.
 
 Indirizzi del Worker (provvisori): `POST /ponte/messaggi` (manda), `GET /ponte/messaggi?dopo=<data>` (legge i nuovi), `POST /ponte/messaggi/<id>/stato` (conferma). Chiave nell'intestazione `Authorization`.
 
 ## 5. Prossimi passi
 1. ~~Mario sceglie cosa condividere~~ fatto: P1, P3, P4, P5, P7 (P2 no per ora, P6 fuori).
-2. Arriva il messaggio della sessione Jona #47 con i campi di Jona: si allineano i nomi qui sopra e si copia questo file anche in Jona.
+2. ~~Allineare i nomi con Jona~~ fatto nella #55 (tabella §4, mandata a Jona #67).
 3. Si scrive il codice solo con la Tappa 2 (C1), insieme al Worker di RVC, e solo col via di Mario.
 
 ## 5b. Icona «🍽️ Ristorante» (approvata da Mario, #54, 10/10/2026, foto 33 `archivio/sessione-54/foto-33-proposta-c18-ristorante.png`)
@@ -69,7 +82,7 @@ Richiesta di Mario (#53): «mettiamo un'icona per condividere informazioni dei c
 - **Chi la vede**: ricevimento e Chiara (linguetta «🍽️ Ristorante» con il numero dei messaggi nuovi). Le ragazze hanno solo il tasto «🍽️ Vassoio da ritirare» nella camera (P3). I guasti di Jona vanno alla manutenzione (P4).
 - **Oggi per il ristorante (P1, parte da solo)**: ospiti, camere, arrivi (camera·persone), partenze; «✓ Jona l'ha ricevuto alle …».
 - **Manda al ristorante (P5)**: tasti grandi 🍳 Colazione in camera · 🎂 Torta / sorpresa · 🌙 Cena tardi · 🥂 Benvenuto in camera · ⭐ Ospite speciale · ✍️ Altro. Ogni richiesta: camera a tocchi, Oggi/Domani, ora a tocchi, persone, nota (✍️ Scrivi / 🎤 Detta), «Manda a Jona». Stato: ⏳ sul telefono → ✓ arrivato a Jona → ✓ fatto (regola S1). Senza rete aspetta e parte da sola.
-- **Dal ristorante**: guasti (→ Manutenzione), eventi (P7, → Porter · HK aree comuni), richieste fatte dall'ospite al ristorante (→ Ricevimento), con «Ho letto».
+- **Dal ristorante**: guasti (→ Manutenzione), eventi (P7, → Porter · HK aree comuni), richieste fatte dall'ospite al ristorante (→ Ricevimento), «Serve a noi» (cose che servono al ristorante, es. 20 tovaglie: → Ricevimento e Chiara, che possono girarlo ai Porter; aggiunto nella #55 dal disegno di Jona), con «Ho letto».
 - **Privacy**: allergie e salute non passano dal ponte (scritta fissa sulla schermata).
 - Online serve il Worker (D5, Cloudflare); prima si costruisce e si prova col simulatore.
 
@@ -84,26 +97,16 @@ Mario (#31): «2 e 3 dopo guardo l'app» → mandare a Jona le scelte senza aspe
 
 ## 7. Parte di Jona (sessione #67, 10/10/2026)
 Mario ha approvato (#67, «Sì») l'immagine `docs/img/ponte/d17-unita.png`: icona 🏨 «Hotel» in alto in Jona, con le 3 idee unite.
-- **Pagina «Hotel»**: in cima «Oggi in hotel» (P1, solo numeri e camere, mai nomi); 4 pulsanti «Manda all'hotel»: 🔧 Guasto (P4), 🛎 Richiesta ospite (P5), 📅 Evento (P7), 📦 Serve a noi (P8, nuovo); sotto il filo dei messaggi con l'hotel, come una chat con etichette, con stati ✓ arrivato · ✓✓ visto · ✔ fatto, e risposta libera.
+- **Pagina «Hotel»**: in cima «Oggi in hotel» (P1, solo numeri e camere, mai nomi); 4 pulsanti «Manda all'hotel»: 🔧 Guasto (P4), 🛎 Richiesta ospite (P5), 📅 Evento (P7), 📦 Serve a noi (`serve-a-noi`, nuovo); sotto il filo dei messaggi con l'hotel, come una chat con etichette, con stati ✓ arrivato · ✓✓ visto · ✔ fatto, e risposta libera.
 - **Da soli nel resto di Jona**: vassoio (P3) → compito «Ritira vassoio · camera N» nella home dello staff con **✔ Fatto**; ospiti di domani (P1) → ordine suggerito in Invii; evento dell'agenda → domanda «Mando l'evento all'hotel?» (Sì/No, mai in automatico); richieste dall'hotel → campanella.
-- **P8 «Serve a noi»** (nuovo, Jona → RVC): necessità del ristorante verso l'hotel (es. 20 tovaglie pulite per stasera). Richiesta di Mario in Jona #66 («necessità del Ristorante Jona all'hotel»). Copre in parte la vecchia P6 biancheria, ma come richiesta libera.
+- **«Serve a noi»** (`serve-a-noi`, nuovo, Jona → RVC): necessità del ristorante verso l'hotel (es. 20 tovaglie pulite per stasera). Richiesta di Mario in Jona #66 («necessità del Ristorante Jona all'hotel»). Copre in parte la vecchia P6 biancheria, ma come richiesta libera.
 
-### Campi proposti da Jona (busta comune di §4, più)
-- `nome`: nome breve di chi manda (es. «Mauro»), da mostrare. `chi` resta l'id.
-- `urgente`: true/false.
-- `rif`: id del messaggio a cui si risponde (risposte nel filo).
-- `testo`: frase libera, sempre presente (riassunto leggibile anche se l'altra app non conosce il tipo).
-- `stato`: `inviato | ricevuto | visto | fatto | annullato` (aggiunto `visto` = ✓✓, il «Ho letto» di RVC); `statoDa: {chi, nome, quando}`.
-
-| tipo | verso | `dati` |
-|---|---|---|
-| `presenze` (P1) | RVC → Jona | `giorni: [{g:"AAAA-MM-GG", camere, ospiti, arrivi:[{camera, persone}], partenze:[{camera, persone}]}]` per **oggi e domani** (domani serve all'ordine suggerito). Un messaggio con id fisso per giorno (`pres_<g>`), rimandato quando cambia. |
-| `vassoio` (P3) | RVC → Jona | `camera` nella busta, `nota` facoltativa. Jona lo segna `fatto` quando è ritirato. |
-| `guasto` (P4) | Jona → RVC | `dove: cucina|sala|bar|terrazza|magazzino|altro`, `cosa`, `foto` (facoltativa). |
-| `richiesta` (P5) | entrambi | `cosa: colazione|torta|cena_tardi|benvenuto|speciale|altro` (i tasti di RVC §5b), `g`, `ora`, `persone`, `nota`; `camera` nella busta. |
-| `evento` (P7) | Jona → RVC | `titolo`, `g`, `ora`, `persone`, `dove`, `note`. Id fisso `ev_<id agenda>`: se l'evento cambia si rimanda, se si cancella `stato: annullato`. |
-| `serve` (P8) | Jona → RVC | `cosa`, `quanti` (facoltativo), `g`, `ora` (per quando), `nota`. |
-| `messaggio` | entrambi | solo `testo` (riga libera «Scrivi all'hotel…»), `camera` facoltativa. |
+### Nomi dei campi (accordo con RVC #55, 10/10/2026)
+Valgono i nomi di RVC (§4 aggiornato nel repo RVC, commit `dba35f1`, già usati nel codice RVC C18): Jona li adotta così come sono.
+- Busta: `{id (uuid dal telefono), tipo, da, struttura, camera|null, quando, chi, dati, stato}`; stati `inviato → arrivato → visto → fatto` (+ `annullato`), mostrati solo se confermati dal server (S1).
+- Da RVC: `oggi` (camere, ospiti, arrivi, partenze: solo numeri) · `richiesta` (`sottotipo` colazione|torta|cena-tardi|benvenuto|speciale|altro, giorno, ora, persone, nota) · `vassoio` (camera).
+- Da Jona: `guasto` (dove, cosa, urgente, foto) · `evento` (giorno, ora, persone, dove) · `richiesta-ospite` (camera, cosa, ora) · `serve-a-noi` (cosa, per quando) · in tutte e due le direzioni `testo` (testo libero, camera facoltativa).
+- Aggiunte chieste da Jona a RVC (#67, in attesa di risposta): `oggi` anche con i numeri di **domani** (servono all'ordine suggerito); `rif` = id del messaggio a cui si risponde; `nome` breve di chi manda da mostrare; evento con id fisso `ev_<id agenda>` (cambiato → si rimanda, cancellato → `annullato`).
 
 ### Dove vive il ponte (proposta tecnica di Jona)
 Dentro il Worker di Jona già online (`worker/`, D1 `jona-allegati-0`, deploy automatico), indirizzi `/ponte/...` di §4, tabella `ponte` a parte e chiave segreta `PONTE_KEY` diversa dalla chiave del ristorante: RVC chiama con `Authorization: Bearer <PONTE_KEY>`, Jona con il gettone Firebase dei membri (come `/gemini`). Così il ponte funziona prima che il Worker di RVC (D5) esista; si può spostare in un Worker a sé più avanti senza cambiare gli indirizzi. Foto: `POST /ponte/allegati` (stesso sistema di `/allegati`), nel messaggio solo l'id. Messaggi cancellati dopo 30 giorni (proposta §2).
