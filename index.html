@@ -3143,7 +3143,7 @@ function reviewSheet(){
 }
 async function reviewSave(){
   const R=S.rev;const dd=rvDup(R.items);const sel=R.items.filter((it,i)=>it.sel&&it.fid&&!(dd[i]&&dd[i].twin!=null));if(!sel.length)return;const ups=rvUps(sel);
-  // decido prima dove va ogni riga: se una riga precedente scelta è lo stesso prodotto, Mario ha voluto tenerle tutte e due → prodotto nuovo
+  // decido prima dove va ogni riga: se una riga precedente scelta è lo stesso prodotto, chi importa ha voluto tenerle tutte e due → prodotto nuovo
   const plan=sel.map((it,i)=>({it,m:sel.slice(0,i).some(o=>o.fid===it.fid&&sameProd(o,it))?null:matchProd(prods().filter(p=>p.fornitoreId===it.fid),it)}));
   const tasks=plan.map(({it,m})=>()=>{
     const d={fornitoreId:it.fid,nome:String(it.nome).trim(),codice:String(it.codice||'').trim(),unita:String(it.unita||'').trim(),prezzo:num(it.prezzo),categoria:it.categoria||'Altro',aggiornato:now(),caricatoDa:S.me};
