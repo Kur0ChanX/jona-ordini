@@ -99,6 +99,7 @@ Mario (#31): «2 e 3 dopo guardo l'app» → mandare a Jona le scelte senza aspe
 Mario ha approvato (#67, «Sì») l'immagine `docs/img/ponte/d17-unita.png`: icona 🏨 «Hotel» in alto in Jona, con le 3 idee unite.
 - **Pagina «Hotel»**: in cima «Oggi in hotel» (P1, solo numeri e camere, mai nomi); 4 pulsanti «Manda all'hotel»: 🔧 Guasto (P4), 🛎 Richiesta ospite (P5), 📅 Evento (P7), 📦 Serve a noi (`serve-a-noi`, nuovo); sotto il filo dei messaggi con l'hotel, come una chat con etichette, con stati ✓ arrivato · ✓✓ visto · ✔ fatto, e risposta libera.
 - **Da soli nel resto di Jona**: vassoio (P3) → compito «Ritira vassoio · camera N» nella home dello staff con **✔ Fatto**; ospiti di domani (P1) → ordine suggerito in Invii; evento dell'agenda → domanda «Mando l'evento all'hotel?» (Sì/No, mai in automatico); richieste dall'hotel → campanella.
+- **Chi vede «Oggi in hotel»**: tutti, staff compreso (Mario #67): solo numeri, niente nomi.
 - **«Serve a noi»** (`serve-a-noi`, nuovo, Jona → RVC): necessità del ristorante verso l'hotel (es. 20 tovaglie pulite per stasera). Richiesta di Mario in Jona #66 («necessità del Ristorante Jona all'hotel»). Copre in parte la vecchia P6 biancheria, ma come richiesta libera.
 
 ### Nomi dei campi (accordo con RVC #55, 10/10/2026)
