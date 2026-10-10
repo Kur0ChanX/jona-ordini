@@ -1,11 +1,19 @@
-# Passaggio di consegne (2026-10-10, fine sessione #67)
+# Passaggio di consegne (2026-10-11, fine sessione #68)
 
-Sessione attuale: #68
+Sessione attuale: #69
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v73** (main `57628f4`, PR #84). CACHE `jona-ordini-v77`. Worker aggiornato (`/salute` → `ponte:false`, cioè manca ancora `PONTE_KEY`: giusto così).
 
 ## Perché l'handoff ora
 Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio dalle 19:40 circa: con `add_repo` del repo RVC la cartella principale della sessione è diventata /home/user (E31). Il contesto era arrivato a ~470k token. **Non aggiungere altri repo alle sessioni Jona**: i file di RVC si chiedono alla sessione RVC con send_message.
+
+## Fatto in #68 (10/10 23:00 - 11/10 0:05 ora italiana)
+- Unite le scorte e le consegne aggiornate dalla #67 (Mario scriveva ancora lì; detto alla #67 di mandarlo qui). Giro completo `38084513591` dopo la v73: **verde** (controllato).
+- D30: passo C fatto (Kur0ChanX ha fatto «join»); **Kur0ChanX ora Owner** dell'organizzazione (foto 0:01 «Made Kur0ChanX an owner»). Account del ristorante = **`JonaRistorante-Ynoy`** (Owner, 2FA attiva); Kur0ChanX 2FA ancora in attesa (M34).
+- Passo «app Claude sull'organizzazione»: Mario è sulla pagina «Install Claude» con due scelte (JonaRistorante-Ynoy e Jona-Ristorante-by-YNOY). Detto: è normale, toccare **Jona-Ristorante-by-YNOY** → **All repositories** → **Install**. Attendo conferma.
+- Regola nuova (Mario, scelta a tocco confermata): le foto dei semplici passi non si salvano più, solo quelle con errori, scelte, dati del ristorante o file (CLAUDE.md, «SOLO IN CLAUDE CODE»). Mario aveva chiesto «perché ri salvi i miei screenshot?»: spiegato E4.
+- Controllato prima del trasloco: deploy Cloudflare (Pages e Worker) va con i segreti del repo (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, ecc.), che si trasferiscono col repo. Il vecchio GitHub Pages `kur0chanx.github.io/jona-ordini` è ancora attivo (200, `has_pages` true) e col trasloco smette di andare (GitHub non rimanda le Pages).
+- **Richiesta di Mario (0:03)**: «non voglio vedere il mio nick Kur0ChanX nei link dei miei colleghi». Da decidere nella #69: il repo-pagina di rimando `Kur0ChanX/jona-ordini` (passo 4 sotto) terrebbe vivo un link col suo nick. Inviti e QR usano già pages.dev / Worker invito (controllare con grep che nell'app non resti nessun `github.io` visibile). Proposta da fare a Mario: niente repo di rimando, se nessun telefono usa più il vecchio indirizzo (dal v37 lo script in `<head>` porta tutti a pages.dev; un'app installata dal vecchio indirizzo però aprirebbe github.io → senza rimando non parte). Verificare se in Firestore/membri c'è modo di capire da dove aprono (es. `errLog` o `location` nelle push) prima di chiedere.
 
 ## Fatto in #67 (19:18-23:10 ora italiana)
 - **Ponte con l'hotel (D17)**: immagine delle 3 idee unite (`docs/img/ponte/d17-unita.png`, sorgente `.html` accanto) → Mario «Sì». Chi vede «Oggi in hotel»: **tutti**; Mario: «anche i nomi se clicchi non sono un problema»; poi in RVC #56 Mario ha scelto **nome + cognome** al tocco.
@@ -23,8 +31,10 @@ Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio d
 - **Scelte di Mario (toccate e confermate)**: **organizzazione privata**, creata dall'account del ristorante, Kur0ChanX secondo proprietario; nome **`Jona-Ristorante-by-YNOY`**.
 - Risposte già date: il link dell'app NON cambia (pages.dev), inviti/QR/telefoni non cambiano, lo staff non deve fare niente; si **trasferisce** il repo (segreti, prove e cronologia vanno con lui).
 - **Guida data a Mario (parti A-C)**: A account con jona.ristorante@gmail.com (https://github.com/signup, in incognito); B organizzazione `Jona-Ristorante-by-YNOY` da https://github.com/account/organizations/new?plan=free (Contact email jona.ristorante@gmail.com, «My personal account», invito a Kur0ChanX, Complete setup); C con Kur0ChanX accettare su https://github.com/orgs/Jona-Ristorante-by-YNOY/invitation. Detto di NON toccare Transfer né Change visibility. **Aggiornamento 23:43 (Mario ha scritto nella #67 chiusa, con foto `docs/img/sessione-67/organizzazione-creata-2343.jpg`)**: account del ristorante e organizzazione `Jona-Ristorante-by-YNOY` CREATI (passi A e B fatti), «You've invited 1 member» (Kur0ChanX). Detto a Mario di fare il passo C (accettare l'invito con Kur0ChanX) e continuare nella #68. **Poi Mario (#67, 23:5x): «ho fatto join» → passo C fatto.** Prossimo: Kur0ChanX Owner, poi Transfer. Avviso GitHub: 2FA obbligatoria entro 24/11/2026 (M34).
-- **Dopo «fatto» (passi da dare, uno per volta)**:
-  1. Rendere Kur0ChanX **Owner** dell'organizzazione (People → ruolo Owner, dall'account del ristorante) se l'invito era da Member.
+- **Stato all'11/10 0:05**: passo C fatto, passo 1 (Owner) fatto, app Claude in installazione.
+- **Passi rimasti (uno per volta)**:
+  1. ~~Kur0ChanX Owner~~ FATTO.
+  1b. App Claude sull'organizzazione (in corso, vedi sopra). Dopo: in questa sessione `add_repo` funzionerà solo dopo il trasloco.
   2. Con Kur0ChanX: https://github.com/Kur0ChanX/jona-ordini/settings → in fondo **Transfer** → `Jona-Ristorante-by-YNOY`.
   3. Installare l'app Claude sull'organizzazione: https://github.com/apps/claude/installations/select_target.
   4. Claude crea un piccolo repo pubblico `Kur0ChanX/jona-ordini` con solo la pagina che rimanda a pages.dev (il vecchio indirizzo `kur0chanx.github.io/jona-ordini` è ancora attivo e rimanda al nuovo; non deve rompersi). Serve che Mario lo crei a mano o dia accesso: verificare.
@@ -41,7 +51,7 @@ Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio d
 - Detto a RVC #57 (send_message, 23:10): doppio tocco migliorato da Mario ed E31 (niente add_repo incrociati).
 
 ## Prossimi passi (in ordine)
-1. D30 GitHub: aspettare «fatto» di Mario, poi i passi sopra, uno per volta, con link.
+1. D30 GitHub: chiedere a Mario se l'installazione dell'app Claude è fatta; poi decidere con lui il vecchio indirizzo col suo nick (vedi «Fatto in #68»), poi Transfer e il resto, uno per volta, con link.
 2. Ponte: quando RVC ha D5, guida a Mario per il segreto `PONTE_KEY` (uguale in GitHub di Jona e nel server di RVC); poi notifiche push per i messaggi dell'hotel e foto dei guasti (D17 in `docs/DA-FARE.md`).
 3. Elenco completo in `docs/DA-FARE.md` (M33 logo JONA da guardare, M31 logo YNOY senza risposta, prove v69/v70).
 
@@ -57,6 +67,6 @@ Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio d
 - Repo privato: le prove su GitHub consumano minuti (2000/mese dell'organizzazione).
 
 ## Ultimo messaggio di Mario, parola per parola
-«2 cose quando mi fai la domanda touch 2 tocchi si può fare che se scrivo non mi metti si confermo ma un altra cosa perché è fraintendibile come è successo prima, poi nel si conferma nelle risposte impostate puoi scrivermi anche la domanda cosí rispondo si confermo e ceyanche scritto la domanda che confermo»
+«è normale?  e poi ricordati che non voglio vedere il mio nick Kur0ChanX nei link dei miei colleghi» (con foto della pagina «Install Claude», 0:03)
 
-Messaggi prima in #67: «vai» · «Si» · «attenzione ho cliccato per sbaglio riesci a non farlo touch…» · «anche i nomi se clicchi non sono un problema direi tutti» · «domanda che ne dici se usiamo un github separato visto che è il mio personale quello Kur0ChanX vorrei dare un account a github con la mail jona.ristorante@gmail.con» · «Non è meglio avere un github separato per non usare i limiti…» · «perché è pubblico jona?» · «io mi ricordo di averlo messo su un git hub diverso da Kur0ChanX» · «differenza tra privato e pubblico? pro e contro / Altra cosa prendi la regola delle domande a doppio touch di rvc» · «in organizzazione privato devo usare un nuovo link per l'app?» · (foto) «stai sbagliando…» · (foto) «Hai di nuovo sbagliato?» · «Dico se creo un altro GitHub privato per jona con account jona.ristorante@gmail.com devo rinviare i link?» · «Consigli nuovo account privato o organizzazione privato nel mio kurochanx?»
+Messaggi prima in #68: (foto overview 23:55) «ora?» · «domanda perché ri salvi i miei screenshot?» · (scelta a tocco: «Solo le importanti», confermata) · (foto People 0:01, Kur0ChanX Owner)
