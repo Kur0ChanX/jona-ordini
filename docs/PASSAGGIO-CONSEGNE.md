@@ -1,13 +1,28 @@
-# Passaggio di consegne (2026-10-10, fine sessione #62)
+# Passaggio di consegne (2026-10-10, fine sessione #63)
 
-Sessione attuale: #63
+Sessione attuale: #64
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v69** (main `76c3416`). **v70 pronta sul ramo, NON ancora pubblicata** (primo lavoro di #63).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v69** (main `76c3416`). **v70 nella PR #81, NON ancora unita** (primo lavoro di #64).
 
-## Sessione #63 (in corso, nuovo account)
-- Cambio account fatto: ora si lavora nel secondo account (quello del Relais). Dettagli, ambienti e routine in `docs/CAMBIO-ACCOUNT.md` («Cambio del 10/10/2026»).
-- Scorta unita e pushata (`c7487fc`). PR #81 (v70) già aperta da #62: prove ripartite sul nuovo commit (solo documenti in più).
-- Ultimo messaggio di Mario (17:21): «Eccomi ho cambiato account passa tutto qui da mario.miscera@gmail.com eri già pronto a passare tutto ma proprio tutto / Ho messo un abiente a caso sono uguali guarda differenziamoli se no è un problema»
+## Sessione #63 (17:21-17:35, primo giro nel nuovo account)
+Chiusa presto: l'hook di handoff ha segnalato contesto sopra soglia al 2° messaggio.
+
+Fatto:
+- **Cambio account**: Mario è passato dall'account Gmail personale al secondo account (quello del Relais). RVC era già passato alle 16:00 (RVC #50 chiusa, #51 attiva in attesa del «via» di Mario). Scorta unita e pushata.
+- **Ambienti** (dettagli e ID in `docs/CAMBIO-ACCOUNT.md`, «Cambio del 10/10/2026»; errore E25): due «Default» identici, rete «Attendibile». Con quella rete il sito dell'app `…pages.dev` dà 403 (provato), l'account di prima ci arrivava. Decisione: `env_01PHQTdrmzBJ65UoCn8yQSqE` → **Jona Ordini**, rete **Completo**; `env_01XAN7jjPicGskXoYJYrNX7e` → **RVC**, rete com'è. Scartato «Personalizzato» con elenco di siti: più fragile (un sito dimenticato blocca il lavoro) e più passi per Mario dal telefono. Mario sta cambiando le impostazioni (M32): la #64 controlli con `list_environments` che i nomi siano cambiati. Se il sito resta bloccato, il controllo online si fa con WebFetch (non passa dalla rete del contenitore).
+- Avvisata RVC #51 (`session_01RqD8ttgM9UvcQjUfNoG5bc`) di passare `environment_id` = `env_01XAN7jjPicGskXoYJYrNX7e` al suo handoff.
+- **Routine «Punto ogni 5 ore»** ricreata: `trig_015ZoD3SEjtWzeDDyZhCCJ2K`, cron `25 */5 * * *` UTC (2:25, 7:25, 12:25, 17:25, 22:25 ora italiana), nella sessione dedicata «⚪ Punto ogni 5 ore · routine automatica (non usare)» (`session_014axqNKYDyiCtcgo35ie866`), risponde solo «.».
+- **PR #81 (v70)** già aperta da #62. Il push della scorta (`c7487fc`, solo documenti) ha fatto ripartire «Prove automatiche» alle 17:25. `subscribe_pr_activity` NON ha funzionato («Could not subscribe»): la #64 controlla a mano (`pull_request_read` → `get_check_runs`) o con `send_later`. Il promemoria `send_later` di #63 è stato cancellato.
+- Screenshot di Mario salvati: `docs/img/account/ambienti-uguali-2026-10-10.jpg`, `docs/img/account/accesso-rete-2026-10-10.jpg`.
+
+Ultimi messaggi di Mario (#63), parola per parola:
+1. (17:21, con screenshot dei due ambienti) «Eccomi ho cambiato account passa tutto qui da mario.miscera@gmail.com eri già pronto a passare tutto ma proprio tutto / Ho messo un abiente a caso sono uguali guarda differenziamoli se no è un problema»
+2. (17:29, screenshot di «Accesso alla rete») «cosa metto?» → risposto: **Completo**, nome **Jona Ordini**, **Salva modifiche**, non toccare **Archivia ambiente**. Restano i passi 6-8 (secondo ambiente → nome **RVC**, rete com'è, **Salva modifiche**). Chiedergli a che passo è.
+
+## Prossimi passi (#64)
+1. Controllare con Mario gli ambienti (M32) e `list_environments`.
+2. **Pubblicare v70** (D30), senza chiedere: «Prove automatiche» verdi sulla PR #81 → squash → controllo online `APP_VER=70` → `git fetch origin main && git merge origin/main` nel ramo definitivo + push. Avvisare Mario in una riga. All'handoff: `create_session` con `environment_id` = `env_01PHQTdrmzBJ65UoCn8yQSqE`.
+3. Aspettare la scelta di Mario sulla miglioria del logo (M31), poi D29.
 
 ## Ultimi messaggi di Mario (#62), parola per parola
 1. «prima aggiorna il mio logo con questa coda il resto tieni il tuo e rifai l'animazione anche vettoriale e inviami poi i file aggiornati valuta migliorie e valuto» (con il disegno `docs/img/logo/ynoy-coda-mario-2026-10-10.jpg`)
@@ -26,11 +41,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
   - `APP_VER=70`, voce NEWS v70, `CACHE` `jona-ordini-v74`. `tools/test-apertura-v62.mjs`: 22 tratti (era 19). README aggiornato.
   - Prove: `test-logo` OK, `test-apertura-v62` 28 PASS, `test-giro` «nessun problema».
   - Mandati a Mario: `v70-prima-dopo.png`, `v70-apertura-app.mp4`, `ynoy-animazione.mp4`, `media/ynoy.svg`, `ynoy-animazione.svg`, `ynoy-2000.png` (tutti in `docs/img/logo/` tranne lo svg).
-
-## Prossimi passi (#63)
-1. **Pubblicare v70** (D30), senza chiedere (regola PUBBLICA SEMPRE IN AUTOMATICO): ramo `claude/jona-v70-logo-coda` da `claude/jona-ramo-definitivo` → PR verso main → «Prove automatiche» verde → squash → controllo online `APP_VER=70` → `git fetch origin main && git merge origin/main` nel ramo definitivo + push. Avvisare Mario in una riga.
-2. Aspettare la scelta di Mario sulla miglioria (M31). Proposte: Ovvia = logo più grande all'apertura (le lune sul telefono sono ~2 mm); Furba = le 4 lune cadono una dopo l'altra con rimbalzo (come «BY»); **Geniale (consigliata)** = le 4 lune come segno di attesa nell'app (Gemini che legge le foto, salvataggi); Nessuna.
-3. Poi D29 (ottimizzazione Android/iPhone/Mac/Windows, piano in `docs/DA-FARE.md`).
 
 ## Da fare per Mario (aperto)
 - Riga del ramo nelle preferenze personali dei due account (testo in consegne #61 / `docs/CAMBIO-ACCOUNT.md`).
