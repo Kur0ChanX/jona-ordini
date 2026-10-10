@@ -5,6 +5,8 @@ const OLD='https://kur0chanx.github.io/jona-ordini/',NEW='https://jona-ristorant
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const mk=async()=>{const c=await b.newContext({viewport:{width:390,height:800},serviceWorkers:'block'});const docs=[];
+  // indirizzo d'arrivo letto prima degli script dell'app (che poi tolgono ?da=gh e #i=)
+  await c.addInitScript(()=>{try{if(/pages\.dev$/.test(location.hostname)&&!sessionStorage.getItem('t_arrivo'))sessionStorage.setItem('t_arrivo',location.href)}catch(e){}});
   for(const base of [OLD,NEW])await c.route(base+'**',async r=>{const u=new URL(r.request().url());if(r.request().resourceType()==='document')docs.push(u.href);
     if(/firebase-config\.js$/.test(u.pathname))return r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'});
     const path=u.pathname.replace(/^\/jona-ordini\//,'/').replace(/^\/$/,'/index.html');const res=await r.fetch({url:LOC+path.slice(1)});return r.fulfill({response:res})});
@@ -15,7 +17,7 @@ const entra=async p=>{await p.click('[data-a="formset"][data-v="dev"]');
 // 1) dal vecchio indirizzo, con altri parametri e #i= (invito): passano tutti
 const A=await mk();
 await A.goto(OLD+'?x=1#i=ABC123');await A.waitForURL(NEW+'**',{timeout:15000});await A.waitForTimeout(1500);
-const arr=A.nav.find(u=>u.startsWith(NEW))||'';
+const arr=await A.evaluate(()=>sessionStorage.getItem('t_arrivo')||'');
 ok(arr===NEW+'?x=1&da=gh#i=ABC123','vecchio → nuovo con ?da=gh, parametri e #i= tenuti ('+arr+')');
 ok(!/da=gh/.test(A.url()),'il segno ?da=gh sparisce dall\'indirizzo ('+A.url()+')');
 ok(await A.evaluate(()=>OLD_URL===true),'OLD_URL acceso');
