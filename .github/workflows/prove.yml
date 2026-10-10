@@ -36,7 +36,7 @@ jobs:
           sudo chown -R "$USER" /opt/node22 /opt/pw-browsers /opt/pw-npm
           npm i --prefix /opt/pw-npm playwright@1.56.1
           ln -sfn /opt/pw-npm/node_modules/playwright /opt/node22/lib/node_modules/playwright
-          /opt/pw-npm/node_modules/.bin/playwright install --with-deps chromium
+          /opt/pw-npm/node_modules/.bin/playwright install --with-deps chromium webkit
           ln -sfn "$(find /opt/pw-browsers -path '*chromium-*' -type f -name chrome | head -1)" /opt/pw-browsers/chromium
           /opt/pw-browsers/chromium --version
           sudo apt-get install -y ffmpeg >/dev/null

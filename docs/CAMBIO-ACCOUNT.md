@@ -91,6 +91,14 @@ Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md. Sessione nel nuovo
 Poi attendi le mie istruzioni.
 ```
 
+## Cambio del 10/10/2026 (fatto)
+- Alle 17:21 Mario è passato dall'account Gmail personale al secondo account (quello del Relais). RVC era già passato alle 16:00 (#50, #51); Jona riparte con la #63.
+- **Ambienti**: nel nuovo account c'erano due ambienti «Default» uguali (rete «Trusted»). Si separano per progetto:
+  - `env_01PHQTdrmzBJ65UoCn8yQSqE` (il primo, già usato da Jona e RVC) → nome **Jona Ordini**, rete **Full**. Serve: con «Trusted» il sito dell'app (`…pages.dev`) e il Worker (`…workers.dev`) sono bloccati (403), e l'account di prima li raggiungeva.
+  - `env_01XAN7jjPicGskXoYJYrNX7e` → nome **RVC**, rete «Trusted» (come finora). Avvisata RVC #51: al suo handoff passa questo `environment_id`.
+  - All'handoff di Jona: `create_session` con `environment_id` = `env_01PHQTdrmzBJ65UoCn8yQSqE`.
+- **Routine** ricreata: «Punto ogni 5 ore» (`trig_015ZoD3SEjtWzeDDyZhCCJ2K`, cron `25 */5 * * *` UTC = 2:25, 7:25, 12:25, 17:25, 22:25 ora italiana) nella sessione dedicata «⚪ Punto ogni 5 ore · routine automatica (non usare)» (`session_014axqNKYDyiCtcgo35ie866`): risponde solo «.». La routine dell'account Gmail resta là finché Mario non la spegne.
+
 ## Routine dell'account Gmail (da ricreare in Hotmail)
 - «Punto ogni 5 ore»: promemoria che si ripete ogni 5 ore (risponde solo «.» e si riprogramma con `send_later` tra 300 minuti). Va ricreato in una sessione dell'account nuovo.
 - «Aggiorna abbonamenti Tier List JRPG»: spenta, lunedì 8:47. Legata all'artifact della tier list dell'account Gmail: ricrearla solo se la tier list viene ripubblicata nell'account nuovo.

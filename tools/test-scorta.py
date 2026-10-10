@@ -91,6 +91,13 @@ with tempfile.TemporaryDirectory() as tmp:
               "push sempre in avanti (la scorta nuova contiene la vecchia)")
     controlla("secondo messaggio" in git(repo, "show", f"{s2}:docs/ULTIMO-MESSAGGIO.md"), "messaggio aggiornato")
 
+    # 3b. un avviso automatico (GitHub, promemoria) non prende il posto del messaggio di Mario
+    hook(repo, "msg", {"prompt": "<task-notification>\n<task-type>queued-remote-notifications</task-type>\n</task-notification>"})
+    open(os.path.join(repo, "a.txt"), "w").write("tre\n")
+    hook(repo, "stop")
+    s3 = remoto_scorta(repo)
+    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "avviso di sistema ignorato")
+
     # 4. sessione nuova da un altro clone: avvio-check segnala la scorta e il merge è in avanti
     altro = os.path.join(tmp, "altro")
     sh("git", "clone", "-q", "-b", "claude/prova-1", nudo, altro, cwd=tmp)
@@ -98,7 +105,7 @@ with tempfile.TemporaryDirectory() as tmp:
     out = sh(sys.executable, os.path.join(HOOKS, "avvio-check.py"), cwd=altro, inp="{}", env=env)
     controlla("SCORTA: origin/scorta/claude/prova-1" in out, "avvio-check segnala la scorta")
     git(altro, "merge", "-q", "--ff-only", "origin/scorta/claude/prova-1")
-    controlla(git(altro, "rev-parse", "HEAD") == s2, "la scorta si unisce in avanti")
+    controlla(git(altro, "rev-parse", "HEAD") == s3, "la scorta si unisce in avanti")
     out = sh(sys.executable, os.path.join(HOOKS, "avvio-check.py"), cwd=altro, inp="{}", env=env)
     controlla("SCORTA" not in out, "dopo l'unione nessun avviso")
 
