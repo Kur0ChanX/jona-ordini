@@ -1,50 +1,42 @@
-# Passaggio di consegne (2026-10-09, fine sessione #47)
+# Passaggio di consegne (2026-10-10, fine sessione #48)
 
-Sessione attuale: #48
+Sessione attuale: #49
 
-## Ultimo messaggio di Mario (#47), parola per parola
-«i prodotti finti che hai messo tu devi cancellarli tu»
+## Ultimo messaggio di Mario (#48), parola per parola
+«nella nuova chat scrivi solo scrivi solo metti extra o che qll c'è su impegno nella vecchia chat e di mettere via. il tutto per risparmiare token
 
-Messaggi prima (#47), parola per parola, in ordine:
-- «rimanda immagine a b c per scegliere o domanda»
-- «lascia com è adesso» (risposta su D16: immagine)
-- «ok avvisami quando è online» (la v63)
+poi continua»
 
-Promesse fatte a Mario e ancora da mantenere: **avvisarlo quando la v63 è online**. Gli ho detto «Tu non devi fare niente».
+Come l'ho capito: il prompt della nuova sessione deve essere minimo («riprendi il lavoro in corso della vecchia sessione»), per risparmiare token; poi si continua il lavoro senza fermarsi ad aspettare. Se non è così, chiedere a Mario in una riga.
+
+Messaggi prima (#48), parola per parola:
+- «sì procedi, avvisami quando è online» (v63)
+- «nel carico listini con i prodotti i file che ti mando o facciamo scannerizzare potrebbero capitare dei prodotti uguali se ci sono avvisami  cosí scegliamo se tenerli o meno, non caricarli uguali dello stesso fornitore 2 volte, però solo se è uguale in tutto ok? aggiorna il programma ora devo caricare file»
 
 ## Stato
-- Online: **v62**.
-- **PR #73 «v63: via i prodotti di prova»** aperta: https://github.com/Kur0ChanX/jona-ordini/pull/73 (ramo `claude/v63-listini-prova`, ultimo commit `30caa1c`, pushato e confermato). Le «Prove automatiche» ripartono sul nuovo commit. Questa sessione era iscritta alla PR: l'iscrizione la toglie questa sessione; **la nuova sessione deve iscriversi** (`subscribe_pr_activity` Kur0ChanX/jona-ordini 73).
-- Ramo consegne `claude/sessione-41-consegne-p7tepk`: `main` (v62) unito (commit `c109ffd`), D16 chiusa.
-- Cartella `/home/user/v63` = worktree del ramo v63 (sparisce col contenitore: `git worktree add ../v63 claude/v63-listini-prova`).
+- Online: **v63** (PR #73 unita, squash `32e9a56`; controllato online APP_VER=63, CACHE v67). `main` unito nel ramo consegne. Mario avvisato; M26 (vede ancora prodotti finti?) senza risposta.
+- **v64 pronta, NON ancora pubblicata**: ramo `claude/v64-doppioni`, commit `68da176`, pushato e confermato. **Il PR non è stato aperto**: `create_pull_request` ha dato due volte «invalid session» (guasto dello strumento GitHub). Mario aspetta la v64 («ora devo caricare file»): URGENTE.
+- Worktree `/home/user/v64` (sparisce col contenitore: `git worktree add ../v64 claude/v64-doppioni`).
 
-## Fatto in #47
-1. D16 chiusa: Mario «lascia com è adesso» → nel ramo consegne resta `docs/img/v62-uscita-scelta.png` con le bozze A/B/C (quella del ramo consegne); la versione di `main` (vecchie uscite polvere/TV/taglio) NON è stata salvata a parte (resta nella cronologia di git). Merge con `git checkout --ours`, commit `c109ffd`, poi `bdb17d1` (DA-FARE).
-2. Arrivato messaggio dalla sessione #46 (`session_012mgHQaR4WnuUgrwW2kdMVw`): giro veloce locale della v63 su `f7fdfe6` TUTTE RIUSCITE (21) + `test-firebase-bulk` e `test-v16`.
-3. Aperta PR #73.
-4. **Richiesta di Mario: cancellare io i prodotti finti, non lui a mano.** Claude non ha accesso al Firestore vero, quindi la cancellazione la fa l'app da sola, una volta. Aggiunto alla v63 (commit `30caa1c`):
-   - `fintoP` più stretto: `!!p.demo || (/^mar\d\d$/.test(p.id) && !p.caricatoDa && p.prezzo==null)` (i `marNN` del seed hanno `prezzo:null`; uno con prezzo scritto a mano resta).
-   - `provaVia()` subito dopo `fintoP`: parte da `deadlineTick` (ogni minuto e al ritorno in primo piano). Condizioni: non `DEMO`, `S.db.kind==='firebase'`, `config/app.provaVia` assente, utente vero (`realU`, non `viewAs`) attivo `gm` o `dev`. Con `jona_fb_emu` (prove con emulatore) non fa niente salvo `localStorage.jona_t_provavia` (così le altre prove tengono i prodotti di prova). Legge i prodotti dal server con il nuovo `S.db.prodServer()` (FirebaseStore, `listini` con `source:'server'`): niente cancellazioni sbagliate da una copia vecchia del telefono. Cancella con `runPool`+`del`, poi scrive `config/app.provaVia=now()` e un toast. Senza rete: errore preso, riprova al giro dopo.
-   - Scartato: anche in modalità locale (rompeva le prove locali che usano i prodotti di prova; il ristorante usa Firebase). Il pulsante manuale «Prodotti di prova → Elimina» resta.
-   - NEWS v63 riscritta (chef: spariscono da soli; dev: `provaVia`, `prodServer`).
-   - Prova nuova `tools/test-firebase-provavia.mjs` (emulatore): RIUSCITA (7 PASS). `test-listini-prova` rilanciata: riuscita. Aggiunta in `VELOCI` di `tools/prova-ci.sh` (dopo `test-listini-prova`).
-   - Il giro veloce locale completo NON è stato rifatto sul nuovo commit: basta il controllo «Prove automatiche» della PR (stesso giro veloce). Se è rosso: capire la causa, correggere.
+## v64: listini senza prodotti doppi
+Richiesta: nell'import (file, foto Gemini, tabella) avvisare dei prodotti uguali per scegliere se tenerli; non caricare due volte una riga dello stesso fornitore se è uguale in tutto.
+- `index.html`: `sameProd(a,b)` (stesso codice; se una delle due non ha codice, stesso nome). `matchProd` ora usa `sameProd` (**correzione**: prima due codici diversi con lo stesso nome si sovrascrivevano). `rvDiff(a,b,cat)` = campi diversi (nome, codice, unità, prezzo, categoria; `norm` per i testi, `num` per il prezzo). `rvDup(items)` per riga: `{twin:j}` uguale in tutto alla riga j dello stesso fornitore; `{sim:j,dif}` stesso prodotto ma qualcosa cambia; `{ex:p}` uguale in tutto a un prodotto già a listino (categoria contata solo se scritta nel file: `catF` nella riga di `impRun`).
+- `impRun`: le righe con un doppio partono senza spunta.
+- `reviewSheet`: banner `#rv-dup` «Prodotti doppi» con i conteggi; etichette «uguale alla riga N: non la carico due volte», «simile alla riga N, cambia: prezzo», «uguale, già a listino», «nuovo: stesso nome di uno già a listino, codice diverso». Casella spenta per le righe uguali in tutto; `rvall` non le spunta mai.
+- `reviewSave`: esclude sempre le righe uguali in tutto; decide prima dove va ogni riga (`plan`): una riga simile spuntata dopo un'altra dello stesso prodotto diventa un prodotto separato (Mario ha scelto di tenerle).
+- Decisioni: righe simili senza spunta di partenza (più sicuro: niente doppioni non voluti, Mario sceglie). Doppi cercati solo nello stesso fornitore (come chiesto). Il prezzo nuovo di un prodotto già a listino lo aggiorna come prima.
+- `APP_VER=64`, CACHE `jona-ordini-v68`, NEWS v64 (chef + dev).
+- Prova nuova `tools/test-listini-doppi.mjs` (14 PASS), in testa a `VELOCI` di `tools/prova-ci.sh`. Riuscite anche `test-scaglione2`, `test-news`, `test-listini-prova`, `test-giro` (TZ=Europe/Rome).
 
-## Prossimo lavoro (#48)
-1. Iscriversi alla PR #73; con «Prove automatiche» verdi → squash merge → controllo online (APP_VER 63, CACHE `jona-ordini-v67` su https://jona-ristorante-by-ynoy-corp.pages.dev/) → subito `git fetch origin main && git merge origin/main` nel ramo consegne + push.
-2. **Avvisare Mario che la v63 è online**: apre l'app (o tocca «App da aggiornare»), i prodotti finti spariscono da soli; chiedergli se ne vede ancora (M26).
-3. D17 ponte RVC: rispondere alla sessione RVC attiva (#29, `session_012YP8hknRTGPF6chZDGPEbV`) con send_message: cosa dà Jona (agenda `agenda_<AAAA-MM>` con `ev={k,t,g,h,cop,note,vis,rep}`, coperti; orari `config/orari_<lunedì>.tp`; `staff` nome/reparto) e cosa serve a Jona (ospiti/camere presenti, partenze, allergie, eventi della struttura → coperti e `sugStats`). Tecnica da valutare: Worker Cloudflare con chiave condivisa (Firebase separati). Solo progetto, niente codice.
-4. Poi D14 (prova Android di Mario) e il resto di `docs/DA-FARE.md`.
-
-## Strumenti
-- Server: `python3 -m http.server 8765` nella cartella del ramo; emulatore `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`; svuotarlo prima di ogni prova Firebase (vedi `tools/prova-ci.sh`).
-- Prove con `TZ=Europe/Rome` (E18).
+## Prossimo lavoro (#49), in ordine
+1. Aprire il PR `claude/v64-doppioni` → `main` (titolo «v64: listini senza prodotti doppi»), iscriversi; con «Prove automatiche» verdi: squash, controllo online (APP_VER 64, CACHE v68), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Pubblicare senza chiedere.
+2. Avvisare Mario che la v64 è online e può caricare i file: vedrà il riquadro giallo «Prodotti doppi» e le righe doppie senza spunta, da spuntare se vuole tenerle.
+3. Se Mario manda file di listini: salvarli subito nel progetto e committarli.
+4. D17 ponte RVC, poi D14 e il resto di `docs/DA-FARE.md`.
 
 ## Ancora da chiedere
-- Esito di M25 (agenda con Mauro): senza risposta.
-- D10 (riquadro «Inviato allo chef»: solo «Continua»): senza risposta.
+- M26 (prodotti finti spariti?), M25 (agenda con Mauro), D10: senza risposta.
 
 ## Rischi aperti
-- La pulizia automatica è irreversibile sui dati veri: la regola è stretta (solo `demo` e `marNN` mai caricati e senza prezzo) e legge dal server. Se Mario ha caricato i listini sotto un fornitore diverso da `mariano`, i `marNN` vecchi vengono tolti: è quello che vuole.
-- Maschera SVG su Android non ancora verificata su un telefono vero.
-- Titolo nuova sessione: `🟤 ▶ ATTIVA · #48 · Jona Ordini · da v62 · 09/10/2026 · prossimo: pubblicare v63 (pulizia automatica prodotti di prova)`.
+- Se lo strumento GitHub resta guasto: riprovare più tardi, non forzare (E11).
+- Maschera SVG su Android non verificata.
