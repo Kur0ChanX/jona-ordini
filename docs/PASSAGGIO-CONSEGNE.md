@@ -1,8 +1,16 @@
-# Passaggio di consegne (2026-10-10, fine sessione #58)
+# Passaggio di consegne (2026-10-10, fine sessione #59)
 
-Sessione attuale: #59
+Sessione attuale: #60
 
-Ramo di lavoro: `claude/jona-sessione-59`. App online: **v68** (main `7ff2c34`). Nessuna versione nuova in #57 e #58.
+Ramo di lavoro: `claude/jona-sessione-60`. App online: **v68** (main `7ff2c34`). Nessuna versione nuova in #57 e #58.
+
+## Ultimo messaggio di Mario (#59), parola per parola
+«ti autorizzo a cancellare i 27 rami  solo quelli che non servono mai piú in nessun caso»
+
+## Esito (#59) della pulizia rami
+- Con l'ok di Mario ho provato a cancellare i 22 rami SICURI AL 100% (stesso commit della PR unita, oppure già tutti dentro `claude/jona-sessione-59`): le 16 `v…`/`claude/v…` dell'elenco sotto, `claude/jona-sessione-52…56`, `claude/sessione-41-consegne-p7tepk`. Risultato: **HTTP 403** dal proxy git della sessione (si può scrivere solo sui propri rami), prima ancora «Git Destructive» dal controllo permessi. Gli strumenti GitHub MCP non hanno «cancella ramo». Non aggirare.
+- Gli altri 5 (hotfix-notifiche, ccr-4a01d00e-6ay25e, ccr-402d6602-imjwpw, backup-automatico, ccr-55f4e829-7nev78) hanno commit in più (solo consegne vecchie e merge di main): per la frase «in nessun caso» NON vanno cancellati senza chiedere di nuovo.
+- Strada rimasta: Mario li cancella dal cestino 🗑 su https://github.com/Kur0ChanX/jona-ordini/branches (voce M31), solo i 22 sicuri.
 
 ## Ultimo messaggio di Mario (#58), parola per parola
 «guarda tutti i servizi che abbiamo utilizzato sui due progetti uno Jonah e uno RVC che mi sono registrato e fammi un file scaricabile che lo tengo sempre con me con che cosa ho utilizzato che insomma se devo rimettere se devo riaprire un progetto ho tutto salvato a prova di stupido creami un file per piacere che me lo salvo e me lo custodisco»
