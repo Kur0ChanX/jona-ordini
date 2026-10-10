@@ -14,7 +14,7 @@ Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio d
 - **v72 online** (PR #83): campi a 16 px (niente zoom su iPhone; `.inp.sm`, `.inp.mono`, `select.v-alt`, `.unit-inp`), prova `tools/test-campi-16.mjs`, `test-giro` controlla anche i campi; giro con WebKit (`test-giro-safari`, solo su GitHub, `prove.yml` installa webkit) e computer 1280/1440 (`test-giro-computer`). Barra di stato iPhone lasciata com'è (D29 resta solo quella, serve foto da iPhone).
 - **v73 online** (PR #84): Worker `/ponte/messaggi` (+ `/stato`, tabella `ponte` nel primo D1, segreto `PONTE_KEY` dal segreto GitHub omonimo nel workflow `cloudflare-worker.yml`); app: funzione «Hotel» (Impostazioni → Funzioni, spenta), icona con pallino, pagina «Hotel» (`htSheet`), moduli (`htForm`), striscia vassoio (`htStrip`), agenda → «Mando l'evento all'hotel?» (`htAgenda`/`htAgDel`), ordine suggerito (`htSugH`), hotel finto (`htSim`, funzione dichiarata così le prove la sostituiscono). Prove `tools/test-hotel.mjs` (41, anche col Worker vero dietro l'app e coda senza rete) e `tools/test-ponte-server.mjs` (28), nelle prove veloci.
 - Correzione della scorta presa da RVC (E28): non salva più gli avvisi automatici come messaggio di Mario.
-- **Giro completo su GitHub** lanciato a mano dopo la v73 (tocca il Worker): run `38084513591`, era ancora in corso alle 23:10. **Primo compito della #68: controllarne l'esito** (`curl https://api.github.com/repos/Kur0ChanX/jona-ordini/actions/runs/38084513591`); se rosso, capire e correggere con priorità.
+- **Giro completo su GitHub** lanciato a mano dopo la v73 (tocca il Worker): run `38084513591`, finito **VERDE** (controllato dalla #67 dopo l'handoff, 23:12). Niente da fare (`curl https://api.github.com/repos/Kur0ChanX/jona-ordini/actions/runs/38084513591`); se rosso, capire e correggere con priorità.
 - **Domande**: E29 (niente strumento a tocco) sostituita dal **doppio tocco** di RVC, poi migliorato da Mario: la seconda domanda RIPETE la domanda e ha 3 scelte «Sì, confermo <la cosa>» · «È una domanda o un dubbio» · «No, ho sbagliato» (CLAUDE.md). E30: due risposte scritte a mano che erano domande, prese per scelte: se Mario scrive a mano una domanda o «roba così», prima si risponde e poi si rifà la domanda.
 
 ## GitHub: Jona fuori dall'account personale (D30, in corso)
@@ -41,10 +41,9 @@ Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio d
 - Detto a RVC #57 (send_message, 23:10): doppio tocco migliorato da Mario ed E31 (niente add_repo incrociati).
 
 ## Prossimi passi (in ordine)
-1. Esito del giro completo `38084513591`.
-2. D30 GitHub: aspettare «fatto» di Mario, poi i passi sopra, uno per volta, con link.
-3. Ponte: quando RVC ha D5, guida a Mario per il segreto `PONTE_KEY` (uguale in GitHub di Jona e nel server di RVC); poi notifiche push per i messaggi dell'hotel e foto dei guasti (D17 in `docs/DA-FARE.md`).
-4. Elenco completo in `docs/DA-FARE.md` (M33 logo JONA da guardare, M31 logo YNOY senza risposta, prove v69/v70).
+1. D30 GitHub: aspettare «fatto» di Mario, poi i passi sopra, uno per volta, con link.
+2. Ponte: quando RVC ha D5, guida a Mario per il segreto `PONTE_KEY` (uguale in GitHub di Jona e nel server di RVC); poi notifiche push per i messaggi dell'hotel e foto dei guasti (D17 in `docs/DA-FARE.md`).
+3. Elenco completo in `docs/DA-FARE.md` (M33 logo JONA da guardare, M31 logo YNOY senza risposta, prove v69/v70).
 
 ## Note tecniche
 - Server locale `python3 -m http.server 8765`; Playwright `/opt/node22/lib/node_modules/playwright`, Chromium `/opt/pw-browsers/chromium`; emulatore `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`.
