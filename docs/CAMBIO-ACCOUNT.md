@@ -25,7 +25,7 @@ Il lavoro non vive nell'account Claude: vive su **GitHub**. Tutti e due gli acco
 
 1. Entra su https://claude.ai con l'account Hotmail. Serve un piano **Pro** o **Max** (Claude Code non c'è nel piano gratuito).
 2. Collega GitHub: https://claude.ai/connect-github → accedi con lo stesso GitHub di sempre (Kur0ChanX). Poi apri https://claude.ai/code → **nuova sessione** → nella scelta del repository devono comparire `jona-ordini` e `RVC`.
-3. Preferenze personali: menu (tocca il tuo nome in basso) → **Impostazioni** → scheda **Account** → campo **Istruzioni per Claude** → cancella quello che c'è e incolla il testo del riquadro «Preferenze» qui sotto. Fallo in **tutti e due** gli account.
+3. Preferenze personali: https://claude.ai/settings/profile (**Impostazioni** → **Profilo**, campo delle preferenze) → cancella quello che c'è e incolla il testo del riquadro «Preferenze» qui sotto. Fallo in **tutti e due** gli account.
 4. Memoria (vedi «Unire le due memorie» sotto).
 5. Connettori, solo se li usi: https://claude.ai/settings/connectors → collega gli stessi dell'account Gmail.
 6. Nella prima sessione Hotmail scrivi a Claude: «ricrea le routine dell'altro account» (Claude legge l'elenco in fondo a questa pagina).
@@ -108,11 +108,11 @@ Sessione attuale: #02 (ramo `claude/servizio-sessione-02`). Pallino ⚪. Questa 
 Fatto nella #01 (10/10/2026):
 - Guida (questo file), regola «CAMBIO ACCOUNT» in CLAUDE.md di Jona; chiesto a RVC #49 di aggiungerla al suo CLAUDE.md.
 - Copia di 4 artifact (RVC Prototipo, Visita Villa Carola, Raccoon Tier, Tier List RPG) mandata a Mario come file. L'«Accordo sul software» è un documento Claude Docs: Mario lo esporta in PDF da Gmail.
-- Preferenze: le «Istruzioni per Claude» di Gmail e Hotmail erano identiche. Dato a Mario il testo unico del riquadro «Preferenze» qui sopra, da incollare in tutti e due gli account (Impostazioni → Account → Istruzioni per Claude).
+- Preferenze (Impostazioni → Profilo): quelle di Gmail e Hotmail erano identiche. Dato a Mario il testo unico del riquadro «Preferenze» qui sopra, da incollare in tutti e due gli account (Impostazioni → Account → Istruzioni per Claude).
 - Hotmail è Pro (confermato da Mario). Limite settimanale Gmail in avviso: torna mercoledì 14/10 alle 12:00.
 - Errore della #01: aveva passato il tema alla sessione Jona #55 invece di aprire una sessione di servizio. Avvisata la #55 che il tema non è suo (deve solo unire il ramo per la guida e la regola).
 
-Fatto nella #02: Mario ha incollato le preferenze nei due account; aggiunto il «prompt di emergenza» che non richiede il numero del ramo.
+Fatto nella #02: Mario ha incollato le preferenze nei due account (Impostazioni → Profilo; Claude non può cambiare le impostazioni degli account, solo Mario); aggiunto il «prompt di emergenza» che non richiede il numero del ramo.
 
 Ancora da fare:
 1. Memoria dei due account (Personalizzazione o Impostazioni → Capacità): unirle se Mario incolla i testi.
