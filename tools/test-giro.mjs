@@ -1,9 +1,11 @@
-import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
-// Giro di ogni scheda per Sviluppatore, Admin Chef e Staff, a 320 e 390 px, tema chiaro e scuro: errori, scorrimento orizzontale, elementi fuori schermo, «undefined/NaN»; foto in /tmp/giro-*.png
-const OUT='/tmp/giro-';
-const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+import { chromium, webkit } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+// Giro di ogni scheda per Sviluppatore, Admin Chef e Staff, a 320 e 390 px, tema chiaro e scuro: errori, scorrimento orizzontale, elementi fuori schermo, «undefined/NaN», campi con testo sotto 16 px (iPhone ingrandisce la pagina, v72); foto in /tmp/giro-*.png
+// v72: GIRO_BROWSER=webkit (motore di Safari) e GIRO_W=1280,1440 (computer); usati da test-giro-safari e test-giro-computer
+const BR=process.env.GIRO_BROWSER||'chromium',WS=(process.env.GIRO_W||'320,390').split(',').map(Number);
+const OUT='/tmp/giro-'+(BR==='chromium'?'':BR+'-');
+const b=BR==='webkit'?await webkit.launch():await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const issues=[];
-for(const theme of ['light','dark'])for(const W of [320,390]){
+for(const theme of ['light','dark'])for(const W of WS){
  const ctx=await b.newContext({viewport:{width:W,height:760},deviceScaleFactor:1,colorScheme:theme});
  await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
  await ctx.route(/open-meteo|generativelanguage|workers\.dev/,r=>r.abort());
@@ -23,10 +25,12 @@ for(const theme of ['light','dark'])for(const W of [320,390]){
   const r=await pg.evaluate(()=>{const W=innerWidth;const sw=document.documentElement.scrollWidth;
    const over=[...document.querySelectorAll('body *')].filter(e=>{const s=getComputedStyle(e);if(s.display==='none'||s.visibility==='hidden')return false;const b=e.getBoundingClientRect();return b.width>0&&b.right>W+1&&!e.closest('[style*="overflow"],.hscroll,.chips,.scroll-x')&&getComputedStyle(e.parentElement).overflowX==='visible'}).slice(0,3).map(e=>e.tagName+'.'+(e.className||'').toString().slice(0,30)+' "'+(e.innerText||'').slice(0,30)+'" r='+Math.round(e.getBoundingClientRect().right));
    const und=document.body.innerText.match(/undefined|NaN|\[object Object\]|null €/g);
-   return {sw,W,over,und}});
+   const small=[...document.querySelectorAll('input,select,textarea')].filter(e=>{if(/^(checkbox|radio|range|file|hidden|color|button|submit)$/.test(e.type))return false;const s=getComputedStyle(e);if(s.display==='none'||s.visibility==='hidden')return false;const b=e.getBoundingClientRect();return b.width>0&&b.height>0&&parseFloat(s.fontSize)<16}).map(e=>`${e.tagName}.${e.className}[${e.dataset.k||e.dataset.a||e.name||e.type}] ${getComputedStyle(e).fontSize}`);
+   return {sw,W,over,und,small}});
   if(r.sw>r.W)issues.push(`${theme} ${W} ${name}: scroll orizzontale ${r.sw}>${r.W}`);
   if(r.over.length)issues.push(`${theme} ${W} ${name}: fuori schermo ${r.over.join(' | ')}`);
   if(r.und)issues.push(`${theme} ${W} ${name}: testo sospetto ${r.und.join(',')}`);
+  if(r.small.length)issues.push(`${theme} ${W} ${name}: campo sotto 16 px (iPhone ingrandisce) ${[...new Set(r.small)].join(' | ')}`);
   await pg.screenshot({path:`${OUT}${theme}-${W}-${name}.png`,fullPage:true});
  };
  for(const role of ['dev','gm','staff']){
