@@ -118,6 +118,17 @@ jobs:
           printf '%s' "$GEMINI_API_KEY" | npx --yes wrangler@4 secret put GEMINI_KEY
           echo "Chiave Gemini del ristorante salvata nel server."
 
+      - name: Chiave del ponte con l'app dell'hotel (se c'è il segreto PONTE_KEY)
+        working-directory: worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PONTE_KEY: ${{ secrets.PONTE_KEY }}
+        run: |
+          if [ -z "$PONTE_KEY" ]; then echo "Nessun segreto PONTE_KEY: il ponte accetta solo i telefoni del ristorante (l'hotel non può ancora collegarsi)."; exit 0; fi
+          printf '%s' "$PONTE_KEY" | npx --yes wrangler@4 secret put PONTE_KEY
+          echo "Chiave del ponte salvata nel server."
+
       - name: Prova del server
         run: |
           # un sottodominio appena creato può metterci qualche minuto a rispondere: riprova fino a 3 minuti

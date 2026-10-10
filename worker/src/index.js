@@ -590,18 +590,141 @@ async function errLeggi(env) {
   return json({ e: r.results || [] });
 }
 
+// ---- ponte con l'app dell'hotel (RVC, v73): messaggi nel primo D1. Forma e tipi in docs/PONTE-RVC.md ----
+// Jona entra con il gettone Firebase dei telefoni (membro), l'hotel con la chiave segreta PONTE_KEY (solo il server di RVC).
+const PONTE_TIPI = { jona: ["guasto", "evento", "richiesta-ospite", "serve-a-noi", "testo"], rvc: ["oggi", "richiesta", "vassoio", "testo"] };
+const PONTE_RANGO = { inviato: 0, arrivato: 1, visto: 2, fatto: 3 };
+const PONTE_GIORNI = 30, PONTE_TETTO = 5000, PONTE_DIM = 8000, PONTE_PAGINA = 200;
+let pontePronto = false;
+async function ponteDb(env) {
+  const d = algDbs(env)[0];
+  if (!d) return null;
+  if (!pontePronto) {
+    await d[1].prepare("CREATE TABLE IF NOT EXISTS ponte (id TEXT PRIMARY KEY, da TEXT NOT NULL, agg INTEGER NOT NULL, m TEXT NOT NULL)").run();
+    await d[1].prepare("CREATE INDEX IF NOT EXISTS ponte_agg ON ponte (agg)").run();
+    pontePronto = true;
+  }
+  return d[1];
+}
+// confronto della chiave senza far capire dal tempo di risposta quante lettere sono giuste
+function ponteUguali(a, b) {
+  a = String(a || ""); b = String(b || "");
+  if (!a || !b) return false;
+  let x = a.length ^ b.length;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) x |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+  return x === 0;
+}
+async function ponteChi(request, env) {
+  const tok = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  if (env.PONTE_KEY && ponteUguali(tok, env.PONTE_KEY)) return "rvc";
+  return (await membro(request, env)) ? "jona" : "";
+}
+const ponteTxt = (x, n) => String(x == null ? "" : x).slice(0, n);
+function ponteMsg(x, da) {
+  if (!x || typeof x !== "object") return null;
+  const id = ponteTxt(x.id, 100);
+  if (!/^[A-Za-z0-9_-]{6,80}$/.test(id) || !PONTE_TIPI[da].includes(x.tipo)) return null;
+  const q = Date.parse(x.quando);
+  const m = {
+    id, tipo: x.tipo, da, struttura: ponteTxt(x.struttura || "villa-carola", 40),
+    camera: x.camera == null || x.camera === "" ? null : ponteTxt(x.camera, 12),
+    quando: new Date(Number.isFinite(q) ? q : Date.now()).toISOString(),
+    chi: ponteTxt(x.chi, 64), nome: ponteTxt(x.nome, 40), testo: ponteTxt(x.testo, 1000),
+    dati: x.dati && typeof x.dati === "object" && !Array.isArray(x.dati) ? x.dati : {},
+    stato: x.stato === "annullato" ? "annullato" : "inviato",
+  };
+  if (x.rif) m.rif = ponteTxt(x.rif, 100);
+  if (x.urgente) m.urgente = true;
+  return JSON.stringify(m).length > PONTE_DIM ? null : m;
+}
+async function ponteManda(request, env, chi) {
+  const db = await ponteDb(env);
+  if (!db) return json({ errore: "server senza database" }, 503);
+  const body = await request.json().catch(() => null);
+  const l = body && Array.isArray(body.m) ? body.m.slice(0, 20) : body && body.id ? [body] : null;
+  if (!l || !l.length) return json({ errore: "richiesta non valida" }, 400);
+  const fatti = [], scartati = [];
+  for (const x of l) {
+    const m = ponteMsg(x, chi);
+    if (!m) { scartati.push({ id: ponteTxt(x && x.id, 100), motivo: "messaggio non valido" }); continue; }
+    const old = await db.prepare("SELECT da, m FROM ponte WHERE id = ?").bind(m.id).first();
+    if (old && old.da !== chi) { scartati.push({ id: m.id, motivo: "id dell'altra app" }); continue; }
+    if (old) {
+      // rimandato (coda del telefono o evento cambiato): lo stato raggiunto non torna indietro
+      const o = JSON.parse(old.m);
+      if (m.stato !== "annullato" && o.stato !== "annullato") { m.stato = o.stato; if (o.statoDa) m.statoDa = o.statoDa; }
+    }
+    const agg = Date.now();
+    await db.prepare("INSERT INTO ponte (id, da, agg, m) VALUES (?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET agg = excluded.agg, m = excluded.m")
+      .bind(m.id, chi, agg, JSON.stringify(m)).run();
+    fatti.push({ id: m.id, stato: m.stato, agg });
+  }
+  await db.prepare("DELETE FROM ponte WHERE id NOT IN (SELECT id FROM ponte ORDER BY agg DESC LIMIT ?)").bind(PONTE_TETTO).run();
+  return json({ ok: fatti.length > 0, m: fatti, scartati }, fatti.length ? 200 : 400);
+}
+async function ponteLeggi(url, env, chi) {
+  const db = await ponteDb(env);
+  if (!db) return json({ m: [], ultimo: 0 });
+  const dopo = Math.max(0, Number(url.searchParams.get("dopo")) || 0);
+  const r = await db.prepare("SELECT id, da, agg, m FROM ponte WHERE agg > ? ORDER BY agg LIMIT ?").bind(dopo, PONTE_PAGINA).all();
+  const out = [];
+  let ultimo = dopo;
+  for (const row of r.results || []) {
+    const m = JSON.parse(row.m);
+    let agg = row.agg;
+    // l'altra app lo sta leggendo adesso: per chi l'ha mandato diventa «arrivato» (conferma vera, non del telefono)
+    if (row.da !== chi && m.stato === "inviato") {
+      m.stato = "arrivato";
+      m.arrivato = new Date().toISOString();
+      agg = Date.now();
+      await db.prepare("UPDATE ponte SET agg = ?, m = ? WHERE id = ?").bind(agg, JSON.stringify(m), row.id).run();
+    }
+    ultimo = Math.max(ultimo, row.agg);
+    out.push(Object.assign(m, { agg }));
+  }
+  return json({ m: out, ultimo, ancora: out.length === PONTE_PAGINA });
+}
+async function ponteStato(request, env, chi, id) {
+  const db = await ponteDb(env);
+  if (!db) return json({ errore: "server senza database" }, 503);
+  const body = await request.json().catch(() => null);
+  const stato = body && body.stato;
+  if (!(stato in PONTE_RANGO) && stato !== "annullato") return json({ errore: "stato non valido" }, 400);
+  const row = await db.prepare("SELECT da, m FROM ponte WHERE id = ?").bind(id).first();
+  if (!row) return json({ errore: "messaggio non trovato" }, 404);
+  const m = JSON.parse(row.m);
+  // «visto» e «fatto» li dice chi lo riceve, «annullato» solo chi l'ha mandato
+  if (stato === "annullato" ? row.da !== chi : row.da === chi) return json({ errore: "stato non permesso" }, 403);
+  if (m.stato === "annullato" || (stato !== "annullato" && PONTE_RANGO[stato] <= (PONTE_RANGO[m.stato] || 0))) return json({ ok: true, stato: m.stato });
+  m.stato = stato;
+  m.statoDa = { chi: ponteTxt(body.chi, 64), nome: ponteTxt(body.nome, 40), quando: new Date().toISOString() };
+  const agg = Date.now();
+  await db.prepare("UPDATE ponte SET agg = ?, m = ? WHERE id = ?").bind(agg, JSON.stringify(m), id).run();
+  return json({ ok: true, stato, agg });
+}
+async function ponte(request, env, url) {
+  const chi = await ponteChi(request, env);
+  if (!chi) return json({ errore: "Non autorizzato" }, 403);
+  if (url.pathname === "/ponte/messaggi" && request.method === "POST") return await ponteManda(request, env, chi);
+  if (url.pathname === "/ponte/messaggi" && request.method === "GET") return await ponteLeggi(url, env, chi);
+  const s = url.pathname.match(/^\/ponte\/messaggi\/([A-Za-z0-9_-]{6,80})\/stato$/);
+  if (s && request.method === "POST") return await ponteStato(request, env, chi, s[1]);
+  return json({ errore: "Non trovato" }, 404);
+}
+
 export default {
   async scheduled(event, env, ctx) {
     if (event && event.cron === PROM_CRON) return ctx.waitUntil(promTick(env).then(() => agTickSrv(env)));
     ctx.waitUntil(algPulizia(env));
     ctx.waitUntil(invDb(env).then(db => db && db.prepare("DELETE FROM inviti WHERE scade < ?").bind(Date.now()).run()));
     ctx.waitUntil(errDb(env).then(db => db && db.prepare("DELETE FROM err WHERE t < ?").bind(Date.now() - ERR_GIORNI * 864e5).run()));
+    ctx.waitUntil(ponteDb(env).then(db => db && db.prepare("DELETE FROM ponte WHERE agg < ?").bind(Date.now() - PONTE_GIORNI * 864e5).run()));
   },
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     try {
-      if (url.pathname === "/salute") return json({ ok: true, servizio: "jona-notifiche", push: !!env.VAPID_JWK, promemoria: algDbs(env).length > 0, gemini: !!env.GEMINI_KEY, allegati: algDbs(env).length });
+      if (url.pathname === "/salute") return json({ ok: true, servizio: "jona-notifiche", push: !!env.VAPID_JWK, promemoria: algDbs(env).length > 0, gemini: !!env.GEMINI_KEY, allegati: algDbs(env).length, ponte: !!env.PONTE_KEY });
       if (url.pathname === "/chiave" && request.method === "GET") return json({ chiave: (await vapid(env)).pub });
       if (url.pathname === "/gemini" && request.method === "POST") return await gemini(request, env);
       if (url.pathname === "/inviti" && request.method === "POST") return await invCrea(request, env);
@@ -616,6 +739,7 @@ export default {
         if (url.pathname === "/allegati/spazio" && request.method === "GET") return json(await algSpazio(env));
         if (request.method === "GET") return await algLeggi(url.pathname.slice(10), env);
       }
+      if (url.pathname.startsWith("/ponte/")) return await ponte(request, env, url);
       if (url.pathname === "/errori") {
         const uid = await membro(request, env);
         if (!uid) return json({ errore: "Telefono non collegato al ristorante" }, 403);
