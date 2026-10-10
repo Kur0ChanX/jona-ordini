@@ -2,7 +2,7 @@
 
 Sessione attuale: #61
 
-Ramo di lavoro: `claude/jona-ramo-definitivo` (ramo unico permanente da #61; i rami `claude/jona-sessione-<NN>` non si usano più). Versione v69 in PR #80.
+Ramo di lavoro: `claude/jona-ramo-definitivo` (ramo unico permanente da #61; i rami `claude/jona-sessione-<NN>` non si usano più). **v69 online** (PR #80, main `76c3416`). Prossimo: D29 (Android, iPhone, Mac, Windows).
 
 ## Ultimo messaggio di Mario (#60), parola per parola
 «Non so se l'avevi già ottimizzato, ma mi raccomando, ottimizza l'app sia per telefoni Android, sia per iPhone, sia per Mac, computer Mac e computer Windows.»
