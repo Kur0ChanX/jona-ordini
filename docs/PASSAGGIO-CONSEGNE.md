@@ -1,8 +1,38 @@
-# Passaggio di consegne (2026-10-10, fine sessione #52)
+# Passaggio di consegne (2026-10-10, fine sessione #53)
 
-Sessione attuale: #53
+Sessione attuale: #54
 
-Ramo di lavoro: `claude/jona-sessione-53` (regola nuova: un ramo per sessione; all'handoff della #53 → `claude/jona-sessione-54`).
+Ramo di lavoro: `claude/jona-sessione-54` (all'handoff della #54 → `claude/jona-sessione-55`). App online: v67 (nessuna versione nuova in #53).
+
+## Ultimo messaggio di Mario (#53), parola per parola
+«prova la migliore opzione gratuita per ora
+
+mi raccomando come regola non scrivere poemi ahahhaahahah attenzione ai token ma si chiaro. poi se devi spiegarmi qualche guida che devo fare manuale per me va bene anche senza un forte limite di caratteri cosí è piú chiaro per me con link e passaggi vari molto chiari»
+
+- Regola salvata in `CLAUDE.md` (COMUNICAZIONE → «RISPOSTE CORTE»): risposte brevi; le guide manuali possono essere lunghe con link e passi.
+- «Migliore opzione gratuita» = secondo lettore Cloudflare Workers AI (D22). Prova vera IN CORSO, vedi sotto.
+
+## PROVA LETTORI IN CORSO (primo lavoro della #54)
+- `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` (on pull_request verso main, solo se cambiano questi 2 file). I push dalla sessione NON fanno partire workflow con `on: push` (provato: niente run) e un workflow nuovo non si lancia a mano finché non è su main → si usa una PR bozza.
+- **PR #78 «Prova lettori foto (bozza, NON unire)»**, ramo `claude/prova-lettori` (= ramo consegne al commit `9d41691`). Run «Prova lettori foto» **38033661843** partito 07:13 UTC (anche «Prove automatiche» 38033661795 gira, è normale).
+- Lo script: prompt preso da `geminiPrompt` in index.html; foto ridotte a 2000 px; lettori: Gemini `gemini-flash-latest`, `gemini-flash-lite-latest` (segreto GEMINI_API_KEY), Cloudflare via `/accounts/<acc>/ai/v1/chat/completions` con id presi da `/ai/models/search`: gemma-4-26b-a4b-it, mistral-small-3.1-24b-instruct, llama-4-scout-17b-16e-instruct, qwen3.8-27b. Punteggio: righe giuste (codice+unità+prezzo) su 3 fatture trascritte (DAC pag1 11 righe con vitello 15,936 vero, Mariano 6, Nieddittas 3) + righe coerenti q×prezzo=importo su tutte le 8 foto + errori + secondi. Tabella nel riassunto del run (`GITHUB_STEP_SUMMARY`) e nel log; risposte grezze nell'artifact `prova-lettori`.
+- Da fare: leggere il risultato (`get_job_logs` del run, o `actions_list list_workflow_jobs 38033661843`). Possibili intoppi: token Cloudflare senza permesso Workers AI (403 → guida a Mario: dash.cloudflare.com/profile/api-tokens → modifica token → aggiungi Account › Workers AI › Read/Edit), id modello non trovato (stampato «-> None»), 429 Gemini. Se serve ripetere: cambiare lo script e pushare su `claude/prova-lettori` (la PR riparte da sola).
+- Poi: mandare a Mario UNA immagine con il risultato (breve!) e, se Cloudflare legge bene, costruire v68: secondo lettore nel Worker (`[ai] binding` in wrangler.toml, `/gemini` → ripiego su Workers AI con 429/504 + confronto numeri → riga rossa). Tocca il Worker → giro completo extra su GitHub dopo (E14). Il miglior modello CF lo dice la prova.
+- Alla fine: chiudere la PR #78 (state closed, NON unire), cancellare niente; tenere gli strumenti di prova (eventuale ingresso su main con la v68, togliendo il trigger o lasciandolo con paths).
+- La #53 si è disiscritta dalla PR #78: **la #54 deve iscriversi** (`subscribe_pr_activity` Kur0ChanX/jona-ordini 78).
+
+## Fatto in #53
+- Analisi lettori (pagine ufficiali 10/10/2026), immagine `docs/img/scelte/lettore-foto-confronto.png`: Gemini free sì (limiti solo in AI Studio, dati usati da Google, 20 MB a richiesta, 258 token ogni riquadro 768 px; a pagamento ~1 cent a foto). Cloudflare Workers AI: 10.000 neuroni/giorno gratis (gemma-4-26b ≈ 55 neuroni a foto → ~150-180 foto/giorno; qwen3.8 ~500). OpenRouter :free 20/min, 50/giorno. Groq vision solo qwen3.8-27b, max 3 foto. Mistral: limiti gratis non pubblici, usa i dati, serve telefono; Mistral OCR 4 ~4 $/1000 pagine (fonti non ufficiali, <1 €/mese per noi). OpenAI niente gratis.
+- Mario: «mi offri poche alternative smart innovative geniali». Regola SOLUZIONE SMART rafforzata in CLAUDE.md: 3 strade (ovvia/furba/geniale) + raccomandazione; 1 idea nuova spontanea per l'uso del momento; controllare che non esista già. Già nell'app (non riproporre): avviso aumenti prezzi, dettatura vocale, QR/BarcodeDetector, link WhatsApp, ordine suggerito.
+- 4 idee (immagine `docs/img/scelte/idee-nuove-ottobre.png`). Mario: «le fatture arrivano nell'app è difficile devo chiedere e arrivano tardi al massimo carico io file il resto va bene 2 3 4 / che dici mettiamo mistral?» → idea 1 scartata (D23 diventa: più XML insieme + file `.p7m`, oggi errore `p7m` in index.html ~riga 1620); approvate D24 (fornitore più conveniente nel carrello), D25 (foto bolla vs ordine), D26 (costo piatti da ricette). Mistral: proposto Cloudflare prima, Mistral (a pagamento, pochi centesimi) solo se Cloudflare legge peggio → Mario: «prova la migliore opzione gratuita per ora».
+- Ordine dei lavori deciso da me: 1 secondo lettore (dopo la prova), 2 D23 p7m/più XML, 3 D24, 4 D25, 5 D26.
+
+## Prossimo lavoro (#54), in ordine
+1. Risultato prova lettori (sopra) → immagine a Mario → v68 secondo lettore.
+2. D23, D24, D25, D26 (vedi `docs/DA-FARE.md`).
+3. Aspettare: screenshot «Controlla e salva» v67 (M27), commercialista (M28). Ancora senza risposta: M26, M25, D10.
+
+## Consegne della #52 (storia)
 
 ## Ultimo messaggio di Mario (#52), parola per parola
 «controlla la migliore app per il nostro progetto e valuta i limiti imposti per caricamento foto
@@ -49,22 +79,10 @@ Messaggio prima (#52): «non sò» (alla domanda «ricevi le fatture XML?») e �
 - Decisioni scartate: filtrare le spese togliendole del tutto (Mario non le vedrebbe: meglio senza spunta e avviso); normalizzare i nomi anche per Excel/XML (rischio di toccare file buoni); arrotondare i prezzi a 4 decimali (`num` tiene 3: basta per DAC; Nieddittas 2,0000 ok).
 - Non fatto ancora (idee per dopo): controllo somma righe = «totale merce/imponibile» della fattura; prezzo mostrato con 3 decimali nel listino (`eur` ne mostra 2: 4,988 → 4,99 €, ma il valore salvato è giusto).
 
-## Alternative a Gemini (risposta a Mario, da sviluppare con lui)
-Gemini non è l'unico punto debole: con la v67 una lettura sbagliata dei numeri si vede (riga rossa), non passa più in silenzio. Strade gratuite proposte:
-1. **Fattura elettronica XML** (consigliata): in Italia le fatture tra aziende passano tutte dallo SDI; l'XML ha codici, descrizioni, unità e prezzi esatti, zero errori di lettura. L'app la importa già (`parseFatturaPA`). Si scarica gratis dal cassetto fiscale (Agenzia delle Entrate → «Fatture e Corrispettivi») o la manda il commercialista; Nieddittas lo scrive in fondo alla fattura. Lavoro possibile: import di più XML insieme e dei file firmati `.p7m` (oggi danno errore `p7m`: si può estrarre l'XML dentro dal browser).
-2. **Due lettori invece di uno**: Gemini + un secondo servizio di visione gratuito (da verificare oggi prezzi/limiti: es. Cloudflare Workers AI con un modello vision nel piano gratuito, Groq, Mistral OCR, OpenRouter modelli free). Si confrontano i numeri: dove non coincidono, riga rossa. Più affidabile, più lavoro sul Worker.
-3. **Controlli in più senza IA**: somma delle righe = totale della fattura; prezzo molto diverso dall'ultimo a listino (es. +/- 40%) → avviso; foto fatte bene (foglio piatto, luce, pagina intera). OCR sul telefono (Tesseract.js) scartato come lettore principale: con tabelle fotografate legge peggio di Gemini.
-Raccomandazione data: XML come strada principale per le fatture, Gemini + controlli per listini di carta e WhatsApp. Per CLAUDE.md, alla scelta mandare a Mario un'immagine di confronto (non fatto in #51 per l'handoff obbligatorio).
+## Alternative a Gemini (#51)
+Superate dall'analisi della #53 (sopra) e dall'immagine `docs/img/scelte/lettura-fatture-3-strade.png`.
 
-## Fatto in #53
-- Punto 1 analizzato su pagine ufficiali (10/10/2026): Gemini free = sì ma limiti solo in AI Studio, dati del gratis usati da Google, foto max 20 MB a richiesta, 258 token per riquadro 768 px; a pagamento ~1 cent a foto. Cloudflare Workers AI: 10.000 neuroni/giorno gratis, modelli vision gemma-4-26b-a4b-it (9.091/27.273 neuroni per M token in/out ≈ 55 neuroni a foto), qwen3.8-27b (40.909/290.909), llama-4-scout, mistral-small-3.1. OpenRouter :free 20/min, 50/giorno (1000 con 10 crediti). Groq vision: solo qwen3.8-27b, max 3 foto, 20 MB, limiti nella console. Mistral: limiti non pubblici, il gratis usa i dati, serve telefono. OpenAI: niente gratis.
-- Immagine `docs/img/scelte/lettore-foto-confronto.png` mandata a Mario con la domanda «procedo col secondo lettore Cloudflare?» (D22).
-
-- Mario (#53): «una soluzione o consiglio in generale dico non solo su questo argomento gemini perché noto che ultimamente mi offri poche alternative o soluzioni smart innovative e geniali per il mio uso del momento». Fatto: regola SOLUZIONE SMART rafforzata in CLAUDE.md (3 strade ovvia/furba/geniale + 1 idea nuova spontanea, controllando che non esista già); 4 idee in D23 con immagine. Già esistenti (non riproporre): avviso aumenti prezzi, dettatura vocale, QR, link WhatsApp, ordine suggerito.
-
-- Mario (#53): «le fatture arrivano nell'app è difficile devo chiedere e arrivano tardi al massimo carico io file il resto va bene 2 3 4 / che dici mettiamo mistral?». Idee 2-3-4 approvate (D24-D26), 1 scartata (→ D23 p7m + più XML). Mistral: OCR 4 ~4 $ ogni 1000 pagine (fonti non ufficiali; ~0,4 cent a foto, <1 €/mese per noi), piano gratuito API non confermato, serve account + carta. Proposto: prima Cloudflare (gratis) provato sulle 8 foto, Mistral solo se Cloudflare legge peggio. Domanda fatta.
-
-## Prossimo lavoro (#53), in ordine
+## Prossimo lavoro (#53, vecchio), in ordine
 1. **Richiesta di Mario**: «la migliore app per il nostro progetto e i limiti per il caricamento foto». Modalità SOLUZIONE SMART: controllare sulle pagine UFFICIALI (oggi) piano gratuito e limiti di: Gemini (Flash e Flash-Lite: richieste/minuto, /giorno, dimensione immagini), Mistral (OCR / Pixtral, piano «Experiment»), Groq (modelli vision Llama), OpenRouter (modelli `:free` con vision), Cloudflare Workers AI (modelli vision, neuroni gratis al giorno: vantaggio, già nel nostro Worker), OpenAI (per completezza, a pagamento). Per ognuno: foto per richiesta, peso massimo, richieste/giorno, serve carta?, dati usati per addestramento? Poi stimare il nostro uso (quante foto/settimana) e proporre UNA scelta con immagine di confronto (tabella colorata, come `lettura-fatture-3-strade.png`). Se possibile provare davvero sulle 8 foto in `docs/img/listini/` confrontando con le trascrizioni a mano di `tools/test-fatture.mjs` (serve una chiave: Cloudflare Workers AI si può usare dal Worker senza account nuovo).
 2. Aspettare: screenshot di «Controlla e salva» con la v67 (M27) e risposta del commercialista (M28).
 3. Chiedere se vede v64-v67 nelle Novità (vista Sviluppatore o Admin Chef, E21).
