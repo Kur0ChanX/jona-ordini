@@ -19,6 +19,10 @@ Ramo di lavoro: `claude/jona-sessione-55` (all'handoff della #55 → `claude/jon
 - Regola nuova di Mario in `CLAUDE.md` (COMUNICAZIONE, «ORARI IN ORA ITALIANA»): orari sempre in ora italiana (Olbia), mai UTC. Ottobre fino al 25: UTC+2.
 - Commit della #54: `6ae7527` (immagine + script), `e2b025f` (regola orari), consegne.
 
+## Fatto in #55
+- **Secondo giro prova lettori** (run 38034926723, 9:35→10:00, artifact 11663702836): permessi Cloudflare OK. Gemini Flash-Lite 20/20, 0 errori, 17 s; **CF `@cf/meta/llama-4-scout-17b-16e-instruct` 19/20**, 0 errori, 72 s (Nieddittas 2/3; coerenti 61/68); Gemini Flash 6/6 ma 2 foto perse per 503, 376 s; CF qwen3.8 13/20 (398 s), mistral-small-3.1 11/20, gemma-4 0 righe (risposta non in formato: da non usare). Immagine `docs/img/scelte/prova-lettori-risultato-2.png` mandata a Mario.
+- Piano v68 proposto: ordine Flash-Lite → Flash → CF Llama 4 Scout (ripiego).
+
 ## Prossimo lavoro (#55), in ordine
 1. Leggere il run 38034926723 (`list_workflow_jobs` → `get_job_logs` job, artifact `prova-lettori` per le risposte grezze). Iscriversi alla PR #78 (`subscribe_pr_activity` Kur0ChanX/jona-ordini 78). Se ancora 403: guida a Mario per il token giusto (forse ha modificato un altro token: chiedere il nome del token che usa GitHub). Mandare a Mario UNA immagine breve (orari italiani!).
 2. Decisione tecnica (mia, poi spiegata a Mario con le 3 strade ovvia/furba/geniale): idea **furba** = mettere `gemini-flash-lite-latest` per primo in `GEM_MODELS` (stesso esito nel test, 15× più veloce, meno 503) con Flash come riserva; **geniale** = secondo lettore Cloudflare in parallelo e confronto numeri → riga rossa; ovvia = Cloudflare solo come ripiego dopo Gemini. Prima di cambiare l'ordine valutare un secondo giro di Gemini Flash (oggi non misurabile per il 503). Per Cloudflare nel Worker: `[ai] binding = "AI"` in `wrangler.toml` (aggiunto dal workflow come per D1), `env.AI.run(modello, …)`.
