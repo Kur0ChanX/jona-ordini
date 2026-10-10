@@ -1,3 +1,5 @@
-# Ultimo messaggio di Mario (11/10/2026 00:53 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 01:04 ora italiana)
 
-adesso fai questo che è simile serve 3 png in alta risoluzione una in bianco una in nero e uno trasparente in vettoriale fatto bene ordina dentro con cartelle
+git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
+Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #71).
+Poi attendi le mie istruzioni.
