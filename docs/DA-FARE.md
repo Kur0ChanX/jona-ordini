@@ -10,11 +10,12 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| D22 | Lettore foto (analisi #53, immagine `docs/img/scelte/lettore-foto-confronto.png`): consigliato Gemini principale + Cloudflare Workers AI (Gemma 4 26B o Qwen 3.8, 10.000 neuroni/giorno gratis ≈ 150 foto, nessun account nuovo) come secondo lettore nel Worker: riserva quando Gemini dà 429/504 e confronto numeri → riga rossa. Prima prova vera sulle 8 foto di `docs/img/listini/`. XML (M28) resta la strada migliore per le fatture | Claude dopo il sì di Mario | domanda fatta |
+| D22 | Lettore foto: prova fatta (#54-#55, `docs/img/scelte/prova-lettori-risultato-2.png`): Flash-Lite 20/20, Cloudflare Llama 4 Scout 19/20, Gemma 0. v68 in costruzione (#55): ordine Flash → Flash-Lite → Cloudflare Llama 4, l'app mostra dal vivo chi legge e perché passa al successivo (solo codici veri del server) | Claude da solo | in corso |
 | D23 | Idea 1 (fatture da Gmail) scartata da Mario: «devo chiedere e arrivano tardi, al massimo carico io i file». Al suo posto: import di più XML insieme e dei file firmati `.p7m` (oggi errore `p7m`) | Claude da solo | da fare |
 | D24 | Idea 4 approvata: nel carrello, stesso prodotto da 2 fornitori → suggerisce il più conveniente | Claude da solo | da fare |
 | D25 | Idea 3 approvata: foto della bolla all'arrivo confrontata con l'ordine (mancanti / prezzo diverso in rosso) | Claude da solo | da fare |
 | D26 | Idea 2 approvata: costo dei piatti dalle ricette (ingredienti dai listini, avviso se il costo sale) | Claude da solo | da fare |
+| M29 | Preparare l'account Hotmail per il cambio account (`docs/CAMBIO-ACCOUNT.md`, passi 1-6) | Mario | prima che finisca il limite settimanale |
 | M28 | Chiedere al commercialista se può mandare ogni mese le fatture dei fornitori in formato XML (file .xml o .p7m) | Mario | quando può |
 | M27 | v67 online (dal 10/10): Fornitori → **Importa listini** → foto delle fatture (DAC, Mariano, Nieddittas) → **Trascrivi con Gemini**. Controlla le righe rosse «da controllare» e dimmi cosa non torna | Mario | appena v67 online |
 | M22 | v53 online: chiudi e riapri l'app (o tocca «App da aggiornare»), manda un ordine e guarda l'animazione nuova; dimmi se il bordo bianco su mani e polsini è sparito e se il logo B ti piace | Mario | ora |
