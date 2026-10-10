@@ -4,6 +4,11 @@ Sessione attuale: #63
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v69** (main `76c3416`). **v70 pronta sul ramo, NON ancora pubblicata** (primo lavoro di #63).
 
+## Sessione #63 (in corso, nuovo account)
+- Cambio account fatto: ora si lavora nel secondo account (quello del Relais). Dettagli, ambienti e routine in `docs/CAMBIO-ACCOUNT.md` («Cambio del 10/10/2026»).
+- Scorta unita e pushata (`c7487fc`). PR #81 (v70) già aperta da #62: prove ripartite sul nuovo commit (solo documenti in più).
+- Ultimo messaggio di Mario (17:21): «Eccomi ho cambiato account passa tutto qui da mario.miscera@gmail.com eri già pronto a passare tutto ma proprio tutto / Ho messo un abiente a caso sono uguali guarda differenziamoli se no è un problema»
+
 ## Ultimi messaggi di Mario (#62), parola per parola
 1. «prima aggiorna il mio logo con questa coda il resto tieni il tuo e rifai l'animazione anche vettoriale e inviami poi i file aggiornati valuta migliorie e valuto» (con il disegno `docs/img/logo/ynoy-coda-mario-2026-10-10.jpg`)
 2. «ricordati il tuo nuovo quello dell'app questo in foto ho fatto screenshot prendilo come riferimento gli altri con la & eliminali» (screenshot dell'apertura: `docs/img/logo/riferimento-app-2026-10-10.jpg`)
