@@ -2,13 +2,21 @@
 
 Sessione attuale: #51
 
-## Ultimo messaggio di Mario (#50), parola per parola
-«su queste 2 foto ha trovato solo questo puoi risolvere?»
+## Ultimo messaggio di Mario (#50), parola per parola (arrivato DOPO l'apertura della #51)
+«ti mando altre foto per correzzioni nella lettura e ottimizzazioni per leggere tutti i dati prezzi codice nome ecc ecc in modo perfetto fai un bel lavoro attento ai dettagli e valuta prossimi errori in fatture o listini»
+(con 6 foto di fatture, salvate in `docs/img/listini/`, elenco sotto)
+
+Messaggio prima, parola per parola: «su queste 2 foto ha trovato solo questo puoi risolvere?»
 (con 4 immagini: le 2 fatture DAC già salvate e 2 schermate di «Controlla e salva»: 3 prodotti «da Tabella incollata»; il gambero ha Unità e Prezzo vuoti e categoria «Altro»; nomi senza virgolette: «SPORA200G», «ROSSOVERITAS335/50PZ»)
 
 Messaggio prima (#50): il prompt di avvio della sessione (riprendere la pubblicazione della v65).
 
 ## File ricevuti (#50)
+- Ultimo messaggio, 6 fatture in `docs/img/listini/`:
+  - `dac-fattura-054851-2026-09-01-pag1.jpg` (pagina 1 di 2, 26 righe, totali «SEGUE»; la pagina 2 è il gambero già salvato)
+  - `dac-fattura-057162-2026-09-08.jpg` (13 righe), `dac-fattura-065742-2026-10-06.jpg` (8 righe), `dac-fattura-269380-2026-09-23.jpg` (2 righe)
+  - `mariano-fattura-13960-2026-09-08.jpg` (F.lli Mariano, frutta e verdura, 24 righe)
+  - `nieddittas-fattura-5274-2026-09-22.jpg` (Nieddittas, molluschi, 3 prodotti + consegna)
 - Le 2 fatture DAC: identiche (md5) a `docs/img/listini/dac-fattura-054851-2026-09-01.jpg` e `dac-fattura-252792-2026-09-08.jpg`, non duplicate.
 - `docs/img/segnalazioni/v65-dac-controlla-1.jpg` e `v65-dac-controlla-2-gambero-vuoto.jpg` (committati sul ramo consegne, `f1e3c9b`).
 
@@ -31,6 +39,13 @@ Causa: `splitLine` (index.html, prima di `parseTable`) prendeva ogni `"` come ap
 - CLAUDE.md non toccato per la v66 (nessuna struttura nuova).
 
 ## Prossimo lavoro (#51), in ordine
+0. Lavoro chiesto da Mario nell'ultimo messaggio (dopo D20, o dentro la v66 se la PR #76 non è ancora unita: decidi tu). Lettura «perfetta» di fatture e listini da foto. Dettagli visti nelle 6 foto (da verificare uno per uno):
+   - DAC: colonne CODICE, CARTONI, N.PEZZI, DESCRIZIONE, U.M., QUANTITÀ, PREZZO, IMPORTO NETTO, IVA. U.M. «K.» = kg, «PZ», «CF», «CT»; «##» attaccato all'U.M. («##PZ», «##K.»); «Pezzi» nella colonna CARTONI; virgolette dispari nei nomi (`"COALVI"1 KG`, `SALATO"PAYSON BRETON"10`); righe di continuazione della descrizione (ECOLABEL, CLASSE A, ARISTAEOMORPHA…) da unire al prodotto sopra, non righe nuove; righe «**»/«****» e blocco «DES 3 JONA VILLA CAROLA» non sono prodotti; fattura su più pagine («SEGUE»); prezzi con 3 decimali (4,988; 0,287; 26,248): controllare che `num()` e il listino li tengano; quantità decimali per K. (4,27).
+   - Mariano: colonne CODICE, DESCRIZIONE, ISO (paese), COLLI, U.M., PESO LORDO, TARA, PESO NETTO, PREZZO, IMPORTO, IVA. Codici con zero davanti (040, 027, 087, 405?) da tenere come testo. Prezzo = colonna PREZZO (al kg o al pz), non IMPORTO.
+   - Nieddittas: codice articolo a sinistra spesso strano («60 V A COCKTAIL PZ», «22», «4», «CDS»); descrizione su più righe (nome scientifico, ALLEVATO FRANCIA): tenere solo la prima riga o un nome corto; «CONSEGNA A DOMICILIO SARDEGNA» (CDS) è una spesa, non un prodotto; prezzi a 4 decimali (2,0000).
+   - Stessi prodotti DAC in più fatture (latte 75060, uova 23072, yogurt 34131/53396, pancakes 806406): la v64 toglie i doppi uguali; controllare che con più foto insieme non nascano «simili» inutili.
+   - Idee da valutare: controllo quantità × prezzo ≈ importo per segnalare righe lette male (colonna in più nel prompt, solo per il controllo); fornitore preso dall'intestazione (`guessSupplier`); prompt con esempi di righe difficili; prova con trascrizioni «giuste» scritte a mano di queste fatture come risposta finta di Gemini (`tools/test-virgolette.mjs` come modello). Il Gemini vero non si può provare da qui (niente chiave): far riprovare Mario.
+   - Rispondere a Mario con un piano breve (cosa cambia per lui), poi fare: le scelte tecniche sono di Claude.
 1. D20: PR #76. «Prove automatiche» verdi → squash, controllo online (APP_VER 66, CACHE v70), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Non tocca il Worker: niente giro completo extra. Se rosse: capire la causa e correggere.
 2. Guardare il risultato del giro completo lanciato dopo la v65 (Actions → «Prove automatiche», evento workflow_dispatch). Se rosso: priorità.
 3. Avvisare Mario: v66 online → M27 (rifare l'import delle 2 foto DAC, controllare che il gambero abbia pz, 45,90, Pesce). Gli ho detto di non salvare ancora il gambero com'era. Se l'aveva già salvato, dopo il nuovo import potrebbe comparire come «simile» (v64): spiegarglielo.
