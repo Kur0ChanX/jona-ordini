@@ -14,6 +14,7 @@ Messaggi prima (#48), parola per parola:
 - «nel carico listini con i prodotti i file che ti mando o facciamo scannerizzare potrebbero capitare dei prodotti uguali se ci sono avvisami  cosí scegliamo se tenerli o meno, non caricarli uguali dello stesso fornitore 2 volte, però solo se è uguale in tutto ok? aggiorna il programma ora devo caricare file»
 
 ## Stato
+- #49: **v64 online** (PR #74, squash `95ca4cb`; corretto un «Mario» in un commento che faceva fallire `test-testbar`; online APP_VER=64, CACHE v68). `main` unito nel ramo consegne. Mario: «metti in automatico sempre la nuova versione se non ci sono problemi» → regola in CLAUDE.md. Sessione a lineage 8: all'handoff Mario apre a mano la nuova (E12).
 - Online: **v63** (PR #73 unita, squash `32e9a56`; controllato online APP_VER=63, CACHE v67). `main` unito nel ramo consegne. Mario avvisato; M26 (vede ancora prodotti finti?) senza risposta.
 - **v64 pronta, NON ancora pubblicata**: ramo `claude/v64-doppioni`, commit `68da176`, pushato e confermato. **Il PR non è stato aperto**: `create_pull_request` ha dato due volte «invalid session» (guasto dello strumento GitHub). Mario aspetta la v64 («ora devo caricare file»): URGENTE.
 - Worktree `/home/user/v64` (sparisce col contenitore: `git worktree add ../v64 claude/v64-doppioni`).
