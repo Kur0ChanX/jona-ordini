@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<style>
+:root{--bg:#EFEBE6;--ink:#2B2321;--muted:#8A7F76;--line:#E4DDD5;--sunk:#F6F3EF;--surface:#fff;--solid:#3A2F2C;
+--lagoon:#1F7F86;--corallo:#AE4E37;--ocra:#94661C;--mirto:#3B7A57;--grigio:#8A7F76}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;width:1240px;padding:26px 24px 24px}
+h1{font-size:27px;font-weight:700;letter-spacing:-.3px}
+.sub{color:var(--muted);font-size:15px;margin:6px 0 16px}
+.legend{display:flex;gap:10px;margin-bottom:18px;font-size:14px;align-items:center}
+.tag{display:inline-block;color:#fff;font-weight:700;font-size:11.5px;padding:3px 9px;border-radius:99px;letter-spacing:.3px;vertical-align:middle}
+.t-o{background:var(--grigio)}.t-f{background:var(--lagoon)}.t-g{background:var(--ocra)}
+.cols{display:flex;gap:22px}
+.col{width:380px}
+.step{display:inline-block;background:var(--solid);color:#fff;font-weight:700;font-size:15px;padding:6px 14px;border-radius:99px;margin-bottom:10px}
+.phone{background:var(--solid);border-radius:30px;padding:8px;height:742px}
+.scr{background:#fff;border-radius:23px;overflow:hidden;height:100%}
+.bar{min-height:62px;background:var(--solid);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 14px 14px;font-weight:600;font-size:16px}
+.ic{width:34px;height:34px;border-radius:10px;background:#4a3d39;display:inline-flex;align-items:center;justify-content:center;font-size:17px;margin-left:6px}
+.ic.on{outline:2.5px solid #D9A955}
+.body{padding:12px 13px}
+h3{font-size:14.5px;font-weight:700;margin:10px 0 6px;display:flex;align-items:center;gap:7px}
+h3:first-child{margin-top:2px}
+.card{background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:13.5px;line-height:1.35}
+.big{color:var(--lagoon);font-weight:700;font-size:23px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.b{color:#fff;font-weight:600;font-size:13.5px;border-radius:11px;padding:11px 6px;text-align:center}
+.b1{background:var(--corallo)}.b2{background:var(--lagoon)}.b3{background:var(--ocra)}.b4{background:var(--mirto)}
+.msg{border-radius:12px;padding:7px 10px;font-size:13px;line-height:1.35;margin-bottom:6px;max-width:88%}
+.in{background:var(--sunk);border:1px solid var(--line)}
+.out{background:#DDEEEE;margin-left:auto}
+.lab{font-weight:700;font-size:11.5px;padding:1px 7px;border-radius:99px;background:#fff;margin-right:4px}
+.l1{color:var(--corallo)}.l2{color:var(--lagoon)}.l3{color:var(--ocra)}.l4{color:var(--mirto)}
+.meta{color:var(--muted);font-size:11.5px;margin-top:2px}
+.inp{border:1px solid var(--line);border-radius:99px;padding:8px 12px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.send{background:var(--lagoon);color:#fff;border-radius:99px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+.field{border:1px solid var(--line);background:var(--sunk);border-radius:11px;padding:10px 11px;font-size:13.5px;margin-bottom:7px}
+.field b{font-weight:600}
+.row{display:flex;gap:7px}
+.row .field{flex:1;text-align:center}
+.tog{display:inline-block;width:30px;height:17px;border-radius:99px;background:var(--corallo);vertical-align:middle;position:relative;margin-left:5px}
+.tog:after{content:"";position:absolute;right:2px;top:2px;width:13px;height:13px;border-radius:99px;background:#fff}
+.go{background:var(--solid);color:#fff;font-weight:700;text-align:center;border-radius:11px;padding:11px;font-size:14px}
+.arrow{text-align:center;color:var(--muted);font-size:12.5px;margin:9px 0 7px}
+.stati{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:7px;padding:0 2px}
+.stati b{color:var(--ink)}
+.where{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 5px}
+.where:first-child{margin-top:2px}
+.mini{display:flex;gap:6px;margin-top:7px}
+.mini span{flex:1;text-align:center;border-radius:9px;padding:7px;font-size:13px;font-weight:600}
+.yes{background:var(--lagoon);color:#fff}.no{background:#fff;border:1px solid var(--line)}
+.ok{background:var(--mirto);color:#fff}
+.notes{font-size:13.5px;line-height:1.45;margin-top:10px}
+.notes p{margin-bottom:3px}
+.p{color:var(--mirto);font-weight:700}.q{color:var(--corallo);font-weight:700}
+.foot{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.45}
+</style></head><body>
+<h1>Ponte Jona ↔ Hotel: le 3 idee unite in un'unica icona 🏨</h1>
+<div class="sub">Un tocco su 🏨 apre la pagina «Hotel». Dall'alto in basso: cosa succede oggi, cosa mandi, cosa vi dite.</div>
+<div class="legend">Da quale idea viene ogni parte:
+ <span class="tag t-g">GENIALE</span> <span class="tag t-o">OVVIA</span> <span class="tag t-f">FURBA</span></div>
+
+<div class="cols">
+<!-- 1 -->
+<div class="col"><div class="step">1 · Pagina «Hotel»</div>
+<div class="phone"><div class="scr">
+ <div class="bar"><span>Jona Ristorante</span><span><span class="ic">🔔</span><span class="ic on">🏨</span></span></div>
+ <div class="body">
+  <h3>Oggi in hotel <span class="tag t-g">GENIALE</span></h3>
+  <div class="card"><span class="big">18</span> camere · <span class="big">34</span> ospiti<br>↘ 3 partenze · ↗ 5 arrivi · solo numeri, niente nomi</div>
+  <h3>Manda all'hotel <span class="tag t-o">OVVIA</span></h3>
+  <div class="btns"><div class="b b1">🔧 Guasto</div><div class="b b2">🛎 Richiesta ospite</div><div class="b b3">📅 Evento</div><div class="b b4">📦 Serve a noi</div></div>
+  <h3>Messaggi con l'hotel <span class="tag t-f">FURBA</span></h3>
+  <div class="msg in"><span class="lab l2">🍽 Vassoio</span> Camera <b>104</b>: vassoio da ritirare<div class="meta">Ricevimento · 12:40</div></div>
+  <div class="msg out"><span class="lab l1">🔧 Guasto</span> Frigo carni non raffredda 📷<div class="meta">Mauro · 12:52 · ✓✓ visto da Manutenzione</div></div>
+  <div class="msg in"><span class="lab l2">🛎 Richiesta</span> Camera <b>212</b>: torta anniversario stasera ore 21<div class="meta">Ricevimento · 13:05</div></div>
+  <div class="msg out"><span class="lab l4">📦 Serve a noi</span> 20 tovaglie pulite per stasera<div class="meta">Maurizio · 13:20 · ✔ fatto</div></div>
+  <div class="inp"><span>Scrivi all'hotel… (camera?)</span><span class="send">➤</span></div>
+ </div></div></div>
+<div class="notes"><p><span class="p">+</span> tutto in un posto, in quest'ordine</p><p><span class="p">+</span> i messaggi sono come la chat che lo staff già usa</p></div>
+</div>
+
+<!-- 2 -->
+<div class="col"><div class="step">2 · Tocchi «🔧 Guasto»</div>
+<div class="phone"><div class="scr">
+ <div class="bar"><span>🔧 Guasto all'hotel</span><span class="ic">✕</span></div>
+ <div class="body">
+  <h3>Modulo corto <span class="tag t-o">OVVIA</span></h3>
+  <div class="field">Dove: <b>Cucina ▾</b></div>
+  <div class="field">Cosa: <b>frigo carni non raffredda</b></div>
+  <div class="row"><div class="field">📷 Foto</div><div class="field">Urgente <span class="tog"></span></div></div>
+  <div class="go">Invia all'hotel</div>
+  <div class="arrow">↓ diventa un messaggio nella pagina «Hotel» ↓</div>
+  <div class="msg out" style="max-width:100%"><span class="lab l1">🔧 Guasto</span> Frigo carni non raffredda 📷 <b style="color:var(--corallo)">URGENTE</b><div class="meta">Mauro · 12:52</div></div>
+  <h3>Come segui il messaggio <span class="tag t-f">FURBA</span></h3>
+  <div class="card">
+   <div class="stati"><span><b>✓</b> arrivato</span><span><b>✓✓</b> visto</span><span><b>✔</b> fatto</span></div>
+   <div class="meta" style="margin-top:6px">L'hotel lo riceve già diviso: Guasto → Manutenzione, Richiesta → Ricevimento.</div>
+  </div>
+  <h3>Gli altri pulsanti</h3>
+  <div class="card">🛎 <b>Richiesta ospite</b>: camera + cosa + ora<br>📅 <b>Evento</b>: giorno, ora, persone, dove<br>📦 <b>Serve a noi</b>: cosa + per quando</div>
+ </div></div></div>
+<div class="notes"><p><span class="p">+</span> 3-4 tocchi, niente da scrivere a mano</p><p><span class="p">+</span> sai sempre se l'hotel l'ha visto</p></div>
+</div>
+
+<!-- 3 -->
+<div class="col"><div class="step">3 · Da solo, nel resto dell'app</div>
+<div class="phone"><div class="scr">
+ <div class="bar"><span>Jona Ristorante</span><span><span class="tag t-g">GENIALE</span></span></div>
+ <div class="body">
+  <div class="where">Home dello staff</div>
+  <div class="card">🍽 <b>Ritira vassoio · camera 104</b><div class="meta">dall'hotel · 12:40</div>
+   <div class="mini"><span class="ok">✔ Fatto</span></div></div>
+  <div class="where">Invii · ordine suggerito</div>
+  <div class="card">🥐 Domani <b>34 ospiti</b> in hotel (+5 arrivi)<br>→ croissant <b>+12</b> rispetto a ieri</div>
+  <div class="where">Agenda</div>
+  <div class="card">📅 Cena gruppo 30 pers. · sab 17 · terrazza 20:00<br><b>Mando l'evento all'hotel?</b>
+   <div class="mini"><span class="yes">Sì, manda</span><span class="no">No</span></div>
+   <div class="meta">Avvisa Porter e Housekeeping</div></div>
+  <div class="where">Campanella 🔔</div>
+  <div class="card">🛎 Nuova richiesta dall'hotel: camera 212, torta ore 21</div>
+ </div></div></div>
+<div class="notes"><p><span class="p">+</span> i dati dell'hotel lavorano da soli</p><p><span class="q">–</span> funziona davvero quando l'app dell'hotel è in uso</p></div>
+</div>
+</div>
+
+<div class="foot"><b>Prima si costruisce con dati finti</b> e si prova. Poi, quando l'app dell'hotel (RVC) sarà in uso, si accende il collegamento vero. Niente addebiti in camera e niente allergie, come già deciso.</div>
+</body></html>
