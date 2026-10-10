@@ -16,7 +16,7 @@ Ramo di lavoro: `claude/jona-sessione-59`. App online: **v68** (main `7ff2c34`).
   - Claude: mario.miscera@gmail.com (Pro, in uso) + account Hotmail (Pro, riserva).
 
 ## Fatto in #58
-- Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47): alle 13:12 **ancora in corso** (strano: di solito ~25 min). **Controllarlo**: https://github.com/Kur0ChanX/jona-ordini/actions/runs/38046156932 (rosso = priorità; bloccato da troppo = guardare i job). Dirlo a Mario in una riga.
+- Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47): finito alle 13:12 **VERDE (success)**, già detto a Mario. Prima di chiudere la #58 risultava (strano: di solito ~25 min). **Controllarlo**: https://github.com/Kur0ChanX/jona-ordini/actions/runs/38046156932 (rosso = priorità; bloccato da troppo = guardare i job). Dirlo a Mario in una riga.
 - Messaggi dalla #57 (chiusa): Mario ha cancellato `scorta/prova-permesso`; può cancellare anche `claude/prova-lettori` (PR #78 chiusa) e `claude/v63-listini-prova`. Nota tolta da D27 in DA-FARE.
 - Domanda di Mario sui due GitHub: confermato che Jona sta su `Kur0ChanX` e RVC su `RVC-Operation-by-YNOY-CORP`, tutti e due visibili collegando **Kur0ChanX**. Aggiunta la nota in `docs/CAMBIO-ACCOUNT.md` (passo 2, con link per installare l'app Claude sull'organizzazione RVC se non compare). Detto a Mario cosa si salva al cambio account (codice e consegne su GitHub, scorta automatica; chat vecchie no; preferenze a mano) e che un account aziendale si può fare (i progetti stanno su GitHub), costa di più: se ne parla se vuole.
 - `scorta/claude/jona-sessione-58` contiene solo `docs/ULTIMO-MESSAGGIO.md` del messaggio d'avvio: non unito, innocuo.
@@ -24,7 +24,7 @@ Ramo di lavoro: `claude/jona-sessione-59`. App online: **v68** (main `7ff2c34`).
 
 ## Prossimo lavoro (#59), in ordine
 1. File dei servizi (sopra).
-2. Esito del giro completo.
+2. (Giro completo: verde, niente da fare.)
 3. D23 (più XML + `.p7m`), poi D24, D25, D26 (`docs/DA-FARE.md`).
 4. Proporre a Mario un'idea SOLUZIONE SMART (non fatta in #56-#58).
 
