@@ -139,6 +139,8 @@ async function send(env, body) {
 
 const GEM_MODELS = ["gemini-flash-latest", "gemini-flash-lite-latest", "gemini-2.5-flash"];
 const GEM_MAX_WAIT = 25000;
+const GEM_BUDGET = 85000;   // tempo massimo di una richiesta: Cloudflare la chiude a 100 s con l'errore 524
+const GEM_TRY_MS = 45000;   // un modello che non risponde entro questo tempo lascia il posto al successivo (Lite, più veloce)
 const GEM_MAX_BODY = 20 * 1024 * 1024;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const geminiErr = (message, status) => json({ error: { message } }, status);
@@ -381,15 +383,26 @@ async function gemini(request, env) {
   if (!req || !Array.isArray(req.contents)) return geminiErr("richiesta non valida", 400);
   const body = JSON.stringify({ contents: req.contents, system_instruction: req.system_instruction, generationConfig: req.generationConfig });
   const start = Date.now();
+  const budget = Number(env.GEM_BUDGET) || GEM_BUDGET, tryMs = Number(env.GEM_TRY_MS) || GEM_TRY_MS;
   let last = "Gemini è occupato", stato = 429;
   for (const m of GEM_MODELS) {
     for (let t = 0; t < 2; t++) {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_KEY },
-        body,
-      });
-      const j = await r.json().catch(() => ({}));
+      const resto = budget - (Date.now() - start);
+      if (resto < 3000) return geminiErr("Gemini ci ha messo troppo a rispondere", 504);
+      let r, j;
+      try {
+        r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_KEY },
+          body,
+          signal: AbortSignal.timeout(Math.min(tryMs, resto)),
+        });
+        const tx = await r.text(); // anche la lettura della risposta rientra nel tempo massimo
+        try { j = JSON.parse(tx); } catch (e) { j = {}; }
+      } catch (e) {
+        last = "Gemini ci ha messo troppo a rispondere"; stato = 504;
+        break; // troppo lento: si passa al modello dopo
+      }
       if (r.ok) return json(j);
       last = (j.error && j.error.message) || "errore " + r.status;
       stato = r.status;
@@ -400,7 +413,7 @@ async function gemini(request, env) {
       await sleep(w);
     }
   }
-  return geminiErr(last, stato === 404 ? 502 : 429);
+  return geminiErr(last, stato === 404 ? 502 : stato === 504 ? 504 : 429);
 }
 
 /* ---- allegati della chat ---- */
