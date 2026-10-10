@@ -16,7 +16,7 @@ Ramo di lavoro: `claude/jona-sessione-58` (all'handoff della #58 → `claude/jon
   - Prova `python3 tools/test-scorta.py` (16 controlli, repo finti). Non è in `prova-ci.sh` (lì solo `.mjs` dell'app).
   - **Verificato dal vivo**: `scorta/claude/jona-sessione-57` è comparso su GitHub (`57ed1fa`) già nella stessa sessione.
   - Documenti: `docs/CAMBIO-ACCOUNT.md` (sezione «Se i token finiscono di colpo» + riga nuova nelle Preferenze), CLAUDE.md (regola CAMBIO ACCOUNT: la scorta si aggiunge, commit+push dopo ogni passo resta), DA-FARE (D27, M30 nuova).
-  - Fatto nuovo: GitHub (tramite il proxy) accetta push su `scorta/*`, ma **non lascia cancellare rami remoti** («Everything up-to-date»). È rimasto `scorta/prova-permesso` (= `dc607f3`, innocuo). Mario può cancellarlo da https://github.com/Kur0ChanX/jona-ordini/branches oppure lasciarlo.
+  - Fatto nuovo: GitHub (tramite il proxy) accetta push su `scorta/*`, ma **non lascia cancellare rami remoti** («Everything up-to-date»). È rimasto `scorta/prova-permesso` (= `dc607f3`, innocuo). Mario l'ha cancellato (10/10, dopo l'handoff #57); può cancellare anche `claude/prova-lettori` e `claude/v63-listini-prova`.
   - RVC: mandato messaggio alla RVC #50. Risposta: chiusa, file passati alla RVC #51 con le consegne. A Jona non resta niente da fare per RVC.
 - Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47) **ancora in corso** quando ho chiuso (dura ~25 min). **Controllarlo per primo** (E14) e dirlo a Mario in una riga. La sveglia delle 13:19 l'ho cancellata (sarebbe arrivata alla sessione chiusa).
 - Il nuovo ramo `scorta/claude/jona-sessione-58` nascerà da solo alla prima risposta della #58.
