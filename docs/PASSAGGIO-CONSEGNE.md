@@ -1,89 +1,61 @@
-# Passaggio di consegne (2026-10-08, fine sessione #40)
+# Passaggio di consegne (2026-10-10, fine sessione #55)
 
-Sessione attuale: #41
+Sessione attuale: #56
 
-## Ultimo messaggio di Mario (#40), parola per parola
-«Appena puoi pubblicami il programma senza consenso e in automatico in priorità lo schermo intero come se fosse tutto continuativo senza, senza bande di colori diversi come se fosse tutto schermo sia nell'immagine di apertura dell'app sia dentro l'app»
-(= PRIORITÀ: schermo intero continuo, nessuna banda di colore diverso, né nella schermata di apertura né dentro l'app. Pubblicare da solo, senza chiedere.)
+Ramo di lavoro: `claude/jona-sessione-56` (all'handoff della #56 → `claude/jona-sessione-57`). App online: v67. **v68 pronta e committata** (commit `27a77fb` sul ramo, prove legate verdi), NON ancora pubblicata.
 
-## Fatto in #40 (08/10)
-- Giro completo su GitHub (run 37813146865, main, partito 17:00 UTC): alle 17:25 ancora in corso → controllarlo: https://github.com/Kur0ChanX/jona-ordini/actions/runs/37813146865
-- v54 (ramo `v54-barra`, main già incluso): test-barra 7/7 e test-giro riusciti in locale. **PR #64 aperta** (https://github.com/Kur0ChanX/jona-ordini/pull/64), controllo «Prove automatiche» (run 37815658221) in corso. Iscrizione agli avvisi della PR fatta in #40 (non vale per la #41).
-- Richiesta «esce dal profilo dopo l'ordine» (sotto): trovata la causa, immagine prima/dopo mandata a Mario (solo «Continua»), risposta di Mario non ancora arrivata.
-- **Questa catena è a profondità 8 (E12)**: la #40 non può aprire sessioni né promemoria (`send_later` rifiutato). Mario deve aprire la #41 a mano.
+## Ultimo messaggio di Mario (#55), parola per parola
+«Mi deve avvisare che il motore sta lavorando, su il flash, se è normale, e perché sta lavorando lì. Che problemi ha avuto l'altro? Se è in sovraccarico o no? Mi raccomando, attenzione ai falsi feedback, perché spesso ci possono essere dei falsi. Mi è capitato in altri programmi.»
 
-## Da fare nella #41
-1. PR #64: se «Prove automatiche» è verde → squash merge da solo (Mario ha detto «senza consenso»), controllo online `sw.js` = `jona-ordini-v58`, poi nel ramo di lavoro `git fetch origin main && git merge origin/main` e push. Se rossa: causa e correzione.
-2. Giro completo 37813146865: se rosso, causa e correzione con priorità. Una riga a Mario.
-3. **PRIORITÀ di Mario: schermo intero continuo senza bande**, anche nell'apertura. Idee tecniche (decide Claude, poi pubblicare da solo con prove legate + test-giro):
-   - Apertura (banda bianca in basso, `docs/img/segnalazioni/v53-avvio-banda-bianca.jpg`): lo splash della WebAPK usa `background_color` del manifest (`#3A2F2C`); la barra dei gesti bianca è del sistema. Valutare: `background_color`/`theme_color` del manifest uguali al colore della prima schermata dell'app (così splash e app sono continui); NB cambiare il manifest fa rigenerare la WebAPK (Chrome la aggiorna da solo, può volerci un giorno).
-   - Dentro l'app (banda nera/viola in alto 144 px = zona fotocamera e barra di stato): v54 copre la zona con `--bg` se il telefono ci disegna. Mario vuole «fin dove potete»: valutare `document.documentElement.requestFullscreen({navigationUI:'hide'})` al primo tocco (difetto: Indietro esce prima dallo schermo intero; foto/condivisione lo fanno uscire → riattivarlo al tocco successivo). Ricordargli M23 (impostazione del telefono: «App a schermo intero» → Jona Ordini → Schermo intero / «notch»): è l'unica cosa che fa disegnare l'app nella zona fotocamera.
-4. Riquadro «Inviato allo chef» (fine di `sendToChef` in index.html): proposto di togliere «Esci dal profilo» e lasciare solo «Continua» (uscita resta: foto in alto → Esci, `meMenu`). Chiedere a Mario la risposta all'immagine, poi farlo (versione insieme al punto 3 se pronto).
-5. Poi `docs/DA-FARE.md` (M22, M21, M20, C7…).
+- Messaggio prima: «Sicuro di utilizzare la versione Gemini Flash Lite. Flash Lite fa un po' schifo, perché non la versione normale, Flash normale, che funziona molto molto bene? La versione Pro, no perché consuma troppo e poi non abbiamo un abbonamento Pro.» → risposto: l'app usa già Flash per primo, Lite solo di riserva; Pro no. Ordine v68: Flash → Flash-Lite → Cloudflare Llama 4.
+- Il suo ultimo messaggio è la richiesta realizzata nella v68 (sotto). Va ancora detto a Mario che è fatta, appena pubblicata.
 
-## Messaggi di Mario della #39 (arrivati dopo l'handoff), parola per parola
-«ha scritto pagare  ma volevo dire vedere
-Poi perché il programma, una volta che fai l'ordine, si può dire che esce dal profilo? Oh, non sembra molto giusta come cosa. Poi il pulsante in alto, subito, il primo che potresti toccare subito esce dal profilo, magari deve fare altro. Sembra strana come scelta.»
-(«vedere» = non vuole vedere la batteria: resta lo schermo intero. Il resto: dopo «Invia allo chef» il riquadro «Inviato allo chef» (index.html, fine di `sendToChef`) ha come primo pulsante grande «Esci dal profilo». In #40 proposto: solo «Continua»; per uscire resta foto → Esci (`meMenu`). Immagine mandata, attesa risposta.)
+## Fatto in #55
+- **Secondo giro prova lettori** (run 38034926723, 9:35→10:00 ora italiana, artifact 11663702836): permessi Cloudflare OK. Gemini Flash-Lite 20/20, 0 errori, 17 s; **CF `@cf/meta/llama-4-scout-17b-16e-instruct` 19/20**, 0 errori, 72 s; Gemini Flash 6/6 ma 2 foto perse per 503, 376 s; CF qwen3.8 13/20 (398 s), mistral-small-3.1 11/20, gemma-4 0 righe (non usarla). Immagine `docs/img/scelte/prova-lettori-risultato-2.png` mandata a Mario (fatta con HTML + Playwright, script nello scratchpad, non nel repo).
+- Iscritto alla PR #78 (`subscribe_pr_activity`). Controllo di riserva cancellato.
+- **Messaggio da un'altra sessione di Mario** («Account switch strategy», `session_01T6FSLJ14J9cy5jTtgWQKnE`): unito il ramo `ccr-c4aaeb72-tfz1na` (solo `docs/CAMBIO-ACCOUNT.md` nuovo + regola «CAMBIO ACCOUNT» in CLAUDE.md › REGOLE TRASVERSALI). Aggiunta **M29** in `docs/DA-FARE.md` (preparare l'account Hotmail, passi 1-6). Regola: quando Mario scrive «cambio account» → handoff fino al push e al ramo nuovo, ma NON aprire la sessione nuova: dargli il prompt di 3 righe per l'altro account. D22 aggiornata in DA-FARE.
+- **v68 costruita** (commit `27a77fb`):
+  - `worker/src/index.js`: `LETTORI` {flash, lite, cf}, `CF_MS` 80 s, `motivoDi` (503 sovraccarico, 429 limite, 504 lento, 404 manca), `lettoreErr` → `{error:{message,codice,motivo,lettore}}`, `leggiCf` (Workers AI via `env.AI.run`, messaggio chat con `image_url` data:base64, risposta riportata nel formato Gemini con `lettore:'cf'`; errori 3040 → 503, 4006/quota → 429, tempo scaduto → 504). In `gemini()`: con `req.lettore` prova SOLO quel lettore, una volta, timeout `GEM_TRY_MS` (45 s); senza `lettore` (Chiedi a Jona, app vecchie) la catena di prima, invariata.
+  - `worker/wrangler.toml`: aggiunto `[ai] binding = "AI"` (statico; il token ha Workers AI Read+Edit dal 10/10). Il workflow aggiunge i D1 in fondo: TOML valido.
+  - `index.html` (zona importazione listini): `gemCall(body, lettore)` (con chiave sul telefono: flash/lite diretti a Google, `cf` → `{salta:true}`; dal server: risposta `lettore` solo se il server lo dice, altrimenti '' → mostrato «Gemini» generico, per non inventare). `GEM_LETT` (nome e ruolo), `gemNome`, `gemPerche` (testo SOLO dal codice HTTP vero), `gemLive` (banner `#gem-live`: ✗ lettore: motivo · secondi, ⏳ Legge X (ruolo) · contasecondi `#gem-sec`), `gemTick` (aggiorna solo il numero ogni secondo). `gemRun`: per ogni foto prova i lettori in ordine; passa al successivo con 429/500/502/503/504/524/404; si ferma subito con altri codici (403, chiave non valida); se tutti falliscono, errore con ogni lettore e il suo codice. Tolta la vecchia «seconda prova dopo `GEM_PAUSA`» (sostituita dalla catena; `GEM_PAUSA` resta dichiarata). `I.gnote` → `S.rev.lett` → riquadro `#rv-lett` «Chi ha letto le foto» in `reviewSheet`; `fonte` = «N foto lette».
+  - APP_VER 68, CACHE `jona-ordini-v72`, NEWS v68 (chef + dev.aggiunte), riga v68 in CLAUDE.md.
+  - `tools/test-gemini-server.mjs`: 59 controlli (nuovi: lettore lite/flash/pro/cf, Workers AI finto con 3040/4006/lento, formato messaggio, catena vecchia senza lettore; app: ordine flash,flash,lite,cf, errore con i 3 codici veri, nota «Flash-Lite dopo 503», banner dal vivo con contasecondi, server vecchio → «Gemini», riquadro «Chi ha letto», chiave sul telefono). Il finto `fbInit` ora ha `fs` (Proxy) perché durante l'attesa partiva un render.
+  - Prove riuscite in locale (TZ=Europe/Rome): test-gemini-server 59, test-fatture 28, test-virgolette 16, test-news 94, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-testbar 7, test-giro.
+- Decisioni: l'app guida la catena (non il Worker) così il banner dal vivo dice la verità su chi lavora in quel momento; ogni richiesta resta sotto i 100 s di Cloudflare (E20). Scartato: banner con stima/tempo inventato; mostrare il messaggio inglese grezzo di Google (meglio il codice + traduzione fissa). Pro scartato (costi, Mario).
 
+## Prossimo lavoro (#56), in ordine
+1. **Pubblicare v68**: aprire PR da `claude/jona-sessione-56` (contiene `27a77fb`) verso `main`, attendere «Prove automatiche» verde, squash merge, controllare online (APP_VER 68) e che il workflow del Worker (`cloudflare-worker.yml`) sia verde (prima volta con `[ai]`: se il deploy fallisce per il binding AI, capire il motivo, avvisare Mario). Subito dopo: `git fetch origin main && git merge origin/main` nel ramo e push.
+2. Tocca il Worker → **giro completo extra su GitHub** (workflow «Prove automatiche», workflow_dispatch modo `tutto`, E14) e dirlo a Mario in una riga.
+3. Dire a Mario (breve, con immagine se serve) che la v68 è online: cosa vedrà mentre legge le foto. Proporre UNA idea nuova (regola SOLUZIONE SMART).
+4. Chiudere la PR #78 senza unirla (state closed) e disiscriversi; gli strumenti `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` sono solo sul ramo `claude/prova-lettori`: eventualmente portarli su main più avanti.
+5. Poi D23 (più XML + `.p7m`), D24, D25, D26 (`docs/DA-FARE.md`).
 
-## Consegne di #39
+## Consegne della #54 (in breve)
+- Primo giro prova lettori (run 38033661843): Flash 7/8 foto perse per 503, Flash-Lite 20/20 (dopo correzione unità «K»), Cloudflare 403. Mario ha aggiunto al token Cloudflare Workers AI Read + Edit. Regola orari in ora italiana in CLAUDE.md.
+- Prova lettori: `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` (on pull_request, solo se cambiano quei file); PR bozza #78 «Prova lettori foto (bozza, NON unire)», ramo `claude/prova-lettori`. I push dalla sessione non fanno partire `on: push`.
 
+## Consegne della #53 (in breve)
+- «Migliore opzione gratuita» = secondo lettore Cloudflare Workers AI (D22). Mistral solo se Cloudflare legge peggio (ora non serve).
+- Regole in CLAUDE.md: RISPOSTE CORTE, SOLUZIONE SMART rafforzata (3 strade ovvia/furba/geniale + 1 idea spontanea, controllare che non esista già). Già nell'app (non riproporre): avviso aumenti prezzi, dettatura vocale, QR/BarcodeDetector, link WhatsApp, ordine suggerito.
+- Idee approvate da Mario: D24 (fornitore più conveniente nel carrello), D25 (foto bolla vs ordine), D26 (costo piatti da ricette); idea fatture da Gmail scartata → D23 (più XML + `.p7m`, oggi errore `p7m` in `impRun`).
 
-## Messaggio precedente di Mario (#39), parola per parola
-«No, no. no, non voglio pagare la batteria dal telefono, voglio l'esclusiva a schermo intero. L'esclusiva a schermo intero. Fin dove potete voi.»
-(= NON vuole la barra con ora e batteria: resta `display: fullscreen`. Risposta alla scelta A/B, `docs/img/v54-barra-scelta.png`: ha scelto A.)
+## v67 nel dettaglio (index.html, tutto nella zona «importazione listini»)
+- `GEM_HEAD = TEMPLATE_HEAD + ';quantita;importo'`: usato nel prompt e in `gemJoin` (che ora conosce entrambe le intestazioni). `TEMPLATE_HEAD` resta per modello CSV e segnaposto.
+- `geminiPrompt` riscritto: stesso ordine del foglio senza saltare righe; fornitore = chi vende scritto in alto (DAC, F.lli Mariano, Nieddittas), mai il cliente/destinatario (ORMA DI CHEF LAI, Villa Carola); codice copiato com'è con gli zeri (040); nome com'è, virgolette comprese, via puntini e `#`/`*`; righe di continuazione (ECOLABEL, CLASSE A, nome scientifico, ALLEVATO FRANCIA) non sono prodotti; U.M. K./KG=kg, PZ=pz, CF=conf, CT=cartone, LT=l anche attaccata (`##PZ`); prezzo unitario con tutti i decimali, già scontato se c'è sconto; quantita = QUANTITÀ o PESO NETTO; importo = IMPORTO/IMPORTO NETTO; niente intestazioni, asterischi, totali, IVA; le spese si possono mettere (l'app le riconosce); cifra illeggibile = vuota.
+- `mapRows`: colonna «prezzo» preferita (`iP0`), se no il vecchio regex (anche «importo» come prezzo, file vecchi invariati); `iQ` quantità, `iI` importo (solo se c'è «prezzo»); gli item hanno `q`, `imp`.
+- Funzioni nuove prima di `guessSupplier`: `UNITA`/`normUnita` (applicata a tutti gli import), `pulisciNome` (solo `kind==='txt'`: incollato/Gemini), `isSpesa` (spese/consegna/trasporto/contributo/cauzione/imballo/nolo/porto/addebito/bancale/pallet a inizio nome; «Spezie», «Porro» no), `rigaNonTorna` (|q×prezzo − importo| > max(0,06; 1,5% importo)).
+- `impRun`: righe con `spesa` (non selezionate), `q`, `imp`. `reviewSheet`: `chk(i)` calcolato a ogni disegno (se Mario corregge il prezzo l'avviso sparisce), banner `#rv-chk` «N righe da controllare», banner `#rv-spese`, pillole «da controllare: q × prezzo € non fa importo» (rossa) e «spesa, non è un prodotto».
+- Quantità e importo NON si salvano nel prodotto (decisione: servono solo al controllo; il listino resta uguale).
+- APP_VER 67, CACHE `jona-ordini-v71`, NEWS v67 (chef + `dev.aggiunte`; attenzione: chiavi valide `aggiunte`/`correzioni`/`risolti`, non `novita`).
+- Prova nuova `tools/test-fatture.mjs` (28 controlli): trascrizioni a mano di DAC pag1 (11 righe, vitello con prezzo sbagliato apposta 5,936), Mariano (6 righe con 040/027/405), Nieddittas (4 righe con CDS), passate come 3 risposte finte di `gemCall` dentro `gemRun`; salvataggio di 20 prodotti; formati vecchi. Sul codice v66 fallisce (verificato). Aggiunta a `VELOCI` in `tools/prova-ci.sh` dopo test-virgolette.
+- Riuscite in locale (TZ=Europe/Rome): test-fatture 28, test-virgolette 16, test-gemini-server 39, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-news 94, test-testbar 7, test-giro.
+- Non tocca il Worker: niente giro completo extra.
+- Decisioni scartate: filtrare le spese togliendole del tutto (Mario non le vedrebbe: meglio senza spunta e avviso); normalizzare i nomi anche per Excel/XML (rischio di toccare file buoni); arrotondare i prezzi a 4 decimali (`num` tiene 3: basta per DAC; Nieddittas 2,0000 ok).
+- Non fatto ancora (idee per dopo): controllo somma righe = «totale merce/imponibile» della fattura; prezzo mostrato con 3 decimali nel listino (`eur` ne mostra 2: 4,988 → 4,99 €, ma il valore salvato è giusto).
 
-Messaggio prima, parola per parola: «Allora, ci sono tre cose che ci portiamo indietro da tempo per guardare a fondo. Uno è appena apri l'app, non so se è un solo mio problema, ma ancora più che ce l'ho trasformato in un programma da Chrome, che si fa diventa icona sul, sulla schermata principale del telefono. Appena l'avvio c'è una, per qualche frame c'è una banda bianca sotto che non mi piace molto. Poi, durante le schermate, quasi sempre c'è la banda nera sopra, che non mi piace, mi piace più a tutto lo schermo. E a volte quella banda nera diventa quella banda violetta, non so perché, se non lo so, ci deve essere un glitch, qualcosa, qualcosa che non stiamo valutando.»
-Screenshot salvati: `docs/img/segnalazioni/v53-avvio-banda-bianca.jpg`, `v53-banda-nera-sopra.jpg`, `v53-banda-viola-sopra.jpg` (commit `22093db`).
-
-## Fatto in #39 (08/10)
-- Analisi dei pixel (immagini 1200×2608): banda in alto alta 144 px. Nera (0,0,0) = zona fotocamera lasciata vuota dal sistema in schermo intero (`viewport-fit=cover` c'è già alla riga 5 di index.html, ma il telefono non disegna lì). Viola (31,5,18) = barra di stato che ricompare, colore scelto da Android. Banda bianca in basso all'avvio (y≥2560) = barra dei gesti durante lo splash di Chrome: non controllabile dalla pagina.
-- Errore nostro trovato: `meta theme-color` fisso `#3A2F2C` anche nel tema scuro (sfondo `--bg` `#1E1816`).
-- **v54 sul ramo `v54-barra`** (commit dopo `22093db`, pushato; NON ancora PR): `themeBar()` mette in `meta theme-color` il `--bg` del tema in uso, chiamata da `applyTheme()` e al cambio di `prefers-color-scheme`; `body::before` fisso, alto `env(safe-area-inset-top)`, colore `--bg`, z-index 25 (sopra `.top` 20, sotto la cartbar 29): se il telefono disegna nella zona fotocamera, il contenuto che scorre non si vede sopra l'intestazione. APP_VER 54, NEWS v54, CACHE `jona-ordini-v58`. Nuova prova `tools/test-barra.mjs` (7/7 riuscite; aggiunta a VELOCI in `tools/prova-ci.sh` e a `tools/README.md`). Riuscite anche test-news (94 PASS), test-logo, test-testbar. **test-giro era in corso alla chiusura: rifarlo.**
-- Manifest NON cambiato (cambiare theme_color fa rigenerare la WebAPK: inutile).
-- Scartato per ora: `requestFullscreen()` al primo tocco (potrebbe disegnare nella zona fotocamera), perché il tasto Indietro di Android uscirebbe prima dallo schermo intero (un Indietro «a vuoto»), e foto/condivisioni lo farebbero uscire. Da valutare SOLO se l'impostazione del telefono (M23) non basta.
-- A Mario: passi per l'impostazione del telefono (cercare «schermo intero» → App a schermo intero → Jona Ordini → Schermo intero; in alternativa cercare «notch» o «fotocamera frontale»). Il telefono è probabilmente Xiaomi (video Xiaomi in #32). Attesa risposta: a che passo è arrivato.
-- Giro completo su GitHub (run 37813146865 su main, partito 17:00 UTC) era ancora in corso: controllarlo. Promemoria `send_later` cancellato (avrebbe svegliato la sessione chiusa).
-
-## Consegne di #38, parola per parola sotto
-## Ultimo messaggio di Mario (#37), parola per parola
-«anche questo ecc ecc»
-(screenshot `docs/img/segnalazioni/v52-mano-bordo-bianco.jpg`: contorno bianco su tutto il bordo di sotto di dita, mano, polso, avambraccio e giù lungo il polsino.) In #38 Mario NON ha scritto messaggi: la sessione ha lavorato da sola sulle consegne.
-
-## Fatto in #38 (08/10)
-- **Bordo bianco su mani, avambracci e polsini** (commit `df1c2a7`, `tools/anim-invio.py`). Causa trovata sul video vero (non sull'anteprima): (1) sul polsino basso la stoffa più chiara (243+) attaccata allo sfondo diventava una striscia bianca sullo sfondo scuro; (2) sulla pelle restava una riga chiara di 1 punto: fuori dal soggetto il colore era il bianco del filmato e il ridimensionamento 1920→720 (Lanczos) lo faceva entrare nel bordo. Correzioni:
-  - `polsino(rgb, fg, zg)`: nella zona giacca toglie la fascia di stoffa chiara (minimo dei canali sfocato ≥243) entro `STOFFA`=14 punti dallo sfondo, poi contorno lisciato (gaussiana 3).
-  - `pulisci(c, fg, zg)`: fascia di `PELLE`=7 punti sul bordo di mani/braccia (fuori giacca): il chiaro in più rispetto alla pelle piena vicina (finestra 31) è bianco e si toglie (c=(c-t)/(1-t), t max 0,9).
-  - Colore fuori dal bordo = colore del bordo più vicino (`distance_transform_edt(..., return_indices=True)`), non più il bianco.
-  - Bordo morbido della giacca stretto di `RIENTRA`=3 punti in più prima della sfumatura.
-  - Nuova variabile `ANIM_SOLO=40-60` per rifare solo alcuni fotogrammi (prove veloci, ~1 min per 5 fotogrammi).
-- Video rifatti (101 fotogrammi, ~55 min), controllati 12 fotogrammi (10-101) su fondo scuro: niente buchi, zona A pulita. Prima/dopo `docs/img/v53-giacca-prima-dopo.png` (fotogrammi 40, 64, 88 mano/polsino e 96 zona A), mandato a Mario. Script del composito era nello scratchpad (`comp.py`: estrae fotogramma n con `select=eq(n\,n-1)`, metà alta colore, metà bassa alfa, su fondo (30,26,24)).
-- Prove legate riuscite: test-invio-anim, test-logo, test-news, test-inviti, test-demo-invito, test-giro.
-- **v53 pubblicata**: PR #63 (logo B senza «&», animazione) con «Prove automatiche» verde, unita con squash (`453df42`). Main riunito nel ramo (`2051074`). Online controllato: `sw.js` = `jona-ordini-v57`, `media/invio-chef.mp4` uguale al repo.
-- Giro completo su GitHub lanciato (workflow `prove.yml`, modo `tutto`, su main) perché è cambiato il Worker `invito` (E14). **Da controllare nella #39**: https://github.com/Kur0ChanX/jona-ordini/actions/workflows/prove.yml — se rosso, capire la causa e correggere con priorità.
-
-## Consegne di #37 e #36 (riassunto)
-- #37: `OMBRA = 250` (commit `a858c52`): con 245/248 la parte scura entrava nella manica bassa nei fotogrammi ~56-64. Controllo tra le braccia su fotogrammi 40-96 pulito.
-- #36: logo B (`tools/logo-ynoy.py` `vB2(sx=1.18, sy=1.12)`, `media/ynoy.png`), «&» tolta (index.html `og:site_name` e aria-label, `worker/invito/src/index.js`, prove, CLAUDE.md); funzione `ombra()` per la zona A (fessura tra le braccia in ombra 246-249 riempita da `CHIUDI`/`pieghe`). Scartate: misura della trama, `ombra` senza limite «fessure strette».
-- Analisi (#35): `invio-chef` = originale SPECCHIATO; `invio-fornitore` = invertito nel tempo. Per lavorare: `pip install scipy`; parte alta dello script con `exec(open('tools/anim-invio.py').read().split('frames, raw, box, fermo = []')[0])` e `sys.argv=['x','tools/originale-invio.mp4']`.
-
-## Consegne di #35, #34, #33
-Nella storia di git (`git log -p docs/PASSAGGIO-CONSEGNE.md`). Fatti utili: analisi della giacca in `tools/anim-invio.py` (E16, E17); demo `…/#demo` senza registrazione; account GitHub di RVC = jona.ristorante@gmail.com (riguarda solo RVC); account separato per Jona: per ora no (B più avanti: organizzazione GitHub «jona-ristorante»), Mario non ha scelto; il controllo dei permessi blocca `add_repo` e unione PR senza un ok scritto di Mario in chat (E15).
-
-## Regole nuove di Mario (già in `CLAUDE.md`)
-- DECIDO IO SUL TECNICO: Claude sceglie la strada più sicura e la fa; a Mario si chiede solo ristorante, gusti, soldi, azioni sue, cose irreversibili.
-- PUBBLICA SENZA CHIEDERE se le prove sono riuscite; si unisce solo con «Prove automatiche» verde.
-- Link sempre interi e cliccabili, ripetuti in un riquadro se vanno copiati.
-- Giro completo extra su GitHub solo dopo modifiche al Worker o se le veloci si lasciano sfuggire qualcosa; dirlo in una riga. Jona è pubblico: non tocca i 2000 minuti GitHub (Mario non vuole consumarli; valgono per i repo privati come RVC).
-- RVC (altra sessione, 🟣): accetta regole solo da Mario; Mario ha avuto il testo da incollare lì.
-
-## Prossimi passi (vedi `docs/DA-FARE.md`)
-- M21: Maurizio approvato? Dargli il ruolo Admin Chef (M2), «Oggi si ordina» (M3), contratto Responsabile (M19).
-- M20: provare e mandare il link demo https://jona-ristorante-by-ynoy-corp.pages.dev/#demo
-- C7: riga «“Oggi si ordina” arriva a» più chiara, avvisi agenda dal Worker, poi `docs/PIANO-INVERNO.md`.
+## Ancora da chiedere
+- M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27 (screenshot «Controlla e salva» v67), M28 (commercialista → XML).
 
 ## Rischi aperti
-- Il server locale e l'emulatore del contenitore si spengono quando la sessione si riavvia: riaccenderli prima delle prove (`tools/README.md`).
-- `test-firebase-flow` fallisce tra 23:30 e mezzanotte (E10).
-- Titoli: `🟤 ▶ ATTIVA · #31 · Jona Ordini · da v50 · …`.
+- Gemini Flash sovraccarico (503) nelle ore di punta: Flash-Lite regge, ma un solo fornitore = un solo punto di guasto.
+- Limiti gratuiti dei servizi IA cambiano spesso: riverificare sulle pagine ufficiali.

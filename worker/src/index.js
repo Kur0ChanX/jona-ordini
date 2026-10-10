@@ -3,6 +3,8 @@
 // La chiave VAPID (JWK P-256) sta nel segreto VAPID_JWK, creato dal workflow GitHub alla prima pubblicazione.
 // /gemini: fa da tramite verso Google Gemini con la chiave del ristorante (segreto GEMINI_KEY), solo per i telefoni
 // registrati (membri/<uid> in Firestore); se Gemini è occupato (429) aspetta quanto chiede e riprova, poi prova il modello Lite.
+// v68: con «lettore» (flash, lite, cf) prova solo quel lettore e, se non riesce, dice il motivo vero (codice di Google o di
+// Cloudflare): così l'app mostra dal vivo chi sta leggendo e perché passa al successivo. «cf» = Workers AI (binding AI, gratis).
 // /allegati: foto e vocali della chat nei database D1 ALLEGATI0, ALLEGATI1… (creati dal workflow; piano gratuito: 500 MB l'uno).
 // Il telefono manda il file in base64 (testo) con il tipo in «x-tipo»: D1 restituirebbe i BLOB come liste di numeri,
 // troppo lente da convertire nei 10 ms del piano gratuito. Ogni file va nel database più vuoto; oltre il tetto si cancellano i più vecchi, e ogni notte (cron) quelli oltre 60 giorni.
@@ -142,6 +144,9 @@ const GEM_MAX_WAIT = 25000;
 const GEM_BUDGET = 85000;   // tempo massimo di una richiesta: Cloudflare la chiude a 100 s con l'errore 524
 const GEM_TRY_MS = 45000;   // un modello che non risponde entro questo tempo lascia il posto al successivo (Lite, più veloce)
 const GEM_MAX_BODY = 20 * 1024 * 1024;
+// v68: lettori delle foto, nell'ordine in cui li prova l'app (il più preciso per primo); cf = ripiego gratis fuori da Google
+const LETTORI = { flash: "gemini-flash-latest", lite: "gemini-flash-lite-latest", cf: "@cf/meta/llama-4-scout-17b-16e-instruct" };
+const CF_MS = 80000;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const geminiErr = (message, status) => json({ error: { message } }, status);
 
@@ -373,6 +378,38 @@ const attesa = j => {
   return Number.isFinite(s) ? Math.max(1000, s * 1000) : 4000;
 };
 
+// motivo dal codice vero della risposta: niente supposizioni (503 = Google dice sovraccarico, 429 = limite, lento = fermato da noi)
+const motivoDi = (st, msg) => st === 503 ? "sovraccarico" : st === 429 ? "limite" : st === 504 ? "lento" : st === 404 ? "manca" : "altro";
+const lettoreErr = (lettore, message, st, motivo) => json({ error: { message, codice: st, motivo, lettore } }, st);
+
+// Workers AI: la richiesta Gemini (testo + una foto) diventa un messaggio in stile chat; la risposta torna nel formato Gemini
+async function leggiCf(req, env, ms) {
+  if (!env.AI) return lettoreErr("cf", "Workers AI non è collegato al server", 502, "manca");
+  const content = [];
+  for (const c of req.contents) for (const x of (c && c.parts) || []) {
+    if (x.text) content.push({ type: "text", text: String(x.text) });
+    const d = x.inline_data || x.inlineData;
+    if (d && d.data) content.push({ type: "image_url", image_url: { url: "data:" + (d.mime_type || d.mimeType || "image/jpeg") + ";base64," + d.data } });
+  }
+  let r;
+  try {
+    r = await Promise.race([
+      env.AI.run(LETTORI.cf, { messages: [{ role: "user", content }], max_tokens: 4000, temperature: 0 }),
+      sleep(ms).then(() => { throw Object.assign(new Error("lento"), { lento: true }); }),
+    ]);
+  } catch (e) {
+    const m = String((e && e.message) || e);
+    if (e && e.lento) return lettoreErr("cf", "Cloudflare non ha risposto entro " + Math.round(ms / 1000) + " s", 504, "lento");
+    // codici di Workers AI: 3040 capacità finita (sovraccarico), 4006 quota gratuita del giorno finita
+    const st = /4006|allocation|neuron/i.test(m) ? 429 : /3040|capacity/i.test(m) ? 503 : 502;
+    return lettoreErr("cf", m.slice(0, 300), st, motivoDi(st));
+  }
+  const txt = r && (typeof r.response === "string" ? r.response
+    : r.choices && r.choices[0] && r.choices[0].message ? r.choices[0].message.content : "");
+  if (!txt) return lettoreErr("cf", "Cloudflare ha risposto vuoto", 502, "altro");
+  return json({ candidates: [{ content: { parts: [{ text: String(txt) }] } }], lettore: "cf" });
+}
+
 async function gemini(request, env) {
   if (!env.GEMINI_KEY) return geminiErr("Gemini non è configurato sul server", 503);
   if (!(await membro(request, env))) return geminiErr("Telefono non collegato al ristorante", 403);
@@ -384,6 +421,27 @@ async function gemini(request, env) {
   const body = JSON.stringify({ contents: req.contents, system_instruction: req.system_instruction, generationConfig: req.generationConfig });
   const start = Date.now();
   const budget = Number(env.GEM_BUDGET) || GEM_BUDGET, tryMs = Number(env.GEM_TRY_MS) || GEM_TRY_MS;
+  if (req.lettore !== undefined) {
+    const l = String(req.lettore);
+    if (!LETTORI[l]) return geminiErr("lettore sconosciuto", 400);
+    if (l === "cf") return await leggiCf(req, env, Number(env.CF_MS) || CF_MS);
+    let r, j;
+    try {
+      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${LETTORI[l]}:generateContent`, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_KEY },
+        body,
+        signal: AbortSignal.timeout(tryMs),
+      });
+      const tx = await r.text();
+      try { j = JSON.parse(tx); } catch (e) { j = {}; }
+    } catch (e) {
+      return lettoreErr(l, "Google non ha risposto entro " + Math.round(tryMs / 1000) + " s", 504, "lento");
+    }
+    if (r.ok) return json(Object.assign(j, { lettore: l }));
+    const msg = (j.error && j.error.message) || "errore " + r.status;
+    return lettoreErr(l, msg, r.status, motivoDi(r.status));
+  }
   let last = "Gemini è occupato", stato = 429;
   for (const m of GEM_MODELS) {
     for (let t = 0; t < 2; t++) {

@@ -1,0 +1,28 @@
+# Prova dei lettori di foto (D22): parte con una PR di prova (bozza, da non unire) che cambia questi file.
+# I push dalla sessione non fanno partire i workflow e uno nuovo non si lancia a mano finché non è su main.
+# Non tocca app né Worker.
+name: Prova lettori foto
+on:
+  pull_request:
+    branches: [main]
+    paths: [tools/prova-lettori.py, .github/workflows/prova-lettori.yml]
+permissions:
+  contents: read
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow
+      - name: Prova
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: python3 tools/prova-lettori.py prova-lettori
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prova-lettori
+          path: prova-lettori
