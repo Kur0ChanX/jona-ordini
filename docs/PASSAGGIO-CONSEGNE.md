@@ -1,59 +1,43 @@
-# Passaggio di consegne (2026-10-10, fine sessione #54)
+# Passaggio di consegne (2026-10-10, fine sessione #55)
 
-Sessione attuale: #55
+Sessione attuale: #56
 
-Ramo di lavoro: `claude/jona-sessione-55` (all'handoff della #55 → `claude/jona-sessione-56`). App online: v67 (nessuna versione nuova in #53 e #54).
+Ramo di lavoro: `claude/jona-sessione-56` (all'handoff della #56 → `claude/jona-sessione-57`). App online: v67. **v68 pronta e committata** (commit `27a77fb` sul ramo, prove legate verdi), NON ancora pubblicata.
 
-## Ultimo messaggio di Mario (#54), parola per parola
-«posso provare l app hai fatto?»
+## Ultimo messaggio di Mario (#55), parola per parola
+«Mi deve avvisare che il motore sta lavorando, su il flash, se è normale, e perché sta lavorando lì. Che problemi ha avuto l'altro? Se è in sovraccarico o no? Mi raccomando, attenzione ai falsi feedback, perché spesso ci possono essere dei falsi. Mi è capitato in altri programmi.»
 
-- Risposta data: non c'è ancora una versione nuova da provare; online resta la v67. La v68 (secondo lettore) si costruisce dopo il risultato della seconda prova.
-
-## Fatto in #54
-- Iscritto alla PR #78. **Primo giro della prova lettori** (run 38033661843, finito 9:19 ora italiana): Gemini Flash 7 foto su 8 rifiutate con 503 «high demand» (sovraccarico), 1 foto letta in 59 s; **Gemini Flash-Lite 20/20 prezzi giusti** (lo script diceva 16/20 perché non contava l'unità «K» come kg: corretto in `tools/prova-lettori.py`, l'app la capisce già con `UNITA`), 79/79 righe coerenti q×prezzo=importo, 0 errori, 17 s in tutto. Cloudflare: **403** sul catalogo modelli (token senza permesso Workers AI). Risposte grezze scaricate (artifact 11663288382, scade): Flash-Lite legge bene anche Mariano (24 righe con 040/027) e Nieddittas (codice ostrica «60 V A COCKTAIL PZ» strano, CDS = consegna).
-- Il Worker `/gemini` (`worker/src/index.js` ~riga 375, `GEM_MODELS` riga 140) passa GIÀ a Flash-Lite con 429 **e 503**: oggi l'app non si sarebbe bloccata, solo più lenta.
-- Immagine risultato `docs/img/scelte/prova-lettori-risultato.png` mandata a Mario.
-- Mario ha aggiunto al token Cloudflare (quello del segreto `CLOUDFLARE_API_TOKEN`) i permessi Account › Workers AI › **Read** e **Edit** e ha fatto **Update token** (confermato da lui). Gli ho spiegato: la scritta gialla «Origin CA Key (Deprecated)» nella pagina API Keys non ci riguarda; non toccare Change/View della Global API Key.
-- Domanda di Mario: «basta caricare le foto nell'app?» → sì, controlli automatici, niente caricamento su cloud a mano.
-- **Secondo giro della prova** (con permessi Cloudflare): `claude/prova-lettori` portato con fast-forward a `6ae7527`, run **38034926723** partito 9:35 ora italiana, ancora in corso all'handoff (dura più del primo: probabile che Cloudflare stia rispondendo).
-- Regola nuova di Mario in `CLAUDE.md` (COMUNICAZIONE, «ORARI IN ORA ITALIANA»): orari sempre in ora italiana (Olbia), mai UTC. Ottobre fino al 25: UTC+2.
-- Commit della #54: `6ae7527` (immagine + script), `e2b025f` (regola orari), consegne.
+- Messaggio prima: «Sicuro di utilizzare la versione Gemini Flash Lite. Flash Lite fa un po' schifo, perché non la versione normale, Flash normale, che funziona molto molto bene? La versione Pro, no perché consuma troppo e poi non abbiamo un abbonamento Pro.» → risposto: l'app usa già Flash per primo, Lite solo di riserva; Pro no. Ordine v68: Flash → Flash-Lite → Cloudflare Llama 4.
+- Il suo ultimo messaggio è la richiesta realizzata nella v68 (sotto). Va ancora detto a Mario che è fatta, appena pubblicata.
 
 ## Fatto in #55
-- **Secondo giro prova lettori** (run 38034926723, 9:35→10:00, artifact 11663702836): permessi Cloudflare OK. Gemini Flash-Lite 20/20, 0 errori, 17 s; **CF `@cf/meta/llama-4-scout-17b-16e-instruct` 19/20**, 0 errori, 72 s (Nieddittas 2/3; coerenti 61/68); Gemini Flash 6/6 ma 2 foto perse per 503, 376 s; CF qwen3.8 13/20 (398 s), mistral-small-3.1 11/20, gemma-4 0 righe (risposta non in formato: da non usare). Immagine `docs/img/scelte/prova-lettori-risultato-2.png` mandata a Mario.
-- Piano v68 proposto: ordine Flash-Lite → Flash → CF Llama 4 Scout (ripiego).
+- **Secondo giro prova lettori** (run 38034926723, 9:35→10:00 ora italiana, artifact 11663702836): permessi Cloudflare OK. Gemini Flash-Lite 20/20, 0 errori, 17 s; **CF `@cf/meta/llama-4-scout-17b-16e-instruct` 19/20**, 0 errori, 72 s; Gemini Flash 6/6 ma 2 foto perse per 503, 376 s; CF qwen3.8 13/20 (398 s), mistral-small-3.1 11/20, gemma-4 0 righe (non usarla). Immagine `docs/img/scelte/prova-lettori-risultato-2.png` mandata a Mario (fatta con HTML + Playwright, script nello scratchpad, non nel repo).
+- Iscritto alla PR #78 (`subscribe_pr_activity`). Controllo di riserva cancellato.
+- **Messaggio da un'altra sessione di Mario** («Account switch strategy», `session_01T6FSLJ14J9cy5jTtgWQKnE`): unito il ramo `ccr-c4aaeb72-tfz1na` (solo `docs/CAMBIO-ACCOUNT.md` nuovo + regola «CAMBIO ACCOUNT» in CLAUDE.md › REGOLE TRASVERSALI). Aggiunta **M29** in `docs/DA-FARE.md` (preparare l'account Hotmail, passi 1-6). Regola: quando Mario scrive «cambio account» → handoff fino al push e al ramo nuovo, ma NON aprire la sessione nuova: dargli il prompt di 3 righe per l'altro account. D22 aggiornata in DA-FARE.
+- **v68 costruita** (commit `27a77fb`):
+  - `worker/src/index.js`: `LETTORI` {flash, lite, cf}, `CF_MS` 80 s, `motivoDi` (503 sovraccarico, 429 limite, 504 lento, 404 manca), `lettoreErr` → `{error:{message,codice,motivo,lettore}}`, `leggiCf` (Workers AI via `env.AI.run`, messaggio chat con `image_url` data:base64, risposta riportata nel formato Gemini con `lettore:'cf'`; errori 3040 → 503, 4006/quota → 429, tempo scaduto → 504). In `gemini()`: con `req.lettore` prova SOLO quel lettore, una volta, timeout `GEM_TRY_MS` (45 s); senza `lettore` (Chiedi a Jona, app vecchie) la catena di prima, invariata.
+  - `worker/wrangler.toml`: aggiunto `[ai] binding = "AI"` (statico; il token ha Workers AI Read+Edit dal 10/10). Il workflow aggiunge i D1 in fondo: TOML valido.
+  - `index.html` (zona importazione listini): `gemCall(body, lettore)` (con chiave sul telefono: flash/lite diretti a Google, `cf` → `{salta:true}`; dal server: risposta `lettore` solo se il server lo dice, altrimenti '' → mostrato «Gemini» generico, per non inventare). `GEM_LETT` (nome e ruolo), `gemNome`, `gemPerche` (testo SOLO dal codice HTTP vero), `gemLive` (banner `#gem-live`: ✗ lettore: motivo · secondi, ⏳ Legge X (ruolo) · contasecondi `#gem-sec`), `gemTick` (aggiorna solo il numero ogni secondo). `gemRun`: per ogni foto prova i lettori in ordine; passa al successivo con 429/500/502/503/504/524/404; si ferma subito con altri codici (403, chiave non valida); se tutti falliscono, errore con ogni lettore e il suo codice. Tolta la vecchia «seconda prova dopo `GEM_PAUSA`» (sostituita dalla catena; `GEM_PAUSA` resta dichiarata). `I.gnote` → `S.rev.lett` → riquadro `#rv-lett` «Chi ha letto le foto» in `reviewSheet`; `fonte` = «N foto lette».
+  - APP_VER 68, CACHE `jona-ordini-v72`, NEWS v68 (chef + dev.aggiunte), riga v68 in CLAUDE.md.
+  - `tools/test-gemini-server.mjs`: 59 controlli (nuovi: lettore lite/flash/pro/cf, Workers AI finto con 3040/4006/lento, formato messaggio, catena vecchia senza lettore; app: ordine flash,flash,lite,cf, errore con i 3 codici veri, nota «Flash-Lite dopo 503», banner dal vivo con contasecondi, server vecchio → «Gemini», riquadro «Chi ha letto», chiave sul telefono). Il finto `fbInit` ora ha `fs` (Proxy) perché durante l'attesa partiva un render.
+  - Prove riuscite in locale (TZ=Europe/Rome): test-gemini-server 59, test-fatture 28, test-virgolette 16, test-news 94, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-testbar 7, test-giro.
+- Decisioni: l'app guida la catena (non il Worker) così il banner dal vivo dice la verità su chi lavora in quel momento; ogni richiesta resta sotto i 100 s di Cloudflare (E20). Scartato: banner con stima/tempo inventato; mostrare il messaggio inglese grezzo di Google (meglio il codice + traduzione fissa). Pro scartato (costi, Mario).
 
-## Prossimo lavoro (#55), in ordine
-1. Leggere il run 38034926723 (`list_workflow_jobs` → `get_job_logs` job, artifact `prova-lettori` per le risposte grezze). Iscriversi alla PR #78 (`subscribe_pr_activity` Kur0ChanX/jona-ordini 78). Se ancora 403: guida a Mario per il token giusto (forse ha modificato un altro token: chiedere il nome del token che usa GitHub). Mandare a Mario UNA immagine breve (orari italiani!).
-2. Decisione tecnica (mia, poi spiegata a Mario con le 3 strade ovvia/furba/geniale): idea **furba** = mettere `gemini-flash-lite-latest` per primo in `GEM_MODELS` (stesso esito nel test, 15× più veloce, meno 503) con Flash come riserva; **geniale** = secondo lettore Cloudflare in parallelo e confronto numeri → riga rossa; ovvia = Cloudflare solo come ripiego dopo Gemini. Prima di cambiare l'ordine valutare un secondo giro di Gemini Flash (oggi non misurabile per il 503). Per Cloudflare nel Worker: `[ai] binding = "AI"` in `wrangler.toml` (aggiunto dal workflow come per D1), `env.AI.run(modello, …)`.
-3. v68 → tocca il Worker → giro completo extra su GitHub dopo (E14). Aggiornare i Worker finti delle prove se cambia `/gemini`.
-4. Chiudere la PR #78 senza unirla quando la prova è finita (strumenti di prova su main con la v68, trigger con `paths`).
+## Prossimo lavoro (#56), in ordine
+1. **Pubblicare v68**: aprire PR da `claude/jona-sessione-56` (contiene `27a77fb`) verso `main`, attendere «Prove automatiche» verde, squash merge, controllare online (APP_VER 68) e che il workflow del Worker (`cloudflare-worker.yml`) sia verde (prima volta con `[ai]`: se il deploy fallisce per il binding AI, capire il motivo, avvisare Mario). Subito dopo: `git fetch origin main && git merge origin/main` nel ramo e push.
+2. Tocca il Worker → **giro completo extra su GitHub** (workflow «Prove automatiche», workflow_dispatch modo `tutto`, E14) e dirlo a Mario in una riga.
+3. Dire a Mario (breve, con immagine se serve) che la v68 è online: cosa vedrà mentre legge le foto. Proporre UNA idea nuova (regola SOLUZIONE SMART).
+4. Chiudere la PR #78 senza unirla (state closed) e disiscriversi; gli strumenti `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` sono solo sul ramo `claude/prova-lettori`: eventualmente portarli su main più avanti.
 5. Poi D23 (più XML + `.p7m`), D24, D25, D26 (`docs/DA-FARE.md`).
 
-## Consegne della #53 (storia)
+## Consegne della #54 (in breve)
+- Primo giro prova lettori (run 38033661843): Flash 7/8 foto perse per 503, Flash-Lite 20/20 (dopo correzione unità «K»), Cloudflare 403. Mario ha aggiunto al token Cloudflare Workers AI Read + Edit. Regola orari in ora italiana in CLAUDE.md.
+- Prova lettori: `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` (on pull_request, solo se cambiano quei file); PR bozza #78 «Prova lettori foto (bozza, NON unire)», ramo `claude/prova-lettori`. I push dalla sessione non fanno partire `on: push`.
 
-### Ultimo messaggio di Mario (#53), parola per parola
-«prova la migliore opzione gratuita per ora
-
-mi raccomando come regola non scrivere poemi ahahhaahahah attenzione ai token ma si chiaro. poi se devi spiegarmi qualche guida che devo fare manuale per me va bene anche senza un forte limite di caratteri cosí è piú chiaro per me con link e passaggi vari molto chiari»
-
-- Regola salvata in `CLAUDE.md` (COMUNICAZIONE → «RISPOSTE CORTE»): risposte brevi; le guide manuali possono essere lunghe con link e passi.
-- «Migliore opzione gratuita» = secondo lettore Cloudflare Workers AI (D22). Prova vera IN CORSO, vedi sotto.
-
-### Prova lettori (preparata in #53)
-- `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` (on pull_request verso main, solo se cambiano questi 2 file). I push dalla sessione NON fanno partire workflow con `on: push` (provato: niente run) e un workflow nuovo non si lancia a mano finché non è su main → si usa una PR bozza.
-- **PR #78 «Prova lettori foto (bozza, NON unire)»**, ramo `claude/prova-lettori` (= ramo consegne al commit `9d41691`). Run «Prova lettori foto» **38033661843** partito 07:13 UTC (anche «Prove automatiche» 38033661795 gira, è normale).
-- Lo script: prompt preso da `geminiPrompt` in index.html; foto ridotte a 2000 px; lettori: Gemini `gemini-flash-latest`, `gemini-flash-lite-latest` (segreto GEMINI_API_KEY), Cloudflare via `/accounts/<acc>/ai/v1/chat/completions` con id presi da `/ai/models/search`: gemma-4-26b-a4b-it, mistral-small-3.1-24b-instruct, llama-4-scout-17b-16e-instruct, qwen3.8-27b. Punteggio: righe giuste (codice+unità+prezzo) su 3 fatture trascritte (DAC pag1 11 righe con vitello 15,936 vero, Mariano 6, Nieddittas 3) + righe coerenti q×prezzo=importo su tutte le 8 foto + errori + secondi. Tabella nel riassunto del run (`GITHUB_STEP_SUMMARY`) e nel log; risposte grezze nell'artifact `prova-lettori`.
-- Da fare: leggere il risultato (`get_job_logs` del run, o `actions_list list_workflow_jobs 38033661843`). Possibili intoppi: token Cloudflare senza permesso Workers AI (403 → guida a Mario: dash.cloudflare.com/profile/api-tokens → modifica token → aggiungi Account › Workers AI › Read/Edit), id modello non trovato (stampato «-> None»), 429 Gemini. Se serve ripetere: cambiare lo script e pushare su `claude/prova-lettori` (la PR riparte da sola).
-- Poi: mandare a Mario UNA immagine con il risultato (breve!) e, se Cloudflare legge bene, costruire v68: secondo lettore nel Worker (`[ai] binding` in wrangler.toml, `/gemini` → ripiego su Workers AI con 429/504 + confronto numeri → riga rossa). Tocca il Worker → giro completo extra su GitHub dopo (E14). Il miglior modello CF lo dice la prova.
-- Alla fine: chiudere la PR #78 (state closed, NON unire), cancellare niente; tenere gli strumenti di prova (eventuale ingresso su main con la v68, togliendo il trigger o lasciandolo con paths).
-- La #53 si è disiscritta dalla PR #78: **la #54 deve iscriversi** (`subscribe_pr_activity` Kur0ChanX/jona-ordini 78).
-
-### Fatto in #53
-- Analisi lettori (pagine ufficiali 10/10/2026), immagine `docs/img/scelte/lettore-foto-confronto.png`: Gemini free sì (limiti solo in AI Studio, dati usati da Google, 20 MB a richiesta, 258 token ogni riquadro 768 px; a pagamento ~1 cent a foto). Cloudflare Workers AI: 10.000 neuroni/giorno gratis (gemma-4-26b ≈ 55 neuroni a foto → ~150-180 foto/giorno; qwen3.8 ~500). OpenRouter :free 20/min, 50/giorno. Groq vision solo qwen3.8-27b, max 3 foto. Mistral: limiti gratis non pubblici, usa i dati, serve telefono; Mistral OCR 4 ~4 $/1000 pagine (fonti non ufficiali, <1 €/mese per noi). OpenAI niente gratis.
-- Mario: «mi offri poche alternative smart innovative geniali». Regola SOLUZIONE SMART rafforzata in CLAUDE.md: 3 strade (ovvia/furba/geniale) + raccomandazione; 1 idea nuova spontanea per l'uso del momento; controllare che non esista già. Già nell'app (non riproporre): avviso aumenti prezzi, dettatura vocale, QR/BarcodeDetector, link WhatsApp, ordine suggerito.
-- 4 idee (immagine `docs/img/scelte/idee-nuove-ottobre.png`). Mario: «le fatture arrivano nell'app è difficile devo chiedere e arrivano tardi al massimo carico io file il resto va bene 2 3 4 / che dici mettiamo mistral?» → idea 1 scartata (D23 diventa: più XML insieme + file `.p7m`, oggi errore `p7m` in index.html ~riga 1620); approvate D24 (fornitore più conveniente nel carrello), D25 (foto bolla vs ordine), D26 (costo piatti da ricette). Mistral: proposto Cloudflare prima, Mistral (a pagamento, pochi centesimi) solo se Cloudflare legge peggio → Mario: «prova la migliore opzione gratuita per ora».
-- Ordine dei lavori deciso da me: 1 secondo lettore (dopo la prova), 2 D23 p7m/più XML, 3 D24, 4 D25, 5 D26.
+## Consegne della #53 (in breve)
+- «Migliore opzione gratuita» = secondo lettore Cloudflare Workers AI (D22). Mistral solo se Cloudflare legge peggio (ora non serve).
+- Regole in CLAUDE.md: RISPOSTE CORTE, SOLUZIONE SMART rafforzata (3 strade ovvia/furba/geniale + 1 idea spontanea, controllare che non esista già). Già nell'app (non riproporre): avviso aumenti prezzi, dettatura vocale, QR/BarcodeDetector, link WhatsApp, ordine suggerito.
+- Idee approvate da Mario: D24 (fornitore più conveniente nel carrello), D25 (foto bolla vs ordine), D26 (costo piatti da ricette); idea fatture da Gmail scartata → D23 (più XML + `.p7m`, oggi errore `p7m` in `impRun`).
 
 ## v67 nel dettaglio (index.html, tutto nella zona «importazione listini»)
 - `GEM_HEAD = TEMPLATE_HEAD + ';quantita;importo'`: usato nel prompt e in `gemJoin` (che ora conosce entrambe le intestazioni). `TEMPLATE_HEAD` resta per modello CSV e segnaposto.
