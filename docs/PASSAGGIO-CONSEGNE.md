@@ -1,36 +1,38 @@
-# Passaggio di consegne (2026-10-10, fine sessione #57)
+# Passaggio di consegne (2026-10-10, fine sessione #58)
 
-Sessione attuale: #58
+Sessione attuale: #59
 
-Ramo di lavoro: `claude/jona-sessione-58` (all'handoff della #58 → `claude/jona-sessione-59`). App online: **v68** (main `7ff2c34`). Nessuna versione nuova in #57.
+Ramo di lavoro: `claude/jona-sessione-59`. App online: **v68** (main `7ff2c34`). Nessuna versione nuova in #57 e #58.
 
-## Ultimo messaggio di Mario (#57), parola per parola
-«Autorizzo Claude a creare l'hook .claude/hooks/scorta.py, a registrarlo in .claude/settings.json e a fargli fare push automatici sui rami scorta/<ramo> di jona-ordini e rvc.»
-(Prima aveva risposto «si» alla strada 3. Dopo l'ultimo messaggio è arrivata solo la conferma di RVC #50, che ha passato i file alla RVC #51.)
+## Ultimo messaggio di Mario (#58), parola per parola
+«guarda tutti i servizi che abbiamo utilizzato sui due progetti uno Jonah e uno RVC che mi sono registrato e fammi un file scaricabile che lo tengo sempre con me con che cosa ho utilizzato che insomma se devo rimettere se devo riaprire un progetto ho tutto salvato a prova di stupido creami un file per piacere che me lo salvo e me lo custodisco»
 
-## Fatto in #57
-- **D27 scorta automatica, FATTA e attiva** (strada 3 scelta da Mario). Il controllo automatico dei permessi aveva bloccato la scrittura dell'hook con il solo «si» (Self-Modification). Ho chiesto a Mario la frase di autorizzazione esplicita e lui l'ha scritta (sopra). Senza quella frase un hook che fa push da solo non passa: tenerlo a mente per RVC e per hook futuri.
-  - `.claude/hooks/scorta.py`: `msg` (UserPromptSubmit) salva il prompt in `.git/scorta-msg.md`; `stop` (Stop) usa un indice temporaneo `.git/scorta-index` (read-tree HEAD + `add -A`, rispetta `.gitignore`) più `docs/ULTIMO-MESSAGGIO.md` → write-tree. Se l'albero è uguale e HEAD è già dentro, non fa niente. `commit-tree` con genitori HEAD + scorta precedente (se non è già antenata) → `refs/scorta/<ramo>` locale e push in background (`timeout 60`) su `scorta/<ramo>`. Sempre in avanti, mai forzato. `JONA_SCORTA_NOPUSH=1` = niente push.
-  - `.claude/settings.json`: aggiunti UserPromptSubmit «scorta.py msg» e Stop «scorta.py stop».
-  - `avvio-check.py`: `controlla_scorta()` fa fetch di `scorta/<ramo>`. Se ha commit che il ramo non ha → avviso «SCORTA: … git merge origin/scorta/<ramo>, poi git push».
-  - Prova `python3 tools/test-scorta.py` (16 controlli, repo finti). Non è in `prova-ci.sh` (lì solo `.mjs` dell'app).
-  - **Verificato dal vivo**: `scorta/claude/jona-sessione-57` è comparso su GitHub (`57ed1fa`) già nella stessa sessione.
-  - Documenti: `docs/CAMBIO-ACCOUNT.md` (sezione «Se i token finiscono di colpo» + riga nuova nelle Preferenze), CLAUDE.md (regola CAMBIO ACCOUNT: la scorta si aggiunge, commit+push dopo ogni passo resta), DA-FARE (D27, M30 nuova).
-  - Fatto nuovo: GitHub (tramite il proxy) accetta push su `scorta/*`, ma **non lascia cancellare rami remoti** («Everything up-to-date»). È rimasto `scorta/prova-permesso` (= `dc607f3`, innocuo). Mario l'ha cancellato (10/10, dopo l'handoff #57); può cancellare anche `claude/prova-lettori` e `claude/v63-listini-prova`.
-  - RVC: mandato messaggio alla RVC #50. Risposta: chiusa, file passati alla RVC #51 con le consegne. A Jona non resta niente da fare per RVC.
-- Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47) **ancora in corso** quando ho chiuso (dura ~25 min). **Controllarlo per primo** (E14) e dirlo a Mario in una riga. La sveglia delle 13:19 l'ho cancellata (sarebbe arrivata alla sessione chiusa).
-- Il nuovo ramo `scorta/claude/jona-sessione-58` nascerà da solo alla prima risposta della #58.
+## PRIMA COSA DA FARE (#59): il file dei servizi per Mario
+- Fare un file scaricabile (PDF consigliato, più HTML) «a prova di stupido» con TUTTI i servizi usati da Jona e da RVC: a cosa serve, account/email, nome del progetto, link diretto, segreti (solo DOVE stanno, mai il valore), come riaprire il progetto da zero.
+- **Non salvarlo in `jona-ordini`**: il repo è PUBBLICO e contiene email. Salvarlo nello scratchpad e mandarlo con `SendUserFile` (display attach). Eventuale copia solo nel repo RVC (privato), chiedendo prima.
+- Dati già raccolti in #58:
+  - Jona: GitHub **Kur0ChanX** `jona-ordini` (pubblico). Cloudflare NUOVO: Pages + Worker `jona-notifiche`, `invito`, D1 `jona-allegati-0..3`, Workers AI; sottodominio `jona-ristorante-by-ynoy-corp`; app https://jona-ristorante-by-ynoy-corp.pages.dev/. Cloudflare VECCHIO: resta `fruguponte` (non toccare), da cancellare `invito` e `jona-notifiche` (M15). Firebase progetto `jona-ordini` (Firestore + accesso anonimo, regole `firebase/firestore.rules`). Gemini (Google AI Studio): chiave nel segreto GitHub `GEMINI_API_KEY` → segreto Worker `GEMINI_KEY`. Open-Meteo (meteo, senza account). Segreti GitHub: vedi `.github/workflows/*.yml` (`grep -o 'secrets\.[A-Z_]*'`). **Email di Cloudflare (nuovo e vecchio), Firebase e Gemini NON scritte da nessuna parte**: chiesto a Mario in #58, senza risposta → nel file lasciare la riga da compilare a mano.
+  - RVC: GitHub organizzazione **RVC-Operation-by-YNOY-CORP** (posseduta dall'account personale di Mario), repo `RVC` privato. Firebase e Cloudflare **non ancora creati** (RVC D5): email scelta relaisvillacarola.operation@gmail.com. Clone in sola lettura fatto in #58 in `/home/user/rvc` (sparisce col contenitore: rifare `add_repo` read + `git clone --depth 1`). Guardare anche `worker/wrangler.toml`, `docs/APP.md`, `docs/PROGETTO.md` di RVC.
+  - Claude: mario.miscera@gmail.com (Pro, in uso) + account Hotmail (Pro, riserva).
 
-## Prossimo lavoro (#58), in ordine
-1. Esito del giro completo: https://github.com/Kur0ChanX/jona-ordini/actions/runs/38046156932 (rosso = priorità).
-2. D23 (più XML + `.p7m`), poi D24, D25, D26 (`docs/DA-FARE.md`).
-3. Proporre a Mario un'idea SOLUZIONE SMART (non fatta né in #56 né in #57).
+## Fatto in #58
+- Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47): alle 13:12 **ancora in corso** (strano: di solito ~25 min). **Controllarlo**: https://github.com/Kur0ChanX/jona-ordini/actions/runs/38046156932 (rosso = priorità; bloccato da troppo = guardare i job). Dirlo a Mario in una riga.
+- Messaggi dalla #57 (chiusa): Mario ha cancellato `scorta/prova-permesso`; può cancellare anche `claude/prova-lettori` (PR #78 chiusa) e `claude/v63-listini-prova`. Nota tolta da D27 in DA-FARE.
+- Domanda di Mario sui due GitHub: confermato che Jona sta su `Kur0ChanX` e RVC su `RVC-Operation-by-YNOY-CORP`, tutti e due visibili collegando **Kur0ChanX**. Aggiunta la nota in `docs/CAMBIO-ACCOUNT.md` (passo 2, con link per installare l'app Claude sull'organizzazione RVC se non compare). Detto a Mario cosa si salva al cambio account (codice e consegne su GitHub, scorta automatica; chat vecchie no; preferenze a mano) e che un account aziendale si può fare (i progetti stanno su GitHub), costa di più: se ne parla se vuole.
+- `scorta/claude/jona-sessione-58` contiene solo `docs/ULTIMO-MESSAGGIO.md` del messaggio d'avvio: non unito, innocuo.
+- **E12 di nuovo**: questa sessione è a «lineage depth 8»: niente `send_later`, niente sessione nuova. Mario apre la #59 a mano da https://claude.ai/code con il prompt di 3 righe.
+
+## Prossimo lavoro (#59), in ordine
+1. File dei servizi (sopra).
+2. Esito del giro completo.
+3. D23 (più XML + `.p7m`), poi D24, D25, D26 (`docs/DA-FARE.md`).
+4. Proporre a Mario un'idea SOLUZIONE SMART (non fatta in #56-#58).
 
 ## Ancora da chiedere
-- M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27 (screenshot «Controlla e salva» v67), M28 (commercialista → XML), M29/M30 (account Hotmail e preferenze).
+- Email dei servizi di Jona (sopra). M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27, M28, M29/M30.
 
 ## Rischi aperti
-- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00. Ora c'è la scorta, e commit+push dopo ogni passo resta.
+- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00: commit+push dopo ogni passo (c'è anche la scorta).
 - Gemini Flash sovraccarico (503) nelle ore di punta: catena Flash-Lite → Cloudflare.
 
 ## v68 (in breve, dettagli nella riga v68 di CLAUDE.md)
