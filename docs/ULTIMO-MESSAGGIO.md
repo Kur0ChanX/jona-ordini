@@ -1,3 +1,5 @@
-# Ultimo messaggio di Mario (11/10/2026 01:20 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 01:34 ora italiana)
 
-mandami anche il logo jona ad alta risoluzione PNG bianco nero e trasparente e vettoriale salva la vecchia scritta YNOY con l'animazione se non c'è in drive cosi se ti dico metti la vecchia fai subito
+git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
+Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #72).
+Poi attendi le mie istruzioni.
