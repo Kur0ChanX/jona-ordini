@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (10/10/2026 23:59 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 00:53 ora italiana)
 
-domanda perché ri salvi i miei screenshot?
+adesso fai questo che è simile serve 3 png in alta risoluzione una in bianco una in nero e uno trasparente in vettoriale fatto bene ordina dentro con cartelle

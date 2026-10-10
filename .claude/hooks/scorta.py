@@ -5,7 +5,7 @@
 #                  e lo manda su GitHub nel ramo scorta/<ramo>, senza toccare il ramo di lavoro né l'indice vero.
 # Ogni scorta contiene HEAD e la scorta prima: il push è sempre in avanti, mai forzato. Niente cambiato = niente push.
 # Per riprendere: git fetch origin scorta/<ramo> && git merge origin/scorta/<ramo> (avvio-check.py lo segnala).
-import datetime, json, os, subprocess, sys
+import datetime, json, os, subprocess, sys, re
 
 CWD = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
 FILE_MSG = "docs/ULTIMO-MESSAGGIO.md"
@@ -38,6 +38,8 @@ def salva_msg(dati, gitdir):
     testo = str(dati.get("prompt") or "").strip()
     if not testo or testo.startswith(AVVISI_DI_SISTEMA):
         return  # avvisi automatici (GitHub, promemoria): non sono messaggi di Mario
+    # l'indirizzo dello script di Google Drive vale come una chiave: il repo è pubblico, non si salva
+    testo = re.sub(r"https://script\.google(?:usercontent)?\.com/\S+", "[indirizzo di Google Drive nascosto]", testo)
     with open(os.path.join(gitdir, "scorta-msg.md"), "w", encoding="utf-8") as f:
         f.write(f"# Ultimo messaggio di Mario ({ora_italiana()} ora italiana)\n\n{testo}\n")
 

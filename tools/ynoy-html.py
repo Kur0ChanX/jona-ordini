@@ -15,7 +15,7 @@ a = h.index('<mask id="ywm"'); a = h.index('<g>', a) + 3; b = h.index('</g>', a)
 h = h[:a] + ''.join(P) + h[b:]
 open('index.html', 'w').write(h); print(len(P), 'tratti, fine', round(t, 3), 's')
 
-# Stessa animazione in un solo file SVG vettoriale (da aprire nel browser o dare a un grafico): docs/img/logo/ynoy-animazione.svg
+# Stessa animazione in un solo file SVG vettoriale (da aprire nel browser o dare a un grafico): docs/img/logo/ynoy-corp/animazione/ynoy-animazione.svg
 logo = re.search(r' d="([^"]+)"', open('media/ynoy.svg').read()).group(1)
 Q = [re.sub(r'animation-delay:([\d.]+)s', lambda m: f'animation-delay:{float(m.group(1))-1.0:.3f}s', p) for p in P]   # parte subito (0,2 s)
 svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 190" width="992" height="380"><title>YNOY CORP</title>'
@@ -23,4 +23,4 @@ svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 190" width="992
        'animation:s .3s cubic-bezier(.4,.1,.6,.9) both}@keyframes s{from{stroke-dashoffset:var(--o)}to{stroke-dashoffset:0}}</style>'
        '<mask id="w" maskUnits="userSpaceOnUse" x="0" y="0" width="496" height="190"><g class="t">' + ''.join(Q) + '</g></mask>'
        '<path fill="#111" fill-rule="evenodd" mask="url(#w)" d="' + logo + '"/></svg>\n')
-open('docs/img/logo/ynoy-animazione.svg', 'w').write(svg); print('animazione SVG', len(svg))
+open('docs/img/logo/ynoy-corp/animazione/ynoy-animazione.svg', 'w').write(svg); print('animazione SVG', len(svg))
