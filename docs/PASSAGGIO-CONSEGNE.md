@@ -1,47 +1,45 @@
-# Passaggio di consegne (2026-10-10, fine sessione #49)
+# Passaggio di consegne (2026-10-10, fine sessione #50)
 
-Sessione attuale: #50
+Sessione attuale: #51
 
-## Ultimo messaggio di Mario (#49), parola per parola
-«ho pravato a caricare su dac queste e mi dà questo errore...risolvi in qlk modo»
-(con 3 immagini: schermata «Gemini non ha risposto (errore 524). Riprova o usa l'app Gemini.» nell'Importa listino di DAC con 2 foto, e le due fatture DAC)
+## Ultimo messaggio di Mario (#50), parola per parola
+«su queste 2 foto ha trovato solo questo puoi risolvere?»
+(con 4 immagini: le 2 fatture DAC già salvate e 2 schermate di «Controlla e salva»: 3 prodotti «da Tabella incollata»; il gambero ha Unità e Prezzo vuoti e categoria «Altro»; nomi senza virgolette: «SPORA200G», «ROSSOVERITAS335/50PZ»)
 
-Messaggi prima (#49), parola per parola:
-- «ok»
-- «metti in automatico sempre la nuova versione se non ci sono problemi»
-- «?»
-- «ho la 62 e non aggiorna» → «mandami il link» → screenshot Novità con v62 in cima + «ora»
+Messaggio prima (#50): il prompt di avvio della sessione (riprendere la pubblicazione della v65).
 
-## File ricevuti (#49)
-- `docs/img/listini/dac-fattura-054851-2026-09-01.jpg` (GAMBERO ROSSO "VERITAS" 3 35/50PZ 1KG, cod. 88563, 45,90 €/pz)
-- `docs/img/listini/dac-fattura-252792-2026-09-08.jpg` (POLLO COSCE GR 180/220*10 PZ FILENI cod. 37807 4,027 €/kg; POLLO SOVRACOSCIO SP "ORA" 200G cod. 805161 7,842 €/kg)
-- `docs/img/segnalazioni/v64-gemini-errore-524.jpg`
-Committati sul ramo consegne.
+## File ricevuti (#50)
+- Le 2 fatture DAC: identiche (md5) a `docs/img/listini/dac-fattura-054851-2026-09-01.jpg` e `dac-fattura-252792-2026-09-08.jpg`, non duplicate.
+- `docs/img/segnalazioni/v65-dac-controlla-1.jpg` e `v65-dac-controlla-2-gambero-vuoto.jpg` (committati sul ramo consegne, `f1e3c9b`).
 
-## Stato
-- **v64 online** (PR #74, squash `95ca4cb`; nel CI era fallita `test-testbar` per un «Mario» in un commento di `reviewSave`: sostituito con «chi importa»). Online APP_VER=64, CACHE v68. `main` unito nel ramo consegne.
-- Regola nuova di Mario: **pubblica sempre in automatico** se le prove sono verdi (scritta in CLAUDE.md). L'auto-merge di GitHub è spento nel repo: non serve, unisco io quando arrivano le prove verdi.
-- «Ho la 62»: in realtà Mario era nella vista **Staff** della barra Test; le Novità v63/v64 sono solo `chef`/`dev` (E21). Gli ho detto di passare a Sviluppatore; non ha confermato.
-- **v65 nella PR #75** (ramo `claude/v65-gemini-lento`, commit `2d7c93d`, pushato e confermato), «Prove automatiche» partite. NON ancora unita.
-- Questa sessione è a **lineage 8**: `send_later` e `create_session` non funzionano → Mario apre a mano la sessione #50 (E12).
+## Fatto in #50
+- **v65 online**: PR #75 unita (squash `14847d4`), sito controllato (APP_VER=65, CACHE `jona-ordini-v69`), workflow «Pubblica server notifiche (Cloudflare Worker)» riuscito (anche «Prova del server»), `main` unito nel ramo consegne. Giro completo su GitHub lanciato (prove.yml, workflow_dispatch modo `tutto`, ref `main`, ~10/10 05:58 UTC): **risultato da guardare** (E14).
+- Con la v65 Gemini ha letto le 2 foto DAC senza errore 524 (confermato dalle schermate di Mario).
+- «Ha trovato solo questo»: le 2 fatture contengono davvero solo 3 prodotti (POLLO COSCE 37807 kg 4,027; POLLO SOVRACOSCIO 805161 kg 7,842; GAMBERO ROSSO 88563 pz 45,90). Spiegato a Mario.
+- Il guasto vero: gambero senza unità/prezzo, categoria «Altro», virgolette sparite. Diario: E22.
 
-## v65: Gemini senza errore 524
-Causa: 524 = Cloudflare chiude dopo 100 s; il Worker `/gemini` mandava tutte le foto insieme e, tra modello lento, riprove e attese, superava i 100 s.
-- `worker/src/index.js`: `GEM_BUDGET` 85 s, `GEM_TRY_MS` 45 s (sovrascrivibili da `env` per le prove); ogni fetch con `AbortSignal.timeout(min(tryMs, resto))`, anche la lettura (`r.text()`); timeout/errore di rete → modello dopo (Lite); fuori tempo → `geminiErr(...,504)`.
-- `index.html`: `gemCall` restituisce anche `st`; messaggio «Gemini ci ha messo troppo a rispondere.» per 502/504/524. `gemRun`: una richiesta per foto, `I.prog` «Gemini legge la foto i di n…», seconda prova dopo `GEM_PAUSA` (3 s) per `GEM_RETRY` 429/502/503/504/524, risultati per foto in `I.gres` (WeakMap: un nuovo tocco legge solo le mancanti), `gemJoin` unisce le tabelle (toglie intestazione ripetuta e ```).
-- APP_VER 65, CACHE `jona-ordini-v69`, NEWS v65 (chef + dev correzioni). CLAUDE.md (riga v20 Gemini) aggiornata nel ramo v65.
-- Prove: `tools/test-gemini-server.mjs` estesa (8 controlli nuovi), messa in testa a `VELOCI` di `tools/prova-ci.sh`; 3 giri riusciti. Riuscite anche test-news, test-listini-doppi, test-scaglione2, test-testbar, test-giro (TZ=Europe/Rome).
-- Decisioni: non toccato il «thinking» di Gemini (parametri diversi tra modelli, rischio 400 senza poter provare con la chiave vera); una foto per richiesta = richieste più corte; risultati parziali tenuti per non rifare le foto già lette.
-- Non verificato con il Gemini vero (non ho la chiave): dopo la pubblicazione chiedere a Mario di riprovare le 2 foto DAC.
+## v66: virgolette nei nomi (PR #76, ramo `claude/v66-virgolette`, commit `7c62451`)
+Causa: `splitLine` (index.html, prima di `parseTable`) prendeva ogni `"` come apertura/chiusura di cella CSV. `GAMBERO ROSSO"VERITAS"3"35/50PZ` ha 3 virgolette → cella aperta fino a fine riga → `;pz;45,90;Pesce` finiva nel nome. Nei nomi con 2 virgolette spariva solo la virgoletta.
+- `splitLine`: le virgolette contano solo se iniziano la cella (cella vuota finora); si chiudono solo se seguite da separatore o fine riga (spazi ammessi); `""` = virgoletta; virgoletta aperta mai chiusa → `l.split(dl)`. Tabelle con `|` invariate.
+- `parseTable`: se una riga ha meno celle dell'intestazione e la divisione semplice dà il numero giusto, usa quella (toglie le virgolette che racchiudono tutta la cella, `uq`).
+- `geminiPrompt`: «listino prezzi (o la fattura, o la bolla)»; regola per fatture/bolle (solo righe prodotto, prezzo unitario colonna PREZZO, U.M. K./KG = kg, PZ = pz anche attaccata alla descrizione); «copia la descrizione com'è, virgolette comprese, e non usare il punto e virgola dentro le celle».
+- APP_VER 66, CACHE `jona-ordini-v70`, NEWS v66 (chef + dev correzioni).
+- Prova nuova `tools/test-virgolette.mjs` (16 controlli: righe DAC vere, CSV con `;` e `""`, virgola, nomi che iniziano con virgolette, virgoletta mai chiusa, `|`, import fino a `S.rev.items`, prompt). Sul codice di `main` falliscono 8 controlli (verificato con una copia di origin/main). Aggiunta a `VELOCI` in `tools/prova-ci.sh` (dopo test-gemini-server).
+- Riuscite in locale (TZ=Europe/Rome): test-virgolette 16, test-gemini-server 39, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-news 94, test-testbar 7, test-giro.
+- PR #76 aperta alle ~06:07 UTC, «Prove automatiche» in corso. La #50 era iscritta agli eventi della PR: **la #51 deve iscriversi di nuovo** (`subscribe_pr_activity` Kur0ChanX/jona-ordini 76) o controllare i check a mano.
+- Decisioni: correzione nel lettore (non solo nel prompt), perché anche CSV/Excel veri possono avere virgolette nei nomi; scartato «togliere tutte le virgolette» (perde i nomi veri e rompe i CSV con `;` tra virgolette). Categoria del gambero: con la cella giusta arriva «Pesce» da Gemini, nessuna logica nuova.
+- CLAUDE.md non toccato per la v66 (nessuna struttura nuova).
 
-## Prossimo lavoro (#50), in ordine
-1. D19: PR #75. Se «Prove automatiche» verdi → squash, controllo online (APP_VER 65, CACHE v69), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Controllare che il workflow «cloudflare-worker» sia andato bene (tocca il Worker), poi lanciare il giro completo su GitHub (prove.yml, modo `tutto`, E14). Se rosse: capire la causa e correggere.
-2. Avvisare Mario: v65 online, riprovare le 2 foto DAC (anche insieme). Nota: sono fatture, non listini; l'import ne ricava i prodotti con il prezzo.
-3. Chiedere se ora vede la v64/v65 nelle Novità (vista Sviluppatore).
-4. Poi `docs/DA-FARE.md` (D17 ponte RVC, D14…).
+## Prossimo lavoro (#51), in ordine
+1. D20: PR #76. «Prove automatiche» verdi → squash, controllo online (APP_VER 66, CACHE v70), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Non tocca il Worker: niente giro completo extra. Se rosse: capire la causa e correggere.
+2. Guardare il risultato del giro completo lanciato dopo la v65 (Actions → «Prove automatiche», evento workflow_dispatch). Se rosso: priorità.
+3. Avvisare Mario: v66 online → M27 (rifare l'import delle 2 foto DAC, controllare che il gambero abbia pz, 45,90, Pesce). Gli ho detto di non salvare ancora il gambero com'era. Se l'aveva già salvato, dopo il nuovo import potrebbe comparire come «simile» (v64): spiegarglielo.
+4. Chiedere se ora vede v64/v65/v66 nelle Novità (vista Sviluppatore o Admin Chef, E21).
+5. Poi `docs/DA-FARE.md` (D17 ponte RVC, D14…).
 
 ## Ancora da chiedere
 - M26 (prodotti finti spariti?), M25, D10: senza risposta.
 
 ## Rischi aperti
-- Se Gemini resta lento anche con una foto: valutare `thinkingConfig` per modello con prova sulla chiave vera, o foto più piccole (`shrinkImg` 2000 px, JPEG 0,85).
+- Gemini potrebbe ancora lasciare vuota l'unità del gambero (U.M. «PZ» attaccata a «GEL##PZ»): il prompt ora lo spiega, non verificato con il Gemini vero.
+- Server di prova `python3 -m http.server 8766` lasciato acceso nello scratchpad (innocuo, il contenitore si chiude da solo).
