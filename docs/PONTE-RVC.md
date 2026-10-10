@@ -99,7 +99,7 @@ Mario (#31): «2 e 3 dopo guardo l'app» → mandare a Jona le scelte senza aspe
 Mario ha approvato (#67, «Sì») l'immagine `docs/img/ponte/d17-unita.png`: icona 🏨 «Hotel» in alto in Jona, con le 3 idee unite.
 - **Pagina «Hotel»**: in cima «Oggi in hotel» (P1, solo numeri e camere, mai nomi); 4 pulsanti «Manda all'hotel»: 🔧 Guasto (P4), 🛎 Richiesta ospite (P5), 📅 Evento (P7), 📦 Serve a noi (`serve-a-noi`, nuovo); sotto il filo dei messaggi con l'hotel, come una chat con etichette, con stati ✓ arrivato · ✓✓ visto · ✔ fatto, e risposta libera.
 - **Da soli nel resto di Jona**: vassoio (P3) → compito «Ritira vassoio · camera N» nella home dello staff con **✔ Fatto**; ospiti di domani (P1) → ordine suggerito in Invii; evento dell'agenda → domanda «Mando l'evento all'hotel?» (Sì/No, mai in automatico); richieste dall'hotel → campanella.
-- **Chi vede «Oggi in hotel»**: da decidere (la risposta «Tutti» della #67 era un tocco per sbaglio). Proposta: tutti, solo numeri, niente nomi.
+- **Chi vede «Oggi in hotel»**: tutti, staff compreso (Mario #67: «anche i nomi se clicchi non sono un problema direi tutti»). In vista solo i numeri; al tocco l'elenco per camera con **nome e cognome** dell'ospite (Mario in RVC #56, confermato due volte; niente telefono, nazionalità, allergie). I cognomi stanno nel ponte solo per oggi e domani e si cancellano con il messaggio `oggi` del giorno dopo.
 - **«Serve a noi»** (`serve-a-noi`, nuovo, Jona → RVC): necessità del ristorante verso l'hotel (es. 20 tovaglie pulite per stasera). Richiesta di Mario in Jona #66 («necessità del Ristorante Jona all'hotel»). Copre in parte la vecchia P6 biancheria, ma come richiesta libera.
 
 ### Nomi dei campi (accordo con RVC #55, 10/10/2026)
@@ -107,10 +107,23 @@ Valgono i nomi di RVC (§4 aggiornato nel repo RVC, commit `dba35f1`, già usati
 - Busta: `{id (uuid dal telefono), tipo, da, struttura, camera|null, quando, chi, dati, stato}`; stati `inviato → arrivato → visto → fatto` (+ `annullato`), mostrati solo se confermati dal server (S1).
 - Da RVC: `oggi` (camere, ospiti, arrivi, partenze: solo numeri) · `richiesta` (`sottotipo` colazione|torta|cena-tardi|benvenuto|speciale|altro, giorno, ora, persone, nota) · `vassoio` (camera).
 - Da Jona: `guasto` (dove, cosa, urgente, foto) · `evento` (giorno, ora, persone, dove) · `richiesta-ospite` (camera, cosa, ora) · `serve-a-noi` (cosa, per quando) · in tutte e due le direzioni `testo` (testo libero, camera facoltativa).
-- Aggiunte chieste da Jona a RVC (#67, in attesa di risposta): `oggi` anche con i numeri di **domani** (servono all'ordine suggerito); `rif` = id del messaggio a cui si risponde; `nome` breve di chi manda da mostrare; evento con id fisso `ev_<id agenda>` (cambiato → si rimanda, cancellato → `annullato`).
+- Aggiunte chieste da Jona, **accettate da RVC #55**: `oggi` anche con i numeri di **domani** (servono all'ordine suggerito); `rif` = id del messaggio a cui si risponde; `nome` breve di chi manda da mostrare; evento con id fisso `ev_<id agenda>` (cambiato → si rimanda, cancellato → `annullato`).
 
 ### Dove vive il ponte (proposta tecnica di Jona)
 Dentro il Worker di Jona già online (`worker/`, D1 `jona-allegati-0`, deploy automatico), indirizzi `/ponte/...` di §4, tabella `ponte` a parte e chiave segreta `PONTE_KEY` diversa dalla chiave del ristorante: RVC chiama con `Authorization: Bearer <PONTE_KEY>`, Jona con il gettone Firebase dei membri (come `/gemini`). Così il ponte funziona prima che il Worker di RVC (D5) esista; si può spostare in un Worker a sé più avanti senza cambiare gli indirizzi. Foto: `POST /ponte/allegati` (stesso sistema di `/allegati`), nel messaggio solo l'id. Messaggi cancellati dopo 30 giorni (proposta §2).
+
+**Risposta di RVC #55**: ponte nel Worker di Jona va bene. La chiave `PONTE_KEY` non va nei telefoni RVC: lato RVC parla con `/ponte/` il server di RVC (Worker D5), che legge e scrive nel Firestore di RVC. Prima di D5 il collegamento vero non parte. La linguetta «🍽️ Ristorante» di RVC è già costruita e provata col simulatore (commit `afa8b8b`).
+
+### Dati esatti di Jona (v73, codice in index.html `htfGo`/`htAgenda`)
+Tutti i messaggi di Jona hanno anche `testo` leggibile (riassunto) e `nome` di chi manda.
+| tipo | `dati` |
+|---|---|
+| `guasto` | `dove` (cucina, sala, bar, terrazza, magazzino, altro), `cosa`, `urgente` (anche nella busta), `nota` |
+| `richiesta-ospite` | `camera` (anche nella busta), `cosa`, `giorno` (AAAA-MM-GG), `ora` (HH:MM o vuota), `nota` |
+| `evento` | `titolo`, `giorno`, `ora`, `persone` (numero), `dove`, `nota`. Dall'agenda: id `ev_<id agenda>`; cambiato → stesso id rimandato; eliminato → stato `annullato` |
+| `serve-a-noi` | `cosa`, `quanti` (testo), `giorno`, `ora` (entro), `nota` |
+| `testo` | `dati` vuoto, solo `testo` |
+Da RVC Jona legge: `oggi` → `dati.giorni: [{g, camere, ospiti, arrivi, partenze, elenco?: [{camera, nome, cognome, persone, arrivo, partenza}]}]` (numeri; se `camere`/`arrivi` sono elenchi conta la lunghezza; senza `giorni` prende `dati` come il giorno di `quando`); `richiesta` → `dati.sottotipo`, `giorno`, `ora`, `persone`, `nota`; `vassoio` → `camera`. Foto dei guasti: non ancora (servono allegati leggibili da RVC).
 
 ### Prossimi passi lato Jona
 1. Conferma dei nomi da RVC (send_message).

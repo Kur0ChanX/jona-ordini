@@ -1033,6 +1033,35 @@ button.or-pi{cursor:pointer}
 .snd-cap.in{opacity:1;transform:none}
 .snd-cap .ic{width:34px;height:34px;padding:6px;border-radius:50%;background:var(--mirto);color:#fff;stroke-width:2.4}
 .snd-hint{margin:10px 0 0;font-size:13px;color:var(--muted)}
+/* v73 ponte con l'hotel */
+.ht-h{font-size:15px;font-weight:600;margin:18px 0 8px}
+.ht-card{display:flex;flex-direction:column;gap:3px;width:100%;text-align:left;background:var(--sunk);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;font-size:15px}
+button.ht-card{cursor:pointer}
+.ht-n{color:var(--lagoon);font-size:24px;font-weight:700}
+.ht-m{color:var(--muted);font-size:14px}
+.ht-ap{color:var(--lagoon)}
+.ht-el{margin-top:8px}
+.ht-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ht-b{display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:8px 10px;border-radius:14px;border:1.5px solid;font:600 15.5px/1.2 var(--font);color:var(--ink);cursor:pointer;text-align:center}
+.ht-b span{font-size:20px}
+.ht-corallo{background:var(--corallo-soft);border-color:var(--corallo)}.ht-lagoon{background:var(--lagoon-soft);border-color:var(--lagoon)}.ht-ocra{background:var(--ocra-soft);border-color:var(--ocra)}.ht-mirto{background:var(--mirto-soft);border-color:var(--mirto)}.ht-solid{background:var(--sunk);border-color:var(--line)}
+.ht-l{display:flex;flex-direction:column;gap:8px}
+.ht-msg{max-width:92%;border-radius:14px;padding:9px 12px;font-size:14.5px;line-height:1.35;background:var(--sunk);border:1px solid var(--line)}
+.ht-msg.out{align-self:flex-end;background:var(--lagoon-soft);border-color:transparent}
+.ht-msg.ann{opacity:.6}.ht-msg.ann .ht-tx{text-decoration:line-through}
+.ht-lab{display:inline-block;font-size:12.5px;font-weight:600;padding:1px 8px;border-radius:99px;border:1px solid}
+.ht-tx{margin-top:4px;overflow-wrap:anywhere}
+.ht-meta{color:var(--muted);font-size:12.5px;margin-top:3px}
+.ht-urg{color:var(--corallo)}
+.ht-az{margin-top:8px;flex-wrap:wrap}
+.ht-in{display:flex;gap:8px;align-items:flex-end;margin-top:14px}
+.ht-in textarea{flex:1;min-width:0;resize:none}
+.ht-finto{display:flex;gap:8px;align-items:flex-start;background:var(--ocra-soft);border-radius:12px;padding:10px 12px;margin:0 0 6px;font-size:14px}
+.ht-finto .ic{flex:none;color:var(--ocra)}
+.ht-sim{margin-top:16px}.ht-sim .btns{margin-top:6px;flex-wrap:wrap}
+.ht-strip{cursor:default}.ht-strip>span:nth-child(2){flex:1}.ht-strip .btn{flex:none}
+.ht-e{font-size:20px}
+.ht-sug{margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -1124,15 +1153,20 @@ pot:'<path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M9 7.
 glass:'<path d="M7 3h10l-1 7.5a4 4 0 0 1-8 0z"/><path d="M12 14.5V20M8.5 20.5h7M7.5 7h9"/>',
 msg:'<path d="M4.5 5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h-1A1.5 1.5 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5z"/><path d="M7.5 9.5h9M7.5 12.5h6"/>',
 play:'<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
-pause:'<path d="M8 5.5v13M16 5.5v13" stroke-width="3"/>'
+pause:'<path d="M8 5.5v13M16 5.5v13" stroke-width="3"/>',
+hotel:'<path d="M5 20.5v-16a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v16"/><path d="M3 20.5h18"/><path d="M10 20.5v-3.5h4v3.5"/><path d="M8.5 7.5h1.5M14 7.5h1.5M8.5 11h1.5M14 11h1.5M8.5 14.5h1.5M14 14.5h1.5"/>'
 };
 const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||''}</svg>`;
 
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=72;
+const APP_VER=73;
 const NEWS=[
+  {v:73,data:'2026-10-10',titolo:'Hotel: il ponte con l\'app dell\'hotel',
+    tutti:['Nuova icona dell\'hotel in alto (quando il responsabile la accende): vedi camere e ospiti di oggi, mandi all\'hotel guasti, richieste degli ospiti, eventi e cose che servono, e scrivi all\'hotel come in chat.','Se l\'hotel chiede di ritirare un vassoio, in cima compare «Ritira il vassoio · camera …» con il pulsante Fatto.'],
+    chef:['Si accende da Impostazioni → Funzioni → Hotel. Finché l\'app dell\'hotel non è in uso resta spenta: c\'è un hotel finto per provarla.','Quando salvi un evento in agenda, l\'app chiede «Mando l\'evento all\'hotel?». Nell\'ordine suggerito compaiono gli ospiti di domani con un consiglio sulla gente prevista.'],
+    dev:{aggiunte:['Worker `/ponte/messaggi` (POST, GET `?dopo=`) e `/ponte/messaggi/<id>/stato` su tabella `ponte` del primo D1: Jona entra col gettone Firebase (`membro`), l\'hotel con il segreto `PONTE_KEY` (workflow dal segreto GitHub `PONTE_KEY`); tipi per verso, «arrivato» solo quando l\'altra app legge, stati che non tornano indietro, visto/fatto solo a chi riceve e annullato solo a chi manda, pulizia a 30 giorni. Prova `tools/test-ponte-server.mjs`.','App: `HT` (cache `jona_ponte`, coda `jona_ponte_q`), `htSend`/`htFlush`/`htPoll` (ogni 60 s, 20 s con la pagina aperta), `htSheet`, `htForm`, `htStrip` (vassoio), `htAgenda`/`htAgDel` (agenda), `htSugH` (ordine suggerito), funzione `hotel` in `FUNZ`. Hotel finto (`htSim`: demo, senza Firebase o «Prova con l\'hotel finto» dello sviluppatore, `jona_ponte_finto`). Prova `tools/test-hotel.mjs` (hotel finto e Worker vero dietro l\'app). Forma dei messaggi: `docs/PONTE-RVC.md`.']}},
   {v:72,data:'2026-10-10',titolo:'Campi comodi su iPhone',
     tutti:['Su iPhone, toccando un campo da riempire, la pagina non si ingrandisce più da sola.'],
     dev:{correzioni:['Testo dei campi portato a 16 px dove era più piccolo (`.inp.sm` 15→16, `.inp.mono` 14→16, `select.v-alt` 15→16, `.unit-inp` 14→16): sotto i 16 px Safari su iPhone ingrandisce la pagina al tocco. Prova nuova `tools/test-campi-16.mjs` (ogni combinazione di classi dei campi di index.html, vista normale e staff); `test-giro` ora segnala anche i campi sotto 16 px. Giro anche con WebKit, il motore di Safari (`test-giro-safari`, solo su GitHub) e su schermi da computer 1280/1440 px (`test-giro-computer`), entrambi nelle prove veloci. Barra di stato di iPhone lasciata com\'è (nessun `apple-mobile-web-app-status-bar-style`): la zona in alto è già stata cambiata e tolta in v54, non si tocca senza una foto da un iPhone.']}},
@@ -2123,10 +2157,10 @@ function shell(me){
   const V={catalogo:vCatalogo,carrello:vCarrello,miei:vMiei,arrivi:vArrivi,richieste:vRichieste,invii:vInvii,fornitori:vFornitori,staff:vStaff,storico:vStorico,orari:vMieiOrari};
   const nc=!isMgr(me)&&S.tab!=='carrello'?cartLines().length:0;
   return`<nav class="nav n${tabs.length}" aria-label="Sezioni"><div class="nav-brand"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div>${tabs.map(t=>{const b=t.b?t.b():0;return`<button type="button" data-a="tab" data-v="${t.id}" ${S.tab===t.id?'aria-current="page"':''}>${ic(t.i)}<span>${t.l}</span>${b?`<span class="badge">${b>99?'99+':b}</span>`:''}</button>`}).join('')}</nav>
-  <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}${agBtn(me)}
+  <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}${agBtn(me)}${htBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${pushAsk()}${errStrip()}${phStrip(me)}${agStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${pushAsk()}${errStrip()}${phStrip(me)}${agStrip(me)}${htStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -2843,7 +2877,7 @@ function sugSheet(){
     return head('Ordine suggerito',esc(f.nome)+' · copre '+(st.cad===1?'1 giorno':st.cad+' giorni')+', fino a '+fino,true)+`
     <div class="sug-wx">${G.wx?G.wx.slice(1,1+Math.min(6,Math.max(3,st.cad))).map(d=>`<div class="sug-d"><span>${new Date(d.t+'T12:00').toLocaleDateString('it-IT',{weekday:'short'})}</span>${ic(wxIc(d.c))}<b>${d.tx}°</b><i>${d.p}%</i></div>`).join(''):`<p class="muted small" style="margin:0">${G.wx===null?'Meteo non disponibile (serve la rete).':'Carico il meteo…'}</p>`}</div>
     ${G.wx?`<div class="sug-wxr"><span>${esc(wf.t)}</span><div class="seg" role="group" aria-label="Usa il meteo">${[[1,'Usa il meteo'],[0,'Ignora']].map(([k,l])=>`<button type="button" aria-pressed="${!!G.useWx===!!k}" data-a="sugWx" data-v="${k}">${l}</button>`).join('')}</div></div>`:''}
-    <span class="lbl">Quanta gente ti aspetti?</span><div class="seg wide" role="group" aria-label="Gente prevista">${SUG_GENTE.map(([k,l])=>`<button type="button" aria-pressed="${G.gente===k}" data-a="sugG" data-v="${k}">${l}</button>`).join('')}</div>
+    <span class="lbl">Quanta gente ti aspetti?</span><div class="seg wide" role="group" aria-label="Gente prevista">${SUG_GENTE.map(([k,l])=>`<button type="button" aria-pressed="${G.gente===k}" data-a="sugG" data-v="${k}">${l}</button>`).join('')}</div>${htSugH()}
     <div class="sug-list">${rows.length?rows.map(r=>`<div class="sug-r${r.sel?'':' off'}"><input type="checkbox" class="rv-c" id="sg-${esc(r.k)}" data-ch="sugSel" data-k="${esc(r.k)}" ${r.sel?'checked':''} aria-label="Ordina ${esc(r.nome)}">
       <label class="sug-i" for="sg-${esc(r.k)}"><b>${esc(r.nome)}</b><span>${r.n>=2?`di solito ${fq(r.tip)} ${esc(r.unita)} a ordine · si usano circa ${fq(Math.round(r.day*st.cad*10)/10)} ${esc(r.unita)} ${st.cad===1?'al giorno':'ogni '+st.cad+' giorni'}`:'ordinato una volta sola'}${r.inO?` · già in ordine ${fq(r.inO)}`:''}</span></label>
       ${stepper('sugQ',esc(r.k).replace(/[^\w-]/g,'_'),r.q,`data-k="${esc(r.k)}"`)}<span class="ln-u">${esc(r.unita)}</span></div>`).join(''):'<p class="muted">Nessun prodotto da proporre.</p>'}</div>
@@ -4802,7 +4836,7 @@ function voiceSheet(){
    config/app.funz {agenda:true}: le funzioni nuove partono spente. Conta d'uso in config/uso_<AAAA-MM> {agenda:{<persona>:giorni}}, al massimo una scrittura al giorno per telefono (jona_uso).
    Agenda: config/agenda_<AAAA-MM> {tipo:'agenda',e:{<id>:ev}}, ricorrenti in config/agenda_ric. ev={t,g:'AAAA-MM-GG',h:'HH:MM'|'',cop,note,vis:'io'|'tutti'|'rep',rep:[],da,cr,mod,r:''|'s'|'m'}.
    Cancellare = e.<id>: null. Per reparto: lo staff vede i suoi, i gestori tutti. «Solo io» è nascosto solo nell'interfaccia (tutti i membri leggono config). */
-const FUNZ=[{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'}];
+const FUNZ=[{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
 const funzOn=k=>!!(cfg().funz||{})[k];
 async function funzSet(k,on){const f=FUNZ.find(x=>x.id===k);if(!f)return;
   await put('config','app',Object.assign({},cfg(),{funz:Object.assign({},cfg().funz||{},{[k]:!!on})}));toast(f.l+(on?' accesa':' spenta'))}
@@ -4985,10 +5019,10 @@ async function agSave(){const f=S.agf,me=realU();if(!f||!me)return;const t=f.t.t
   await agPut(doc,{[id]:ev});
   if(f.subito&&ev.vis!=='io'){const ds=agDest(Object.assign({id},ev)).map(u=>u.id),tt=(f.id?'Cambiato in agenda: ':'Nuovo in agenda: ')+t,tx=agCap(agLbl(ev.g))+(ev.h?' alle '+ev.h:'');
     if(ds.length){for(const a of ds)await put('notifiche',uid(),{a,titolo:tt,testo:tx,tipo:'agenda',rif:id,letta:false,creato:now(),da:me.id});pushSend(ds,tt,tx).catch(()=>{})}}
-  closeSheet();if(S.ag){S.ag.g=ev.g;if(S.ag.v==='mese')S.ag.sel=ev.g}refreshSheet();toast('Evento salvato')}
+  closeSheet();if(S.ag){S.ag.g=ev.g;if(S.ag.v==='mese')S.ag.sel=ev.g}refreshSheet();toast('Evento salvato');htAgenda(id,ev)}
 async function agDel(){const f=S.agf,old=f&&f.id?agGet(f.id):null;if(!old)return closeSheet();
   if(!await ask('Eliminare l\'evento?','«'+old.t+'» sparisce dall\'agenda'+(old.r?' per tutte le ripetizioni':'')+'.','Elimina',true))return;
-  await upd('config',old.doc,{['e.'+old.id]:null});closeSheet();refreshSheet();toast('Evento eliminato')}
+  await upd('config',old.doc,{['e.'+old.id]:null});closeSheet();refreshSheet();toast('Evento eliminato');htAgDel(old.id)}
 
 /* foto di un'agenda di carta → eventi letti da Gemini, da confermare */
 function agFoto(){pickFile({accept:'image/*',multiple:true},fs=>agFotoGo(fs))}
@@ -5051,6 +5085,143 @@ function agStrip(me){if(!funzOn('agenda')||!realU()||S.wallMode)return'';
   const l=agDay(today(),me);if(!l.length)return'';
   return`<button type="button" class="ag-strip" data-a="agOpen">${ic('calendar')}<span><b>Oggi in hotel</b> ${l.slice(0,3).map(e=>esc((e.h?e.h+' ':'')+(agK(e)!=='ev'?AG_K[agK(e)]+': ':'')+e.t)).join(' · ')}${l.length>3?' · +'+(l.length-3):''}</span></button>`}
 const agBtn=me=>funzOn('agenda')&&agCan(me)?`<button type="button" class="icon-btn" data-a="agOpen" aria-label="Agenda">${ic('calendar')}</button>`:'';
+
+/* ================= ponte con l'hotel (v73, D17) =================
+   Icona in alto (funzione «hotel» in Impostazioni → Funzioni, parte spenta) e pagina «Hotel»: oggi in hotel, «Manda all'hotel»,
+   messaggi con l'hotel. Messaggi nel Worker (/ponte, docs/PONTE-RVC.md), letti ogni minuto con l'app aperta (ogni 20 s con la pagina aperta).
+   Si mostra solo quello che conferma il server (S1): finché un messaggio non è partito resta «in attesa di rete».
+   Senza server (prove, app dimostrativa) o con «Hotel finto» acceso dallo sviluppatore: hotel simulato dentro il telefono. */
+const HT_K={guasto:['🔧','Guasto','corallo'],'richiesta-ospite':['🛎','Richiesta ospite','lagoon'],evento:['📅','Evento','ocra'],'serve-a-noi':['📦','Serve a noi','mirto'],testo:['💬','Messaggio','solid'],vassoio:['🍽','Vassoio','lagoon'],richiesta:['🛎','Richiesta','lagoon']};
+const HT_SUB={colazione:'Colazione in camera',torta:'Torta / sorpresa','cena-tardi':'Cena tardi',benvenuto:'Benvenuto in camera',speciale:'Ospite speciale',altro:'Altro'};
+const HT_DOVE={cucina:'Cucina',sala:'Sala',bar:'Bar',terrazza:'Terrazza',magazzino:'Magazzino',altro:'Altro'};
+const HT_ST={inviato:'✓ partito',arrivato:'✓ arrivato',visto:'✓✓ visto',fatto:'✔ fatto',annullato:'annullato'},HT_R={inviato:0,arrivato:1,visto:2,fatto:3};
+const HT={m:{},q:[],ultimo:0,at:0,busy:0,k:''};
+function htSim(){return DEMO||!S.db||S.db.kind!=='firebase'||(ls('jona_ponte_finto')===1&&isDev(realU()))}
+function htLoad(){const k=htSim()?'jona_ponte_finto_m':'jona_ponte';if(HT.k===k)return;HT.k=k;const d=ls(k)||{};HT.m=d.m||{};HT.ultimo=d.ultimo||0;HT.q=ls(k+'_q')||[];
+  if(k==='jona_ponte_finto_m'&&!Object.keys(HT.m).length)htSimSeed()}
+function htSave(){const lim=now()-30*DAY,l=Object.values(HT.m).filter(m=>m.loc||Date.parse(m.quando)>lim||(m.agg||0)>lim).sort((a,b)=>(b.agg||0)-(a.agg||0)).slice(0,300);
+  HT.m=Object.fromEntries(l.map(m=>[m.id,m]));ls(HT.k,{m:HT.m,ultimo:HT.ultimo});ls(HT.k+'_q',HT.q)}
+const htMe=()=>{const u=realU();return u?{chi:u.id,nome:u.nome||fullName(u)}:{chi:'',nome:''}};
+const htWhen=(g,h)=>(g===today()?'oggi':g===agAdd(today(),1)?'domani':agLbl(g))+(h?' alle '+h:'');
+const htOra=q=>{const d=new Date(q);if(isNaN(d))return'';return String(q).slice(0,10)===new Date().toISOString().slice(0,10)?d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}):d.toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})};
+function htNew(tipo,dati,testo,o){const id=o&&o.id||'jona_'+uid();return Object.assign({tipo,da:'jona',struttura:'villa-carola',camera:null,quando:new Date().toISOString()},htMe(),{testo:String(testo||'').slice(0,1000),dati,stato:'inviato',loc:1},o||{},{id})}
+async function htSend(m){htLoad();const old=HT.m[m.id];if(old&&old.stato!=='annullato'&&m.stato!=='annullato'){m.stato=old.stato;if(old.statoDa)m.statoDa=old.statoDa}
+  HT.m[m.id]=m;
+  if(htSim()){m.loc=0;m.agg=now();htSave();htSimAns(m);schedule();return true}
+  HT.q=HT.q.filter(x=>!(x.k==='m'&&x.m.id===m.id));HT.q.push({k:'m',m});htSave();schedule();return htFlush()}
+function htStato(id,stato){htLoad();const m=HT.m[id];if(!m)return;
+  if(htSim()){m.stato=stato;m.statoDa=Object.assign(htMe(),{quando:new Date().toISOString()});m.agg=now();htSave();schedule();return}
+  m.stLoc=stato;HT.q=HT.q.filter(x=>!(x.k==='s'&&x.id===id));HT.q.push({k:'s',id,stato});htSave();schedule();htFlush()}
+async function htFlush(){if(HT.busy||!HT.q.length||htSim())return false;HT.busy=1;let tutto=true;
+  try{const tok=await algTok(),H={'content-type':'application/json',authorization:'Bearer '+tok};
+    const ms=HT.q.filter(x=>x.k==='m').map(x=>x.m);
+    if(ms.length){const r=await fetch(PUSH_URL+'/ponte/messaggi',{method:'POST',headers:H,body:JSON.stringify({m:ms.slice(0,20)})});const b=await r.json().catch(()=>({}));
+      if(r.ok||r.status===400){const via=new Set();for(const f of b.m||[]){via.add(f.id);const x=HT.m[f.id];if(x){x.loc=0;x.stato=f.stato;x.agg=f.agg}}
+        for(const f of b.scartati||[]){via.add(f.id);const x=HT.m[f.id];if(x){x.loc=0;x.err=1}}
+        HT.q=HT.q.filter(x=>!(x.k==='m'&&via.has(x.m.id)));if(HT.q.some(x=>x.k==='m'))tutto=false}else tutto=false}
+    for(const x of HT.q.filter(x=>x.k==='s')){const r=await fetch(PUSH_URL+'/ponte/messaggi/'+encodeURIComponent(x.id)+'/stato',{method:'POST',headers:H,body:JSON.stringify(Object.assign({stato:x.stato},htMe()))});
+      if(r.ok||(r.status>=400&&r.status<500)){const b=await r.json().catch(()=>({}));const m=HT.m[x.id];if(m){delete m.stLoc;if(b.stato)m.stato=b.stato;if(b.agg)m.agg=b.agg}HT.q=HT.q.filter(y=>y!==x)}else tutto=false}
+  }catch(e){tutto=false}finally{HT.busy=0;htSave();schedule()}
+  return tutto}
+async function htPoll(){if(!funzOn('hotel')||!realU()||HT.busy||htSim())return;htLoad();HT.at=now();await htFlush();
+  const primo=!HT.ultimo,nuovi=[];
+  try{const H={authorization:'Bearer '+await algTok()};let dopo=HT.ultimo?HT.ultimo-5000:now()-14*DAY;
+    for(let g=0;g<5;g++){const r=await fetch(PUSH_URL+'/ponte/messaggi?dopo='+dopo,{headers:H});if(!r.ok)break;const b=await r.json();
+      for(const m of b.m||[]){const old=HT.m[m.id];if(!old&&m.da==='rvc'&&m.tipo!=='oggi')nuovi.push(m);if(old&&old.stLoc)m.stLoc=old.stLoc;HT.m[m.id]=m}
+      HT.ultimo=Math.max(HT.ultimo,b.ultimo||0);if(!b.ancora)break;dopo=b.ultimo}
+    htSave();if(nuovi.length&&!primo)htAvvisa(nuovi);schedule()}catch(e){}}
+setInterval(()=>{if(document.visibilityState==='visible'&&now()-HT.at>(sheets.some(o=>o.ht)?20000:60000))htPoll()},10000);
+function htAvvisa(l){const m=l[l.length-1];toast(m.tipo==='vassoio'?'Dall\'hotel: vassoio da ritirare in camera '+(m.camera||'?'):'Dall\'hotel: '+htTxt(m).slice(0,80))}
+function htTxt(m){if(m.testo)return m.testo;const d=m.dati||{};
+  return m.tipo==='guasto'?(HT_DOVE[d.dove]||'')+': '+(d.cosa||''):m.tipo==='richiesta'?(HT_SUB[d.sottotipo]||'Richiesta')+(d.giorno?' · '+htWhen(d.giorno,d.ora):'')+(d.nota?' · '+d.nota:''):m.tipo==='evento'?(d.titolo||'Evento')+' · '+htWhen(d.giorno,d.ora):d.cosa||''}
+function htGiorno(g){htLoad();const n=v=>typeof v==='number'?v:Array.isArray(v)?v.length:Number(v)||0;
+  for(const m of Object.values(HT.m).filter(m=>m.tipo==='oggi'&&m.stato!=='annullato').sort((a,b)=>(b.agg||0)-(a.agg||0))){const d=m.dati||{};
+    const l=Array.isArray(d.giorni)?d.giorni:[Object.assign({g:String(m.quando).slice(0,10)},d)],x=l.find(y=>y&&y.g===g);
+    if(x)return{camere:n(x.camere),ospiti:n(x.ospiti),arrivi:n(x.arrivi),partenze:n(x.partenze),elenco:Array.isArray(x.elenco)?x.elenco:[]}}
+  return null}
+const htVisK=()=>HT.k+'_vis';
+function htNuovi(){htLoad();const v=Number(ls(htVisK())||0);return Object.values(HT.m).filter(m=>m.da==='rvc'&&m.tipo!=='oggi'&&(m.agg||0)>v&&(HT_R[m.stato]||0)<2).length}
+function htVisto(){htLoad();ls(htVisK(),Math.max(0,...Object.values(HT.m).map(m=>m.agg||0)))}
+const htBtn=me=>{if(!funzOn('hotel')||!realU()||S.wallMode)return'';const n=htNuovi();return`<button type="button" class="icon-btn bell" data-a="htOpen" aria-label="Hotel${n?', '+n+' messaggi nuovi':''}">${ic('hotel')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>`};
+/* vassoio da ritirare: striscia in cima a ogni scheda, per tutti, con «Fatto» */
+function htStrip(me){if(!funzOn('hotel')||!realU()||S.wallMode)return'';htLoad();
+  const l=Object.values(HT.m).filter(m=>m.tipo==='vassoio'&&m.da==='rvc'&&(HT_R[m.stLoc||m.stato]||0)<3&&m.stato!=='annullato').sort((a,b)=>String(a.quando).localeCompare(b.quando)).slice(0,3);
+  return l.map(m=>`<div class="ag-strip ht-strip"><span class="ht-e" aria-hidden="true">🍽</span><span><b>Ritira il vassoio · camera ${esc(m.camera||'?')}</b> Dall'hotel, ${esc(htOra(m.quando))}</span><button type="button" class="btn primary sm" data-a="htSt" data-v="${esc(m.id)}" data-s="fatto">${ic('check')} Fatto</button></div>`).join('')}
+function htOpen(){if(!funzOn('hotel'))return;htLoad();S.ht={det:false,t:''};usoSegna('hotel');htVisto();openSheet({cls:'tall',ht:1,live:()=>true,render:htSheet,onClose:()=>{htVisto();schedule()}});htPoll()}
+function htSheet(){const me=realU(),og=htGiorno(today()),dm=htGiorno(agAdd(today(),1)),sim=htSim(),fb=S.db&&S.db.kind==='firebase';
+  const l=Object.values(HT.m).filter(m=>m.tipo!=='oggi').sort((a,b)=>String(a.quando).localeCompare(b.quando)).slice(-40);
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Hotel<div class="sh-s">${sim?'Hotel finto: dati di prova':'Messaggi con l\'app dell\'hotel'}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${sim?`<p class="ht-finto">${ic('warn')}<span>Hotel finto: i dati sono di prova e i messaggi non partono davvero.${isDev(me)&&fb?` <button type="button" class="btn ghost sm" data-a="htFinto" data-v="0">Usa l'hotel vero</button>`:''}</span></p>`:isDev(me)?`<p class="muted small">Solo sviluppatore: <button type="button" class="btn ghost sm" data-a="htFinto" data-v="1">Prova con l'hotel finto</button></p>`:''}
+  <h3 class="ht-h">Oggi in hotel</h3>${htOggiH(og,dm)}
+  <h3 class="ht-h">Manda all'hotel</h3><div class="ht-btns">${['guasto','richiesta-ospite','evento','serve-a-noi'].map(k=>`<button type="button" class="ht-b ht-${HT_K[k][2]}" data-a="htForm" data-v="${k}"><span aria-hidden="true">${HT_K[k][0]}</span>${HT_K[k][1]}</button>`).join('')}</div>
+  <h3 class="ht-h">Messaggi con l'hotel</h3>${l.length?`<div class="ht-l">${l.map(htMsgH).join('')}</div>`:'<p class="muted">Ancora nessun messaggio.</p>'}
+  <div class="ht-in"><textarea class="inp" rows="1" data-in="htT" placeholder="Scrivi all'hotel…" aria-label="Scrivi all'hotel">${esc(S.ht?S.ht.t:'')}</textarea><button type="button" class="btn primary" data-a="htTesto" aria-label="Manda all'hotel">${ic('send')}</button></div>
+  ${sim&&(isDev(me)||DEMO)?`<div class="ht-sim"><span class="muted small">Prova, fai arrivare dall'hotel finto:</span><div class="btns">${[['vassoio','Vassoio'],['richiesta','Richiesta'],['testo','Messaggio']].map(([k,t])=>`<button type="button" class="btn ghost sm" data-a="htSimMsg" data-v="${k}">${t}</button>`).join('')}</div></div>`:''}`}
+function htOggiH(og,dm){if(!og)return`<div class="ht-card"><span class="muted">Ancora nessun dato dall'hotel per oggi.</span>${dm?`<span class="ht-m">Domani ${dm.ospiti} ospiti</span>`:''}</div>`;
+  const el=og.elenco.slice().sort((a,b)=>String(a.camera).localeCompare(String(b.camera),'it',{numeric:true}));
+  return`<button type="button" class="ht-card" data-a="htDet" aria-expanded="${!!(S.ht&&S.ht.det)}"><span><b class="ht-n">${og.camere}</b> camere · <b class="ht-n">${og.ospiti}</b> ospiti</span><span class="ht-m">↗ ${og.arrivi} ${og.arrivi===1?'arrivo':'arrivi'} · ↘ ${og.partenze} ${og.partenze===1?'partenza':'partenze'}${dm?` · domani ${dm.ospiti} ospiti`:''}</span>${el.length?`<span class="ht-m ht-ap">${S.ht&&S.ht.det?'Tocca per chiudere':'Tocca per vedere le camere'}</span>`:''}</button>
+  ${S.ht&&S.ht.det&&el.length?`<div class="panel ht-el">${el.map(x=>`<div class="row"><div class="row-i"><div class="row-t">Camera ${esc(x.camera)}${x.nome||x.cognome?' · '+esc([x.nome,x.cognome].filter(Boolean).join(' ')):''}</div><div class="row-m">${x.persone?esc(x.persone)+(Number(x.persone)===1?' persona':' persone'):''}${x.arrivo?' · arriva oggi':''}${x.partenza?' · parte oggi':''}</div></div></div>`).join('')}</div>`:''}`}
+function htMsgH(m){const k=HT_K[m.tipo]||HT_K.testo,mio=m.da==='jona',ann=m.stato==='annullato';
+  const st=m.stLoc?'⏳ in partenza':m.loc?'⏳ in attesa di rete':m.err?'non accettato dal server':HT_ST[m.stato]||'';
+  const az=ann||m.stLoc?'':!mio?[(HT_R[m.stato]||0)<2?`<button type="button" class="btn ghost sm" data-a="htSt" data-v="${esc(m.id)}" data-s="visto">Ho letto</button>`:'',(HT_R[m.stato]||0)<3?`<button type="button" class="btn ghost sm" data-a="htSt" data-v="${esc(m.id)}" data-s="fatto">${ic('check')} Fatto</button>`:''].join(''):!m.loc&&!m.err&&(HT_R[m.stato]||0)<3?`<button type="button" class="btn ghost sm" data-a="htAnn" data-v="${esc(m.id)}">Annulla</button>`:'';
+  const lab=m.tipo==='richiesta'&&m.dati&&HT_SUB[m.dati.sottotipo]||k[1];
+  return`<div class="ht-msg ${mio?'out':'in'}${ann?' ann':''}"><div><span class="ht-lab ht-${k[2]}">${k[0]} ${esc(lab)}</span>${m.camera?` <b>Camera ${esc(m.camera)}</b>`:''}${m.urgente?' <b class="ht-urg">URGENTE</b>':''}</div><div class="ht-tx">${esc(htTxt(m))}</div><div class="ht-meta">${esc(m.nome||(mio?'':'Hotel'))} · ${esc(htOra(m.quando))}${st?' · '+esc(st):''}${m.statoDa&&m.statoDa.nome&&(HT_R[m.stato]||0)>=2?' da '+esc(m.statoDa.nome):''}</div>${az?`<div class="btns ht-az">${az}</div>`:''}</div>`}
+/* moduli corti «Manda all'hotel» (nomi dei campi come in docs/PONTE-RVC.md) */
+function htForm(k){if(!HT_K[k])return;const b={guasto:{dove:'cucina',cosa:'',urgente:false},'richiesta-ospite':{camera:'',cosa:'',giorno:'oggi',ora:''},evento:{titolo:'',giorno:today(),ora:'',persone:'',dove:''},'serve-a-noi':{cosa:'',quanti:'',giorno:'oggi',ora:''}}[k];
+  S.htf=Object.assign({k,nota:''},b);openSheet({render:htFormH})}
+function htFormH(){const f=S.htf,k=HT_K[f.k];
+  const inp=(id,lab,ph,x='')=>`<label class="lbl" for="htf-${id}">${lab}</label><input class="inp" id="htf-${id}" data-in="htf" data-k="${id}" value="${esc(f[id])}" placeholder="${esc(ph)}" ${x}>`;
+  const seg=(key,l)=>`<div class="seg wide">${l.map(([v,t])=>`<button type="button" aria-pressed="${String(f[key])===String(v)}" data-a="htfSet" data-k="${key}" data-v="${v}">${t}</button>`).join('')}</div>`;
+  const quando=`<span class="lbl">Per quando</span>${seg('giorno',[['oggi','Oggi'],['domani','Domani']])}`;
+  const b=f.k==='guasto'?`<span class="lbl">Dove</span><div class="chips ag-wrap" role="group" aria-label="Dove">${Object.entries(HT_DOVE).map(([v,t])=>`<button type="button" class="chip" aria-pressed="${f.dove===v}" data-a="htfSet" data-k="dove" data-v="${v}">${t}</button>`).join('')}</div>${inp('cosa','Cosa non va','Es. il frigo delle carni non raffredda')}<span class="lbl">Urgente</span>${seg('urgente',[[true,'Sì, subito'],[false,'No']])}`
+   :f.k==='richiesta-ospite'?inp('camera','Camera','Es. 104','inputmode="numeric"')+inp('cosa','Cosa chiede l\'ospite','Es. colazione in camera')+quando+inp('ora','Ora (facoltativa)','','type="time"')
+   :f.k==='evento'?inp('titolo','Evento','Es. cena di gruppo')+`<div class="ag-2"><label><span class="lbl">Data</span><input type="date" class="inp" data-in="htf" data-k="giorno" value="${esc(f.giorno)}"></label><label><span class="lbl">Ora</span><input type="time" class="inp" data-in="htf" data-k="ora" value="${esc(f.ora)}"></label></div>`+inp('persone','Persone','Es. 30','inputmode="numeric"')+inp('dove','Dove','Es. terrazza')
+   :inp('cosa','Cosa serve','Es. tovaglie pulite')+inp('quanti','Quanti (facoltativo)','Es. 20')+quando+inp('ora','Entro che ora (facoltativa)','','type="time"');
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${k[0]} ${k[1]} all'hotel</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>${b}
+  <label class="lbl" for="htf-nota">Note (facoltative)</label><textarea class="inp" id="htf-nota" rows="2" data-in="htf" data-k="nota">${esc(f.nota)}</textarea>
+  <div class="sheet-foot btns" style="margin-top:18px"><button type="button" class="btn primary big block" data-a="htfGo">${ic('send')} Invia all'hotel</button></div>`}
+async function htfGo(){const f=S.htf;if(!f)return;const t=s=>String(s==null?'':s).trim(),g=f.giorno==='oggi'?today():f.giorno==='domani'?agAdd(today(),1):f.giorno,nota=t(f.nota);let m;
+  if(f.k==='guasto'){if(!t(f.cosa))return toast('Scrivi cosa non va.','warn');m=htNew('guasto',{dove:f.dove,cosa:t(f.cosa),urgente:!!f.urgente,nota},HT_DOVE[f.dove]+': '+t(f.cosa)+(nota?' · '+nota:''),{urgente:!!f.urgente})}
+  else if(f.k==='richiesta-ospite'){if(!t(f.camera))return toast('Scrivi la camera.','warn');if(!t(f.cosa))return toast('Scrivi cosa chiede l\'ospite.','warn');
+    m=htNew('richiesta-ospite',{camera:t(f.camera).slice(0,12),cosa:t(f.cosa),giorno:g,ora:f.ora||'',nota},t(f.cosa)+' · '+htWhen(g,f.ora)+(nota?' · '+nota:''),{camera:t(f.camera).slice(0,12)})}
+  else if(f.k==='evento'){if(!t(f.titolo))return toast('Scrivi l\'evento.','warn');if(!/^\d{4}-\d{2}-\d{2}$/.test(g||''))return toast('Scegli la data.','warn');
+    const p=t(f.persone)===''?0:num(f.persone);if(p==null||p<0)return toast('Le persone devono essere un numero.','warn');
+    m=htNew('evento',{titolo:t(f.titolo),giorno:g,ora:f.ora||'',persone:Math.round(p),dove:t(f.dove),nota},t(f.titolo)+' · '+htWhen(g,f.ora)+(p?' · '+Math.round(p)+' persone':'')+(t(f.dove)?' · '+t(f.dove):''))}
+  else{if(!t(f.cosa))return toast('Scrivi cosa serve.','warn');m=htNew('serve-a-noi',{cosa:t(f.cosa),quanti:t(f.quanti),giorno:g,ora:f.ora||'',nota},(t(f.quanti)?t(f.quanti)+' ':'')+t(f.cosa)+' · '+htWhen(g,f.ora?f.ora:'')+(nota?' · '+nota:''))}
+  closeSheet();htToast(await htSend(m))}
+const htToast=ok=>toast(htSim()?'Mandato all\'hotel finto (prova)':ok?'Mandato all\'hotel':'Senza rete: parte appena torna la rete',ok||htSim()?'':'warn');
+/* agenda: un evento nuovo si manda all'hotel solo dopo «Sì» (Mario #67); se era già stato mandato si aggiorna da solo */
+async function htAgenda(id,ev){if(!funzOn('hotel')||!ev||ev.k!=='ev'||ev.vis==='io')return;htLoad();const hid='ev_'+id,old=HT.m[hid];
+  const m=()=>htNew('evento',{titolo:ev.t,giorno:ev.g,ora:ev.h||'',persone:ev.cop||0,dove:'',nota:ev.note||''},ev.t+' · '+htWhen(ev.g,ev.h)+(ev.cop?' · '+ev.cop+' persone':''),{id:hid});
+  if(old&&old.stato!=='annullato'){await htSend(m());return toast('Evento aggiornato anche all\'hotel')}
+  if(await ask('Mando l\'evento all\'hotel?','«'+ev.t+'» '+htWhen(ev.g,ev.h)+'. Porter e Housekeeping lo vedono nell\'app dell\'hotel.','Sì, manda'))htToast(await htSend(m()))}
+function htAgDel(id){htLoad();const x=HT.m['ev_'+id];if(!funzOn('hotel')||!x||x.stato==='annullato')return;htStato(x.id,'annullato');toast('Evento annullato anche per l\'hotel')}
+/* ordine suggerito: ospiti di domani dall'hotel e consiglio sulla gente prevista */
+function htSugH(){if(!funzOn('hotel'))return'';const o=htGiorno(today()),d=htGiorno(agAdd(today(),1));if(!d)return'';
+  const r=o&&o.ospiti?d.ospiti/o.ospiti:0,c=r?SUG_GENTE.reduce((a,x)=>Math.abs(x[0]-r)<Math.abs(a[0]-r)?x:a):null;
+  return`<p class="muted small ht-sug"><b>Domani in hotel: ${d.ospiti} ospiti</b>${o?' (oggi '+o.ospiti+')':''}${c?' · consiglio: <b>'+c[1]+'</b>':''}</p>`}
+/* hotel finto (prove e app dimostrativa) */
+function htSimSeed(){const t=today(),A=now(),q=new Date().toISOString();
+  const el=[['104','Anna','Bianchi',2,0,0],['105','Luca','Rossi',2,1,0],['112','Marta','Ferri',3,0,1],['201','Paolo','Moretti',2,0,0],['204','Elena','Conti',1,1,0],['212','Giorgio','Galli',2,0,0]];
+  const add=m=>{HT.m[m.id]=Object.assign({da:'rvc',struttura:'villa-carola',camera:null,quando:q,chi:'ric',nome:'Ricevimento',testo:'',dati:{},stato:'arrivato',agg:A},m)};
+  add({id:'rvc_oggi_finto',tipo:'oggi',dati:{giorni:[{g:t,camere:18,ospiti:34,arrivi:5,partenze:3,elenco:el.map(([camera,nome,cognome,persone,a,p])=>({camera,nome,cognome,persone,arrivo:!!a,partenza:!!p}))},{g:agAdd(t,1),camere:20,ospiti:39,arrivi:6,partenze:4}]}});
+  add({id:'rvc_vassoio_finto',tipo:'vassoio',camera:'104',testo:'Vassoio da ritirare'});
+  add({id:'rvc_richiesta_finta',tipo:'richiesta',camera:'212',dati:{sottotipo:'torta',giorno:t,ora:'21:00',persone:2,nota:'Scritta «Buon anniversario»'}});
+  htSave()}
+function htSimAns(m){if(m.stato==='annullato')return;const go=(ms,f)=>setTimeout(()=>{const x=HT.m[m.id];if(x&&HT.k==='jona_ponte_finto_m'&&f(x)){x.agg=now();htSave();schedule()}},ms);
+  go(1500,x=>x.stato==='inviato'&&(x.stato='arrivato'));
+  go(6000,x=>(HT_R[x.stato]||0)<2&&(x.stato='visto',x.statoDa={chi:'ric',nome:m.tipo==='guasto'?'Manutenzione':'Ricevimento',quando:new Date().toISOString()}))}
+function htSimMsg(k){htLoad();const n=Object.keys(HT.m).length,c=['104','112','201','204'][n%4];
+  const m={id:'rvc_finto_'+uid(),tipo:k,da:'rvc',struttura:'villa-carola',camera:k==='testo'?null:c,quando:new Date().toISOString(),chi:'ric',nome:'Ricevimento',stato:'arrivato',agg:now(),
+    testo:k==='vassoio'?'Vassoio da ritirare':k==='testo'?'Stasera il gruppo arriva alle 20:30, non alle 20.':'',dati:k==='richiesta'?{sottotipo:'colazione',giorno:agAdd(today(),1),ora:'08:00',persone:2}:{}};
+  HT.m[m.id]=m;htSave();htAvvisa([m]);schedule()}
+const HT_A={htOpen:()=>htOpen(),htDet:()=>{if(S.ht)S.ht.det=!S.ht.det;schedule()},htForm:d=>htForm(d.v),
+  htfSet:d=>{if(!S.htf)return;S.htf[d.k]=d.k==='urgente'?d.v==='true':d.v;refreshSheet()},htfGo:()=>htfGo(),
+  htSt:d=>{htStato(d.v,d.s);if(d.s==='fatto')toast(htSim()?'Segnato fatto (hotel finto)':'Segnato fatto: l\'hotel lo vede')},
+  htAnn:async d=>{if(await ask('Annullare il messaggio?','L\'hotel lo vede come annullato.','Annulla il messaggio',true))htStato(d.v,'annullato')},
+  htTesto:async()=>{const t=String(S.ht&&S.ht.t||'').trim();if(!t)return;S.ht.t='';const ta=document.querySelector('[data-in="htT"]');if(ta)ta.value='';htToast(await htSend(htNew('testo',{},t)))},
+  htFinto:d=>{ls('jona_ponte_finto',d.v==='1'?1:null);HT.k='';htLoad();schedule();if(!htSim())htPoll()},htSimMsg:d=>htSimMsg(d.v)};
+const HT_IN={htT:t=>{if(S.ht)S.ht.t=t.value},htf:t=>{if(S.htf)S.htf[t.dataset.k]=t.value}};
 
 /* ================= eventi ================= */
 const A={
@@ -5368,6 +5539,7 @@ async function guard(fn,el){
   try{await fn()}catch(e){console.warn(e);toast(errMsg(e),'err')}finally{if(el&&el.isConnected)delete el.dataset.busy}
 }
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(!t)return;const f=A[t.dataset.a];if(!f)return;if(t.tagName!=='A')e.preventDefault();guard(()=>f(t.dataset,t),t)});
+Object.assign(A,HT_A);Object.assign(IN,HT_IN);
 document.addEventListener('input',e=>{const t=e.target;const f=t.dataset&&IN[t.dataset.in];if(f)f(t)});
 document.addEventListener('change',e=>{const t=e.target;const f=t.dataset&&CH[t.dataset.ch];if(f)guard(()=>f(t))});
 document.addEventListener('keydown',e=>{
