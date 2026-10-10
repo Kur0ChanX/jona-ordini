@@ -1130,8 +1130,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=63;
+const APP_VER=64;
 const NEWS=[
+  {v:64,data:'2026-10-10',titolo:'Listini: niente prodotti doppi',
+    chef:['Quando caricate un listino (file, foto o tabella) l\'app cerca i prodotti doppi dello stesso fornitore.','Una riga uguale in tutto a un\'altra, o a un prodotto già a listino, non viene caricata due volte.','Se due righe sono lo stesso prodotto ma qualcosa cambia (per esempio il prezzo), l\'app le segna in giallo e toglie la spunta: scegliete voi quali tenere.'],
+    dev:{aggiunte:['`rvDup(items)`: per ogni riga dell\'import `{twin:j}` (uguale in tutto alla riga j, stesso fornitore: mai salvata, casella spenta), `{sim:j,dif}` (stesso prodotto con `sameProd`, campi diversi in `dif`: tolta la spunta), `{ex:p}` (uguale in tutto a un prodotto già a listino; la categoria conta solo se è nel file, `catF`). Banner `#rv-dup` in `reviewSheet`. `reviewSave` decide prima la destinazione: righe simili tenute tutte e due = prodotti separati. Prova `tools/test-listini-doppi.mjs`.'],correzioni:['`matchProd`: con due codici diversi non unisce più due prodotti solo perché hanno lo stesso nome (prima l\'import sovrascriveva l\'altro formato).']}},
   {v:63,data:'2026-10-09',titolo:'Via i prodotti di prova',
     chef:['I prodotti finti messi all\'inizio spariscono da soli da tutti i fornitori, la prima volta che un gestore apre l\'app. Restano solo i prodotti caricati da voi con i listini o scritti a mano.','Se in futuro ne ricompaiono: Impostazioni → «Prodotti di prova» → «Elimina».'],
     dev:{aggiunte:['`fintoP(p)`: prodotto di prova = `p.demo` oppure id `mar01`..`mar19` di `seedIfEmpty` mai toccato da un import (`caricatoDa` assente) e senza prezzo. `provaVia` (da `deadlineTick`, solo con Firebase, gestore o sviluppatore veri, non in demo né con l\'emulatore salvo `jona_t_provavia`) li cancella una volta sola leggendo i listini dal server (`S.db.prodServer`) e segna `config/app.provaVia`. `demoDel` li cancella tutti, con l\'elenco per fornitore nella conferma. Prova `tools/test-listini-prova.mjs`.']}},
@@ -3093,7 +3096,8 @@ async function impRun(kind,files){
     const def=I.fid;
     const rows=items.map(it=>{const fid=guessSupplier(it.fornitore)||def;const f=fid?forn(fid):null;
       return{fid,nome:it.nome.slice(0,160),codice:String(it.codice||'').slice(0,40),unita:String(it.unita||'').slice(0,20),prezzo:it.prezzo,
-        categoria:CATS.includes(it.categoria)?it.categoria:((f&&f.categoria)||'Altro'),fnome:it.fornitore,sel:!!fid}});
+        categoria:CATS.includes(it.categoria)?it.categoria:((f&&f.categoria)||'Altro'),catF:CATS.includes(it.categoria),fnome:it.fornitore,sel:!!fid}});
+    rvDup(rows).forEach((d,i)=>{if(d)rows[i].sel=false});
     S.rev={fonte,items:rows};closeSheet();reviewSheet();
   }catch(e){I.stage='pick';I.err=errMsg(e);refreshSheet()}
 }
@@ -3103,18 +3107,34 @@ const pctS=x=>'+'+String(x).replace('.',',')+'%';
 // Prodotti dell'import che costano più di prima, dal più aumentato.
 function rvUps(items){const out=[];for(const it of items){if(!it.fid)continue;const m=matchProd(prods().filter(p=>p.fornitoreId===it.fid),it);const nw=num(it.prezzo);
   const pc=m?pctUp(m.prezzo,nw):0;if(pc)out.push({it,nome:String(it.nome).trim(),fnome:forn(it.fid).nome,old:m.prezzo,nw,pc})}return out.sort((a,b)=>b.pc-a.pc)}
-function matchProd(existing,it){const c=norm(it.codice);return(c&&existing.find(p=>norm(p.codice)===c))||existing.find(p=>norm(p.nome)===norm(it.nome))}
+// Stesso prodotto: stesso codice; se una delle due righe non ha codice, stesso nome. Due codici diversi = prodotti diversi anche con lo stesso nome.
+const sameProd=(a,b)=>{const c1=norm(a.codice),c2=norm(b.codice);return c1&&c2?c1===c2:norm(a.nome)===norm(b.nome)};
+function matchProd(existing,it){const c=norm(it.codice);return(c&&existing.find(p=>norm(p.codice)===c))||existing.find(p=>sameProd(p,it))}
+// Campi diversi tra due righe (vuoto = uguali in tutto). La categoria conta solo se cat è vero.
+const RV_F=[['nome','nome'],['codice','codice'],['unita','unità'],['prezzo','prezzo'],['categoria','categoria']];
+const rvDiff=(a,b,cat=true)=>RV_F.filter(([k])=>k==='prezzo'?num(a.prezzo)!==num(b.prezzo):k==='categoria'?cat&&(a.categoria||'')!==(b.categoria||''):norm(a[k])!==norm(b[k])).map(f=>f[1]);
+// Doppioni dell'import, per riga: {twin:j} uguale in tutto alla riga j (stesso fornitore), {sim:j,dif} stesso prodotto della riga j ma qualcosa cambia,
+// {ex:p} uguale in tutto al prodotto p già a listino (la categoria conta solo se è scritta nel file), null nessuno.
+function rvDup(items){const byC={},byN={},ex={},out=[];
+  items.forEach((it,i)=>{let r=null;if(it.fid){const c=norm(it.codice),n=norm(it.nome),kc=it.fid+'|'+c,kn=it.fid+'|'+n;
+    const cand=[...new Set([...(c?byC[kc]||[]:[]),...(byN[kn]||[])])].sort((a,b)=>a-b).filter(j=>sameProd(items[j],it));
+    const tw=cand.find(j=>!rvDiff(items[j],it).length);
+    if(tw!=null)r={twin:tw};else if(cand.length)r={sim:cand[0],dif:rvDiff(items[cand[0]],it)};
+    else{const m=matchProd(ex[it.fid]||(ex[it.fid]=prods().filter(p=>p.fornitoreId===it.fid)),it);if(m&&!rvDiff(m,it,it.catF).length)r={ex:m}}
+    if(c)(byC[kc]=byC[kc]||[]).push(i);(byN[kn]=byN[kn]||[]).push(i)}
+    out.push(r)});return out}
 function reviewSheet(){
   openSheet({cls:'tall',render:()=>{const R=S.rev;if(!R)return'<p class="muted">Niente da importare.</p>';const ns=R.items.filter(i=>i.sel).length;const fs=Object.values(D().fornitori).sort(byNome);
-  const miss=R.items.filter(i=>!i.fid).length;const ups=rvUps(R.items);
+  const miss=R.items.filter(i=>!i.fid).length;const ups=rvUps(R.items);const dd=rvDup(R.items),nd=k=>dd.filter(d=>d&&d[k]!=null).length,tw=nd('twin'),sm=nd('sim'),ex=nd('ex');
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Controlla e salva<div class="sh-s">${R.items.length} prodotti, da ${esc(R.fonte)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <p class="muted" style="margin:0">Correggi quello che serve. Se un prodotto esiste già nel listino del fornitore, aggiorno nome e prezzo.</p>
   ${miss?`<div class="err">${miss===1?'Una riga':miss+' righe'} senza fornitore riconosciuto: scegli il fornitore${R.items.length>1?' (puoi applicarlo a tutte con il menu qui sotto)':''}.</div><select class="inp" id="rv-all-f" data-ch="rvallf" aria-label="Fornitore per le righe senza fornitore"><option value="">Assegna un fornitore alle righe mancanti…</option>${fs.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')}</select>`:''}
   ${ups.length?`<div class="banner dup" role="note">${ic('warn')}<div><b>${ups.length===1?'1 prodotto costa di più':ups.length+' prodotti costano di più'}</b> rispetto al listino:<ul>${ups.slice(0,8).map(u=>`<li>${esc(u.nome)}: ${eur(u.old)} → ${eur(u.nw)} <b>${pctS(u.pc)}</b></li>`).join('')}</ul>${ups.length>8?`…e altri ${ups.length-8}, segnati in rosso qui sotto.`:''}</div></div>`:''}
-  <label class="checkall"><input type="checkbox" id="rvall" data-ch="rvall" ${ns===R.items.length?'checked':''}> Seleziona tutti</label>
-  <div>${R.items.map((it,i)=>{const ex=prods().filter(p=>p.fornitoreId===it.fid);const m=it.fid&&matchProd(ex,it);
-    const st=!it.fid?pill('ko','fornitore mancante'+(it.fnome?': '+it.fnome:'')):m?(num(it.prezzo)!==m.prezzo?(pctUp(m.prezzo,num(it.prezzo))?pill('ko','aumentato '+pctS(pctUp(m.prezzo,num(it.prezzo)))+', era '+eur(m.prezzo)):pill('wait','prezzo attuale '+(m.prezzo!=null?eur(m.prezzo):'vuoto'))):pill('','già a listino')):pill('ok','nuovo');const id=`rv-${i}`;
-    return`<div class="rv ${it.sel?'':'off'}"><input type="checkbox" class="rv-c" id="${id}-s" data-ch="rvsel" data-i="${i}" ${it.sel?'checked':''} ${it.fid?'':'disabled'} aria-label="Seleziona ${esc(it.nome)}"><div class="rv-f">
+  ${tw+sm+ex?`<div class="banner dup" id="rv-dup" role="note">${ic('warn')}<div><b>Prodotti doppi</b><ul>${tw?`<li>${tw===1?'1 riga uguale':tw+' righe uguali'} in tutto a un'altra: non la carico due volte.</li>`:''}${ex?`<li>${ex===1?'1 riga uguale':ex+' righe uguali'} in tutto a un prodotto già a listino: la salto.</li>`:''}${sm?`<li>${sm===1?'1 riga simile':sm+' righe simili'} a un'altra (stesso prodotto, ma qualcosa cambia): le ho tolte. Spunta quelle da tenere.</li>`:''}</ul></div></div>`:''}
+  <label class="checkall"><input type="checkbox" id="rvall" data-ch="rvall" ${ns===R.items.length-tw?'checked':''}> Seleziona tutti</label>
+  <div>${R.items.map((it,i)=>{const ex=prods().filter(p=>p.fornitoreId===it.fid);const m=it.fid&&matchProd(ex,it),d=dd[i];
+    const st=d&&d.twin!=null?pill('','uguale alla riga '+(d.twin+1)+': non la carico due volte'):d&&d.sim!=null?pill('wait','simile alla riga '+(d.sim+1)+', cambia: '+d.dif.join(', ')):d&&d.ex?pill('','uguale, già a listino'):!it.fid?pill('ko','fornitore mancante'+(it.fnome?': '+it.fnome:'')):m?(num(it.prezzo)!==m.prezzo?(pctUp(m.prezzo,num(it.prezzo))?pill('ko','aumentato '+pctS(pctUp(m.prezzo,num(it.prezzo)))+', era '+eur(m.prezzo)):pill('wait','prezzo attuale '+(m.prezzo!=null?eur(m.prezzo):'vuoto'))):pill('','già a listino')):ex.some(p=>norm(p.nome)===norm(it.nome))?pill('wait','nuovo: stesso nome di uno già a listino, codice diverso'):pill('ok','nuovo');const id=`rv-${i}`;
+    return`<div class="rv ${it.sel?'':'off'}"><input type="checkbox" class="rv-c" id="${id}-s" data-ch="rvsel" data-i="${i}" ${it.sel?'checked':''} ${it.fid&&!(d&&d.twin!=null)?'':'disabled'} aria-label="Seleziona ${esc(it.nome)}"><div class="rv-f">
     <select class="inp sm" id="${id}-f" data-ch="rvf" data-i="${i}" aria-label="Fornitore"><option value="">Fornitore…</option>${fs.map(f=>`<option value="${f.id}" ${it.fid===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}</select>
     <input class="inp sm" id="${id}-n" value="${esc(it.nome)}" data-in="rv" data-i="${i}" data-k="nome" aria-label="Nome">
     <div class="rv-g"><input class="inp sm" id="${id}-c" placeholder="Codice" value="${esc(it.codice||'')}" data-in="rv" data-i="${i}" data-k="codice" aria-label="Codice"><input class="inp sm" id="${id}-u" placeholder="Unità" value="${esc(it.unita||'')}" data-in="rv" data-i="${i}" data-k="unita" aria-label="Unità"><input class="inp sm" id="${id}-p" placeholder="Prezzo" inputmode="decimal" value="${esc(it.prezzo==null?'':String(it.prezzo).replace('.',','))}" data-in="rv" data-i="${i}" data-k="prezzo" aria-label="Prezzo">
@@ -3122,8 +3142,10 @@ function reviewSheet(){
   <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Annulla</button><button type="button" class="btn primary" data-a="rvok" ${ns?'':'disabled'}>${ic('check')} Salva ${ns} nel listino</button></div>`}});
 }
 async function reviewSave(){
-  const R=S.rev;const sel=R.items.filter(i=>i.sel&&i.fid);if(!sel.length)return;const ups=rvUps(sel);
-  const tasks=sel.map(it=>()=>{const ex=prods().filter(p=>p.fornitoreId===it.fid);const m=matchProd(ex,it);
+  const R=S.rev;const dd=rvDup(R.items);const sel=R.items.filter((it,i)=>it.sel&&it.fid&&!(dd[i]&&dd[i].twin!=null));if(!sel.length)return;const ups=rvUps(sel);
+  // decido prima dove va ogni riga: se una riga precedente scelta è lo stesso prodotto, chi importa ha voluto tenerle tutte e due → prodotto nuovo
+  const plan=sel.map((it,i)=>({it,m:sel.slice(0,i).some(o=>o.fid===it.fid&&sameProd(o,it))?null:matchProd(prods().filter(p=>p.fornitoreId===it.fid),it)}));
+  const tasks=plan.map(({it,m})=>()=>{
     const d={fornitoreId:it.fid,nome:String(it.nome).trim(),codice:String(it.codice||'').trim(),unita:String(it.unita||'').trim(),prezzo:num(it.prezzo),categoria:it.categoria||'Altro',aggiornato:now(),caricatoDa:S.me};
     if(m){if(m.prezzo!=null&&m.prezzo!==d.prezzo)d.prezzoPrec=m.prezzo;return upd('prodotti',m.id,d)}return put('prodotti',uid(),d)});
   await runPool(tasks,4);S.rev=null;closeSheet();toast(sel.length+' prodotti salvati nel listino');
@@ -5140,7 +5162,7 @@ const CH={
   ometasel:t=>{const o=D().ordini[t.dataset.o];if(o)metaOf(o)[t.dataset.k]=t.value},
   rq2v:t=>{const L=rcvState(t.dataset.o).lines[+t.dataset.i];L.arr=Math.max(0,num(t.value)||0);refreshSheet()},
   rvsel:t=>{S.rev.items[+t.dataset.i].sel=t.checked;refreshSheet()},
-  rvall:t=>{S.rev.items.forEach(i=>{if(i.fid)i.sel=t.checked});refreshSheet()},
+  rvall:t=>{const dd=rvDup(S.rev.items);S.rev.items.forEach((i,k)=>{if(i.fid)i.sel=t.checked&&!(dd[k]&&dd[k].twin!=null)});refreshSheet()},
   rvf:t=>{const it=S.rev.items[+t.dataset.i];it.fid=t.value;it.sel=!!t.value;refreshSheet()},
   rvallf:t=>{if(!t.value)return;S.rev.items.forEach(i=>{if(!i.fid){i.fid=t.value;i.sel=true}});refreshSheet()},
   rvcat:t=>{S.rev.items[+t.dataset.i].categoria=t.value},
