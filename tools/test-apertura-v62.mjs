@@ -1,5 +1,5 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
-// v62: schermata d'apertura: JONA cade da davanti e si posa con un colpo (jonaIn: schiacciamento, onde, granelli rasoterra, ombra, scossa), YNOY si scrive a mano (SVG con 19 tratti), poi sfuma JONA e per ultima la firma (yAway), poi l'app; la schermata d'ingresso con i profili non cambia
+// v62: schermata d'apertura: JONA cade da davanti e si posa con un colpo (jonaIn: schiacciamento, onde, granelli rasoterra, ombra, scossa), YNOY si scrive a mano (SVG con 22 tratti dalla v70), poi sfuma JONA e per ultima la firma (yAway), poi l'app; la schermata d'ingresso con i profili non cambia
 const URL='http://localhost:8765/index.html';
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
@@ -17,7 +17,7 @@ const stato=(p,t)=>p.evaluate(t=>{const l=document.querySelector('.splash .logo-
     rg:op('.splash .jrg'),d:Math.max(...[...document.querySelectorAll('.splash .jpb')].map(e=>+getComputedStyle(e).opacity)),np:document.querySelectorAll('.splash .jpb').length,vecchi:document.querySelectorAll('.splash .jfl,.splash .jd').length,nt:ps.length,t1:dash(ps[0]),tN:dash(ps[ps.length-1]),y0:op('.splash .y0'),oY:op('.splash .yn'),oS:op('.splash .wall-by>span'),sh:op('.splash .jsh'),oH:op('.splash .jhit'),shake:getComputedStyle(sp).transform!=='none',sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}},t);
 for(const w of [320,390]){
   const {p,c,errs}=await apri(w,true);
-  let s=await stato(p,0);ok(s&&s.anL==='jonaIn'&&s.nt===19&&s.np===34&&!s.vecchi,`${w}px: jonaIn, 19 tratti di YNOY, 34 granelli, niente bagliore né puntini vecchi ${JSON.stringify(s)}`);
+  let s=await stato(p,0);ok(s&&s.anL==='jonaIn'&&s.nt===22&&s.np===34&&!s.vecchi,`${w}px: jonaIn, 22 tratti di YNOY (v70: coda con 4 lune), 34 granelli, niente bagliore né puntini vecchi ${JSON.stringify(s)}`);
   ok(s&&s.sL>4&&s.oL<.1,`${w}px: all'inizio JONA è grande e trasparente (arriva da davanti) ${JSON.stringify(s)}`);
   ok(s&&s.rg<.01&&s.d<.01&&s.t1>0&&s.tN>0&&s.y0<.01,`${w}px: prima del colpo niente onde né granelli, YNOY non ancora scritto ${JSON.stringify(s)}`);
   s=await stato(p,300);ok(s&&s.sL>1.2&&s.sw<=s.cw,`${w}px: mentre JONA è grande niente scorrimento di lato ${JSON.stringify(s)}`);

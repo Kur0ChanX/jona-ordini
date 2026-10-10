@@ -1,48 +1,15 @@
-import numpy as np, scipy.ndimage as ndi
-from PIL import Image, ImageDraw, ImageFont
-import os; S=os.environ.get('S','/tmp')
-ink=255-np.asarray(Image.open('tools/originale-ynoy.jpg').convert('L')).astype(np.float32)
-Y0,Y1=414,476
-def piece(x0,x1): return ink[Y0:Y1,x0:x1].copy()
-C=piece(1350,1408); O=piece(1408,1474); RP=piece(1474,1576); R=piece(1474,1527); P=piece(1527,1576); AMP=(1290,1349)
-def base():
-    b=ink.copy(); b[Y0:Y1,1288:1576]=0; return b   # via & e CORP (sotto riga 414 la Y non arriva qui)
-def paste(b,p,x,y=Y0,scale=1.0):
-    if scale!=1.0:
-        im=Image.fromarray(p.astype(np.uint8)); p=np.asarray(im.resize((round(p.shape[1]*scale),round(p.shape[0]*scale)),Image.LANCZOS)).astype(np.float32)
-    h,w=p.shape; b[y:y+h,x:x+w]=np.maximum(b[y:y+h,x:x+w],p)
-def vA():  # CORP spostato dove iniziava la &, stessa misura
-    b=base(); x=1293
-    for p in (C,O,RP): paste(b,p,x); x+=p.shape[1]
-    return b
-def vB():  # CORP più grande, stessa base, occupa lo spazio di &CORP
-    b=base(); s=1.22; x=1290; yb=Y1   # baseline invariata
-    for p in (C,O,RP):
-        h=round(p.shape[0]*s); paste(b,p,x,yb-h,s); x+=round(p.shape[1]*s)
-    return b
-def vC():  # CORP stessa misura, lettere più distanziate da 1293 a 1573
-    b=base(); L=(C,O,R,P); ws=[p.shape[1] for p in L]; gap=(1573-1293-sum(ws))/3; x=1293
-    for p in L: paste(b,p,round(x)); x+=p.shape[1]+gap
-    return b
-def vB2(sx=1.18,sy=1.12):  # B scelto da Mario: un po' più piccolo (più in altezza) e centrato tra la Y e il giro
-    b=base(); ps=[]
-    for p in (C,O,RP):
-        im=Image.fromarray(p.astype(np.uint8)); ps.append(np.asarray(im.resize((round(p.shape[1]*sx),round(p.shape[0]*sy)),Image.LANCZOS)).astype(np.float32))
-    w=sum(q.shape[1] for q in ps); ym=Y1-ps[0].shape[0]//2
-    L=1150+np.where(b[ym,1150:1420]>60)[0].max(); R=1420+np.where(b[ym,1420:1700]>60)[0].min()
-    x=round((L+R-w)/2)
-    for q in ps: paste(b,q,x,Y1-q.shape[0]); x+=q.shape[1]
-    return b
-def mask(b):
-    a=np.clip(b,0,255); c=a[191:747,149:1683]
-    im=Image.fromarray(c.astype(np.uint8)).resize((480,174),Image.LANCZOS)
-    out=Image.new('L',(496,190),0); out.paste(im,(8,8)); return out
-def preview(m,label):
-    W,H=640,300; bg=Image.new('RGB',(W,H),(30,26,24))
-    big=m.resize((496,190),Image.LANCZOS)
-    col=Image.new('RGB',big.size,(221,211,200)); bg.paste(col,((W-496)//2,70),big)
-    d=ImageDraw.Draw(bg); F=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',40)
-    d.text((20,12),label,fill=(255,255,255),font=F); return bg
-if __name__=='__main__':
-    ims=[preview(mask(ink),'Ora'),preview(mask(vA()),'A'),preview(mask(vB()),'B'),preview(mask(vC()),'C')]
-    G=Image.new('RGB',(640,1200)); [G.paste(t,(0,i*300)) for i,t in enumerate(ims)]; G.save(f'{S}/logo-scelta.png')
+"""Logo YNOY CORP (v70). Il disegno vero è il vettoriale media/ynoy.svg (496x190, nero, pieno con evenodd):
+coda nuova di Mario del 10/10/2026 (docs/img/logo/ynoy-coda-mario-2026-10-10.jpg, punta a forcella + 4 lune)
+unita al logo dell'app (CORP senza «&», scelta v53), poi ridisegnato a curve (potrace). Le versioni con la «&»
+sono state tolte su richiesta di Mario; la storia resta in git (v53-v69: tools/originale-ynoy.jpg).
+Questo script rifà dal vettoriale: media/ynoy.png (maschera dell'app, 992x380, nero + trasparenza)
+e docs/img/logo/ynoy-2000.png (nero su trasparente, 2000 px di larghezza, per stampa e grafici).
+Uso: pip install cairosvg && python3 tools/logo-ynoy.py
+Dopo: python3 tools/ynoy-tratti.py > /tmp/t.json && python3 tools/ynoy-html.py /tmp/t.json (animazione)."""
+import io, cairosvg
+from PIL import Image
+svg = open('media/ynoy.svg', 'rb').read()
+for out, w in (('media/ynoy.png', 992), ('docs/img/logo/ynoy-2000.png', 2000)):
+    a = Image.open(io.BytesIO(cairosvg.svg2png(bytestring=svg, output_width=w, output_height=round(w * 190 / 496)))).split()[-1]
+    Image.merge('LA', (Image.new('L', a.size, 0), a)).save(out, optimize=True)
+    print(out, a.size)
