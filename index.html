@@ -1130,8 +1130,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=67;
+const APP_VER=68;
 const NEWS=[
+  {v:68,data:'2026-10-10',titolo:'Foto delle fatture: vedi chi legge',
+    chef:['Mentre l\'app legge una foto vedi quale lettore sta lavorando e da quanti secondi.','Se Gemini Flash è sovraccarico o non risponde in tempo, l\'app passa da sola a Gemini Flash-Lite e poi a Cloudflare (gratis), e ti scrive il motivo vero con il codice dell\'errore.','In «Controlla e salva» c\'è scritto chi ha letto ogni foto.'],
+    dev:{aggiunte:['Worker `/gemini` con `lettore` (flash, lite, cf): prova solo quel lettore e risponde con `lettore` o con `{error:{codice,motivo,lettore}}`. `cf` = Workers AI `@cf/meta/llama-4-scout-17b-16e-instruct` (binding `AI` in `wrangler.toml`), scelto con la prova lettori (19/20). Senza `lettore` (vecchie app, «Chiedi a Jona») tutto come prima.','App: `gemRun` prova `GEM_LETT` in ordine, `gemLive` col contasecondi, `gemPerche` traduce SOLO il codice vero; `S.rev.lett` → riquadro «Chi ha letto le foto».']}},
   {v:67,data:'2026-10-10',titolo:'Foto delle fatture: lettura più precisa',
     chef:['Le foto delle fatture (DAC, Mariano, Nieddittas…) vengono lette con più attenzione: codici con lo zero davanti, prezzi con tutti i decimali, unità giuste (K. diventa kg, CF conf, CT cartone).','Se quantità × prezzo non dà l\'importo scritto sulla fattura, la riga è segnata in rosso «da controllare»: forse una cifra è stata letta male.','Le spese di consegna e trasporto non finiscono più nel listino come prodotti.'],
     dev:{aggiunte:['`geminiPrompt` con `GEM_HEAD` (+`quantita;importo`, solo per il controllo `rigaNonTorna`): fornitore = chi vende, codici come testo, righe di continuazione, asterischi, sconti, PESO NETTO.','`mapRows`: colonna «prezzo» preferita a «importo», colonne quantità e importo. `normUnita`, `pulisciNome` (solo testo incollato/Gemini), `isSpesa` (riga non selezionata). Prova `tools/test-fatture.mjs` con le trascrizioni delle foto di Mario.']}},
@@ -3029,15 +3032,18 @@ function gemSrvOk(){if(gemSrv.ok!==null)return Promise.resolve(gemSrv.ok);if(!pu
   return gemSrv.p||(gemSrv.p=fetch(PUSH_URL+'/salute').then(r=>r.json()).then(j=>{gemSrv.ok=!!j.gemini;if(gemSrv.ok)refreshSheet();return gemSrv.ok}).catch(()=>false).finally(()=>{gemSrv.p=null}))}
 const gemOn=()=>!!gemKey()||(!!gemSrv.ok&&pushFb());
 const gemTxt=j=>((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n').trim();
-async function gemCall(body){const k=gemKey();let last='',st=0,srv=false;
-  try{if(k){for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body)});
+async function gemCall(body,lettore){const k=gemKey();let last='',st=0,srv=false;
+  try{if(k&&lettore){if(!GEM_DIR[lettore])return{st:0,salta:true};const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEM_DIR[lettore]+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body)});
+      const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j),lettore};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status}
+    else if(k){for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body)});
         const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j)};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status;if(r.status!==404)break}}
     else if(await gemSrvOk()){srv=true;let tok='';try{tok=await fbInit().auth.currentUser.getIdToken()}catch(e){}
-      const r=await fetch(PUSH_URL+'/gemini',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(body)});
-      const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j)};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status}
+      const r=await fetch(PUSH_URL+'/gemini',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(lettore?Object.assign({},body,{lettore}):body)});
+      // lettore = quello che il server dice di aver usato davvero (un server vecchio non lo dice: allora resta «Gemini» generico)
+      const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j),lettore:j.lettore||''};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status}
     else return{err:'Prima inserisci la chiave Gemini.'}}
   catch(e){return{err:'Non riesco a contattare Gemini: controlla la connessione.'}}
-  return{st,err:srv&&st===403?'Questo telefono non è collegato al ristorante: rientra con la chiave.'
+  return{st,msg:last,err:srv&&st===403?'Questo telefono non è collegato al ristorante: rientra con la chiave.'
     :st===429?'Gemini è molto occupato adesso: riprova tra un minuto.'
     :st===504||st===524||st===502?'Gemini ci ha messo troppo a rispondere.'
     :/key|API_KEY|permission/i.test(last)?(srv?'La chiave Gemini del ristorante non funziona: avvisa lo sviluppatore.':'La chiave Gemini non è valida: controllala.')
@@ -3046,7 +3052,7 @@ function fotoStage(I){const k=gemKey(),srv=!k&&gemOn(),n=I.photos.length;
   return(I.err?`<div class="err">${esc(I.err)}</div>`:'')+`<p class="muted" style="margin-top:0">${n?n+(n===1?' foto pronta':' foto pronte'):'Nessuna foto'}. Puoi aggiungerne altre se il listino ha più pagine.</p>
   ${n?`<div class="chips">${I.photos.map((p,i)=>`<button type="button" class="chip" data-a="gemDel" data-v="${i}">${esc(p.name.slice(0,22))} ${ic('x')}</button>`).join('')}</div>`:''}
   <div class="btns" style="justify-content:flex-start;margin:10px 0 18px"><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="cam">${ic('camera')} Scatta</button><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="gal">${ic('image')} Galleria</button></div>
-  ${I.busy?`<div class="banner">${esc(I.prog||'Gemini sta leggendo il listino…')} Può volerci un minuto.</div>`:k||srv?`<button type="button" class="btn primary block big" data-a="gemGo" ${n?'':'disabled'}>${ic('sparkle')} Trascrivi con Gemini</button>`
+  ${I.busy?`<div class="banner" id="gem-live" role="status"><div>${gemLive(I)}</div></div>`:k||srv?`<button type="button" class="btn primary block big" data-a="gemGo" ${n?'':'disabled'}>${ic('sparkle')} Trascrivi con Gemini</button>`
   :`<button type="button" class="btn primary block big" data-a="gemShare" ${n?'':'disabled'}>${ic('sparkle')} Apri con l'app Gemini</button>
   <p class="muted small">Scegli Gemini, incolla il testo già copiato, poi torna qui e incolla la tabella che ti restituisce.</p><div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="impPaste">${ic('paste')} Incolla la risposta</button></div>`}
   <h2 class="sec">Trascrizione automatica</h2>
@@ -3060,21 +3066,41 @@ async function gemAdd(files){const I=S.imp;if(!I)return;I.err='';for(const f of 
 const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
 // v65: una foto per volta (ogni richiesta resta sotto i 100 s di Cloudflare), una seconda prova se Gemini è lento o occupato,
 // le foto già lette restano in I.gres: un nuovo tocco legge solo quelle mancanti.
-const GEM_RETRY=/^(429|502|503|504|524)$/;
+// v68: per ogni foto l'app prova i lettori in ordine (Flash, Flash-Lite, Cloudflare) e mostra dal vivo chi legge e, se passa
+// al successivo, il motivo preso SOLO dal codice vero della risposta (503 sovraccarico, 429 limite, 504/524 nessuna risposta in tempo).
+const GEM_RETRY=/^(429|500|502|503|504|524|404)$/;
+const GEM_DIR={flash:'gemini-flash-latest',lite:'gemini-flash-lite-latest'};
+const GEM_LETT=[['flash','Gemini Flash','il più preciso'],['lite','Gemini Flash-Lite','riserva veloce di Google'],['cf','Cloudflare Llama 4','riserva gratis fuori da Google']];
+const gemNome=l=>(GEM_LETT.find(x=>x[0]===l)||[0,'Gemini'])[1];
+function gemPerche(l,st){const chi=l==='cf'?'Cloudflare':'Google';
+  return st===503?chi+' ha risposto «sovraccarico» (errore 503)':st===429?chi+' ha risposto «limite di richieste raggiunto» (errore 429)'
+    :st===504||st===524?'nessuna risposta in tempo (errore '+st+'): l\'app passa avanti per non farti aspettare'
+    :st===404?chi+' ha risposto «non disponibile» (errore 404)':st===502&&l==='cf'?'Cloudflare non è collegato al server (errore 502)':'errore '+(st||'di rete')}
+function gemLive(I){const L=I.glive;if(!L)return esc(I.prog||'Gemini sta leggendo il listino…');
+  return(L.n>1?`<b>Foto ${L.i+1} di ${L.n}</b><br>`:'')+L.log.map(x=>`✗ ${esc(gemNome(x.l))}: ${esc(gemPerche(x.l,x.st))} · ${x.sec} s<br>`).join('')
+    +`⏳ Legge <b>${esc(gemNome(L.l))}</b> (${esc((GEM_LETT.find(x=>x[0]===L.l)||[])[2]||'')}) · <span id="gem-sec">${Math.round((Date.now()-L.t0)/1000)}</span> s`}
 function gemJoin(a){const hd=l=>l.replace(/\s/g,'').toLowerCase();let H=[hd(GEM_HEAD),hd(TEMPLATE_HEAD)],first=true;
   return a.map(t=>{const rs=String(t).split('\n').filter(l=>!/^\s*```/.test(l));const i=rs.findIndex(l=>l.trim());
     if(i>=0){if(first)H=H.concat(hd(rs[i]));else if([].concat(H).includes(hd(rs[i])))rs.splice(i,1)}first=false;return rs.join('\n')}).join('\n')}
 async function gemRun(){const I=S.imp;if(!I||!I.photos.length||I.busy)return;I.busy=true;I.err='';I.prog='';refreshSheet();
-  try{I.gres=I.gres||new WeakMap();const n=I.photos.length,out=[];
+  try{I.gres=I.gres||new WeakMap();const n=I.photos.length,out=[],note=[];gemTick();
     for(let i=0;i<n;i++){const p=I.photos[i];if(I.gres.has(p)){out.push(I.gres.get(p));continue}
-      if(n>1){I.prog=`Gemini legge la foto ${i+1} di ${n}…`;refreshSheet()}
       const body={contents:[{parts:[{text:geminiPrompt()},{inline_data:{mime_type:'image/jpeg',data:await b64(p)}}]}],generationConfig:{temperature:0}};
-      let g=await gemCall(body);
-      if(!g.txt&&GEM_RETRY.test(String(g.st))){await new Promise(r=>setTimeout(r,GEM_PAUSA));g=await gemCall(body)}
-      if(!g.txt){I.busy=false;I.prog='';I.err=(n>1?`Foto ${i+1} di ${n}: `:'')+(g.err||'Gemini non ha risposto.')+(out.length?' Le foto già lette restano: tocca di nuovo «Trascrivi con Gemini» per leggere le altre.':' Riprova o usa l\'app Gemini.');refreshSheet();return}
-      I.gres.set(p,g.txt);out.push(g.txt)}
-    I.busy=false;I.prog='';I.txt=gemJoin(out);impRun('txt')}
-  catch(e){I.busy=false;I.prog='';I.err='Non riesco a contattare Gemini. Controlla la connessione.';refreshSheet()}}
+      const log=[];let g=null;
+      for(const [l] of GEM_LETT){I.glive={n,i,l,log,t0:Date.now()};refreshSheet();
+        g=await gemCall(body,l);if(g.salta){g=null;continue}
+        if(g.txt)break;
+        log.push({l,st:g.st,sec:Math.round((Date.now()-I.glive.t0)/1000)});
+        if(!GEM_RETRY.test(String(g.st)))break}
+      if(!g||!g.txt){const tutti=log.length&&log.every(x=>GEM_RETRY.test(String(x.st)));I.busy=false;I.glive=null;I.prog='';
+        I.err=(n>1?`Foto ${i+1} di ${n}: `:'')+(tutti?'nessun lettore è riuscito a leggerla. '+log.map(x=>gemNome(x.l)+': '+gemPerche(x.l,x.st)).join('; ')+'. Riprova tra qualche minuto.':((g&&g.err)||'Gemini non ha risposto.'))
+          +(out.length?' Le foto già lette restano: tocca di nuovo «Trascrivi con Gemini» per leggere le altre.':tutti?'':' Riprova o usa l\'app Gemini.');refreshSheet();return}
+      I.gres.set(p,g.txt);out.push(g.txt);note.push({l:g.lettore,log})}
+    I.busy=false;I.glive=null;I.prog='';I.gnote=note;I.txt=gemJoin(out);impRun('txt')}
+  catch(e){I.busy=false;I.glive=null;I.prog='';I.err='Non riesco a contattare Gemini. Controlla la connessione.';refreshSheet()}
+  finally{clearInterval(gemTick.h)}}
+// contasecondi dal vivo: cambia solo il numero, senza ridisegnare il foglio
+function gemTick(){clearInterval(gemTick.h);gemTick.h=setInterval(()=>{const I=S.imp,e=document.getElementById('gem-sec');if(!I||!I.glive){clearInterval(gemTick.h);return}if(e)e.textContent=Math.round((Date.now()-I.glive.t0)/1000)},1000)}
 let GEM_PAUSA=3000;
 async function gemShare(){const I=S.imp;if(!I||!I.photos.length)return;await copyText(geminiPrompt());
   if(navigator.canShare&&navigator.canShare({files:I.photos})){try{await navigator.share({files:I.photos,text:geminiPrompt()})}catch(e){}}
@@ -3137,14 +3163,14 @@ async function impRun(kind,files){
       if(/\.(csv|tsv|txt)$/i.test(fl.name))items=mapRows(parseTable(await fl.text()));
       else{toast('Apro il file…');await need('xlsx');const wb=XLSX.read(await fl.arrayBuffer(),{type:'array'});const rows=[];wb.SheetNames.forEach(n=>rows.push(...XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:''})));items=mapRows(rows)}
       fonte=fl.name}
-    else if(kind==='txt'){items=mapRows(parseTable(I.txt));fonte='Tabella incollata'}
+    else if(kind==='txt'){items=mapRows(parseTable(I.txt));fonte=I.gnote?(I.gnote.length===1?'foto letta':I.gnote.length+' foto lette'):'Tabella incollata'}
     if(!items||!items.length){I.stage=kind==='txt'?'paste':'pick';I.err='Non trovo le colonne. Serve almeno una riga di intestazione con "nome" e una tra "prezzo", "codice" o "unita".';refreshSheet();return}
     const def=I.fid;
     const rows=items.map(it=>{const fid=guessSupplier(it.fornitore)||def;const f=fid?forn(fid):null;const nome=(kind==='txt'?pulisciNome(it.nome):it.nome)||it.nome,spesa=isSpesa(nome);
       return{fid,nome:nome.slice(0,160),codice:String(it.codice||'').slice(0,40),unita:normUnita(it.unita).slice(0,20),prezzo:it.prezzo,
         categoria:CATS.includes(it.categoria)?it.categoria:((f&&f.categoria)||'Altro'),catF:CATS.includes(it.categoria),fnome:it.fornitore,sel:!!fid&&!spesa,spesa,q:it.q,imp:it.imp}});
     rvDup(rows).forEach((d,i)=>{if(d)rows[i].sel=false});
-    S.rev={fonte,items:rows};closeSheet();reviewSheet();
+    S.rev={fonte,items:rows,lett:kind==='txt'?I.gnote||null:null};I.gnote=null;closeSheet();reviewSheet();
   }catch(e){I.stage='pick';I.err=errMsg(e);refreshSheet()}
 }
 // Aumento di prezzo in percentuale (0 se non è aumentato o manca il prezzo vecchio).
@@ -3174,6 +3200,7 @@ function reviewSheet(){
   const miss=R.items.filter(i=>!i.fid).length;const ups=rvUps(R.items);const chk=i=>rigaNonTorna({q:i.q,imp:i.imp,prezzo:num(i.prezzo)}),nchk=R.items.filter(chk).length,nsp=R.items.filter(i=>i.spesa).length;const dd=rvDup(R.items),nd=k=>dd.filter(d=>d&&d[k]!=null).length,tw=nd('twin'),sm=nd('sim'),ex=nd('ex');
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Controlla e salva<div class="sh-s">${R.items.length} prodotti, da ${esc(R.fonte)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <p class="muted" style="margin:0">Correggi quello che serve. Se un prodotto esiste già nel listino del fornitore, aggiorno nome e prezzo.</p>
+  ${R.lett&&R.lett.length?`<div class="banner" id="rv-lett" role="note">${ic('sparkle')}<div><b>Chi ha letto le foto</b><ul>${R.lett.map((x,i)=>`<li>${R.lett.length>1?'Foto '+(i+1)+': ':''}${esc(gemNome(x.l))}${x.log.length?' — prima '+x.log.map(y=>esc(gemNome(y.l))+': '+esc(gemPerche(y.l,y.st))).join('; '):''}</li>`).join('')}</ul></div></div>`:''}
   ${miss?`<div class="err">${miss===1?'Una riga':miss+' righe'} senza fornitore riconosciuto: scegli il fornitore${R.items.length>1?' (puoi applicarlo a tutte con il menu qui sotto)':''}.</div><select class="inp" id="rv-all-f" data-ch="rvallf" aria-label="Fornitore per le righe senza fornitore"><option value="">Assegna un fornitore alle righe mancanti…</option>${fs.map(f=>`<option value="${f.id}">${esc(f.nome)}</option>`).join('')}</select>`:''}
   ${ups.length?`<div class="banner dup" role="note">${ic('warn')}<div><b>${ups.length===1?'1 prodotto costa di più':ups.length+' prodotti costano di più'}</b> rispetto al listino:<ul>${ups.slice(0,8).map(u=>`<li>${esc(u.nome)}: ${eur(u.old)} → ${eur(u.nw)} <b>${pctS(u.pc)}</b></li>`).join('')}</ul>${ups.length>8?`…e altri ${ups.length-8}, segnati in rosso qui sotto.`:''}</div></div>`:''}
   ${tw+sm+ex?`<div class="banner dup" id="rv-dup" role="note">${ic('warn')}<div><b>Prodotti doppi</b><ul>${tw?`<li>${tw===1?'1 riga uguale':tw+' righe uguali'} in tutto a un'altra: non la carico due volte.</li>`:''}${ex?`<li>${ex===1?'1 riga uguale':ex+' righe uguali'} in tutto a un prodotto già a listino: la salto.</li>`:''}${sm?`<li>${sm===1?'1 riga simile':sm+' righe simili'} a un'altra (stesso prodotto, ma qualcosa cambia): le ho tolte. Spunta quelle da tenere.</li>`:''}</ul></div></div>`:''}
