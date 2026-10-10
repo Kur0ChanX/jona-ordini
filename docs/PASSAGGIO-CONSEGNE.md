@@ -1,60 +1,57 @@
-# Passaggio di consegne (2026-10-10, fine sessione #50)
+# Passaggio di consegne (2026-10-10, fine sessione #51)
 
-Sessione attuale: #51
+Sessione attuale: #52
 
-## Ultimo messaggio di Mario (#50), parola per parola (arrivato DOPO l'apertura della #51)
-«ti mando altre foto per correzzioni nella lettura e ottimizzazioni per leggere tutti i dati prezzi codice nome ecc ecc in modo perfetto fai un bel lavoro attento ai dettagli e valuta prossimi errori in fatture o listini»
-(con 6 foto di fatture, salvate in `docs/img/listini/`, elenco sotto)
+## Ultimo messaggio di Mario (#51), parola per parola
+«Mi consigli altre alternative a gemini o soluzioni in generale valuto tutto però free al momento, magari è nostro collo di bottiglia nel senso puoi ortimizzarti quanto vuoi secondo me ma se gemini legge male o meno siamo fregati no?»
 
-Messaggio prima, parola per parola: «su queste 2 foto ha trovato solo questo puoi risolvere?»
-(con 4 immagini: le 2 fatture DAC già salvate e 2 schermate di «Controlla e salva»: 3 prodotti «da Tabella incollata»; il gambero ha Unità e Prezzo vuoti e categoria «Altro»; nomi senza virgolette: «SPORA200G», «ROSSOVERITAS335/50PZ»)
+Risposta data in #51 (in breve, modalità BRAINSTORMING): vedi «Alternative a Gemini» sotto. Ho chiuso con UNA domanda a Mario: **riceve le fatture elettroniche XML (cassetto fiscale dell'Agenzia delle Entrate o dal commercialista)?** Risposta ancora da avere.
 
-Messaggio prima (#50): il prompt di avvio della sessione (riprendere la pubblicazione della v65).
+Messaggi prima (#50, arrivati alla #51 tramite la #50): «ti mando altre foto per correzzioni nella lettura e ottimizzazioni per leggere tutti i dati prezzi codice nome ecc ecc in modo perfetto fai un bel lavoro attento ai dettagli e valuta prossimi errori in fatture o listini» (6 foto, sotto) e «su queste 2 foto ha trovato solo questo puoi risolvere?».
 
-## File ricevuti (#50)
-- Ultimo messaggio, 6 fatture in `docs/img/listini/`:
-  - `dac-fattura-054851-2026-09-01-pag1.jpg` (pagina 1 di 2, 26 righe, totali «SEGUE»; la pagina 2 è il gambero già salvato)
-  - `dac-fattura-057162-2026-09-08.jpg` (13 righe), `dac-fattura-065742-2026-10-06.jpg` (8 righe), `dac-fattura-269380-2026-09-23.jpg` (2 righe)
-  - `mariano-fattura-13960-2026-09-08.jpg` (F.lli Mariano, frutta e verdura, 24 righe)
-  - `nieddittas-fattura-5274-2026-09-22.jpg` (Nieddittas, molluschi, 3 prodotti + consegna)
-- Le 2 fatture DAC: identiche (md5) a `docs/img/listini/dac-fattura-054851-2026-09-01.jpg` e `dac-fattura-252792-2026-09-08.jpg`, non duplicate.
-- `docs/img/segnalazioni/v65-dac-controlla-1.jpg` e `v65-dac-controlla-2-gambero-vuoto.jpg` (committati sul ramo consegne, `f1e3c9b`).
+## File ricevuti (#50, già committati)
+- `docs/img/listini/`: `dac-fattura-054851-2026-09-01-pag1.jpg` (pag. 1 di 2, «SEGUE»), `dac-fattura-054851-2026-09-01.jpg` (pag. 2), `dac-fattura-252792-2026-09-08.jpg`, `dac-fattura-057162-2026-09-08.jpg`, `dac-fattura-065742-2026-10-06.jpg`, `dac-fattura-269380-2026-09-23.jpg`, `mariano-fattura-13960-2026-09-08.jpg` (F.lli Mariano, 24 righe), `nieddittas-fattura-5274-2026-09-22.jpg` (3 molluschi + consegna CDS).
+- `docs/img/segnalazioni/v65-dac-controlla-1.jpg`, `v65-dac-controlla-2-gambero-vuoto.jpg`.
+- Nessun file nuovo in #51.
 
-## Fatto in #50
-- **v65 online**: PR #75 unita (squash `14847d4`), sito controllato (APP_VER=65, CACHE `jona-ordini-v69`), workflow «Pubblica server notifiche (Cloudflare Worker)» riuscito (anche «Prova del server»), `main` unito nel ramo consegne. Giro completo su GitHub lanciato (prove.yml, workflow_dispatch modo `tutto`, ref `main`, ~10/10 05:58 UTC): **risultato da guardare** (E14).
-- Con la v65 Gemini ha letto le 2 foto DAC senza errore 524 (confermato dalle schermate di Mario).
-- «Ha trovato solo questo»: le 2 fatture contengono davvero solo 3 prodotti (POLLO COSCE 37807 kg 4,027; POLLO SOVRACOSCIO 805161 kg 7,842; GAMBERO ROSSO 88563 pz 45,90). Spiegato a Mario.
-- Il guasto vero: gambero senza unità/prezzo, categoria «Altro», virgolette sparite. Diario: E22.
+## Fatto in #51
+- **v66 online**: PR #76 unita (squash `35f2f3a`), sito controllato (APP_VER=66 con `curl -sL …/`, CACHE `jona-ordini-v70`). `main` unito nel ramo consegne (merge `5fd968c`) e pushato. Nota: `curl` senza `-L` su `/index.html` dà vuoto (Cloudflare Pages reindirizza a `/`).
+- **Giro completo dopo la v65** (run 38029278135, workflow_dispatch `tutto`): **verde**.
+- **v67 «lettura fatture più precisa»**: ramo `claude/v67-fatture` (commit `99a1390` + merge di main `b04161b`), **PR #77** aperta ~06:21 UTC, «Prove automatiche» in corso (run 38030681005). Dettagli sotto.
+- `docs/DA-FARE.md`: D20 → D21 (v67 PR #77), M27 riscritta per la v67. `CLAUDE.md`: riga «Import listini» con v66/v67 (commit `00eaf0b`).
+- Iscrizione eventi: tolta la PR #76, messa la PR #77 (questa sessione); **la #52 deve iscriversi alla PR #77** (`subscribe_pr_activity` Kur0ChanX/jona-ordini 77). Il controllo di sicurezza delle 07:00 UTC (trigger `trig_01Eu85BrBvLRaw1orAUZ9Eoc`) è stato cancellato all'handoff: la #52 ne arma uno suo se serve.
 
-## v66: virgolette nei nomi (PR #76, ramo `claude/v66-virgolette`, commit `7c62451`)
-Causa: `splitLine` (index.html, prima di `parseTable`) prendeva ogni `"` come apertura/chiusura di cella CSV. `GAMBERO ROSSO"VERITAS"3"35/50PZ` ha 3 virgolette → cella aperta fino a fine riga → `;pz;45,90;Pesce` finiva nel nome. Nei nomi con 2 virgolette spariva solo la virgoletta.
-- `splitLine`: le virgolette contano solo se iniziano la cella (cella vuota finora); si chiudono solo se seguite da separatore o fine riga (spazi ammessi); `""` = virgoletta; virgoletta aperta mai chiusa → `l.split(dl)`. Tabelle con `|` invariate.
-- `parseTable`: se una riga ha meno celle dell'intestazione e la divisione semplice dà il numero giusto, usa quella (toglie le virgolette che racchiudono tutta la cella, `uq`).
-- `geminiPrompt`: «listino prezzi (o la fattura, o la bolla)»; regola per fatture/bolle (solo righe prodotto, prezzo unitario colonna PREZZO, U.M. K./KG = kg, PZ = pz anche attaccata alla descrizione); «copia la descrizione com'è, virgolette comprese, e non usare il punto e virgola dentro le celle».
-- APP_VER 66, CACHE `jona-ordini-v70`, NEWS v66 (chef + dev correzioni).
-- Prova nuova `tools/test-virgolette.mjs` (16 controlli: righe DAC vere, CSV con `;` e `""`, virgola, nomi che iniziano con virgolette, virgoletta mai chiusa, `|`, import fino a `S.rev.items`, prompt). Sul codice di `main` falliscono 8 controlli (verificato con una copia di origin/main). Aggiunta a `VELOCI` in `tools/prova-ci.sh` (dopo test-gemini-server).
-- Riuscite in locale (TZ=Europe/Rome): test-virgolette 16, test-gemini-server 39, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-news 94, test-testbar 7, test-giro.
-- PR #76 aperta alle ~06:07 UTC, «Prove automatiche» in corso. La #50 era iscritta agli eventi della PR: **la #51 deve iscriversi di nuovo** (`subscribe_pr_activity` Kur0ChanX/jona-ordini 76) o controllare i check a mano.
-- Decisioni: correzione nel lettore (non solo nel prompt), perché anche CSV/Excel veri possono avere virgolette nei nomi; scartato «togliere tutte le virgolette» (perde i nomi veri e rompe i CSV con `;` tra virgolette). Categoria del gambero: con la cella giusta arriva «Pesce» da Gemini, nessuna logica nuova.
-- CLAUDE.md non toccato per la v66 (nessuna struttura nuova).
+## v67 nel dettaglio (index.html, tutto nella zona «importazione listini»)
+- `GEM_HEAD = TEMPLATE_HEAD + ';quantita;importo'`: usato nel prompt e in `gemJoin` (che ora conosce entrambe le intestazioni). `TEMPLATE_HEAD` resta per modello CSV e segnaposto.
+- `geminiPrompt` riscritto: stesso ordine del foglio senza saltare righe; fornitore = chi vende scritto in alto (DAC, F.lli Mariano, Nieddittas), mai il cliente/destinatario (ORMA DI CHEF LAI, Villa Carola); codice copiato com'è con gli zeri (040); nome com'è, virgolette comprese, via puntini e `#`/`*`; righe di continuazione (ECOLABEL, CLASSE A, nome scientifico, ALLEVATO FRANCIA) non sono prodotti; U.M. K./KG=kg, PZ=pz, CF=conf, CT=cartone, LT=l anche attaccata (`##PZ`); prezzo unitario con tutti i decimali, già scontato se c'è sconto; quantita = QUANTITÀ o PESO NETTO; importo = IMPORTO/IMPORTO NETTO; niente intestazioni, asterischi, totali, IVA; le spese si possono mettere (l'app le riconosce); cifra illeggibile = vuota.
+- `mapRows`: colonna «prezzo» preferita (`iP0`), se no il vecchio regex (anche «importo» come prezzo, file vecchi invariati); `iQ` quantità, `iI` importo (solo se c'è «prezzo»); gli item hanno `q`, `imp`.
+- Funzioni nuove prima di `guessSupplier`: `UNITA`/`normUnita` (applicata a tutti gli import), `pulisciNome` (solo `kind==='txt'`: incollato/Gemini), `isSpesa` (spese/consegna/trasporto/contributo/cauzione/imballo/nolo/porto/addebito/bancale/pallet a inizio nome; «Spezie», «Porro» no), `rigaNonTorna` (|q×prezzo − importo| > max(0,06; 1,5% importo)).
+- `impRun`: righe con `spesa` (non selezionate), `q`, `imp`. `reviewSheet`: `chk(i)` calcolato a ogni disegno (se Mario corregge il prezzo l'avviso sparisce), banner `#rv-chk` «N righe da controllare», banner `#rv-spese`, pillole «da controllare: q × prezzo € non fa importo» (rossa) e «spesa, non è un prodotto».
+- Quantità e importo NON si salvano nel prodotto (decisione: servono solo al controllo; il listino resta uguale).
+- APP_VER 67, CACHE `jona-ordini-v71`, NEWS v67 (chef + `dev.aggiunte`; attenzione: chiavi valide `aggiunte`/`correzioni`/`risolti`, non `novita`).
+- Prova nuova `tools/test-fatture.mjs` (28 controlli): trascrizioni a mano di DAC pag1 (11 righe, vitello con prezzo sbagliato apposta 5,936), Mariano (6 righe con 040/027/405), Nieddittas (4 righe con CDS), passate come 3 risposte finte di `gemCall` dentro `gemRun`; salvataggio di 20 prodotti; formati vecchi. Sul codice v66 fallisce (verificato). Aggiunta a `VELOCI` in `tools/prova-ci.sh` dopo test-virgolette.
+- Riuscite in locale (TZ=Europe/Rome): test-fatture 28, test-virgolette 16, test-gemini-server 39, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-news 94, test-testbar 7, test-giro.
+- Non tocca il Worker: niente giro completo extra.
+- Decisioni scartate: filtrare le spese togliendole del tutto (Mario non le vedrebbe: meglio senza spunta e avviso); normalizzare i nomi anche per Excel/XML (rischio di toccare file buoni); arrotondare i prezzi a 4 decimali (`num` tiene 3: basta per DAC; Nieddittas 2,0000 ok).
+- Non fatto ancora (idee per dopo): controllo somma righe = «totale merce/imponibile» della fattura; prezzo mostrato con 3 decimali nel listino (`eur` ne mostra 2: 4,988 → 4,99 €, ma il valore salvato è giusto).
 
-## Prossimo lavoro (#51), in ordine
-0. Lavoro chiesto da Mario nell'ultimo messaggio (dopo D20, o dentro la v66 se la PR #76 non è ancora unita: decidi tu). Lettura «perfetta» di fatture e listini da foto. Dettagli visti nelle 6 foto (da verificare uno per uno):
-   - DAC: colonne CODICE, CARTONI, N.PEZZI, DESCRIZIONE, U.M., QUANTITÀ, PREZZO, IMPORTO NETTO, IVA. U.M. «K.» = kg, «PZ», «CF», «CT»; «##» attaccato all'U.M. («##PZ», «##K.»); «Pezzi» nella colonna CARTONI; virgolette dispari nei nomi (`"COALVI"1 KG`, `SALATO"PAYSON BRETON"10`); righe di continuazione della descrizione (ECOLABEL, CLASSE A, ARISTAEOMORPHA…) da unire al prodotto sopra, non righe nuove; righe «**»/«****» e blocco «DES 3 JONA VILLA CAROLA» non sono prodotti; fattura su più pagine («SEGUE»); prezzi con 3 decimali (4,988; 0,287; 26,248): controllare che `num()` e il listino li tengano; quantità decimali per K. (4,27).
-   - Mariano: colonne CODICE, DESCRIZIONE, ISO (paese), COLLI, U.M., PESO LORDO, TARA, PESO NETTO, PREZZO, IMPORTO, IVA. Codici con zero davanti (040, 027, 087, 405?) da tenere come testo. Prezzo = colonna PREZZO (al kg o al pz), non IMPORTO.
-   - Nieddittas: codice articolo a sinistra spesso strano («60 V A COCKTAIL PZ», «22», «4», «CDS»); descrizione su più righe (nome scientifico, ALLEVATO FRANCIA): tenere solo la prima riga o un nome corto; «CONSEGNA A DOMICILIO SARDEGNA» (CDS) è una spesa, non un prodotto; prezzi a 4 decimali (2,0000).
-   - Stessi prodotti DAC in più fatture (latte 75060, uova 23072, yogurt 34131/53396, pancakes 806406): la v64 toglie i doppi uguali; controllare che con più foto insieme non nascano «simili» inutili.
-   - Idee da valutare: controllo quantità × prezzo ≈ importo per segnalare righe lette male (colonna in più nel prompt, solo per il controllo); fornitore preso dall'intestazione (`guessSupplier`); prompt con esempi di righe difficili; prova con trascrizioni «giuste» scritte a mano di queste fatture come risposta finta di Gemini (`tools/test-virgolette.mjs` come modello). Il Gemini vero non si può provare da qui (niente chiave): far riprovare Mario.
-   - Rispondere a Mario con un piano breve (cosa cambia per lui), poi fare: le scelte tecniche sono di Claude.
-1. D20: PR #76. «Prove automatiche» verdi → squash, controllo online (APP_VER 66, CACHE v70), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Non tocca il Worker: niente giro completo extra. Se rosse: capire la causa e correggere.
-2. Guardare il risultato del giro completo lanciato dopo la v65 (Actions → «Prove automatiche», evento workflow_dispatch). Se rosso: priorità.
-3. Avvisare Mario: v66 online → M27 (rifare l'import delle 2 foto DAC, controllare che il gambero abbia pz, 45,90, Pesce). Gli ho detto di non salvare ancora il gambero com'era. Se l'aveva già salvato, dopo il nuovo import potrebbe comparire come «simile» (v64): spiegarglielo.
-4. Chiedere se ora vede v64/v65/v66 nelle Novità (vista Sviluppatore o Admin Chef, E21).
+## Alternative a Gemini (risposta a Mario, da sviluppare con lui)
+Gemini non è l'unico punto debole: con la v67 una lettura sbagliata dei numeri si vede (riga rossa), non passa più in silenzio. Strade gratuite proposte:
+1. **Fattura elettronica XML** (consigliata): in Italia le fatture tra aziende passano tutte dallo SDI; l'XML ha codici, descrizioni, unità e prezzi esatti, zero errori di lettura. L'app la importa già (`parseFatturaPA`). Si scarica gratis dal cassetto fiscale (Agenzia delle Entrate → «Fatture e Corrispettivi») o la manda il commercialista; Nieddittas lo scrive in fondo alla fattura. Lavoro possibile: import di più XML insieme e dei file firmati `.p7m` (oggi danno errore `p7m`: si può estrarre l'XML dentro dal browser).
+2. **Due lettori invece di uno**: Gemini + un secondo servizio di visione gratuito (da verificare oggi prezzi/limiti: es. Cloudflare Workers AI con un modello vision nel piano gratuito, Groq, Mistral OCR, OpenRouter modelli free). Si confrontano i numeri: dove non coincidono, riga rossa. Più affidabile, più lavoro sul Worker.
+3. **Controlli in più senza IA**: somma delle righe = totale della fattura; prezzo molto diverso dall'ultimo a listino (es. +/- 40%) → avviso; foto fatte bene (foglio piatto, luce, pagina intera). OCR sul telefono (Tesseract.js) scartato come lettore principale: con tabelle fotografate legge peggio di Gemini.
+Raccomandazione data: XML come strada principale per le fatture, Gemini + controlli per listini di carta e WhatsApp. Per CLAUDE.md, alla scelta mandare a Mario un'immagine di confronto (non fatto in #51 per l'handoff obbligatorio).
+
+## Prossimo lavoro (#52), in ordine
+1. D21: PR #77. «Prove automatiche» verdi → squash, controllo online (`curl -sL https://jona-ristorante-by-ynoy-corp.pages.dev/` APP_VER 67, `sw.js` CACHE v71), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Se rosse: capire la causa e correggere.
+2. Avvisare Mario «v67 online» → M27 (rifare l'import delle fatture, guardare righe rosse, mandare screenshot di «Controlla e salva»).
+3. Aspettare la risposta sulla domanda XML; poi proporre il lavoro scelto (immagine di confronto delle 3 strade, una domanda per volta).
+4. Chiedere se vede v64-v67 nelle Novità (vista Sviluppatore o Admin Chef, E21).
 5. Poi `docs/DA-FARE.md` (D17 ponte RVC, D14…).
 
 ## Ancora da chiedere
-- M26 (prodotti finti spariti?), M25, D10: senza risposta.
+- Domanda XML (sopra). M26 (prodotti finti spariti?), M25, D10: senza risposta.
 
 ## Rischi aperti
-- Gemini potrebbe ancora lasciare vuota l'unità del gambero (U.M. «PZ» attaccata a «GEL##PZ»): il prompt ora lo spiega, non verificato con il Gemini vero.
-- Server di prova `python3 -m http.server 8766` lasciato acceso nello scratchpad (innocuo, il contenitore si chiude da solo).
+- Gemini vero non provato con il prompt v67 (niente chiave qui): può ancora sbagliare cifre o unità; la riga rossa lo segnala solo se quantità e importo sono letti.
+- Server di prova `python3 -m http.server 8765` acceso nel contenitore della #51 (innocuo).
