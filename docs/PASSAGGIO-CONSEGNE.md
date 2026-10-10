@@ -1,49 +1,37 @@
-# Passaggio di consegne (2026-10-10, fine sessione #56)
+# Passaggio di consegne (2026-10-10, fine sessione #57)
 
-Sessione attuale: #57
+Sessione attuale: #58
 
-Ramo di lavoro: `claude/jona-sessione-57` (all'handoff della #57 → `claude/jona-sessione-58`). App online: **v68** (PR #79 unita con squash, commit main `7ff2c34`, controllato online: `gem-live` presente, CACHE `jona-ordini-v72`; Worker e Pages verdi).
+Ramo di lavoro: `claude/jona-sessione-58` (all'handoff della #58 → `claude/jona-sessione-59`). App online: **v68** (main `7ff2c34`). Nessuna versione nuova in #57.
 
-## Ultimo messaggio di Mario (#56), parola per parola
-«Il problema è che se, se finisco l'account all'improvviso, se finisco il token all'improvviso, cioè tu no, no, non perdi, se, non spendi troppo token, eh, ogni, l'avviso di quello settimanale è fatto da 75%, da 75% fino al 100% ci sono tantissimi messaggi e ogni volta tu non salvi questa regola, ogni volta nelle, nel, nel, nel, nel, nel passaggio e non sprechi un sacco di token, non si riesce a trovare una nuova soluzione.
+## Ultimo messaggio di Mario (#57), parola per parola
+«Autorizzo Claude a creare l'hook .claude/hooks/scorta.py, a registrarlo in .claude/settings.json e a fargli fare push automatici sui rami scorta/<ramo> di jona-ordini e rvc.»
+(Prima aveva risposto «si» alla strada 3. Dopo l'ultimo messaggio è arrivata solo la conferma di RVC #50, che ha passato i file alla RVC #51.)
 
-Ho mandato anche questo messaggio uguale al progetto RVC. Mettetevi d'accordo per lavorare insieme.»
+## Fatto in #57
+- **D27 scorta automatica, FATTA e attiva** (strada 3 scelta da Mario). Il controllo automatico dei permessi aveva bloccato la scrittura dell'hook con il solo «si» (Self-Modification). Ho chiesto a Mario la frase di autorizzazione esplicita e lui l'ha scritta (sopra). Senza quella frase un hook che fa push da solo non passa: tenerlo a mente per RVC e per hook futuri.
+  - `.claude/hooks/scorta.py`: `msg` (UserPromptSubmit) salva il prompt in `.git/scorta-msg.md`; `stop` (Stop) usa un indice temporaneo `.git/scorta-index` (read-tree HEAD + `add -A`, rispetta `.gitignore`) più `docs/ULTIMO-MESSAGGIO.md` → write-tree. Se l'albero è uguale e HEAD è già dentro, non fa niente. `commit-tree` con genitori HEAD + scorta precedente (se non è già antenata) → `refs/scorta/<ramo>` locale e push in background (`timeout 60`) su `scorta/<ramo>`. Sempre in avanti, mai forzato. `JONA_SCORTA_NOPUSH=1` = niente push.
+  - `.claude/settings.json`: aggiunti UserPromptSubmit «scorta.py msg» e Stop «scorta.py stop».
+  - `avvio-check.py`: `controlla_scorta()` fa fetch di `scorta/<ramo>`. Se ha commit che il ramo non ha → avviso «SCORTA: … git merge origin/scorta/<ramo>, poi git push».
+  - Prova `python3 tools/test-scorta.py` (16 controlli, repo finti). Non è in `prova-ci.sh` (lì solo `.mjs` dell'app).
+  - **Verificato dal vivo**: `scorta/claude/jona-sessione-57` è comparso su GitHub (`57ed1fa`) già nella stessa sessione.
+  - Documenti: `docs/CAMBIO-ACCOUNT.md` (sezione «Se i token finiscono di colpo» + riga nuova nelle Preferenze), CLAUDE.md (regola CAMBIO ACCOUNT: la scorta si aggiunge, commit+push dopo ogni passo resta), DA-FARE (D27, M30 nuova).
+  - Fatto nuovo: GitHub (tramite il proxy) accetta push su `scorta/*`, ma **non lascia cancellare rami remoti** («Everything up-to-date»). È rimasto `scorta/prova-permesso` (= `dc607f3`, innocuo). Mario può cancellarlo da https://github.com/Kur0ChanX/jona-ordini/branches oppure lasciarlo.
+  - RVC: mandato messaggio alla RVC #50. Risposta: chiusa, file passati alla RVC #51 con le consegne. A Jona non resta niente da fare per RVC.
+- Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47) **ancora in corso** quando ho chiuso (dura ~25 min). **Controllarlo per primo** (E14) e dirlo a Mario in una riga. La sveglia delle 13:19 l'ho cancellata (sarebbe arrivata alla sessione chiusa).
+- Il nuovo ramo `scorta/claude/jona-sessione-58` nascerà da solo alla prima risposta della #58.
 
-## Domanda aperta a Mario (attendere la risposta, poi D27)
-Gli ho proposto 3 strade (tabella in chat):
-1. Ovvia: Claude fa commit+push dopo ogni passo quando il limite è in avviso (costa token, dipende dalla memoria di Claude).
-2. Furba: hook «scorta» a zero token.
-3. **Geniale (consigliata)**: la 2 + frase fissa nelle preferenze dei due account «riparti dal ramo col numero più alto» → al cambio account non serve preparare niente.
-Domanda: «Mi dai l'ok per la strada 3? Rispondi "sì 3", oppure "2" o "1"». Se dice sì → costruire D27 (sotto).
-
-### Progetto D27 (hook scorta), già pensato
-- `.claude/hooks/scorta.py`, registrato in `.claude/settings.json`.
-- UserPromptSubmit: scrive l'ultimo messaggio di Mario (campo `prompt` dello stdin JSON) in `.git/scorta-msg.md` (FUORI dal working tree: `git status` resta pulito, l'handoff non vede modifiche pendenti).
-- Stop: indice temporaneo (`GIT_INDEX_FILE` in `.git/`) → `git add -A` (rispetta `.gitignore`, niente segreti) + `docs/ULTIMO-MESSAGGIO.md` iniettato con `hash-object -w` + `update-index --cacheinfo` → `write-tree`; se l'albero è uguale all'ultima scorta non fa niente; `commit-tree` con genitori HEAD e la scorta precedente (se diversa) → `git push origin <sha>:refs/heads/scorta/<ramo>` in background con timeout. Sempre fast-forward, niente force. Ramo di lavoro e app non toccati. I push dalla sessione non fanno partire workflow.
-- `avvio-check.py`: se `origin/scorta/<ramo>` contiene commit non presenti nel ramo, lo segnala (e la sessione la unisce con `git merge`, fast-forward perché HEAD è antenato).
-- Coordinamento RVC (sessione `session_01M9K5UqXKXCqWTSKRggCWw9`, «🟢 ▶ ATTIVA · #50 · RVC», ha proposto a Mario la stessa idea e attende il suo «via»): Jona scrive il file una volta, RVC lo copia identico (`git fetch https://github.com/Kur0ChanX/jona-ordini <ramo>`). Il mio messaggio a RVC è stato BLOCCATO dal controllo automatico dei permessi («Unauthorized Persistence»: hook che pusha da solo senza consenso esplicito di Mario). Quindi: prima il «sì» scritto di Mario, poi mandare il messaggio a RVC e costruire.
-- Poi aggiornare `docs/CAMBIO-ACCOUNT.md` (sezione «Se i token finiscono di colpo» + testo Preferenze con la frase fissa) e la regola in CLAUDE.md (CAMBIO ACCOUNT: «push dopo ogni passo» sostituito dalla scorta automatica).
-- Prova: script in `tools/` che crea un repo finto, simula UserPromptSubmit + Stop e controlla ramo scorta, messaggio, `git status` pulito, nessun push se niente cambia.
-
-## Fatto in #56
-- PR #79 (v68) aperta, «Prove automatiche» verde, squash merge, `main` unito nel ramo e pushato (`00f405c`). Worker (prima volta con `[ai]`) e Pages verdi.
-- Giro completo extra su GitHub lanciato (workflow «Prove automatiche», `modo: tutto`, ref main, ~12:50 ora italiana): **controllare l'esito** (E14) e dirlo a Mario in una riga.
-- PR #78 (bozza prova lettori) chiusa senza unirla. Nota: `tools/prova-lettori.py` e `.github/workflows/prova-lettori.yml` sono finiti su main con la v68 (erano nel ramo di lavoro): innocui (il workflow parte solo su PR che cambiano quei file). Sulla PR #79 è partito anche il job «prova» (prova lettori, usa quota Gemini): non bloccava il merge.
-- Unito il ramo `ccr-c4aaeb72-tfz1na` (guida `docs/CAMBIO-ACCOUNT.md` aggiornata, regola CAMBIO ACCOUNT in CLAUDE.md, riga E23 in ERRORI.md). La catena «⚪ Servizio account» (#02, `session_01U6vJDxXtWf1quE4M8j74ks`, ramo `claude/servizio-sessione-02`) gestisce preferenze/memorie/piano dei due account: NON è lavoro di Jona. A Jona resta solo il «cambio account» quando Mario lo scrive qui.
-- Limite settimanale (`seven_day`) in **avviso** in tutte le sessioni; si azzera mercoledì 14/10 alle 12:00 ora italiana.
-- Detto a Mario che la v68 è online e cosa vede (banner «⏳ Legge Gemini Flash · 12 s», motivo vero se un lettore fallisce). Idea nuova SOLUZIONE SMART non proposta questa volta (risposta già lunga): proporla alla prossima occasione.
-
-## Prossimo lavoro (#57), in ordine
-1. Attendere la risposta di Mario sulla strada (1/2/3) e costruire D27; coordinarsi con RVC.
-2. Controllare il giro completo su GitHub (rosso = priorità).
-3. Poi D23 (più XML + `.p7m`), D24, D25, D26 (`docs/DA-FARE.md`).
+## Prossimo lavoro (#58), in ordine
+1. Esito del giro completo: https://github.com/Kur0ChanX/jona-ordini/actions/runs/38046156932 (rosso = priorità).
+2. D23 (più XML + `.p7m`), poi D24, D25, D26 (`docs/DA-FARE.md`).
+3. Proporre a Mario un'idea SOLUZIONE SMART (non fatta né in #56 né in #57).
 
 ## Ancora da chiedere
-- M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27 (screenshot «Controlla e salva» v67), M28 (commercialista → XML).
+- M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27 (screenshot «Controlla e salva» v67), M28 (commercialista → XML), M29/M30 (account Hotmail e preferenze).
 
 ## Rischi aperti
-- Gemini Flash sovraccarico (503) nelle ore di punta: ora c'è la catena Flash-Lite → Cloudflare.
-- Limite settimanale in avviso: se finisce prima dell'hook D27, si riparte dal ramo col numero più alto (tutto è pushato).
+- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00. Ora c'è la scorta, e commit+push dopo ogni passo resta.
+- Gemini Flash sovraccarico (503) nelle ore di punta: catena Flash-Lite → Cloudflare.
 
 ## v68 (in breve, dettagli nella riga v68 di CLAUDE.md)
 Worker: `LETTORI` {flash, lite, cf}, `leggiCf` (Workers AI), errori `{codice,motivo,lettore}`. App: `gemRun` prova `GEM_LETT` in ordine per ogni foto, banner `gemLive`/`gemTick`, `gemPerche` solo da codici veri, riquadro «Chi ha letto le foto». Prova `tools/test-gemini-server.mjs` (59 controlli).
