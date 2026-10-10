@@ -1,64 +1,63 @@
-# Passaggio di consegne (2026-10-10, fine sessione #66)
+# Passaggio di consegne (2026-10-10, fine sessione #67)
 
-Sessione attuale: #67
+Sessione attuale: #68
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v71** (main `41cb365`, PR #82). CACHE `jona-ordini-v75`. Nessun codice dell'app cambiato in #66.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v73** (main `57628f4`, PR #84). CACHE `jona-ordini-v77`. Worker aggiornato (`/salute` → `ponte:false`, cioè manca ancora `PONTE_KEY`: giusto così).
 
-## Fatto in #66 (18:54-19:20)
-- Avvio: due scorte unite (contenevano solo `docs/ULTIMO-MESSAGGIO.md`), push confermato.
-- Detto a Mario che la v71 (logo JONA vettoriale) è online; M33 resta aperto (deve riaprire l'app e guardare il logo).
-- **Limite settimanale**: Mario: «forse è del vecchio account». Verificato con `get_session`: nell'account attuale c'è solo `five_hour`, «allowed». Corretto in «Rischi aperti». Niente più commit dopo ogni passo per questo motivo (la scorta automatica resta).
-- **Ponte con RVC (D17)**: Mario ha chiesto (parola per parola sotto) un'icona in Jona per mandare all'hotel informazioni dei clienti e necessità del ristorante. La stessa richiesta l'ha fatta anche a RVC #53 (C18 di RVC).
-  - Letto il progetto di RVC: repo `RVC-Operation-by-YNOY-CORP/RVC` (privato), ramo `claude/rvc-ramo-definitivo`, file `docs/PONTE-JONA.md`. Aggiunto a questa sessione con `add_repo` (sola lettura), copia in `/home/user/rvc` (sparisce col contenitore). Il nome giusto del repo NON è `Kur0ChanX/RVC` (errore 404).
-  - Lì è già deciso: **strada B** = ponte su Cloudflare Worker con chiave segreta, D1, le due app restano separate e offline-first (coda). Scelte di Mario (RVC #30): **P1** camere occupate, ospiti, arrivi, partenze (RVC→Jona); **P3** vassoi da ritirare in camera (RVC→Jona); **P4** guasti del ristorante (Jona→RVC, diventano ticket); **P5** richieste speciali dell'ospite (entrambi i versi); **P7** eventi con orari e persone (Jona→RVC). **P2 addebiti in camera: no per ora.** P6 biancheria: fuori. Allergie/salute fuori (GDPR art. 9). Forma messaggio provvisoria `{id, tipo, da, struttura, camera, quando, chi, dati, stato}`, stati `inviato|ricevuto|fatto|annullato`; indirizzi provvisori `POST /ponte/messaggi`, `GET /ponte/messaggi?dopo=`, `POST /ponte/messaggi/<id>/stato`, chiave in `Authorization`. La chiave mai nel codice (Jona è pubblico). RVC non è ancora in uso in hotel (Tappa 2 in costruzione, il suo Worker serve D5 Cloudflare): il ponte si può costruire e provare con dati finti, ma funziona davvero solo quando RVC è in uso.
-  - Proposte a Mario 3 strade per l'icona 🏨 «Hotel» in alto in Jona, immagine `docs/img/ponte/d17-tre-strade.png` (sorgente HTML nella cartella temporanea, persa: rifarla se serve, stile Jona: colori `--lagoon #1F7F86`, `--corallo #AE4E37`, `--ocra #94661C`, `--mirto #3B7A57`, `--solid #3A2F2C`, font Jost):
-    1. **Ovvia**: pulsanti grandi «Manda all'hotel» (🔧 Guasto, 🛎 Richiesta ospite, 📅 Evento, 📦 Serve a noi) che aprono un modulo breve (dove, cosa, foto, urgente); sotto «Dall'hotel» elenchi per tipo.
-    2. **Furba**: chat «Hotel» con etichette (Vassoio, Guasto, Richiesta, Evento, Serve a noi), numero camera, foto, stati ✓ arrivato / ✓✓ visto da reparto. Riusa la chat di Jona.
-    3. **Geniale**: in cima «Oggi in hotel» (camere, ospiti, partenze, arrivi); ospiti → colazioni attese nell'ordine suggerito (`sugStats`); eventi dell'agenda mandati da soli all'hotel (Porter, Housekeeping); vassoio in camera → compito «Ritira» nella home dello staff.
-  - **Risposta di Mario: gli piace la 3 («che vedono anche le camere ecc») e chiede di unire le 3 idee in modo ordinato.** Risposta data in breve: sì.
-  - Avvisata RVC #54 (`session_01EFMQTbkHtDuvmV2vH9Y97i`) con send_message: le 3 strade, etichette comuni, aspetto la scelta di Mario, poi mando i campi di Jona; niente codice senza il via di Mario.
-- `docs/DA-FARE.md` D17 aggiornato.
+## Perché l'handoff ora
+Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio dalle 19:40 circa: con `add_repo` del repo RVC la cartella principale della sessione è diventata /home/user (E31). Il contesto era arrivato a ~470k token. **Non aggiungere altri repo alle sessioni Jona**: i file di RVC si chiedono alla sessione RVC con send_message.
 
-## Prossimo lavoro (in quest'ordine)
-### 1. Ponte: immagine della versione UNITA (subito, primo messaggio a Mario)
-Proposta ordinata da disegnare (una pagina «Hotel» dall'icona 🏨, dall'alto in basso):
-- **In cima (Geniale)**: «Oggi in hotel» = camere occupate, ospiti, arrivi, partenze (P1). Chi lo vede: da decidere (proposta: tutti; numeri senza nomi degli ospiti).
-- **Sotto (Ovvia)**: 4 pulsanti grandi «Manda all'hotel»: 🔧 Guasto (P4), 🛎 Richiesta ospite (P5), 📅 Evento (P7), 📦 Serve a noi (necessità del ristorante). Ognuno apre un modulo corto con camera/dove, testo, foto.
-- **Sotto (Furba)**: il filo dei messaggi con l'hotel come una chat, con etichette colorate e stati (✓ arrivato, ✓✓ visto, ✔ fatto). Qui arrivano anche Vassoio (P3) e Richieste dall'hotel. Si può rispondere.
-- **Da soli (Geniale)**: ospiti → colazioni/coperti attesi nell'ordine suggerito; eventi dell'agenda → proposta «Manda all'hotel?» (meglio chiedere che mandare da soli: scelta da far fare a Mario); vassoio → compito «Ritira» nella home dello staff.
-Fare UNA immagine (stile della prima, telefono 390 px, 1-2 schermate) e chiedere conferma (E19: per il gusto prima l'immagine, poi si costruisce). Poi una domanda per volta (es. chi vede «Oggi in hotel»; eventi in automatico o con conferma). Dopo la conferma: mandare a RVC (send_message alla sessione RVC attiva) i campi di Jona e copiare `docs/PONTE-JONA.md` in Jona.
-Tecnica da decidere io (non chiedere a Mario): dove vive il ponte. Idea: dentro il Worker di Jona già online (`worker/`, D1 già pronto) con indirizzi `/ponte/...` e chiave segreta per RVC, così funziona prima che RVC abbia il suo Worker; da confrontare con un Worker «ponte» a sé. Niente codice del ponte senza il via di Mario (regola di RVC: Tappa 2).
+## Fatto in #67 (19:18-23:10 ora italiana)
+- **Ponte con l'hotel (D17)**: immagine delle 3 idee unite (`docs/img/ponte/d17-unita.png`, sorgente `.html` accanto) → Mario «Sì». Chi vede «Oggi in hotel»: **tutti**; Mario: «anche i nomi se clicchi non sono un problema»; poi in RVC #56 Mario ha scelto **nome + cognome** al tocco.
+  - Accordo con RVC: nomi dei campi di RVC adottati; tutto in `docs/PONTE-RVC.md` (copia del `docs/PONTE-JONA.md` di RVC + §7 parte di Jona con «Dati esatti di Jona»). RVC ha accettato: `oggi` anche per domani, `rif`, `nome`, evento `ev_<id agenda>` + `annullato`, ponte dentro il Worker di Jona. La chiave `PONTE_KEY` sta solo nel server di RVC (D5 di RVC, non ancora fatto): prima di D5 il collegamento vero non parte.
+  - `oggi`: `dati.giorni: [{g, camere, ospiti, arrivi, partenze, elenco?: [{camera, nome, cognome, persone, arrivo, partenza}]}]`.
+- **v72 online** (PR #83): campi a 16 px (niente zoom su iPhone; `.inp.sm`, `.inp.mono`, `select.v-alt`, `.unit-inp`), prova `tools/test-campi-16.mjs`, `test-giro` controlla anche i campi; giro con WebKit (`test-giro-safari`, solo su GitHub, `prove.yml` installa webkit) e computer 1280/1440 (`test-giro-computer`). Barra di stato iPhone lasciata com'è (D29 resta solo quella, serve foto da iPhone).
+- **v73 online** (PR #84): Worker `/ponte/messaggi` (+ `/stato`, tabella `ponte` nel primo D1, segreto `PONTE_KEY` dal segreto GitHub omonimo nel workflow `cloudflare-worker.yml`); app: funzione «Hotel» (Impostazioni → Funzioni, spenta), icona con pallino, pagina «Hotel» (`htSheet`), moduli (`htForm`), striscia vassoio (`htStrip`), agenda → «Mando l'evento all'hotel?» (`htAgenda`/`htAgDel`), ordine suggerito (`htSugH`), hotel finto (`htSim`, funzione dichiarata così le prove la sostituiscono). Prove `tools/test-hotel.mjs` (41, anche col Worker vero dietro l'app e coda senza rete) e `tools/test-ponte-server.mjs` (28), nelle prove veloci.
+- Correzione della scorta presa da RVC (E28): non salva più gli avvisi automatici come messaggio di Mario.
+- **Giro completo su GitHub** lanciato a mano dopo la v73 (tocca il Worker): run `38084513591`, era ancora in corso alle 23:10. **Primo compito della #68: controllarne l'esito** (`curl https://api.github.com/repos/Kur0ChanX/jona-ordini/actions/runs/38084513591`); se rosso, capire e correggere con priorità.
+- **Domande**: E29 (niente strumento a tocco) sostituita dal **doppio tocco** di RVC, poi migliorato da Mario: la seconda domanda RIPETE la domanda e ha 3 scelte «Sì, confermo <la cosa>» · «È una domanda o un dubbio» · «No, ho sbagliato» (CLAUDE.md). E30: due risposte scritte a mano che erano domande, prese per scelte: se Mario scrive a mano una domanda o «roba così», prima si risponde e poi si rifà la domanda.
 
-### 2. v72 (D29 strada 2 «Furba», Claude da solo; promesso a Mario «parto appena mi rispondi»)
-Cosa c'è già (non rifare): `viewport-fit=cover`, `safe-area-inset-top/bottom`, `apple-touch-icon`, `apple-mobile-web-app-capable`/`-title`, `theme-color` dinamico, media query per computer (700/760/900/980/1260 px), controllo `PushManager`, manifest fullscreen.
-1. **Zoom dei campi su iPhone**: Safari ingrandisce se un campo ha testo <16 px (visto `select.v-alt` 15px). Misurare con Playwright ogni `input/select/textarea` visibile nelle schede (riusare il giro di `test-giro`), portarli a 16px solo dove serve, controllare l'aspetto con `test-giro`.
-2. **Barra in alto su iPhone installata**: manca `apple-mobile-web-app-status-bar-style`. Con `black-translucent` l'ora è bianca: controllare prima che la zona in alto (`body::before`, v54) sia scura in tema chiaro e scuro; se dubbio lasciare e annotare.
-3. **Prove con Safari e computer su GitHub**: variabili in `test-giro.mjs` (es. `GIRO_BROWSER=webkit`, `GIRO_W=1280,1440`); in `.github/workflows/prove.yml` installare WebKit (`/opt/pw-npm/node_modules/.bin/playwright install --with-deps webkit` o il percorso giusto su GitHub) e far girare il giro con WebKit 390 e Chromium 1280/1440 dentro `tools/prova-ci.sh`. In locale WebKit non c'è e NON si scarica.
-4. NEWS v72, `APP_VER` 72, `CACHE` `jona-ordini-v76`, riga v72 in CLAUDE.md, prova nuova (testo dei campi ≥16 px).
-5. Pubblicare da solo se le prove sono verdi, poi `git fetch origin main && git merge origin/main` sul ramo definitivo + push. Avvisare Mario.
+## GitHub: Jona fuori dall'account personale (D30, in corso)
+- Mario: Kur0ChanX è il suo account personale; «mi sembra assurdo… usare un mio account per un'app dell'hotel». Vuole un account con **jona.ristorante@gmail.com**.
+- Spiegato: limiti di GitHub per proprietario (le organizzazioni hanno i loro); repo pubblici = prove gratis senza limite; privati = 2000 minuti/mese del proprietario (~14 min per giro veloce). Repo pubblico oggi: contiene 8 foto di fatture dei fornitori (`docs/img/listini/`) e nomi dello staff, visibili anche nella cronologia (non si cancellano senza comandi forzati).
+- **Scelte di Mario (toccate e confermate)**: **organizzazione privata**, creata dall'account del ristorante, Kur0ChanX secondo proprietario; nome **`Jona-Ristorante-by-YNOY`**.
+- Risposte già date: il link dell'app NON cambia (pages.dev), inviti/QR/telefoni non cambiano, lo staff non deve fare niente; si **trasferisce** il repo (segreti, prove e cronologia vanno con lui).
+- **Guida data a Mario (parti A-C)**: A account con jona.ristorante@gmail.com (https://github.com/signup, in incognito); B organizzazione `Jona-Ristorante-by-YNOY` da https://github.com/account/organizations/new?plan=free (Contact email jona.ristorante@gmail.com, «My personal account», invito a Kur0ChanX, Complete setup); C con Kur0ChanX accettare su https://github.com/orgs/Jona-Ristorante-by-YNOY/invitation. Detto di NON toccare Transfer né Change visibility. Attendo «fatto» e il passo a cui è arrivato.
+- **Dopo «fatto» (passi da dare, uno per volta)**:
+  1. Rendere Kur0ChanX **Owner** dell'organizzazione (People → ruolo Owner, dall'account del ristorante) se l'invito era da Member.
+  2. Con Kur0ChanX: https://github.com/Kur0ChanX/jona-ordini/settings → in fondo **Transfer** → `Jona-Ristorante-by-YNOY`.
+  3. Installare l'app Claude sull'organizzazione: https://github.com/apps/claude/installations/select_target.
+  4. Claude crea un piccolo repo pubblico `Kur0ChanX/jona-ordini` con solo la pagina che rimanda a pages.dev (il vecchio indirizzo `kur0chanx.github.io/jona-ordini` è ancora attivo e rimanda al nuovo; non deve rompersi). Serve che Mario lo crei a mano o dia accesso: verificare.
+  5. Repo privato: Settings → **Change visibility** → Private.
+  6. Aggiornare `source_url` in CLAUDE.md, consegne, `docs/CAMBIO-ACCOUNT.md`, prompt dell'handoff; remote git (`git remote set-url origin https://github.com/Jona-Ristorante-by-YNOY/jona-ordini`); controllare che le prove su GitHub partano (minuti dell'organizzazione) e che il deploy Cloudflare funzioni.
+  - Regola «PROVE SU GITHUB» di CLAUDE.md (repo pubblico = minuti illimitati) va riscritta dopo il passaggio a privato: contare i minuti come in RVC (`.claude/conta-minuti.py` di RVC).
 
-## Ancora aperto per Mario
-- D17 ponte: conferma dell'immagine unita (prossima sessione).
-- M33: guardare il logo JONA nuovo all'apertura (riaprire l'app).
-- M31: scelta della miglioria del logo YNOY (Ovvia/Furba/Geniale/Nessuna): nessuna risposta.
-- Provare v69 (riga verde «costa … in meno» → **Passa**) e v70 (apertura con YNOY nuovo).
-- Elenco completo: `docs/DA-FARE.md`.
+## File ricevuti da Mario in #67
+- `docs/img/sessione-67/doppio-tocco-domanda-presa-per-scelta.jpg` (E30)
+- `docs/img/sessione-67/riassunto-app-sembra-decisione.jpg` (il riassunto automatico dell'app «Confermo l'impostazione…» sembrava una decisione: non lo era)
+
+## Sessioni RVC
+- RVC attiva: **#57** `session_012rNkxoDxKP4Ky6i1ejLy9t` (aspetta il «via» di Mario). Le #55 e #56 sono chiuse. RVC sta costruendo C18 (linguetta «🍽️ Ristorante») e corregge un falso ok del ponte («Salvato · in attesa di Jona»).
+- Detto a RVC #57 (send_message, 23:10): doppio tocco migliorato da Mario ed E31 (niente add_repo incrociati).
+
+## Prossimi passi (in ordine)
+1. Esito del giro completo `38084513591`.
+2. D30 GitHub: aspettare «fatto» di Mario, poi i passi sopra, uno per volta, con link.
+3. Ponte: quando RVC ha D5, guida a Mario per il segreto `PONTE_KEY` (uguale in GitHub di Jona e nel server di RVC); poi notifiche push per i messaggi dell'hotel e foto dei guasti (D17 in `docs/DA-FARE.md`).
+4. Elenco completo in `docs/DA-FARE.md` (M33 logo JONA da guardare, M31 logo YNOY senza risposta, prove v69/v70).
 
 ## Note tecniche
-- In locale: emulatore Firebase `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`, server `python3 -m http.server 8765`. Playwright globale `/opt/node22/lib/node_modules/playwright`.
-- Per guardare l'apertura ferma a un istante: copia di `tools/video-apertura.mjs` (serve `webdriver` falso, profilo entrato, `getAnimations()` fermate a `currentTime`).
-- Seguire le prove su GitHub: ciclo in background con `curl https://api.github.com/repos/Kur0ChanX/jona-ordini/actions/runs?head_sha=<sha>` finché `completed` (repo pubblico).
-- Controllo online: `curl -sSL "https://jona-ristorante-by-ynoy-corp.pages.dev/?x=…" | grep APP_VER`.
+- Server locale `python3 -m http.server 8765`; Playwright `/opt/node22/lib/node_modules/playwright`, Chromium `/opt/pw-browsers/chromium`; emulatore `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`.
+- Esito prove: `curl https://api.github.com/repos/Kur0ChanX/jona-ordini/actions/runs?head_sha=<sha>`; log con `mcp__github__get_job_logs`.
+- Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini (cambierà dopo D30), `source_revision` `claude/jona-ramo-definitivo`.
 - Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva.
-- Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`.
 
 ## Rischi aperti
-- Limite settimanale: era dell'account vecchio (Mario, #66). Nell'account attuale solo `five_hour`, «allowed» (10/10 19:13).
-- Logo JONA: le «R», «S», «O» piccole di RISTORANTE ricostruite da pochi pixel; se Mario vede un difetto, segnare la zona sul suo screenshot (E16) e correggere `tools/logo-jona.py`.
-- Android: maschera SVG intorno a YNOY (D14) e logo JONA SVG mai provati da Mario su Android.
-- Ponte: due sessioni (Jona e RVC) lavorano sulla stessa cosa: tenersi allineati con send_message e non dare a Mario due proposte diverse.
+- Ponte: funziona davvero solo quando RVC avrà il suo server (D5) e `PONTE_KEY`.
+- D30: il trasferimento cambia l'indirizzo del repo; il vecchio GitHub Pages va tenuto vivo con il repo-pagina di rimando, altrimenti i telefoni installati dal vecchio indirizzo si rompono.
+- Repo privato: le prove su GitHub consumano minuti (2000/mese dell'organizzazione).
 
 ## Ultimo messaggio di Mario, parola per parola
-«Mi piace la 3 che vedono anche le camere ecc ecc ma si possono unire le 3 idee in modo ordinato ?»
+«2 cose quando mi fai la domanda touch 2 tocchi si può fare che se scrivo non mi metti si confermo ma un altra cosa perché è fraintendibile come è successo prima, poi nel si conferma nelle risposte impostate puoi scrivermi anche la domanda cosí rispondo si confermo e ceyanche scritto la domanda che confermo»
 
-Messaggi prima in #66: «limite settinanale forse è del vecchio account / poi / Ti ricordi di creare un ponte con l'app RVC magari mettiamo un icona per condividere alcuni informazioni o mandare informazioni dei clienti al All'hotel o necessità del Ristorante Jona all hotel»
+Messaggi prima in #67: «vai» · «Si» · «attenzione ho cliccato per sbaglio riesci a non farlo touch…» · «anche i nomi se clicchi non sono un problema direi tutti» · «domanda che ne dici se usiamo un github separato visto che è il mio personale quello Kur0ChanX vorrei dare un account a github con la mail jona.ristorante@gmail.con» · «Non è meglio avere un github separato per non usare i limiti…» · «perché è pubblico jona?» · «io mi ricordo di averlo messo su un git hub diverso da Kur0ChanX» · «differenza tra privato e pubblico? pro e contro / Altra cosa prendi la regola delle domande a doppio touch di rvc» · «in organizzazione privato devo usare un nuovo link per l'app?» · (foto) «stai sbagliando…» · (foto) «Hai di nuovo sbagliato?» · «Dico se creo un altro GitHub privato per jona con account jona.ristorante@gmail.com devo rinviare i link?» · «Consigli nuovo account privato o organizzazione privato nel mio kurochanx?»
