@@ -4,7 +4,7 @@
 # «tutto»: tutte le prove come tools/prova-tutto.sh (~1 ora, una volta a settimana).
 cd "$(dirname "$0")/.."
 M=${1:-veloce}; S=${2:-/tmp/jona-prove}; mkdir -p "$S"
-VELOCI="test-gemini-server test-virgolette test-fatture test-conveniente test-listini-doppi test-listini-prova test-firebase-provavia test-apertura-v62 test-logo-nitido test-barra test-agenda-v58 test-agenda-v59 test-agenda-v61 test-demo-invito test-richieste-gestite test-errori test-errori-server test-falsi-ok test-firebase-telefoni test-v35 test-v40 test-firebase-flow test-news test-demo test-testbar test-agenda test-responsabile test-giro test-giro-safari test-giro-computer test-campi-16 test-hotel test-ponte-server"
+VELOCI="test-gemini-server test-virgolette test-fatture test-conveniente test-listini-doppi test-listini-prova test-firebase-provavia test-apertura-v62 test-logo-nitido test-barra test-agenda-v58 test-agenda-v59 test-agenda-v61 test-demo-invito test-richieste-gestite test-errori test-errori-server test-falsi-ok test-firebase-telefoni test-v35 test-v40 test-firebase-flow test-news test-demo test-testbar test-agenda test-responsabile test-giro test-giro-safari test-giro-computer test-campi-16 test-hotel test-ponte-server test-vecchio-indirizzo"
 (python3 -m http.server 8765 >/dev/null 2>&1 &)
 (npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona > $S/emu.log 2>&1 &)
 for i in $(seq 1 120); do curl -s http://127.0.0.1:8080 >/dev/null && curl -s http://127.0.0.1:9099 >/dev/null && curl -s http://127.0.0.1:8765 >/dev/null && break; sleep 2; done
