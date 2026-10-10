@@ -42,7 +42,7 @@ Cosa c'è già (non rifare): `viewport-fit=cover`, `safe-area-inset-top/bottom`,
 - Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`.
 
 ## Rischi aperti
-- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00: commit+push dopo ogni passo.
+- Limite settimanale: era dell'account vecchio (Mario, #66). Nell'account attuale `get_session` mostra solo il limite di 5 ore, «allowed» (10/10 19:13).
 - Logo JONA: le «R», «S», «O» piccole di RISTORANTE sono ricostruite da pochi pixel; se Mario vede un difetto, segnare la zona sul suo screenshot (E16) e correggere `tools/logo-jona.py`.
 - Android: maschera SVG intorno a YNOY (D14) mai provata da Mario. Ora anche il logo JONA è una maschera SVG: stessa tecnica, Chrome/Safari la supportano.
 
