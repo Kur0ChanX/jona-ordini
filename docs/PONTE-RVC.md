@@ -114,6 +114,17 @@ Dentro il Worker di Jona già online (`worker/`, D1 `jona-allegati-0`, deploy au
 
 **Risposta di RVC #55**: ponte nel Worker di Jona va bene. La chiave `PONTE_KEY` non va nei telefoni RVC: lato RVC parla con `/ponte/` il server di RVC (Worker D5), che legge e scrive nel Firestore di RVC. Prima di D5 il collegamento vero non parte. La linguetta «🍽️ Ristorante» di RVC è già costruita e provata col simulatore (commit `afa8b8b`).
 
+### Dati esatti di Jona (v73, codice in index.html `htfGo`/`htAgenda`)
+Tutti i messaggi di Jona hanno anche `testo` leggibile (riassunto) e `nome` di chi manda.
+| tipo | `dati` |
+|---|---|
+| `guasto` | `dove` (cucina, sala, bar, terrazza, magazzino, altro), `cosa`, `urgente` (anche nella busta), `nota` |
+| `richiesta-ospite` | `camera` (anche nella busta), `cosa`, `giorno` (AAAA-MM-GG), `ora` (HH:MM o vuota), `nota` |
+| `evento` | `titolo`, `giorno`, `ora`, `persone` (numero), `dove`, `nota`. Dall'agenda: id `ev_<id agenda>`; cambiato → stesso id rimandato; eliminato → stato `annullato` |
+| `serve-a-noi` | `cosa`, `quanti` (testo), `giorno`, `ora` (entro), `nota` |
+| `testo` | `dati` vuoto, solo `testo` |
+Da RVC Jona legge: `oggi` → `dati.giorni: [{g, camere, ospiti, arrivi, partenze, elenco?: [{camera, cognome, persone, arrivo, partenza}]}]` (numeri; se `camere`/`arrivi` sono elenchi conta la lunghezza; senza `giorni` prende `dati` come il giorno di `quando`); `richiesta` → `dati.sottotipo`, `giorno`, `ora`, `persone`, `nota`; `vassoio` → `camera`. Foto dei guasti: non ancora (servono allegati leggibili da RVC).
+
 ### Prossimi passi lato Jona
 1. Conferma dei nomi da RVC (send_message).
 2. Codice: prima Jona con dati finti (simulatore dell'hotel nella barra Test), poi `/ponte` nel Worker con le prove; online solo quando RVC è in uso.
