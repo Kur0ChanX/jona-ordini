@@ -25,7 +25,7 @@ Il lavoro non vive nell'account Claude: vive su **GitHub**. Tutti e due gli acco
 
 1. Entra su https://claude.ai con l'account Hotmail. Serve un piano **Pro** o **Max** (Claude Code non c'è nel piano gratuito).
 2. Collega GitHub: https://claude.ai/connect-github → accedi con lo stesso GitHub di sempre (Kur0ChanX). Poi apri https://claude.ai/code → **nuova sessione** → nella scelta del repository devono comparire `jona-ordini` e `RVC`.
-3. Preferenze personali: https://claude.ai/settings/profile → campo delle preferenze personali → cancella quello che c'è e incolla il testo del riquadro «Preferenze» qui sotto → **Salva**.
+3. Preferenze personali: menu (tocca il tuo nome in basso) → **Impostazioni** → scheda **Account** → campo **Istruzioni per Claude** → cancella quello che c'è e incolla il testo del riquadro «Preferenze» qui sotto. Fallo in **tutti e due** gli account.
 4. Memoria (vedi «Unire le due memorie» sotto).
 5. Connettori, solo se li usi: https://claude.ai/settings/connectors → collega gli stessi dell'account Gmail.
 6. Nella prima sessione Hotmail scrivi a Claude: «ricrea le routine dell'altro account» (Claude legge l'elenco in fondo a questa pagina).
@@ -82,3 +82,10 @@ Poi attendi le mie istruzioni.
 ## Routine dell'account Gmail (da ricreare in Hotmail)
 - «Punto ogni 5 ore»: promemoria che si ripete ogni 5 ore (risponde solo «.» e si riprogramma con `send_later` tra 300 minuti). Va ricreato in una sessione dell'account nuovo.
 - «Aggiorna abbonamenti Tier List JRPG»: spenta, lunedì 8:47. Legata all'artifact della tier list dell'account Gmail: ricrearla solo se la tier list viene ripubblicata nell'account nuovo.
+
+## Stato (10/10/2026, sessione di servizio «cambio account»)
+- Preferenze: Mario ha mandato lo screenshot dell'account Hotmail (Impostazioni → Account → «Istruzioni per Claude»): il testo è **identico** a quello di Gmail. Sono già unificate: in tutti e due gli account va solo aggiunto il paragrafo «CAMBIO ACCOUNT» del riquadro sopra.
+- Piano: nel menu dell'account Hotmail compare «Effettua l'upgrade del piano». Da controllare in Impostazioni → **Fatturazione** che sia Pro o Max (serve per Claude Code). Risposta di Mario ancora da avere.
+- Memoria: nel menu c'è «Personalizzazione» (probabilmente lì la memoria). Testi dei due account non ancora ricevuti.
+- Fatto: guida, regola in CLAUDE.md, copia di 4 artifact mandata a Mario, avviso alle sessioni Jona #55 e RVC #49.
+- Ultimo messaggio di Mario (parola per parola): «se intendi questo come nelle foto  c'è scritto questo» + il testo delle preferenze (uguale al riquadro sopra, senza il paragrafo CAMBIO ACCOUNT) + 2 screenshot (Impostazioni → Account; menu dell'account Hotmail).
