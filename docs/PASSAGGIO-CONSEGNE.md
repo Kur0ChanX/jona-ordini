@@ -4,6 +4,10 @@ Sessione attuale: #75
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v75** (PR #86 unita con squash `aed77cc`, controllato online `APP_VER=75`). `main` già unito nel ramo di lavoro. Nessuna PR aperta.
 
+## Fatto in #75 (11/10 ora italiana)
+- Unita la scorta. Script del Drive risponde **v2** (M38 fatta: tolta).
+- Riordino `Jona/Loghi` FATTO: sottocartelle `JONA`, `YNOY CORP` (Originale, Vettoriale, PNG alta risoluzione, Animazione, LEGGIMI.txt: spostate da «YNOY CORP 3 lune» + animazione caricata), `Vecchi` (gli 8 file sparsi + `docs/img/logo/vecchi/*`). «YNOY CORP 3 lune» è vuota: il cestino è stato negato dal controllo automatico → la cestina Mario a mano. Link: https://drive.google.com/drive/folders/1ecGLASRvK65nJ2o5yyNprtZT-oVqHStq
+
 ## Fatto in #74 (11/10, 1:49-2:00 ora italiana)
 - Unita la scorta (solo `ULTIMO-MESSAGGIO.md`). Rinominate #74 e #73.
 - Script del Drive risponde ancora **v1** (`elenco` → «servono nome e dati»). Aggiunta **M38** in `DA-FARE.md` (guida: Salva → Gestisci deployment → matita → Nuova versione, URL uguale), guida data a Mario.
