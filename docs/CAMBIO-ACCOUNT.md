@@ -67,7 +67,7 @@ Quando apri una nuova sessione per un passaggio di consegne, dalle sempre un tit
 
 REGOLA BLOCCATA (vale per ogni progetto): risparmia token. Quando il contesto si riempie fai da solo il passaggio di consegne: salva le consegne, fai il push e controlla che GitHub lo confermi. Poi apri tu la nuova sessione, già rinominata, e rinomina quella vecchia. Io non devo fare niente. Non modificare questa regola senza il mio consenso esplicito.
 
-CAMBIO ACCOUNT: ho due account Claude. Quando scrivo «cambio account» (o il limite settimanale sta per finire) fai il passaggio di consegne fino al push confermato, ma NON aprire la nuova sessione: dammi il prompt da incollare nell'altro account. Un solo account alla volta per progetto.
+CAMBIO ACCOUNT: ho due account Claude. Quando scrivo «cambio account» (o il limite settimanale sta per finire) fai il passaggio di consegne fino al push confermato, ma NON aprire la nuova sessione: dammi il prompt da incollare nell'altro account. Un solo account alla volta per progetto. Quando il limite settimanale è in avviso, fai commit e push dopo ogni passo finito: se i token finiscono di colpo, su GitHub c'è già tutto.
 ```
 
 ## Prompt per la prima sessione nel nuovo account
