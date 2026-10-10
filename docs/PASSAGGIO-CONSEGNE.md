@@ -1,34 +1,55 @@
-# Passaggio di consegne (2026-10-10, fine sessione #55)
+# Passaggio di consegne (2026-10-10, fine sessione #59)
 
-Sessione attuale: #56
+Sessione attuale: #60
 
-Ramo di lavoro: `claude/jona-sessione-56` (all'handoff della #56 → `claude/jona-sessione-57`). App online: v67. **v68 pronta e committata** (commit `27a77fb` sul ramo, prove legate verdi), NON ancora pubblicata.
+Ramo di lavoro: `claude/jona-sessione-60`. App online: **v68** (main `7ff2c34`). Nessuna versione nuova in #57 e #58.
 
-## Ultimo messaggio di Mario (#55), parola per parola
-«Mi deve avvisare che il motore sta lavorando, su il flash, se è normale, e perché sta lavorando lì. Che problemi ha avuto l'altro? Se è in sovraccarico o no? Mi raccomando, attenzione ai falsi feedback, perché spesso ci possono essere dei falsi. Mi è capitato in altri programmi.»
+## Ultimo messaggio di Mario (#59), parola per parola
+«ti autorizzo a cancellare i 27 rami  solo quelli che non servono mai piú in nessun caso»
 
-- Messaggio prima: «Sicuro di utilizzare la versione Gemini Flash Lite. Flash Lite fa un po' schifo, perché non la versione normale, Flash normale, che funziona molto molto bene? La versione Pro, no perché consuma troppo e poi non abbiamo un abbonamento Pro.» → risposto: l'app usa già Flash per primo, Lite solo di riserva; Pro no. Ordine v68: Flash → Flash-Lite → Cloudflare Llama 4.
-- Il suo ultimo messaggio è la richiesta realizzata nella v68 (sotto). Va ancora detto a Mario che è fatta, appena pubblicata.
+## Esito (#59) della pulizia rami
+- Con l'ok di Mario ho provato a cancellare i 22 rami SICURI AL 100% (stesso commit della PR unita, oppure già tutti dentro `claude/jona-sessione-59`): le 16 `v…`/`claude/v…` dell'elenco sotto, `claude/jona-sessione-52…56`, `claude/sessione-41-consegne-p7tepk`. Risultato: **HTTP 403** dal proxy git della sessione (si può scrivere solo sui propri rami), prima ancora «Git Destructive» dal controllo permessi. Gli strumenti GitHub MCP non hanno «cancella ramo». Non aggirare.
+- Gli altri 5 (hotfix-notifiche, ccr-4a01d00e-6ay25e, ccr-402d6602-imjwpw, backup-automatico, ccr-55f4e829-7nev78) hanno commit in più (solo consegne vecchie e merge di main): per la frase «in nessun caso» NON vanno cancellati senza chiedere di nuovo.
+- Strada rimasta: Mario li cancella dal cestino 🗑 su https://github.com/Kur0ChanX/jona-ordini/branches (voce M31), solo i 22 sicuri.
 
-## Fatto in #55
-- **Secondo giro prova lettori** (run 38034926723, 9:35→10:00 ora italiana, artifact 11663702836): permessi Cloudflare OK. Gemini Flash-Lite 20/20, 0 errori, 17 s; **CF `@cf/meta/llama-4-scout-17b-16e-instruct` 19/20**, 0 errori, 72 s; Gemini Flash 6/6 ma 2 foto perse per 503, 376 s; CF qwen3.8 13/20 (398 s), mistral-small-3.1 11/20, gemma-4 0 righe (non usarla). Immagine `docs/img/scelte/prova-lettori-risultato-2.png` mandata a Mario (fatta con HTML + Playwright, script nello scratchpad, non nel repo).
-- Iscritto alla PR #78 (`subscribe_pr_activity`). Controllo di riserva cancellato.
-- **Messaggio da un'altra sessione di Mario** («Account switch strategy», `session_01T6FSLJ14J9cy5jTtgWQKnE`): unito il ramo `ccr-c4aaeb72-tfz1na` (solo `docs/CAMBIO-ACCOUNT.md` nuovo + regola «CAMBIO ACCOUNT» in CLAUDE.md › REGOLE TRASVERSALI). Aggiunta **M29** in `docs/DA-FARE.md` (preparare l'account Hotmail, passi 1-6). Regola: quando Mario scrive «cambio account» → handoff fino al push e al ramo nuovo, ma NON aprire la sessione nuova: dargli il prompt di 3 righe per l'altro account. D22 aggiornata in DA-FARE.
-- **v68 costruita** (commit `27a77fb`):
-  - `worker/src/index.js`: `LETTORI` {flash, lite, cf}, `CF_MS` 80 s, `motivoDi` (503 sovraccarico, 429 limite, 504 lento, 404 manca), `lettoreErr` → `{error:{message,codice,motivo,lettore}}`, `leggiCf` (Workers AI via `env.AI.run`, messaggio chat con `image_url` data:base64, risposta riportata nel formato Gemini con `lettore:'cf'`; errori 3040 → 503, 4006/quota → 429, tempo scaduto → 504). In `gemini()`: con `req.lettore` prova SOLO quel lettore, una volta, timeout `GEM_TRY_MS` (45 s); senza `lettore` (Chiedi a Jona, app vecchie) la catena di prima, invariata.
-  - `worker/wrangler.toml`: aggiunto `[ai] binding = "AI"` (statico; il token ha Workers AI Read+Edit dal 10/10). Il workflow aggiunge i D1 in fondo: TOML valido.
-  - `index.html` (zona importazione listini): `gemCall(body, lettore)` (con chiave sul telefono: flash/lite diretti a Google, `cf` → `{salta:true}`; dal server: risposta `lettore` solo se il server lo dice, altrimenti '' → mostrato «Gemini» generico, per non inventare). `GEM_LETT` (nome e ruolo), `gemNome`, `gemPerche` (testo SOLO dal codice HTTP vero), `gemLive` (banner `#gem-live`: ✗ lettore: motivo · secondi, ⏳ Legge X (ruolo) · contasecondi `#gem-sec`), `gemTick` (aggiorna solo il numero ogni secondo). `gemRun`: per ogni foto prova i lettori in ordine; passa al successivo con 429/500/502/503/504/524/404; si ferma subito con altri codici (403, chiave non valida); se tutti falliscono, errore con ogni lettore e il suo codice. Tolta la vecchia «seconda prova dopo `GEM_PAUSA`» (sostituita dalla catena; `GEM_PAUSA` resta dichiarata). `I.gnote` → `S.rev.lett` → riquadro `#rv-lett` «Chi ha letto le foto» in `reviewSheet`; `fonte` = «N foto lette».
-  - APP_VER 68, CACHE `jona-ordini-v72`, NEWS v68 (chef + dev.aggiunte), riga v68 in CLAUDE.md.
-  - `tools/test-gemini-server.mjs`: 59 controlli (nuovi: lettore lite/flash/pro/cf, Workers AI finto con 3040/4006/lento, formato messaggio, catena vecchia senza lettore; app: ordine flash,flash,lite,cf, errore con i 3 codici veri, nota «Flash-Lite dopo 503», banner dal vivo con contasecondi, server vecchio → «Gemini», riquadro «Chi ha letto», chiave sul telefono). Il finto `fbInit` ora ha `fs` (Proxy) perché durante l'attesa partiva un render.
-  - Prove riuscite in locale (TZ=Europe/Rome): test-gemini-server 59, test-fatture 28, test-virgolette 16, test-news 94, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-testbar 7, test-giro.
-- Decisioni: l'app guida la catena (non il Worker) così il banner dal vivo dice la verità su chi lavora in quel momento; ogni richiesta resta sotto i 100 s di Cloudflare (E20). Scartato: banner con stima/tempo inventato; mostrare il messaggio inglese grezzo di Google (meglio il codice + traduzione fissa). Pro scartato (costi, Mario).
+## Ultimo messaggio di Mario (#58), parola per parola
+«guarda tutti i servizi che abbiamo utilizzato sui due progetti uno Jonah e uno RVC che mi sono registrato e fammi un file scaricabile che lo tengo sempre con me con che cosa ho utilizzato che insomma se devo rimettere se devo riaprire un progetto ho tutto salvato a prova di stupido creami un file per piacere che me lo salvo e me lo custodisco»
 
-## Prossimo lavoro (#56), in ordine
-1. **Pubblicare v68**: aprire PR da `claude/jona-sessione-56` (contiene `27a77fb`) verso `main`, attendere «Prove automatiche» verde, squash merge, controllare online (APP_VER 68) e che il workflow del Worker (`cloudflare-worker.yml`) sia verde (prima volta con `[ai]`: se il deploy fallisce per il binding AI, capire il motivo, avvisare Mario). Subito dopo: `git fetch origin main && git merge origin/main` nel ramo e push.
-2. Tocca il Worker → **giro completo extra su GitHub** (workflow «Prove automatiche», workflow_dispatch modo `tutto`, E14) e dirlo a Mario in una riga.
-3. Dire a Mario (breve, con immagine se serve) che la v68 è online: cosa vedrà mentre legge le foto. Proporre UNA idea nuova (regola SOLUZIONE SMART).
-4. Chiudere la PR #78 senza unirla (state closed) e disiscriversi; gli strumenti `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` sono solo sul ramo `claude/prova-lettori`: eventualmente portarli su main più avanti.
-5. Poi D23 (più XML + `.p7m`), D24, D25, D26 (`docs/DA-FARE.md`).
+## Fatto in #59
+- File dei servizi FATTO e mandato a Mario (PDF + HTML, solo nello scratchpad, NON nel repo pubblico): account di base, Jona (GitHub, Cloudflare nuovo/vecchio, Firebase, Gemini, Open-Meteo, pezzi Cloudflare, dove stanno i segreti), RVC (org, repo privato, Gmail RVC, Firebase/Cloudflare da creare), riapertura facile/difficile, righe da compilare a mano per le email mancanti. Accesso al repo RVC negato in #59 (add_repo bloccato dal controllo permessi): parte RVC dai dati già noti.
+- Giro completo run 38046156932 controllato: VERDE (12:47→13:12).
+- Rami: Mario chiede pulizia ogni tanto (solo inutili) + nomi in ordine progressivo, anche in RVC → regola «RAMI IN ORDINE» in CLAUDE.md, D28 (mandarla a RVC), M31. Push delle etichette `archivio/*` fallito («unexpected disconnect»), `git push --delete` bloccato dal controllo permessi. Rami da togliere (verificati: PR unita con stesso commit, oppure già contenuti in `claude/jona-sessione-59`; quelli con commit in più hanno solo consegne vecchie e merge di main): claude/v67-fatture, claude/v66-virgolette, claude/v65-gemini-lento, claude/v64-doppioni, claude/v62-logo, v61-agenda-destinatari, v60-zona-fotocamera, v59-agenda-pianifica, v58-agenda-smart, v57-schermo-intero-come-v45, v56-senza-avviso-fs, v55-schermo-intero, v54-barra, v43-responsabili, v42-agenda, v26-foto-vocali, hotfix-notifiche, ccr-4a01d00e-6ay25e, ccr-402d6602-imjwpw, backup-automatico, ccr-55f4e829-7nev78, claude/jona-sessione-52…56, claude/sessione-41-consegne-p7tepk. Da tenere: main, jona-sessione-57/58/59 + scorte, ccr-e62d560c-mkuuho (questa sessione), ccr-c4aaeb72-tfz1na (recente), claude/servizio-sessione-02, scorta-video-invio-v1.
+
+## (era) PRIMA COSA DA FARE (#59): il file dei servizi per Mario
+- Fare un file scaricabile (PDF consigliato, più HTML) «a prova di stupido» con TUTTI i servizi usati da Jona e da RVC: a cosa serve, account/email, nome del progetto, link diretto, segreti (solo DOVE stanno, mai il valore), come riaprire il progetto da zero.
+- **Non salvarlo in `jona-ordini`**: il repo è PUBBLICO e contiene email. Salvarlo nello scratchpad e mandarlo con `SendUserFile` (display attach). Eventuale copia solo nel repo RVC (privato), chiedendo prima.
+- Dati già raccolti in #58:
+  - Jona: GitHub **Kur0ChanX** `jona-ordini` (pubblico). Cloudflare NUOVO: Pages + Worker `jona-notifiche`, `invito`, D1 `jona-allegati-0..3`, Workers AI; sottodominio `jona-ristorante-by-ynoy-corp`; app https://jona-ristorante-by-ynoy-corp.pages.dev/. Cloudflare VECCHIO: resta `fruguponte` (non toccare), da cancellare `invito` e `jona-notifiche` (M15). Firebase progetto `jona-ordini` (Firestore + accesso anonimo, regole `firebase/firestore.rules`). Gemini (Google AI Studio): chiave nel segreto GitHub `GEMINI_API_KEY` → segreto Worker `GEMINI_KEY`. Open-Meteo (meteo, senza account). Segreti GitHub: vedi `.github/workflows/*.yml` (`grep -o 'secrets\.[A-Z_]*'`). **Email di Cloudflare (nuovo e vecchio), Firebase e Gemini NON scritte da nessuna parte**: chiesto a Mario in #58, senza risposta → nel file lasciare la riga da compilare a mano.
+  - RVC: GitHub organizzazione **RVC-Operation-by-YNOY-CORP** (posseduta dall'account personale di Mario), repo `RVC` privato. Firebase e Cloudflare **non ancora creati** (RVC D5): email scelta relaisvillacarola.operation@gmail.com. Clone in sola lettura fatto in #58 in `/home/user/rvc` (sparisce col contenitore: rifare `add_repo` read + `git clone --depth 1`). Guardare anche `worker/wrangler.toml`, `docs/APP.md`, `docs/PROGETTO.md` di RVC.
+  - Claude: mario.miscera@gmail.com (Pro, in uso) + account Hotmail (Pro, riserva).
+
+## Fatto in #58
+- Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47): finito alle 13:12 **VERDE (success)**, già detto a Mario. Prima di chiudere la #58 risultava (strano: di solito ~25 min). **Controllarlo**: https://github.com/Kur0ChanX/jona-ordini/actions/runs/38046156932 (rosso = priorità; bloccato da troppo = guardare i job). Dirlo a Mario in una riga.
+- Messaggi dalla #57 (chiusa): Mario ha cancellato `scorta/prova-permesso`; può cancellare anche `claude/prova-lettori` (PR #78 chiusa) e `claude/v63-listini-prova`. Nota tolta da D27 in DA-FARE.
+- Domanda di Mario sui due GitHub: confermato che Jona sta su `Kur0ChanX` e RVC su `RVC-Operation-by-YNOY-CORP`, tutti e due visibili collegando **Kur0ChanX**. Aggiunta la nota in `docs/CAMBIO-ACCOUNT.md` (passo 2, con link per installare l'app Claude sull'organizzazione RVC se non compare). Detto a Mario cosa si salva al cambio account (codice e consegne su GitHub, scorta automatica; chat vecchie no; preferenze a mano) e che un account aziendale si può fare (i progetti stanno su GitHub), costa di più: se ne parla se vuole.
+- `scorta/claude/jona-sessione-58` contiene solo `docs/ULTIMO-MESSAGGIO.md` del messaggio d'avvio: non unito, innocuo.
+- **E12 di nuovo**: questa sessione è a «lineage depth 8»: niente `send_later`, niente sessione nuova. Mario apre la #59 a mano da https://claude.ai/code con il prompt di 3 righe.
+
+## Prossimo lavoro (#59), in ordine
+1. File dei servizi (sopra).
+2. (Giro completo: verde, niente da fare.)
+3. D23 (più XML + `.p7m`), poi D24, D25, D26 (`docs/DA-FARE.md`).
+4. Proporre a Mario un'idea SOLUZIONE SMART (non fatta in #56-#58).
+
+## Ancora da chiedere
+- Email dei servizi di Jona (sopra). M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27, M28, M29/M30.
+
+## Rischi aperti
+- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00: commit+push dopo ogni passo (c'è anche la scorta).
+- Gemini Flash sovraccarico (503) nelle ore di punta: catena Flash-Lite → Cloudflare.
+
+## v68 (in breve, dettagli nella riga v68 di CLAUDE.md)
+Worker: `LETTORI` {flash, lite, cf}, `leggiCf` (Workers AI), errori `{codice,motivo,lettore}`. App: `gemRun` prova `GEM_LETT` in ordine per ogni foto, banner `gemLive`/`gemTick`, `gemPerche` solo da codici veri, riquadro «Chi ha letto le foto». Prova `tools/test-gemini-server.mjs` (59 controlli).
 
 ## Consegne della #54 (in breve)
 - Primo giro prova lettori (run 38033661843): Flash 7/8 foto perse per 503, Flash-Lite 20/20 (dopo correzione unità «K»), Cloudflare 403. Mario ha aggiunto al token Cloudflare Workers AI Read + Edit. Regola orari in ora italiana in CLAUDE.md.

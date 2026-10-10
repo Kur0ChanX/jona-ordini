@@ -7,6 +7,11 @@
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/handoff-check.py\" 2>/dev/null || true",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scorta.py\" msg 2>/dev/null || true",
+            "timeout": 10
           }
         ]
       }
@@ -29,6 +34,17 @@
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/handoff-check.py\" compact 2>/dev/null || true",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scorta.py\" stop 2>/dev/null || true",
+            "timeout": 60
           }
         ]
       }

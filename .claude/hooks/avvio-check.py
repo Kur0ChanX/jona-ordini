@@ -81,7 +81,19 @@ def ripara():
     return f"Avvio: ramo {ramo} {stato}. {dettagli}Fetch e merge già fatti dall'hook: non rifarli."
 
 
-avvisi = ["Leggi docs/ERRORI.md (diario degli errori) prima di lavorare.", ripara()]
+def controlla_scorta():
+    # Scorta automatica (scorta.py, D27): se la sessione prima si è fermata di colpo, il lavoro più nuovo è lì.
+    ramo = git("symbolic-ref", "-q", "--short", "HEAD")
+    if not ramo or not ok("fetch", "-q", "origin", f"+refs/heads/scorta/{ramo}:refs/remotes/origin/scorta/{ramo}"):
+        return ""
+    remoto = f"origin/scorta/{ramo}"
+    if ok("merge-base", "--is-ancestor", remoto, "HEAD"):
+        return ""
+    return (f"SCORTA: {remoto} ha lavoro non presente nel ramo (sessione chiusa di colpo?). "
+            f"Uniscila con git merge {remoto} (contiene docs/ULTIMO-MESSAGGIO.md con l'ultimo messaggio di Mario), poi git push.")
+
+
+avvisi = ["Leggi docs/ERRORI.md (diario degli errori) prima di lavorare.", ripara(), controlla_scorta()]
 print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart",
-                                         "additionalContext": " ".join(avvisi)}}))
+                                         "additionalContext": " ".join(a for a in avvisi if a)}}))
 sys.exit(0)

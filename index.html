@@ -237,6 +237,7 @@ html.staff-ui .news-v li{font-size:17px}
 .urg-b{min-height:44px;border-radius:12px;border:2px solid var(--corallo);background:transparent;color:var(--corallo);font:600 15px/1 var(--font);padding:0 14px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .urg-b.on{background:var(--corallo);color:#fff}
 .tag.best{background:var(--mirto-soft);color:var(--mirto);border-color:transparent}
+.cheap{min-height:44px;border-radius:12px;border:0;background:var(--mirto-soft);color:var(--mirto);font:500 14px/1.3 var(--font);padding:8px 12px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;text-align:left}
 .sup{display:inline-flex;align-items:center;gap:7px;font:500 13.5px/1.2 var(--font);color:var(--ink2)}
 .sup i{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
 .sup.big{font-size:18px;font-weight:400;color:var(--ink)}
@@ -1130,8 +1131,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=68;
+const APP_VER=69;
 const NEWS=[
+  {v:69,data:'2026-10-10',titolo:'Il fornitore più conveniente',
+    chef:['Quando approvi una richiesta: se lo stesso prodotto costa meno da un altro fornitore, compare la riga verde «Da … costa … in meno».','Tocca «Passa» e il prodotto passa al fornitore più conveniente, con la stessa quantità.','Confronta solo prodotti con la stessa unità (kg con kg, pezzi con pezzi).'],
+    dev:{aggiunte:['`cheaperOf(pid)`: stesso gruppo `gkey`, altro fornitore, stessa unità (`normUnita`), prezzo almeno 1% più basso. `cheapHTML` in `gmLine` (`rbest` → `rswapTo`, lo stesso del menù «Cambia fornitore»).']}},
   {v:68,data:'2026-10-10',titolo:'Foto delle fatture: vedi chi legge',
     chef:['Mentre l\'app legge una foto vedi quale lettore sta lavorando e da quanti secondi.','Se Gemini Flash è sovraccarico o non risponde in tempo, l\'app passa da sola a Gemini Flash-Lite e poi a Cloudflare (gratis), e ti scrive il motivo vero con il codice dell\'errore.','In «Controlla e salva» c\'è scritto chi ha letto ogni foto.'],
     dev:{aggiunte:['Worker `/gemini` con `lettore` (flash, lite, cf): prova solo quel lettore e risponde con `lettore` o con `{error:{codice,motivo,lettore}}`. `cf` = Workers AI `@cf/meta/llama-4-scout-17b-16e-instruct` (binding `AI` in `wrangler.toml`), scelto con la prova lettori (19/20). Senza `lettore` (vecchie app, «Chiedi a Jona») tutto come prima.','App: `gemRun` prova `GEM_LETT` in ordine, `gemLive` col contasecondi, `gemPerche` traduce SOLO il codice vero; `S.rev.lett` → riquadro «Chi ha letto le foto».']}},
@@ -2357,6 +2361,12 @@ function ask(title,text,ok,danger,input){
 function itemsOf(r){return S.drafts[r.id]||r.items||[]}
 const reqUrg=r=>(r.items||[]).some(i=>i.urgente)?1:0;
 function draft(rid){if(!S.drafts[rid]){const r=D().richieste[rid];S.drafts[rid]=clone(r.items||[]).map(it=>Object.assign(it,{qtaOrig:it.qtaOrig??it.qta}));S.removed[rid]=[]}return S.drafts[rid]}
+// Stesso prodotto da un altro fornitore, con la stessa unità e un prezzo più basso (almeno 1%): il più economico, se c'è.
+function cheaperOf(pid){const p=D().prodotti[pid];if(!p||p.prezzo==null)return null;const u=normUnita(p.unita).toLowerCase();let b=null;
+  for(const q of S.gidx.get(gkey(p.nome))||[]){if(q.id===pid||q.fornitoreId===p.fornitoreId||q.prezzo==null||normUnita(q.unita).toLowerCase()!==u)continue;if(q.prezzo<p.prezzo*0.99&&(!b||q.prezzo<b.prezzo))b=q}
+  return b}
+function cheapHTML(p,b,qta,attr){const d=p.prezzo-b.prezzo;return`<div class="ln-x"><button type="button" class="cheap" ${attr}>${ic('receipt')}<span>Da <b>${esc(forn(b.fornitoreId).nome)}</b> costa ${eur(d)} in meno${p.unita?' / '+esc(p.unita):''}${qta>1?` (risparmi ${eur(d*qta)})`:''} · <u>Passa</u></span></button></div>`}
+function rswapTo(rid,i,pid){const p=D().prodotti[pid];if(!p)return;const x=draft(rid);Object.assign(x[+i],{pid:p.id,nome:p.nome,codice:p.codice||'',unita:p.unita||'',prezzo:p.prezzo??null,fornitoreId:p.fornitoreId,fornitoreNome:forn(p.fornitoreId).nome,cambiato:true});render()}
 function altsOf(it){const p=D().prodotti[it.pid];const arr=S.gidx.get(gkey(p?p.nome:it.nome))||[];return arr.some(x=>x.id===it.pid)?arr:[]}
 function vRichieste(){
   const pend=Object.values(D().richieste).filter(r=>r.stato==='inviata').sort((a,b)=>reqUrg(b)-reqUrg(a)||a.creato-b.creato);
@@ -2409,8 +2419,9 @@ function gmLine(rid,it){
   if(it.libero)sw=`<select class="inp sm" id="rsup-${rid}-${it.idx}" data-ch="rsup" data-r="${rid}" data-i="${it.idx}" aria-label="Fornitore"><option value="">Scegli il fornitore…</option>${Object.values(D().fornitori).sort(byNome).map(f=>`<option value="${f.id}" ${it.fornitoreId===f.id?'selected':''}>${esc(f.nome)}</option>`).join('')}</select>`;
   else{const alts=altsOf(it);if(alts.length>1)sw=`<select class="inp sm" id="rsw-${rid}-${it.idx}" data-ch="rswap" data-r="${rid}" data-i="${it.idx}" aria-label="Cambia fornitore">${alts.map(p=>`<option value="${p.id}" ${p.id===it.pid?'selected':''}>${esc(forn(p.fornitoreId).nome)}${p.prezzo!=null?', '+eur(p.prezzo)+(p.unita?' / '+p.unita:''):''}</option>`).join('')}</select>`}
   const ch=!it.aggiunto&&it.qtaOrig!=null&&it.qtaOrig!==it.qta;
+  const cp=!it.libero&&D().prodotti[it.pid],cb=cp&&cheaperOf(it.pid);
   return`<div class="line wrap big"><div class="ln-i"><div class="ln-n">${esc(it.nome)}${it.urgente?' <span class="tag urg">urgente</span>':''}${it.libero?' <span class="tag">fuori listino</span>':''}${it.aggiunto?' <span class="tag gm">aggiunto da te</span>':''}</div><div class="ln-m">${it.codice?'cod. '+esc(it.codice):''}${it.prezzo!=null?' '+eur(it.prezzo)+(it.unita?' / '+esc(it.unita):''):''}${ch?` <span class="was">chiesti ${fq(it.qtaOrig)}</span>`:''}</div></div>
-  ${stepper('rq',rid+'-'+it.idx,it.qta,`data-r="${rid}" data-i="${it.idx}"`)}<span class="ln-u">${esc(it.unita||'')}</span><button type="button" class="icon-btn" data-a="rrm" data-r="${rid}" data-i="${it.idx}" aria-label="Togli ${esc(it.nome)}">${ic('x')}</button>${sw?`<div class="ln-x">${sw}</div>`:''}</div>`;
+  ${stepper('rq',rid+'-'+it.idx,it.qta,`data-r="${rid}" data-i="${it.idx}"`)}<span class="ln-u">${esc(it.unita||'')}</span><button type="button" class="icon-btn" data-a="rrm" data-r="${rid}" data-i="${it.idx}" aria-label="Togli ${esc(it.nome)}">${ic('x')}</button>${sw?`<div class="ln-x">${sw}</div>`:''}${cb?cheapHTML(cp,cb,it.qta,`data-a="rbest" data-r="${rid}" data-i="${it.idx}" data-p="${cb.id}"`):''}</div>`;
 }
 // «+ Aggiungi» dentro il blocco di un fornitore: cerca solo nel suo listino, così ogni prodotto aggiunto ha già il fornitore.
 function reqPickSheet(rid,fid){
@@ -5095,6 +5106,7 @@ syncRetry:()=>{if(!S.db||!S.db.netRetry)return;S.db.netRetry().catch(()=>{});if(
   cadd:d=>{setCart(d.p,1);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}},
   c:d=>setCart(d.p,cartQty(d.p)+Number(d.d)),
   crm:d=>setCart(d.p,0),
+rbest:d=>rswapTo(d.r,d.i,d.p),
   curg:d=>{const c=S.cart.find(x=>x.pid===d.p);if(!c)return;c.urg=!c.urg;saveCart();render();if(c.urg)toast('Segnato urgente: Maurizio lo vedrà in cima')},
   cfree:()=>{const n=S.q.trim();if(!n)return;S.cart.push({pid:'lib_'+uid(),libero:true,nome:n,qta:1,unita:'pz'});saveCart();S.q='';render();toast('«'+n+'» aggiunto al carrello')},
   csend:()=>sendCart(),
@@ -5232,7 +5244,7 @@ const CH={
     if(old&&!r.alts.includes(old))r.alts.unshift(old);r.alts=r.alts.slice(0,5);refreshSheet()},
   rqv:t=>{const x=draft(t.dataset.r);x[+t.dataset.i].qta=Math.max(0,num(t.value)||0);render()},
   rsup:t=>{const x=draft(t.dataset.r);const it=x[+t.dataset.i];it.fornitoreId=t.value;it.fornitoreNome=t.value?forn(t.value).nome:'';render()},
-  rswap:t=>{const p=D().prodotti[t.value];if(!p)return;const x=draft(t.dataset.r);Object.assign(x[+t.dataset.i],{pid:p.id,nome:p.nome,codice:p.codice||'',unita:p.unita||'',prezzo:p.prezzo??null,fornitoreId:p.fornitoreId,fornitoreNome:forn(p.fornitoreId).nome,cambiato:true});render()},
+  rswap:t=>rswapTo(t.dataset.r,t.dataset.i,t.value),
   oqv:t=>{const v=num(t.value);return setOrderQty(t.dataset.o,+t.dataset.i,v==null?0:v)},
   ometasel:t=>{const o=D().ordini[t.dataset.o];if(o)metaOf(o)[t.dataset.k]=t.value},
   rq2v:t=>{const L=rcvState(t.dataset.o).lines[+t.dataset.i];L.arr=Math.max(0,num(t.value)||0);refreshSheet()},
