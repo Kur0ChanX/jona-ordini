@@ -7,7 +7,11 @@ Ramo di lavoro: `claude/jona-sessione-59`. App online: **v68** (main `7ff2c34`).
 ## Ultimo messaggio di Mario (#58), parola per parola
 «guarda tutti i servizi che abbiamo utilizzato sui due progetti uno Jonah e uno RVC che mi sono registrato e fammi un file scaricabile che lo tengo sempre con me con che cosa ho utilizzato che insomma se devo rimettere se devo riaprire un progetto ho tutto salvato a prova di stupido creami un file per piacere che me lo salvo e me lo custodisco»
 
-## PRIMA COSA DA FARE (#59): il file dei servizi per Mario
+## Fatto in #59
+- File dei servizi FATTO e mandato a Mario (PDF + HTML, solo nello scratchpad, NON nel repo pubblico): account di base, Jona (GitHub, Cloudflare nuovo/vecchio, Firebase, Gemini, Open-Meteo, pezzi Cloudflare, dove stanno i segreti), RVC (org, repo privato, Gmail RVC, Firebase/Cloudflare da creare), riapertura facile/difficile, righe da compilare a mano per le email mancanti. Accesso al repo RVC negato in #59 (add_repo bloccato dal controllo permessi): parte RVC dai dati già noti.
+- Giro completo run 38046156932 controllato: VERDE (12:47→13:12).
+
+## (era) PRIMA COSA DA FARE (#59): il file dei servizi per Mario
 - Fare un file scaricabile (PDF consigliato, più HTML) «a prova di stupido» con TUTTI i servizi usati da Jona e da RVC: a cosa serve, account/email, nome del progetto, link diretto, segreti (solo DOVE stanno, mai il valore), come riaprire il progetto da zero.
 - **Non salvarlo in `jona-ordini`**: il repo è PUBBLICO e contiene email. Salvarlo nello scratchpad e mandarlo con `SendUserFile` (display attach). Eventuale copia solo nel repo RVC (privato), chiedendo prima.
 - Dati già raccolti in #58:
