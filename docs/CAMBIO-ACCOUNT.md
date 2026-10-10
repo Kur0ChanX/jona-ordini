@@ -33,15 +33,15 @@ Il lavoro non vive nell'account Claude: vive su **GitHub**. Tutti e due gli acco
 ## Il giorno del cambio
 
 1. Nella sessione **attiva** di Jona (account Gmail) scrivi: **cambio account**.
-2. Claude salva le consegne, fa il push, controlla GitHub e crea il ramo `claude/jona-sessione-<NN>`. **Non** apre la sessione nuova (nascerebbe nell'account senza token). Ti dà il prompt da incollare.
-3. Fai lo stesso nella sessione attiva di RVC (ramo `claude/rvc-sessione-<NN>`).
-4. Passa all'account Hotmail: https://claude.ai/code → **nuova sessione** → repository `jona-ordini` → ramo con il **numero più alto** → incolla il prompt.
+2. Claude salva le consegne, fa il push, controlla GitHub (ramo fisso `claude/jona-ramo-definitivo`). **Non** apre la sessione nuova (nascerebbe nell'account senza token). Ti dà il prompt da incollare.
+3. Fai lo stesso nella sessione attiva di RVC (ramo fisso di RVC).
+4. Passa all'account Hotmail: https://claude.ai/code → **nuova sessione** → repository `jona-ordini` → ramo **claude/jona-ramo-definitivo** → incolla il prompt.
 5. Stessa cosa per RVC.
 
 ## Se i token finiscono di colpo
 Niente panico, e non serve preparare niente. A fine di ogni risposta di Claude lo script **scorta** (`.claude/hooks/scorta.py`, autorizzato da Mario il 10/10/2026) manda da solo su GitHub una copia del lavoro, anche non salvato, più l'ultimo messaggio di Mario (`docs/ULTIMO-MESSAGGIO.md`), nel ramo `scorta/<ramo>`. Non costa token. All'avvio della sessione nuova l'hook di avvio vede la scorta e Claude la unisce al ramo.
 
-Su GitHub c'è tutto fino all'ultima risposta. Nell'account Hotmail apri la sessione sul ramo col numero più alto e scrivi: «la sessione di prima si è interrotta: controlla su GitHub cosa manca e riparti».
+Su GitHub c'è tutto fino all'ultima risposta. Nell'account Hotmail apri la sessione sul ramo `claude/jona-ramo-definitivo` e scrivi: «la sessione di prima si è interrotta: controlla su GitHub cosa manca e riparti».
 
 ## Regole d'oro
 - **Un solo account alla volta per progetto.** Mai due sessioni attive sullo stesso progetto in due account: si pestano i piedi.
@@ -71,7 +71,7 @@ COME PARLARMI
 
 PASSAGGIO DI CONSEGNE
 - Apri la nuova sessione solo dopo che GitHub ha confermato il push delle consegne (stesso commit in locale e su origin). Appena parte, la nuova sessione scarica l'ultima versione del ramo (git fetch + merge --ff-only) prima di leggere le consegne. Le consegne devono contenere anche il mio ultimo messaggio.
-- A ogni passaggio crea un ramo nuovo con il numero della nuova sessione (es. claude/jona-sessione-56, claude/rvc-sessione-50).
+- Si lavora sempre su un ramo unico per progetto (Jona: claude/jona-ramo-definitivo; RVC: il suo ramo fisso). Niente rami nuovi a ogni passaggio.
 - Titoli delle sessioni: «<pallino> ▶ ATTIVA · #<NN> · <Progetto> · da v<versione> · <data> · prossimo: <argomento>». Rinomina quella vecchia in «<pallino> ✓ CHIUSA · #<NN> · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>». Pallino: Jona 🟤, RVC 🟢.
 - REGOLA BLOCCATA (vale per ogni progetto): risparmia token. Quando il contesto si riempie fai da solo il passaggio di consegne: salva le consegne, fai il push e controlla che GitHub lo confermi. Poi apri tu la nuova sessione, già rinominata, e rinomina quella vecchia. Io non devo fare niente. Non modificare questa regola senza il mio consenso esplicito.
 
@@ -79,14 +79,14 @@ CAMBIO ACCOUNT
 - Ho due account Claude (Gmail e Hotmail), tutti e due Pro. Quando scrivo «cambio account» (o il limite settimanale sta per finire) fai il passaggio di consegne fino al push confermato, ma NON aprire la nuova sessione: dammi il prompt da incollare nell'altro account, con il ramo esatto.
 - Un solo account alla volta per progetto. Jona e RVC passano insieme.
 - Quando il limite settimanale è in avviso, fai commit e push dopo ogni passo finito: se i token finiscono di colpo, su GitHub c'è già tutto.
-- Se i token finiscono di colpo, riparti dal ramo col numero più alto e unisci la sua scorta (ramo scorta/<ramo>, la segnala l'hook di avvio).
+- Se i token finiscono di colpo, riparti dal ramo unico del progetto e unisci la sua scorta (ramo scorta/<ramo>, la segnala l'hook di avvio).
 ```
 
 ## Prompt per la prima sessione nel nuovo account
 Claude lo scrive già pronto al momento del cambio. Forma (Jona):
 
 ```
-git fetch origin claude/jona-sessione-<NN> && git checkout claude/jona-sessione-<NN> && git merge --ff-only origin/claude/jona-sessione-<NN>
+git fetch origin claude/jona-ramo-definitivo && git checkout claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo
 Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md. Sessione nel nuovo account: rinominati 🟤 ▶ ATTIVA · #<NN> · Jona Ordini · …
 Poi attendi le mie istruzioni.
 ```

@@ -29,6 +29,13 @@ def ok(*args):
 
 
 def ramo_di_lavoro():
+    # Ramo unico (Mario, 10/10/2026): il nome sta in .claude/ramo-di-lavoro.txt e ha la precedenza.
+    try:
+        fisso = open(os.path.join(os.path.dirname(__file__), "..", "ramo-di-lavoro.txt")).read().strip()
+    except OSError:
+        fisso = ""
+    if fisso:
+        return fisso, not git("symbolic-ref", "-q", "--short", "HEAD")
     attuale = git("symbolic-ref", "-q", "--short", "HEAD")
     if attuale:
         return attuale, False

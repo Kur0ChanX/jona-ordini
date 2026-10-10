@@ -1,82 +1,41 @@
-# Passaggio di consegne (2026-10-10, fine sessione #59)
+# Passaggio di consegne (2026-10-10, fine sessione #62)
 
-Sessione attuale: #60
+Sessione attuale: #63
 
-Ramo di lavoro: `claude/jona-sessione-60`. App online: **v68** (main `7ff2c34`). Nessuna versione nuova in #57 e #58.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v69** (main `76c3416`). **v70 pronta sul ramo, NON ancora pubblicata** (primo lavoro di #63).
 
-## Ultimo messaggio di Mario (#59), parola per parola
-«ti autorizzo a cancellare i 27 rami  solo quelli che non servono mai piú in nessun caso»
+## Ultimi messaggi di Mario (#62), parola per parola
+1. «prima aggiorna il mio logo con questa coda il resto tieni il tuo e rifai l'animazione anche vettoriale e inviami poi i file aggiornati valuta migliorie e valuto» (con il disegno `docs/img/logo/ynoy-coda-mario-2026-10-10.jpg`)
+2. «ricordati il tuo nuovo quello dell'app questo in foto ho fatto screenshot prendilo come riferimento gli altri con la & eliminali» (screenshot dell'apertura: `docs/img/logo/riferimento-app-2026-10-10.jpg`)
+→ Fatto (sotto). Gli ho mandato i file e chiesto quale miglioria preferisce (M31): **risposta non ancora arrivata**. La sua domanda precedente («Parto con D29?») è rimasta senza risposta: il logo è venuto prima.
 
-## Esito (#59) della pulizia rami
-- Con l'ok di Mario ho provato a cancellare i 22 rami SICURI AL 100% (stesso commit della PR unita, oppure già tutti dentro `claude/jona-sessione-59`): le 16 `v…`/`claude/v…` dell'elenco sotto, `claude/jona-sessione-52…56`, `claude/sessione-41-consegne-p7tepk`. Risultato: **HTTP 403** dal proxy git della sessione (si può scrivere solo sui propri rami), prima ancora «Git Destructive» dal controllo permessi. Gli strumenti GitHub MCP non hanno «cancella ramo». Non aggirare.
-- Gli altri 5 (hotfix-notifiche, ccr-4a01d00e-6ay25e, ccr-402d6602-imjwpw, backup-automatico, ccr-55f4e829-7nev78) hanno commit in più (solo consegne vecchie e merge di main): per la frase «in nessun caso» NON vanno cancellati senza chiedere di nuovo.
-- Strada rimasta: Mario li cancella dal cestino 🗑 su https://github.com/Kur0ChanX/jona-ordini/branches (voce M31), solo i 22 sicuri.
+## Fatto in #62
+- All'avvio: scorta unita (solo `docs/ULTIMO-MESSAGGIO.md`, era un avviso GitHub della PR #80 già unita).
+- **v70, logo YNOY con la coda nuova** (commit `b39b8cf` + `7f7f0e6`, pushati):
+  - Il disegno di Mario è lo stesso logo con coda diversa (punta a forcella sotto lo svolazzo + 4 lune al posto dei trattini e dello svolazzo sottile). Allineato al logo dell'app con OpenCV ECC (corrispondenza 0,9986 sulle lettere), coda presa dal disegno da y≥497 e x<800 (la Y finisce a y 494), sfumata 760-800 sullo svolazzo. CORP resta quello dell'app (senza «&», v53).
+  - **`media/ynoy.svg`** = nuovo originale vettoriale (potrace a 3×, 16 contorni, evenodd, viewBox 496×190 nelle stesse coordinate della maschera). Nota: `potracer` traccia i pixel False → si passa l'inchiostro negato.
+  - `tools/logo-ynoy.py` riscritto: dal vettoriale fa `media/ynoy.png` (ora 992×380, più nitido) e `docs/img/logo/ynoy-2000.png` (serve `pip install cairosvg`). Scala nuova 0,304 (era 0,313) perché le lune scendono più in basso: logo largo **177 px** (era 172) in `.wall-by i` e `.splash .yn`.
+  - `tools/ynoy-tratti.py`: coordinate dei tratti convertite + coda nuova (tratto `S` fino alla punta, punta della forcella, 4 tratti `K` per le lune; la luna piena ha un giro stretto). 73 pixel scoperti su 50897.
+  - **`tools/ynoy-html.py`** (nuovo): mette i tratti nella maschera `#ywm` di `index.html` (durata 0,03 s + 0,000647 s/unità, scalati 1,2-2,8 s; `--o`=100+100·(w/2+0,3)/len) e scrive `docs/img/logo/ynoy-animazione.svg` (animazione vettoriale autonoma).
+  - Tolti (richiesta di Mario): `tools/originale-ynoy.jpg`, `docs/img/logo-senza-e-scelta.png`, `docs/img/v53-logo-b-prima-dopo.png` (restano nella storia git). Nelle Novità vecchie «YNOY&CORP» → «YNOY CORP».
+  - `APP_VER=70`, voce NEWS v70, `CACHE` `jona-ordini-v74`. `tools/test-apertura-v62.mjs`: 22 tratti (era 19). README aggiornato.
+  - Prove: `test-logo` OK, `test-apertura-v62` 28 PASS, `test-giro` «nessun problema».
+  - Mandati a Mario: `v70-prima-dopo.png`, `v70-apertura-app.mp4`, `ynoy-animazione.mp4`, `media/ynoy.svg`, `ynoy-animazione.svg`, `ynoy-2000.png` (tutti in `docs/img/logo/` tranne lo svg).
 
-## Ultimo messaggio di Mario (#58), parola per parola
-«guarda tutti i servizi che abbiamo utilizzato sui due progetti uno Jonah e uno RVC che mi sono registrato e fammi un file scaricabile che lo tengo sempre con me con che cosa ho utilizzato che insomma se devo rimettere se devo riaprire un progetto ho tutto salvato a prova di stupido creami un file per piacere che me lo salvo e me lo custodisco»
+## Prossimi passi (#63)
+1. **Pubblicare v70** (D30), senza chiedere (regola PUBBLICA SEMPRE IN AUTOMATICO): ramo `claude/jona-v70-logo-coda` da `claude/jona-ramo-definitivo` → PR verso main → «Prove automatiche» verde → squash → controllo online `APP_VER=70` → `git fetch origin main && git merge origin/main` nel ramo definitivo + push. Avvisare Mario in una riga.
+2. Aspettare la scelta di Mario sulla miglioria (M31). Proposte: Ovvia = logo più grande all'apertura (le lune sul telefono sono ~2 mm); Furba = le 4 lune cadono una dopo l'altra con rimbalzo (come «BY»); **Geniale (consigliata)** = le 4 lune come segno di attesa nell'app (Gemini che legge le foto, salvataggi); Nessuna.
+3. Poi D29 (ottimizzazione Android/iPhone/Mac/Windows, piano in `docs/DA-FARE.md`).
 
-## Fatto in #59
-- File dei servizi FATTO e mandato a Mario (PDF + HTML, solo nello scratchpad, NON nel repo pubblico): account di base, Jona (GitHub, Cloudflare nuovo/vecchio, Firebase, Gemini, Open-Meteo, pezzi Cloudflare, dove stanno i segreti), RVC (org, repo privato, Gmail RVC, Firebase/Cloudflare da creare), riapertura facile/difficile, righe da compilare a mano per le email mancanti. Accesso al repo RVC negato in #59 (add_repo bloccato dal controllo permessi): parte RVC dai dati già noti.
-- Giro completo run 38046156932 controllato: VERDE (12:47→13:12).
-- Rami: Mario chiede pulizia ogni tanto (solo inutili) + nomi in ordine progressivo, anche in RVC → regola «RAMI IN ORDINE» in CLAUDE.md, D28 (mandarla a RVC), M31. Push delle etichette `archivio/*` fallito («unexpected disconnect»), `git push --delete` bloccato dal controllo permessi. Rami da togliere (verificati: PR unita con stesso commit, oppure già contenuti in `claude/jona-sessione-59`; quelli con commit in più hanno solo consegne vecchie e merge di main): claude/v67-fatture, claude/v66-virgolette, claude/v65-gemini-lento, claude/v64-doppioni, claude/v62-logo, v61-agenda-destinatari, v60-zona-fotocamera, v59-agenda-pianifica, v58-agenda-smart, v57-schermo-intero-come-v45, v56-senza-avviso-fs, v55-schermo-intero, v54-barra, v43-responsabili, v42-agenda, v26-foto-vocali, hotfix-notifiche, ccr-4a01d00e-6ay25e, ccr-402d6602-imjwpw, backup-automatico, ccr-55f4e829-7nev78, claude/jona-sessione-52…56, claude/sessione-41-consegne-p7tepk. Da tenere: main, jona-sessione-57/58/59 + scorte, ccr-e62d560c-mkuuho (questa sessione), ccr-c4aaeb72-tfz1na (recente), claude/servizio-sessione-02, scorta-video-invio-v1.
+## Da fare per Mario (aperto)
+- Riga del ramo nelle preferenze personali dei due account (testo in consegne #61 / `docs/CAMBIO-ACCOUNT.md`).
+- Provare v69 (riga verde «costa … in meno» → **Passa**) e v70 (riaprire l'app, guardare l'apertura).
+- Elenco completo: `docs/DA-FARE.md`.
 
-## (era) PRIMA COSA DA FARE (#59): il file dei servizi per Mario
-- Fare un file scaricabile (PDF consigliato, più HTML) «a prova di stupido» con TUTTI i servizi usati da Jona e da RVC: a cosa serve, account/email, nome del progetto, link diretto, segreti (solo DOVE stanno, mai il valore), come riaprire il progetto da zero.
-- **Non salvarlo in `jona-ordini`**: il repo è PUBBLICO e contiene email. Salvarlo nello scratchpad e mandarlo con `SendUserFile` (display attach). Eventuale copia solo nel repo RVC (privato), chiedendo prima.
-- Dati già raccolti in #58:
-  - Jona: GitHub **Kur0ChanX** `jona-ordini` (pubblico). Cloudflare NUOVO: Pages + Worker `jona-notifiche`, `invito`, D1 `jona-allegati-0..3`, Workers AI; sottodominio `jona-ristorante-by-ynoy-corp`; app https://jona-ristorante-by-ynoy-corp.pages.dev/. Cloudflare VECCHIO: resta `fruguponte` (non toccare), da cancellare `invito` e `jona-notifiche` (M15). Firebase progetto `jona-ordini` (Firestore + accesso anonimo, regole `firebase/firestore.rules`). Gemini (Google AI Studio): chiave nel segreto GitHub `GEMINI_API_KEY` → segreto Worker `GEMINI_KEY`. Open-Meteo (meteo, senza account). Segreti GitHub: vedi `.github/workflows/*.yml` (`grep -o 'secrets\.[A-Z_]*'`). **Email di Cloudflare (nuovo e vecchio), Firebase e Gemini NON scritte da nessuna parte**: chiesto a Mario in #58, senza risposta → nel file lasciare la riga da compilare a mano.
-  - RVC: GitHub organizzazione **RVC-Operation-by-YNOY-CORP** (posseduta dall'account personale di Mario), repo `RVC` privato. Firebase e Cloudflare **non ancora creati** (RVC D5): email scelta relaisvillacarola.operation@gmail.com. Clone in sola lettura fatto in #58 in `/home/user/rvc` (sparisce col contenitore: rifare `add_repo` read + `git clone --depth 1`). Guardare anche `worker/wrangler.toml`, `docs/APP.md`, `docs/PROGETTO.md` di RVC.
-  - Claude: mario.miscera@gmail.com (Pro, in uso) + account Hotmail (Pro, riserva).
-
-## Fatto in #58
-- Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47): finito alle 13:12 **VERDE (success)**, già detto a Mario. Prima di chiudere la #58 risultava (strano: di solito ~25 min). **Controllarlo**: https://github.com/Kur0ChanX/jona-ordini/actions/runs/38046156932 (rosso = priorità; bloccato da troppo = guardare i job). Dirlo a Mario in una riga.
-- Messaggi dalla #57 (chiusa): Mario ha cancellato `scorta/prova-permesso`; può cancellare anche `claude/prova-lettori` (PR #78 chiusa) e `claude/v63-listini-prova`. Nota tolta da D27 in DA-FARE.
-- Domanda di Mario sui due GitHub: confermato che Jona sta su `Kur0ChanX` e RVC su `RVC-Operation-by-YNOY-CORP`, tutti e due visibili collegando **Kur0ChanX**. Aggiunta la nota in `docs/CAMBIO-ACCOUNT.md` (passo 2, con link per installare l'app Claude sull'organizzazione RVC se non compare). Detto a Mario cosa si salva al cambio account (codice e consegne su GitHub, scorta automatica; chat vecchie no; preferenze a mano) e che un account aziendale si può fare (i progetti stanno su GitHub), costa di più: se ne parla se vuole.
-- `scorta/claude/jona-sessione-58` contiene solo `docs/ULTIMO-MESSAGGIO.md` del messaggio d'avvio: non unito, innocuo.
-- **E12 di nuovo**: questa sessione è a «lineage depth 8»: niente `send_later`, niente sessione nuova. Mario apre la #59 a mano da https://claude.ai/code con il prompt di 3 righe.
-
-## Prossimo lavoro (#59), in ordine
-1. File dei servizi (sopra).
-2. (Giro completo: verde, niente da fare.)
-3. D23 (più XML + `.p7m`), poi D24, D25, D26 (`docs/DA-FARE.md`).
-4. Proporre a Mario un'idea SOLUZIONE SMART (non fatta in #56-#58).
-
-## Ancora da chiedere
-- Email dei servizi di Jona (sopra). M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27, M28, M29/M30.
+## Note tecniche
+- Strumenti installati con pip in #62 (non restano nel contenitore nuovo): scikit-image, opencv-python-headless, potracer, cairosvg.
+- Video dell'apertura: server `python3 -m http.server 8765`, `node tools/video-apertura.mjs <cartella>` (117 fotogrammi), poi ffmpeg.
 
 ## Rischi aperti
-- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00: commit+push dopo ogni passo (c'è anche la scorta).
-- Gemini Flash sovraccarico (503) nelle ore di punta: catena Flash-Lite → Cloudflare.
-
-## v68 (in breve, dettagli nella riga v68 di CLAUDE.md)
-Worker: `LETTORI` {flash, lite, cf}, `leggiCf` (Workers AI), errori `{codice,motivo,lettore}`. App: `gemRun` prova `GEM_LETT` in ordine per ogni foto, banner `gemLive`/`gemTick`, `gemPerche` solo da codici veri, riquadro «Chi ha letto le foto». Prova `tools/test-gemini-server.mjs` (59 controlli).
-
-## Consegne della #54 (in breve)
-- Primo giro prova lettori (run 38033661843): Flash 7/8 foto perse per 503, Flash-Lite 20/20 (dopo correzione unità «K»), Cloudflare 403. Mario ha aggiunto al token Cloudflare Workers AI Read + Edit. Regola orari in ora italiana in CLAUDE.md.
-- Prova lettori: `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` (on pull_request, solo se cambiano quei file); PR bozza #78 «Prova lettori foto (bozza, NON unire)», ramo `claude/prova-lettori`. I push dalla sessione non fanno partire `on: push`.
-
-## Consegne della #53 (in breve)
-- «Migliore opzione gratuita» = secondo lettore Cloudflare Workers AI (D22). Mistral solo se Cloudflare legge peggio (ora non serve).
-- Regole in CLAUDE.md: RISPOSTE CORTE, SOLUZIONE SMART rafforzata (3 strade ovvia/furba/geniale + 1 idea spontanea, controllare che non esista già). Già nell'app (non riproporre): avviso aumenti prezzi, dettatura vocale, QR/BarcodeDetector, link WhatsApp, ordine suggerito.
-- Idee approvate da Mario: D24 (fornitore più conveniente nel carrello), D25 (foto bolla vs ordine), D26 (costo piatti da ricette); idea fatture da Gmail scartata → D23 (più XML + `.p7m`, oggi errore `p7m` in `impRun`).
-
-## v67 nel dettaglio (index.html, tutto nella zona «importazione listini»)
-- `GEM_HEAD = TEMPLATE_HEAD + ';quantita;importo'`: usato nel prompt e in `gemJoin` (che ora conosce entrambe le intestazioni). `TEMPLATE_HEAD` resta per modello CSV e segnaposto.
-- `geminiPrompt` riscritto: stesso ordine del foglio senza saltare righe; fornitore = chi vende scritto in alto (DAC, F.lli Mariano, Nieddittas), mai il cliente/destinatario (ORMA DI CHEF LAI, Villa Carola); codice copiato com'è con gli zeri (040); nome com'è, virgolette comprese, via puntini e `#`/`*`; righe di continuazione (ECOLABEL, CLASSE A, nome scientifico, ALLEVATO FRANCIA) non sono prodotti; U.M. K./KG=kg, PZ=pz, CF=conf, CT=cartone, LT=l anche attaccata (`##PZ`); prezzo unitario con tutti i decimali, già scontato se c'è sconto; quantita = QUANTITÀ o PESO NETTO; importo = IMPORTO/IMPORTO NETTO; niente intestazioni, asterischi, totali, IVA; le spese si possono mettere (l'app le riconosce); cifra illeggibile = vuota.
-- `mapRows`: colonna «prezzo» preferita (`iP0`), se no il vecchio regex (anche «importo» come prezzo, file vecchi invariati); `iQ` quantità, `iI` importo (solo se c'è «prezzo»); gli item hanno `q`, `imp`.
-- Funzioni nuove prima di `guessSupplier`: `UNITA`/`normUnita` (applicata a tutti gli import), `pulisciNome` (solo `kind==='txt'`: incollato/Gemini), `isSpesa` (spese/consegna/trasporto/contributo/cauzione/imballo/nolo/porto/addebito/bancale/pallet a inizio nome; «Spezie», «Porro» no), `rigaNonTorna` (|q×prezzo − importo| > max(0,06; 1,5% importo)).
-- `impRun`: righe con `spesa` (non selezionate), `q`, `imp`. `reviewSheet`: `chk(i)` calcolato a ogni disegno (se Mario corregge il prezzo l'avviso sparisce), banner `#rv-chk` «N righe da controllare», banner `#rv-spese`, pillole «da controllare: q × prezzo € non fa importo» (rossa) e «spesa, non è un prodotto».
-- Quantità e importo NON si salvano nel prodotto (decisione: servono solo al controllo; il listino resta uguale).
-- APP_VER 67, CACHE `jona-ordini-v71`, NEWS v67 (chef + `dev.aggiunte`; attenzione: chiavi valide `aggiunte`/`correzioni`/`risolti`, non `novita`).
-- Prova nuova `tools/test-fatture.mjs` (28 controlli): trascrizioni a mano di DAC pag1 (11 righe, vitello con prezzo sbagliato apposta 5,936), Mariano (6 righe con 040/027/405), Nieddittas (4 righe con CDS), passate come 3 risposte finte di `gemCall` dentro `gemRun`; salvataggio di 20 prodotti; formati vecchi. Sul codice v66 fallisce (verificato). Aggiunta a `VELOCI` in `tools/prova-ci.sh` dopo test-virgolette.
-- Riuscite in locale (TZ=Europe/Rome): test-fatture 28, test-virgolette 16, test-gemini-server 39, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-news 94, test-testbar 7, test-giro.
-- Non tocca il Worker: niente giro completo extra.
-- Decisioni scartate: filtrare le spese togliendole del tutto (Mario non le vedrebbe: meglio senza spunta e avviso); normalizzare i nomi anche per Excel/XML (rischio di toccare file buoni); arrotondare i prezzi a 4 decimali (`num` tiene 3: basta per DAC; Nieddittas 2,0000 ok).
-- Non fatto ancora (idee per dopo): controllo somma righe = «totale merce/imponibile» della fattura; prezzo mostrato con 3 decimali nel listino (`eur` ne mostra 2: 4,988 → 4,99 €, ma il valore salvato è giusto).
-
-## Ancora da chiedere
-- M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27 (screenshot «Controlla e salva» v67), M28 (commercialista → XML).
-
-## Rischi aperti
-- Gemini Flash sovraccarico (503) nelle ore di punta: Flash-Lite regge, ma un solo fornitore = un solo punto di guasto.
-- Limiti gratuiti dei servizi IA cambiano spesso: riverificare sulle pagine ufficiali.
+- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00: commit+push dopo ogni passo.
+- Android: maschera SVG intorno a YNOY (D14) mai provata da Mario; la v70 usa lo stesso metodo.
