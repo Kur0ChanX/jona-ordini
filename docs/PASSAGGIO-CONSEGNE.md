@@ -1,56 +1,46 @@
-# Passaggio di consegne (2026-10-10, fine sessione #63)
+# Passaggio di consegne (2026-10-10, fine sessione #64)
 
-Sessione attuale: #64
+Sessione attuale: #65
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v69** (main `76c3416`). **v70 nella PR #81, NON ancora unita** (primo lavoro di #64).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v70** (main `fbd485a`, PR #81 unita alle 17:55; controllato online: `APP_VER=70`, `CACHE` `jona-ordini-v74`, `media/ynoy.svg` 200). Codice del ramo = main (dopo l'unione differiscono solo i documenti).
 
-## Sessione #63 (17:21-17:35, primo giro nel nuovo account)
-Chiusa presto: l'hook di handoff ha segnalato contesto sopra soglia al 2° messaggio.
+## Fatto in #64 (17:31-18:05)
+- All'avvio: scorta unita (era più vecchia del ramo: tenuta la versione del ramo per `docs/ULTIMO-MESSAGGIO.md`).
+- **Ambienti (M32) controllati e chiusi**: `list_environments` → `env_01PHQTdrmzBJ65UoCn8yQSqE` = **Jona Ordini**, `env_01XAN7jjPicGskXoYJYrNX7e` = **RVC**. Questa sessione gira in «Jona Ordini» e il sito `…pages.dev` risponde 200 → rete «Completo» giusta, non invertiti. La rete di RVC da qui non si vede (deve restare com'era).
+- **Prove rosse sulla PR #81**: `test-firebase-flow` «promemoria scadenza arrivato anche a B». Riprodotta in locale 3 volte su 3: NON era un caso. Causa: `test_f1` (dati di prova `makeTestData`) ha ora limite fissa 18:00; tra le 17:00 e le 18:00 è anche lui nell'ultima ora (`dlInfo` → `soon`) → 2 promemoria invece di 1. App giusta, prova sbagliata. Correzione (commit `f3da0ea` sul ramo della v70, ora in main): prima del controllo la prova toglie l'ora limite agli altri fornitori `test_`. Verde 2 su 2 in locale, poi «Prove automatiche» verdi → squash → online. Errore **E26** in `docs/ERRORI.md`.
+- Unione di main nel ramo definitivo: conflitti solo negli appunti (`DA-FARE`, `ERRORI`, consegne, `ULTIMO-MESSAGGIO`) perché il ramo della v70 portava appunti vecchi entrati con la scorta (E7). Tenuti quelli del ramo definitivo (più nuovi).
+- Nota per i controlli online: `…pages.dev/index.html` risponde 308 verso `/` → controllare con `curl -sSL "https://jona-ristorante-by-ynoy-corp.pages.dev/?x=…"`.
+- **D29 avviata**: controllo di cosa c'è già e immagine con 3 strade mandata a Mario. **Mario ha scelto la 2 «Furba»**.
 
-Fatto:
-- **Cambio account**: Mario è passato dall'account Gmail personale al secondo account (quello del Relais). RVC era già passato alle 16:00 (RVC #50 chiusa, #51 attiva in attesa del «via» di Mario). Scorta unita e pushata.
-- **Ambienti** (dettagli e ID in `docs/CAMBIO-ACCOUNT.md`, «Cambio del 10/10/2026»; errore E25): due «Default» identici, rete «Attendibile». Con quella rete il sito dell'app `…pages.dev` dà 403 (provato), l'account di prima ci arrivava. Decisione: `env_01PHQTdrmzBJ65UoCn8yQSqE` → **Jona Ordini**, rete **Completo**; `env_01XAN7jjPicGskXoYJYrNX7e` → **RVC**, rete com'è. Scartato «Personalizzato» con elenco di siti: più fragile (un sito dimenticato blocca il lavoro) e più passi per Mario dal telefono. Mario sta cambiando le impostazioni (M32): la #64 controlli con `list_environments` che i nomi siano cambiati. Se il sito resta bloccato, il controllo online si fa con WebFetch (non passa dalla rete del contenitore).
-- Avvisata RVC #51 (`session_01RqD8ttgM9UvcQjUfNoG5bc`) di passare `environment_id` = `env_01XAN7jjPicGskXoYJYrNX7e` al suo handoff.
-- **Routine «Punto ogni 5 ore»** ricreata: `trig_015ZoD3SEjtWzeDDyZhCCJ2K`, cron `25 */5 * * *` UTC (2:25, 7:25, 12:25, 17:25, 22:25 ora italiana), nella sessione dedicata «⚪ Punto ogni 5 ore · routine automatica (non usare)» (`session_014axqNKYDyiCtcgo35ie866`), risponde solo «.».
-- **PR #81 (v70)** già aperta da #62. Il push della scorta (`c7487fc`, solo documenti) ha fatto ripartire «Prove automatiche» alle 17:25. `subscribe_pr_activity` NON ha funzionato («Could not subscribe»): la #64 controlla a mano (`pull_request_read` → `get_check_runs`) o con `send_later`. Il promemoria `send_later` di #63 è stato cancellato.
-- Screenshot di Mario salvati: `docs/img/account/ambienti-uguali-2026-10-10.jpg`, `docs/img/account/accesso-rete-2026-10-10.jpg`.
+## D29, strada 2 «Furba» (prossimo lavoro, da fare SUBITO)
+Cosa c'è già (non rifare): `viewport-fit=cover`, `safe-area-inset-top/bottom` (21 usi), `apple-touch-icon`, `apple-mobile-web-app-capable` e `-title`, `theme-color` dinamico, media query per computer (700/760/900/980/1260 px), controllo `PushManager` prima delle push, `manifest` fullscreen con ripiego standalone.
+Da fare (ramo `claude/jona-v71-dispositivi` da main, poi PR, versione v71):
+1. **Zoom dei campi su iPhone**: Safari ingrandisce la pagina se un campo ha testo sotto 16 px. Visto `select.v-alt` 15px; misurare con Playwright ogni `input/select/textarea` visibile nelle schede (riusare il giro di `test-giro`) e portarli a 16px solo dove serve (attenzione a non rompere l'aspetto: controllare con `test-giro`).
+2. **Barra in alto su iPhone (app installata)**: manca `apple-mobile-web-app-status-bar-style`. Con `black-translucent` il contenuto va sotto la barra (già gestito da `safe-area-inset-top`) ma il testo dell'ora è bianco: prima controllare che la zona in alto (`body::before`, v54) sia scura in tema chiaro e scuro, altrimenti ora illeggibile. Se dubbio, lasciare com'è e annotarlo.
+3. **Prove con Safari e computer su GitHub**: `test-giro.mjs` oggi usa solo Chromium a 320/390. Aggiungere variabili (es. `GIRO_BROWSER=webkit`, `GIRO_W=1280,1440`) e in `.github/workflows/prove.yml` installare WebKit (`/opt/pw-npm/node_modules/.bin/playwright install --with-deps webkit`) e far girare il giro anche con WebKit (390) e Chromium (1280/1440), dentro `tools/prova-ci.sh` (VELOCI). In locale WebKit non c'è e NON va scaricato (regola dell'ambiente): si prova solo su GitHub con la PR (gratis, repo pubblico).
+4. Voce NEWS v71, `APP_VER` 71, `CACHE` `jona-ordini-v75`, riga v71 in CLAUDE.md, prova nuova per lo zoom (testo dei campi ≥ 16 px).
+5. Pubblicare in automatico se le prove sono verdi (regola PUBBLICA SEMPRE IN AUTOMATICO), poi `git fetch origin main && git merge origin/main` sul ramo definitivo + push. Avvisare Mario.
 
-Ultimi messaggi di Mario (#63), parola per parola:
-1. (17:21, con screenshot dei due ambienti) «Eccomi ho cambiato account passa tutto qui da mario.miscera@gmail.com eri già pronto a passare tutto ma proprio tutto / Ho messo un abiente a caso sono uguali guarda differenziamoli se no è un problema»
-2. (17:29, screenshot di «Accesso alla rete») «cosa metto?» → risposto: **Completo**, nome **Jona Ordini**, **Salva modifiche**, non toccare **Archivia ambiente**. Restano i passi 6-8 (secondo ambiente → nome **RVC**, rete com'è, **Salva modifiche**). Chiedergli a che passo è.
-
-## Prossimi passi (#64)
-1. Controllare con Mario gli ambienti (M32) e `list_environments`.
-2. **Pubblicare v70** (D30), senza chiedere: «Prove automatiche» verdi sulla PR #81 → squash → controllo online `APP_VER=70` → `git fetch origin main && git merge origin/main` nel ramo definitivo + push. Avvisare Mario in una riga. All'handoff: `create_session` con `environment_id` = `env_01PHQTdrmzBJ65UoCn8yQSqE`.
-3. Aspettare la scelta di Mario sulla miglioria del logo (M31), poi D29.
-
-## Ultimi messaggi di Mario (#62), parola per parola
-1. «prima aggiorna il mio logo con questa coda il resto tieni il tuo e rifai l'animazione anche vettoriale e inviami poi i file aggiornati valuta migliorie e valuto» (con il disegno `docs/img/logo/ynoy-coda-mario-2026-10-10.jpg`)
-2. «ricordati il tuo nuovo quello dell'app questo in foto ho fatto screenshot prendilo come riferimento gli altri con la & eliminali» (screenshot dell'apertura: `docs/img/logo/riferimento-app-2026-10-10.jpg`)
-→ Fatto (sotto). Gli ho mandato i file e chiesto quale miglioria preferisce (M31): **risposta non ancora arrivata**. La sua domanda precedente («Parto con D29?») è rimasta senza risposta: il logo è venuto prima.
-
-## Fatto in #62
-- All'avvio: scorta unita (solo `docs/ULTIMO-MESSAGGIO.md`, era un avviso GitHub della PR #80 già unita).
-- **v70, logo YNOY con la coda nuova** (commit `b39b8cf` + `7f7f0e6`, pushati):
-  - Il disegno di Mario è lo stesso logo con coda diversa (punta a forcella sotto lo svolazzo + 4 lune al posto dei trattini e dello svolazzo sottile). Allineato al logo dell'app con OpenCV ECC (corrispondenza 0,9986 sulle lettere), coda presa dal disegno da y≥497 e x<800 (la Y finisce a y 494), sfumata 760-800 sullo svolazzo. CORP resta quello dell'app (senza «&», v53).
-  - **`media/ynoy.svg`** = nuovo originale vettoriale (potrace a 3×, 16 contorni, evenodd, viewBox 496×190 nelle stesse coordinate della maschera). Nota: `potracer` traccia i pixel False → si passa l'inchiostro negato.
-  - `tools/logo-ynoy.py` riscritto: dal vettoriale fa `media/ynoy.png` (ora 992×380, più nitido) e `docs/img/logo/ynoy-2000.png` (serve `pip install cairosvg`). Scala nuova 0,304 (era 0,313) perché le lune scendono più in basso: logo largo **177 px** (era 172) in `.wall-by i` e `.splash .yn`.
-  - `tools/ynoy-tratti.py`: coordinate dei tratti convertite + coda nuova (tratto `S` fino alla punta, punta della forcella, 4 tratti `K` per le lune; la luna piena ha un giro stretto). 73 pixel scoperti su 50897.
-  - **`tools/ynoy-html.py`** (nuovo): mette i tratti nella maschera `#ywm` di `index.html` (durata 0,03 s + 0,000647 s/unità, scalati 1,2-2,8 s; `--o`=100+100·(w/2+0,3)/len) e scrive `docs/img/logo/ynoy-animazione.svg` (animazione vettoriale autonoma).
-  - Tolti (richiesta di Mario): `tools/originale-ynoy.jpg`, `docs/img/logo-senza-e-scelta.png`, `docs/img/v53-logo-b-prima-dopo.png` (restano nella storia git). Nelle Novità vecchie «YNOY&CORP» → «YNOY CORP».
-  - `APP_VER=70`, voce NEWS v70, `CACHE` `jona-ordini-v74`. `tools/test-apertura-v62.mjs`: 22 tratti (era 19). README aggiornato.
-  - Prove: `test-logo` OK, `test-apertura-v62` 28 PASS, `test-giro` «nessun problema».
-  - Mandati a Mario: `v70-prima-dopo.png`, `v70-apertura-app.mp4`, `ynoy-animazione.mp4`, `media/ynoy.svg`, `ynoy-animazione.svg`, `ynoy-2000.png` (tutti in `docs/img/logo/` tranne lo svg).
-
-## Da fare per Mario (aperto)
-- Riga del ramo nelle preferenze personali dei due account (testo in consegne #61 / `docs/CAMBIO-ACCOUNT.md`).
-- Provare v69 (riga verde «costa … in meno» → **Passa**) e v70 (riaprire l'app, guardare l'apertura).
+## Ancora aperto per Mario
+- M31: scelta della miglioria del logo (Ovvia/Furba/Geniale/Nessuna): nessuna risposta.
+- Provare v69 (riga verde «costa … in meno» → **Passa**) e v70 (riaprire l'app, guardare l'apertura con il logo nuovo).
+- Riga del ramo nelle preferenze personali dei due account (`docs/CAMBIO-ACCOUNT.md`).
 - Elenco completo: `docs/DA-FARE.md`.
 
+## Promesse fatte a Mario in #64
+- «Ti avviso quando la v70 è online»: fatto nel messaggio di chiusura di #64 (online alle 17:55).
+
 ## Note tecniche
-- Strumenti installati con pip in #62 (non restano nel contenitore nuovo): scikit-image, opencv-python-headless, potracer, cairosvg.
-- Video dell'apertura: server `python3 -m http.server 8765`, `node tools/video-apertura.mjs <cartella>` (117 fotogrammi), poi ffmpeg.
+- In locale: emulatore Firebase con `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona` (Java c'è), server `python3 -m http.server 8765`. Playwright globale in `/opt/node22/lib/node_modules/playwright`.
+- Per seguire le prove su GitHub senza `subscribe_pr_activity` (non funziona in questo account): ciclo in background con `curl https://api.github.com/repos/Kur0ChanX/jona-ordini/actions/runs/<id>` finché `status` = `completed` (repo pubblico, niente chiave).
+- Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva (da #63).
+- All'handoff: `create_session` con `environment_id` = `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`.
 
 ## Rischi aperti
 - Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00: commit+push dopo ogni passo.
-- Android: maschera SVG intorno a YNOY (D14) mai provata da Mario; la v70 usa lo stesso metodo.
+- Android: maschera SVG intorno a YNOY (D14) mai provata da Mario.
+- Altre prove potrebbero dipendere dall'ora come E10/E18/E26: se una fallisce sempre in una fascia, cercare orari fissi nei dati di prova.
+
+## Ultimo messaggio di Mario (#64), parola per parola
+«2» (risposta alla scelta delle strade di D29: strada 2 «Furba»).
+Messaggi prima: «ok avvisami quando è online» (v70) · «ok intanto parto con D29?» · «si e dimmi se ho messo gli ambienti giusti o invertiti» · «come faccio a sapere se ho fatto giusto?»

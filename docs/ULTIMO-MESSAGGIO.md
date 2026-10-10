@@ -1,5 +1,5 @@
-# Ultimo messaggio di Mario (10/10/2026 17:29 ora italiana)
+# Ultimo messaggio di Mario (10/10/2026 ~17:50 ora italiana)
 
-(con screenshot di «Accesso alla rete», salvato in `docs/img/account/accesso-rete-2026-10-10.jpg`)
+2
 
-cosa metto?
+(scelta della strada 2 «Furba» per D29)
