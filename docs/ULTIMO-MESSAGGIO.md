@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (11/10/2026 00:06 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 00:53 ora italiana)
 
-ok vado nella 69
+adesso fai questo che è simile serve 3 png in alta risoluzione una in bianco una in nero e uno trasparente in vettoriale fatto bene ordina dentro con cartelle
