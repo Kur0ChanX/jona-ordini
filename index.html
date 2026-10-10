@@ -5160,7 +5160,7 @@ function htSheet(){const me=realU(),og=htGiorno(today()),dm=htGiorno(agAdd(today
 function htOggiH(og,dm){if(!og)return`<div class="ht-card"><span class="muted">Ancora nessun dato dall'hotel per oggi.</span>${dm?`<span class="ht-m">Domani ${dm.ospiti} ospiti</span>`:''}</div>`;
   const el=og.elenco.slice().sort((a,b)=>String(a.camera).localeCompare(String(b.camera),'it',{numeric:true}));
   return`<button type="button" class="ht-card" data-a="htDet" aria-expanded="${!!(S.ht&&S.ht.det)}"><span><b class="ht-n">${og.camere}</b> camere · <b class="ht-n">${og.ospiti}</b> ospiti</span><span class="ht-m">↗ ${og.arrivi} ${og.arrivi===1?'arrivo':'arrivi'} · ↘ ${og.partenze} ${og.partenze===1?'partenza':'partenze'}${dm?` · domani ${dm.ospiti} ospiti`:''}</span>${el.length?`<span class="ht-m ht-ap">${S.ht&&S.ht.det?'Tocca per chiudere':'Tocca per vedere le camere'}</span>`:''}</button>
-  ${S.ht&&S.ht.det&&el.length?`<div class="panel ht-el">${el.map(x=>`<div class="row"><div class="row-i"><div class="row-t">Camera ${esc(x.camera)}${x.cognome?' · '+esc(x.cognome):''}</div><div class="row-m">${x.persone?esc(x.persone)+(Number(x.persone)===1?' persona':' persone'):''}${x.arrivo?' · arriva oggi':''}${x.partenza?' · parte oggi':''}</div></div></div>`).join('')}</div>`:''}`}
+  ${S.ht&&S.ht.det&&el.length?`<div class="panel ht-el">${el.map(x=>`<div class="row"><div class="row-i"><div class="row-t">Camera ${esc(x.camera)}${x.nome||x.cognome?' · '+esc([x.nome,x.cognome].filter(Boolean).join(' ')):''}</div><div class="row-m">${x.persone?esc(x.persone)+(Number(x.persone)===1?' persona':' persone'):''}${x.arrivo?' · arriva oggi':''}${x.partenza?' · parte oggi':''}</div></div></div>`).join('')}</div>`:''}`}
 function htMsgH(m){const k=HT_K[m.tipo]||HT_K.testo,mio=m.da==='jona',ann=m.stato==='annullato';
   const st=m.stLoc?'⏳ in partenza':m.loc?'⏳ in attesa di rete':m.err?'non accettato dal server':HT_ST[m.stato]||'';
   const az=ann||m.stLoc?'':!mio?[(HT_R[m.stato]||0)<2?`<button type="button" class="btn ghost sm" data-a="htSt" data-v="${esc(m.id)}" data-s="visto">Ho letto</button>`:'',(HT_R[m.stato]||0)<3?`<button type="button" class="btn ghost sm" data-a="htSt" data-v="${esc(m.id)}" data-s="fatto">${ic('check')} Fatto</button>`:''].join(''):!m.loc&&!m.err&&(HT_R[m.stato]||0)<3?`<button type="button" class="btn ghost sm" data-a="htAnn" data-v="${esc(m.id)}">Annulla</button>`:'';
@@ -5202,9 +5202,9 @@ function htSugH(){if(!funzOn('hotel'))return'';const o=htGiorno(today()),d=htGio
   return`<p class="muted small ht-sug"><b>Domani in hotel: ${d.ospiti} ospiti</b>${o?' (oggi '+o.ospiti+')':''}${c?' · consiglio: <b>'+c[1]+'</b>':''}</p>`}
 /* hotel finto (prove e app dimostrativa) */
 function htSimSeed(){const t=today(),A=now(),q=new Date().toISOString();
-  const el=[['104','Bianchi',2,0,0],['105','Rossi',2,1,0],['112','Ferri',3,0,1],['201','Moretti',2,0,0],['204','Conti',1,1,0],['212','Galli',2,0,0]];
+  const el=[['104','Anna','Bianchi',2,0,0],['105','Luca','Rossi',2,1,0],['112','Marta','Ferri',3,0,1],['201','Paolo','Moretti',2,0,0],['204','Elena','Conti',1,1,0],['212','Giorgio','Galli',2,0,0]];
   const add=m=>{HT.m[m.id]=Object.assign({da:'rvc',struttura:'villa-carola',camera:null,quando:q,chi:'ric',nome:'Ricevimento',testo:'',dati:{},stato:'arrivato',agg:A},m)};
-  add({id:'rvc_oggi_finto',tipo:'oggi',dati:{giorni:[{g:t,camere:18,ospiti:34,arrivi:5,partenze:3,elenco:el.map(([camera,cognome,persone,a,p])=>({camera,cognome,persone,arrivo:!!a,partenza:!!p}))},{g:agAdd(t,1),camere:20,ospiti:39,arrivi:6,partenze:4}]}});
+  add({id:'rvc_oggi_finto',tipo:'oggi',dati:{giorni:[{g:t,camere:18,ospiti:34,arrivi:5,partenze:3,elenco:el.map(([camera,nome,cognome,persone,a,p])=>({camera,nome,cognome,persone,arrivo:!!a,partenza:!!p}))},{g:agAdd(t,1),camere:20,ospiti:39,arrivi:6,partenze:4}]}});
   add({id:'rvc_vassoio_finto',tipo:'vassoio',camera:'104',testo:'Vassoio da ritirare'});
   add({id:'rvc_richiesta_finta',tipo:'richiesta',camera:'212',dati:{sottotipo:'torta',giorno:t,ora:'21:00',persone:2,nota:'Scritta «Buon anniversario»'}});
   htSave()}

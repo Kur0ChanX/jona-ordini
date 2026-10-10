@@ -34,7 +34,7 @@ const top=p=>txt(p,'.sheet-wrap:last-child .sheet');
   ok(/Hotel finto/.test(t)&&/18\s*camere/.test(t)&&/34\s*ospiti/.test(t)&&/5 arrivi/.test(t)&&/3 partenze/.test(t)&&/domani 39 ospiti/.test(t),'«Oggi in hotel»: camere, ospiti, arrivi, partenze e domani');
   ok(!/Bianchi/.test(t),'i cognomi non si vedono finché non si tocca');
   await p.click('[data-a="htDet"]');await w(300);t=await top(p);
-  ok(/Camera 104 · Bianchi/.test(t)&&/Camera 212 · Galli/.test(t),'al tocco l\'elenco delle camere con il cognome');
+  ok(/Camera 104 · Anna Bianchi/.test(t)&&/Camera 212 · Giorgio Galli/.test(t),'al tocco l\'elenco delle camere con nome e cognome');
   ok(/Torta \/ sorpresa/.test(t)&&/Camera 212/.test(t),'richiesta dell\'hotel nei messaggi');
   // guasto: controllo e invio
   await p.click('[data-a="htForm"][data-v="guasto"]');await w(300);

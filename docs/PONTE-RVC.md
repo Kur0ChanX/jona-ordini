@@ -99,7 +99,7 @@ Mario (#31): «2 e 3 dopo guardo l'app» → mandare a Jona le scelte senza aspe
 Mario ha approvato (#67, «Sì») l'immagine `docs/img/ponte/d17-unita.png`: icona 🏨 «Hotel» in alto in Jona, con le 3 idee unite.
 - **Pagina «Hotel»**: in cima «Oggi in hotel» (P1, solo numeri e camere, mai nomi); 4 pulsanti «Manda all'hotel»: 🔧 Guasto (P4), 🛎 Richiesta ospite (P5), 📅 Evento (P7), 📦 Serve a noi (`serve-a-noi`, nuovo); sotto il filo dei messaggi con l'hotel, come una chat con etichette, con stati ✓ arrivato · ✓✓ visto · ✔ fatto, e risposta libera.
 - **Da soli nel resto di Jona**: vassoio (P3) → compito «Ritira vassoio · camera N» nella home dello staff con **✔ Fatto**; ospiti di domani (P1) → ordine suggerito in Invii; evento dell'agenda → domanda «Mando l'evento all'hotel?» (Sì/No, mai in automatico); richieste dall'hotel → campanella.
-- **Chi vede «Oggi in hotel»**: tutti, staff compreso (Mario #67: «anche i nomi se clicchi non sono un problema direi tutti»). In vista solo i numeri; al tocco l'elenco per camera con il **cognome** dell'ospite (minimo indispensabile: niente nome di battesimo, telefono, nazionalità, allergie). I cognomi stanno nel ponte solo per oggi e domani e si cancellano con il messaggio `oggi` del giorno dopo.
+- **Chi vede «Oggi in hotel»**: tutti, staff compreso (Mario #67: «anche i nomi se clicchi non sono un problema direi tutti»). In vista solo i numeri; al tocco l'elenco per camera con **nome e cognome** dell'ospite (Mario in RVC #56, confermato due volte; niente telefono, nazionalità, allergie). I cognomi stanno nel ponte solo per oggi e domani e si cancellano con il messaggio `oggi` del giorno dopo.
 - **«Serve a noi»** (`serve-a-noi`, nuovo, Jona → RVC): necessità del ristorante verso l'hotel (es. 20 tovaglie pulite per stasera). Richiesta di Mario in Jona #66 («necessità del Ristorante Jona all'hotel»). Copre in parte la vecchia P6 biancheria, ma come richiesta libera.
 
 ### Nomi dei campi (accordo con RVC #55, 10/10/2026)
@@ -123,7 +123,7 @@ Tutti i messaggi di Jona hanno anche `testo` leggibile (riassunto) e `nome` di c
 | `evento` | `titolo`, `giorno`, `ora`, `persone` (numero), `dove`, `nota`. Dall'agenda: id `ev_<id agenda>`; cambiato → stesso id rimandato; eliminato → stato `annullato` |
 | `serve-a-noi` | `cosa`, `quanti` (testo), `giorno`, `ora` (entro), `nota` |
 | `testo` | `dati` vuoto, solo `testo` |
-Da RVC Jona legge: `oggi` → `dati.giorni: [{g, camere, ospiti, arrivi, partenze, elenco?: [{camera, cognome, persone, arrivo, partenza}]}]` (numeri; se `camere`/`arrivi` sono elenchi conta la lunghezza; senza `giorni` prende `dati` come il giorno di `quando`); `richiesta` → `dati.sottotipo`, `giorno`, `ora`, `persone`, `nota`; `vassoio` → `camera`. Foto dei guasti: non ancora (servono allegati leggibili da RVC).
+Da RVC Jona legge: `oggi` → `dati.giorni: [{g, camere, ospiti, arrivi, partenze, elenco?: [{camera, nome, cognome, persone, arrivo, partenza}]}]` (numeri; se `camere`/`arrivi` sono elenchi conta la lunghezza; senza `giorni` prende `dati` come il giorno di `quando`); `richiesta` → `dati.sottotipo`, `giorno`, `ora`, `persone`, `nota`; `vassoio` → `camera`. Foto dei guasti: non ancora (servono allegati leggibili da RVC).
 
 ### Prossimi passi lato Jona
 1. Conferma dei nomi da RVC (send_message).
