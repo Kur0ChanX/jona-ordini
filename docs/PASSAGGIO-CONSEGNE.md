@@ -1,11 +1,19 @@
-# Passaggio di consegne (2026-10-11, fine sessione #68)
+# Passaggio di consegne (2026-10-11, fine sessione #69)
 
-Sessione attuale: #69
+Sessione attuale: #70
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v73** (main `57628f4`, PR #84). CACHE `jona-ordini-v77`. Worker aggiornato (`/salute` → `ponte:false`, cioè manca ancora `PONTE_KEY`: giusto così).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v73** (main `57628f4`). **v74 in PR #85** (ramo `claude/jona-v74-vecchio-indirizzo`), CACHE `jona-ordini-v78`.
 
-## Perché l'handoff ora
-Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio dalle 19:40 circa: con `add_repo` del repo RVC la cartella principale della sessione è diventata /home/user (E31). Il contesto era arrivato a ~470k token. **Non aggiungere altri repo alle sessioni Jona**: i file di RVC si chiedono alla sessione RVC con send_message.
+## Fatto in #69 (11/10 0:05-0:35 ora italiana)
+- Unita la scorta (messaggio delle 23:59). La #68 ha scritto (send_message): Mario ha fatto **Save** sull'installazione dell'app Claude in `Jona-Ristorante-by-YNOY` → passo «app Claude» FATTO.
+- Controllato: nel codice dell'app il nick Kur0ChanX non c'è. App `jona-ristorante-by-ynoy-corp.pages.dev`, inviti e QR `invito.jona-ristorante-by-ynoy-corp.workers.dev/<codice>`, notifiche `jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev`. Il nick resta solo nel vecchio indirizzo `kur0chanx.github.io/jona-ordini` (icone installate prima della v37). Detto a Mario: inviti e QR già dati restano validi, il trasloco non li tocca (stanno su Cloudflare).
+- **Scelta di Mario (a tocco, confermata): strada «Geniale»** per il vecchio indirizzo: niente repo di rimando col nick. **v74**: lo script in `<head>` passa da github.io a pages.dev con `?da=gh` (parametri e `#` tenuti); `OLD_URL` (sessionStorage `jona_da_gh`, toglie `da=gh` dall'indirizzo) → avviso `oldUrl()` «Installa di nuovo l'app» (classe `.old-url`, pulsante «Apri il nuovo» `target=_blank`) + `errLog('Vecchio indirizzo: app aperta da github.io')` con la persona (scatola nera, striscia errori dello sviluppatore). Niente in demo. NEWS v74, `APP_VER` 74. Prova `tools/test-vecchio-indirizzo.mjs` (nelle veloci di `prova-ci.sh`). `test-giro`, `test-news` verdi in locale.
+  - PR #85: prima corsa rossa SOLO per la prova nuova (su GitHub il primo `framenavigated` non aveva il `#`); corretto leggendo `location.href` con `addInitScript` (commit pushato 0:33, `TZ=Europe/Rome` verde in locale). **Da fare nella #70**: `subscribe_pr_activity` su #85, aspettare «Prove automatiche» verde → squash → controllo online (`/index.html` con `APP_VER=74`) → `git fetch origin main && git merge origin/main` nel ramo di lavoro → push. Se rossa: capire e correggere.
+  - Piano D30 dopo la v74: qualche giorno di attesa guardando la scatola nera (righe «Vecchio indirizzo»); se nessuno arriva → Transfer senza rimando; se qualcuno arriva → dire a Mario chi, che gli fa reinstallare l'app (guida Android/iPhone già data: «Apri il nuovo» → Chrome ⋮ **Installa app** / Safari **Condividi** → **Aggiungi alla schermata Home**, poi togliere la vecchia icona; su iPhone potrebbe chiedere di rientrare: tenere pronto QR o invito).
+- **Richiesta nuova di Mario: cartella con i suoi file** («se mi perdo qualcosa in chat… ho perso la foto png del logo YNOY e il vettoriale»). Mandati subito con SendUserFile `docs/img/logo/ynoy-2000.png` e `media/ynoy.svg`. Proposte 3 strade (Ovvia GitHub, Furba pagina privata claude.ai consigliata, Geniale Drive); **Mario ha scelto: il suo Drive `mario.miscera@gmail.com`, cartella «Claude Code Lavoro»** (confermato).
+  - Nessun connettore Drive in questa sessione (i connettori si leggono all'avvio; il connettore di claude.ai non garantisce il caricamento di PNG). Scelta tecnica: **Google Apps Script** come app web nel Drive di Mario. Codice in `tools/drive/Codice.gs` (crea la cartella se manca, sottocartelle con `sotto`, sostituisce un file con lo stesso nome mettendo il vecchio nel cestino), caricatore `tools/drive/carica.sh` (`JONA_DRIVE_URL=… bash tools/drive/carica.sh "Jona/Loghi" file…`; `curl -L`; `script.google.com` raggiungibile dal contenitore).
+  - **Guida data a Mario (12 passi)**: https://script.google.com/home → **Nuovo progetto** → incolla codice → salva → **Esegui il deployment** → **Nuovo deployment** → ⚙ **App web** → Esegui come **Io**, accesso **Chiunque** → autorizza (Avanzate → Vai a … non sicuro → Consenti) → copia l'**URL** e incollalo in chat. Attendo l'URL.
+  - L'URL vale come una chiave e il repo è pubblico: `.claude/hooks/scorta.py` ora sostituisce `https://script.google(usercontent).com/…` con «[indirizzo di Google Drive nascosto]» in `ULTIMO-MESSAGGIO.md` (prova in `tools/test-scorta.py`, 18 controlli ok). **Mai scrivere l'URL in file del repo, consegne o commit.** Quando arriva: provarlo (`curl -sL "$URL"` → `{ok:true,cartella:…}`), caricare i loghi YNOY e JONA (`media/ynoy.png`, `media/ynoy.svg`, `docs/img/logo/ynoy-2000.png`, `media/jona.svg`) in «Jona/Loghi», mandare a Mario il link della cartella. Per le sessioni future: Mario deve mettere `JONA_DRIVE_URL` nelle variabili dell'ambiente (leggere `read_documentation` `environment.secrets` e dargli link e passi; in tutti e due gli account, Jona e RVC), altrimenti l'URL va passato a mano ogni sessione. Da proporre poi: caricare in Drive anche i file importanti futuri (foto con errori/dati, documenti) come regola.
 
 ## Fatto in #68 (10/10 23:00 - 11/10 0:05 ora italiana)
 - Unite le scorte e le consegne aggiornate dalla #67 (Mario scriveva ancora lì; detto alla #67 di mandarlo qui). Giro completo `38084513591` dopo la v73: **verde** (controllato).
@@ -51,9 +59,10 @@ Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio d
 - Detto a RVC #57 (send_message, 23:10): doppio tocco migliorato da Mario ed E31 (niente add_repo incrociati).
 
 ## Prossimi passi (in ordine)
-1. D30 GitHub: chiedere a Mario se l'installazione dell'app Claude è fatta; poi decidere con lui il vecchio indirizzo col suo nick (vedi «Fatto in #68»), poi Transfer e il resto, uno per volta, con link.
-2. Ponte: quando RVC ha D5, guida a Mario per il segreto `PONTE_KEY` (uguale in GitHub di Jona e nel server di RVC); poi notifiche push per i messaggi dell'hotel e foto dei guasti (D17 in `docs/DA-FARE.md`).
-3. Elenco completo in `docs/DA-FARE.md` (M33 logo JONA da guardare, M31 logo YNOY senza risposta, prove v69/v70).
+1. PR #85 (v74): iscriversi, verde → squash → online → merge di `main` nel ramo di lavoro (prima di toccare `docs/DA-FARE.md`, già cambiato nella PR: E7).
+2. Drive: attendere l'URL di Mario, provarlo, caricare i loghi, link della cartella a Mario, poi `JONA_DRIVE_URL` nell'ambiente. Aggiungere in `docs/DA-FARE.md` (DOPO il merge di main) la voce **D31** Drive di Mario.
+3. D30: attesa della scatola nera, poi Transfer e il resto (sezione D30 sotto; il passo «repo di rimando» è tolto).
+4. Ponte: quando RVC ha D5, guida per `PONTE_KEY`. Elenco completo in `docs/DA-FARE.md`.
 
 ## Note tecniche
 - Server locale `python3 -m http.server 8765`; Playwright `/opt/node22/lib/node_modules/playwright`, Chromium `/opt/pw-browsers/chromium`; emulatore `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`.
@@ -67,6 +76,6 @@ Gli hook di Jona (handoff-check, scorta, avvio-check) erano spenti in silenzio d
 - Repo privato: le prove su GitHub consumano minuti (2000/mese dell'organizzazione).
 
 ## Ultimo messaggio di Mario, parola per parola
-«è normale?  e poi ricordati che non voglio vedere il mio nick Kur0ChanX nei link dei miei colleghi» (con foto della pagina «Install Claude», 0:03)
+«Ma se mi perdo qlkosa in chat è possibile creare una cartella e mi mandi il link dove posso trovare i file esempio ho perso la foto png del logo YNOY e il vettoriale di YNOY» → risposta a tocco: «Facciamo il mio drive  mario.miscera@gmail.com e cartella Claude Code Lavoro» (confermata). Poi ha ricevuto la guida dei 12 passi: aspettare il suo URL.
 
-Messaggi prima in #68: (foto overview 23:55) «ora?» · «domanda perché ri salvi i miei screenshot?» · (scelta a tocco: «Solo le importanti», confermata) · (foto People 0:01, Kur0ChanX Owner)
+Messaggi prima in #69: «come gli faccio reinstallare l'app?» · «quindi avrenno il nuovo link senza Kur0ChanX?» · «quindi anche i qr code ed inviti sono nuovi?»
