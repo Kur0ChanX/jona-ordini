@@ -10,6 +10,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| D29 | Ottimizzare l'app per Android, iPhone, Mac e Windows (Mario #60). Piano nelle consegne #60: giro con WebKit (Safari) e schermi da computer, zona sicura iPhone, icone Apple, push su iPhone, tastiera, mouse. Prima la v69 | Claude da solo | dopo la v69 |
 | D28 | Regola dei rami (CLAUDE.md «RAMI IN ORDINE», versione 10/10 sera: niente pulizia, solo nomi in ordine): metterla nel CLAUDE.md di RVC | Claude | prossimo contatto con RVC |
 | D27 | Scorta automatica **fatta in Jona** (10/10, sessione #57, autorizzata da Mario): `.claude/hooks/scorta.py` + avviso in `avvio-check.py`, prova `tools/test-scorta.py` (16 controlli). Resta: RVC copia lo stesso file (messaggio mandato alla sessione RVC). | Claude | ora |
 | M30 | Preferenze dei due account (Gmail e Hotmail): aggiungi la riga nuova di CAMBIO ACCOUNT («Se i token finiscono di colpo, riparti dal ramo col numero più alto…», testo in `docs/CAMBIO-ACCOUNT.md`) | Mario | quando prepari Hotmail (M29) |

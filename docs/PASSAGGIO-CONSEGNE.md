@@ -1,82 +1,52 @@
-# Passaggio di consegne (2026-10-10, fine sessione #59)
+# Passaggio di consegne (2026-10-10, fine sessione #60)
 
-Sessione attuale: #60
+Sessione attuale: #61
 
-Ramo di lavoro: `claude/jona-sessione-60`. App online: **v68** (main `7ff2c34`). Nessuna versione nuova in #57 e #58.
+Ramo di lavoro: `claude/jona-sessione-61` (= `claude/jona-v69-conveniente` + queste consegne). App online: **v68** (main `7ff2c34`). **v69 pronta, NON ancora pubblicata.**
 
-## Ultimo messaggio di Mario (#59), parola per parola
-«ti autorizzo a cancellare i 27 rami  solo quelli che non servono mai piú in nessun caso»
+## Ultimo messaggio di Mario (#60), parola per parola
+«Non so se l'avevi già ottimizzato, ma mi raccomando, ottimizza l'app sia per telefoni Android, sia per iPhone, sia per Mac, computer Mac e computer Windows.»
+→ Risposto solo in breve (handoff obbligatorio). È la voce nuova **D29** in `docs/DA-FARE.md`. Da fare DOPO aver pubblicato la v69.
 
-## Esito (#59) della pulizia rami
-- Con l'ok di Mario ho provato a cancellare i 22 rami SICURI AL 100% (stesso commit della PR unita, oppure già tutti dentro `claude/jona-sessione-59`): le 16 `v…`/`claude/v…` dell'elenco sotto, `claude/jona-sessione-52…56`, `claude/sessione-41-consegne-p7tepk`. Risultato: **HTTP 403** dal proxy git della sessione (si può scrivere solo sui propri rami), prima ancora «Git Destructive» dal controllo permessi. Gli strumenti GitHub MCP non hanno «cancella ramo». Non aggirare.
-- Gli altri 5 (hotfix-notifiche, ccr-4a01d00e-6ay25e, ccr-402d6602-imjwpw, backup-automatico, ccr-55f4e829-7nev78) hanno commit in più (solo consegne vecchie e merge di main): per la frase «in nessun caso» NON vanno cancellati senza chiedere di nuovo.
-- Strada rimasta: Mario li cancella dal cestino 🗑 su https://github.com/Kur0ChanX/jona-ordini/branches (voce M31), solo i 22 sicuri.
+## PRIMA COSA DA FARE (#61): pubblicare la v69
+1. Ramo della versione: `claude/jona-v69-conveniente` (commit `f8d003f`, già su GitHub). Lavora lì per la PR. Gli appunti (consegne, DA-FARE) cambiali solo in `claude/jona-sessione-61` (E7).
+2. Prove legate già fatte in #60 (TZ=Europe/Rome): `test-conveniente` 10/10, `test-news`, `test-richieste-gestite`, `test-testbar`, `test-staff` senza FAIL. `test-firebase-approva-arrivi` → TimeoutError perché **l'emulatore Firebase non era avviato** (serve Java, vedi `tools/README.md` punto 3): rilanciarla CON l'emulatore prima della PR. `test-giro` era ancora in corso alla chiusura: rilanciarlo.
+3. Se tutto verde: PR verso `main` → controllo «Prove automatiche» verde → squash → controllo online → `git fetch origin main && git merge origin/main` su `claude/jona-sessione-61` + push. Pubblica senza chiedere (regola PUBBLICA SEMPRE IN AUTOMATICO). Non tocca il Worker: niente giro completo extra.
+4. Dire a Mario che è online e cosa provare (M nuovo: approvare una richiesta con un prodotto che c'è da 2 fornitori).
 
-## Ultimo messaggio di Mario (#58), parola per parola
-«guarda tutti i servizi che abbiamo utilizzato sui due progetti uno Jonah e uno RVC che mi sono registrato e fammi un file scaricabile che lo tengo sempre con me con che cosa ho utilizzato che insomma se devo rimettere se devo riaprire un progetto ho tutto salvato a prova di stupido creami un file per piacere che me lo salvo e me lo custodisco»
+## v69 nel dettaglio (D24, idea approvata da Mario in #53)
+- `index.html`: `cheaperOf(pid)` prima di `altsOf`: stesso gruppo `gkey` (`S.gidx`), altro fornitore, prezzo non nullo, stessa unità (`normUnita(...).toLowerCase()`), prezzo < 99% dell'attuale → il più economico. `cheapHTML(p,b,qta,attr)`: pulsante `.cheap` (verde mirto) «Da **X** costa N € in meno / unità (risparmi M €) · Passa», testo dentro uno `<span>` (senza, l'inline-flex lo spezzava in colonne: visto nello screenshot).
+- `gmLine` (approvazione richieste): riga verde se `cheaperOf` trova qualcosa; azione `rbest` → `rswapTo(rid,i,pid)`. `rswapTo` è il vecchio corpo di `rswap` (menù «Cambia fornitore»), ora condiviso.
+- CSS `.cheap` dopo `.tag.best`. APP_VER 69, NEWS v69 (chef + dev.aggiunte), `sw.js` CACHE `jona-ordini-v73`.
+- Prova nuova `tools/test-conveniente.mjs` (10 controlli: unità diversa, differenza < 1%, già il più economico, staff senza suggerimento, approvazione con risparmio, «Passa», 320/390 px, nessun errore). Aggiunta a `VELOCI` in `tools/prova-ci.sh`. Con `SHOT0=…png` fa lo screenshot della riga verde.
+- CLAUDE.md: riga v69. DA-FARE: D24 aggiornata.
 
-## Fatto in #59
-- File dei servizi FATTO e mandato a Mario (PDF + HTML, solo nello scratchpad, NON nel repo pubblico): account di base, Jona (GitHub, Cloudflare nuovo/vecchio, Firebase, Gemini, Open-Meteo, pezzi Cloudflare, dove stanno i segreti), RVC (org, repo privato, Gmail RVC, Firebase/Cloudflare da creare), riapertura facile/difficile, righe da compilare a mano per le email mancanti. Accesso al repo RVC negato in #59 (add_repo bloccato dal controllo permessi): parte RVC dai dati già noti.
-- Giro completo run 38046156932 controllato: VERDE (12:47→13:12).
-- Rami: Mario chiede pulizia ogni tanto (solo inutili) + nomi in ordine progressivo, anche in RVC → regola «RAMI IN ORDINE» in CLAUDE.md, D28 (mandarla a RVC), M31. Push delle etichette `archivio/*` fallito («unexpected disconnect»), `git push --delete` bloccato dal controllo permessi. Rami da togliere (verificati: PR unita con stesso commit, oppure già contenuti in `claude/jona-sessione-59`; quelli con commit in più hanno solo consegne vecchie e merge di main): claude/v67-fatture, claude/v66-virgolette, claude/v65-gemini-lento, claude/v64-doppioni, claude/v62-logo, v61-agenda-destinatari, v60-zona-fotocamera, v59-agenda-pianifica, v58-agenda-smart, v57-schermo-intero-come-v45, v56-senza-avviso-fs, v55-schermo-intero, v54-barra, v43-responsabili, v42-agenda, v26-foto-vocali, hotfix-notifiche, ccr-4a01d00e-6ay25e, ccr-402d6602-imjwpw, backup-automatico, ccr-55f4e829-7nev78, claude/jona-sessione-52…56, claude/sessione-41-consegne-p7tepk. Da tenere: main, jona-sessione-57/58/59 + scorte, ccr-e62d560c-mkuuho (questa sessione), ccr-c4aaeb72-tfz1na (recente), claude/servizio-sessione-02, scorta-video-invio-v1.
+## Decisioni (#60) e perché
+- **D24 prima di D23**: Mario «possibile ma non saprei ora» su D23. D23 (più XML + `.p7m`) serve solo quando il commercialista manda gli XML (M28, aperto); D24 funziona subito con i listini già caricati.
+- **Già esisteva** nel catalogo: etichetta «più conveniente» (`groupHTML`) e per lo staff `defOpt` sceglie già il più economico. Mancava solo nell'approvazione.
+- **Niente suggerimento nel carrello**: il gestore NON ha la scheda Carrello (`GM_TABS`/`DEV_TABS`), lo staff ce l'ha ma non vede i prezzi (`showPrices` = `isMgr`). L'avevo costruito e poi tolto (codice che non sarebbe mai girato) → E24.
+- Soglia 1%: evita suggerimenti per pochi centesimi (es. 1,00 contro 0,995).
+- Unità diverse non si confrontano (kg contro cassa): niente conversioni, troppo rischioso.
 
-## (era) PRIMA COSA DA FARE (#59): il file dei servizi per Mario
-- Fare un file scaricabile (PDF consigliato, più HTML) «a prova di stupido» con TUTTI i servizi usati da Jona e da RVC: a cosa serve, account/email, nome del progetto, link diretto, segreti (solo DOVE stanno, mai il valore), come riaprire il progetto da zero.
-- **Non salvarlo in `jona-ordini`**: il repo è PUBBLICO e contiene email. Salvarlo nello scratchpad e mandarlo con `SendUserFile` (display attach). Eventuale copia solo nel repo RVC (privato), chiedendo prima.
-- Dati già raccolti in #58:
-  - Jona: GitHub **Kur0ChanX** `jona-ordini` (pubblico). Cloudflare NUOVO: Pages + Worker `jona-notifiche`, `invito`, D1 `jona-allegati-0..3`, Workers AI; sottodominio `jona-ristorante-by-ynoy-corp`; app https://jona-ristorante-by-ynoy-corp.pages.dev/. Cloudflare VECCHIO: resta `fruguponte` (non toccare), da cancellare `invito` e `jona-notifiche` (M15). Firebase progetto `jona-ordini` (Firestore + accesso anonimo, regole `firebase/firestore.rules`). Gemini (Google AI Studio): chiave nel segreto GitHub `GEMINI_API_KEY` → segreto Worker `GEMINI_KEY`. Open-Meteo (meteo, senza account). Segreti GitHub: vedi `.github/workflows/*.yml` (`grep -o 'secrets\.[A-Z_]*'`). **Email di Cloudflare (nuovo e vecchio), Firebase e Gemini NON scritte da nessuna parte**: chiesto a Mario in #58, senza risposta → nel file lasciare la riga da compilare a mano.
-  - RVC: GitHub organizzazione **RVC-Operation-by-YNOY-CORP** (posseduta dall'account personale di Mario), repo `RVC` privato. Firebase e Cloudflare **non ancora creati** (RVC D5): email scelta relaisvillacarola.operation@gmail.com. Clone in sola lettura fatto in #58 in `/home/user/rvc` (sparisce col contenitore: rifare `add_repo` read + `git clone --depth 1`). Guardare anche `worker/wrangler.toml`, `docs/APP.md`, `docs/PROGETTO.md` di RVC.
-  - Claude: mario.miscera@gmail.com (Pro, in uso) + account Hotmail (Pro, riserva).
+## Regola dei rami cambiata (Mario, #60)
+- Mario: «Ho paura di cancellare un ramo sbagliato … calcella allora la regola in entrambi i progetti di cancellare i rami tanto non si può ma rinnominarli bene in ordine si».
+- Fatto: CLAUDE.md «RAMI IN ORDINE» = solo nomi in ordine, **mai cancellare rami** (né Claude né Mario); i vecchi non si rinominano (rinominare = cancellare, 403). M31 tolta. Detto a Mario che i rami in più non danno problemi.
+- Mandato messaggio alla sessione RVC #52 (`session_01JsFRVrgkAm7xSebe2EK7op`) con la regola nuova da mettere nel CLAUDE.md di RVC quando Mario dà il via. D28 aggiornata.
 
-## Fatto in #58
-- Giro completo su GitHub (run 38046156932, main v68, partito alle 12:47): finito alle 13:12 **VERDE (success)**, già detto a Mario. Prima di chiudere la #58 risultava (strano: di solito ~25 min). **Controllarlo**: https://github.com/Kur0ChanX/jona-ordini/actions/runs/38046156932 (rosso = priorità; bloccato da troppo = guardare i job). Dirlo a Mario in una riga.
-- Messaggi dalla #57 (chiusa): Mario ha cancellato `scorta/prova-permesso`; può cancellare anche `claude/prova-lettori` (PR #78 chiusa) e `claude/v63-listini-prova`. Nota tolta da D27 in DA-FARE.
-- Domanda di Mario sui due GitHub: confermato che Jona sta su `Kur0ChanX` e RVC su `RVC-Operation-by-YNOY-CORP`, tutti e due visibili collegando **Kur0ChanX**. Aggiunta la nota in `docs/CAMBIO-ACCOUNT.md` (passo 2, con link per installare l'app Claude sull'organizzazione RVC se non compare). Detto a Mario cosa si salva al cambio account (codice e consegne su GitHub, scorta automatica; chat vecchie no; preferenze a mano) e che un account aziendale si può fare (i progetti stanno su GitHub), costa di più: se ne parla se vuole.
-- `scorta/claude/jona-sessione-58` contiene solo `docs/ULTIMO-MESSAGGIO.md` del messaggio d'avvio: non unito, innocuo.
-- **E12 di nuovo**: questa sessione è a «lineage depth 8»: niente `send_later`, niente sessione nuova. Mario apre la #59 a mano da https://claude.ai/code con il prompt di 3 righe.
+## D29 nuova (ultimo messaggio di Mario): app ottimizzata per Android, iPhone, Mac, Windows
+- Cosa c'è già (da verificare, non rifare): app installabile (PWA, `manifest.webmanifest` fullscreen), `test-giro.mjs` a 320/390 px chiaro/scuro, barra laterale su schermi larghi (`.nav-brand`).
+- Proposta per #61 (dopo la v69): giro di prova con Playwright anche con WebKit (motore di Safari su iPhone e Mac) se installabile senza download pesanti, e Chromium a 1280/1440 px (Windows/Mac); controllare: zona sicura iPhone (`env(safe-area-inset-*)`, `viewport-fit=cover`), `apple-touch-icon`, `apple-mobile-web-app-*`, notifiche push su iPhone (solo con app installata, iOS 16.4+), tastiera su iPhone che copre i campi, scorciatoie e mouse/rotellina su computer, input `type=date/time` su Safari. Proporre a Mario 3 strade (ovvia/furba/geniale) con immagine, poi fare.
+- Mario non ha detto che qualcosa non va: è una raccomandazione generale.
 
-## Prossimo lavoro (#59), in ordine
-1. File dei servizi (sopra).
-2. (Giro completo: verde, niente da fare.)
-3. D23 (più XML + `.p7m`), poi D24, D25, D26 (`docs/DA-FARE.md`).
-4. Proporre a Mario un'idea SOLUZIONE SMART (non fatta in #56-#58).
+## Errori nuovi
+- E24 in `docs/ERRORI.md` (suggerimento costruito nel carrello del gestore, che non esiste).
 
-## Ancora da chiedere
-- Email dei servizi di Jona (sopra). M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27, M28, M29/M30.
+## Ancora aperto (da prima)
+- Email dei servizi di Jona, M26, M25, D10: senza risposta. In attesa: M27, M28, M29/M30. D23, D25, D26 da fare. Elenco completo in `docs/DA-FARE.md`.
 
 ## Rischi aperti
-- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00: commit+push dopo ogni passo (c'è anche la scorta).
+- Limite settimanale in avviso fino a mercoledì 14/10 alle 12:00 (ora italiana): commit+push dopo ogni passo.
 - Gemini Flash sovraccarico (503) nelle ore di punta: catena Flash-Lite → Cloudflare.
 
-## v68 (in breve, dettagli nella riga v68 di CLAUDE.md)
-Worker: `LETTORI` {flash, lite, cf}, `leggiCf` (Workers AI), errori `{codice,motivo,lettore}`. App: `gemRun` prova `GEM_LETT` in ordine per ogni foto, banner `gemLive`/`gemTick`, `gemPerche` solo da codici veri, riquadro «Chi ha letto le foto». Prova `tools/test-gemini-server.mjs` (59 controlli).
-
-## Consegne della #54 (in breve)
-- Primo giro prova lettori (run 38033661843): Flash 7/8 foto perse per 503, Flash-Lite 20/20 (dopo correzione unità «K»), Cloudflare 403. Mario ha aggiunto al token Cloudflare Workers AI Read + Edit. Regola orari in ora italiana in CLAUDE.md.
-- Prova lettori: `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` (on pull_request, solo se cambiano quei file); PR bozza #78 «Prova lettori foto (bozza, NON unire)», ramo `claude/prova-lettori`. I push dalla sessione non fanno partire `on: push`.
-
-## Consegne della #53 (in breve)
-- «Migliore opzione gratuita» = secondo lettore Cloudflare Workers AI (D22). Mistral solo se Cloudflare legge peggio (ora non serve).
-- Regole in CLAUDE.md: RISPOSTE CORTE, SOLUZIONE SMART rafforzata (3 strade ovvia/furba/geniale + 1 idea spontanea, controllare che non esista già). Già nell'app (non riproporre): avviso aumenti prezzi, dettatura vocale, QR/BarcodeDetector, link WhatsApp, ordine suggerito.
-- Idee approvate da Mario: D24 (fornitore più conveniente nel carrello), D25 (foto bolla vs ordine), D26 (costo piatti da ricette); idea fatture da Gmail scartata → D23 (più XML + `.p7m`, oggi errore `p7m` in `impRun`).
-
-## v67 nel dettaglio (index.html, tutto nella zona «importazione listini»)
-- `GEM_HEAD = TEMPLATE_HEAD + ';quantita;importo'`: usato nel prompt e in `gemJoin` (che ora conosce entrambe le intestazioni). `TEMPLATE_HEAD` resta per modello CSV e segnaposto.
-- `geminiPrompt` riscritto: stesso ordine del foglio senza saltare righe; fornitore = chi vende scritto in alto (DAC, F.lli Mariano, Nieddittas), mai il cliente/destinatario (ORMA DI CHEF LAI, Villa Carola); codice copiato com'è con gli zeri (040); nome com'è, virgolette comprese, via puntini e `#`/`*`; righe di continuazione (ECOLABEL, CLASSE A, nome scientifico, ALLEVATO FRANCIA) non sono prodotti; U.M. K./KG=kg, PZ=pz, CF=conf, CT=cartone, LT=l anche attaccata (`##PZ`); prezzo unitario con tutti i decimali, già scontato se c'è sconto; quantita = QUANTITÀ o PESO NETTO; importo = IMPORTO/IMPORTO NETTO; niente intestazioni, asterischi, totali, IVA; le spese si possono mettere (l'app le riconosce); cifra illeggibile = vuota.
-- `mapRows`: colonna «prezzo» preferita (`iP0`), se no il vecchio regex (anche «importo» come prezzo, file vecchi invariati); `iQ` quantità, `iI` importo (solo se c'è «prezzo»); gli item hanno `q`, `imp`.
-- Funzioni nuove prima di `guessSupplier`: `UNITA`/`normUnita` (applicata a tutti gli import), `pulisciNome` (solo `kind==='txt'`: incollato/Gemini), `isSpesa` (spese/consegna/trasporto/contributo/cauzione/imballo/nolo/porto/addebito/bancale/pallet a inizio nome; «Spezie», «Porro» no), `rigaNonTorna` (|q×prezzo − importo| > max(0,06; 1,5% importo)).
-- `impRun`: righe con `spesa` (non selezionate), `q`, `imp`. `reviewSheet`: `chk(i)` calcolato a ogni disegno (se Mario corregge il prezzo l'avviso sparisce), banner `#rv-chk` «N righe da controllare», banner `#rv-spese`, pillole «da controllare: q × prezzo € non fa importo» (rossa) e «spesa, non è un prodotto».
-- Quantità e importo NON si salvano nel prodotto (decisione: servono solo al controllo; il listino resta uguale).
-- APP_VER 67, CACHE `jona-ordini-v71`, NEWS v67 (chef + `dev.aggiunte`; attenzione: chiavi valide `aggiunte`/`correzioni`/`risolti`, non `novita`).
-- Prova nuova `tools/test-fatture.mjs` (28 controlli): trascrizioni a mano di DAC pag1 (11 righe, vitello con prezzo sbagliato apposta 5,936), Mariano (6 righe con 040/027/405), Nieddittas (4 righe con CDS), passate come 3 risposte finte di `gemCall` dentro `gemRun`; salvataggio di 20 prodotti; formati vecchi. Sul codice v66 fallisce (verificato). Aggiunta a `VELOCI` in `tools/prova-ci.sh` dopo test-virgolette.
-- Riuscite in locale (TZ=Europe/Rome): test-fatture 28, test-virgolette 16, test-gemini-server 39, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-news 94, test-testbar 7, test-giro.
-- Non tocca il Worker: niente giro completo extra.
-- Decisioni scartate: filtrare le spese togliendole del tutto (Mario non le vedrebbe: meglio senza spunta e avviso); normalizzare i nomi anche per Excel/XML (rischio di toccare file buoni); arrotondare i prezzi a 4 decimali (`num` tiene 3: basta per DAC; Nieddittas 2,0000 ok).
-- Non fatto ancora (idee per dopo): controllo somma righe = «totale merce/imponibile» della fattura; prezzo mostrato con 3 decimali nel listino (`eur` ne mostra 2: 4,988 → 4,99 €, ma il valore salvato è giusto).
-
-## Ancora da chiedere
-- M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27 (screenshot «Controlla e salva» v67), M28 (commercialista → XML).
-
-## Rischi aperti
-- Gemini Flash sovraccarico (503) nelle ore di punta: Flash-Lite regge, ma un solo fornitore = un solo punto di guasto.
-- Limiti gratuiti dei servizi IA cambiano spesso: riverificare sulle pagine ufficiali.
+## Consegne precedenti (#59) in breve
+- File dei servizi fatto e mandato a Mario (solo scratchpad, non nel repo pubblico). Giro completo run 38046156932 verde. Pulizia rami impossibile (403) → ora regola cambiata, niente pulizia.
