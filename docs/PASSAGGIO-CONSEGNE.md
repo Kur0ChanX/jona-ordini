@@ -2,7 +2,7 @@
 
 Sessione attuale: #61
 
-Ramo di lavoro: `claude/jona-sessione-61` (= `claude/jona-v69-conveniente` + queste consegne). App online: **v68** (main `7ff2c34`). **v69 pronta, NON ancora pubblicata.**
+Ramo di lavoro: `claude/jona-ramo-definitivo` (ramo unico permanente da #61; i rami `claude/jona-sessione-<NN>` non si usano più). Versione v69 in PR #80.
 
 ## Ultimo messaggio di Mario (#60), parola per parola
 «Non so se l'avevi già ottimizzato, ma mi raccomando, ottimizza l'app sia per telefoni Android, sia per iPhone, sia per Mac, computer Mac e computer Windows.»
