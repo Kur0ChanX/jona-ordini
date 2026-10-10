@@ -10,8 +10,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| M31 | Pulizia rami: Claude non può cancellarli (403, la sessione scrive solo sui suoi rami). Elenco dei 22 rami sicuri nelle consegne #59 (gli altri 5 restano, hanno commit in più). Mario sceglie: dare il permesso in chat o cancellarli da https://github.com/Kur0ChanX/jona-ordini/branches | Mario | quando vuoi |
-| D28 | Regola dei rami (CLAUDE.md «RAMI IN ORDINE»): mandata alla sessione RVC #51 il 10/10. Resta: controllare che sia nel CLAUDE.md di RVC | Claude | prossimo contatto con RVC |
+| D28 | Regola dei rami (CLAUDE.md «RAMI IN ORDINE», versione 10/10 sera: niente pulizia, solo nomi in ordine): metterla nel CLAUDE.md di RVC | Claude | prossimo contatto con RVC |
 | D27 | Scorta automatica **fatta in Jona** (10/10, sessione #57, autorizzata da Mario): `.claude/hooks/scorta.py` + avviso in `avvio-check.py`, prova `tools/test-scorta.py` (16 controlli). Resta: RVC copia lo stesso file (messaggio mandato alla sessione RVC). | Claude | ora |
 | M30 | Preferenze dei due account (Gmail e Hotmail): aggiungi la riga nuova di CAMBIO ACCOUNT («Se i token finiscono di colpo, riparti dal ramo col numero più alto…», testo in `docs/CAMBIO-ACCOUNT.md`) | Mario | quando prepari Hotmail (M29) |
 | D22 | Lettore foto: **v68 online** (10/10, PR #79): Flash → Flash-Lite → Cloudflare Llama 4, banner dal vivo. Giro completo extra su GitHub partito alle 12:5x | Claude da solo | controllare il giro completo |
