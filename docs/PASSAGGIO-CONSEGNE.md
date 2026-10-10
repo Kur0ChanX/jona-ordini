@@ -1,22 +1,35 @@
-# Passaggio di consegne (2026-10-10, fine sessione #65)
+# Passaggio di consegne (2026-10-10, fine sessione #66)
 
-Sessione attuale: #66
+Sessione attuale: #67
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v71** (main `41cb365`, PR #82 unita alle 18:52; controllato online `APP_VER=71`). CACHE `jona-ordini-v75`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v71** (main `41cb365`, PR #82). CACHE `jona-ordini-v75`. Nessun codice dell'app cambiato in #66.
 
-## Fatto in #65 (18:20-18:55)
-- All'avvio: scorta vecchia (17:30) unita con `merge -s ours` (il ramo aveva già il messaggio più nuovo).
-- La #64 ha scritto (messaggio tra sessioni) che Mario, dopo l'handoff, ha chiesto: «quando zooma all'inizio è sgranata riesci a migliorare la risoluzione o qualche soluzione per avere un logo migliore jona / il problema è solo che è bassa la risoluzione / Poi mandami il mio Logo YNOY in vettoriale è in un formato Png alta risoluzione». Il logo YNOY glielo aveva già mandato la #64.
-- **v71 logo JONA nitido** (fatto e online):
-  - Causa: `.logo-full` usava una maschera PNG 480×384; l'apertura (`jonaIn`) la ingrandisce 4,2 volte → sgranata.
-  - Soluzione: SVG vettoriale `media/jona.svg`, messo dentro index.html come `data:image/svg+xml,` (due volte: `-webkit-mask` e `mask`). Generatore `tools/logo-jona.py <maschera.png> <uscita.svg>` (pip: numpy scipy pillow scikit-image potracer). Conchiglia = contorno ricalcato (potrace); lettere sottili = linea al centro (scheletro) con rette raddrizzate, angoli vivi (catene unite nei nodi a due vie), curve lisciate (spline), spessore = area/lunghezza, punte tagliate dritte sui bordi della riga (clipPath), le «O» senza taglio (escono un poco dalla riga).
-  - Scartati: ricalco a contorno di tutto (lettere sottili spezzate, ondulate e troppo spesse); rifare le scritte con un font (rischio di cambiare il logo: è una questione di gusto, E19).
-  - Maschera vecchia salvata in `docs/img/logo/jona-maschera-480.png`; immagine prima/dopo `docs/img/logo/v71-prima-dopo.png` (mandata a Mario).
-  - Prova nuova `tools/test-logo-nitido.mjs` (in VELOCI di `tools/prova-ci.sh`): maschera SVG, stesso disegno della PNG entro 2 px nei due sensi, bordi netti ingranditi, SVG in index.html = `media/jona.svg`. Verdi anche test-apertura-v62, test-news, test-giro; «Prove automatiche» GitHub verdi.
-  - Errore E27 (sostituzione rotta per la `)` in `url(%23r0)`) in `docs/ERRORI.md`.
-- `docs/DA-FARE.md`: M33 (Mario guarda il logo nuovo), D29 ora su ramo `claude/jona-v72-dispositivi` (versione v72).
+## Fatto in #66 (18:54-19:20)
+- Avvio: due scorte unite (contenevano solo `docs/ULTIMO-MESSAGGIO.md`), push confermato.
+- Detto a Mario che la v71 (logo JONA vettoriale) è online; M33 resta aperto (deve riaprire l'app e guardare il logo).
+- **Limite settimanale**: Mario: «forse è del vecchio account». Verificato con `get_session`: nell'account attuale c'è solo `five_hour`, «allowed». Corretto in «Rischi aperti». Niente più commit dopo ogni passo per questo motivo (la scorta automatica resta).
+- **Ponte con RVC (D17)**: Mario ha chiesto (parola per parola sotto) un'icona in Jona per mandare all'hotel informazioni dei clienti e necessità del ristorante. La stessa richiesta l'ha fatta anche a RVC #53 (C18 di RVC).
+  - Letto il progetto di RVC: repo `RVC-Operation-by-YNOY-CORP/RVC` (privato), ramo `claude/rvc-ramo-definitivo`, file `docs/PONTE-JONA.md`. Aggiunto a questa sessione con `add_repo` (sola lettura), copia in `/home/user/rvc` (sparisce col contenitore). Il nome giusto del repo NON è `Kur0ChanX/RVC` (errore 404).
+  - Lì è già deciso: **strada B** = ponte su Cloudflare Worker con chiave segreta, D1, le due app restano separate e offline-first (coda). Scelte di Mario (RVC #30): **P1** camere occupate, ospiti, arrivi, partenze (RVC→Jona); **P3** vassoi da ritirare in camera (RVC→Jona); **P4** guasti del ristorante (Jona→RVC, diventano ticket); **P5** richieste speciali dell'ospite (entrambi i versi); **P7** eventi con orari e persone (Jona→RVC). **P2 addebiti in camera: no per ora.** P6 biancheria: fuori. Allergie/salute fuori (GDPR art. 9). Forma messaggio provvisoria `{id, tipo, da, struttura, camera, quando, chi, dati, stato}`, stati `inviato|ricevuto|fatto|annullato`; indirizzi provvisori `POST /ponte/messaggi`, `GET /ponte/messaggi?dopo=`, `POST /ponte/messaggi/<id>/stato`, chiave in `Authorization`. La chiave mai nel codice (Jona è pubblico). RVC non è ancora in uso in hotel (Tappa 2 in costruzione, il suo Worker serve D5 Cloudflare): il ponte si può costruire e provare con dati finti, ma funziona davvero solo quando RVC è in uso.
+  - Proposte a Mario 3 strade per l'icona 🏨 «Hotel» in alto in Jona, immagine `docs/img/ponte/d17-tre-strade.png` (sorgente HTML nella cartella temporanea, persa: rifarla se serve, stile Jona: colori `--lagoon #1F7F86`, `--corallo #AE4E37`, `--ocra #94661C`, `--mirto #3B7A57`, `--solid #3A2F2C`, font Jost):
+    1. **Ovvia**: pulsanti grandi «Manda all'hotel» (🔧 Guasto, 🛎 Richiesta ospite, 📅 Evento, 📦 Serve a noi) che aprono un modulo breve (dove, cosa, foto, urgente); sotto «Dall'hotel» elenchi per tipo.
+    2. **Furba**: chat «Hotel» con etichette (Vassoio, Guasto, Richiesta, Evento, Serve a noi), numero camera, foto, stati ✓ arrivato / ✓✓ visto da reparto. Riusa la chat di Jona.
+    3. **Geniale**: in cima «Oggi in hotel» (camere, ospiti, partenze, arrivi); ospiti → colazioni attese nell'ordine suggerito (`sugStats`); eventi dell'agenda mandati da soli all'hotel (Porter, Housekeeping); vassoio in camera → compito «Ritira» nella home dello staff.
+  - **Risposta di Mario: gli piace la 3 («che vedono anche le camere ecc») e chiede di unire le 3 idee in modo ordinato.** Risposta data in breve: sì.
+  - Avvisata RVC #54 (`session_01EFMQTbkHtDuvmV2vH9Y97i`) con send_message: le 3 strade, etichette comuni, aspetto la scelta di Mario, poi mando i campi di Jona; niente codice senza il via di Mario.
+- `docs/DA-FARE.md` D17 aggiornato.
 
-## Prossimo lavoro: D29 strada 2 «Furba» (v72, Claude da solo, SUBITO)
+## Prossimo lavoro (in quest'ordine)
+### 1. Ponte: immagine della versione UNITA (subito, primo messaggio a Mario)
+Proposta ordinata da disegnare (una pagina «Hotel» dall'icona 🏨, dall'alto in basso):
+- **In cima (Geniale)**: «Oggi in hotel» = camere occupate, ospiti, arrivi, partenze (P1). Chi lo vede: da decidere (proposta: tutti; numeri senza nomi degli ospiti).
+- **Sotto (Ovvia)**: 4 pulsanti grandi «Manda all'hotel»: 🔧 Guasto (P4), 🛎 Richiesta ospite (P5), 📅 Evento (P7), 📦 Serve a noi (necessità del ristorante). Ognuno apre un modulo corto con camera/dove, testo, foto.
+- **Sotto (Furba)**: il filo dei messaggi con l'hotel come una chat, con etichette colorate e stati (✓ arrivato, ✓✓ visto, ✔ fatto). Qui arrivano anche Vassoio (P3) e Richieste dall'hotel. Si può rispondere.
+- **Da soli (Geniale)**: ospiti → colazioni/coperti attesi nell'ordine suggerito; eventi dell'agenda → proposta «Manda all'hotel?» (meglio chiedere che mandare da soli: scelta da far fare a Mario); vassoio → compito «Ritira» nella home dello staff.
+Fare UNA immagine (stile della prima, telefono 390 px, 1-2 schermate) e chiedere conferma (E19: per il gusto prima l'immagine, poi si costruisce). Poi una domanda per volta (es. chi vede «Oggi in hotel»; eventi in automatico o con conferma). Dopo la conferma: mandare a RVC (send_message alla sessione RVC attiva) i campi di Jona e copiare `docs/PONTE-JONA.md` in Jona.
+Tecnica da decidere io (non chiedere a Mario): dove vive il ponte. Idea: dentro il Worker di Jona già online (`worker/`, D1 già pronto) con indirizzi `/ponte/...` e chiave segreta per RVC, così funziona prima che RVC abbia il suo Worker; da confrontare con un Worker «ponte» a sé. Niente codice del ponte senza il via di Mario (regola di RVC: Tappa 2).
+
+### 2. v72 (D29 strada 2 «Furba», Claude da solo; promesso a Mario «parto appena mi rispondi»)
 Cosa c'è già (non rifare): `viewport-fit=cover`, `safe-area-inset-top/bottom`, `apple-touch-icon`, `apple-mobile-web-app-capable`/`-title`, `theme-color` dinamico, media query per computer (700/760/900/980/1260 px), controllo `PushManager`, manifest fullscreen.
 1. **Zoom dei campi su iPhone**: Safari ingrandisce se un campo ha testo <16 px (visto `select.v-alt` 15px). Misurare con Playwright ogni `input/select/textarea` visibile nelle schede (riusare il giro di `test-giro`), portarli a 16px solo dove serve, controllare l'aspetto con `test-giro`.
 2. **Barra in alto su iPhone installata**: manca `apple-mobile-web-app-status-bar-style`. Con `black-translucent` l'ora è bianca: controllare prima che la zona in alto (`body::before`, v54) sia scura in tema chiaro e scuro; se dubbio lasciare e annotare.
@@ -25,13 +38,11 @@ Cosa c'è già (non rifare): `viewport-fit=cover`, `safe-area-inset-top/bottom`,
 5. Pubblicare da solo se le prove sono verdi, poi `git fetch origin main && git merge origin/main` sul ramo definitivo + push. Avvisare Mario.
 
 ## Ancora aperto per Mario
+- D17 ponte: conferma dell'immagine unita (prossima sessione).
 - M33: guardare il logo JONA nuovo all'apertura (riaprire l'app).
 - M31: scelta della miglioria del logo YNOY (Ovvia/Furba/Geniale/Nessuna): nessuna risposta.
 - Provare v69 (riga verde «costa … in meno» → **Passa**) e v70 (apertura con YNOY nuovo).
 - Elenco completo: `docs/DA-FARE.md`.
-
-## Promesse fatte a Mario in #65
-- «Se le prove sono verdi pubblico da solo e ti avviso»: pubblicato (18:52). L'avviso «v71 online» va dato a Mario dalla sessione #66 nel primo messaggio, se la #65 non l'ha già detto (la #65 lo scrive nel messaggio di chiusura).
 
 ## Note tecniche
 - In locale: emulatore Firebase `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`, server `python3 -m http.server 8765`. Playwright globale `/opt/node22/lib/node_modules/playwright`.
@@ -42,9 +53,12 @@ Cosa c'è già (non rifare): `viewport-fit=cover`, `safe-area-inset-top/bottom`,
 - Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`.
 
 ## Rischi aperti
-- Limite settimanale: era dell'account vecchio (Mario, #66). Nell'account attuale `get_session` mostra solo il limite di 5 ore, «allowed» (10/10 19:13).
-- Logo JONA: le «R», «S», «O» piccole di RISTORANTE sono ricostruite da pochi pixel; se Mario vede un difetto, segnare la zona sul suo screenshot (E16) e correggere `tools/logo-jona.py`.
-- Android: maschera SVG intorno a YNOY (D14) mai provata da Mario. Ora anche il logo JONA è una maschera SVG: stessa tecnica, Chrome/Safari la supportano.
+- Limite settimanale: era dell'account vecchio (Mario, #66). Nell'account attuale solo `five_hour`, «allowed» (10/10 19:13).
+- Logo JONA: le «R», «S», «O» piccole di RISTORANTE ricostruite da pochi pixel; se Mario vede un difetto, segnare la zona sul suo screenshot (E16) e correggere `tools/logo-jona.py`.
+- Android: maschera SVG intorno a YNOY (D14) e logo JONA SVG mai provati da Mario su Android.
+- Ponte: due sessioni (Jona e RVC) lavorano sulla stessa cosa: tenersi allineati con send_message e non dare a Mario due proposte diverse.
 
 ## Ultimo messaggio di Mario, parola per parola
-Nessun messaggio nuovo di Mario in #65 (la sessione è partita col prompt di avvio). Ultimo suo messaggio (arrivato in #64 dopo l'handoff): «quando zooma all'inizio è sgranata riesci a migliorare la risoluzione o qualche soluzione per avere un logo migliore jona / il problema è solo che è bassa la risoluzione / Poi mandami il mio Logo YNOY in vettoriale è in un formato Png alta risoluzione»
+«Mi piace la 3 che vedono anche le camere ecc ecc ma si possono unire le 3 idee in modo ordinato ?»
+
+Messaggi prima in #66: «limite settinanale forse è del vecchio account / poi / Ti ricordi di creare un ponte con l'app RVC magari mettiamo un icona per condividere alcuni informazioni o mandare informazioni dei clienti al All'hotel o necessità del Ristorante Jona all hotel»
