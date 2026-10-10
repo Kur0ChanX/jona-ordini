@@ -1,43 +1,47 @@
-# Passaggio di consegne (2026-10-10, fine sessione #48)
+# Passaggio di consegne (2026-10-10, fine sessione #49)
 
-Sessione attuale: #49
+Sessione attuale: #50
 
-## Ultimo messaggio di Mario (#48), parola per parola
-«nella nuova chat scrivi solo scrivi solo metti extra o che qll c'è su impegno nella vecchia chat e di mettere via. il tutto per risparmiare token
+## Ultimo messaggio di Mario (#49), parola per parola
+«ho pravato a caricare su dac queste e mi dà questo errore...risolvi in qlk modo»
+(con 3 immagini: schermata «Gemini non ha risposto (errore 524). Riprova o usa l'app Gemini.» nell'Importa listino di DAC con 2 foto, e le due fatture DAC)
 
-poi continua»
+Messaggi prima (#49), parola per parola:
+- «ok»
+- «metti in automatico sempre la nuova versione se non ci sono problemi»
+- «?»
+- «ho la 62 e non aggiorna» → «mandami il link» → screenshot Novità con v62 in cima + «ora»
 
-Come l'ho capito: il prompt della nuova sessione deve essere minimo («riprendi il lavoro in corso della vecchia sessione»), per risparmiare token; poi si continua il lavoro senza fermarsi ad aspettare. Se non è così, chiedere a Mario in una riga.
-
-Messaggi prima (#48), parola per parola:
-- «sì procedi, avvisami quando è online» (v63)
-- «nel carico listini con i prodotti i file che ti mando o facciamo scannerizzare potrebbero capitare dei prodotti uguali se ci sono avvisami  cosí scegliamo se tenerli o meno, non caricarli uguali dello stesso fornitore 2 volte, però solo se è uguale in tutto ok? aggiorna il programma ora devo caricare file»
+## File ricevuti (#49)
+- `docs/img/listini/dac-fattura-054851-2026-09-01.jpg` (GAMBERO ROSSO "VERITAS" 3 35/50PZ 1KG, cod. 88563, 45,90 €/pz)
+- `docs/img/listini/dac-fattura-252792-2026-09-08.jpg` (POLLO COSCE GR 180/220*10 PZ FILENI cod. 37807 4,027 €/kg; POLLO SOVRACOSCIO SP "ORA" 200G cod. 805161 7,842 €/kg)
+- `docs/img/segnalazioni/v64-gemini-errore-524.jpg`
+Committati sul ramo consegne.
 
 ## Stato
-- #49: **v64 online** (PR #74, squash `95ca4cb`; corretto un «Mario» in un commento che faceva fallire `test-testbar`; online APP_VER=64, CACHE v68). `main` unito nel ramo consegne. Mario: «metti in automatico sempre la nuova versione se non ci sono problemi» → regola in CLAUDE.md. Sessione a lineage 8: all'handoff Mario apre a mano la nuova (E12).
-- Online: **v63** (PR #73 unita, squash `32e9a56`; controllato online APP_VER=63, CACHE v67). `main` unito nel ramo consegne. Mario avvisato; M26 (vede ancora prodotti finti?) senza risposta.
-- **v64 pronta, NON ancora pubblicata**: ramo `claude/v64-doppioni`, commit `68da176`, pushato e confermato. **Il PR non è stato aperto**: `create_pull_request` ha dato due volte «invalid session» (guasto dello strumento GitHub). Mario aspetta la v64 («ora devo caricare file»): URGENTE.
-- Worktree `/home/user/v64` (sparisce col contenitore: `git worktree add ../v64 claude/v64-doppioni`).
+- **v64 online** (PR #74, squash `95ca4cb`; nel CI era fallita `test-testbar` per un «Mario» in un commento di `reviewSave`: sostituito con «chi importa»). Online APP_VER=64, CACHE v68. `main` unito nel ramo consegne.
+- Regola nuova di Mario: **pubblica sempre in automatico** se le prove sono verdi (scritta in CLAUDE.md). L'auto-merge di GitHub è spento nel repo: non serve, unisco io quando arrivano le prove verdi.
+- «Ho la 62»: in realtà Mario era nella vista **Staff** della barra Test; le Novità v63/v64 sono solo `chef`/`dev` (E21). Gli ho detto di passare a Sviluppatore; non ha confermato.
+- **v65 nella PR #75** (ramo `claude/v65-gemini-lento`, commit `2d7c93d`, pushato e confermato), «Prove automatiche» partite. NON ancora unita.
+- Questa sessione è a **lineage 8**: `send_later` e `create_session` non funzionano → Mario apre a mano la sessione #50 (E12).
 
-## v64: listini senza prodotti doppi
-Richiesta: nell'import (file, foto Gemini, tabella) avvisare dei prodotti uguali per scegliere se tenerli; non caricare due volte una riga dello stesso fornitore se è uguale in tutto.
-- `index.html`: `sameProd(a,b)` (stesso codice; se una delle due non ha codice, stesso nome). `matchProd` ora usa `sameProd` (**correzione**: prima due codici diversi con lo stesso nome si sovrascrivevano). `rvDiff(a,b,cat)` = campi diversi (nome, codice, unità, prezzo, categoria; `norm` per i testi, `num` per il prezzo). `rvDup(items)` per riga: `{twin:j}` uguale in tutto alla riga j dello stesso fornitore; `{sim:j,dif}` stesso prodotto ma qualcosa cambia; `{ex:p}` uguale in tutto a un prodotto già a listino (categoria contata solo se scritta nel file: `catF` nella riga di `impRun`).
-- `impRun`: le righe con un doppio partono senza spunta.
-- `reviewSheet`: banner `#rv-dup` «Prodotti doppi» con i conteggi; etichette «uguale alla riga N: non la carico due volte», «simile alla riga N, cambia: prezzo», «uguale, già a listino», «nuovo: stesso nome di uno già a listino, codice diverso». Casella spenta per le righe uguali in tutto; `rvall` non le spunta mai.
-- `reviewSave`: esclude sempre le righe uguali in tutto; decide prima dove va ogni riga (`plan`): una riga simile spuntata dopo un'altra dello stesso prodotto diventa un prodotto separato (Mario ha scelto di tenerle).
-- Decisioni: righe simili senza spunta di partenza (più sicuro: niente doppioni non voluti, Mario sceglie). Doppi cercati solo nello stesso fornitore (come chiesto). Il prezzo nuovo di un prodotto già a listino lo aggiorna come prima.
-- `APP_VER=64`, CACHE `jona-ordini-v68`, NEWS v64 (chef + dev).
-- Prova nuova `tools/test-listini-doppi.mjs` (14 PASS), in testa a `VELOCI` di `tools/prova-ci.sh`. Riuscite anche `test-scaglione2`, `test-news`, `test-listini-prova`, `test-giro` (TZ=Europe/Rome).
+## v65: Gemini senza errore 524
+Causa: 524 = Cloudflare chiude dopo 100 s; il Worker `/gemini` mandava tutte le foto insieme e, tra modello lento, riprove e attese, superava i 100 s.
+- `worker/src/index.js`: `GEM_BUDGET` 85 s, `GEM_TRY_MS` 45 s (sovrascrivibili da `env` per le prove); ogni fetch con `AbortSignal.timeout(min(tryMs, resto))`, anche la lettura (`r.text()`); timeout/errore di rete → modello dopo (Lite); fuori tempo → `geminiErr(...,504)`.
+- `index.html`: `gemCall` restituisce anche `st`; messaggio «Gemini ci ha messo troppo a rispondere.» per 502/504/524. `gemRun`: una richiesta per foto, `I.prog` «Gemini legge la foto i di n…», seconda prova dopo `GEM_PAUSA` (3 s) per `GEM_RETRY` 429/502/503/504/524, risultati per foto in `I.gres` (WeakMap: un nuovo tocco legge solo le mancanti), `gemJoin` unisce le tabelle (toglie intestazione ripetuta e ```).
+- APP_VER 65, CACHE `jona-ordini-v69`, NEWS v65 (chef + dev correzioni). CLAUDE.md (riga v20 Gemini) aggiornata nel ramo v65.
+- Prove: `tools/test-gemini-server.mjs` estesa (8 controlli nuovi), messa in testa a `VELOCI` di `tools/prova-ci.sh`; 3 giri riusciti. Riuscite anche test-news, test-listini-doppi, test-scaglione2, test-testbar, test-giro (TZ=Europe/Rome).
+- Decisioni: non toccato il «thinking» di Gemini (parametri diversi tra modelli, rischio 400 senza poter provare con la chiave vera); una foto per richiesta = richieste più corte; risultati parziali tenuti per non rifare le foto già lette.
+- Non verificato con il Gemini vero (non ho la chiave): dopo la pubblicazione chiedere a Mario di riprovare le 2 foto DAC.
 
-## Prossimo lavoro (#49), in ordine
-1. Aprire il PR `claude/v64-doppioni` → `main` (titolo «v64: listini senza prodotti doppi»), iscriversi; con «Prove automatiche» verdi: squash, controllo online (APP_VER 64, CACHE v68), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Pubblicare senza chiedere.
-2. Avvisare Mario che la v64 è online e può caricare i file: vedrà il riquadro giallo «Prodotti doppi» e le righe doppie senza spunta, da spuntare se vuole tenerle.
-3. Se Mario manda file di listini: salvarli subito nel progetto e committarli.
-4. D17 ponte RVC, poi D14 e il resto di `docs/DA-FARE.md`.
+## Prossimo lavoro (#50), in ordine
+1. D19: PR #75. Se «Prove automatiche» verdi → squash, controllo online (APP_VER 65, CACHE v69), subito `git fetch origin main && git merge origin/main` nel ramo consegne + push. Controllare che il workflow «cloudflare-worker» sia andato bene (tocca il Worker), poi lanciare il giro completo su GitHub (prove.yml, modo `tutto`, E14). Se rosse: capire la causa e correggere.
+2. Avvisare Mario: v65 online, riprovare le 2 foto DAC (anche insieme). Nota: sono fatture, non listini; l'import ne ricava i prodotti con il prezzo.
+3. Chiedere se ora vede la v64/v65 nelle Novità (vista Sviluppatore).
+4. Poi `docs/DA-FARE.md` (D17 ponte RVC, D14…).
 
 ## Ancora da chiedere
-- M26 (prodotti finti spariti?), M25 (agenda con Mauro), D10: senza risposta.
+- M26 (prodotti finti spariti?), M25, D10: senza risposta.
 
 ## Rischi aperti
-- Se lo strumento GitHub resta guasto: riprovare più tardi, non forzare (E11).
-- Maschera SVG su Android non verificata.
+- Se Gemini resta lento anche con una foto: valutare `thinkingConfig` per modello con prova sulla chiave vera, o foto più piccole (`shrinkImg` 2000 px, JPEG 0,85).
