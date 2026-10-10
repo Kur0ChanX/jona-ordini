@@ -97,6 +97,12 @@ with tempfile.TemporaryDirectory() as tmp:
     hook(repo, "stop")
     s3 = remoto_scorta(repo)
     controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "avviso di sistema ignorato")
+    hook(repo, "msg", {"prompt": "ecco https://script.google.com/macros/s/AKfycbSEGRETO123/exec fatto"})
+    open(os.path.join(repo, "a.txt"), "w").write("quattro\n")
+    hook(repo, "stop")
+    s3 = remoto_scorta(repo)
+    u = git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md")
+    controlla("SEGRETO" not in u and "nascosto" in u and "fatto" in u, "indirizzo dello script di Google Drive nascosto")
 
     # 4. sessione nuova da un altro clone: avvio-check segnala la scorta e il merge è in avanti
     altro = os.path.join(tmp, "altro")
