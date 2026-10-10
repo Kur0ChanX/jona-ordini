@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (11/10/2026 00:53 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 01:19 ora italiana)
 
-adesso fai questo che è simile serve 3 png in alta risoluzione una in bianco una in nero e uno trasparente in vettoriale fatto bene ordina dentro con cartelle
+mandami anche il logo jona ad alta risoluzione PNG bianco nero e trasparente e vettoriale salva la vecchia scritta YNOY con l'animazione se non c'è in drive cosi se ti dico metti la vecchia fai subito

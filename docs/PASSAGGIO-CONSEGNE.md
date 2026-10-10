@@ -1,22 +1,23 @@
-# Passaggio di consegne (2026-10-11, fine sessione #70)
+# Passaggio di consegne (2026-10-11, fine sessione #71)
 
-Sessione attuale: #71
+Sessione attuale: #72
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v74** (main `4d6afd5`, PR #85 unita con squash; controllato online `APP_VER=74`). `main` già unito nel ramo di lavoro.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v74**. **v75 in PR #86** (ramo `claude/jona-v75-logo-ynoy`), non ancora unita.
 
-## Fatto in #70 (11/10, 0:25-1:10 ora italiana)
-- Unita la scorta (messaggio «ok vado nella 69»).
-- **v74 online** (PR #85, D30): la prima corsa delle prove era rossa per un **bug vero**, non per la prova: lo script in `<head>` del vecchio indirizzo leggeva `location.hash` DOPO il controllo (asincrono) del nuovo sito; intanto l'app del vecchio indirizzo toglieva `#i=` dall'indirizzo (riga `history.replaceState(null,'',location.pathname+location.search)`) → l'invito andava perso se il nuovo rispondeva lento. Corretto: `var Q=location.search,H=location.hash` letti subito. La prova `tools/test-vecchio-indirizzo.mjs` ora fa rispondere `manifest.webmanifest` del nuovo con 2 s di ritardo (riprodotto il fallimento senza correzione, verde con correzione). Prove su GitHub verdi → squash → online.
-- Merge di `main` nel ramo di lavoro: conflitti solo negli appunti (E7): `DA-FARE.md` presa da main (riga D30 più nuova, nient'altro cambiato), consegne e `ULTIMO-MESSAGGIO.md` tenute dal ramo di lavoro.
-- **Drive di Mario (D31) FATTO**: Mario ha creato l'app web di Apps Script (con l'aiuto della #69 chiusa, che mi passava i suoi messaggi con send_message). URL `/exec` provato: `{ok:true}`. **L'URL è segreto: mai nel repo, nei commit, nelle consegne** (controllo: `grep -r "macros/s/" .` non deve trovare l'URL vero). Mario ce l'ha; se serve prima di M35 va richiesto a lui.
-  - Scelta di Mario (0:46, nella #69): «la usiamo anche per RVC Dentro facciamo 2 Cartelle una Jona una RVC» → sottocartelle `Jona/…` e `RVC/…`.
-  - Cartella principale «Claude Code Lavoro»: https://drive.google.com/drive/folders/16lc3HVlPfb04-UHO3mXxzz9hXhgdSuto
-  - `Jona/Loghi` (https://drive.google.com/drive/folders/1ecGLASRvK65nJ2o5yyNprtZT-oVqHStq): 7 file vecchi (ynoy-2000.png, ynoy.png, ynoy.svg, ynoy-animazione.svg/.mp4, jona.svg, jona-maschera-480.png).
-  - Lo script del Drive sa solo creare cartelle e sostituire file con lo stesso nome (il vecchio nel cestino); non sposta né cancella. Per riordinare servirebbe una nuova versione di `Codice.gs` + nuovo deployment da Mario.
-  - Alla RVC #57 detto (send_message, SENZA URL: il controllo di sicurezza blocca l'invio di chiavi tra sessioni) di usare `sotto="RVC/…"` e che Mario metterà `JONA_DRIVE_URL` anche nell'ambiente RVC.
-  - Guida data a Mario per **M35**: barra in alto → nome dell'ambiente → **Edit** → variabili d'ambiente → `JONA_DRIVE_URL=<URL>` → **Save**; in Jona e RVC, poi anche nell'account Hotmail. Non ancora confermato.
-- **Logo YNOY CORP con 3 lune** (richiesta di Mario, foto salvata in `docs/img/logo/ynoy-corp-originale-mario.jpg`, 2492×2492): ricalcato a curve con `tools/logo-ynoy-corp.py` (potrace su foto ingrandita ×3 e ammorbidita; differenza dall'originale ~1%, solo bordi; attenzione: potracer ricalca i False, si passa `~m`). Uscite in `docs/img/logo/ynoy-corp/`: `png/` 4000×1783 (sfondo-bianco, sfondo-nero, trasparente-nero, trasparente-bianco — Mario ne aveva chiesti 3, il quarto è in più per fondi scuri), `vettoriale/` (SVG nero, SVG bianco, PDF nero per tipografie). Caricati nel Drive in `Jona/Loghi/YNOY CORP 3 lune/` (https://drive.google.com/drive/folders/1GohEnZevSAN87yU9QbZ4rGPnYHj8-XfE) con sottocartelle «PNG alta risoluzione», «Vettoriale», «Originale» e un `LEGGIMI.txt`. Anteprima mandata a Mario. **Nell'app non è cambiato niente** (resta YNOY con 4 lune, `media/ynoy.svg`).
-- Domanda aperta a Mario (M36): mettere il logo con 3 lune anche nell'app? Se sì: nuova versione che sostituisce `media/ynoy.svg` (attenzione: animazione di apertura `tools/ynoy-tratti.py`/`ynoy-html.py` e `tools/logo-ynoy.py` dipendono dal disegno con 4 lune; prima mandare un'immagine prima/dopo, E19).
+## Fatto in #71 (11/10, 0:55-1:20 ora italiana)
+- Unita la scorta (solo `ULTIMO-MESSAGGIO.md`).
+- Mario: «sì» a tutte e due le domande → M36 logo nuovo nell'app; M35 dice di aver messo `JONA_DRIVE_URL`, ma **in #71 la variabile non c'era** (vale solo per sessioni nuove: in #72 controllare con `[ -n "$JONA_DRIVE_URL" ] && echo ok`, senza stampare l'URL).
+- Confronto logo app/nuovo (`docs/img/logo/confronti/confronto-logo-app.png`): sono quasi uguali (anche il «vecchio» ha 3 falci + 1 luna piena; cambiano giro dello svolazzo, più piccolo, e posizione di CORP). Mario: «metto quello nuovo ma ordina dentro tutto in cartelle hai fatto un macello» (il macello = Drive `Jona/Loghi` con 7 file vecchi sparsi + la sottocartella; lo script non sapeva spostare).
+- **Drive**: `tools/drive/Codice.gs` **v2** (azioni `elenco`, `sposta` file o cartella con `cartella:true`, `cestina`; commit `8f0376c` sul ramo di lavoro) + `tools/drive/azione.sh` (uso nel commento in testa). Guida data a Mario (M37): copiare da https://raw.githubusercontent.com/Kur0ChanX/jona-ordini/claude/jona-ramo-definitivo/tools/drive/Codice.gs → incollare in script.google.com → **Salva progetto** → **Esegui il deployment** → **Gestisci deployment** → matita → **Nuova versione** → **Esegui il deployment** (URL uguale) → incollarlo in chat. Non ancora fatto/risposto.
+  - Ordine promesso per il Drive `Jona/Loghi`: **YNOY CORP** (PNG alta risoluzione · Vettoriale · Originale · Animazione), **JONA**, **Vecchi**. La cartella «YNOY CORP 3 lune» già esistente va rinominata/spostata in «YNOY CORP» (lo script non rinomina: spostare i file nelle sottocartelle nuove e cestinare quella vuota, o lasciarla se rinominare serve).
+- **v75 (PR #86)**: `media/ynoy.svg` = ricalco nero (`docs/img/logo/ynoy-corp/vettoriale/ynoy-corp-nero.svg`) con scala 0.228, traslato (27.15, 11.22) nel 496×190 (allineato al vecchio con ricerca IoU 0.80, poi centrato); `tools/logo-ynoy.py` ora fa solo `media/ynoy.png`; punti di `tools/ynoy-tratti.py` spostati di (+19,−19) e giro dello svolazzo nuovo (pixel scoperti 225 su 48259; prima 73); `tools/ynoy-html.py` → 22 tratti 1,2-2,8 s. APP_VER 75, NEWS v75, CACHE `jona-ordini-v79`. Prove legate verdi in locale: test-logo, test-apertura-v62, test-logo-nitido. Fotogrammi mandati a Mario: `docs/img/logo/confronti/v75-apertura-fotogrammi.png`.
+  - Cartelle del repo riordinate (nella PR): `docs/img/logo/ynoy-corp/{png,vettoriale,originale,animazione}`, `jona/jona-maschera-480.png`, `confronti/`, `vecchi/` (con `ynoy-4-lune.svg`, `ynoy-4-lune-2000.png`, `ynoy-4-lune-animazione.mp4` = **il vecchio logo con animazione: per «rimetti la vecchia» basta copiare `vecchi/ynoy-4-lune.svg` in `media/ynoy.svg` e rifare logo-ynoy + tratti con i punti di prima**: i punti vecchi sono nel commit `87eff38` di `tools/ynoy-tratti.py`). Percorsi aggiornati in CLAUDE.md, test-logo-nitido, logo-ynoy-corp.py, ynoy-html.py, logo-ynoy.py. `DA-FARE.md` cambiato nella PR (tolta M35, M36 → M37): attenzione E7 all'unione.
+  - Questa sessione era iscritta agli eventi della PR #86: **la #72 deve fare `subscribe_pr_activity` sulla #86**, aspettare «Prove automatiche» verdi, squash, controllo online `APP_VER=75`, poi `git fetch origin main && git merge origin/main` nel ramo di lavoro e push.
+
+## Richiesta nuova di Mario (da fare in #72)
+- Logo **JONA** ad alta risoluzione: PNG su bianco, su nero, trasparente + vettoriale (partire da `media/jona.svg`, come `tools/logo-ynoy-corp.py` fa per YNOY: 4000 px, sfondo-bianco, sfondo-nero, trasparente-nero/bianco, SVG nero/bianco, PDF), in `docs/img/logo/jona/{png,vettoriale}`, mandarli a Mario con SendUserFile e caricarli nel Drive in `Jona/Loghi/JONA/…`.
+- Salvare nel Drive il **vecchio YNOY con l'animazione** (`Jona/Loghi/Vecchi/`: `ynoy-4-lune.svg`, `ynoy-4-lune-2000.png`, `ynoy-4-lune-animazione.mp4`, e l'SVG animato vecchio `git show 87eff38:docs/img/logo/ynoy-animazione.svg`) se non c'è già (i 7 file vecchi in `Jona/Loghi` sono proprio questi: spostarli in Vecchi). Così se Mario dice «metti la vecchia» si fa subito (vedi sopra).
+- Serve l'URL del Drive (variabile o incollato da Mario dopo M37).
 
 ## D30: Jona fuori dall'account personale (in corso)
 - Organizzazione **`Jona-Ristorante-by-YNOY`** creata dall'account del ristorante **`JonaRistorante-Ynoy`** (jona.ristorante@gmail.com, Owner, 2FA attiva); Kur0ChanX Owner; app Claude installata sull'organizzazione (Save fatto, #68/#69).
@@ -31,7 +32,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - Jona #69 (`session_012rm19dw5jKyzhu49kU3CtR`) è chiusa ma Mario ci ha scritto fino alle 0:46; le ho detto di rimandarlo alla sessione attiva e inoltrare. Fare lo stesso con la #70 se Mario scrive lì.
 
 ## Prossimi passi (in ordine)
-1. Attendere le risposte di Mario: M35 (variabile `JONA_DRIVE_URL`) e M36 (logo 3 lune nell'app?).
+0. #72: PR #86 (subscribe, verde → squash → online → merge main), poi logo JONA + Drive (sopra).
+1. Attendere M37 (script del Drive v2 + URL).
 2. D30: attesa della scatola nera, poi Transfer (sopra).
 3. Proporre a Mario la regola «file importanti anche nel Drive» (D31).
 4. Ponte con l'hotel: quando RVC ha D5, guida per `PONTE_KEY`. Elenco completo in `docs/DA-FARE.md`.
@@ -50,6 +52,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-(con la foto del logo YNOY CORP a 3 lune) «adesso fai questo che è simile serve 3 png in alta risoluzione una in bianco una in nero e uno trasparente in vettoriale fatto bene ordina dentro con cartelle» → FATTO (sopra). Ultima mia domanda rimasta aperta: «Vuoi questo logo con 3 lune anche dentro l'app, al posto di quello con 4 lune?»
+(11/10 01:19) «mandami anche il logo jona ad alta risoluzione PNG bianco nero e trasparente e vettoriale salva la vecchia scritta YNOY con l'animazione se non c'è in drive cosi se ti dico metti la vecchia fai subito»
 
-Prima, nella #69 (0:46): «la usiamo anche per RVC Dentro facciamo 2 Cartelle una Jona una RVC».
+Prima: «1 metto qll nuovo na ordina dentro tutto in cartelle hai fatto un macello». Domanda mia aperta: a che passo è della guida M37 (aggiornare lo script del Drive).
