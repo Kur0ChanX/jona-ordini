@@ -38,7 +38,10 @@ Il lavoro non vive nell'account Claude: vive su **GitHub**. Tutti e due gli acco
 4. Passa all'account Hotmail: https://claude.ai/code → **nuova sessione** → repository `jona-ordini` → ramo con il **numero più alto** → incolla il prompt.
 5. Stessa cosa per RVC.
 
-Se i token finiscono di colpo, a metà lavoro: niente panico. Su GitHub c'è tutto fino all'ultimo push. Nell'account Hotmail apri la sessione sul ramo col numero più alto e scrivi: «la sessione di prima si è interrotta: controlla su GitHub cosa manca e riparti».
+## Se i token finiscono di colpo
+Niente panico, e non serve preparare niente. A fine di ogni risposta di Claude lo script **scorta** (`.claude/hooks/scorta.py`, autorizzato da Mario il 10/10/2026) manda da solo su GitHub una copia del lavoro, anche non salvato, più l'ultimo messaggio di Mario (`docs/ULTIMO-MESSAGGIO.md`), nel ramo `scorta/<ramo>`. Non costa token. All'avvio della sessione nuova l'hook di avvio vede la scorta e Claude la unisce al ramo.
+
+Su GitHub c'è tutto fino all'ultima risposta. Nell'account Hotmail apri la sessione sul ramo col numero più alto e scrivi: «la sessione di prima si è interrotta: controlla su GitHub cosa manca e riparti».
 
 ## Regole d'oro
 - **Un solo account alla volta per progetto.** Mai due sessioni attive sullo stesso progetto in due account: si pestano i piedi.
@@ -76,6 +79,7 @@ CAMBIO ACCOUNT
 - Ho due account Claude (Gmail e Hotmail), tutti e due Pro. Quando scrivo «cambio account» (o il limite settimanale sta per finire) fai il passaggio di consegne fino al push confermato, ma NON aprire la nuova sessione: dammi il prompt da incollare nell'altro account, con il ramo esatto.
 - Un solo account alla volta per progetto. Jona e RVC passano insieme.
 - Quando il limite settimanale è in avviso, fai commit e push dopo ogni passo finito: se i token finiscono di colpo, su GitHub c'è già tutto.
+- Se i token finiscono di colpo, riparti dal ramo col numero più alto e unisci la sua scorta (ramo scorta/<ramo>, la segnala l'hook di avvio).
 ```
 
 ## Prompt per la prima sessione nel nuovo account

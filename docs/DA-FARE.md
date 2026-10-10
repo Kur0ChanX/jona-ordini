@@ -10,7 +10,8 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| D27 | 🔴 Token che finiscono di colpo (Mario, 10/10): hook «scorta» a zero token (salva l'ultimo messaggio di Mario e il lavoro su `scorta/<ramo>` a ogni risposta) + frase fissa «riparti dal ramo col numero più alto» nelle preferenze. Strada 3 consigliata; serve il «sì» scritto di Mario (il controllo automatico ha bloccato l'invio senza consenso). Lo scrive Jona, RVC copia lo stesso file | Claude dopo l'ok di Mario | in attesa del sì |
+| D27 | Scorta automatica **fatta in Jona** (10/10, sessione #57, autorizzata da Mario): `.claude/hooks/scorta.py` + avviso in `avvio-check.py`, prova `tools/test-scorta.py` (16 controlli). Resta: RVC copia lo stesso file (messaggio mandato alla sessione RVC). Ramo di prova `scorta/prova-permesso` su GitHub da cancellare (il proxy non lascia cancellare: innocuo) | Claude | ora |
+| M30 | Preferenze dei due account (Gmail e Hotmail): aggiungi la riga nuova di CAMBIO ACCOUNT («Se i token finiscono di colpo, riparti dal ramo col numero più alto…», testo in `docs/CAMBIO-ACCOUNT.md`) | Mario | quando prepari Hotmail (M29) |
 | D22 | Lettore foto: **v68 online** (10/10, PR #79): Flash → Flash-Lite → Cloudflare Llama 4, banner dal vivo. Giro completo extra su GitHub partito alle 12:5x | Claude da solo | controllare il giro completo |
 | D23 | Idea 1 (fatture da Gmail) scartata da Mario: «devo chiedere e arrivano tardi, al massimo carico io i file». Al suo posto: import di più XML insieme e dei file firmati `.p7m` (oggi errore `p7m`) | Claude da solo | da fare |
 | D24 | Idea 4 approvata: nel carrello, stesso prodotto da 2 fornitori → suggerisce il più conveniente | Claude da solo | da fare |
