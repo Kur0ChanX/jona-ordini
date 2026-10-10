@@ -1,4 +1,4 @@
-"""Logo YNOY CORP con la coda a 3 lune (foto di Mario dell'11/10/2026: docs/img/logo/ynoy-corp-originale-mario.jpg).
+"""Logo YNOY CORP con la coda a 3 lune (foto di Mario dell'11/10/2026: docs/img/logo/ynoy-corp/originale/ynoy-corp-originale-mario.jpg).
 Ricalca la foto a curve (potrace) e da quel vettoriale fa i PNG ad alta risoluzione.
 Uso: pip install numpy scipy pillow potracer cairosvg && python3 tools/logo-ynoy-corp.py [cartella di uscita]
 Esce: SVG nero e bianco (trasparenti), PDF vettoriale nero e PNG 4000 px: sfondo bianco, sfondo nero, trasparente nero, trasparente bianco."""
@@ -6,7 +6,7 @@ import io, os, sys, numpy as np, potrace, cairosvg
 from PIL import Image
 from scipy import ndimage
 
-SRC = 'docs/img/logo/ynoy-corp-originale-mario.jpg'
+SRC = 'docs/img/logo/ynoy-corp/originale/ynoy-corp-originale-mario.jpg'
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'docs/img/logo/ynoy-corp'
 K = 3        # ingrandimento prima del ricalco: curve più lisce
 BORDO = 0.06  # margine attorno al logo (frazione della larghezza)
