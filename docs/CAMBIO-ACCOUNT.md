@@ -24,7 +24,7 @@ Il lavoro non vive nell'account Claude: vive su **GitHub**. Tutti e due gli acco
 ## Preparazione (una volta sola, sull'account Hotmail)
 
 1. Entra su https://claude.ai con l'account Hotmail. Serve un piano **Pro** o **Max** (Claude Code non c'è nel piano gratuito).
-2. Collega GitHub: https://claude.ai/connect-github → accedi con lo stesso GitHub di sempre (Kur0ChanX). Poi apri https://claude.ai/code → **nuova sessione** → nella scelta del repository devono comparire `jona-ordini` e `RVC`.
+2. Collega GitHub: https://claude.ai/connect-github → accedi con lo stesso GitHub di sempre (Kur0ChanX). Poi apri https://claude.ai/code → **nuova sessione** → nella scelta del repository devono comparire `jona-ordini` e `RVC`. Nota (10/10/2026): i due progetti stanno in due posti diversi di GitHub: Jona in `Kur0ChanX/jona-ordini`, RVC in `RVC-Operation-by-YNOY-CORP/RVC`. Dall'account Gmail Claude li vede tutti e due entrando con Kur0ChanX: quindi anche nell'account Hotmail basta collegare **Kur0ChanX**. Se `RVC` non compare, sul GitHub di RVC va installata l'app Claude: https://github.com/apps/claude/installations/select_target → scegli `RVC-Operation-by-YNOY-CORP`.
 3. Preferenze personali: menu (tocca il tuo nome in basso) → **Impostazioni** → scheda **Account** → campo **Istruzioni per Claude** → cancella quello che c'è e incolla il testo del riquadro «Preferenze» qui sotto. Fallo in **tutti e due** gli account.
 4. Memoria (vedi «Unire le due memorie» sotto).
 5. Connettori, solo se li usi: https://claude.ai/settings/connectors → collega gli stessi dell'account Gmail.
