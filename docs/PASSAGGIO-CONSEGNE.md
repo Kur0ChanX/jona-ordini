@@ -1,8 +1,13 @@
-# Passaggio di consegne (2026-10-11, fine sessione #72)
+# Passaggio di consegne (2026-10-11, fine sessione #73)
 
-Sessione attuale: #73
+Sessione attuale: #74
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v75** (PR #86 unita con squash `aed77cc`, controllato online `APP_VER=75`). `main` già unito nel ramo di lavoro. Nessuna PR aperta.
+
+## Fatto in #73 (11/10, 1:45-1:50 ora italiana)
+- Unita la scorta (solo `ULTIMO-MESSAGGIO.md`), push confermato.
+- **M37 FATTO da Mario** (messaggio di RVC #60 alle 1:48): Codice.gs v2 incollato, nuovo deployment, vecchio archiviato, link nuovo in `JONA_DRIVE_URL` degli ambienti «Jona Ordini» e «RVC». Tolta M37 da `DA-FARE.md`.
+- La #73 vedeva ancora l'URL vecchio (risposta v1): le variabili si leggono solo all'avvio. Per questo handoff subito alla #74, che fa la parte Drive (Prossimi passi 1-2).
 
 ## Fatto in #72 (11/10, 1:34-1:45 ora italiana)
 - Sessione aperta a mano da Mario (telefono, catena ripartita da 0). Unita la scorta (solo `ULTIMO-MESSAGGIO.md`).
@@ -25,7 +30,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - Jona #71 `session_01MKFn44AvJMKQKuSQyqcqvW` (chiusa). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 
 ## Prossimi passi (in ordine)
-1. Attendere M37: Mario aggiorna lo script del Drive a v2 (forse insieme al nuovo deployment guidato da RVC #60). Controllo: `bash tools/drive/azione.sh elenco "Jona/Loghi"` → se risponde `{"ok":false,"errore":"servono nome e dati"}` è ancora v1. Se l'URL è cambiato serve la variabile nuova: le variabili d'ambiente si leggono solo all'avvio della sessione (`[ -n "$JONA_DRIVE_URL" ]`, mai stampare l'URL).
+1. M37 è fatto: controllare che lo script risponda v2 con il nuovo URL. Se risponde ancora v1 o «Page Not Found», dirlo a Mario (variabile non aggiornata nell'ambiente). Prima era: attendere M37: Mario aggiorna lo script del Drive a v2 (forse insieme al nuovo deployment guidato da RVC #60). Controllo: `bash tools/drive/azione.sh elenco "Jona/Loghi"` → se risponde `{"ok":false,"errore":"servono nome e dati"}` è ancora v1. Se l'URL è cambiato serve la variabile nuova: le variabili d'ambiente si leggono solo all'avvio della sessione (`[ -n "$JONA_DRIVE_URL" ]`, mai stampare l'URL).
 2. Con lo script v2: caricare `docs/img/logo/jona/{png,vettoriale}` in `Jona/Loghi/JONA/…`, i file di `docs/img/logo/vecchi/` (+ `git show 87eff38:docs/img/logo/ynoy-animazione.svg`) in `Jona/Loghi/Vecchi`, YNOY CORP in `Jona/Loghi/YNOY CORP/{PNG alta risoluzione,Vettoriale,Originale,Animazione}`; spostare i 7 file vecchi sparsi in `Jona/Loghi` dentro `Vecchi` (prima `elenco`, poi `sposta`), cestinare la cartella «YNOY CORP 3 lune» solo se vuota. Poi mandare a Mario il link della cartella.
 3. D30: attesa della scatola nera, poi Transfer (sopra).
 4. Proporre a Mario la regola «file importanti anche nel Drive» (D31).
@@ -45,8 +50,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-Nella #72 Mario ha scritto solo il prompt di avvio: «git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo). Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #72). Poi attendi le mie istruzioni.»
+Nella #73 Mario ha scritto solo il prompt di avvio: «git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo). Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #73). Poi attendi le istruzioni di Mario.» (mandato dalla #72).
 
-Ultima richiesta vera (11/10 01:19, nella #71): «mandami anche il logo jona ad alta risoluzione PNG bianco nero e trasparente e vettoriale salva la vecchia scritta YNOY con l'animazione se non c'è in drive cosi se ti dico metti la vecchia fai subito» → logo fatto e mandato; parte Drive in attesa di M37.
-
-Domanda mia aperta (fine #72): «A che passo sei arrivato?» della guida M37 (incollare Codice.gs v2 prima del nuovo deployment, poi nuovo URL in `JONA_DRIVE_URL` di Jona e RVC).
+Ultima richiesta vera (11/10 01:19, nella #71): «mandami anche il logo jona ad alta risoluzione PNG bianco nero e trasparente e vettoriale salva la vecchia scritta YNOY con l'animazione se non c'è in drive cosi se ti dico metti la vecchia fai subito» → logo fatto e mandato; la parte Drive la fa la #74.
