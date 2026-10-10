@@ -26,7 +26,7 @@ VERO = {
     '603': ('pz', 1.55), '1172': ('kg', 2.95)},
   'nieddittas-fattura-5274-2026-09-22.jpg': {'22': ('kg', 4.70), '4': ('kg', 20.50), 'CDS': ('pz', 5.0)},
 }
-UM = {'k.': 'kg', 'kg': 'kg', 'pz': 'pz', 'cf': 'conf', 'conf': 'conf', 'ct': 'cartone', 'cartone': 'cartone', 'lt': 'l', 'l': 'l'}
+UM = {'k': 'kg', 'k.': 'kg', 'kg': 'kg', 'pz': 'pz', 'cf': 'conf', 'conf': 'conf', 'ct': 'cartone', 'cartone': 'cartone', 'lt': 'l', 'l': 'l'}
 
 def foto(nome):
     im = Image.open(os.path.join(ROOT, 'docs/img/listini', nome)).convert('RGB')
