@@ -1,5 +1,3 @@
-# Ultimo messaggio di Mario (10/10/2026 18:54 ora italiana)
+# Ultimo messaggio di Mario (10/10/2026 19:17 ora italiana)
 
-git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
-Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #66).
-Poi attendi le mie istruzioni.
+Mi piace la 3 che vedono anche le camere ecc ecc ma si possono unire le 3 idee in modo ordinato ?
