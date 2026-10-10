@@ -10,7 +10,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| D22 | Lettura fatture: scegliere la strada (A XML dal commercialista, B Gemini + secondo lettore gratis, C ChatGPT a pagamento). Immagine `docs/img/scelte/lettura-fatture-3-strade.png`. Raccomandata A, poi B per listini di carta | Claude dopo la scelta di Mario | in attesa |
+| D22 | Lettore foto (analisi #53, immagine `docs/img/scelte/lettore-foto-confronto.png`): consigliato Gemini principale + Cloudflare Workers AI (Gemma 4 26B o Qwen 3.8, 10.000 neuroni/giorno gratis ≈ 150 foto, nessun account nuovo) come secondo lettore nel Worker: riserva quando Gemini dà 429/504 e confronto numeri → riga rossa. Prima prova vera sulle 8 foto di `docs/img/listini/`. XML (M28) resta la strada migliore per le fatture | Claude dopo il sì di Mario | domanda fatta |
 | M28 | Chiedere al commercialista se può mandare ogni mese le fatture dei fornitori in formato XML (file .xml o .p7m) | Mario | quando può |
 | M27 | v67 online (dal 10/10): Fornitori → **Importa listini** → foto delle fatture (DAC, Mariano, Nieddittas) → **Trascrivi con Gemini**. Controlla le righe rosse «da controllare» e dimmi cosa non torna | Mario | appena v67 online |
 | M22 | v53 online: chiudi e riapri l'app (o tocca «App da aggiornare»), manda un ordine e guarda l'animazione nuova; dimmi se il bordo bianco su mani e polsini è sparito e se il logo B ti piace | Mario | ora |
