@@ -102,7 +102,31 @@ with tempfile.TemporaryDirectory() as tmp:
     hook(repo, "stop")
     s3 = remoto_scorta(repo)
     u = git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md")
-    controlla("SEGRETO" not in u and "nascosto" in u and "fatto" in u, "indirizzo dello script di Google Drive nascosto")
+    controlla("SEGRETO" not in u and "[segreto tolto dalla scorta]" in u and "fatto" in u, "indirizzo dello script di Google Drive nascosto")
+
+    # 3d. un segreto incollato in chat non arriva su GitHub (resto del messaggio intatto); solo valori finti
+    url = "https://script.google.com/macros/s/AKfycbFINTO0123456789abcdefghijklmnopqrstuvwxyz_-ABCDEF/exec"
+    segreti = [url, "AIzaSyFINTA0123456789abcdefghijklmnopq", "ghp_FINTO0123456789abcdefghijklmnop",
+               "sk-ant-api03-FINTA0123456789abcdef", "FINTO9x8y7z6w5v4u3t2s1r0q9p8o7n6m5l4k3", "valore-env-segreto-123"]
+    testo = ("ecco il link " + url + " e la chiave " + " ".join(segreti[1:5]) + " e " + segreti[5] +
+             " · normale https://claude.ai/code perché è così")
+    env_prova = dict(os.environ, CLAUDE_PROJECT_DIR=repo, PROVA_DRIVE_URL=segreti[5])
+    subprocess.run([sys.executable, os.path.join(HOOKS, "scorta.py"), "msg"], cwd=repo, input=json.dumps({"prompt": testo}),
+                   text=True, env=env_prova, timeout=90)
+    open(os.path.join(repo, "a.txt"), "w").write("cinque\n")
+    hook(repo, "stop")
+    s3 = remoto_scorta(repo)
+    salvato = git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md")
+    controlla(not any(s in salvato for s in segreti) and "AKfyc" not in salvato, "segreti tolti dalla scorta")
+    controlla(salvato.count("[segreto tolto dalla scorta]") == 6, "ogni segreto segnato come tolto")
+    controlla("ecco il link" in salvato and "https://claude.ai/code perché è così" in salvato, "il resto del messaggio resta")
+
+    # 3e. il prompt di avvio di una sessione non prende il posto del messaggio di Mario
+    hook(repo, "msg", {"prompt": "[AVVIO] git fetch origin claude/prova-1"})
+    open(os.path.join(repo, "a.txt"), "w").write("sei\n")
+    hook(repo, "stop")
+    s3 = remoto_scorta(repo)
+    controlla("ecco il link" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "prompt di avvio ignorato")
 
     # 4. sessione nuova da un altro clone: avvio-check segnala la scorta e il merge è in avanti
     altro = os.path.join(tmp, "altro")
