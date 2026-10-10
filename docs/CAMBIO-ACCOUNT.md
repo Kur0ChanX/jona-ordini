@@ -38,7 +38,18 @@ Il lavoro non vive nell'account Claude: vive su **GitHub**. Tutti e due gli acco
 4. Passa all'account Hotmail: https://claude.ai/code → **nuova sessione** → repository `jona-ordini` → ramo con il **numero più alto** → incolla il prompt.
 5. Stessa cosa per RVC.
 
-Se i token finiscono di colpo, a metà lavoro: niente panico. Su GitHub c'è tutto fino all'ultimo push. Nell'account Hotmail apri la sessione sul ramo col numero più alto e scrivi: «la sessione di prima si è interrotta: controlla su GitHub cosa manca e riparti».
+### Emergenza: i token finiscono di colpo
+Niente panico: su GitHub c'è tutto fino all'ultimo push (con il limite in avviso Claude pusha dopo ogni passo).
+Non serve il prompt della sessione vecchia: questo funziona sempre, anche senza sapere il numero del ramo.
+
+1. Passa all'altro account: https://claude.ai/code → **nuova sessione** → repository `jona-ordini` (o `RVC`) → ramo qualsiasi.
+2. Incolla (cambia `jona` con `rvc` per RVC):
+
+```
+EMERGENZA CAMBIO ACCOUNT: la sessione di prima (altro account) si è fermata per fine token.
+git fetch origin, trova il ramo claude/jona-sessione-<NN> col numero più alto, fai checkout e merge --ff-only.
+Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md, controlla su GitHub cosa manca, rinominati come sessione #NN+1 e riparti.
+```
 
 ## Regole d'oro
 - **Un solo account alla volta per progetto.** Mai due sessioni attive sullo stesso progetto in due account: si pestano i piedi.
@@ -101,10 +112,11 @@ Fatto nella #01 (10/10/2026):
 - Hotmail è Pro (confermato da Mario). Limite settimanale Gmail in avviso: torna mercoledì 14/10 alle 12:00.
 - Errore della #01: aveva passato il tema alla sessione Jona #55 invece di aprire una sessione di servizio. Avvisata la #55 che il tema non è suo (deve solo unire il ramo per la guida e la regola).
 
+Fatto nella #02: Mario ha incollato le preferenze nei due account; aggiunto il «prompt di emergenza» che non richiede il numero del ramo.
+
 Ancora da fare:
-1. Mario conferma di aver incollato il testo unico in tutti e due gli account.
-2. Memoria dei due account (Personalizzazione o Impostazioni → Capacità): unirle se Mario incolla i testi.
-3. Il giorno del cambio: Mario scrive «cambio account» nelle sessioni attive di Jona e RVC.
-4. Ricreare la routine «Punto ogni 5 ore» nell'account Hotmail quando ci si passa.
+1. Memoria dei due account (Personalizzazione o Impostazioni → Capacità): unirle se Mario incolla i testi.
+2. Il giorno del cambio: Mario scrive «cambio account» nelle sessioni attive di Jona e RVC.
+3. Ricreare la routine «Punto ogni 5 ore» nell'account Hotmail quando ci si passa.
 
 Ultimo messaggio di Mario (parola per parola): «Ripeto. Non dovevi passare a Giona Ordini, dovevi creare una nuova sezione perché sono due argomenti diversi. Uno sono gli ordini, sto programmando per un programma e questa invece è una discussione generica sul passaggio di account. Quindi dovevi creare una, un numero, cosa ne so, due di questa chat, tipo servizio o qualcosa. Se l'è denominata tu così.»
