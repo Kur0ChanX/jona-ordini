@@ -8,6 +8,8 @@ const mk=async()=>{const c=await b.newContext({viewport:{width:390,height:800},s
   // indirizzo d'arrivo letto prima degli script dell'app (che poi tolgono ?da=gh e #i=)
   await c.addInitScript(()=>{try{if(/pages\.dev$/.test(location.hostname)&&!sessionStorage.getItem('t_arrivo'))sessionStorage.setItem('t_arrivo',location.href)}catch(e){}});
   for(const base of [OLD,NEW])await c.route(base+'**',async r=>{const u=new URL(r.request().url());if(r.request().resourceType()==='document')docs.push(u.href);
+    // il nuovo risponde in ritardo (come in rete vera): l'app del vecchio indirizzo intanto toglie #i= dall'indirizzo
+    if(/manifest\.webmanifest$/.test(u.pathname)&&u.origin+'/'===NEW)await new Promise(z=>setTimeout(z,2000));
     if(/firebase-config\.js$/.test(u.pathname))return r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'});
     const path=u.pathname.replace(/^\/jona-ordini\//,'/').replace(/^\/$/,'/index.html');const res=await r.fetch({url:LOC+path.slice(1)});return r.fulfill({response:res})});
   const p=await c.newPage();p.nav=[];p.on('framenavigated',f=>{if(f===p.mainFrame())p.nav.push(f.url())});p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));p.docs=docs;return p};
