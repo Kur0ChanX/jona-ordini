@@ -1130,8 +1130,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=64;
+const APP_VER=65;
 const NEWS=[
+  {v:65,data:'2026-10-10',titolo:'Foto dei listini: Gemini più affidabile',
+    chef:['Con più foto Gemini le legge una per volta: ogni foto ci mette meno e non si blocca più con «errore 524».','Se Gemini è lento o occupato riprova da solo. Se una foto non passa, quelle già lette restano: un nuovo tocco su «Trascrivi con Gemini» legge solo le mancanti.'],
+    dev:{correzioni:['Errore 524 sulle foto (DAC, 2 foto): la richiesta a `/gemini` superava i 100 s di Cloudflare. Worker: tempo massimo `GEM_BUDGET` 85 s e `GEM_TRY_MS` 45 s per modello (`AbortSignal.timeout`, anche sulla lettura della risposta), poi il modello dopo (Lite); fuori tempo → 504 in JSON invece del 524 di Cloudflare.','`gemRun`: una richiesta per foto, avanzamento `I.prog`, seconda prova dopo `GEM_PAUSA` per 429/502/503/504/524 (`GEM_RETRY`), risultati per foto in `I.gres` (WeakMap), tabelle unite con `gemJoin` (intestazione ripetuta e recinti di codice tolti). `gemCall` restituisce anche `st` e un messaggio per 502/504/524.']}},
   {v:64,data:'2026-10-10',titolo:'Listini: niente prodotti doppi',
     chef:['Quando caricate un listino (file, foto o tabella) l\'app cerca i prodotti doppi dello stesso fornitore.','Una riga uguale in tutto a un\'altra, o a un prodotto già a listino, non viene caricata due volte.','Se due righe sono lo stesso prodotto ma qualcosa cambia (per esempio il prezzo), l\'app le segna in giallo e toglie la spunta: scegliete voi quali tenere.'],
     dev:{aggiunte:['`rvDup(items)`: per ogni riga dell\'import `{twin:j}` (uguale in tutto alla riga j, stesso fornitore: mai salvata, casella spenta), `{sim:j,dif}` (stesso prodotto con `sameProd`, campi diversi in `dif`: tolta la spunta), `{ex:p}` (uguale in tutto a un prodotto già a listino; la categoria conta solo se è nel file, `catF`). Banner `#rv-dup` in `reviewSheet`. `reviewSave` decide prima la destinazione: righe simili tenute tutte e due = prodotti separati. Prova `tools/test-listini-doppi.mjs`.'],correzioni:['`matchProd`: con due codici diversi non unisce più due prodotti solo perché hanno lo stesso nome (prima l\'import sovrascriveva l\'altro formato).']}},
@@ -3021,15 +3024,16 @@ async function gemCall(body){const k=gemKey();let last='',st=0,srv=false;
       const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j)};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status}
     else return{err:'Prima inserisci la chiave Gemini.'}}
   catch(e){return{err:'Non riesco a contattare Gemini: controlla la connessione.'}}
-  return{err:srv&&st===403?'Questo telefono non è collegato al ristorante: rientra con la chiave.'
+  return{st,err:srv&&st===403?'Questo telefono non è collegato al ristorante: rientra con la chiave.'
     :st===429?'Gemini è molto occupato adesso: riprova tra un minuto.'
+    :st===504||st===524||st===502?'Gemini ci ha messo troppo a rispondere.'
     :/key|API_KEY|permission/i.test(last)?(srv?'La chiave Gemini del ristorante non funziona: avvisa lo sviluppatore.':'La chiave Gemini non è valida: controllala.')
     :'Gemini non ha risposto'+(last?' ('+last+')':'')+'.'}}
 function fotoStage(I){const k=gemKey(),srv=!k&&gemOn(),n=I.photos.length;
   return(I.err?`<div class="err">${esc(I.err)}</div>`:'')+`<p class="muted" style="margin-top:0">${n?n+(n===1?' foto pronta':' foto pronte'):'Nessuna foto'}. Puoi aggiungerne altre se il listino ha più pagine.</p>
   ${n?`<div class="chips">${I.photos.map((p,i)=>`<button type="button" class="chip" data-a="gemDel" data-v="${i}">${esc(p.name.slice(0,22))} ${ic('x')}</button>`).join('')}</div>`:''}
   <div class="btns" style="justify-content:flex-start;margin:10px 0 18px"><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="cam">${ic('camera')} Scatta</button><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="gal">${ic('image')} Galleria</button></div>
-  ${I.busy?`<div class="banner">Gemini sta leggendo il listino… può volerci un minuto.</div>`:k||srv?`<button type="button" class="btn primary block big" data-a="gemGo" ${n?'':'disabled'}>${ic('sparkle')} Trascrivi con Gemini</button>`
+  ${I.busy?`<div class="banner">${esc(I.prog||'Gemini sta leggendo il listino…')} Può volerci un minuto.</div>`:k||srv?`<button type="button" class="btn primary block big" data-a="gemGo" ${n?'':'disabled'}>${ic('sparkle')} Trascrivi con Gemini</button>`
   :`<button type="button" class="btn primary block big" data-a="gemShare" ${n?'':'disabled'}>${ic('sparkle')} Apri con l'app Gemini</button>
   <p class="muted small">Scegli Gemini, incolla il testo già copiato, poi torna qui e incolla la tabella che ti restituisce.</p><div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="impPaste">${ic('paste')} Incolla la risposta</button></div>`}
   <h2 class="sec">Trascrizione automatica</h2>
@@ -3041,12 +3045,24 @@ function shrinkImg(file){return new Promise((res,rej)=>{const url=URL.createObje
   im.onerror=()=>{URL.revokeObjectURL(url);rej({code:'img'})};im.src=url})}
 async function gemAdd(files){const I=S.imp;if(!I)return;I.err='';for(const f of files){try{I.photos.push(await shrinkImg(f))}catch(e){I.err='Una foto non si apre: prova a rifarla.'}}I.stage='foto';refreshSheet()}
 const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
-async function gemRun(){const I=S.imp;if(!I||!I.photos.length||I.busy)return;I.busy=true;I.err='';refreshSheet();
-  try{const parts=[{text:geminiPrompt()}];for(const p of I.photos)parts.push({inline_data:{mime_type:'image/jpeg',data:await b64(p)}});
-    const g=await gemCall({contents:[{parts}],generationConfig:{temperature:0}}),txt=g.txt||'';
-    I.busy=false;if(!txt){I.err=(g.err||'Gemini non ha risposto.')+' Riprova o usa l\'app Gemini.';refreshSheet();return}
-    I.txt=txt;impRun('txt')}
-  catch(e){I.busy=false;I.err='Non riesco a contattare Gemini. Controlla la connessione.';refreshSheet()}}
+// v65: una foto per volta (ogni richiesta resta sotto i 100 s di Cloudflare), una seconda prova se Gemini è lento o occupato,
+// le foto già lette restano in I.gres: un nuovo tocco legge solo quelle mancanti.
+const GEM_RETRY=/^(429|502|503|504|524)$/;
+function gemJoin(a){const hd=l=>l.replace(/\s/g,'').toLowerCase();let H=hd(TEMPLATE_HEAD),first=true;
+  return a.map(t=>{const rs=String(t).split('\n').filter(l=>!/^\s*```/.test(l));const i=rs.findIndex(l=>l.trim());
+    if(i>=0){if(first)H=[H,hd(rs[i])];else if([].concat(H).includes(hd(rs[i])))rs.splice(i,1)}first=false;return rs.join('\n')}).join('\n')}
+async function gemRun(){const I=S.imp;if(!I||!I.photos.length||I.busy)return;I.busy=true;I.err='';I.prog='';refreshSheet();
+  try{I.gres=I.gres||new WeakMap();const n=I.photos.length,out=[];
+    for(let i=0;i<n;i++){const p=I.photos[i];if(I.gres.has(p)){out.push(I.gres.get(p));continue}
+      if(n>1){I.prog=`Gemini legge la foto ${i+1} di ${n}…`;refreshSheet()}
+      const body={contents:[{parts:[{text:geminiPrompt()},{inline_data:{mime_type:'image/jpeg',data:await b64(p)}}]}],generationConfig:{temperature:0}};
+      let g=await gemCall(body);
+      if(!g.txt&&GEM_RETRY.test(String(g.st))){await new Promise(r=>setTimeout(r,GEM_PAUSA));g=await gemCall(body)}
+      if(!g.txt){I.busy=false;I.prog='';I.err=(n>1?`Foto ${i+1} di ${n}: `:'')+(g.err||'Gemini non ha risposto.')+(out.length?' Le foto già lette restano: tocca di nuovo «Trascrivi con Gemini» per leggere le altre.':' Riprova o usa l\'app Gemini.');refreshSheet();return}
+      I.gres.set(p,g.txt);out.push(g.txt)}
+    I.busy=false;I.prog='';I.txt=gemJoin(out);impRun('txt')}
+  catch(e){I.busy=false;I.prog='';I.err='Non riesco a contattare Gemini. Controlla la connessione.';refreshSheet()}}
+let GEM_PAUSA=3000;
 async function gemShare(){const I=S.imp;if(!I||!I.photos.length)return;await copyText(geminiPrompt());
   if(navigator.canShare&&navigator.canShare({files:I.photos})){try{await navigator.share({files:I.photos,text:geminiPrompt()})}catch(e){}}
   else toast('Il telefono non permette di condividere da qui: apri Gemini, allega le foto e incolla il testo copiato.','warn');
