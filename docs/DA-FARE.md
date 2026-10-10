@@ -10,7 +10,6 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| M32 | Ambienti del nuovo account: rinominare i due «Default» in **Jona Ordini** (rete **Full**) e **RVC** (rete com'è). Passi dati in chat il 10/10 (sessione #63) | Mario | ora |
 | D30 | v70 logo con la coda nuova: pronta sul ramo definitivo (commit `7f7f0e6`), prove legate + `test-giro` verdi. PR #81 aperta (#62), prove ripartite in #63 → «Prove automatiche» verde → squash → controllo online (`APP_VER=70`) → unire main nel ramo definitivo | Claude da solo | subito (#63) |
 | M31 | Scegliere la miglioria del logo: Ovvia (logo più grande all'apertura), Furba (lune che cadono con rimbalzo), Geniale (4 lune come segno di attesa nell'app, consigliata), Nessuna | Mario | quando vuoi |
 | D29 | Ottimizzare l'app per Android, iPhone, Mac e Windows (Mario #60). Piano nelle consegne #60: giro con WebKit (Safari) e schermi da computer, zona sicura iPhone, icone Apple, push su iPhone, tastiera, mouse. Prima la v69 | Claude da solo | dopo la v69 |
