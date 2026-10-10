@@ -1,5 +1,7 @@
-# Ultimo messaggio di Mario (10/10/2026 18:06 ora italiana)
+# Ultimo messaggio di Mario (10/10/2026 ~18:10 ora italiana)
 
-git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
-Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #65).
-Poi attendi le mie istruzioni.
+quando zooma all'inizio è sgranata riesci a migliorare la risoluzione o qualche soluzione per avere un logo migliore jona
+
+il problema è solo che è bassa la risoluzione
+
+Poi mandami il mio Logo YNOY in vettoriale è in un formato Png alta risoluzione

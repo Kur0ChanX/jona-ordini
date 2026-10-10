@@ -41,6 +41,11 @@ Da fare (ramo `claude/jona-v71-dispositivi` da main, poi PR, versione v71):
 - Android: maschera SVG intorno a YNOY (D14) mai provata da Mario.
 - Altre prove potrebbero dipendere dall'ora come E10/E18/E26: se una fallisce sempre in una fascia, cercare orari fissi nei dati di prova.
 
+## Messaggio arrivato in #64 DOPO l'handoff (da fare in #65, prima di D29)
+Parola per parola: «quando zooma all'inizio è sgranata riesci a migliorare la risoluzione o qualche soluzione per avere un logo migliore jona / il problema è solo che è bassa la risoluzione / Poi mandami il mio Logo YNOY in vettoriale è in un formato Png alta risoluzione»
+- Logo YNOY: già mandati a Mario in #64 `media/ynoy.svg` (vettoriale) e `docs/img/logo/ynoy-2000.png` (2000 px). Fatto.
+- DA FARE: il logo **Jona** nell'apertura (quando si ingrandisce all'inizio) è sgranato: risoluzione bassa. Trovare l'immagine usata nell'apertura (`.splash`), farla vettoriale o ad alta risoluzione, e provare con un prima/dopo sullo stesso fotogramma (E17).
+
 ## Ultimo messaggio di Mario (#64), parola per parola
 «2» (risposta alla scelta delle strade di D29: strada 2 «Furba»).
 Messaggi prima: «ok avvisami quando è online» (v70) · «ok intanto parto con D29?» · «si e dimmi se ho messo gli ambienti giusti o invertiti» · «come faccio a sapere se ho fatto giusto?»
