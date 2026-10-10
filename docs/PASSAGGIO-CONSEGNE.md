@@ -1,34 +1,52 @@
-# Passaggio di consegne (2026-10-10, fine sessione #55)
+# Passaggio di consegne (2026-10-10, fine sessione #56)
 
-Sessione attuale: #56
+Sessione attuale: #57
 
-Ramo di lavoro: `claude/jona-sessione-56` (all'handoff della #56 → `claude/jona-sessione-57`). App online: v67. **v68 pronta e committata** (commit `27a77fb` sul ramo, prove legate verdi), NON ancora pubblicata.
+Ramo di lavoro: `claude/jona-sessione-57` (all'handoff della #57 → `claude/jona-sessione-58`). App online: **v68** (PR #79 unita con squash, commit main `7ff2c34`, controllato online: `gem-live` presente, CACHE `jona-ordini-v72`; Worker e Pages verdi).
 
-## Ultimo messaggio di Mario (#55), parola per parola
-«Mi deve avvisare che il motore sta lavorando, su il flash, se è normale, e perché sta lavorando lì. Che problemi ha avuto l'altro? Se è in sovraccarico o no? Mi raccomando, attenzione ai falsi feedback, perché spesso ci possono essere dei falsi. Mi è capitato in altri programmi.»
+## Ultimo messaggio di Mario (#56), parola per parola
+«Il problema è che se, se finisco l'account all'improvviso, se finisco il token all'improvviso, cioè tu no, no, non perdi, se, non spendi troppo token, eh, ogni, l'avviso di quello settimanale è fatto da 75%, da 75% fino al 100% ci sono tantissimi messaggi e ogni volta tu non salvi questa regola, ogni volta nelle, nel, nel, nel, nel, nel passaggio e non sprechi un sacco di token, non si riesce a trovare una nuova soluzione.
 
-- Messaggio prima: «Sicuro di utilizzare la versione Gemini Flash Lite. Flash Lite fa un po' schifo, perché non la versione normale, Flash normale, che funziona molto molto bene? La versione Pro, no perché consuma troppo e poi non abbiamo un abbonamento Pro.» → risposto: l'app usa già Flash per primo, Lite solo di riserva; Pro no. Ordine v68: Flash → Flash-Lite → Cloudflare Llama 4.
-- Il suo ultimo messaggio è la richiesta realizzata nella v68 (sotto). Va ancora detto a Mario che è fatta, appena pubblicata.
+Ho mandato anche questo messaggio uguale al progetto RVC. Mettetevi d'accordo per lavorare insieme.»
 
-## Fatto in #55
-- **Secondo giro prova lettori** (run 38034926723, 9:35→10:00 ora italiana, artifact 11663702836): permessi Cloudflare OK. Gemini Flash-Lite 20/20, 0 errori, 17 s; **CF `@cf/meta/llama-4-scout-17b-16e-instruct` 19/20**, 0 errori, 72 s; Gemini Flash 6/6 ma 2 foto perse per 503, 376 s; CF qwen3.8 13/20 (398 s), mistral-small-3.1 11/20, gemma-4 0 righe (non usarla). Immagine `docs/img/scelte/prova-lettori-risultato-2.png` mandata a Mario (fatta con HTML + Playwright, script nello scratchpad, non nel repo).
-- Iscritto alla PR #78 (`subscribe_pr_activity`). Controllo di riserva cancellato.
-- **Messaggio da un'altra sessione di Mario** («Account switch strategy», `session_01T6FSLJ14J9cy5jTtgWQKnE`): unito il ramo `ccr-c4aaeb72-tfz1na` (solo `docs/CAMBIO-ACCOUNT.md` nuovo + regola «CAMBIO ACCOUNT» in CLAUDE.md › REGOLE TRASVERSALI). Aggiunta **M29** in `docs/DA-FARE.md` (preparare l'account Hotmail, passi 1-6). Regola: quando Mario scrive «cambio account» → handoff fino al push e al ramo nuovo, ma NON aprire la sessione nuova: dargli il prompt di 3 righe per l'altro account. D22 aggiornata in DA-FARE.
-- **v68 costruita** (commit `27a77fb`):
-  - `worker/src/index.js`: `LETTORI` {flash, lite, cf}, `CF_MS` 80 s, `motivoDi` (503 sovraccarico, 429 limite, 504 lento, 404 manca), `lettoreErr` → `{error:{message,codice,motivo,lettore}}`, `leggiCf` (Workers AI via `env.AI.run`, messaggio chat con `image_url` data:base64, risposta riportata nel formato Gemini con `lettore:'cf'`; errori 3040 → 503, 4006/quota → 429, tempo scaduto → 504). In `gemini()`: con `req.lettore` prova SOLO quel lettore, una volta, timeout `GEM_TRY_MS` (45 s); senza `lettore` (Chiedi a Jona, app vecchie) la catena di prima, invariata.
-  - `worker/wrangler.toml`: aggiunto `[ai] binding = "AI"` (statico; il token ha Workers AI Read+Edit dal 10/10). Il workflow aggiunge i D1 in fondo: TOML valido.
-  - `index.html` (zona importazione listini): `gemCall(body, lettore)` (con chiave sul telefono: flash/lite diretti a Google, `cf` → `{salta:true}`; dal server: risposta `lettore` solo se il server lo dice, altrimenti '' → mostrato «Gemini» generico, per non inventare). `GEM_LETT` (nome e ruolo), `gemNome`, `gemPerche` (testo SOLO dal codice HTTP vero), `gemLive` (banner `#gem-live`: ✗ lettore: motivo · secondi, ⏳ Legge X (ruolo) · contasecondi `#gem-sec`), `gemTick` (aggiorna solo il numero ogni secondo). `gemRun`: per ogni foto prova i lettori in ordine; passa al successivo con 429/500/502/503/504/524/404; si ferma subito con altri codici (403, chiave non valida); se tutti falliscono, errore con ogni lettore e il suo codice. Tolta la vecchia «seconda prova dopo `GEM_PAUSA`» (sostituita dalla catena; `GEM_PAUSA` resta dichiarata). `I.gnote` → `S.rev.lett` → riquadro `#rv-lett` «Chi ha letto le foto» in `reviewSheet`; `fonte` = «N foto lette».
-  - APP_VER 68, CACHE `jona-ordini-v72`, NEWS v68 (chef + dev.aggiunte), riga v68 in CLAUDE.md.
-  - `tools/test-gemini-server.mjs`: 59 controlli (nuovi: lettore lite/flash/pro/cf, Workers AI finto con 3040/4006/lento, formato messaggio, catena vecchia senza lettore; app: ordine flash,flash,lite,cf, errore con i 3 codici veri, nota «Flash-Lite dopo 503», banner dal vivo con contasecondi, server vecchio → «Gemini», riquadro «Chi ha letto», chiave sul telefono). Il finto `fbInit` ora ha `fs` (Proxy) perché durante l'attesa partiva un render.
-  - Prove riuscite in locale (TZ=Europe/Rome): test-gemini-server 59, test-fatture 28, test-virgolette 16, test-news 94, test-listini-doppi 14, test-listini-prova 7, test-scaglione2 20, test-testbar 7, test-giro.
-- Decisioni: l'app guida la catena (non il Worker) così il banner dal vivo dice la verità su chi lavora in quel momento; ogni richiesta resta sotto i 100 s di Cloudflare (E20). Scartato: banner con stima/tempo inventato; mostrare il messaggio inglese grezzo di Google (meglio il codice + traduzione fissa). Pro scartato (costi, Mario).
+## Domanda aperta a Mario (attendere la risposta, poi D27)
+Gli ho proposto 3 strade (tabella in chat):
+1. Ovvia: Claude fa commit+push dopo ogni passo quando il limite è in avviso (costa token, dipende dalla memoria di Claude).
+2. Furba: hook «scorta» a zero token.
+3. **Geniale (consigliata)**: la 2 + frase fissa nelle preferenze dei due account «riparti dal ramo col numero più alto» → al cambio account non serve preparare niente.
+Domanda: «Mi dai l'ok per la strada 3? Rispondi "sì 3", oppure "2" o "1"». Se dice sì → costruire D27 (sotto).
 
-## Prossimo lavoro (#56), in ordine
-1. **Pubblicare v68**: aprire PR da `claude/jona-sessione-56` (contiene `27a77fb`) verso `main`, attendere «Prove automatiche» verde, squash merge, controllare online (APP_VER 68) e che il workflow del Worker (`cloudflare-worker.yml`) sia verde (prima volta con `[ai]`: se il deploy fallisce per il binding AI, capire il motivo, avvisare Mario). Subito dopo: `git fetch origin main && git merge origin/main` nel ramo e push.
-2. Tocca il Worker → **giro completo extra su GitHub** (workflow «Prove automatiche», workflow_dispatch modo `tutto`, E14) e dirlo a Mario in una riga.
-3. Dire a Mario (breve, con immagine se serve) che la v68 è online: cosa vedrà mentre legge le foto. Proporre UNA idea nuova (regola SOLUZIONE SMART).
-4. Chiudere la PR #78 senza unirla (state closed) e disiscriversi; gli strumenti `tools/prova-lettori.py` + `.github/workflows/prova-lettori.yml` sono solo sul ramo `claude/prova-lettori`: eventualmente portarli su main più avanti.
-5. Poi D23 (più XML + `.p7m`), D24, D25, D26 (`docs/DA-FARE.md`).
+### Progetto D27 (hook scorta), già pensato
+- `.claude/hooks/scorta.py`, registrato in `.claude/settings.json`.
+- UserPromptSubmit: scrive l'ultimo messaggio di Mario (campo `prompt` dello stdin JSON) in `.git/scorta-msg.md` (FUORI dal working tree: `git status` resta pulito, l'handoff non vede modifiche pendenti).
+- Stop: indice temporaneo (`GIT_INDEX_FILE` in `.git/`) → `git add -A` (rispetta `.gitignore`, niente segreti) + `docs/ULTIMO-MESSAGGIO.md` iniettato con `hash-object -w` + `update-index --cacheinfo` → `write-tree`; se l'albero è uguale all'ultima scorta non fa niente; `commit-tree` con genitori HEAD e la scorta precedente (se diversa) → `git push origin <sha>:refs/heads/scorta/<ramo>` in background con timeout. Sempre fast-forward, niente force. Ramo di lavoro e app non toccati. I push dalla sessione non fanno partire workflow.
+- `avvio-check.py`: se `origin/scorta/<ramo>` contiene commit non presenti nel ramo, lo segnala (e la sessione la unisce con `git merge`, fast-forward perché HEAD è antenato).
+- Coordinamento RVC (sessione `session_01M9K5UqXKXCqWTSKRggCWw9`, «🟢 ▶ ATTIVA · #50 · RVC», ha proposto a Mario la stessa idea e attende il suo «via»): Jona scrive il file una volta, RVC lo copia identico (`git fetch https://github.com/Kur0ChanX/jona-ordini <ramo>`). Il mio messaggio a RVC è stato BLOCCATO dal controllo automatico dei permessi («Unauthorized Persistence»: hook che pusha da solo senza consenso esplicito di Mario). Quindi: prima il «sì» scritto di Mario, poi mandare il messaggio a RVC e costruire.
+- Poi aggiornare `docs/CAMBIO-ACCOUNT.md` (sezione «Se i token finiscono di colpo» + testo Preferenze con la frase fissa) e la regola in CLAUDE.md (CAMBIO ACCOUNT: «push dopo ogni passo» sostituito dalla scorta automatica).
+- Prova: script in `tools/` che crea un repo finto, simula UserPromptSubmit + Stop e controlla ramo scorta, messaggio, `git status` pulito, nessun push se niente cambia.
+
+## Fatto in #56
+- PR #79 (v68) aperta, «Prove automatiche» verde, squash merge, `main` unito nel ramo e pushato (`00f405c`). Worker (prima volta con `[ai]`) e Pages verdi.
+- Giro completo extra su GitHub lanciato (workflow «Prove automatiche», `modo: tutto`, ref main, ~12:50 ora italiana): **controllare l'esito** (E14) e dirlo a Mario in una riga.
+- PR #78 (bozza prova lettori) chiusa senza unirla. Nota: `tools/prova-lettori.py` e `.github/workflows/prova-lettori.yml` sono finiti su main con la v68 (erano nel ramo di lavoro): innocui (il workflow parte solo su PR che cambiano quei file). Sulla PR #79 è partito anche il job «prova» (prova lettori, usa quota Gemini): non bloccava il merge.
+- Unito il ramo `ccr-c4aaeb72-tfz1na` (guida `docs/CAMBIO-ACCOUNT.md` aggiornata, regola CAMBIO ACCOUNT in CLAUDE.md, riga E23 in ERRORI.md). La catena «⚪ Servizio account» (#02, `session_01U6vJDxXtWf1quE4M8j74ks`, ramo `claude/servizio-sessione-02`) gestisce preferenze/memorie/piano dei due account: NON è lavoro di Jona. A Jona resta solo il «cambio account» quando Mario lo scrive qui.
+- Limite settimanale (`seven_day`) in **avviso** in tutte le sessioni; si azzera mercoledì 14/10 alle 12:00 ora italiana.
+- Detto a Mario che la v68 è online e cosa vede (banner «⏳ Legge Gemini Flash · 12 s», motivo vero se un lettore fallisce). Idea nuova SOLUZIONE SMART non proposta questa volta (risposta già lunga): proporla alla prossima occasione.
+
+## Prossimo lavoro (#57), in ordine
+1. Attendere la risposta di Mario sulla strada (1/2/3) e costruire D27; coordinarsi con RVC.
+2. Controllare il giro completo su GitHub (rosso = priorità).
+3. Poi D23 (più XML + `.p7m`), D24, D25, D26 (`docs/DA-FARE.md`).
+
+## Ancora da chiedere
+- M26 (prodotti finti spariti?), M25, D10: senza risposta. In attesa: M27 (screenshot «Controlla e salva» v67), M28 (commercialista → XML).
+
+## Rischi aperti
+- Gemini Flash sovraccarico (503) nelle ore di punta: ora c'è la catena Flash-Lite → Cloudflare.
+- Limite settimanale in avviso: se finisce prima dell'hook D27, si riparte dal ramo col numero più alto (tutto è pushato).
+
+## v68 (in breve, dettagli nella riga v68 di CLAUDE.md)
+Worker: `LETTORI` {flash, lite, cf}, `leggiCf` (Workers AI), errori `{codice,motivo,lettore}`. App: `gemRun` prova `GEM_LETT` in ordine per ogni foto, banner `gemLive`/`gemTick`, `gemPerche` solo da codici veri, riquadro «Chi ha letto le foto». Prova `tools/test-gemini-server.mjs` (59 controlli).
 
 ## Consegne della #54 (in breve)
 - Primo giro prova lettori (run 38033661843): Flash 7/8 foto perse per 503, Flash-Lite 20/20 (dopo correzione unità «K»), Cloudflare 403. Mario ha aggiunto al token Cloudflare Workers AI Read + Edit. Regola orari in ora italiana in CLAUDE.md.

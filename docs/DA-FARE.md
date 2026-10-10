@@ -10,7 +10,8 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
-| D22 | Lettore foto: prova fatta (#54-#55, `docs/img/scelte/prova-lettori-risultato-2.png`): Flash-Lite 20/20, Cloudflare Llama 4 Scout 19/20, Gemma 0. v68 in costruzione (#55): ordine Flash → Flash-Lite → Cloudflare Llama 4, l'app mostra dal vivo chi legge e perché passa al successivo (solo codici veri del server) | Claude da solo | in corso |
+| D27 | 🔴 Token che finiscono di colpo (Mario, 10/10): hook «scorta» a zero token (salva l'ultimo messaggio di Mario e il lavoro su `scorta/<ramo>` a ogni risposta) + frase fissa «riparti dal ramo col numero più alto» nelle preferenze. Strada 3 consigliata; serve il «sì» scritto di Mario (il controllo automatico ha bloccato l'invio senza consenso). Lo scrive Jona, RVC copia lo stesso file | Claude dopo l'ok di Mario | in attesa del sì |
+| D22 | Lettore foto: **v68 online** (10/10, PR #79): Flash → Flash-Lite → Cloudflare Llama 4, banner dal vivo. Giro completo extra su GitHub partito alle 12:5x | Claude da solo | controllare il giro completo |
 | D23 | Idea 1 (fatture da Gmail) scartata da Mario: «devo chiedere e arrivano tardi, al massimo carico io i file». Al suo posto: import di più XML insieme e dei file firmati `.p7m` (oggi errore `p7m`) | Claude da solo | da fare |
 | D24 | Idea 4 approvata: nel carrello, stesso prodotto da 2 fornitori → suggerisce il più conveniente | Claude da solo | da fare |
 | D25 | Idea 3 approvata: foto della bolla all'arrivo confrontata con l'ordine (mancanti / prezzo diverso in rosso) | Claude da solo | da fare |
