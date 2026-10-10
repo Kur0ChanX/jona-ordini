@@ -1,27 +1,16 @@
-# Passaggio di consegne (2026-10-11, fine sessione #71)
+# Passaggio di consegne (2026-10-11, fine sessione #72)
 
-Sessione attuale: #72
+Sessione attuale: #73
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v74**. **v75 in PR #86** (ramo `claude/jona-v75-logo-ynoy`), non ancora unita.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v75** (PR #86 unita con squash `aed77cc`, controllato online `APP_VER=75`). `main` già unito nel ramo di lavoro. Nessuna PR aperta.
 
-## Fatto in #71 (11/10, 0:55-1:20 ora italiana)
-- Unita la scorta (solo `ULTIMO-MESSAGGIO.md`).
-- Mario: «sì» a tutte e due le domande → M36 logo nuovo nell'app; M35 dice di aver messo `JONA_DRIVE_URL`, ma **in #71 la variabile non c'era** (vale solo per sessioni nuove: in #72 controllare con `[ -n "$JONA_DRIVE_URL" ] && echo ok`, senza stampare l'URL).
-- Confronto logo app/nuovo (`docs/img/logo/confronti/confronto-logo-app.png`): sono quasi uguali (anche il «vecchio» ha 3 falci + 1 luna piena; cambiano giro dello svolazzo, più piccolo, e posizione di CORP). Mario: «metto quello nuovo ma ordina dentro tutto in cartelle hai fatto un macello» (il macello = Drive `Jona/Loghi` con 7 file vecchi sparsi + la sottocartella; lo script non sapeva spostare).
-- **Drive**: `tools/drive/Codice.gs` **v2** (azioni `elenco`, `sposta` file o cartella con `cartella:true`, `cestina`; commit `8f0376c` sul ramo di lavoro) + `tools/drive/azione.sh` (uso nel commento in testa). Guida data a Mario (M37): copiare da https://raw.githubusercontent.com/Kur0ChanX/jona-ordini/claude/jona-ramo-definitivo/tools/drive/Codice.gs → incollare in script.google.com → **Salva progetto** → **Esegui il deployment** → **Gestisci deployment** → matita → **Nuova versione** → **Esegui il deployment** (URL uguale). NON incollarlo in chat (repo pubblico + scorta): solo variabile `JONA_DRIVE_URL`. Non ancora fatto/risposto.
-  - Ordine promesso per il Drive `Jona/Loghi`: **YNOY CORP** (PNG alta risoluzione · Vettoriale · Originale · Animazione), **JONA**, **Vecchi**. La cartella «YNOY CORP 3 lune» già esistente va rinominata/spostata in «YNOY CORP» (lo script non rinomina: spostare i file nelle sottocartelle nuove e cestinare quella vuota, o lasciarla se rinominare serve).
-- **v75 (PR #86)**: `media/ynoy.svg` = ricalco nero (`docs/img/logo/ynoy-corp/vettoriale/ynoy-corp-nero.svg`) con scala 0.228, traslato (27.15, 11.22) nel 496×190 (allineato al vecchio con ricerca IoU 0.80, poi centrato); `tools/logo-ynoy.py` ora fa solo `media/ynoy.png`; punti di `tools/ynoy-tratti.py` spostati di (+19,−19) e giro dello svolazzo nuovo (pixel scoperti 225 su 48259; prima 73); `tools/ynoy-html.py` → 22 tratti 1,2-2,8 s. APP_VER 75, NEWS v75, CACHE `jona-ordini-v79`. Prove legate verdi in locale: test-logo, test-apertura-v62, test-logo-nitido. Fotogrammi mandati a Mario: `docs/img/logo/confronti/v75-apertura-fotogrammi.png`.
-  - Cartelle del repo riordinate (nella PR): `docs/img/logo/ynoy-corp/{png,vettoriale,originale,animazione}`, `jona/jona-maschera-480.png`, `confronti/`, `vecchi/` (con `ynoy-4-lune.svg`, `ynoy-4-lune-2000.png`, `ynoy-4-lune-animazione.mp4` = **il vecchio logo con animazione: per «rimetti la vecchia» basta copiare `vecchi/ynoy-4-lune.svg` in `media/ynoy.svg` e rifare logo-ynoy + tratti con i punti di prima**: i punti vecchi sono nel commit `87eff38` di `tools/ynoy-tratti.py`). Percorsi aggiornati in CLAUDE.md, test-logo-nitido, logo-ynoy-corp.py, ynoy-html.py, logo-ynoy.py. `DA-FARE.md` cambiato nella PR (tolta M35, M36 → M37): attenzione E7 all'unione.
-  - Questa sessione era iscritta agli eventi della PR #86: **la #72 deve fare `subscribe_pr_activity` sulla #86**, aspettare «Prove automatiche» verdi, squash, controllo online `APP_VER=75`, poi `git fetch origin main && git merge origin/main` nel ramo di lavoro e push.
-
-## 🔴 PRIMA DI TUTTO in #72: segreti nella scorta
-- RVC #59 (send_message 01:18): Mario ha incollato in chat RVC l'URL segreto del Drive e `scorta.py` l'ha mandato su GitHub nel ramo scorta. **Jona è un repo PUBBLICO**: stesso rischio con `docs/ULTIMO-MESSAGGIO.md`. RVC ha aggiunto `togli_segreti()` in `.claude/hooks/scorta.py` (link script.google.com, chiavi AIza/sk-/ghp_/xox/AKIA, chiavi private, key=/token= negli indirizzi, gettoni lunghi, valori delle variabili d'ambiente con KEY/TOKEN/SECRET/PASSWORD/_URL), chiamata in `salva_msg` prima di scrivere; prova in `tools/test-scorta.py` (21 controlli), commit `6caa74c` di RVC. Chiedere il codice alla sessione RVC con send_message (niente add_repo, E31) e portarlo in Jona, con prova. Poi controllare `git log -p origin/scorta/claude/jona-ramo-definitivo | grep -c "macros/s/"` (deve essere 0).
-- In #71 ho detto a Mario di NON incollare l'URL in chat, ma di metterlo solo nella variabile `JONA_DRIVE_URL` dell'ambiente (vale per le sessioni nuove). Se Mario fa un nuovo deployment (consigliato da RVC), l'URL nuovo va nella variabile di Jona e di RVC.
-
-## Richiesta nuova di Mario (da fare in #72)
-- Logo **JONA** ad alta risoluzione: PNG su bianco, su nero, trasparente + vettoriale (partire da `media/jona.svg`, come `tools/logo-ynoy-corp.py` fa per YNOY: 4000 px, sfondo-bianco, sfondo-nero, trasparente-nero/bianco, SVG nero/bianco, PDF), in `docs/img/logo/jona/{png,vettoriale}`, mandarli a Mario con SendUserFile e caricarli nel Drive in `Jona/Loghi/JONA/…`.
-- Salvare nel Drive il **vecchio YNOY con l'animazione** (`Jona/Loghi/Vecchi/`: `ynoy-4-lune.svg`, `ynoy-4-lune-2000.png`, `ynoy-4-lune-animazione.mp4`, e l'SVG animato vecchio `git show 87eff38:docs/img/logo/ynoy-animazione.svg`) se non c'è già (i 7 file vecchi in `Jona/Loghi` sono proprio questi: spostarli in Vecchi). Così se Mario dice «metti la vecchia» si fa subito (vedi sopra).
-- Serve l'URL del Drive (variabile o incollato da Mario dopo M37).
+## Fatto in #72 (11/10, 1:34-1:45 ora italiana)
+- Sessione aperta a mano da Mario (telefono, catena ripartita da 0). Unita la scorta (solo `ULTIMO-MESSAGGIO.md`).
+- 🔴 **Segreti nella scorta: CHIUSO.** Controllati tutti i 146 commit con `git show <commit>:docs/ULTIMO-MESSAGGIO.md` (anche le scorte) + `git log --all -m -p`: l'URL vero del Drive NON è mai finito su GitHub; ci sono solo URL finti delle prove (`…SEGRETO…`, `…FINTO…`). Portato da RVC #60 il filtro: `togli_segreti()` in `.claude/hooks/scorta.py` (chiavi private, link script.google, AIza, sk-/pk-/rk-, ghp_/github_pat_, xox, AKIA, key=/token= negli indirizzi, gettoni ≥32 caratteri con lettere+cifre, valori delle variabili d'ambiente con KEY/TOKEN/SECRET/PASSWORD/_URL ≥12 caratteri) + `[AVVIO]` tra gli avvisi saltati. Prova `tools/test-scorta.py`: 22 controlli verdi (3d segreti finti, 3e prompt di avvio). Verificato anche con il vero `JONA_DRIVE_URL` (tolto). E32 in ERRORI.
+- **Logo JONA ad alta risoluzione FATTO** (richiesta di Mario 01:19): `tools/logo-jona-alta.py` (da `media/jona.svg`, taglio con margine 6%, colori cambiati su fill del tracciato pieno e `stroke="#000"`) → `docs/img/logo/jona/png/jona-{sfondo-bianco,sfondo-nero,trasparente-nero,trasparente-bianco}.png` (4000×3281), `vettoriale/jona-{nero,bianco}.svg`, `jona-nero.pdf`, `anteprima-jona.png`. Mandati a Mario con SendUserFile. **Non ancora nel Drive** (serve M37).
+- **v75 online**: prove «Prove automatiche» verdi (01:20-01:35) → squash → online. Merge di `main` nel ramo di lavoro: conflitti solo negli appunti (E7): consegne e `ULTIMO-MESSAGGIO.md` tenute dal ramo di lavoro, `DA-FARE.md` e `tools/logo-ynoy-corp.py` (percorsi nuovi) da main. In M37 corretto «incollare l'URL in chat» → mai in chat, solo variabile. Tolti 2 doppioni (`docs/img/logo/confronto-logo-app.png`, `docs/img/logo/ynoy-corp-originale-mario.jpg`: identici alle copie in `confronti/` e `ynoy-corp/originale/`). Ora `docs/img/logo/` = `confronti`, `jona`, `vecchi`, `ynoy-corp`.
+- Drive: `JONA_DRIVE_URL` c'è in questa sessione, ma lo script risponde ancora **v1** (`elenco` → «servono nome e dati»): M37 non fatta. RVC #60 dice che Mario sta facendo un **nuovo deployment** (vecchio archiviato) → l'URL di questa sessione potrebbe smettere di andare; la #73 lo legge dall'ambiente all'avvio.
+- Titolo della sessione rinominato; #71 era già «✓ CHIUSA».
 
 ## D30: Jona fuori dall'account personale (in corso)
 - Organizzazione **`Jona-Ristorante-by-YNOY`** creata dall'account del ristorante **`JonaRistorante-Ynoy`** (jona.ristorante@gmail.com, Owner, 2FA attiva); Kur0ChanX Owner; app Claude installata sull'organizzazione (Save fatto, #68/#69).
@@ -32,15 +21,15 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni RVC
-- RVC attiva: **#57** `session_012rNkxoDxKP4Ky6i1ejLy9t`. Sa del Drive (sotto `RVC/…`), non ha l'URL.
-- Jona #69 (`session_012rm19dw5jKyzhu49kU3CtR`) è chiusa ma Mario ci ha scritto fino alle 0:46; le ho detto di rimandarlo alla sessione attiva e inoltrare. Fare lo stesso con la #70 se Mario scrive lì.
+- RVC attiva: **#60** `session_01PgR2wPAzKZQDrzHfcJHbUM` (prossimo: C33 dettatura Porter). Ha mandato a Jona il codice del filtro segreti. Le ho scritto (#72) di far incollare a Mario **Codice.gs v2** PRIMA del nuovo deployment dello script del Drive (lo script è UNO per Jona e RVC), e che il nuovo URL va in `JONA_DRIVE_URL` di tutti e due gli ambienti.
+- Jona #71 `session_01MKFn44AvJMKQKuSQyqcqvW` (chiusa). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 
 ## Prossimi passi (in ordine)
-0. #72: PR #86 (subscribe, verde → squash → online → merge main), poi logo JONA + Drive (sopra).
-1. Attendere M37 (script del Drive v2 + URL).
-2. D30: attesa della scatola nera, poi Transfer (sopra).
-3. Proporre a Mario la regola «file importanti anche nel Drive» (D31).
-4. Ponte con l'hotel: quando RVC ha D5, guida per `PONTE_KEY`. Elenco completo in `docs/DA-FARE.md`.
+1. Attendere M37: Mario aggiorna lo script del Drive a v2 (forse insieme al nuovo deployment guidato da RVC #60). Controllo: `bash tools/drive/azione.sh elenco "Jona/Loghi"` → se risponde `{"ok":false,"errore":"servono nome e dati"}` è ancora v1. Se l'URL è cambiato serve la variabile nuova: le variabili d'ambiente si leggono solo all'avvio della sessione (`[ -n "$JONA_DRIVE_URL" ]`, mai stampare l'URL).
+2. Con lo script v2: caricare `docs/img/logo/jona/{png,vettoriale}` in `Jona/Loghi/JONA/…`, i file di `docs/img/logo/vecchi/` (+ `git show 87eff38:docs/img/logo/ynoy-animazione.svg`) in `Jona/Loghi/Vecchi`, YNOY CORP in `Jona/Loghi/YNOY CORP/{PNG alta risoluzione,Vettoriale,Originale,Animazione}`; spostare i 7 file vecchi sparsi in `Jona/Loghi` dentro `Vecchi` (prima `elenco`, poi `sposta`), cestinare la cartella «YNOY CORP 3 lune» solo se vuota. Poi mandare a Mario il link della cartella.
+3. D30: attesa della scatola nera, poi Transfer (sopra).
+4. Proporre a Mario la regola «file importanti anche nel Drive» (D31).
+5. Ponte con l'hotel: quando RVC ha D5, guida per `PONTE_KEY`. Elenco completo in `docs/DA-FARE.md`.
 
 ## Note tecniche
 - Drive: `JONA_DRIVE_URL=… bash tools/drive/carica.sh "Jona/<cartella>" file…` (risposta JSON `{ok,link,cartella}`; per avere il link di una cartella si carica un file dentro). `cairosvg` e `potracer` vanno installati con pip a ogni sessione.
@@ -56,6 +45,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-(11/10 01:19) «mandami anche il logo jona ad alta risoluzione PNG bianco nero e trasparente e vettoriale salva la vecchia scritta YNOY con l'animazione se non c'è in drive cosi se ti dico metti la vecchia fai subito»
+Nella #72 Mario ha scritto solo il prompt di avvio: «git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo). Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #72). Poi attendi le mie istruzioni.»
 
-Prima: «1 metto qll nuovo na ordina dentro tutto in cartelle hai fatto un macello». Domanda mia aperta: a che passo è della guida M37 (aggiornare lo script del Drive).
+Ultima richiesta vera (11/10 01:19, nella #71): «mandami anche il logo jona ad alta risoluzione PNG bianco nero e trasparente e vettoriale salva la vecchia scritta YNOY con l'animazione se non c'è in drive cosi se ti dico metti la vecchia fai subito» → logo fatto e mandato; parte Drive in attesa di M37.
+
+Domanda mia aperta (fine #72): «A che passo sei arrivato?» della guida M37 (incollare Codice.gs v2 prima del nuovo deployment, poi nuovo URL in `JONA_DRIVE_URL` di Jona e RVC).
