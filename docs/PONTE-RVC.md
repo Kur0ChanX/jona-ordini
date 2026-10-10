@@ -107,10 +107,12 @@ Valgono i nomi di RVC (§4 aggiornato nel repo RVC, commit `dba35f1`, già usati
 - Busta: `{id (uuid dal telefono), tipo, da, struttura, camera|null, quando, chi, dati, stato}`; stati `inviato → arrivato → visto → fatto` (+ `annullato`), mostrati solo se confermati dal server (S1).
 - Da RVC: `oggi` (camere, ospiti, arrivi, partenze: solo numeri) · `richiesta` (`sottotipo` colazione|torta|cena-tardi|benvenuto|speciale|altro, giorno, ora, persone, nota) · `vassoio` (camera).
 - Da Jona: `guasto` (dove, cosa, urgente, foto) · `evento` (giorno, ora, persone, dove) · `richiesta-ospite` (camera, cosa, ora) · `serve-a-noi` (cosa, per quando) · in tutte e due le direzioni `testo` (testo libero, camera facoltativa).
-- Aggiunte chieste da Jona a RVC (#67, in attesa di risposta): `oggi` anche con i numeri di **domani** (servono all'ordine suggerito); `rif` = id del messaggio a cui si risponde; `nome` breve di chi manda da mostrare; evento con id fisso `ev_<id agenda>` (cambiato → si rimanda, cancellato → `annullato`).
+- Aggiunte chieste da Jona, **accettate da RVC #55**: `oggi` anche con i numeri di **domani** (servono all'ordine suggerito); `rif` = id del messaggio a cui si risponde; `nome` breve di chi manda da mostrare; evento con id fisso `ev_<id agenda>` (cambiato → si rimanda, cancellato → `annullato`).
 
 ### Dove vive il ponte (proposta tecnica di Jona)
 Dentro il Worker di Jona già online (`worker/`, D1 `jona-allegati-0`, deploy automatico), indirizzi `/ponte/...` di §4, tabella `ponte` a parte e chiave segreta `PONTE_KEY` diversa dalla chiave del ristorante: RVC chiama con `Authorization: Bearer <PONTE_KEY>`, Jona con il gettone Firebase dei membri (come `/gemini`). Così il ponte funziona prima che il Worker di RVC (D5) esista; si può spostare in un Worker a sé più avanti senza cambiare gli indirizzi. Foto: `POST /ponte/allegati` (stesso sistema di `/allegati`), nel messaggio solo l'id. Messaggi cancellati dopo 30 giorni (proposta §2).
+
+**Risposta di RVC #55**: ponte nel Worker di Jona va bene. La chiave `PONTE_KEY` non va nei telefoni RVC: lato RVC parla con `/ponte/` il server di RVC (Worker D5), che legge e scrive nel Firestore di RVC. Prima di D5 il collegamento vero non parte. La linguetta «🍽️ Ristorante» di RVC è già costruita e provata col simulatore (commit `afa8b8b`).
 
 ### Prossimi passi lato Jona
 1. Conferma dei nomi da RVC (send_message).
