@@ -112,7 +112,7 @@ Fatto nella #01 (10/10/2026):
 - Hotmail è Pro (confermato da Mario). Limite settimanale Gmail in avviso: torna mercoledì 14/10 alle 12:00.
 - Errore della #01: aveva passato il tema alla sessione Jona #55 invece di aprire una sessione di servizio. Avvisata la #55 che il tema non è suo (deve solo unire il ramo per la guida e la regola).
 
-Fatto nella #02: Mario ha incollato le preferenze nei due account (Impostazioni → Profilo; Claude non può cambiare le impostazioni degli account, solo Mario); aggiunto il «prompt di emergenza» che non richiede il numero del ramo.
+Fatto nella #02: Mario ha incollato le preferenze nei due account, versione completa (COME PARLARMI / PASSAGGIO DI CONSEGNE / CAMBIO ACCOUNT), ricontrollata il 10/10 (Impostazioni → Profilo; Claude non può cambiare le impostazioni degli account, solo Mario); aggiunto il «prompt di emergenza» che non richiede il numero del ramo.
 
 Ancora da fare:
 1. Memoria dei due account (Personalizzazione o Impostazioni → Capacità): unirle se Mario incolla i testi.
