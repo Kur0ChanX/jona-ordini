@@ -2,6 +2,10 @@
 
 Sessione attuale: #52
 
+## Messaggio di Mario arrivato nella #51 DOPO l'handoff (parola per parola)
+«nelle sessioni Progetto jona e RVC cambia il pallino colorato all'inizio con RVC Verde colore del progetto e in jona marrone colore bel progetto. poi quando crei un nuovo ramo nominalo in modo vhe lo riconosco esempio il numero successivo della sessione cosí quando dopo 8 volte che lo gai tu in automatico quando avvio io la nuova sessione teovo subito il ramo che devo mettere senza complicazioni metti un nome che jon ti crea problemi e che capisco subito io che è il nuovo»
+Fatto dalla #51: CLAUDE.md → RVC 🟢 (non più 🟣), Jona resta 🟤; regola «ramo nuovo a ogni handoff» `claude/jona-sessione-<NN>` (RVC `claude/rvc-sessione-<NN>`). Creato e pushato `claude/jona-sessione-52`: **la #52 passa a quel ramo** (`git fetch origin claude/jona-sessione-52 && git checkout claude/jona-sessione-52`) e da ora lavora lì. **Da fare dalla #52**: dire la regola (pallino verde + nome del ramo) alla sessione RVC attiva (`list_sessions`, `send_message`), perché la #51 non può toccare il repo RVC; rinominare in 🟢 la sessione RVC attiva.
+
 ## Ultimo messaggio di Mario (#51), parola per parola
 «Mi consigli altre alternative a gemini o soluzioni in generale valuto tutto però free al momento, magari è nostro collo di bottiglia nel senso puoi ortimizzarti quanto vuoi secondo me ma se gemini legge male o meno siamo fregati no?»
 

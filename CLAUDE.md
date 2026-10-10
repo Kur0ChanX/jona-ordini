@@ -49,6 +49,7 @@ Obiettivi: token economy, contesto pulito, codice funzionante, zero regressioni 
      - Il commit con `docs/PASSAGGIO-CONSEGNE.md` è pushato e GitHub lo conferma: `git fetch origin <ramo>` e `git rev-parse HEAD` uguale a `git rev-parse origin/<ramo>`. Solo DOPO crea la nuova sessione (altrimenti la nuova sessione scarica le consegne vecchie).
      - Le consegne riportano l'ultimo messaggio di Mario, anche se arrivato mentre preparavi l'handoff.
   3. Se TUTTE le condizioni sono vere: apri automaticamente la nuova sessione (usando lo strumento `Create Session`) e avvisami quando è pronta, senza chiedere permesso.
+     - RAMO NUOVO A OGNI HANDOFF (Mario, 10/10/2026, vale per OGNI progetto): prima di aprire la nuova sessione creo un ramo con il numero della nuova sessione, dal ramo delle consegne aggiornato: Jona `claude/jona-sessione-<NN>` (es. `claude/jona-sessione-53`), RVC `claude/rvc-sessione-<NN>`. Solo minuscole, numeri e trattini. Lo pusho, controllo che GitHub lo abbia, lo uso come `source_revision` e nel prompt. Così, quando Mario apre a mano una sessione (limite di 8 sessioni a catena, E12), sceglie il ramo col numero più alto.
      - La nuova sessione va aperta GIÀ COLLEGATA al progetto (Mario, 08/10/2026): passa sempre `source_url` = l'indirizzo GitHub del repo (Jona: `https://github.com/Kur0ChanX/jona-ordini`) e `source_revision` = `<ramo>`. Se una sessione parte lo stesso senza repo, ricollegalo con `add_repo` (accesso `push`) (E15).
   4. Se ANCHE UNA SOLA condizione è falsa: FERMATI immediatamente. Non aprire nuove sessioni. Scrivimi in 1-2 righe cosa è andato storto e attendi il mio intervento.
   5. NOMI CHIARI DELLE SESSIONI: dai sempre un titolo alla nuova sessione nel formato `▶ ATTIVA · #<NN> · <Progetto> · da v<versione> · <data> · prossimo: <argomento>` e rinomina quella vecchia in `✓ CHIUSA · #<NN> · <Progetto> · v<da>→v<a> · <date> · <argomenti principali>` (strumento di rinomina della sessione). Così tra tante conversazioni si capisce subito quale usare.
@@ -139,7 +140,7 @@ App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Mauri
 IndexedDB `jona-outbox` (store `q`): push non partite, lette sia da `index.html` (`obx*`) sia da `sw.js` (Background Sync, tag `jona-outbox`).
 
 ## Regole di lavoro
-- PALLINO DEL PROGETTO (Mario, 07/10/2026): i titoli delle sessioni Jona iniziano con 🟤 prima di ▶/✓ (es. `🟤 ▶ ATTIVA · #26 · Jona Ordini · …`, `🟤 ✓ CHIUSA · #25 · Jona Ordini · …`). Il 🟣 è di RVC.
+- PALLINO DEL PROGETTO (Mario, 07/10/2026): i titoli delle sessioni Jona iniziano con 🟤 prima di ▶/✓ (es. `🟤 ▶ ATTIVA · #26 · Jona Ordini · …`, `🟤 ✓ CHIUSA · #25 · Jona Ordini · …`). Il 🟢 (verde) è di RVC (Mario, 10/10/2026: prima era 🟣).
 - Niente nome del creatore (Mario Miscera, `mario-miscera`, `kur0chanx`) in link, inviti e testi che vedono gli utenti. Il nome di chi invita (utente dell'app) invece va bene. Stessa regola nel progetto RVC.
 - Ad OGNI versione cambia `CACHE` in `sw.js`.
 - Ad ogni versione aggiungi la voce in `NEWS` e aumenta `APP_VER`.
