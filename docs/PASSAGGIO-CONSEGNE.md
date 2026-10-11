@@ -1,21 +1,24 @@
-# Passaggio di consegne (2026-10-11, fine sessione #85)
+# Passaggio di consegne (2026-10-11, fine sessione #86)
 
-Sessione attuale: #86
+Sessione attuale: #87
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v82** (PR #93 squash `f3e3809`, controllato `APP_VER=82` ~18:10). Ramo riallineato a `main`. Sul ramo, NON ancora online: **v83** (committata).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v82**. Sul ramo, pronta e approvata da Mario: **v83**.
 
-## Fatto in #85 (11/10, ~17:45-18:10 ora italiana)
-- Unite scorte. Mario chiedeva perché l'icona 🫒 non cambiava in SPA: la SPA #08 era ferma su una domanda/permesso e non leggeva i messaggi delle altre sessioni (una sessione bloccata li legge solo dopo la risposta di Mario). Ora SPA #08 chiusa e #09 attiva hanno 🫒. Detto a Mario di rispondere alla domanda aperta in SPA #09.
-- La #84 ha aggiunto E37 (domande scritte nel testo invece che a tocco). Rifatta la domanda a tocco con doppio tocco: Mario ha scelto **D10**.
-- **v82 online** (D10): foglio «Inviato allo chef» solo «Continua» (tolto «Esci dal profilo»). Prova in `tools/test-invio-anim.mjs`.
+## ✅ SUBITO (#87): pubblicare la v83 — Mario ha scritto «si vai»
+- Mario ha visto le 7 foto e ha detto di pubblicare. Passi: PR dal ramo verso `main` → controllo `prove` verde → squash → subito `git fetch origin main && git merge origin/main` sul ramo + push → controllo online `APP_VER=83` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33).
+- Prove già fatte in #86 (tutte verdi): `test-orari-reparto` (nuova, anche TZ Roma), `test-orari-resp`, `test-orari`, `test-v31`, `test-v16`, `test-responsabile`, `test-news`, `test-demo`, `test-giro`. Non rifarle (MENO CONTROLLI DOPPI). `test-firebase-orari` lo fa GitHub.
+- La v83 tocca solo index.html (niente Worker): niente giro completo extra.
 
-## v83 in corso (D32) — orari di Mauro e Chef, strada «3 Geniale»
-- Richiesta di Mario (vedi ultimo messaggio). Immagine con 3 strade (Ovvia: nel pianificatore come tutti; Furba: riga «Responsabili» in cima, ognuno scrive il suo; **Geniale: Furba + striscia «Chi c'è adesso» in tutta l'app con «Scrivi»**). Mario ha scelto **3 Geniale** (doppio tocco confermato).
-- Fatto (index.html): `config/orari_<lun>.resp.<id>` = riga di 7 giorni per chi ha `contratto.libero` (`orFree`): scritta subito, niente bozza/pubblicazione/controlli ore. `orResp`, `orRRow`, `orRCan` (la persona stessa o `isMgr`), `orCellSheet(id,g,lun)` in modo `resp` (nota «lo vedono subito tutti», salvataggio separato in `orSaveCell`), azione `orRCell`. Pianificatore (`vOrari`): gruppo «Responsabili · lo vedono subito tutti» in cima alla tabella (`cellR`/`whoR`, colore `.rep-resp` #B5654A). `orOggi`: responsabili da `resp` con «Responsabile ·». `vMieiOrari`: per i responsabili 7 giorni da toccare («Scrivi quando ci sei») e settimana prossima sempre disponibile. `rsStrip(me)` dopo `agStrip` in `screenApp`: «Mauro in servizio fino alle…» / «arriva alle…», bottone «Scrivi» → `rsChat` → `chOpen(chDm(me,u))`; non mostra se stessi; niente se riposo/finito. Firestore: va bene così (`config` già permesso).
-- `APP_VER=83`, `CACHE` v87, voce `NEWS` v83 (chef + tutti + dev).
-- Prove: nuova `tools/test-orari-resp.mjs` (20 PASS, anche TZ Roma); `tools/test-responsabile.mjs` aggiornata (prima diceva «Mauro non nel pianificatore» e «Orario libero»: comportamento cambiato su richiesta); test-orari, test-v16, test-news verdi.
-- **Prossimo**: far girare `test-giro` e `test-demo` (la striscia nuova sta in alto: E35) e `test-firebase-orari` (emulatore), poi PR dal ramo → `prove` verde → squash → merge `main` nel ramo → controllo online `APP_VER=83`. Pubblicare da soli (regola).
-- Da aggiungere a CLAUDE.md (Struttura) dopo l'unione: riga «v83 orari dei responsabili» con i nomi qui sopra.
+## Fatto in #86 (11/10, ~18:30-19:30 ora italiana)
+- **⛔ STOP chiarito**: Mario, nella #85, ha scritto di non aver toccato le risposte a tocco (E38). Da allora le scelte si chiedono **scritte nel testo**, e Mario risponde a parole (niente strumento a tocco per cose importanti finché E38 non è capito). Mario ha risposto «si» a «tieni o togli la v82» → **v82 resta** (presa come «tieni», detto a Mario). Poi ha chiesto «foto mi servono» → mandate 4 foto v83.
+- Errore trovato con le foto: in «In turno oggi» nome e orario si sovrapponevano. Corretto (`.or-nw` in `orOggi`, colore `rep-resp` per i responsabili).
+- **Nuova richiesta di Mario**: «mauro deve fare gli orari per la sala e maurizio per la cucina». Scelta A di Mario: **Mauro pubblica da solo** la sala. Contesto (salvato in CLAUDE.md, riga v83): Maurizio = proprietario e capo cucina, ristorante in gestione nelle mura dell'hotel; Mauro = F&B Manager dell'hotel, ponte tra hotel/camere e ristorante (di solito sopra lo chef come ruolo).
+- Fatto nella v83 (index.html): `OR_PLAN={fb:['sala']}`, `orPlanner`, `orScope` (gestori: chips Tutti/Cucina/Sala, ricordato in `jona_or_rep`), `orInSc`, `orPubAt` (`pubR.<reparto>`; settimane vecchie senza `pubR` = tutte pubblicate). `orStato`, `orCopy` (copia solo il reparto, lascia gli altri), `orPublish` (tp aggiornato solo per il reparto, avviso ai `gm` quando pubblica l'F&B), `cmGmBox(sc)`, `orCellSheet` (l'F&B non apre caselle fuori dalla sala). `vMieiOrari`: per l'F&B selettore «I miei orari | Turni della sala» (`S.orPl`, azione `orPl`); staff: «Orari non ancora pronti» finché il suo reparto non è pubblicato. NEWS v83: righe nuove per chef e gruppo nuovo `fb` (in `newsFor`, solo staff con `OR_PLAN`). Prova `tools/test-orari-reparto.mjs` (26 PASS).
+- Commit pushati: correzione «In turno oggi», orari per reparto, CLAUDE.md.
+
+## v83 (D32) — riassunto
+- Orari dei responsabili (`resp.<id>`, striscia «Chi c'è adesso» `rsStrip`/`rsChat`) + orari per reparto (sopra). Dettagli in CLAUDE.md (riga v83). `APP_VER=83`, `CACHE` v87.
+- Foto per Mario (non nel repo): script nello scratchpad della #86, si rifanno con Playwright se servono.
 
 ## D33 — funzioni smart per orari e agenda (chiesto da Mario, ancora da proporre)
 Proporre con immagine + domanda a tocco con doppio tocco (3 strade: ovvia/furba/geniale). Controllato che NON esistono già: richieste di indisponibilità/ferie dallo staff; promemoria del turno (sera prima / 1 ora prima); turni proposti in automatico dai coperti dell'agenda; costo del personale della settimana. Esistono già: «Copia settimana prima», turni tipo, assenze (R/F/M/P), cambi turno, timbratura QR, «In turno oggi», agenda con ripetizioni e appunti, coperti in ordine suggerito.
@@ -30,7 +33,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = staff segna i giorni in cui
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #85 `session_01YBt4KxQa3Z4RMeKrQdvghK` (chiusa), #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #86 `session_01XaFfJiACdkE4pXQs6PbCok` (chiusa), #85 `session_01YBt4KxQa3Z4RMeKrQdvghK`, #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp`. Una sessione ferma su una domanda o un permesso non legge i messaggi delle altre finché Mario non risponde lì.
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 - D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sotto).
@@ -48,13 +51,9 @@ Idee: Ovvia = promemoria del turno via push; Furba = staff segna i giorni in cui
 - Repo privato: le prove su GitHub consumeranno minuti (2000/mese dell'organizzazione).
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
-## ⛔ STOP (dopo l'handoff)
-Mario, nella #85 chiusa: «nooo aspetta, non ho cliccato nulla e mi succede spesso, perché?». Le risposte a tocco di #85 (D10 «Sì, confermo» e orari «3 Geniale» «Sì, confermo») sono arrivate dallo strumento, ma Mario dice di non aver toccato nulla. La #85 ha fermato la #86 (interrupt + messaggio). **Non pubblicare v83 né aprire PR**: prima chiarire con Mario quali scelte sono sue. La v82 (D10) è già online: se D10 non era sua, chiedere se tenerla.
-Causa probabile (da verificare): sul telefono il riquadro delle domande riceve un tocco «fantasma» (es. scorrendo o al ritorno nell'app) e la prima scelta/la conferma partono da sole. Possibile rimedio: domande senza scelta consigliata in cima, oppure la risposta va confermata scrivendo «sì» a mano.
+## E38 (aperto)
+Risposte a tocco arrivate senza che Mario toccasse (#85). Causa non capita. Finché non è chiaro: domande scritte nel testo, risposta a parole. Rimedi possibili in ERRORI.md E38.
 
 ## Ultimo messaggio di Mario, parola per parola
-«nooo
-aspetta
-non ho cliccato nulla e mi succede spesso 
-perché?»
-(Prima: «anche mauro abilitano agli orari metti il programma orari di mauro e chef in un punto visibile e controlla se c'è bisogno di migliorie o funzioni, funzioni evolute smart nel programma orari e agenda» = D32 v83, D33 da proporre.)
+«si vai»
+(Risposta a: «Pubblico la v83? Scrivi "pubblica" oppure dimmi cosa cambiare.»)
