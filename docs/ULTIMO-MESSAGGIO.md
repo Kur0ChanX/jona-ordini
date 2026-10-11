@@ -1,3 +1,6 @@
-# Ultimo messaggio di Mario (11/10/2026 23:12 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 ~23:55 ora italiana, scritto nella #90 dopo l'handoff, girato alla #91)
 
-Scusa, ho incollato per sbaglio. Mi hanno consigliato come MCP perché Claude Perplexity. Mi conviene installarlo, a cosa serve e se funziona in tutti i miei progetti. Ho letto che mi fa delle ricerche più approfondite, guarda su un database molto più ampio. Cosa mi consigli?
+quanti agenti hai in aiuto?
+che dicie se aggiungiamo agli ingredienti un Png per ogni ingrediente oreso da internet tutti innerenti tranloro come grafica o disegno sarebbe bello in stole disegno ogni ingrediente e lo sfondo è un effetto foglio pagina come se ha disegnato su un foglio riesci a trovare un Png per ogni ingrediente? senza appesantire app che dici valuta
+e rinnomina la sessione e Rispondimi quanti agenti lavoro in questo progetto ora?
+vai avanti da solo leggi tutte le mie richieste e fermatinsolo per scelte importanti
