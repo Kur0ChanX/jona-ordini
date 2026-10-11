@@ -1,24 +1,24 @@
-# Passaggio di consegne (2026-10-11, fine sessione #78)
+# Passaggio di consegne (2026-10-11, fine sessione #79)
 
-Sessione attuale: #79
+Sessione attuale: #80
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR: regola RAMO SINGOLO). App online: **v77** (PR #88 unita in #77, squash `49b9aba`, controllato `APP_VER=77` online).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR: regola RAMO SINGOLO). App online: **v79** (PR #90 unita, squash `5f12c34`, controllato `APP_VER=79` online alle 10:31). `main` unito nel ramo e pushato.
 
-## Fatto in #78 (11/10, ~8:40-9:30 ora italiana) — LAVORO A METÀ, NON ONLINE
-- Unite due scorte (solo ULTIMO-MESSAGGIO), push confermati.
-- Mario: «si vai avanti» = SÌ a **D26** (costo dei piatti dalle ricette). Studiato il codice, NIENTE ancora scritto per D26. Progetto deciso (da fare così):
-  - `FUNZ` nuova `{id:'ricette',l:'Ricette e costo dei piatti',…,on:true}` accesa di partenza: cambiare `funzOn` (riga ~4924) in `k in funz ? !!funz[k] : !!FUNZ.find(..).on` (solo `funzOn` legge `cfg().funz`).
-  - Dati `config/ricette` {tipo:'ricette', r:{<id>:{id,n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG,da,cr,mod}}}; scrittura `upd('config','ricette',{'r.<id>':…})` (`put` se il doc non c'è, come `agPut`), cancellare = `r.<id>: null`. Nessuna regola Firestore nuova (`config` già permessa).
-  - Unità: prodotto in kg → g/kg, in l → ml/l (q/1000), altrimenti l'unità del prodotto (`normUnita`). Prezzo: `D().prodotti[pid]`, se manca stesso `gkey` + stessa unità in `S.gidx` (prima stesso fornitore, poi il più economico), se no ultimo prezzo `pz` con avviso.
-  - Costo a porzione = totale/porzioni; food cost % = costo / (prezzo di vendita / 1,10 IVA). «Costo salito» se ≥ `rif`×1,03; «Ok, visto» rimette `rif` e i `pz`.
-  - Solo gestori (`isMgr`): icona `pot` in alto dopo `agBtn(me)` (riga ~2179, `rcBtn`), striscia `rcStrip(me)` dopo `agStrip(me)` (stile `.ag-strip.ag-nuovo`), fogli con `openSheet` (lista, modifica, selettore prodotti come `pickSheet` riga ~2827), azioni in `A`, campi in `IN` (`data-in`), select in `CH` (`data-ch`), campi classe `inp` (16 px). Prova nuova `tools/test-ricette.mjs` (modello `tools/test-conveniente.mjs`).
-- Poi Mario ha mandato la foto del logo YNOY CORP **con 4 lune** («Rimetti questa nell'animazione di apertura app»). È uguale (stesso md5) a `docs/img/logo/vecchi/ynoy-coda-mario-2026-10-10.jpg`, già salvata (e nel Drive `Jona/Loghi/Vecchi`: Mario «dovresti trovarlo già tutto in drive»). La v75 l'aveva sostituito con quello a 3 lune. Fatto (commit sul ramo, NON online):
-  - rimessi da `aed77cc^` (prima della v75): `media/ynoy.svg`, `media/ynoy.png`, la riga `  if(S.splash)` di index.html, `tools/logo-ynoy.py`, `tools/ynoy-html.py`, `tools/ynoy-tratti.py`, `tools/test-logo-nitido.mjs` (dopo la v75 nessuno li aveva toccati);
-  - v78: `APP_VER=78`, voce NEWS v78 «Logo YNOY CORP con 4 lune», `CACHE` jona-ordini-v82.
-  - Prove: `test-logo` OK, `test-news` OK, `test-apertura-v62` OK. **`test-logo-nitido` FALLISCE** (`page.evaluate: Event` alla riga 14: fetch/immagine nella pagina). Probabile: la versione di prima della v75 della prova non va più con il resto (v75 l'aveva cambiata in 4 righe: `git show aed77cc -- tools/test-logo-nitido.mjs`). Capire la causa: forse va tenuta la versione v75 della prova (`git checkout aed77cc -- tools/test-logo-nitido.mjs`) se controlla solo JONA. Poi `test-giro`, guardare la schermata di apertura a occhio (4 lune), PR dal ramo unico → squash → controllo online v78.
+## Fatto in #79 (11/10, ~9:45-10:35 ora italiana)
+- Mario: «vai» → finita la v78 e fatta la D26 (v79). Tutte e due online.
+- **v78 (PR #89, squash `f5a6e8f`)**: logo YNOY CORP con 4 lune nell'apertura. La prova `test-logo-nitido` falliva solo perché la versione di prima della v75 cercava `docs/img/logo/jona-maschera-480.png`; rimessa la versione v75 della prova (percorso `docs/img/logo/jona/`). Apertura guardata a occhio: 4 lune come la foto di Mario.
+- **v79 (PR #90, D26) «Ricette e costo dei piatti»**, solo gestori (`isMgr`):
+  - Ingresso: riquadro `rcCta` in **Fornitori** sotto «Importa listini» (NON icona in alto: la prima versione con la pentola nella barra faceva uscire la barra a 390 px, `test-demo`/`test-giro` rossi su GitHub → E35). Striscia `rcStrip` «Costo dei piatti salito … +X%» con «Ok, visto» (`rcVisto` → `rcSnap`).
+  - Funzione `ricette` in `FUNZ` con `on:true`: `funzOn` ora usa il valore di partenza se `config/app.funz` non l'ha mai toccata (agenda e hotel restano spente).
+  - Dati `config/ricette` {tipo, r:{<id>:{id,n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG,da,cr,mod}}}, `rcPut` (upd `r.<id>` o put), cancellare = `r.<id>: null`. Nessuna regola Firestore nuova.
+  - `rcPrezzo`: prodotto del listino con la stessa unità → stesso `gkey`+unità (prima stesso fornitore, poi il più economico, «da <fornitore>») → ultimo `pz` («non più a listino, ultimo prezzo»). `rcCalc`: g/kg e ml/l (`rcU`), costo a porzione, food cost = costo / (prezzo menù / 1,10), prezzo per stare al 30%; ingredienti senza quantità o prezzo fuori dal costo con avviso. `rcSalito` ≥3% sopra `rif`. Food cost >35% in rosso.
+  - Fogli `rcList`, `rcFormH` (nome, porzioni, prezzo nel menù, ingredienti con quantità + unità + costo, Togli, Elimina), `rcPick` (cerca in tutti i listini). Salvare rimette `rif` al costo attuale.
+  - `APP_VER=79`, NEWS v79 (chef + dev), `CACHE` v83, riga v79 in CLAUDE.md. Prova `tools/test-ricette.mjs` (31 controlli, anche TZ=Europe/Rome), aggiunta a `VELOCI`. Verdi: test-ricette, test-agenda, test-news, test-demo, test-giro; «prove» GitHub verde.
+  - Scelte tecniche: ingresso in Fornitori (dove stanno i prezzi; barra in alto piena); niente food cost senza prezzo del menù; prezzi solo per gestori (lo staff non li vede, E24).
+- DA-FARE: tolta D26, aggiunta **M41** (Mario prova una ricetta vera). ERRORI: **E35**.
 
-## Domanda aperta
-- Nessuna. D26 approvata («si vai avanti»): farla DOPO aver pubblicato la v78 del logo.
+## Idea da proporre a Mario (non ancora detta)
+- «Chiedi a Jona» potrebbe conoscere le ricette (es. «quale piatto ha il food cost più alto?»): aggiungere un riassunto delle ricette a `jonaCtx`. Controllare prima che non ci sia già.
 
 ## Fatto in #77 (11/10, 4:33-~5:15 ora italiana)
 - PR #88 (v77, D25 bolla) con «prove» verde → squash merge, `main` unito nel ramo (conflitto solo nelle consegne, tenute quelle del ramo, E7), v77 online verificata. Detto a Mario cosa provare (M40).
@@ -57,12 +57,11 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 
 ## Sessioni RVC
 - RVC attiva: **#63** `session_01BbQ5CHa4J1ii2dr5zYUxQ1` (C16 scambio turno). #60-#62 chiuse. Prima: #60 (C33 dettatura Porter). Ha mandato a Jona il codice del filtro segreti. Le ho scritto (#72) di far incollare a Mario **Codice.gs v2** PRIMA del nuovo deployment dello script del Drive (lo script è UNO per Jona e RVC), e che il nuovo URL va in `JONA_DRIVE_URL` di tutti e due gli ambienti.
-- Jona #75 `session_01QPzuujHhDE3xqGshobfAn3` e #76 `session_01Ada4vhK6uEQRyN1yrqjQTF` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiusa). Jona #75 `session_01QPzuujHhDE3xqGshobfAn3` e #76 `session_01Ada4vhK6uEQRyN1yrqjQTF` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 
 ## Prossimi passi (in ordine)
-1. Finire e pubblicare la v78 (logo 4 lune, sopra): sistemare `test-logo-nitido`, `test-giro`, PR, squash, `main` nel ramo, controllo online.
-2. Fare D26 (progetto sopra), v79.
-3. Attendere Mario. M39 (fattura .p7m vera) e M40 (bolla vera): se manda foto o file, salvarli (solo senza dati sensibili) e usarli nelle prove (`tools/test-bolla.mjs`, `tools/test-p7m.mjs`).
+1. Dire a Mario in breve che v78 e v79 sono online e cosa provare (M41: Fornitori → Ricette e costo dei piatti). Proporre l'idea sopra.
+2. Attendere Mario. M39 (fattura .p7m vera) e M40 (bolla vera): se manda foto o file, salvarli (solo senza dati sensibili) e usarli nelle prove (`tools/test-bolla.mjs`, `tools/test-p7m.mjs`).
 3. D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sopra).
 5. Ponte con l'hotel: quando RVC ha D5, guida per `PONTE_KEY`. Elenco completo in `docs/DA-FARE.md`.
 
@@ -80,4 +79,4 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-«dovresti trovarlo già tutto in drive» (prima: «Rimetti questa nell'animazione di apertura app» con la foto del logo a 4 lune; prima ancora «si vai avanti» per D26).
+«vai» (risposta al piano: finire la v78 del logo, poi D26).
