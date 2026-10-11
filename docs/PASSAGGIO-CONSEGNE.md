@@ -34,7 +34,7 @@ Elenco completo in `docs/DA-FARE.md`. NON chiedere a Mario prove dal vero (M…)
 
 ## Sessioni
 - Jona #84 `session_01YDpAVby2ft8GwjUK4qGiUZ` (chiusa), #83 `session_01LzEDJuhMnDxtkkFmJoMu1G` (chiusa), #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiusa), #81 `session_014yinZg1B2R2g39VnAWDWH5` (chiusa). #80 `session_01B4hWXa4uTY1e2ik1qt27Qq`, #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: #08 `session_01Ta4N7WcGt86qybK8z3uJG4` (per la regola «regole per tutti i progetti»).
+- RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (#08 `session_01Ta4N7WcGt86qybK8z3uJG4` chiusa). Una sessione ferma su una domanda a tocco o su un permesso non legge i messaggi delle altre finché Mario non risponde lì (per la regola «regole per tutti i progetti»).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto** (mancano gli account Firebase e Cloudflare dell'hotel, li crea Mario con la guida di RVC). `PONTE_KEY` serve solo quando il Worker RVC va online → prove dell'anno prossimo.
 
 ## Note tecniche
