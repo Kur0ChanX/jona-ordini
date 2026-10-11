@@ -58,6 +58,8 @@ html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px);-webki
 html.on-wall{background:var(--cocoa)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--font);-webkit-font-smoothing:antialiased;min-height:100%}
 html.on-wall body{background:var(--cocoa)}
+/* v87: la scossa dell'apertura (jShake) sposta la .splash di qualche px: senza taglio la pagina diventa scorrevole e Android mostra per un attimo le barre di scorrimento grigie a destra e in basso */
+html.on-splash #app{overflow:hidden;overflow:clip}
 body.noscroll{overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -632,7 +634,7 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .vn-al{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--sunk);color:var(--ink2);font-size:14px;margin:8px 0}
 .vn-al .ic{flex:none;color:var(--ocra)}
 .vn-busy{display:flex;gap:8px;align-items:center;padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}
-.vn-top{margin:0;padding-left:22px;line-height:1.7}
+.vn-top{margin:0;padding-left:22px;line-height:1.7}.vn-top b{float:right;margin-left:12px}
 .ag-2>*{min-width:0}.ag-2 .btn{white-space:normal;text-align:center;justify-content:center}
 .sc-row{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px}.sc-row>div{min-width:0}.sc-row b{display:block;font-weight:500}.sc-row span{display:block}
 .setrow:first-of-type{border-top:0}
@@ -1210,8 +1212,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=86;
+const APP_VER=87;
 const NEWS=[
+  {v:87,data:'2026-10-12',titolo:'Apertura pulita',
+    tutti:['All\'apertura dell\'app non compaiono più le righe grigie a destra e in basso.','Cantina Vini: in «Più venduti» il numero sta a destra, sulla stessa riga del vino.'],
+    dev:{correzioni:['D38: la scossa `jShake` spostava la `.splash` di 1-6 px e rendeva la pagina scorrevole (560-980 ms): Android mostrava le barre di scorrimento. Classe `on-splash` su `<html>` (in `render()`, con `S.splash`) e `html.on-splash #app{overflow:clip}`. Prova in `tools/test-apertura-v62.mjs`.','`.vn-top`: numero in `<b>` con `float:right` prima del nome. Prova in `tools/test-cantina.mjs`.']}},
   {v:86,data:'2026-10-11',titolo:'App più leggera',
     tutti:['L\'app è più fluida sui telefoni meno potenti: barre in alto e in basso più leggere da disegnare e meno lavoro quando l\'app è in secondo piano.'],
     dev:{aggiunte:['D37: classe `lite` su `<html>` (script in `<head>`: `deviceMemory`≤4 o `hardwareConcurrency`≤4) → `.top` e `.nav` senza `backdrop-filter`, sfondo pieno.','`deadlineTick` non chiama `render()` con `document.hidden` (al ritorno lo rifà `visibilitychange`).','`chWatch` (Firebase): uno snapshot senza `docChanges` (solo cache/rete) non chiama più `schedule()`. Prova `tools/test-leggera.mjs`.']}},
@@ -1920,7 +1925,7 @@ function paint(el,html){
 }
 function render(){
   obxTick();waitCheck();const html=view();
-  document.documentElement.classList.toggle('on-wall',S.wallMode);
+  document.documentElement.classList.toggle('on-wall',S.wallMode);document.documentElement.classList.toggle('on-splash',!!S.splash);
   document.documentElement.classList.toggle('staff-ui',!S.wallMode&&!isMgr(meU()));
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
   for(const o of sheets)if(o.live&&o.live())paintSheet(o);
@@ -5592,7 +5597,7 @@ function vnList(){const V=S.vn,me=meU(),all=vnAll(),can=vnCan(me),ven=vnVenduti(
     <div class="vn-abb">${VN_ABB.map(([k,l])=>`<button type="button" class="chip" aria-pressed="${V.abb===k}" data-a="vnAbb" data-v="${k}">${l}</button>`).join('')}</div>
     ${V.abb?(l.length?l.map(v=>`<button type="button" class="vn-card" data-a="vnShow" data-v="${v.id}"><div class="vn-ct"><span class="vn-dot vn-${esc(v.tipo||'rosso')}" aria-hidden="true"></span><b>${vnTit(v)}</b>${v.pv?`<span class="vn-pv">${eur(v.pv)}</span>`:''}</div>${v.frase?`<p class="vn-fr">«${esc(v.frase)}»</p>`:''}${v.parole?`<p class="vn-par">${esc(v.parole)}</p>`:''}</button>`).join(''):`<p class="muted">Nessun vino in casa per questo piatto.${can?' Apri un vino e scegli i suoi abbinamenti.':''}</p>`):''}`}
   if(V.v==='inv'){const tot=all.reduce((s,v)=>s+(+v.q||0),0),val=all.reduce((s,v)=>s+(+v.q||0)*(+v.pc||0),0),nv=Object.values(ven).reduce((s,x)=>s+x,0),bassi=all.filter(v=>v.min>0&&(+v.q||0)<=v.min);
-    const top=Object.entries(ven).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([id,n])=>{const v=vnGet(id);return v?`<li>${vnTit(v)} <b>${n}</b></li>`:''}).join('');
+    const top=Object.entries(ven).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([id,n])=>{const v=vnGet(id);return v?`<li><b>${n}</b>${vnTit(v)}</li>`:''}).join('');
     return head+`<div class="rc-tot vn-tot"><div><span>Bottiglie in casa</span><b>${tot}</b></div><div><span>Vendute questo mese</span><b>${nv}</b></div>${isMgr(me)&&val?`<div><span>Valore (prezzo d'acquisto)</span><b>${eur(val)}</b></div>`:''}</div>
     ${bassi.length?`<p class="vn-al">${ic('warn')} Da riordinare: ${bassi.map(v=>vnTit(v)+' ('+(+v.q||0)+')').join(', ')}</p>`:''}
     ${top?`<span class="lbl">Più venduti questo mese</span><ol class="vn-top">${top}</ol>`:''}

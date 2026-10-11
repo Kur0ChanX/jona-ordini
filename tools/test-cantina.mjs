@@ -108,7 +108,7 @@ await sc('[data-a="vnV"][data-v="inv"]');await wait(250);
 t=await txt('.sheet');
 ok(/Bottiglie in casa 6/.test(t)&&/Vendute questo mese 2/.test(t),'Inventario: 6 in casa, 2 vendute');
 ok(/Da riordinare: Tignanello 2020 \(0\)/.test(t),'Inventario: Tignanello da riordinare');
-ok(/Più venduti questo mese Tignanello 2020 2/.test(t),'Inventario: più venduti');
+ok(/Più venduti questo mese/.test(t)&&await pg.evaluate(()=>{const l=document.querySelector('.vn-top li');return !!l&&/Tignanello 2020/.test(l.textContent)&&l.querySelector('b')?.textContent==='2'&&getComputedStyle(l.querySelector('b')).float==='right'}),'Inventario: più venduti (v87: numero a destra, non va a capo da solo)');
 ok(/Valore \(prezzo d'acquisto\) 0,00 €/.test(t)||!/Valore/.test(t),'valore: solo con prezzo d\'acquisto');
 await pg.locator('.sheet [data-a="vnVen"]').last().click();await wait(400);
 ok(/Bottiglie in casa 5/.test(await txt('.sheet')),'conta veloce: «−» toglie una bottiglia');
