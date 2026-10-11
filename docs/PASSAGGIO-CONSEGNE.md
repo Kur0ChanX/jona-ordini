@@ -1,12 +1,21 @@
-# Passaggio di consegne (2026-10-11, fine sessione #76)
+# Passaggio di consegne (2026-10-11, fine sessione #77)
 
-Sessione attuale: #77
+Sessione attuale: #78
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v77** (PR #88 unita in #77, squash `49b9aba`). **PR #88 (v77, D25) APERTA** dal ramo `claude/jona-v77-bolla` (stesso contenuto del ramo di lavoro a `ffe4590` + consegne): https://github.com/Kur0ChanX/jona-ordini/pull/88
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR: regola RAMO SINGOLO). App online: **v77** (PR #88 unita in #77, squash `49b9aba`, controllato `APP_VER=77` online).
 
-## 🔴 Primo lavoro della #77
-1. Controllare il check «prove» della PR #88 (nome minuscolo, E33). Se verde: squash merge, controllo online `APP_VER=77` su https://jona-ristorante-by-ynoy-corp.pages.dev/ , poi `git fetch origin main && git merge origin/main` nel ramo di lavoro e push (E7: conflitti solo negli appunti → tenere quelli del ramo di lavoro). Se rosso: capire la causa e correggere.
-2. Dire a Mario che v77 è online e cosa provare (M40).
+## Fatto in #77 (11/10, 4:33-~5:15 ora italiana)
+- PR #88 (v77, D25 bolla) con «prove» verde → squash merge, `main` unito nel ramo (conflitto solo nelle consegne, tenute quelle del ramo, E7), v77 online verificata. Detto a Mario cosa provare (M40).
+- Unita la scorta (solo ULTIMO-MESSAGGIO).
+- Messaggio di Mario (scritto in RVC #63, girato dalla #76): ramo singolo + Drive solo essenziale. Fatto:
+  - CLAUDE.md «DRIVE IN ORDINE» (sostituisce D31 «Furba»): Drive solo cartelle in ordine, si carica solo l'essenziale che serve davvero a Mario + ciò che decide lui; mai file di lavoro né segreti.
+  - Mario: «passa a spa le regole drive nuove» → mandata la regola alla sessione **SPA Sensorial #03** (`session_01QPVtwg4JKdF87sSmQjLT33`, repo `SPA-Sensorial-by-YNOY/spa-sensorial`, pallino 🔵), da adattare alla loro cartella. Nessuna risposta richiesta.
+  - Doppio tocco: Mario ha scelto **«Solo ramo unico»**, confermato. CLAUDE.md: «RAMO SINGOLO» (sostituisce «RAMI IN ORDINE»), riga nel RAMO DEFINITIVO e «Pubblicazione: PR dal ramo unico → squash…». Le prossime PR si aprono con head `claude/jona-ramo-definitivo` verso `main`. Vecchi rami restano.
+  - DA-FARE: D28 e D31 chiuse.
+- Mario ha chiesto «resta altro?»: risposto con M40, M39, M34, M33 e domanda «parto con D26?» (senza risposta). Poi «d 30 non ho capito»: spiegato in parole semplici (spostamento del repo nell'organizzazione del ristorante, attesa della scatola nera per il vecchio indirizzo, poi Transfer che fa lui). Non deve fare niente ora.
+
+## Domanda aperta
+- «Parto con D26 (costo dei piatti dalle ricette, già approvata)?» — rifarla col doppio tocco.
 
 ## Fatto in #76 (11/10, 3:00-4:35 ora italiana)
 - Unite due scorte (vecchie, solo `ULTIMO-MESSAGGIO.md`).
@@ -38,7 +47,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - Jona #75 `session_01QPzuujHhDE3xqGshobfAn3` e #76 `session_01Ada4vhK6uEQRyN1yrqjQTF` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 
 ## Prossimi passi (in ordine)
-1. PR #88 (v77): vedi «Primo lavoro» in cima.
+1. Rifare a Mario la domanda su D26 (doppio tocco).
 2. Attendere Mario. M39 (fattura .p7m vera) e M40 (bolla vera): se manda foto o file, salvarli (solo senza dati sensibili) e usarli nelle prove (`tools/test-bolla.mjs`, `tools/test-p7m.mjs`).
 3. D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sopra).
 4. Lavoro «Claude da solo» già approvato: D26 (costo dei piatti dalle ricette). Proporlo a Mario.
@@ -58,6 +67,4 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-«no lascia stare anche in jona digli di lasciare com era che c'era la regola del ramo singolo se non xrea problemi ed è ottimale per il drive solo ordine con cartelle e si carica solo l'essenziale che può servirmi veramente e basta e poi qll che devido io» (scritto in RVC #63, 4:25, girato dalla #76 alla #77). Fatto in #77: regola DRIVE IN ORDINE scritta e passata a SPA #03 (Mario: «passa a spa le regole drive nuove»); RAMO SINGOLO confermato col doppio tocco (anche le PR dal ramo unico).
-
-Prima: «si» (scritto nella #75 chiusa, ~4:13, girato qui). Poi nella #76 ha scelto col doppio tocco «D25 foto bolla (Consigliata)» + «Sì, confermo il lavoro». Nessun messaggio dopo.
+«d 30 non ho capito» (risposto con la spiegazione semplice; prima: «resta altro?», «passa a spa le regole drive nuove»).
