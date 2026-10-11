@@ -1,3 +1,5 @@
-# Ultimo messaggio di Mario (11/10/2026 17:35 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 17:44 ora italiana)
 
-Non è cambiato l'icona in spa. Sembra che non c'è una buona comunicazione con la spa. Su RVC sì, ma su spa no. Quale può essere il problema?
+git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
+Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #85).
+Poi attendi le istruzioni di Mario.
