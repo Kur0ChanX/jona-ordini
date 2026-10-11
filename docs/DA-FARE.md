@@ -11,6 +11,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
 | M39 | v76 online: Fornitori → **Importa listini** → **Fattura elettronica XML** → scegli una o più fatture (.xml o .p7m firmate). Dimmi se le righe e i fornitori tornano | Mario | quando hai una fattura XML o .p7m |
+| M40 | v77 online: alla prossima consegna, in **Arrivi** → **Controlla** → foto della bolla → **Confronta la bolla con l'ordine**. Dimmi se segna giusto e mandami la foto se sbaglia | Mario (o chi riceve la merce) | alla prossima consegna |
 | M33 | v71 online (18:53): riapri l'app e guarda se il logo JONA all'apertura ora è nitido | Mario | ora |
 | M31 | Scegliere la miglioria del logo: Ovvia (logo più grande all'apertura), Furba (lune che cadono con rimbalzo), Geniale (4 lune come segno di attesa nell'app, consigliata), Nessuna | Mario | quando vuoi |
 | D29 | Ottimizzare l'app per Android, iPhone, Mac e Windows (Mario #60, strada 2 «Furba» #64). **v72 online (#67, PR #83)**: campi a 16 px (niente zoom su iPhone, prova `test-campi-16`), giro con WebKit e su computer 1280/1440 su GitHub. Resta solo (b) barra di stato su iPhone installata: non toccata (zona in alto già cambiata e tolta in v54); si guarda solo con una foto da un iPhone con l'app installata | Claude da solo | ora |
@@ -23,7 +24,6 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 | D22 | Lettore foto: **v68 online** (10/10, PR #79): Flash → Flash-Lite → Cloudflare Llama 4, banner dal vivo. Giro completo extra su GitHub partito alle 12:5x | Claude da solo | controllare il giro completo |
 | D23 | Import di più XML insieme e dei `.p7m` firmati: **fatto in v76** (#75, prova `tools/test-p7m.mjs`). Resta: Mario prova con una fattura vera .p7m (M39) | Claude | dopo M39 |
 | D24 | ✅ v69 ONLINE 10/10 14:07 (PR #80): in approvazione delle richieste, «Da … costa … in meno · Passa» se lo stesso prodotto (stessa unità) costa meno da un altro fornitore. Il gestore non ha carrello e lo staff non vede i prezzi: il suggerimento sta solo lì. Prova `tools/test-conveniente.mjs` | Claude da solo | pubblicare |
-| D25 | Idea 3 approvata: foto della bolla all'arrivo confrontata con l'ordine (mancanti / prezzo diverso in rosso) | Claude da solo | da fare |
 | D26 | Idea 2 approvata: costo dei piatti dalle ricette (ingredienti dai listini, avviso se il costo sale) | Claude da solo | da fare |
 | M29 | Preparare l'account Hotmail per il cambio account (`docs/CAMBIO-ACCOUNT.md`, passi 1-6) | Mario | prima che finisca il limite settimanale |
 | M28 | Chiedere al commercialista se può mandare ogni mese le fatture dei fornitori in formato XML (file .xml o .p7m) | Mario | quando può |
