@@ -592,6 +592,7 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .ag-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}.ag-wd{text-align:center;font-size:12px;color:var(--muted)}
 .ag-c{position:relative;aspect-ratio:1;min-height:38px;border:0;border-radius:10px;background:var(--sunk);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0}
 .ag-c i{font-style:normal;font-size:10px;line-height:1;color:var(--lagoon)}.ag-c.oggi{outline:2px solid var(--lagoon)}.ag-c[aria-pressed="true"]{background:var(--lagoon);color:var(--on-lagoon)}.ag-c[aria-pressed="true"] i{color:inherit}
+.rc-cerca{box-shadow:none;border-color:var(--line);margin-top:12px}.rc-l{margin-top:10px}.rc-alto{color:var(--corallo);font-weight:600}.rc-ing{padding:10px 0;border-top:1px solid var(--line)}.rc-in{display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere}.rc-q{display:flex;align-items:center;gap:8px;margin-top:6px}.rc-q .inp.sm{width:86px;flex:none}.rc-q select.inp.sm{width:78px;flex:none}.rc-u{min-width:28px;color:var(--ink2)}.rc-c{flex:1;text-align:right;font-weight:600;white-space:nowrap}.rc-tot{display:grid;gap:6px;margin:14px 0 6px;padding:12px 14px;border-radius:12px;background:var(--sunk)}.rc-tot div{display:flex;justify-content:space-between;gap:10px}
 .ag-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ag-2>*{min-width:0}.ag-2 .btn{white-space:normal;text-align:center;justify-content:center}
 .sc-row{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px}.sc-row>div{min-width:0}.sc-row b{display:block;font-weight:500}.sc-row span{display:block}
@@ -1165,8 +1166,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=78;
+const APP_VER=79;
 const NEWS=[
+  {v:79,data:'2026-10-11',titolo:'Ricette e costo dei piatti',
+    chef:['In Fornitori c\'è «Ricette e costo dei piatti». Scrivi il piatto, scegli gli ingredienti dai listini e le quantità: l\'app calcola il costo a porzione e il food cost.','Se un fornitore alza un prezzo e il costo di un piatto sale di più del 3%, compare un avviso in alto.','Si spegne in Impostazioni → Funzioni.'],
+    dev:{aggiunte:['D26: `config/ricette` {r:{<id>:{n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG}}}; `rcPrezzo` (listino, poi stesso `gkey` e unità: prima stesso fornitore, poi il più economico, poi ultimo prezzo `pz`), `rcCalc` (g/kg, ml/l; food cost su prezzo / 1,10), `rcSalito` (≥3% sopra `rif`), striscia `rcStrip` con «Ok, visto» (`rcSnap`), ingresso `rcCta` in Fornitori, fogli `rcList`/`rcFormH`/`rcPick`. Funzione `ricette` accesa di partenza: `FUNZ[].on` e `funzOn` legge il valore di partenza se non è mai stata toccata. Prova `tools/test-ricette.mjs`.']}},
   {v:78,data:'2026-10-11',titolo:'Logo YNOY CORP con 4 lune',
     tutti:['All\'apertura dell\'app e nelle schermate d\'ingresso torna il logo YNOY CORP con le 4 lune.'],
     dev:{correzioni:['Rimessi `media/ynoy.svg`, `media/ynoy.png`, la riga della schermata di apertura (`S.splash`) e gli script `tools/logo-ynoy.py`, `tools/ynoy-html.py`, `tools/ynoy-tratti.py`, `tools/test-logo-nitido.mjs` com\'erano prima della v75 (logo a 4 lune, foto di Mario `docs/img/logo/vecchi/ynoy-coda-mario-2026-10-10.jpg`).']}},
@@ -2182,7 +2186,7 @@ function shell(me){
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}${agBtn(me)}${htBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${oldUrl()}${pushAsk()}${errStrip()}${phStrip(me)}${agStrip(me)}${htStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${oldUrl()}${pushAsk()}${errStrip()}${phStrip(me)}${agStrip(me)}${rcStrip(me)}${htStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -3029,6 +3033,7 @@ function vFornitori(){
   const fs=Object.values(D().fornitori).sort(byNome);const cnt={};for(const p of prods())cnt[p.fornitoreId]=(cnt[p.fornitoreId]||0)+1;
   return`<div class="vhead"><div><h1 class="vt">Fornitori</h1><p class="vsub">${fs.length} fornitori, ${prods().length} prodotti a listino</p></div><button type="button" class="btn ghost" data-a="fnew">${ic('plus')} Nuovo</button></div>
   <button type="button" class="sug-cta" data-a="imp" data-f="">${ic('upload')}<div><b>Importa listini</b><span>Excel, CSV, fattura XML, tabella preparata con Gemini o foto</span></div>${ic('chev')}</button>
+  ${rcCta(meU())}
   ${fs.length?`<div class="fgrid">${fs.map(f=>{const m=METODI[f.metodo],n=cnt[f.id]||0;return`<button type="button" class="fcard" data-a="fopen" data-f="${f.id}" style="--c:${fcolor(f.id)}" aria-label="${esc(f.nome)}">
     <span class="fc-top">${f.logo?`<img src="${esc(f.logo)}" alt="">`:`<b>${esc(f.nome.charAt(0))}</b>`}</span>
     <span class="fc-b"><span class="fc-n">${esc(f.nome)}</span><span class="fc-m">${m?ic(m.i)+esc(m.l):'Invio da definire'}</span>
@@ -4923,8 +4928,8 @@ function voiceSheet(){
    config/app.funz {agenda:true}: le funzioni nuove partono spente. Conta d'uso in config/uso_<AAAA-MM> {agenda:{<persona>:giorni}}, al massimo una scrittura al giorno per telefono (jona_uso).
    Agenda: config/agenda_<AAAA-MM> {tipo:'agenda',e:{<id>:ev}}, ricorrenti in config/agenda_ric. ev={t,g:'AAAA-MM-GG',h:'HH:MM'|'',cop,note,vis:'io'|'tutti'|'rep',rep:[],da,cr,mod,r:''|'s'|'m'}.
    Cancellare = e.<id>: null. Per reparto: lo staff vede i suoi, i gestori tutti. «Solo io» è nascosto solo nell'interfaccia (tutti i membri leggono config). */
-const FUNZ=[{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
-const funzOn=k=>!!(cfg().funz||{})[k];
+const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
+const funzOn=k=>{const f=cfg().funz||{};return k in f?!!f[k]:!!(FUNZ.find(x=>x.id===k)||{}).on};
 async function funzSet(k,on){const f=FUNZ.find(x=>x.id===k);if(!f)return;
   await put('config','app',Object.assign({},cfg(),{funz:Object.assign({},cfg().funz||{},{[k]:!!on})}));toast(f.l+(on?' accesa':' spenta'))}
 const usoMese=()=>today().slice(0,7);
@@ -5311,9 +5316,74 @@ const HT_A={htOpen:()=>htOpen(),htDet:()=>{if(S.ht)S.ht.det=!S.ht.det;schedule()
 const HT_IN={htT:t=>{if(S.ht)S.ht.t=t.value},htf:t=>{if(S.htf)S.htf[t.dataset.k]=t.value}};
 
 /* ================= eventi ================= */
+/* ================= ricette e costo dei piatti (D26, v79) =================
+   config/ricette {tipo:'ricette', r:{<id>:{id,n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG,da,cr,mod}}}: solo i gestori.
+   Prezzo di ogni ingrediente: il prodotto del listino; se manca o ha cambiato unità, stesso nome (gkey) e stessa unità
+   (prima lo stesso fornitore, poi il più economico); se no l'ultimo prezzo salvato (pz). Unità: kg → g/kg, l → ml/l.
+   Food cost % = costo a porzione / (prezzo di vendita / 1,10 IVA). «Costo salito» se il costo a porzione supera rif del 3%. */
+const RC_IVA=1.10,RC_SALITO=1.03,RC_FC=30,RC_ALTO=35;
+const rcAll=()=>Object.values((D().config.ricette||{}).r||{}).filter(r=>r&&r.id).sort((a,b)=>String(a.n).localeCompare(String(b.n),'it'));
+const rcU=pu=>{const t=normUnita(pu),u=t.toLowerCase();return u==='kg'?[['g',.001],['kg',1]]:u==='l'?[['ml',.001],['l',1]]:[[t||'pz',1]]};
+const rcFatt=g=>{const u=rcU(g.pu).find(x=>x[0]===g.u);return u?u[1]:1};
+const rcPct=n=>fq(Math.round(n*10)/10)+'%';
+function rcPrezzo(g){const p=D().prodotti[g.pid],pu=normUnita(g.pu).toLowerCase();
+  if(p&&p.prezzo!=null&&normUnita(p.unita).toLowerCase()===pu)return{pr:p.prezzo,da:'listino',f:p.fornitoreId};
+  const alt=((S.gidx&&S.gidx.get(gkey(g.nome)))||[]).filter(q=>q.prezzo!=null&&normUnita(q.unita).toLowerCase()===pu);
+  const b=alt.find(q=>q.fornitoreId===g.fid)||alt.sort((x,y)=>x.prezzo-y.prezzo)[0];
+  if(b)return{pr:b.prezzo,da:'simile',f:b.fornitoreId};
+  return g.pz!=null?{pr:g.pz,da:'vecchio',f:g.fid}:null}
+function rcCalc(r){let tot=0,manca=0;const righe=(r.ing||[]).map(g=>{const q=num(g.q),p=rcPrezzo(g);const c=p&&q>0?q*rcFatt(g)*p.pr:null;if(c==null)manca++;else tot+=c;return{g,p,c}});
+  const por=num(r.por)>0?num(r.por):1,cp=tot/por,pv=num(r.pv);
+  return{righe,tot,cp,manca,fc:pv>0&&cp>0?cp/(pv/RC_IVA)*100:null,cons:cp>0?cp*RC_IVA*100/RC_FC:null}}
+function rcSalito(r){if(!(r.rif>0))return 0;const c=rcCalc(r);if(c.manca)return 0;const x=c.cp/r.rif;return x>=RC_SALITO?x-1:0}
+function rcSnap(r){const ing=(r.ing||[]).map(g=>{const p=rcPrezzo(g);return Object.assign({},g,{pz:p?p.pr:(g.pz??null)})});const c=rcCalc(Object.assign({},r,{ing}));
+  return Object.assign({},r,{ing,rif:!c.manca&&c.cp>0?Math.round(c.cp*1e4)/1e4:null,rifG:today()})}
+async function rcPut(r){if(D().config.ricette)await upd('config','ricette',{['r.'+r.id]:r});else await put('config','ricette',{tipo:'ricette',r:{[r.id]:r}})}
+const rcOn=me=>funzOn('ricette')&&isMgr(me)&&!!realU()&&!S.wallMode;
+const rcCta=me=>{if(!rcOn(me))return'';const n=rcAll().length;return`<button type="button" class="sug-cta" data-a="rcOpen">${ic('pot')}<div><b>Ricette e costo dei piatti</b><span>${n?n+(n===1?' ricetta':' ricette')+' · costo a porzione e food cost':'Quanto costa ogni piatto, con i prezzi dei listini'}</span></div>${ic('chev')}</button>`};
+function rcStrip(me){if(!rcOn(me))return'';const l=rcAll().map(r=>({r,s:rcSalito(r)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);if(!l.length)return'';
+  return`<div class="ag-strip ag-nuovo rc-strip">${ic('pot')}<button type="button" class="ag-st-t" data-a="rcOpen"><b>Costo dei piatti salito</b> ${l.slice(0,2).map(x=>esc(x.r.n)+' +'+rcPct(x.s*100)).join(' — ')}${l.length>2?' — +'+(l.length-2):''}</button><button type="button" class="btn primary sm" data-a="rcVisto">Ok, visto</button></div>`}
+async function rcVisto(){for(const r of rcAll())if(rcSalito(r)>0)await rcPut(rcSnap(r));toast('Costi aggiornati')}
+function rcOpen(){if(!funzOn('ricette'))return;S.rc={q:''};usoSegna('ricette');openSheet({cls:'tall',live:()=>true,render:rcList})}
+function rcList(){const all=rcAll(),q=norm(S.rc.q),l=all.filter(r=>!q||norm(r.n).includes(q));
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Ricette e costo dei piatti<div class="sh-s">${all.length} ${all.length===1?'ricetta':'ricette'} · prezzi presi dai listini</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <button type="button" class="btn primary big block" data-a="rcNew">${ic('plus')} Nuova ricetta</button>
+  ${all.length>6?`<div class="search rc-cerca">${ic('search')}<input id="rcq" type="search" placeholder="Cerca un piatto" value="${esc(S.rc.q)}" data-in="rcq" autocomplete="off"></div>`:''}
+  <div class="rc-l">${l.length?l.map(r=>{const c=rcCalc(r),s=rcSalito(r);return`<button type="button" class="prow" data-a="rcEdit" data-v="${r.id}"><div class="row-i"><div class="row-t">${esc(r.n)}</div><div class="row-m">${eur(c.cp)} a porzione${c.fc!=null?` · <span class="${c.fc>RC_ALTO?'rc-alto':''}">food cost ${rcPct(c.fc)}</span>`:''}${s?` <span class="tag urg">costo +${rcPct(s*100)}</span>`:''}${c.manca?` <span class="tag">${c.manca} senza prezzo</span>`:''}</div></div>${ic('chev')}</button>`}).join(''):`<p class="muted">${q?'Nessun piatto trovato.':'Nessuna ricetta. Tocca «Nuova ricetta», scegli gli ingredienti dai listini e l\'app calcola quanto costa il piatto.'}</p>`}</div>`}
+function rcForm(r){const f=r?clone(r):{n:'',por:1,pv:'',ing:[]};const sv=v=>v==null||v===''?'':String(v).replace('.',',');
+  f.por=sv(f.por)||'1';f.pv=sv(f.pv);f.ing=(f.ing||[]).map(g=>Object.assign({},g,{q:sv(g.q)}));S.rcf=f;
+  openSheet({cls:'tall',live:()=>true,render:rcFormH})}
+function rcFormH(){const f=S.rcf,c=rcCalc(f);
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica ricetta':'Nuova ricetta'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <label class="lbl" for="rcf-n">Nome del piatto</label><input class="inp" id="rcf-n" data-in="rcf" data-k="n" value="${esc(f.n)}" placeholder="Es. Spaghetti alle vongole">
+  <div class="ag-2"><label><span class="lbl">Porzioni</span><input class="inp" id="rcf-por" inputmode="decimal" data-in="rcf" data-k="por" value="${esc(f.por)}"></label><label><span class="lbl">Prezzo nel menù €</span><input class="inp" id="rcf-pv" inputmode="decimal" data-in="rcf" data-k="pv" value="${esc(f.pv)}" placeholder="Es. 18"></label></div>
+  <span class="lbl">Ingredienti</span>
+  ${c.righe.map((x,i)=>{const g=x.g,us=rcU(g.pu);return`<div class="rc-ing"><div class="rc-in"><b>${esc(g.nome)}</b><span class="muted small">${x.p?`${eur(x.p.pr)} / ${esc(normUnita(g.pu)||'pz')}${x.p.da==='simile'?' · da '+esc(forn(x.p.f).nome):x.p.da==='vecchio'?' · non più a listino, ultimo prezzo':''}`:'senza prezzo'}</span></div>
+    <div class="rc-q"><input class="inp sm" id="rcq-${i}" inputmode="decimal" data-in="rcfq" data-i="${i}" value="${esc(g.q)}" placeholder="0" aria-label="Quantità di ${esc(g.nome)}">${us.length>1?`<select class="inp sm" id="rcu-${i}" data-ch="rcu" data-i="${i}" aria-label="Unità di ${esc(g.nome)}">${us.map(([u])=>`<option value="${u}" ${g.u===u?'selected':''}>${u}</option>`).join('')}</select>`:`<span class="rc-u">${esc(us[0][0])}</span>`}<span class="rc-c">${x.c!=null?eur(x.c):'—'}</span><button type="button" class="icon-btn" data-a="rcIngDel" data-v="${i}" aria-label="Togli ${esc(g.nome)}">${ic('x')}</button></div></div>`}).join('')||'<p class="muted small">Ancora nessun ingrediente.</p>'}
+  <button type="button" class="btn ghost" data-a="rcPick">${ic('plus')} Aggiungi ingrediente</button>
+  <div class="rc-tot"><div><span>Costo totale</span><b>${eur(c.tot)}</b></div><div><span>Costo a porzione</span><b>${eur(c.cp)}</b></div>${c.fc!=null?`<div class="${c.fc>RC_ALTO?'rc-alto':''}"><span>Food cost</span><b>${rcPct(c.fc)}</b></div>`:''}${c.cons?`<div><span>Prezzo per stare al ${RC_FC}%</span><b>${eur(c.cons)}</b></div>`:''}</div>
+  ${c.manca?`<p class="muted small">${c.manca===1?'1 ingrediente senza quantità o prezzo: non è':c.manca+' ingredienti senza quantità o prezzo: non sono'} nel costo.</p>`:''}
+  <p class="muted small">Food cost: costo a porzione diviso il prezzo del menù senza IVA (10%).</p>
+  <div class="sheet-foot btns" style="margin-top:18px">${f.id?`<button type="button" class="btn ghost danger" data-a="rcDel">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary big" data-a="rcSave">${ic('check')} Salva</button></div>`}
+function rcPick(){S.rcpq='';openSheet({cls:'tall',live:()=>true,render:()=>{const q=norm(S.rcpq),toks=q?q.split(' '):[];
+  const l=prods().filter(p=>!toks.length||toks.every(t=>norm(p.nome+' '+(p.codice||'')).includes(t))).sort(byNome).slice(0,80);
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Aggiungi ingrediente<div class="sh-s">Dai listini dei fornitori</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <div class="search rc-cerca">${ic('search')}<input id="rcpq" type="search" placeholder="Cerca un prodotto" value="${esc(S.rcpq)}" data-in="rcpq" autocomplete="off"></div>
+  <div>${l.length?l.map(p=>`<button type="button" class="prow" data-a="rcAdd" data-v="${p.id}"><div class="row-i"><div class="row-t">${esc(p.nome)}</div><div class="row-m">${esc(forn(p.fornitoreId).nome)}${p.prezzo!=null?' · '+eur(p.prezzo)+(p.unita?' / '+esc(p.unita):''):' · senza prezzo'}</div></div>${ic('plus')}</button>`).join(''):`<p class="muted">Nessun prodotto${q?' trovato':' a listino: caricalo da Fornitori'}.</p>`}</div>`}})}
+function rcAdd(id){const p=D().prodotti[id];if(!p||!S.rcf)return;const pu=normUnita(p.unita)||'pz';
+  S.rcf.ing.push({pid:p.id,nome:p.nome,fid:p.fornitoreId||'',pu,q:'',u:rcU(pu)[0][0],pz:p.prezzo??null});closeSheet();refreshSheet();
+  const i=S.rcf.ing.length-1;setTimeout(()=>{const n=document.getElementById('rcq-'+i);if(n)n.focus()},300)}
+async function rcSave(){const f=S.rcf,me=realU();if(!f||!me)return;const n=f.n.trim();if(!n){toast('Scrivi il nome del piatto','err');return}
+  const r={id:f.id||uid(),n,por:num(f.por)>0?num(f.por):1,pv:num(f.pv)>0?num(f.pv):null,ing:f.ing.map(g=>({pid:g.pid,nome:g.nome,fid:g.fid||'',pu:g.pu,q:num(g.q)>0?num(g.q):null,u:g.u,pz:g.pz??null})),da:f.da||me.id,cr:f.cr||now(),mod:now()};
+  await rcPut(rcSnap(r));closeSheet();toast('Ricetta salvata')}
+async function rcDel(){const f=S.rcf;if(!f||!f.id)return closeSheet();
+  if(!await ask('Eliminare la ricetta?','«'+f.n+'» sparisce dalle ricette.','Elimina',true))return;
+  await upd('config','ricette',{['r.'+f.id]:null});closeSheet();toast('Ricetta eliminata')}
+
 const A={
   closeSheet:()=>closeSheet(),
-  funzSet:d=>funzSet(d.k,d.v==='1'),agOpen:()=>agOpen(),agV:d=>{S.ag.v=d.v;S.ag.sel='';refreshSheet()},agToday:()=>{S.ag.g=today();S.ag.sel='';refreshSheet()},
+  funzSet:d=>funzSet(d.k,d.v==='1'),agOpen:()=>agOpen(),
+  rcOpen:()=>rcOpen(),rcNew:()=>rcForm(null),rcEdit:d=>{const r=((D().config.ricette||{}).r||{})[d.v];if(r)rcForm(r)},rcPick:()=>rcPick(),rcAdd:d=>rcAdd(d.v),rcIngDel:d=>{S.rcf.ing.splice(+d.v,1);refreshSheet()},rcSave:()=>rcSave(),rcDel:()=>rcDel(),rcVisto:()=>rcVisto(),agV:d=>{S.ag.v=d.v;S.ag.sel='';refreshSheet()},agToday:()=>{S.ag.g=today();S.ag.sel='';refreshSheet()},
   agDayGo:d=>{S.ag.v='oggi';S.ag.g=d.v;S.ag.sel='';refreshSheet();const b=document.querySelector('.sheet.tall');if(b)b.scrollTop=0},
   agNewAt:d=>agForm({g:d.g||S.ag.g,h:d.v||''}),
   agNtAdd:async()=>{const u=realU(),g=S.ag.g,t=String(S.ag.nt||'').trim();if(!u)return;if(!t)return toast('Scrivi l\'appunto.','warn');const l=agNotes(g,u);if(l.length>=60)return toast('Al massimo 60 appunti al giorno.','warn');
@@ -5497,12 +5567,14 @@ const IN={
   pe:t=>{S.pe[t.dataset.k]=t.value},
   rv:t=>{if(S.rev)S.rev.items[+t.dataset.i][t.dataset.k]=t.dataset.k==='prezzo'?num(t.value):t.value},
   pkq:t=>{S.pkq=t.value;refreshSheet()},
+  rcq:t=>{S.rc.q=t.value;refreshSheet()},rcpq:t=>{S.rcpq=t.value;refreshSheet()},rcf:t=>{S.rcf[t.dataset.k]=t.value;refreshSheet()},rcfq:t=>{const g=S.rcf.ing[+t.dataset.i];if(g){g.q=t.value;refreshSheet()}},
   imptxt:t=>{S.imp.txt=t.value},
   askv:t=>{S.askVal=t.value},
   cfgName:t=>{S.cfgName=t.value},
   cfgLuogo:t=>{S.cfgLuogo=t.value}
 };
 const CH={
+  rcu:t=>{const g=S.rcf&&S.rcf.ing[+t.dataset.i];if(g){g.u=t.value;refreshSheet()}},
   formsel:t=>{S.form[t.dataset.k]=t.value},
   cv:t=>{const v=num(t.value);setCart(t.dataset.p,v==null?0:v)},
   cunit:t=>{const c=S.cart.find(x=>x.pid===t.dataset.p);if(c){c.unita=t.value.trim();saveCart()}},
