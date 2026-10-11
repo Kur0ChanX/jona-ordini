@@ -1,0 +1,113 @@
+// D35-D36 / v85: ruoli nuovi (Chef de rang, Bartender…) e Bar: cocktail (data/cocktail.json) e inventario alcolici
+// con bottiglie intere e quanto resta di quella aperta (⅓, ½, ⅔), movimenti del mese, «Si possono fare».
+import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+import { readFileSync } from 'fs';
+const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+const ctx=await b.newContext({viewport:{width:390,height:800}});
+await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
+const pg=await ctx.newPage();
+const errs=[];pg.on('pageerror',e=>errs.push(e.message));
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
+const wait=ms=>pg.waitForTimeout(ms);
+const sc=sel=>pg.locator('.sheet').last().locator(sel).first().click();
+const txt=async(sel='#app')=>(await pg.locator(sel).last().innerText()).replace(/\s+/g,' ');
+// dati: il file è quello generato dal sorgente
+const J=JSON.parse(readFileSync(new URL('../data/cocktail.json',import.meta.url),'utf8'));
+ok(J.c.length>=200,'almeno 200 cocktail ('+J.c.length+')');
+ok(J.c.every(c=>c[0]&&c[1]&&'SMCFP'.includes(c[2])&&c[3]&&c[4].length&&c[6]),'ogni cocktail ha nome, famiglia, metodo, bicchiere, ingredienti e passaggi');
+ok(new Set(J.c.map(c=>c[0].toLowerCase())).size===J.c.length,'nessun doppione');
+const neg=J.c.find(c=>c[0]==='Negroni');
+ok(neg&&JSON.stringify(neg[4])===JSON.stringify([['3','cl','Gin',1],['3','cl','Campari',1],['3','cl','Vermouth rosso',1]]),'Negroni: 3 cl gin, Campari e vermouth rosso');
+ok(J.c.filter(c=>c[1]==='zero').every(c=>c[4].every(x=>x.length===3)),'analcolici senza alcolici');
+await pg.goto('http://localhost:8765/index.html');
+await pg.click('[data-a="formset"][data-v="dev"]');
+for(const [k,v] of [['nome','Luca'],['cognome','Rossi'],['username','luca'],['pw','password123'],['pw2','password123']])await pg.fill(`input[data-k="${k}"]`,v);
+await pg.click('[data-a="setupGo"]');
+await pg.waitForSelector('.testbar');await wait(300);
+const SRC=readFileSync(new URL('./cocktail.txt',import.meta.url),'utf8');
+ok(await pg.evaluate(()=>BR_CAT.flatMap(x=>x[1]).length===new Set(BR_CAT.flatMap(x=>x[1])).size),'BR_CAT senza doppioni');
+// D35 ruoli
+ok(await pg.evaluate(()=>['Chef de rang','Commis di sala','Bartender','Barback','Chef de partie','Runner'].every(m=>MANSIONI.includes(m))&&MANSIONI.includes('Altro')),'mansioni nuove: Chef de rang, Commis di sala, Bartender, Barback, Chef de partie, Runner');
+ok(await pg.evaluate(()=>{const d=document.createElement('select');d.innerHTML=mansOpt('Barman');return d.value==='Barman'&&d.querySelectorAll('optgroup').length===MANSIONI_G.length}),'mansione vecchia «Barman» resta scelta (non cambia da sola)');
+ok(await pg.evaluate(()=>isBar({mansione:'Barman'})&&isBar({mansione:'Bartender'})&&isBar({mansione:'Barback'})&&!isBar({mansione:'Cameriere'})),'isBar: Barman, Bartender, Barback');
+ok(await pg.evaluate(()=>brCan({ruolo:'staff',reparto:'sala',mansione:'Bartender'})&&brCan({ruolo:'staff',reparto:'fb'})&&brCan({ruolo:'gm'})&&!brCan({ruolo:'staff',reparto:'sala',mansione:'Cameriere'})&&!brCan({ruolo:'staff',reparto:'cucina',mansione:'Cuoco'})),'Bar: gestori, F&B e bartender sì; camerieri e cucina no');
+ok(await pg.evaluate(()=>funzOn('bar')),'funzione «bar» accesa di partenza');
+// ingressi
+await pg.click('.testbar [data-a="viewAs"][data-v="staff"]');await wait(300);
+ok(await pg.locator('[data-a="brOpen"]').count()===0,'staff di cucina: niente Bar');
+await pg.click('.testbar [data-a="viewAs"][data-v="gm"]');await wait(300);
+await pg.click('nav [data-a="tab"][data-v="fornitori"]');await wait(300);
+ok(await pg.locator('main .sug-cta[data-a="brOpen"]').count()===1,'chef: «Bar» in Fornitori');
+await pg.click('main [data-a="brOpen"]');await wait(700);
+let t=await txt('.sheet');
+ok(/Bar \d{3} cocktail/.test(t)&&/Negroni/.test(t),'si apre con i cocktail caricati');
+ok(await pg.locator('.sheet .br-r').count()===60&&/Mostra altri 60/.test(t),'60 righe disegnate alla volta');
+await sc('[data-a="brPiu"]');await wait(200);
+ok(await pg.locator('.sheet .br-r').count()===120,'«Mostra altri» aggiunge 60 righe');
+ok(await pg.locator('.sheet [data-a="brFat"]').count()===0,'senza bottiglie: niente «Si possono fare»');
+await pg.fill('#brq','campari');await wait(250);
+t=await txt('.sheet');
+ok(/Negroni/.test(t)&&/Americano/.test(t)&&!/Mojito/.test(t),'ricerca per ingrediente (campari)');
+await pg.fill('#brq','');await wait(150);
+await sc('[data-a="brF"][data-v="zero"]');await wait(200);
+t=await txt('.sheet');
+ok(/Virgin Mojito/.test(t)&&!/Negroni/.test(t),'filtro Analcolici');
+await sc('[data-a="brF"][data-v=""]');await wait(150);
+await pg.fill('#brq','negroni');await wait(200);
+await pg.locator('.sheet .br-r',{hasText:/^Negroni/}).first().click();await wait(350);
+t=await txt('.sheet');
+ok(/Negroni/.test(t)&&/IBA/.test(t)&&/3 cl Gin/.test(t)&&/Old fashioned/.test(t)&&/Mezza fetta d'arancia/.test(t),'scheda: dosi, bicchiere e guarnizione');
+ok(!/in casa|manca/.test(t),'senza inventario niente «in casa / manca»');
+await sc('[data-a="closeSheet"]');await wait(300);
+// inventario
+await sc('[data-a="brV"][data-v="inv"]');await wait(200);
+ok(/Ancora nessuna bottiglia/.test(await txt('.sheet')),'inventario vuoto con spiegazione');
+await sc('[data-a="brNew"]');await wait(300);
+await pg.fill('#brf-n','Tanqueray');await pg.selectOption('#brf-cat','Gin');await pg.fill('#brf-pi','2');await pg.fill('#brf-min','1');await pg.fill('#brf-pc','16');
+await sc('[data-a="brfAp"][data-v="0.5"]');await wait(100);
+await sc('[data-a="brSave"]');await wait(500);
+for(const [n,c,pi] of [['Campari','Campari','1'],['Carpano','Vermouth rosso','0']]){await sc('[data-a="brNew"]');await wait(300);await pg.fill('#brf-n',n);await pg.selectOption('#brf-cat',c);await pg.fill('#brf-pi',pi);await sc('[data-a="brSave"]');await wait(500)}
+const tq=await pg.evaluate(()=>brAll().find(b=>b.n==='Tanqueray'));
+ok(tq&&tq.cat==='Gin'&&tq.pi===2&&tq.ap===0.5&&tq.min===1&&tq.pc===16&&tq.cl===70,'bottiglia salvata in config/bar (intere, aperta ½, formato, prezzo)');
+t=await txt('.sheet');
+ok(/2 \+ ½/.test(t)&&/Gin/.test(t)&&/Valore/.test(t),'inventario: «2 + ½», gruppo Gin e valore per il gestore');
+// conta: carpano a 0 → negroni non fattibile
+await sc('[data-a="brV"][data-v="ck"]');await wait(200);await pg.fill('#brq','');await wait(150);
+await sc('[data-a="brFat"]');await wait(200);
+t=await txt('.sheet');
+ok(/Gin Tonic/.test(t)&&/Gin Lemon/.test(t)&&!/Negroni\b/.test(t)&&!/(?<!Virgin )Mojito/.test(t),'«Si possono fare»: Gin Tonic sì, Negroni no (vermouth finito), Mojito no');
+await sc('[data-a="brV"][data-v="inv"]');await wait(200);
+await pg.locator('.sheet .br-r',{hasText:'Carpano'}).click();await wait(300);
+await sc('[data-a="brPi"][data-v="1"]');await wait(400);
+await sc('[data-a="closeSheet"]');await wait(300);
+await sc('[data-a="brV"][data-v="ck"]');await wait(200);
+ok(/Negroni\b/.test(await txt('.sheet')),'arrivato il vermouth: il Negroni si può fare');
+await sc('[data-a="brFat"]');await wait(150);await pg.fill('#brq','negroni');await wait(200);
+await pg.locator('.sheet .br-r',{hasText:/^Negroni/}).first().click();await wait(350);
+t=await txt('.sheet');
+ok((t.match(/in casa/g)||[]).length===3&&!/manca/.test(t),'scheda del Negroni: tre alcolici «in casa»');
+await sc('[data-a="closeSheet"]');await wait(300);
+// movimenti: aperta da ½ a ⅓, poi finita → apro la prossima
+await sc('[data-a="brV"][data-v="inv"]');await wait(200);
+await pg.locator('.sheet .br-r',{hasText:'Tanqueray'}).click();await wait(300);
+await sc('[data-a="brAp"][data-v="0.3333333333333333"]');await wait(400);
+await sc('[data-a="brFin"]');await wait(400);
+const tq2=await pg.evaluate(()=>brGet(brAll().find(b=>b.n==='Tanqueray').id));
+ok(tq2.pi===1&&tq2.ap===1,'«Finita: apro la prossima»: una intera in meno, aperta piena');
+const mv=await pg.evaluate(()=>Object.values(D().config[brMese()].m).filter(m=>m.b===brAll().find(b=>b.n==='Tanqueray').id).map(m=>[m.t,Math.round(m.d*1000)/1000]).sort().join('|'));
+ok(mv==='conta,-0.167|fin,-0.333','movimenti del mese: conta −⅙ e finita −⅓ ('+mv+')');
+await sc('[data-a="closeSheet"]');await wait(300);
+t=await txt('.sheet');
+ok(/Usate questo mese ½/.test(t),'«Usate questo mese» = ½ bottiglia');
+// staff senza prezzi
+await pg.evaluate(()=>closeSheet());await wait(200);await pg.evaluate(()=>closeSheet());await wait(200);
+await pg.click('.testbar [data-a="viewAs"][data-v="fb"]');await wait(300);
+ok(await pg.locator('main .sug-cta[data-a="brOpen"]').count()===1,'F&B: Bar in «Cosa serve?»');
+await pg.click('main [data-a="brOpen"]');await wait(500);
+await sc('[data-a="brV"][data-v="inv"]');await wait(200);
+ok(!/Valore/.test(await txt('.sheet')),'staff: niente valore al prezzo d\'acquisto');
+await pg.locator('.sheet .br-r',{hasText:'Tanqueray'}).click();await wait(300);
+ok(!/acquisto/.test(await txt('.sheet')),'staff: niente prezzo d\'acquisto nella bottiglia');
+ok(SRC.split('\n').filter(l=>l&&!l.startsWith('#')).length===J.c.length,'data/cocktail.json allineato a tools/cocktail.txt');
+ok(!errs.length,'nessun errore JS'+(errs.length?': '+errs.join(' | '):''));
+await b.close();

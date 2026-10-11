@@ -1,41 +1,53 @@
-# Passaggio di consegne (2026-10-11, fine sessione #87)
+# Passaggio di consegne (2026-10-11, fine sessione #89)
 
-Sessione attuale: #88
+Sessione attuale: #90
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v83** (PR #94, squash `4507927`, 11/10 ~22:00). **v84 Cantina Vini nella PR #95** (aperta 22:24, controllo `prove` in corso).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v84**. **v85 nella PR #96**, ancora da unire.
 
-## ✅ SUBITO (#88): chiudere la PR #95 (v84 Cantina Vini)
-- Controllo `prove` sul commit `56a1c1a` partito alle 22:24 ora italiana. Se è verde: squash della PR #95 → subito `git fetch origin main && git merge origin/main` sul ramo + push → controllo online `APP_VER=84` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33). Se rosso: capire la causa e correggere (non saltare prove).
-- Prove già fatte in #87, tutte verdi: `test-cantina` (43 PASS, anche con TZ Roma), `test-news`, `test-demo`, `test-campi-16`, `test-ricette`, `test-giro`. Non rifarle.
-- Dopo la pubblicazione: in `docs/DA-FARE.md` segnare D34 come fatta (resta solo la domanda delle vendite, sotto).
+## ✅ SUBITO (#90): chiudere la PR #96 (v85 ruoli + Bar)
+- La #89 è durata pochissimo (avviso del contesto pieno subito). Le prove su GitHub della PR #96 sono state annullate 3 volte perché arrivavano commit nuovi (consegne #88, D37, consegne #89). Con l'ultimo push (consegne #89) ripartono: **aspettare il controllo `prove` sull'ultimo commit del ramo** (`curl https://api.github.com/repos/Kur0ChanX/jona-ordini/commits/<sha>/check-runs`, ~15 min) SENZA fare altri push nel frattempo (ogni push annulla e riparte).
+- Verde → squash PR #96 (titolo «v85: ruoli nuovi e Bar (cocktail + inventario alcolici)») → subito `git fetch origin main && git merge origin/main` sul ramo + push → controllo online `APP_VER=85` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33). Rosso → capire la causa e correggere.
+- La PR #96 ora contiene anche D37 (solo `.claude/agents/ottimizza.md` e `tools/misura-velocita.mjs`: non toccano l'app).
+- Prove dell'app già fatte in #88, tutte verdi. Non rifarle.
+- Dopo: in `docs/DA-FARE.md` togliere D35-D36 e D37 (se proposta fatta). Poi dire a Mario cosa c'è di nuovo (v84 Cantina + v85 Bar) e mandargli la foto del Bar: script pronto da rifare (Playwright 390×844, `deviceScaleFactor:2`: `/#demo` → `[data-a="demoGo"]` → `nav [data-a="tab"][data-v="fornitori"]` → `main [data-a="brOpen"]`; poi riga «Negroni»; poi Escape, `brOpen`, `[data-a="brV"][data-v="inv"]`; 3 foto affiancate con PIL). In #89 la foto era venuta bene (lista cocktail, scheda Negroni «in casa», inventario 33 bottiglie, 435,83 €, «Da riordinare: Havana ⅓»).
 
-## Ultima richiesta di Mario (#87, 22:2x): grafica e leggerezza — vale per D34-D36 e d'ora in poi
-«cura la grafica in stile moderno e attinente all'app e non appesantire l'app deve andare su anche telefoni normali non troppo performanti ultimi usciti» + «Vai avanti da solo chiedimi solo scelte importanti».
-- Quindi: aspetto moderno nello stile dell'app (variabili `--lagoon`, `--ocra`, `--surface`, `.sug-cta`, `.chip`, `.seg`, fogli `.sheet`); niente immagini pesanti, niente librerie nuove, niente animazioni continue; liste lunghe (es. 200 cocktail) senza appesantire: dati compatti, filtro/ricerca, al massimo ~60 righe disegnate alla volta (come `rcPick` fa con `slice(0,80)`).
-- Possibile controllo per D34: guardare la Cantina Vini anche in tema scuro e a 320 px (foto fatta solo a 390 chiaro: andava bene). Se serve una rifinitura, in una versione piccola dopo la v84.
-- Mario vuole che si vada avanti da soli: chiedere solo scelte importanti (gusti grossi, soldi, cose del ristorante). Domande scritte nel testo (E38).
+## Fatto in #89 (11/10, 22:47-22:55)
+- **D37 parte 1 – agente**: `.claude/agents/ottimizza.md` (agente «ottimizza»: misura, trova cosa pesa, max 3 proposte; non fa commit; regole di sicurezza). Si carica dalle sessioni nuove (#90 in poi: `Agent` con `subagent_type: ottimizza`).
+- `tools/misura-velocita.mjs`: telefono economico simulato (CPU ×4, 4G lento 1,6 Mbit/s, latenza 150 ms) con un piccolo server proprio su :8766 che comprime i file come Cloudflare (python http.server non comprime: con lui i numeri erano falsi, 8,4 s). Tetti in `TETTI`; esce con 1 se superati. Numeri di oggi: index.html 857 KB (285 KB compresso); primo avvio 480 KB scaricati, prima schermata 3,5 s, blocco più lungo 287 ms, memoria 5 MB; demo 334 KB, 2,7 s. Tutto entro i tetti. NON ancora nelle prove di GitHub (decidere dopo qualche misura: i tempi su GitHub cambiano).
+- Fatto nuovo: CLAUDE.md dice index.html «~260 KB», in realtà **857 KB** (666 KB di script, 189 KB di CSS). Le librerie `lib/` si caricano già solo al bisogno (`LIB` in index.html), `cocktail.json` solo nel Bar. Da correggere la riga in CLAUDE.md.
+- Analisi dell'agente (arrivata dopo la chiusura, NON rifarla): tutto entro i tetti; `render()` a riposo 0 ridisegni; per scheda 26-63 ms, Invii 110-133 ms (`view()` 34); `deadlineTick` ~84 ms ogni 60 s. Proposte (da fare da solo, rischio basso prima, poi prove legate + `test-giro`):
+  1. `backdrop-filter: blur` su `.top` (riga ~156) e `.nav` (~195): sfocatura rifatta a ogni scorrimento, scatti tipici sugli Android economici → spegnerla sui telefoni lenti (es. `@media (hover:none) and (max-resolution:2dppx)`) con sfondo pieno. Rischio basso (cambia poco l'aspetto: foto prima/dopo a Mario solo come informazione).
+  2. `deadlineTick` (~2697) richiama `render()` ogni 60 s per il gestore anche con l'app in secondo piano → saltarlo se `document.visibilityState!=='visible'` (come `htPoll`); `sugStats` in memoria finché ordini e meteo non cambiano. Rischio basso; attenzione E26/E36 (prove legate all'ora dei promemoria): far girare `test-firebase-flow` e `test-agenda-v61`.
+  3. `chWatch` (~4307): 500 messaggi con `includeMetadataChanges` anche a chat chiusa, ogni cambio → `schedule()` → ridisegno completo → a chat chiusa limite 100 e senza metadata. Rischio medio: ricontrollare i non letti con `tools/test-firebase-chat.mjs`.
+  Misure con i dati piccoli della demo: con i dati veri Invii e chat costano di più. Script dell'agente perso (era nello scratchpad).
+- **D37 parte 2 – strumenti MCP** (ricerca fatta, proposta da fare a Mario nel testo, E38). Collegato oggi: solo Google Drive. Utili trovati:
+  - **Ovvia**: niente di nuovo (scatola nera + prove su GitHub bastano).
+  - **Furba**: connettore **Cloudflare Developer Platform** (claude.ai → Impostazioni → Connettori): leggerei da solo la scatola nera (`/errori`, tabella `err` nel D1), i log del Worker e le righe «Vecchio indirizzo» di D30, senza chiedere niente a Mario. Rischio: dà anche il permesso di cancellare (D1, Worker) → si usa solo in lettura, regola da scrivere.
+  - **Geniale**: Cloudflare + una routine settimanale che legge la scatola nera e manda a Mario un riassunto «errori della settimana» (e chiude D30 da sola quando non arriva più nessuno dal vecchio indirizzo).
+  - Scartato: Sentry (doppione della scatola nera, account in più).
+  - Raccomandazione: Furba (poi Geniale se va bene).
+- Messaggio della #88 ricevuto (D37) e gestito.
 
-## Fatto in #87 (11/10, 21:50-22:30 ora italiana)
-- Unita la scorta della #86 (solo `docs/ULTIMO-MESSAGGIO.md`, messaggio delle 20:09 già gestito).
-- **v83 pubblicata**: PR #94 → prove verdi → squash → ramo riallineato → online `APP_VER=83`. D32 tolta da DA-FARE.
-- **Richiesta nuova di Mario** arrivata dalla #86 (scritta lì per sbaglio, girata con send_message): salvata parola per parola in `docs/richieste/cantina-vini-cocktail.md`; in DA-FARE: **D34** Cantina Vini, **D35** Chef de rang e ruoli mancanti, **D36** Bartender: Cocktail (~200 più famosi) + inventario alcolici (bottiglie intera / 2/3 / metà / 1/3).
-- **v84 Cantina Vini (D34)** fatta (dettagli in CLAUDE.md, riga v84; NEWS v84; `CACHE` v88; demo con 4 vini e 3 vendite). Scelte prese e perché:
-  - Dati in `config/cantina` (un documento, come le ricette: le regole Firestore permettono già `config` a ogni membro, niente regole nuove) + movimenti per mese in `config/cantina_mov_<AAAA-MM>` (vendite del mese senza documenti enormi).
-  - Niente foto salvate (peserebbero sul documento e sul telefono): pallino colorato per tipo di vino.
-  - IA: `gemCall` (stessa via di agenda e listini; con Firebase passa dal Worker `/gemini`, niente chiave sul telefono). Prompt: premi mai inventati, annata e gradi solo se letti; `sicuro:false` → avviso «controlla bene». Riempie solo i campi vuoti (non cancella quello scritto a mano). Doppione (stesso nome, cantina, annata) → apre quello già in cantina.
-  - «Supporto al tavolo» inventato per Mario: riquadro «Al tavolo in 10 secondi» (frase da dire ≤25 parole + 3 parole chiave + va con + servizio + prezzo), e «Consiglia» per piatto con solo i vini in casa, i più venduti prima.
-  - Vendite: per ora pulsante «− Venduta» (e − / + nell'Inventario); vendita con 0 in casa chiede conferma, mai sotto zero.
-  - Chi vede: gestori in Fornitori; staff non di cucina in «Cosa serve?» (Catalogo). Modifica: gestori, `fb`, `resp`, `sala` (`vnCan`). Prezzo d'acquisto solo `isMgr`; se l'F&B salva, il prezzo d'acquisto resta.
-- Foto per Mario: `cantina-v84.png` (Carta, Consiglia «Pesce», scheda, Inventario) mandata; script nello scratchpad della #87 (si rifà con Playwright su `/#demo` → `demoGo` → Fornitori → `vnOpen`).
+## Fatto in #88 (11/10, 22:26-22:50 ora italiana)
+- Unita la scorta (solo `docs/ULTIMO-MESSAGGIO.md`, richiesta D34-D36 già salvata).
+- **v84 pubblicata** (PR #95 verde → squash → ramo riallineato → online).
+- **v85 (D35 + D36)** fatta. Scelte e perché:
+  - D35: niente reparto `bar` nuovo (toccherebbe chat `rep_`, orari per reparto, `OR_PLAN`, prove: rischio alto per poco). Il Bartender è una **mansione** (reparto Sala). Mansioni in gruppi con optgroup: Cucina (Chef, Sous chef, Chef de partie, Cuoco, Commis di cucina, Pasticcere, Pizzaiolo, Lavapiatti), Sala (Maître, Chef de rang, Commis di sala, Cameriere, Runner, Hostess, Sommelier), Bar (Bartender, Barback), Gestione (F&B manager), Altro. «Barman» e «Commis» dei profili vecchi restano (`mansOpt` li mette in cima scelti, non cambiano da soli). Demo: Andrea = Bartender.
+  - D36: 212 cocktail (89 IBA) scritti in `tools/cocktail.txt` (una riga per cocktail, facile da correggere) → `python3 tools/cocktail.py` → `data/cocktail.json` (44 KB, scaricato solo quando si apre il Bar: l'app non pesa di più). Lista disegnata 60 alla volta («Mostra altri»). Ricerca per nome o ingrediente, filtri per famiglia (Gin, Vodka, Rum, Tequila, Whisky, Brandy, Aperitivi e bollicine, Liquori e shot, Analcolici; 14 analcolici + tocco sardo «Mirto Spritz»).
+  - Inventario: per bottiglia `pi` intere chiuse + `ap` quanto resta dell'aperta (Nessuna/⅓/½/⅔/Piena), «Finita: apro la prossima», «Avvisa sotto», prezzo d'acquisto solo gestori; «Usate questo mese» dai movimenti negativi. Idea furba aggiunta: «Si possono fare» = cocktail con tutti gli alcolici in casa (il tipo della bottiglia `cat` è uguale ai nomi degli ingredienti; Cognac≈Brandy, Prosecco≈Champagne, Bourbon≈Rye). Nella scheda del cocktail «in casa / manca» per ogni alcolico.
+  - Chi vede: gestori (Fornitori), fb, resp, bartender/barman/barback (in «Cosa serve?»). Funzione `bar` accesa di partenza (Impostazioni → Funzioni).
+  - `test-cantina` e `test-bar` aggiunte alle prove veloci di GitHub (`tools/prova-ci.sh`): prima test-cantina non c'era.
 
 ## Domanda aperta a Mario (scritta nel testo in #87, ancora senza risposta)
 «Oggi come registrate i vini venduti? Scontrino di cassa (con quale programma?), comanda su carta, oppure niente?» → serve per collegare le vendite (es. foto della chiusura di cassa letta dall'IA). Fino alla risposta resta «− Venduta».
 
 ## Prossimi lavori (in ordine, da soli, poi pubblicare in automatico se le prove sono verdi)
-1. PR #95 (sopra).
-2. **D35 ruoli**: `MANSIONI` (index.html, riga ~1465) oggi = Chef, Sous chef, Cuoco, Commis, Pasticcere, Lavapiatti, Maître, Cameriere, Sommelier, Barman, F&B manager, Altro. Aggiungere almeno **Chef de rang**, **Bartender** (Mario usa questa parola; tenere «Barman» per i profili vecchi o rinominare con cura), Commis di sala, Chef de partie, Pizzaiolo?, Barback?, Receptionist/Hostess? (scegliere da soli quelli tipici di un ristorante d'hotel). Valutare un reparto `bar` in `REPARTI` (oggi cucina, sala, fb, resp, altro): attenzione a chat `rep_<reparto>`, `OR_PLAN`, orari per reparto, `newsFor`, prove `test-orari-reparto`/`test-responsabile`.
-3. **D36 Bartender**: sezione **Cocktail** (circa 200 cocktail famosi: ingredienti con dosi, metodo, bicchiere, guarnizione, passaggi brevi da manuale IBA) — dati in un file statico leggero (es. `data/cocktail.json` caricato solo quando si apre, aggiunto a `FILES` di `sw.js` e al passo «Prepara i file» del workflow Cloudflare), ricerca e filtri; + **inventario alcolici** con bottiglia intera / 2/3 / metà / 1/3 (simile a `vnMov`, con `config/bar` e movimenti). Ingresso per chi ha mansione Bartender/Barman (e gestori).
+1. PR #96 (sopra).
+2. **D37** (agente fatto in #89; resta: analisi con l'agente + proposta MCP a Mario, vedi «Fatto in #89») (richiesta di Mario arrivata nella #87 alle 22:29, girata qui): «Aggiungi un agente per ottimizzare e velocizzare. se vuoi consigliarmi Tool Search mcp di claude se qualcosa può tornare utile al progetto o migliorarlo o evolverlo ecc»
+   - Fare: agente `.claude/agents/` per ottimizzare e velocizzare (peso e velocità dell'app sui telefoni economici, regola «non appesantire»); poi cercare strumenti MCP/plugin utili (ToolSearch, SearchMcpRegistry, SearchPlugins) e proporli a Mario con 3 strade (ovvia, furba, geniale). Domande nel testo (E38).
+3. Idee possibili per il Bar (non chieste, da proporre a Mario solo se utili): «Cocktail della casa» (ricette scritte dal bartender), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
 4. D33 (funzioni smart per orari e agenda): proposta con 3 strade (dettagli sotto).
+5. Controllo Cantina Vini e Bar in tema scuro e a 320 px (foto), rifinitura se serve.
 
 ## v83 (D32) — riassunto
 - Orari dei responsabili (`resp.<id>`, striscia «Chi c'è adesso» `rsStrip`/`rsChat`) + orari per reparto (sopra). Dettagli in CLAUDE.md (riga v83). `APP_VER=83`, `CACHE` v87.
@@ -57,7 +69,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = staff segna i giorni in cui
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiusa), #86 `session_01XaFfJiACdkE4pXQs6PbCok` (chiusa), #85 `session_01YBt4KxQa3Z4RMeKrQdvghK`, #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #89 `session_01Y1ek4ZACQwmsRsQn8vWqyn` (chiusa; catena di sessioni al limite: «lineage depth 8, limit 8», E12 → la #90 la apre Mario a mano), #88 `session_0199ANgsgVouZX79Xd7QJFZX` (chiusa), #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiusa), #86 `session_01XaFfJiACdkE4pXQs6PbCok` (chiusa), #85 `session_01YBt4KxQa3Z4RMeKrQdvghK`, #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp`. Una sessione ferma su una domanda o un permesso non legge i messaggi delle altre finché Mario non risponde lì.
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 - D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sotto).
@@ -82,4 +94,6 @@ Risposte a tocco arrivate senza che Mario toccasse (#85). Causa non capita. Finc
 «cura la grafica in stile moderno e attinente all'app e non appesantire l'app deve andare su anche telefoni normali non troppo performanti ultimi usciti
 
 Vai avanti da solo chiedimi solo scelte importanti»
-(Arrivato dopo il messaggio sulla v84 e la domanda sulle vendite dei vini.)
+(Arrivato in #87 dopo il messaggio sulla v84.)
+
+Poi, ancora nella #87 (girato da lì, 22:29): «Aggiungi un agente per ottimizzare e velocizzare. se vuoi consigliarmi Tool Search mcp di claude se qualcosa può tornare utile al progetto o migliorarlo o evolverlo ecc»
