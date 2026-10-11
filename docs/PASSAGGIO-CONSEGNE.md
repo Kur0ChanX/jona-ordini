@@ -1,8 +1,24 @@
-# Passaggio di consegne (2026-10-11, fine sessione #77)
+# Passaggio di consegne (2026-10-11, fine sessione #78)
 
-Sessione attuale: #78
+Sessione attuale: #79
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR: regola RAMO SINGOLO). App online: **v77** (PR #88 unita in #77, squash `49b9aba`, controllato `APP_VER=77` online).
+
+## Fatto in #78 (11/10, ~8:40-9:30 ora italiana) — LAVORO A METÀ, NON ONLINE
+- Unite due scorte (solo ULTIMO-MESSAGGIO), push confermati.
+- Mario: «si vai avanti» = SÌ a **D26** (costo dei piatti dalle ricette). Studiato il codice, NIENTE ancora scritto per D26. Progetto deciso (da fare così):
+  - `FUNZ` nuova `{id:'ricette',l:'Ricette e costo dei piatti',…,on:true}` accesa di partenza: cambiare `funzOn` (riga ~4924) in `k in funz ? !!funz[k] : !!FUNZ.find(..).on` (solo `funzOn` legge `cfg().funz`).
+  - Dati `config/ricette` {tipo:'ricette', r:{<id>:{id,n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG,da,cr,mod}}}; scrittura `upd('config','ricette',{'r.<id>':…})` (`put` se il doc non c'è, come `agPut`), cancellare = `r.<id>: null`. Nessuna regola Firestore nuova (`config` già permessa).
+  - Unità: prodotto in kg → g/kg, in l → ml/l (q/1000), altrimenti l'unità del prodotto (`normUnita`). Prezzo: `D().prodotti[pid]`, se manca stesso `gkey` + stessa unità in `S.gidx` (prima stesso fornitore, poi il più economico), se no ultimo prezzo `pz` con avviso.
+  - Costo a porzione = totale/porzioni; food cost % = costo / (prezzo di vendita / 1,10 IVA). «Costo salito» se ≥ `rif`×1,03; «Ok, visto» rimette `rif` e i `pz`.
+  - Solo gestori (`isMgr`): icona `pot` in alto dopo `agBtn(me)` (riga ~2179, `rcBtn`), striscia `rcStrip(me)` dopo `agStrip(me)` (stile `.ag-strip.ag-nuovo`), fogli con `openSheet` (lista, modifica, selettore prodotti come `pickSheet` riga ~2827), azioni in `A`, campi in `IN` (`data-in`), select in `CH` (`data-ch`), campi classe `inp` (16 px). Prova nuova `tools/test-ricette.mjs` (modello `tools/test-conveniente.mjs`).
+- Poi Mario ha mandato la foto del logo YNOY CORP **con 4 lune** («Rimetti questa nell'animazione di apertura app»). È uguale (stesso md5) a `docs/img/logo/vecchi/ynoy-coda-mario-2026-10-10.jpg`, già salvata (e nel Drive `Jona/Loghi/Vecchi`: Mario «dovresti trovarlo già tutto in drive»). La v75 l'aveva sostituito con quello a 3 lune. Fatto (commit sul ramo, NON online):
+  - rimessi da `aed77cc^` (prima della v75): `media/ynoy.svg`, `media/ynoy.png`, la riga `  if(S.splash)` di index.html, `tools/logo-ynoy.py`, `tools/ynoy-html.py`, `tools/ynoy-tratti.py`, `tools/test-logo-nitido.mjs` (dopo la v75 nessuno li aveva toccati);
+  - v78: `APP_VER=78`, voce NEWS v78 «Logo YNOY CORP con 4 lune», `CACHE` jona-ordini-v82.
+  - Prove: `test-logo` OK, `test-news` OK, `test-apertura-v62` OK. **`test-logo-nitido` FALLISCE** (`page.evaluate: Event` alla riga 14: fetch/immagine nella pagina). Probabile: la versione di prima della v75 della prova non va più con il resto (v75 l'aveva cambiata in 4 righe: `git show aed77cc -- tools/test-logo-nitido.mjs`). Capire la causa: forse va tenuta la versione v75 della prova (`git checkout aed77cc -- tools/test-logo-nitido.mjs`) se controlla solo JONA. Poi `test-giro`, guardare la schermata di apertura a occhio (4 lune), PR dal ramo unico → squash → controllo online v78.
+
+## Domanda aperta
+- Nessuna. D26 approvata («si vai avanti»): farla DOPO aver pubblicato la v78 del logo.
 
 ## Fatto in #77 (11/10, 4:33-~5:15 ora italiana)
 - PR #88 (v77, D25 bolla) con «prove» verde → squash merge, `main` unito nel ramo (conflitto solo nelle consegne, tenute quelle del ramo, E7), v77 online verificata. Detto a Mario cosa provare (M40).
@@ -13,9 +29,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
   - Doppio tocco: Mario ha scelto **«Solo ramo unico»**, confermato. CLAUDE.md: «RAMO SINGOLO» (sostituisce «RAMI IN ORDINE»), riga nel RAMO DEFINITIVO e «Pubblicazione: PR dal ramo unico → squash…». Le prossime PR si aprono con head `claude/jona-ramo-definitivo` verso `main`. Vecchi rami restano.
   - DA-FARE: D28 e D31 chiuse.
 - Mario ha chiesto «resta altro?»: risposto con M40, M39, M34, M33 e domanda «parto con D26?» (senza risposta). Poi «d 30 non ho capito»: spiegato in parole semplici (spostamento del repo nell'organizzazione del ristorante, attesa della scatola nera per il vecchio indirizzo, poi Transfer che fa lui). Non deve fare niente ora.
-
-## Domanda aperta
-- «Parto con D26 (costo dei piatti dalle ricette, già approvata)?» — rifarla col doppio tocco.
 
 ## Fatto in #76 (11/10, 3:00-4:35 ora italiana)
 - Unite due scorte (vecchie, solo `ULTIMO-MESSAGGIO.md`).
@@ -47,10 +60,10 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - Jona #75 `session_01QPzuujHhDE3xqGshobfAn3` e #76 `session_01Ada4vhK6uEQRyN1yrqjQTF` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 
 ## Prossimi passi (in ordine)
-1. Rifare a Mario la domanda su D26 (doppio tocco).
-2. Attendere Mario. M39 (fattura .p7m vera) e M40 (bolla vera): se manda foto o file, salvarli (solo senza dati sensibili) e usarli nelle prove (`tools/test-bolla.mjs`, `tools/test-p7m.mjs`).
+1. Finire e pubblicare la v78 (logo 4 lune, sopra): sistemare `test-logo-nitido`, `test-giro`, PR, squash, `main` nel ramo, controllo online.
+2. Fare D26 (progetto sopra), v79.
+3. Attendere Mario. M39 (fattura .p7m vera) e M40 (bolla vera): se manda foto o file, salvarli (solo senza dati sensibili) e usarli nelle prove (`tools/test-bolla.mjs`, `tools/test-p7m.mjs`).
 3. D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sopra).
-4. Lavoro «Claude da solo» già approvato: D26 (costo dei piatti dalle ricette). Proporlo a Mario.
 5. Ponte con l'hotel: quando RVC ha D5, guida per `PONTE_KEY`. Elenco completo in `docs/DA-FARE.md`.
 
 ## Note tecniche
@@ -67,4 +80,4 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-«d 30 non ho capito» (risposto con la spiegazione semplice; prima: «resta altro?», «passa a spa le regole drive nuove»).
+«dovresti trovarlo già tutto in drive» (prima: «Rimetti questa nell'animazione di apertura app» con la foto del logo a 4 lune; prima ancora «si vai avanti» per D26).
