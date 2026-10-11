@@ -24,9 +24,11 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 
 ## Prossimi lavori (in ordine, da soli, poi pubblicare in automatico se le prove sono verdi)
 1. PR #96 (sopra).
-2. Idee possibili per il Bar (non chieste, da proporre a Mario solo se utili): «Cocktail della casa» (ricette scritte dal bartender), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
-3. D33 (funzioni smart per orari e agenda): proposta con 3 strade (dettagli sotto).
-4. Controllo Cantina Vini e Bar in tema scuro e a 320 px (foto), rifinitura se serve.
+2. **D37** (richiesta di Mario arrivata nella #87 alle 22:29, girata qui): «Aggiungi un agente per ottimizzare e velocizzare. se vuoi consigliarmi Tool Search mcp di claude se qualcosa può tornare utile al progetto o migliorarlo o evolverlo ecc»
+   - Fare: agente `.claude/agents/` per ottimizzare e velocizzare (peso e velocità dell'app sui telefoni economici, regola «non appesantire»); poi cercare strumenti MCP/plugin utili (ToolSearch, SearchMcpRegistry, SearchPlugins) e proporli a Mario con 3 strade (ovvia, furba, geniale). Domande nel testo (E38).
+3. Idee possibili per il Bar (non chieste, da proporre a Mario solo se utili): «Cocktail della casa» (ricette scritte dal bartender), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
+4. D33 (funzioni smart per orari e agenda): proposta con 3 strade (dettagli sotto).
+5. Controllo Cantina Vini e Bar in tema scuro e a 320 px (foto), rifinitura se serve.
 
 ## v83 (D32) — riassunto
 - Orari dei responsabili (`resp.<id>`, striscia «Chi c'è adesso» `rsStrip`/`rsChat`) + orari per reparto (sopra). Dettagli in CLAUDE.md (riga v83). `APP_VER=83`, `CACHE` v87.
@@ -73,4 +75,6 @@ Risposte a tocco arrivate senza che Mario toccasse (#85). Causa non capita. Finc
 «cura la grafica in stile moderno e attinente all'app e non appesantire l'app deve andare su anche telefoni normali non troppo performanti ultimi usciti
 
 Vai avanti da solo chiedimi solo scelte importanti»
-(Arrivato in #87 dopo il messaggio sulla v84. In #88 nessun messaggio nuovo di Mario.)
+(Arrivato in #87 dopo il messaggio sulla v84.)
+
+Poi, ancora nella #87 (girato da lì, 22:29): «Aggiungi un agente per ottimizzare e velocizzare. se vuoi consigliarmi Tool Search mcp di claude se qualcosa può tornare utile al progetto o migliorarlo o evolverlo ecc»
