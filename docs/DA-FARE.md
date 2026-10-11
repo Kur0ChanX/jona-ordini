@@ -12,6 +12,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| M42 | Collegare **5stelle** (gestionale dell'hotel): chiedi al fornitore di 5stelle se ha un'interfaccia (API), la documentazione e i costi (messaggio già dato in #83). Poi Claude lo studia con RVC (tema dell'hotel) | Mario | quando puoi |
 | M39 | v76 online: Fornitori → **Importa listini** → **Fattura elettronica XML** → scegli una o più fatture (.xml o .p7m firmate). Dimmi se le righe e i fornitori tornano | Mario | quando hai una fattura XML o .p7m |
 | M40 | v77 online: alla prossima consegna, in **Arrivi** → **Controlla** → foto della bolla → **Confronta la bolla con l'ordine**. Dimmi se segna giusto e mandami la foto se sbaglia | Mario (o chi riceve la merce) | alla prossima consegna |
 | M41 | v79 online: in **Fornitori** tocca **Ricette e costo dei piatti** → **Nuova ricetta** → scegli gli ingredienti e le quantità di un piatto vero. Dimmi se il costo torna | Mario o Maurizio | quando hai 5 minuti |
