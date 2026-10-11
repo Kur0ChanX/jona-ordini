@@ -32,11 +32,13 @@ await pg.click('[data-a="agSave"]');await wait(300);
 ok(/Scegli almeno una persona/.test(await txt('#toasts')),'senza persone: avviso');
 await pg.click('.sheet [data-a="agfPer"][data-v="maurizio"]');await wait(150);
 await pg.click('[data-a="agSave"]');await wait(500);
+/* i promemoria «30 min prima» (deadlineTick ogni 60 s) non contano: qui si contano solo le notifiche di «Avvisa subito» (rossa su GitHub alle 15:44 con l'evento alle 16:00) */
+await pg.evaluate(()=>deadlineTick());await wait(300);
 const e1=await pg.evaluate(()=>{const e=agAll().find(x=>x.t==='Chiamare il commercialista');return e&&{id:e.id,vis:e.vis,per:e.per,doc:e.doc}});
 ok(e1&&e1.vis==='pers'&&e1.per.join()==='maurizio','evento salvato per «Persone: Maurizio» '+JSON.stringify(e1));
 const see=await pg.evaluate(id=>{const e=agGet(id),st=D().staff;return['maurizio','luca','anna','mauro'].map(k=>agSee(e,st[k])?1:0).join('')},e1.id);
 ok(see==='1000','lo vede solo Maurizio (non gli altri gestori né lo staff): '+see);
-const n1=await pg.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='agenda').map(n=>n.a+'|'+n.titolo));
+const n1=await pg.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='agenda'&&/^(Nuovo|Cambiato) in agenda: /.test(n.titolo)).map(n=>n.a+'|'+n.titolo));
 ok(n1.length===1&&n1[0]==='maurizio|Nuovo in agenda: Chiamare il commercialista','«Avvisa subito»: notifica solo a Maurizio '+JSON.stringify(n1));
 let T=await txt('.sheet');ok(/Maurizio/.test(T)&&/visto da 0\/1/.test(T),'riga: «Maurizio» e «visto da 0/1»');
 
@@ -53,7 +55,7 @@ await pg.fill('#agf-t','Pulizia celle frigo');await pg.click('.sheet [data-a="ag
 await pg.click('.sheet [data-a="agfRep"][data-v="cucina"]');await pg.click('.sheet [data-a="agfSub"][data-v="0"]');await wait(150);
 await pg.click('[data-a="agSave"]');await wait(500);
 ok(await pg.evaluate(()=>{const e=agAll().find(x=>x.t==='Pulizia celle frigo');return agDest(e).map(u=>u.id).sort().join()})==='luca,maurizio','reparto cucina: destinatari Luca e Maurizio');
-ok(await pg.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='agenda').length)===1,'«Avvisa subito: No»: nessuna notifica in più');
+ok(await pg.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='agenda'&&/^(Nuovo|Cambiato) in agenda: /.test(n.titolo)).length)===1,'«Avvisa subito: No»: nessuna notifica in più');
 
 // 4. piano per il server: avvisi solo alle iscrizioni dei destinatari
 const pl=await pg.evaluate(async id=>{PUSH.subs={s1:{u:'maurizio',sub:{endpoint:'e-maurizio'}},s2:{u:'luca',sub:{endpoint:'e-luca'}},s3:{u:'anna',sub:{endpoint:'e-anna'}}};
