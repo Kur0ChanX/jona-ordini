@@ -914,7 +914,7 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .sug-r .step{margin-left:auto}
 .sug-r .rv-c{margin-top:0}
 /* ---------- orari del personale ---------- */
-.staff-sw{margin:0 0 16px}
+.staff-sw,.or-pl-sw{margin:0 0 16px}.or-reps{margin:0 0 10px}
 .staff-sw .ic{width:17px;height:17px;vertical-align:-3px;margin-right:5px}
 .rep-cucina{--k:var(--ocra)}.rep-sala{--k:var(--lagoon)}.rep-altro{--k:var(--mirto)}.rep-resp{--k:#B5654A}
 button.or-rday{width:100%;text-align:left;font:inherit;color:inherit;border:0;cursor:pointer}.or-rnote{margin:4px 2px 12px}
@@ -1173,9 +1173,10 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 const APP_VER=83;
 const NEWS=[
   {v:83,data:'2026-10-11',titolo:'Orari dei responsabili e «Chi c\'è adesso»',
-    chef:['Chef e F&B Manager (orario libero) ora scrivono il loro orario in «I miei orari»: lo vedono subito tutti, senza controlli sulle ore.','Nella scheda Orari c\'è il gruppo «Responsabili» in cima: puoi scrivere anche tu i loro orari.'],
+    chef:['Chef e F&B Manager (orario libero) ora scrivono il loro orario in «I miei orari»: lo vedono subito tutti, senza controlli sulle ore.','Nella scheda Orari c\'è il gruppo «Responsabili» in cima: puoi scrivere anche tu i loro orari.','Orari per reparto: in alto scegli Cucina o Sala. Ogni reparto si pubblica per conto suo.','Mauro (F&B Manager) prepara e pubblica i turni della sala: quando lo fa ricevi un avviso.'],
+    fb:['In «Orari» c\'è «Turni della sala»: prepari i turni della sala e li pubblichi tu. Lo chef riceve un avviso.'],
     tutti:['In alto vedi quale responsabile è in servizio e chi arriva più tardi, con «Scrivi» per mandargli un messaggio.','In «In turno oggi» ci sono anche i responsabili.'],
-    dev:{aggiunte:['`config/orari_<lun>.resp.<id>` (riga dei responsabili `orFree`, senza bozza né controlli), `orResp`, `orRRow`, `orRCan`, `orCellSheet(id,g,lun)` modo resp, azione `orRCell`; gruppo «Responsabili» nel pianificatore; `orOggi` con `resp`; `rsStrip` + `rsChat` (chat diretta). Prova `tools/test-orari-resp.mjs`.']}},
+    dev:{aggiunte:['`config/orari_<lun>.resp.<id>` (riga dei responsabili `orFree`, senza bozza né controlli), `orResp`, `orRRow`, `orRCan`, `orCellSheet(id,g,lun)` modo resp, azione `orRCell`; gruppo «Responsabili» nel pianificatore; `orOggi` con `resp`; `rsStrip` + `rsChat` (chat diretta). Prova `tools/test-orari-resp.mjs`.','Orari per reparto: `OR_PLAN` {fb:[\'sala\']}, `orPlanner`, `orScope` (gestori: filtro `S.orRep`/`jona_or_rep`), `orInSc`, `orPubAt` (`pubR.<reparto>`; settimane vecchie senza `pubR` = tutte pubblicate); `orStato`, `orCopy`, `orPublish` e `cmGmBox` per reparto; avviso ai `gm` quando pubblica l\'F&B; «Turni della sala» in `vMieiOrari` (`S.orPl`). Gruppo `fb` in `NEWS`. Prova `tools/test-orari-reparto.mjs`.']}},
   {v:82,data:'2026-10-11',titolo:'Invio allo chef più semplice',
     tutti:['Dopo «Invia allo chef» c\'è solo il pulsante «Continua»: niente più «Esci dal profilo» toccato per sbaglio.'],
     dev:{aggiunte:['Foglio «Inviato allo chef»: tolto il pulsante `logout`, resta solo `closeSheet` («Continua», primario). Prova in `tools/test-invio-anim.mjs`.']}},
@@ -3767,6 +3768,15 @@ const orRRow=(lun,id)=>(((orWeek(lun)||{}).resp||{})[id])||{};
 const orRCan=(me,id)=>!!me&&(me.id===id||isMgr(me));
 const orPeople=()=>Object.values(D().staff).filter(u=>u.stato==='attivo'&&!orFree(u)&&(u.ruolo!=='dev'||u.contratto)).sort(byNome);
 const orRep=u=>REPARTI[u.reparto]?u.reparto:'altro';
+// v83: chi fa gli orari di quale reparto. I gestori tutti (filtro per reparto ricordato in jona_or_rep), l'F&B Manager la sala e la pubblica da solo
+const OR_PLAN={fb:['sala']};
+const orPlanner=u=>!!u&&(isMgr(u)||!!OR_PLAN[u.reparto]);
+// reparti che vede chi fa gli orari: null = tutti
+const orScope=(u=meU())=>{if(!u)return[];if(!isMgr(u))return OR_PLAN[u.reparto]||[];if(S.orRep===undefined)S.orRep=ls('jona_or_rep')||'';return REPARTI[S.orRep]?[S.orRep]:null};
+const orInSc=(u,sc)=>!!u&&(!sc||sc.includes(orRep(u)));
+// pubblicata per quei reparti (pubR.<reparto>); le settimane pubblicate prima della v83 valgono per tutti
+function orPubAt(w,sc){if(!w||!w.tp)return 0;if(!w.pubR)return w.pub||1;
+  const r=sc||[...new Set(orIds(w).map(id=>D().staff[id]).filter(u=>u&&!orFree(u)).map(orRep))];const v=r.map(k=>w.pubR[k]||0);return!v.length?w.pub||1:v.includes(0)?0:Math.min(...v)}
 // controlli di una persona in una settimana (prev = sua riga della settimana prima): [{g,k:'err'|'warn',t}], g=-1 vale per tutta la settimana
 function orCheck(u,row,prev){
   const c=contrOf(u),out=[],add=(g,k,t)=>out.push({g,k,t});row=row||{};
@@ -3797,10 +3807,11 @@ function orProblems(lun){const t=(orWeek(lun)||{}).t||{},pt=(orWeek(orShift(lun,
   for(const u of orPeople())for(const x of orCheck(u,t[u.id],pt[u.id]))r.push(Object.assign({u},x));
   const w=orWeek(lun);for(const p of r)if(p.k==='err'&&orOk(w,p.u.id).includes(p.t))p.ok=true;
   return r.sort((a,b)=>(a.ok?2:a.k==='err'?0:1)-(b.ok?2:b.k==='err'?0:1))}
-function orStato(w){
-  if(!w||(!orAny(w.t)&&!w.tp))return{k:'',l:'Settimana vuota'};
-  if(!w.tp)return{k:'wait',l:'Bozza: lo staff non la vede ancora'};
-  return orChanged(w).length?{k:'wait',l:'Modifiche da avvisare',ch:true}:{k:'ok',l:'Pubblicata '+ago(w.pub)};
+function orStato(w,sc){
+  const inS=id=>orInSc(D().staff[id],sc),pa=orPubAt(w,sc);
+  if(!w||(!Object.entries(w.t||{}).some(([id,r])=>inS(id)&&orHas(r))&&!pa))return{k:'',l:'Settimana vuota'};
+  if(!pa)return{k:'wait',l:'Bozza: lo staff non la vede ancora'};
+  return orChanged(w).filter(inS).length?{k:'wait',l:'Modifiche da avvisare',ch:true}:{k:'ok',l:'Pubblicata '+ago(pa)};
 }
 // a chi serve il pranzo e la cena: turni che toccano 12:00–14:30 e 19:30–22:00
 const orIn=(v,a,b)=>orShifts(v).some(s=>s[0]<b&&s[1]>a);
@@ -3822,7 +3833,8 @@ async function orConsent(u,errs,prima){
 /* pianificatore dei gestori: scheda Staff → Orari */
 function vOrari(){
   const lun=S.orW||(S.orW=orLun()),cur=orLun();const w=orWeek(lun)||{};const t=w.t||{},tp=w.tp||null;
-  const ppl=orPeople(),rsp=orResp(),probs=orProblems(lun),st=orStato(w);
+  const me=meU(),sc=orScope(me),ppl=orPeople().filter(u=>orInSc(u,sc)),rsp=orResp(),probs=orProblems(lun).filter(p=>orInSc(p.u,sc)),st=orStato(w,sc);
+  const rps=isMgr(me)?[...new Set(orPeople().map(orRep))]:[];
   const cellK={},nameK={};for(const p of probs)for(const g of p.gs||[p.g]){const m=g<0?nameK:cellK,k=g<0?p.u.id:p.u.id+'_'+g,v=p.ok?'acc':p.k;if(m[k]!=='err'&&!(m[k]==='warn'&&v==='acc'))m[k]=v}
   const td=lun===cur?(new Date().getDay()+6)%7:-1;
   const rel=lun===cur?'Questa settimana':lun===orShift(cur,1)?'Settimana prossima':lun===orShift(cur,-1)?'Settimana scorsa':orDate(lun).getFullYear()+'';
@@ -3844,9 +3856,10 @@ function vOrari(){
   return`<div class="or-week"><button type="button" class="icon-btn" data-a="orW" data-v="-1" aria-label="Settimana prima">${ic('chevl')}</button>
   <div class="or-wt"><b>${orRange(lun)}</b><span>${rel}${lun!==cur?` · <button type="button" class="or-today" data-a="orW" data-v="0">Torna a oggi</button>`:''}</span></div>
   <button type="button" class="icon-btn" data-a="orW" data-v="1" aria-label="Settimana dopo">${ic('chev')}</button></div>
+  ${rps.length>1?`<div class="chips or-reps" role="group" aria-label="Reparto">${[['','Tutti']].concat(rps.map(k=>[k,REPARTI[k]])).map(([k,l])=>`<button type="button" class="chip" aria-pressed="${(sc?sc[0]:'')===k}" data-a="orRep" data-v="${k}">${l}</button>`).join('')}</div>`:''}
   <div class="or-st">${st.k?pill(st.k,st.l):`<span class="st">${st.l}</span>`}${w.pub&&st.ch?`<span class="muted small">pubblicata ${ago(w.pub)}</span>`:''}</div>
   <div class="or-acts"><button type="button" class="btn ghost sm" data-a="orCopy">${ic('copy')} Copia settimana prima</button><button type="button" class="btn ghost sm" data-a="orTipi">${ic('clock')} Turni tipo</button>${tbOn()?`<button type="button" class="btn ghost sm" data-a="tbXls">${ic('sheet')} Presenze</button>`:''}${st.k==='ok'||!st.k?'':`<button type="button" class="btn primary sm" data-a="orPub">${ic('send')} ${tp?'Avvisa delle modifiche':'Pubblica'}</button>`}</div>
-  ${cmGmBox()}${lun===cur?orOggi():''}
+  ${cmGmBox(sc)}${lun===cur?orOggi():''}
   ${probs.length?`<section class="or-pb ${nerr?'':nda?'w':'a'}"><button type="button" class="or-pbh" data-a="orPb" aria-expanded="${!!S.orPb}">${ic('warn')}<b>${nda?nda+' da controllare':'Errori accettati'}</b><span>${[nerr?nerr+(nerr===1?' errore':' errori'):nda?'solo avvisi':'',nacc?nacc+' accettat'+(nacc===1?'o':'i'):''].filter(Boolean).join(' · ')}</span>${ic('chev',S.orPb?'up':'dn')}</button>
   ${S.orPb?`<div class="or-pl">${probs.map(p=>`<button type="button" class="or-pi ${p.ok?'acc':p.k}" data-a="orCell" data-u="${p.u.id}" data-g="${fd(p.u,p.g)}">${avatar(p.u,28)}<span><b>${esc(p.u.nome)}</b> ${esc(p.t)}${p.ok?' <i class="or-acc">accettato</i>':''}</span></button>`).join('')}</div>`:''}</section>`
   :orAny(t)?`<div class="or-ok">${ic('check')} Tutto a posto: riposi, pause e ore controllati.</div>`:''}
@@ -3863,7 +3876,7 @@ function orSetV(v){const E=S.orE,sh=orShifts(v);E.abs=OR_ASS[v]?v:'';
 const orVal=E=>E.abs||[[E.a1,E.b1],[E.a2,E.b2]].filter(([a,b])=>a&&b).map(([a,b])=>a+'-'+b).join(',');
 function orCellSheet(id,g,lunR){
   if(!D().staff[id])return;const resp=!!lunR,lun=lunR||S.orW||orLun();
-  if(resp&&!orRCan(realU(),id))return;
+  if(resp?!orRCan(realU(),id):!(orPlanner(meU())&&orInSc(D().staff[id],orScope())))return;
   S.orE={id,g,lun,days:[g],resp};orSetV(resp?orRRow(lun,id)[g]||'':((orWeek(lun)||{}).t||{})[id]?.[g]||'');
   openSheet({live:()=>true,render:()=>{const E=S.orE,u=D().staff[E.id]||{},c=contrOf(u),v=orVal(E),sh=orShifts(v);
     const pr=E.resp?[]:orCheck(u,((orWeek(E.lun)||{}).t||{})[E.id],((orWeek(orShift(E.lun,-1))||{}).t||{})[E.id]);
@@ -3899,9 +3912,11 @@ async function orSaveCell(clear){
   else if(p)toast(u.nome+' – '+p.t,'warn');else toast(clear?'Turno tolto':'Salvato'+(E.days.length>1?' su '+E.days.length+' giorni':''));
 }
 async function orCopy(){
-  const lun=S.orW||orLun(),p=orWeek(orShift(lun,-1));if(!p||!orAny(p.t))return toast('La settimana prima è vuota.','warn');
-  const w=orWeek(lun);if(w&&orAny(w.t)&&!await ask('Sostituire gli orari di questa settimana?','I turni già messi in questa settimana vengono sostituiti da quelli della settimana prima.','Sostituisci',true))return;
-  const t={};for(const [id,r] of Object.entries(p.t))if(D().staff[id]&&orHas(r))t[id]=clone(r);
+  const sc=orScope(),inS=id=>orInSc(D().staff[id],sc);if(!orPlanner(meU()))return;
+  const lun=S.orW||orLun(),p=orWeek(orShift(lun,-1));if(!p||!Object.entries(p.t||{}).some(([id,r])=>inS(id)&&orHas(r)))return toast('La settimana prima è vuota.','warn');
+  const w=orWeek(lun);if(w&&Object.entries(w.t||{}).some(([id,r])=>inS(id)&&orHas(r))&&!await ask('Sostituire gli orari di questa settimana?','I turni già messi in questa settimana vengono sostituiti da quelli della settimana prima.','Sostituisci',true))return;
+  const t={};for(const [id,r] of Object.entries((w&&w.t)||{}))if(!inS(id))t[id]=r;
+  for(const [id,r] of Object.entries(p.t))if(D().staff[id]&&inS(id)&&orHas(r))t[id]=clone(r);
   if(w)await upd('config','orari_'+lun,{t,mod:now()});else await put('config','orari_'+lun,{tipo:'orari',lun,t,mod:now()});
   toast('Copiati i turni della settimana prima: controlla e pubblica');
 }
@@ -3925,17 +3940,22 @@ async function orTipoAdd(){
 }
 async function orTipoDel(i){const l=orTipi().slice();const [x]=l.splice(i,1);if(!x)return;await put('config','orari_tipi',{l});toast('Turno tipo eliminato: '+x.n)}
 async function orPublish(){
+  const me0=meU(),sc=orScope(me0),inS=id=>orInSc(D().staff[id],sc);if(!orPlanner(me0))return;
   const lun=S.orW||orLun(),w=orWeek(lun);if(!w||(!orAny(w.t)&&!w.tp))return toast('Non ci sono turni da pubblicare.','warn');
-  const first=!w.tp,t=w.t||{};const ids=first?Object.keys(t).filter(id=>orHas(t[id])):orChanged(w);
-  if(!ids.length)return toast('Niente di nuovo da avvisare.');
-  const errs=orProblems(lun).filter(p=>p.k==='err'&&!p.ok);
+  const first=!orPubAt(w,sc),t=w.t||{};const ids=(first?Object.keys(t).filter(id=>orHas(t[id])):orChanged(w)).filter(inS);
+  if(!ids.length)return toast(first?'Non ci sono turni da pubblicare.':'Niente di nuovo da avvisare.');
+  const errs=orProblems(lun).filter(p=>p.k==='err'&&!p.ok&&orInSc(p.u,sc));
   if(errs.length&&!await ask(errs.length===1?'C\'è 1 errore negli orari':'Ci sono '+errs.length+' errori negli orari','Il primo: '+errs[0].u.nome+', '+errs[0].t+'.\nVuoi pubblicare lo stesso?','Pubblica lo stesso',true))return;
-  await upd('config','orari_'+lun,{tp:clone(t),pub:now(),pubDa:S.me||''});
+  const tp=clone(w.tp||{});for(const id of orIds(w))if(inS(id)){if(orHas(t[id]))tp[id]=clone(t[id]);else delete tp[id]}
+  const reps=sc||Object.keys(REPARTI),pubR=Object.assign({},w.pubR||(w.tp?Object.fromEntries(Object.keys(REPARTI).map(k=>[k,w.pub||1])):{}));for(const k of reps)pubR[k]=now();
+  await upd('config','orari_'+lun,{tp,pub:now(),pubDa:S.me||'',pubR});
   const rg=orRange(lun),me=realU()||{};let n=0;
   for(const id of ids){const u=D().staff[id];if(!u||u.stato!=='attivo'||id===me.id)continue;const r=t[id],old=w.tp&&orHas(w.tp[id]);
     const nd=[0,1,2,3,4,5,6].filter(g=>orShifts((r||{})[g]).length).length;
     const tx=old?'Cambia: '+orDiffDays(w.tp[id],r).map(g=>OR_GGL[g].toLowerCase()).join(', ')+'. Apri «Orari» per vederli.':nd?`${nd} ${nd===1?'giorno':'giorni'} di lavoro. Apri «Orari» per vederli.`:'Apri «Orari» per vederli.';
     await notify(id,(old?'Orari cambiati: ':'Orari pubblicati: ')+rg,tx,'orari',lun);n++}
+  // chi pubblica solo un reparto (es. l'F&B Manager la sala): avvisati anche i gestori
+  if(!isMgr(me0)&&sc&&sc.length)for(const u of Object.values(D().staff))if(isGM(u)&&u.stato==='attivo'&&u.id!==me.id)await notify(u.id,(first?'Orari pubblicati: ':'Orari cambiati: ')+sc.map(k=>REPARTI[k]).join(', '),(me.nome||'')+' ha pubblicato i turni di '+rg+'. Apri Staff → Orari per vederli.','orari',lun);
   toast((first?'Orari pubblicati':'Modifiche pubblicate')+(n?': '+(n===1?'avvisata 1 persona':'avvisate '+n+' persone'):''));
 }
 
@@ -4115,8 +4135,8 @@ function cmStaffBox(me){
     ${toMe&&c.stato==='chiesto'?`<div class="btns"><button type="button" class="btn ghost sm" data-a="cmNo" data-l="${c.lun}" data-c="${c.id}">Rifiuta</button><button type="button" class="btn primary sm" data-a="cmSi" data-l="${c.lun}" data-c="${c.id}">Accetta</button></div>`
     :!toMe&&cmOpen(c)?`<button type="button" class="btn ghost sm" data-a="cmAnn" data-l="${c.lun}" data-c="${c.id}">Annulla</button>`:''}</div>`}).join('')}</section>`;
 }
-function cmGmBox(){
-  const cs=cmAll().filter(cmOpen);if(!cs.length)return'';
+function cmGmBox(sc){
+  const cs=cmAll().filter(cmOpen).filter(c=>orInSc(D().staff[c.da],sc));if(!cs.length)return'';
   return`<section class="cm-box gm"><h2 class="sec" style="margin-top:0">Cambi turno<span>${cs.length}</span></h2>${cs.map(c=>{const da=D().staff[c.da]||{nome:'?'},a=D().staff[c.a]||{nome:'?'};
     const w=orWeek(c.lun)||{},[tA,tB]=cmApply(w.t||{},c),prev=(orWeek(orShift(c.lun,-1))||{}).t||{};
     const pr=[[da,tA],[a,tB]].flatMap(([u,r])=>u.id?orCheck(u,r,prev[u.id]).filter(p=>p.k==='err').map(p=>u.nome+': '+p.t):[]);
@@ -4136,11 +4156,13 @@ function orOggi(){
   ${l.length?`<ul>${l.map(x=>`<li class="rep-${x.rs?'resp':orRep(x.u)}${on(x)?' on':''}">${avatar(x.u,32)}<div class="or-nw"><b>${esc(x.u.nome)}${x.u.cognome?' '+esc(x.u.cognome.charAt(0))+'.':''}</b><span>${x.rs?'Responsabile · ':''}${x.sh.map(([a,b])=>orHMc(a)+'–'+orHMc(b)).join(', ')}</span></div>${on(x)?'<i class="tag gm">Adesso</i>':''}</li>`).join('')}</ul>`:''}</section>`;
 }
 function vMieiOrari(me){
+  const pl=!isMgr(me)&&orPlanner(me)?`<div class="seg wide or-pl-sw" role="group" aria-label="Orari">${[['','I miei orari'],['plan','Turni della '+orScope(me).map(k=>REPARTI[k].toLowerCase()).join(' e ')]].map(([k,l])=>`<button type="button" aria-pressed="${(S.orPl||'')===k}" data-a="orPl" data-v="${k}">${l}</button>`).join('')}</div>`:'';
+  if(pl&&S.orPl==='plan')return`<h1 class="vt">Orari</h1><p class="vsub">Tocca una casella per mettere il turno. Quando pubblichi, lo staff li vede.</p>${pl}${vOrari()}`;
   const cur=orLun(),nx=orShift(cur,1),wn=orWeek(nx);const nextOk=orFree(me)||!!(wn&&wn.tp&&orHas(wn.tp[me.id]));
   if(S.orMy==='next'&&!nextOk)S.orMy='';
-  const lun=S.orMy==='next'?nx:cur,w=orWeek(lun),r=w&&w.tp?w.tp[me.id]:null,c=contrOf(me);
+  const lun=S.orMy==='next'?nx:cur,w=orWeek(lun),pubMe=!!orPubAt(w,[orRep(me)]),r=pubMe?w.tp[me.id]:null,c=contrOf(me);
   const td=lun===cur?(new Date().getDay()+6)%7:-1;
-  const head=`<h1 class="vt">I miei orari</h1><p class="vsub">${orRange(lun)}</p>
+  const head=`<h1 class="vt">I miei orari</h1><p class="vsub">${orRange(lun)}</p>${pl}
   ${tbCard(me)}${cmStaffBox(me)}${S.orMy==='next'?'':orOggi()}
   ${nextOk?`<div class="seg wide or-my" role="group" aria-label="Settimana">${[['','Questa settimana'],['next','Prossima']].map(([k,l])=>`<button type="button" aria-pressed="${(S.orMy||'')===k}" data-a="orMy" data-v="${k}">${l}</button>`).join('')}</div>`:''}`;
   if(orFree(me)&&!orHas(r)){const rr=orRRow(lun,me.id);
@@ -4148,7 +4170,7 @@ function vMieiOrari(me){
     ${[0,1,2,3,4,5,6].map(g=>{const v=rr[g]||'',sh=orShifts(v);
       return`<button type="button" class="or-day or-rday${g===td?' today':''}${td>=0&&g<td?' past':''}" data-a="orRCell" data-u="${me.id}" data-g="${g}" data-l="${lun}"><div class="or-dh"><b>${OR_GGL[g]}</b><span>${orDay(lun,g).toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span>${g===td?'<span class="tag gm">Oggi</span>':''}</div>
       ${sh.length?sh.map(([a,b])=>`<div class="or-dt rep-resp">${orHM(a)} – ${orHM(b)}</div>`).join(''):OR_ASS[v]?`<div class="or-da">${OR_ASS[v]}</div>`:`<div class="or-dn">${ic('plus')} Scrivi quando ci sei</div>`}</button>`}).join('')}`}
-  if(!orHas(r))return head+empty('calendar',w&&w.tp?'Nessun turno':'Orari non ancora pronti',w&&w.tp?'In questa settimana non hai turni.':'Quando Maurizio li pubblica ricevi un avviso.');
+  if(!orHas(r))return head+empty('calendar',pubMe?'Nessun turno':'Orari non ancora pronti',pubMe?'In questa settimana non hai turni.':'Quando li pubblicano ricevi un avviso.');
   return head+`
   ${[0,1,2,3,4,5,6].map(g=>{const v=r[g]||'',sh=orShifts(v);
     return`<article class="or-day${g===td?' today':''}${td>=0&&g<td?' past':''}"><div class="or-dh"><b>${OR_GGL[g]}</b><span>${orDay(lun,g).toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span>${g===td?'<span class="tag gm">Oggi</span>':''}</div>
@@ -4508,7 +4530,7 @@ function chPaint(force){
 /* ================= notifiche, menu, impostazioni ================= */
 /* novità: versioni visibili al ruolo mostrato (meU), ultima vista salvata per il profilo vero (realU) */
 const NEWS_DEV=[['aggiunte','Aggiunte'],['correzioni','Correzioni'],['risolti','Problemi risolti'],['noti','Problemi noti']];
-function newsFor(me){const lv=isDev(me)?2:isGM(me)?1:0;return NEWS.map(n=>{const it=(n.tutti||[]).concat(lv>=1&&n.chef||[]);const d=lv>=2&&n.dev||{};return{v:n.v,data:n.data,titolo:n.titolo,it,tech:NEWS_DEV.filter(([k])=>d[k]&&d[k].length).map(([k,l])=>[l,d[k]])}}).filter(n=>n.it.length||n.tech.length)}
+function newsFor(me){const lv=isDev(me)?2:isGM(me)?1:0;return NEWS.map(n=>{const it=(n.tutti||[]).concat(lv>=1&&n.chef||[],!lv&&me&&OR_PLAN[me.reparto]&&n.fb||[]);const d=lv>=2&&n.dev||{};return{v:n.v,data:n.data,titolo:n.titolo,it,tech:NEWS_DEV.filter(([k])=>d[k]&&d[k].length).map(([k,l])=>[l,d[k]])}}).filter(n=>n.it.length||n.tech.length)}
 function newsSeen(){const u=realU();if(!u)return APP_VER;const k='jona_news_'+u.id;const v=ls(k);if(typeof v==='number')return v;ls(k,APP_VER-1);return APP_VER-1}
 const newsCount=me=>{const s=newsSeen();return newsFor(me).filter(n=>n.v>s).length};
 const newsBtn=me=>{const n=newsCount(me);return`<button type="button" class="news-btn" data-a="news" aria-label="Novità${n?', '+n+' da vedere':''}">${ic('sparkle')}<span class="news-l">Novità</span>${n?`<span class="news-n">${n>9?'9+':n}</span>`:''}</button>`};
@@ -5790,7 +5812,9 @@ Object.assign(A,{
   orTipoAdd:()=>orTipoAdd(),
   orTipoDel:d=>orTipoDel(+d.i),
   orPub:()=>orPublish(),
-  orMy:d=>{S.orMy=d.v;window.scrollTo(0,0);render()}
+  orMy:d=>{S.orMy=d.v;window.scrollTo(0,0);render()},
+orPl:d=>{S.orPl=d.v;window.scrollTo(0,0);render()},
+orRep:d=>{S.orRep=d.v;ls('jona_or_rep',d.v||null);S.orPb=false;render()}
 });
 IN.orN=t=>{if(S.orN)S.orN[t.dataset.k]=t.value};
 CH.orT=t=>{const E=S.orE;if(!E)return;E[t.dataset.k]=t.value;E.abs='';refreshSheet()};
