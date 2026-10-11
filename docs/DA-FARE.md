@@ -26,7 +26,6 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 | M30 | Preferenze dei due account (Gmail e Hotmail): aggiungi la riga nuova di CAMBIO ACCOUNT («Se i token finiscono di colpo, riparti dal ramo col numero più alto…», testo in `docs/CAMBIO-ACCOUNT.md`) | Mario | quando prepari Hotmail (M29) |
 | D22 | Lettore foto: **v68 online** (10/10, PR #79): Flash → Flash-Lite → Cloudflare Llama 4, banner dal vivo. Giro completo extra su GitHub partito alle 12:5x | Claude da solo | controllare il giro completo |
 | D23 | Import di più XML insieme e dei `.p7m` firmati: **fatto in v76** (#75, prova `tools/test-p7m.mjs`). Resta: Mario prova con una fattura vera .p7m (M39) | Claude | dopo M39 |
-| D24 | ✅ v69 ONLINE 10/10 14:07 (PR #80): in approvazione delle richieste, «Da … costa … in meno · Passa» se lo stesso prodotto (stessa unità) costa meno da un altro fornitore. Il gestore non ha carrello e lo staff non vede i prezzi: il suggerimento sta solo lì. Prova `tools/test-conveniente.mjs` | Claude da solo | pubblicare |
 | M29 | Preparare l'account Hotmail per il cambio account (`docs/CAMBIO-ACCOUNT.md`, passi 1-6) | Mario | prima che finisca il limite settimanale |
 | M28 | Chiedere al commercialista se può mandare ogni mese le fatture dei fornitori in formato XML (file .xml o .p7m) | Mario | quando può |
 | M27 | v67 online (dal 10/10): Fornitori → **Importa listini** → foto delle fatture (DAC, Mariano, Nieddittas) → **Trascrivi con Gemini**. Controlla le righe rosse «da controllare» e dimmi cosa non torna | Mario | appena v67 online |
