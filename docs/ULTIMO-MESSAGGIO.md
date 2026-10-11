@@ -1,6 +1,5 @@
-# Ultimo messaggio di Mario (11/10/2026 15:25 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 15:59 ora italiana)
 
-si e poi procedi  con il resto
-
-le prove non posso farle adesso si proverà tutto il prossimo anno devo creare un software praticamente pronto con tutte le funzioni prima
- m29 ci penserò io
+git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
+Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #81).
+Poi attendi le istruzioni di Mario.
