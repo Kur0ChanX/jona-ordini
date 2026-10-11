@@ -1166,8 +1166,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=79;
+const APP_VER=80;
 const NEWS=[
+  {v:80,data:'2026-10-11',titolo:'Chiedi a Jona conosce le ricette',
+    chef:['«Chiedi a Jona» ora conosce le tue ricette e il loro costo. Prova: «Quale piatto ha il food cost più alto?» o «Quanto mi costa una porzione di spaghetti alle vongole?».'],
+    dev:{aggiunte:['`jonaRc()` aggiunge a `jonaCtx` `ricette` (piatto, porzioni, prezzo, costo a porzione, food cost, prezzo al 30%, ingredienti con costo e fornitore), solo per i gestori e con la funzione `ricette` accesa. Suggerimento `JONA_TIP_RC` se ci sono ricette. C3: `test-firebase-bulk` e `test-firebase-sync` ora con controlli PASS/FAIL. Prova in `tools/test-ricette.mjs`.']}},
   {v:79,data:'2026-10-11',titolo:'Ricette e costo dei piatti',
     chef:['In Fornitori c\'è «Ricette e costo dei piatti». Scrivi il piatto, scegli gli ingredienti dai listini e le quantità: l\'app calcola il costo a porzione e il food cost.','Se un fornitore alza un prezzo e il costo di un piatto sale di più del 3%, compare un avviso in alto.','Si spegne in Impostazioni → Funzioni.'],
     dev:{aggiunte:['D26: `config/ricette` {r:{<id>:{n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG}}}; `rcPrezzo` (listino, poi stesso `gkey` e unità: prima stesso fornitore, poi il più economico, poi ultimo prezzo `pz`), `rcCalc` (g/kg, ml/l; food cost su prezzo / 1,10), `rcSalito` (≥3% sopra `rif`), striscia `rcStrip` con «Ok, visto» (`rcSnap`), ingresso `rcCta` in Fornitori, fogli `rcList`/`rcFormH`/`rcPick`. Funzione `ricette` accesa di partenza: `FUNZ[].on` e `funzOn` legge il valore di partenza se non è mai stata toccata. Prova `tools/test-ricette.mjs`.']}},
@@ -4124,7 +4127,7 @@ function orContrForm(p){
 /* ================= «Chiedi a Jona» (gestori) =================
    Domande scritte o a voce sui dati dell'app. Risponde Gemini con la chiave di questo telefono (jona_gemini_key):
    gli mandiamo un riassunto compatto dei dati (fornitori, listino, ordini, richieste, staff, orari) e le ultime domande. */
-const JONA_TIPS=['Quanto abbiamo speso da ogni fornitore questo mese?','Chi lavora sabato sera?','Quando abbiamo ordinato l\'ultima volta il burro?','Quali prodotti sono aumentati di prezzo?','Cosa chiede più spesso la sala?'];
+const JONA_TIP_RC='Quale piatto ha il food cost più alto?',JONA_TIPS=['Quanto abbiamo speso da ogni fornitore questo mese?','Chi lavora sabato sera?','Quando abbiamo ordinato l\'ultima volta il burro?','Quali prodotti sono aumentati di prezzo?','Cosa chiede più spesso la sala?'];
 function jonaCtx(){
   const d=D(),F=d.fornitori,fn=id=>(F[id]||{}).nome||'',dt=t=>t?new Date(t).toLocaleString('it-IT',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
   const staff=Object.values(d.staff).filter(u=>u.stato!=='in_attesa').map(u=>{const c=isGM(meU())?contrOf(u):null;return[u.id,fullName(u),RUOLI[u.ruolo],REPARTI[u.reparto]||'',u.mansione||'',u.stato,c?c.ore+'h/sett, pausa '+c.pausa+' min, '+c.liberi+' liberi':isGM(meU())&&orFree(u)?'Full time Responsabile, orario libero':'']});
@@ -4141,8 +4144,11 @@ function jonaCtx(){
     ordini:Object.values(d.ordini).sort((a,b)=>(b.creato||0)-(a.creato||0)).map(o=>[dt(o.creato),dt(o.inviato),fn(o.fornitoreId)||o.fornitoreNome,o.stato,o.ricevuto?dt(o.ricevuto)+(o.differenze?' con differenze':''):'',(o.items||[]).map(l=>[l.nome,l.qta,l.unita||'',l.prezzo??''])]),
     richieste_colonne:['data','persona','reparto','stato','prodotti: nome, quantità, unità'],
     richieste:Object.values(d.richieste).sort((a,b)=>(b.creato||0)-(a.creato||0)).slice(0,250).map(r=>[dt(r.creato),r.utenteNome,REPARTI[r.reparto]||'',r.stato,(r.items||[]).map(i=>[i.nome,i.qta,i.unita||''])]),
-    staff_colonne:['id','nome','ruolo','reparto','mansione','stato','contratto'],staff,orari});
+    staff_colonne:['id','nome','ruolo','reparto','mansione','stato','contratto'],staff,orari,...jonaRc()});
 }
+function jonaRc(){if(!funzOn('ricette')||!isMgr(meU()))return{};const e2=x=>x==null?'':Math.round(x*100)/100;
+  return{ricette_colonne:['piatto','porzioni','prezzo nel menù €','costo a porzione €','food cost %','prezzo per stare al 30% €','ingredienti senza prezzo o quantità','ingredienti: nome, quantità, unità, costo €, da chi'],
+    ricette:rcAll().map(r=>{const c=rcCalc(r);return[r.n,num(r.por)||1,num(r.pv)||'',e2(c.cp),c.fc==null?'':Math.round(c.fc*10)/10,e2(c.cons),c.manca,c.righe.map(x=>[x.g.nome,x.g.q??'',x.g.u||'',e2(x.c),x.p&&x.p.da||''])]})}}
 const jonaMd=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').split('\n').map(l=>/^\s*[-*•]\s+/.test(l)?'<li>'+l.replace(/^\s*[-*•]\s+/,'')+'</li>':l).join('\n')
   .replace(/(?:<li>.*?<\/li>\n?)+/g,m=>'<ul>'+m.replace(/\n/g,'')+'</ul>').replace(/\n/g,'<br>');
 function jonaSheet(){
@@ -4150,7 +4156,7 @@ function jonaSheet(){
   openSheet({cls:'tall jona-sh',live:()=>true,render:()=>{const J=S.jona,key=gemOn();
     return`<div class="grab"></div><div class="sh-h"><span class="jona-av">${ic('sparkle')}</span><div class="sh-t">Chiedi a Jona<div class="sh-s">Domande sui dati dell'app, a voce o scritte</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     ${!key?`<div class="jona-key">${ic('sparkle')}<div><b>Serve la chiave Gemini su questo telefono</b><span>È gratis: la crei su aistudio.google.com/apikey e la incolli qui una volta sola.</span><button type="button" class="btn primary sm" data-a="gemKey">Inserisci la chiave</button></div></div>`:''}
-    <div class="jona-msgs" id="jona-msgs">${J.msgs.length?J.msgs.map(m=>`<div class="jona-m ${m.r}">${m.r==='a'?jonaMd(m.t):esc(m.t)}</div>`).join(''):`<div class="jona-tips">${JONA_TIPS.map(t=>`<button type="button" class="chip" data-a="jonaTip" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>`}
+    <div class="jona-msgs" id="jona-msgs">${J.msgs.length?J.msgs.map(m=>`<div class="jona-m ${m.r}">${m.r==='a'?jonaMd(m.t):esc(m.t)}</div>`).join(''):`<div class="jona-tips">${JONA_TIPS.concat(jonaRc().ricette&&rcAll().length?[JONA_TIP_RC]:[]).map(t=>`<button type="button" class="chip" data-a="jonaTip" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>`}
     ${J.busy?'<div class="jona-m a busy"><i></i><i></i><i></i></div>':''}</div>
     <div class="jona-in"><textarea class="inp" id="jona-q" rows="1" placeholder="Scrivi una domanda…" data-in="jonaQ" enterkeyhint="send">${esc(J.q)}</textarea>
     ${vSR()?`<button type="button" class="icon-btn" data-a="jonaMic" aria-label="Detta la domanda">${ic('mic')}</button>`:''}<button type="button" class="jona-send" data-a="jonaAsk" aria-label="Chiedi" ${J.busy||!key?'disabled':''}>${ic('send')}</button></div>

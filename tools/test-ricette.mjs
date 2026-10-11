@@ -90,6 +90,10 @@ ok(await pg.evaluate(()=>S.rcf.ing.length===3),'«Togli» toglie l\'ingrediente'
 await pg.fill('#rcf-n','');await pg.click('.sheet [data-a="rcSave"]');await wait(300);
 ok(/Scrivi il nome del piatto/.test(await txt('#toasts')),'senza nome non salva');
 await pg.fill('#rcf-n','Spaghetti alle vongole');
+// v80: Chiedi a Jona conosce le ricette (solo gestori)
+const jr=await pg.evaluate(()=>{const j=JSON.parse(jonaCtx());return{c:j.ricette_colonne,r:j.ricette}});
+ok(jr.r&&jr.r.length===1&&jr.r[0][0]==='Spaghetti alle vongole'&&jr.r[0][1]===4&&jr.r[0][2]===18,'Chiedi a Jona: ricetta nel contesto con porzioni e prezzo '+JSON.stringify(jr.r&&jr.r[0]&&jr.r[0].slice(0,6)));
+ok(jr.r&&typeof jr.r[0][3]==='number'&&jr.r[0][3]>0&&typeof jr.r[0][4]==='number'&&jr.r[0][7].length===3&&jr.r[0][7][0][0]==='Vongole veraci','Chiedi a Jona: costo a porzione, food cost e ingredienti con costo');
 // elimina
 await pg.click('.sheet [data-a="rcDel"]');await wait(300);
 await pg.locator('.sheet button',{hasText:'Elimina'}).last().click();await wait(500);
@@ -99,5 +103,9 @@ ok(await pg.evaluate(()=>{const c=rcCalc({por:'2',pv:'',ing:[{pid:'x',nome:'Latt
 // spenta: icona sparisce
 await pg.evaluate(()=>funzSet('ricette',false));await wait(400);
 ok(await pg.locator('[data-a="rcOpen"]').count()===0,'funzione spenta: niente ingresso');
+ok(await pg.evaluate(()=>!('ricette' in JSON.parse(jonaCtx()))),'Chiedi a Jona: niente ricette con la funzione spenta');
+await pg.evaluate(()=>funzSet('ricette',true));await wait(300);
+ok(await pg.evaluate(()=>'ricette' in JSON.parse(jonaCtx())),'Chiedi a Jona: ricette di nuovo nel contesto per il gestore');
+ok(await pg.evaluate(()=>{const v=S.viewAs;S.viewAs='staff';const r=!('ricette' in JSON.parse(jonaCtx()));S.viewAs=v;return r}),'Chiedi a Jona: niente ricette nel contesto per lo staff');
 ok(!errs.length,'nessun errore nella pagina '+errs.join(' | '));
 await b.close();
