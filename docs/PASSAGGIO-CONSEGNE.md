@@ -48,6 +48,13 @@ Idee: Ovvia = promemoria del turno via push; Furba = staff segna i giorni in cui
 - Repo privato: le prove su GitHub consumeranno minuti (2000/mese dell'organizzazione).
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
+## ⛔ STOP (dopo l'handoff)
+Mario, nella #85 chiusa: «nooo aspetta, non ho cliccato nulla e mi succede spesso, perché?». Le risposte a tocco di #85 (D10 «Sì, confermo» e orari «3 Geniale» «Sì, confermo») sono arrivate dallo strumento, ma Mario dice di non aver toccato nulla. La #85 ha fermato la #86 (interrupt + messaggio). **Non pubblicare v83 né aprire PR**: prima chiarire con Mario quali scelte sono sue. La v82 (D10) è già online: se D10 non era sua, chiedere se tenerla.
+Causa probabile (da verificare): sul telefono il riquadro delle domande riceve un tocco «fantasma» (es. scorrendo o al ritorno nell'app) e la prima scelta/la conferma partono da sole. Possibile rimedio: domande senza scelta consigliata in cima, oppure la risposta va confermata scrivendo «sì» a mano.
+
 ## Ultimo messaggio di Mario, parola per parola
-«anche mauro abilitano agli orari metti il programma orari di mauro e chef in un punto visibile e controlla se c'è bisogno di migliorie o funzioni, funzioni evolute smart nel programma orari e agenda»
-(La prima parte = D32 v83, la seconda = D33 da proporre.)
+«nooo
+aspetta
+non ho cliccato nulla e mi succede spesso 
+perché?»
+(Prima: «anche mauro abilitano agli orari metti il programma orari di mauro e chef in un punto visibile e controlla se c'è bisogno di migliorie o funzioni, funzioni evolute smart nel programma orari e agenda» = D32 v83, D33 da proporre.)
