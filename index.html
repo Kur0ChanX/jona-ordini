@@ -1163,8 +1163,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=75;
+const APP_VER=76;
 const NEWS=[
+  {v:76,data:'2026-10-11',titolo:'Fatture XML: più insieme e firmate',
+    chef:['In Importa listini → «Fattura elettronica XML» puoi scegliere più fatture insieme: ogni riga va al suo fornitore.','Ora si aprono anche le fatture firmate (.p7m), così come arrivano dal cassetto fiscale.','Se un file non si legge, l\'app ti dice quale e carica gli altri.'],
+    dev:{aggiunte:['`p7mXml`: legge la busta CAdES (DER, BER a lunghezza indefinita con OCTET STRING a pezzi, base64/PEM) e prende l\'eContent (OID data); `xmlText` usa la codifica scritta nell\'XML (UTF-8 o ISO-8859-1). `PICK.xml.multiple`; `impRun` unisce le righe di tutti i file, salta quelli rotti con avviso. Prova `tools/test-p7m.mjs` con le fatture finte di `tools/fatture-prova` (firmate con openssl).']}},
   {v:75,data:'2026-10-11',titolo:'Logo YNOY CORP aggiornato',
     tutti:['In fondo alle schermate d\'ingresso e di apertura c\'è il logo YNOY CORP nuovo, uguale a quello originale.'],
     dev:{correzioni:['`media/ynoy.svg` = ricalco della foto di Mario (`docs/img/logo/ynoy-corp/vettoriale/ynoy-corp-nero.svg`) scalato e centrato nel 496×190 (lettere e lune allineate al logo di prima, giro dello svolazzo più piccolo e CORP spostato); `media/ynoy.png` da `tools/logo-ynoy.py`; tratti della scrittura rifatti (`tools/ynoy-tratti.py`: punti spostati e giro nuovo → `tools/ynoy-html.py`). Cartelle dei loghi in ordine: `docs/img/logo/{ynoy-corp,jona,confronti,vecchi}`.']}},
@@ -1675,7 +1678,7 @@ function errMsg(e){const c=e&&e.code;return({
   fb:'Il database non ha accettato la modifica. Riprova.',
   lib:'Non riesco a caricare il componente per i file. Controlla la connessione e riprova.',
   xml:'Il file XML non sembra una fattura elettronica valida.',
-  p7m:'Il file .p7m è firmato digitalmente: scarica la versione .xml dal cassetto fiscale o dal gestionale.'
+  p7m:'Non riesco ad aprire il file firmato .p7m: scarica la versione .xml dal cassetto fiscale o dal gestionale.'
 }[c])||('Operazione non riuscita'+(c?' ('+c+')':'')+'. Riprova.')}
 function subscribe(name){
   let q=S.db.collection(name);if(COLS[name])q=COLS[name](q);
@@ -3078,7 +3081,7 @@ function impSheet(fid){
     return head+(I.err?`<div class="err">${esc(I.err)}</div>`:'')+`<div class="imp-opts">
     <button type="button" class="imp-opt" data-a="impPaste">${ic('paste')}<div><b>Incolla tabella</b><span>Il testo preparato da Gemini dalle foto, o righe copiate da Excel</span></div></button>
     <button type="button" class="imp-opt" data-a="impPick" data-k="xls">${ic('sheet')}<div><b>File Excel o CSV</b><span>Le colonne vengono riconosciute da sole</span></div></button>
-    <button type="button" class="imp-opt" data-a="impPick" data-k="xml">${ic('receipt')}<div><b>Fattura elettronica XML</b><span>Codici e prezzi reali dall'ultima fattura, utile per Metro</span></div></button>
+    <button type="button" class="imp-opt" data-a="impPick" data-k="xml">${ic('receipt')}<div><b>Fattura elettronica XML</b><span>Codici e prezzi reali dalle fatture, anche più insieme e firmate (.p7m), utile per Metro</span></div></button>
     ${I.fid?`<button type="button" class="imp-opt" data-a="pnew" data-f="${I.fid}">${ic('pencil')}<div><b>Un prodotto a mano</b><span>Nome, codice, unità e prezzo</span></div></button>`:''}</div>
     <h2 class="sec">Per le foto dei listini</h2>
     <div class="imp-opts" style="margin-bottom:12px"><button type="button" class="imp-opt" data-a="gemFoto" data-k="cam">${ic('camera')}<div><b>Scatta foto del listino</b><span>Gemini legge le foto e trascrive tutto</span></div></button>
@@ -3170,7 +3173,7 @@ async function gemShare(){const I=S.imp;if(!I||!I.photos.length)return;await cop
   if(navigator.canShare&&navigator.canShare({files:I.photos})){try{await navigator.share({files:I.photos,text:geminiPrompt()})}catch(e){}}
   else toast('Il telefono non permette di condividere da qui: apri Gemini, allega le foto e incolla il testo copiato.','warn');
   I.stage='paste';refreshSheet()}
-const PICK={xls:{accept:'.xlsx,.xls,.csv,.ods,.tsv,.txt',k:'xls'},xml:{accept:'.xml,.p7m,text/xml,application/xml',k:'xml'}};
+const PICK={xls:{accept:'.xlsx,.xls,.csv,.ods,.tsv,.txt',k:'xls'},xml:{accept:'.xml,.p7m,text/xml,application/xml',k:'xml',multiple:true}};
 let pickCb=null;
 function pickFile(o,cb){const p=$('#picker');p.value='';p.accept=o.accept||'';if(o.capture)p.setAttribute('capture',o.capture);else p.removeAttribute('capture');p.multiple=!!o.multiple;pickCb=cb;p.click()}
 // v66: le virgolette contano solo se racchiudono tutta la cella (CSV); quelle dentro un nome (GAMBERO ROSSO"VERITAS"3"35/50PZ) restano
@@ -3200,6 +3203,29 @@ function mapRows(rows){
   }
   return null;
 }
+// v76: fattura firmata .p7m = busta CAdES (PKCS#7, DER o BER, a volte in base64): il testo XML sta nell'eContent,
+// spesso spezzato in più pezzi OCTET STRING. Si legge la busta invece di cercare «<?xml» (i pezzi taglierebbero il testo).
+function p7mXml(buf){
+  let b=new Uint8Array(buf);
+  const head=new TextDecoder('latin1').decode(b.slice(0,80)).replace(/-----BEGIN[^-]*-----/,'').trim();
+  if(/^MI[A-Za-z0-9+/]/.test(head)){const t=new TextDecoder('latin1').decode(b).replace(/-----[^-]+-----/g,'').replace(/[^A-Za-z0-9+/=]/g,'');
+    const bin=atob(t);b=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i)}
+  const rd=(p,lim)=>{if(p+2>lim)throw{code:'p7m'};const tag=b[p++],cons=!!(tag&32);let l=b[p++],len=-1;
+    if(l<128)len=l;else if(l>128){len=0;for(let n=l&127;n--;)len=len*256+b[p++]}
+    const kids=[];let end;
+    if(len<0){if(!cons)throw{code:'p7m'};let q=p;while(!(b[q]===0&&b[q+1]===0)){const k=rd(q,lim);kids.push(k);q=k.end}end=q+2}
+    else{end=p+len;if(end>lim)throw{code:'p7m'};if(cons){let q=p;while(q<end){const k=rd(q,end);kids.push(k);q=k.end}}}
+    return{tag,cons,p,end:end,len,kids}};
+  const OID_DATA='2a864886f70d010701',hex=n=>[...b.slice(n.p,n.p+n.len)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  const raw=n=>n.cons?n.kids.flatMap(raw):[b.slice(n.p,n.p+n.len)];
+  const root=rd(0,b.length),sd=root.kids[1]&&root.kids[1].kids[0];if(!sd)throw{code:'p7m'};
+  const ec=sd.kids.find(k=>k.tag===0x30&&k.kids[0]&&k.kids[0].tag===6&&hex(k.kids[0])===OID_DATA);
+  if(!ec||!ec.kids[1]||!ec.kids[1].kids[0])throw{code:'p7m'};
+  const parts=raw(ec.kids[1].kids[0]),out=new Uint8Array(parts.reduce((a,x)=>a+x.length,0));let o=0;parts.forEach(x=>{out.set(x,o);o+=x.length});
+  return xmlText(out)}
+// testo dell'XML con la codifica scritta nella prima riga (le fatture sono quasi sempre UTF-8, alcune ISO-8859-1)
+function xmlText(u8){const m=/encoding=["']([\w-]+)["']/i.exec(new TextDecoder('latin1').decode(u8.slice(0,200)));
+  let dec;try{dec=new TextDecoder(m?m[1]:'utf-8')}catch(e){dec=new TextDecoder('utf-8')}return dec.decode(u8).replace(/^﻿/,'')}
 function parseFatturaPA(t){
   const d=new DOMParser().parseFromString(t,'application/xml');if(d.getElementsByTagName('parsererror').length)throw{code:'xml'};
   const g=(el,tag)=>{const x=el.getElementsByTagNameNS('*',tag)[0];return x?x.textContent.trim():''};
@@ -3222,7 +3248,12 @@ async function impRun(kind,files){
   const I=S.imp;if(!I)return;I.err='';
   try{
     let items=null,fonte='';
-    if(kind==='xml'){if(/\.p7m$/i.test(files[0].name))throw{code:'p7m'};items=parseFatturaPA(await files[0].text());fonte='Fattura XML'}
+    if(kind==='xml'){items=[];const bad=[];let e1=null;
+      for(const fl of files){try{const buf=await fl.arrayBuffer();const it=parseFatturaPA(/\.p7m$/i.test(fl.name)?p7mXml(buf):xmlText(new Uint8Array(buf)));
+          if(!it.length)throw{code:'xml'};items.push(...it)}catch(e){e1=e1||e;bad.push(fl.name)}}
+      if(!items.length&&e1)throw e1;
+      if(bad.length)toast((bad.length===1?'Non riesco a leggere ':'Non riesco a leggere '+bad.length+' file: ')+bad.join(', ').slice(0,120),'warn');
+      const n=files.length-bad.length;fonte=n>1?n+' fatture XML':'Fattura XML'}
     else if(kind==='xls'){const fl=files[0];
       if(/\.(csv|tsv|txt)$/i.test(fl.name))items=mapRows(parseTable(await fl.text()));
       else{toast('Apro il file…');await need('xlsx');const wb=XLSX.read(await fl.arrayBuffer(),{type:'array'});const rows=[];wb.SheetNames.forEach(n=>rows.push(...XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:''})));items=mapRows(rows)}

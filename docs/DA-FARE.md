@@ -10,6 +10,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| M39 | v76 online: Fornitori → **Importa listini** → **Fattura elettronica XML** → scegli una o più fatture (.xml o .p7m firmate). Dimmi se le righe e i fornitori tornano | Mario | quando hai una fattura XML o .p7m |
 | M33 | v71 online (18:53): riapri l'app e guarda se il logo JONA all'apertura ora è nitido | Mario | ora |
 | M31 | Scegliere la miglioria del logo: Ovvia (logo più grande all'apertura), Furba (lune che cadono con rimbalzo), Geniale (4 lune come segno di attesa nell'app, consigliata), Nessuna | Mario | quando vuoi |
 | D29 | Ottimizzare l'app per Android, iPhone, Mac e Windows (Mario #60, strada 2 «Furba» #64). **v72 online (#67, PR #83)**: campi a 16 px (niente zoom su iPhone, prova `test-campi-16`), giro con WebKit e su computer 1280/1440 su GitHub. Resta solo (b) barra di stato su iPhone installata: non toccata (zona in alto già cambiata e tolta in v54); si guarda solo con una foto da un iPhone con l'app installata | Claude da solo | ora |
@@ -20,7 +21,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 | D27 | Scorta automatica **fatta in Jona** (10/10, sessione #57, autorizzata da Mario): `.claude/hooks/scorta.py` + avviso in `avvio-check.py`, prova `tools/test-scorta.py` (16 controlli). #72: filtro dei segreti `togli_segreti()` uguale a RVC (link Drive, chiavi, gettoni, valori delle variabili d'ambiente), 22 controlli. Resta: RVC copia lo stesso file (messaggio mandato alla sessione RVC). | Claude | ora |
 | M30 | Preferenze dei due account (Gmail e Hotmail): aggiungi la riga nuova di CAMBIO ACCOUNT («Se i token finiscono di colpo, riparti dal ramo col numero più alto…», testo in `docs/CAMBIO-ACCOUNT.md`) | Mario | quando prepari Hotmail (M29) |
 | D22 | Lettore foto: **v68 online** (10/10, PR #79): Flash → Flash-Lite → Cloudflare Llama 4, banner dal vivo. Giro completo extra su GitHub partito alle 12:5x | Claude da solo | controllare il giro completo |
-| D23 | Idea 1 (fatture da Gmail) scartata da Mario: «devo chiedere e arrivano tardi, al massimo carico io i file». Al suo posto: import di più XML insieme e dei file firmati `.p7m` (oggi errore `p7m`) | Claude da solo | da fare |
+| D23 | Import di più XML insieme e dei `.p7m` firmati: **fatto in v76** (#75, prova `tools/test-p7m.mjs`). Resta: Mario prova con una fattura vera .p7m (M39) | Claude | dopo M39 |
 | D24 | ✅ v69 ONLINE 10/10 14:07 (PR #80): in approvazione delle richieste, «Da … costa … in meno · Passa» se lo stesso prodotto (stessa unità) costa meno da un altro fornitore. Il gestore non ha carrello e lo staff non vede i prezzi: il suggerimento sta solo lì. Prova `tools/test-conveniente.mjs` | Claude da solo | pubblicare |
 | D25 | Idea 3 approvata: foto della bolla all'arrivo confrontata con l'ordine (mancanti / prezzo diverso in rosso) | Claude da solo | da fare |
 | D26 | Idea 2 approvata: costo dei piatti dalle ricette (ingredienti dai listini, avviso se il costo sale) | Claude da solo | da fare |
