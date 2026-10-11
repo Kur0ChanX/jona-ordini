@@ -1,35 +1,29 @@
-# Passaggio di consegne (2026-10-11, fine sessione #80)
+# Passaggio di consegne (2026-10-11, fine sessione #81)
 
-Sessione attuale: #81
+Sessione attuale: #82
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). App online: **v79**. **v80 nella PR #91** (https://github.com/Kur0ChanX/jona-ordini/pull/91), head `f696a0f`: alle 15:39 il controllo «prove» era in corso. **PRIMA COSA della #81**: leggere il check `prove` di `f696a0f` (o dell'head attuale). Se è verde: squash merge della #91, poi `git fetch origin main && git merge origin/main` sul ramo e push, controllo online `APP_VER=80`. Se è rosso: capire la causa e correggere.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). App: **v80 unita in `main`** (PR #91, squash `f0a4541`, 16:2x ora italiana); alle 16:25 il sito diceva ancora `APP_VER=79` (deploy Cloudflare in corso). **PRIMA COSA della #82**: controllare `https://jona-ristorante-by-ynoy-corp.pages.dev/` → `APP_VER=80`. Poi finire la **v81** (sotto).
 
-## Fatto in #80 (11/10, ~10:30-15:40 ora italiana)
-- Unite due scorte (solo `ULTIMO-MESSAGGIO.md`).
-- **Fatto nuovo, importante (Mario):** «le prove non posso farle adesso, si proverà tutto il prossimo anno: devo creare un software praticamente pronto con tutte le funzioni prima». Quindi NON chiedere a Mario prove dal vero (M…): si costruiscono le funzioni che mancano. Scritto in cima a `docs/DA-FARE.md`. **M29 (Hotmail) la gestisce Mario da solo**: non ricordarla.
-- Riassunto «cosa ci rimane» dato a Mario (tabella in 3 parti). Spiegato «passaggio server»: per ora Mario non deve fare niente.
-- Chiesto a RVC #75 (`session_01WavGbXKh2pPo9jSrRipbbc`, attiva) lo stato del D5. Risposta: **D5 non fatto**, mancano gli account Firebase e Cloudflare dell'hotel (li crea Mario con la guida di RVC, email relaisvillacarola.operation@gmail.com). Lato app RVC il ponte c'è già (messaggi `da:'rvc'`, 7 lingue); manca il pezzo nel Worker RVC (POST/GET `/ponte/messaggi` verso il nostro), dopo D5. `PONTE_KEY` serve solo quando il Worker RVC va online → prove dell'anno prossimo. Da dire a Mario in breve (non ancora detto in dettaglio: gli ho detto solo «D5 non pronto, la chiave servirà l'anno prossimo»).
-- **C3 fatta**: `tools/test-firebase-bulk.mjs` (8 controlli) e `tools/test-firebase-sync.mjs` (19 controlli) ora hanno `ok()` PASS/FAIL ed escono con codice 1 se qualcosa fallisce. In sync gli errori di rete attesi senza rete («Failed to load resource») non contano. Verdi con l'emulatore.
-- **C8 tolta**: `cutoutFix` era già stato tolto nella v62 (prova in `test-barra`). Tolte anche D32 (v78 online) e D24 (v69 online) da DA-FARE.
-- **v80 (PR #91)** «Chiedi a Jona conosce le ricette» (era l'idea proposta in #79): `jonaRc()` in index.html aggiunge a `jonaCtx` `ricette_colonne`/`ricette` (piatto, porzioni, prezzo menù, costo a porzione, food cost %, prezzo al 30%, ingredienti senza prezzo, ingredienti [nome,q,u,costo,da]), solo se `funzOn('ricette')` e `isMgr(meU())`. Suggerimento `JONA_TIP_RC` «Quale piatto ha il food cost più alto?» nei chip se ci sono ricette. `APP_VER=80`, NEWS v80 (chef+dev), `CACHE` v84, riga v80 in CLAUDE.md. Controlli aggiunti in `tools/test-ricette.mjs` (36 verdi, anche TZ=Europe/Rome): contesto con la ricetta, niente ricette per lo staff (`S.viewAs='staff'` dentro evaluate: cliccare la barra Test con il foglio aperto andava in timeout) e con funzione spenta. Verdi anche test-news, test-giro.
+## Fatto in #81 (11/10, ~15:59-16:25 ora italiana)
+- Unita la scorta (solo `ULTIMO-MESSAGGIO.md`).
+- **PR #91 rossa** su `7f2e823`: `test-agenda-v61` «Avvisa subito: No: nessuna notifica in più». Causa: prova legata all'ora. L'evento di prova è alle 16:00 con avviso «30 min prima»; alle 15:44 il controllo automatico (`deadlineTick`, a 4 s e ogni 60 s) creava il promemoria per chi l'ha scritto e la prova lo contava. L'app era giusta. Riprodotto con una copia della prova nello scratchpad (evento a «adesso + 14 min» + `deadlineTick()` forzato). Corretto in `tools/test-agenda-v61.mjs`: conta solo le notifiche «Nuovo/Cambiato in agenda» e chiama `deadlineTick()` apposta. **E36** in `docs/ERRORI.md`. Prove GitHub verdi su `65f3b91` → squash merge della #91 → `main` unito nel ramo (`6176d85`).
+- **Mario ha confermato (doppio tocco)** le 2 regole girate da RVC #75: scritte in `CLAUDE.md` (REGOLE TRASVERSALI): «FOTO IN HD SENZA PIÙ TOKEN» e «REGOLE PER TUTTI I PROGETTI» (per ogni nuova regola su come lavoro: domanda a tocco «La mando anche a RVC e SPA Sensorial?», se sì `send_message` alle sessioni attive). Non le ho rimandate a RVC/SPA: vengono da RVC.
+- **Mario ha scelto (doppio tocco): «Agenda passo 2 (D11)»** come prossimo lavoro. Le prove dal vero restano rimandate all'anno prossimo.
 
-## Domanda a Mario senza risposta
-- Messaggio da RVC #75 (15:56): secondo RVC, Mario ha dato una regola per tutti i progetti: «mettila come regola ovunque mandami foto in hd ma senza usare più token». In RVC è scritta in CLAUDE.md («FOTO IN HD SENZA PIÙ TOKEN»): immagini sempre in alta risoluzione (Playwright con deviceScaleFactor 2, confronti fino a 2400 px), mandate con SendUserFile (non costa token); per controllarle si guarda una sola volta una copia piccola (≤1000 px). Non l'ho aggiunta perché arriva da un'altra sessione. Detto a Mario: la #81 la scrive in CLAUDE.md appena Mario conferma.
-- Secondo messaggio da RVC #75 (15:58): altra regola di Mario per tutti i progetti, parole sue: «voglio che le regole per far funzionare al mio meglio Claude Code siano per tutti i progetti, basta solo che mi chiedi devo mandare anche a…». Cioè: quando nasce una regola su come lavora Claude Code, chiedere a Mario con domanda a tocco «La mando anche a RVC e SPA Sensorial?»; se sì, mandarla con send_message alla sessione attiva di ogni progetto (SPA attiva: #08 `session_01Ta4N7WcGt86qybK8z3uJG4`). Anche questa da scrivere in CLAUDE.md quando Mario conferma, insieme a quella delle foto.
-- «Visto che le prove dal vero sono rimandate, posso costruire le funzioni che aspettavano una prova? Per esempio l'agenda passo 2 (D11)». Da rifare col doppio tocco (strumento delle domande) se Mario non risponde. Candidati dopo: D11 (ripetizioni complete, appunti veloci dalla home, coperti → ordine suggerito), D10 (riquadro «Inviato allo chef» solo «Continua»), C7 rifiniture.
+## v81 (D11) in corso: codice scritto, commit `5d2b011`
+Tutto in `index.html`. Già verdi (in locale, TZ Roma): `test-agenda`, `test-agenda-v58`, `test-agenda-v59`, `test-agenda-v61`.
+1. **Ripetizioni complete**: `AG_R` (No, Ogni giorno `g`, Giorni scelti `gs` con `rg` 0=lun..6=dom, Ogni settimana `s`, Ogni mese `m`, Ogni anno `a`), `rf` «Fino al» (facoltativo, compreso), `rx` giorni saltati. `agOnDay` riscritta, `agRg`, `agRLbl` (etichetta «ogni lun, mer» / «fino al 3 novembre»). Modulo: chip «Ripeti» (`agfR`), chip dei giorni (`agfRg`), campo `#agf-rf`, pulsante «Salta solo <giorno>» (`agSkip`, `.ag-skip`) se l'evento salvato è ripetuto e aperto da un giorno (`agEdit` passa `dg` da `data-g`). `agSave` controlla: almeno un giorno per `gs`, «fino al» non prima della data; tiene `rx` e `ckd`. «Avvisa subito» aggiunge «· ogni …» al testo.
+   - **Cose da fare negli eventi ripetuti**: la spunta vale solo per quel giorno (`ckd.d<AAAAMMGG>` = indici fatti, potati oltre 60 giorni; `agCkK`, `agCkOk`). `agEvH(e,me,mgr,next,g)` ha ora il giorno `g`; `agCk` riceve `id|i|g`.
+   - Riga veloce `agParse`: «ogni giorno», «tutti i giorni», «ogni settimana/mese/anno», «ogni lunedì»/«tutti i lunedì» → `r` (il giorno della settimana dà la data di partenza). Restituisce anche `r`.
+2. **Appunti veloci dalla home**: per chi scrive in agenda (`agCan`) la striscia diventa `.ag-strip.ag-can` con il testo (eventi di oggi o «Oggi niente in agenda» + «N appunti») e il pulsante **Appunto** (`agNtQ` → `agNtQuick`: foglio «Appunti di oggi» con `agNotesH`, tastiera subito aperta, «Apri l'agenda» `agFull`). Senza eventi oggi la striscia c'è solo nella prima scheda (`GM_TABS[0]`/`DEV_TABS[0]`/`STAFF_TABS[0]`). Lo staff semplice ha la striscia di prima. Dettatura anche per gli appunti: `agMic(dst)` con `dst` `q` (riga veloce) o `nt` (appunto, poi `A.agNtAdd`), `S.ag.mic` ora vale `'q'|'nt'|false`.
+3. **Coperti in agenda → ordine suggerito**: `sugAgenda(cad)` somma i coperti degli eventi da domani per `cad` giorni (come il meteo); fattore = 1 + coperti / (coperti di un giorno normale × giorni), max ×3, moltiplicato al meteo in `sugRows`. `sugAgH(st)` sotto «Quanta gente ti aspetti?»: «In agenda: N coperti · sab Gruppo Rossi 40…»; se manca `config/app.copNorm` campo «Coperti in un giorno normale» + Salva (`sugCnSave`), altrimenti «Eventi: +X% (giorno normale N coperti · cambia)» con «Usa l'agenda / Ignora» (`sugAg`, `S.sug.useAg`). Solo con la funzione agenda accesa. Scelta mia: i coperti degli eventi contano «in più» rispetto a un giorno normale (gruppi, matrimoni); il gestore può sempre toccare «Ignora».
+   - CSS nuovi: `.sug-lnk`, `.ag-skip`. IN nuovo: `sugCn`.
 
-## Fatto in #79 (11/10, ~9:45-10:35 ora italiana)
-- Mario: «vai» → finita la v78 e fatta la D26 (v79). Tutte e due online.
-- **v78 (PR #89, squash `f5a6e8f`)**: logo YNOY CORP con 4 lune nell'apertura. La prova `test-logo-nitido` falliva solo perché la versione di prima della v75 cercava `docs/img/logo/jona-maschera-480.png`; rimessa la versione v75 della prova (percorso `docs/img/logo/jona/`). Apertura guardata a occhio: 4 lune come la foto di Mario.
-- **v79 (PR #90, D26) «Ricette e costo dei piatti»**, solo gestori (`isMgr`):
-  - Ingresso: riquadro `rcCta` in **Fornitori** sotto «Importa listini» (NON icona in alto: la prima versione con la pentola nella barra faceva uscire la barra a 390 px, `test-demo`/`test-giro` rossi su GitHub → E35). Striscia `rcStrip` «Costo dei piatti salito … +X%» con «Ok, visto» (`rcVisto` → `rcSnap`).
-  - Funzione `ricette` in `FUNZ` con `on:true`: `funzOn` ora usa il valore di partenza se `config/app.funz` non l'ha mai toccata (agenda e hotel restano spente).
-  - Dati `config/ricette` {tipo, r:{<id>:{id,n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG,da,cr,mod}}}, `rcPut` (upd `r.<id>` o put), cancellare = `r.<id>: null`. Nessuna regola Firestore nuova.
-  - `rcPrezzo`: prodotto del listino con la stessa unità → stesso `gkey`+unità (prima stesso fornitore, poi il più economico, «da <fornitore>») → ultimo `pz` («non più a listino, ultimo prezzo»). `rcCalc`: g/kg e ml/l (`rcU`), costo a porzione, food cost = costo / (prezzo menù / 1,10), prezzo per stare al 30%; ingredienti senza quantità o prezzo fuori dal costo con avviso. `rcSalito` ≥3% sopra `rif`. Food cost >35% in rosso.
-  - Fogli `rcList`, `rcFormH` (nome, porzioni, prezzo nel menù, ingredienti con quantità + unità + costo, Togli, Elimina), `rcPick` (cerca in tutti i listini). Salvare rimette `rif` al costo attuale.
-  - `APP_VER=79`, NEWS v79 (chef + dev), `CACHE` v83, riga v79 in CLAUDE.md. Prova `tools/test-ricette.mjs` (31 controlli, anche TZ=Europe/Rome), aggiunta a `VELOCI`. Verdi: test-ricette, test-agenda, test-news, test-demo, test-giro; «prove» GitHub verde.
-  - Scelte tecniche: ingresso in Fornitori (dove stanno i prezzi; barra in alto piena); niente food cost senza prezzo del menù; prezzi solo per gestori (lo staff non li vede, E24).
-- DA-FARE: tolta D26, aggiunta **M41** (Mario prova una ricetta vera). ERRORI: **E35**.
+**Da fare per chiudere la v81** (in ordine):
+1. Prova nuova `tools/test-agenda-v81.mjs` (modalità locale, come `test-agenda-v61`): `agOnDay` per tutti i tipi (giorno, giorni scelti, anno, fino al, saltati), modulo (chip, giorni, «Scegli almeno un giorno», «fino al» prima della data), «Salta solo …», spunta per giorno negli eventi ripetuti, `agParse` «ogni lunedì»/«tutti i giorni», striscia con «Appunto» (gestore sì, staff no; vuota solo nella prima scheda), foglio appunti veloci (aggiungi, spunta), ordine suggerito con coperti (servono 2+ ordini inviati del fornitore: vedi come fa `test-v40`/`test-hotel` per `sugStats`), `copNorm` salvato, «Ignora», 320 px senza scorrimento. Rilanciare anche con `TZ=Europe/Rome` (E18). Aggiungerla a `VELOCI` in `tools/prova-ci.sh`.
+2. `APP_VER=81`, voce NEWS v81 (chef + dev), `CACHE` v85 in `sw.js`, riga v81 in `CLAUDE.md`.
+3. Prove legate: test-agenda*, test-v40 (ordine suggerito?), test-hotel (usa `htSugH`), test-demo, test-giro (la striscia cambia: E35). Poi PR dal ramo unico, «prove» verde → squash → `git fetch origin main && git merge origin/main` → push → controllo online.
+4. `docs/DA-FARE.md`: togliere D11 quando online.
 
 ## D30: Jona fuori dall'account personale (in corso)
 - Organizzazione **`Jona-Ristorante-by-YNOY`** creata dall'account del ristorante **`JonaRistorante-Ynoy`** (jona.ristorante@gmail.com, Owner, 2FA attiva); Kur0ChanX Owner; app Claude installata sull'organizzazione (Save fatto, #68/#69).
@@ -39,15 +33,17 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - Inviti e QR già dati restano validi (stanno su Cloudflare). Nel codice dell'app il nick non c'è.
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
-## Sessioni RVC
-- RVC attiva: **#75** `session_01WavGbXKh2pPo9jSrRipbbc` (#63-#74 chiuse). Prima: #60 (C33 dettatura Porter). Ha mandato a Jona il codice del filtro segreti. Le ho scritto (#72) di far incollare a Mario **Codice.gs v2** PRIMA del nuovo deployment dello script del Drive (lo script è UNO per Jona e RVC), e che il nuovo URL va in `JONA_DRIVE_URL` di tutti e due gli ambienti.
-- Jona #80 `session_01B4hWXa4uTY1e2ik1qt27Qq` (chiusa). Jona #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiusa). Jona #75 `session_01QPzuujHhDE3xqGshobfAn3` e #76 `session_01Ada4vhK6uEQRyN1yrqjQTF` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+## Sessioni
+- Jona #81 `session_014yinZg1B2R2g39VnAWDWH5` (chiusa). #80 `session_01B4hWXa4uTY1e2ik1qt27Qq`, #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC attiva: **#75** `session_01WavGbXKh2pPo9jSrRipbbc`. SPA attiva: #08 `session_01Ta4N7WcGt86qybK8z3uJG4` (per la regola «regole per tutti i progetti»).
+- Ponte con l'hotel: RVC dice che **D5 non è fatto** (mancano gli account Firebase e Cloudflare dell'hotel, li crea Mario con la guida di RVC). `PONTE_KEY` serve solo quando il Worker RVC va online → prove dell'anno prossimo.
 
 ## Prossimi passi (in ordine)
-1. Finire la v80 (PR #91, sopra).
-2. Rifare a Mario la domanda su D11 (sopra) e costruire le funzioni che mancano. Niente richieste di prove dal vero.
-3. D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sopra).
-5. Ponte con l'hotel: quando RVC ha D5, guida per `PONTE_KEY`. Elenco completo in `docs/DA-FARE.md`.
+1. Controllo online v80 (sopra).
+2. Finire la v81 (sopra) e pubblicarla in automatico se le prove sono verdi.
+3. Poi altre funzioni che mancano (Mario vuole un software «praticamente pronto con tutte le funzioni» prima delle prove dell'anno prossimo): candidati D10 (riquadro «Inviato allo chef» solo «Continua»), C7 rifiniture; chiedere a Mario a tocco (doppio tocco) da cosa partire.
+4. D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sopra).
+Elenco completo in `docs/DA-FARE.md`. NON chiedere a Mario prove dal vero (M…); M29 la gestisce lui.
 
 ## Note tecniche
 - Drive: `JONA_DRIVE_URL=… bash tools/drive/carica.sh "Jona/<cartella>" file…` (risposta JSON `{ok,link,cartella}`; per avere il link di una cartella si carica un file dentro). `cairosvg` e `potracer` vanno installati con pip a ogni sessione.
@@ -63,7 +59,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-«si e poi procedi  con il resto
-
-le prove non posso farle adesso si proverà tutto il prossimo anno devo creare un software praticamente pronto con tutte le funzioni prima
- m29 ci penserò io»
+Risposte a tocco (doppio tocco) di Mario in #81:
+- «RVC dice che mi hai dato 2 regole per tutti i progetti… Le scrivo anche in Jona?» → «Sì, tutte e due (Consigliato)» · «Sì, confermo le regole».
+- «Le prove dal vero sono rimandate all'anno prossimo. Da cosa parto per completare l'app?» → «Agenda passo 2 (Consigliato)» · «Sì, confermo da dove parto».
