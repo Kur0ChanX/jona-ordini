@@ -2,7 +2,7 @@
 
 Sessione attuale: #77
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v76**. **PR #88 (v77, D25) APERTA** dal ramo `claude/jona-v77-bolla` (stesso contenuto del ramo di lavoro a `ffe4590` + consegne): https://github.com/Kur0ChanX/jona-ordini/pull/88
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v77** (PR #88 unita in #77, squash `49b9aba`). **PR #88 (v77, D25) APERTA** dal ramo `claude/jona-v77-bolla` (stesso contenuto del ramo di lavoro a `ffe4590` + consegne): https://github.com/Kur0ChanX/jona-ordini/pull/88
 
 ## 🔴 Primo lavoro della #77
 1. Controllare il check «prove» della PR #88 (nome minuscolo, E33). Se verde: squash merge, controllo online `APP_VER=77` su https://jona-ristorante-by-ynoy-corp.pages.dev/ , poi `git fetch origin main && git merge origin/main` nel ramo di lavoro e push (E7: conflitti solo negli appunti → tenere quelli del ramo di lavoro). Se rosso: capire la causa e correggere.
