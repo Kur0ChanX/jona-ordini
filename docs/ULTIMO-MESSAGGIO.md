@@ -1,3 +1,5 @@
-# Ultimo messaggio di Mario (11/10/2026 ~17:47 ora italiana, nella #84 chiusa)
+# Ultimo messaggio di Mario (11/10/2026 17:44 ora italiana)
 
-«non ho cliccato il touch della risposta è si è persa... dove trovo la domanda e perché non c'è stata la regola doppio tocco»
+git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
+Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #85).
+Poi attendi le istruzioni di Mario.
