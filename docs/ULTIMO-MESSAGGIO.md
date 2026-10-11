@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (11/10/2026 ~17:47 ora italiana, nella #84 chiusa)
+# Ultimo messaggio di Mario (11/10/2026 20:09 ora italiana)
 
-«non ho cliccato il touch della risposta è si è persa... dove trovo la domanda e perché non c'è stata la regola doppio tocco»
+A. ti dò un oo di contesto,maurizio è capo della cucina e proprietario del ristorante  ma Mauro è f&b manager è di solito è sopra lo chef come ruolo ma mauro fa' da ponte tra hotel camere e ristorante perché le mura del ristorante sono dell'hotel Maurizio è in affitto in gestione
