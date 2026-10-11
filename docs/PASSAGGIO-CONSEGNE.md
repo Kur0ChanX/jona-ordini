@@ -58,4 +58,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-«si» (scritto nella #75 chiusa, ~4:13, girato qui). Poi nella #76 ha scelto col doppio tocco «D25 foto bolla (Consigliata)» + «Sì, confermo il lavoro». Nessun messaggio dopo.
+«no lascia stare anche in jona digli di lasciare com era che c'era la regola del ramo singolo se non xrea problemi ed è ottimale per il drive solo ordine con cartelle e si carica solo l'essenziale che può servirmi veramente e basta e poi qll che devido io» (scritto in RVC #63, 4:25, girato dalla #76 alla #77). Da fare: confermare col doppio tocco il testo nuovo delle regole RAMI e DRIVE in CLAUDE.md.
+
+Prima: «si» (scritto nella #75 chiusa, ~4:13, girato qui). Poi nella #76 ha scelto col doppio tocco «D25 foto bolla (Consigliata)» + «Sì, confermo il lavoro». Nessun messaggio dopo.
