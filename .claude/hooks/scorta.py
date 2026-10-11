@@ -9,7 +9,22 @@ import datetime, json, os, subprocess, sys, re
 
 CWD = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
 FILE_MSG = "docs/ULTIMO-MESSAGGIO.md"
-AVVISI_DI_SISTEMA = ("<task-notification", "<system-reminder", "<wake ", "[SYSTEM NOTIFICATION")
+AVVISI_DI_SISTEMA = ("<task-notification", "<system-reminder", "<wake ", "[SYSTEM NOTIFICATION", "[AVVIO]")
+# Un segreto incollato in chat non deve mai arrivare su GitHub con la scorta (il repo è pubblico). Stesso codice di RVC.
+TOLTO = "[segreto tolto dalla scorta]"
+SEGRETI = [re.compile(p, re.S) for p in (
+    r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(?:-----END [A-Z ]*PRIVATE KEY-----|\Z)",  # chiavi private
+    r"https?://script\.google(?:usercontent)?\.com/\S+",  # app web di Apps Script (cartella Drive)
+    r"AIza[0-9A-Za-z_\-]{20,}",  # chiavi Google/Firebase
+    r"\b(?:sk|pk|rk)-[A-Za-z0-9_\-]{16,}",  # chiavi API (Anthropic, OpenAI, Stripe…)
+    r"\b(?:gh[pousr]_|github_pat_)[A-Za-z0-9_]{20,}",  # gettoni GitHub
+    r"\bxox[abprs]-[A-Za-z0-9\-]{10,}",  # gettoni Slack
+    r"\bAKIA[0-9A-Z]{16}\b",  # chiavi AWS
+    r"(?i)\b(?:key|token|secret|password|pass|pwd|auth|sig|signature)=[^\s&]+",  # valori segreti negli indirizzi
+)]
+# sequenze lunghe di lettere e cifre insieme (gettoni sconosciuti); le parole normali non arrivano a 32 caratteri
+GETTONE = re.compile(r"[A-Za-z0-9_\-]{32,}")
+NOMI_SEGRETI = re.compile(r"KEY|TOKEN|SECRET|PASSWORD|_URL$", re.I)
 
 
 def run(*args, env=None, inp=None, timeout=30):
@@ -34,14 +49,22 @@ def ora_italiana():
         return datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC")
 
 
+def togli_segreti(testo):
+    for nome, valore in os.environ.items():  # i valori segreti dell'ambiente, se Mario li incolla in chat
+        if NOMI_SEGRETI.search(nome) and len(valore) >= 12 and valore in testo:
+            testo = testo.replace(valore, TOLTO)
+    for p in SEGRETI:
+        testo = p.sub(TOLTO, testo)
+    return GETTONE.sub(lambda m: TOLTO if re.search(r"\d", m.group()) and re.search(r"[A-Za-z]", m.group())
+                       else m.group(), testo)
+
+
 def salva_msg(dati, gitdir):
     testo = str(dati.get("prompt") or "").strip()
     if not testo or testo.startswith(AVVISI_DI_SISTEMA):
-        return  # avvisi automatici (GitHub, promemoria): non sono messaggi di Mario
-    # l'indirizzo dello script di Google Drive vale come una chiave: il repo è pubblico, non si salva
-    testo = re.sub(r"https://script\.google(?:usercontent)?\.com/\S+", "[indirizzo di Google Drive nascosto]", testo)
+        return  # avvisi automatici (GitHub, promemoria, prompt di avvio): non sono messaggi di Mario
     with open(os.path.join(gitdir, "scorta-msg.md"), "w", encoding="utf-8") as f:
-        f.write(f"# Ultimo messaggio di Mario ({ora_italiana()} ora italiana)\n\n{testo}\n")
+        f.write(f"# Ultimo messaggio di Mario ({ora_italiana()} ora italiana)\n\n{togli_segreti(testo)}\n")
 
 
 def scorta(gitdir, push=True):
