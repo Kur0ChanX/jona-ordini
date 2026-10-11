@@ -1,13 +1,28 @@
-# Passaggio di consegne (2026-10-11, fine sessione #88)
+# Passaggio di consegne (2026-10-11, fine sessione #89)
 
-Sessione attuale: #89
+Sessione attuale: #90
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v84** Cantina Vini (PR #95, squash `050db8d`, online alle 22:46). **v85 nella PR #96** (aperta ~22:45, controllo `prove` in corso sul commit `9757eee`).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v84**. **v85 nella PR #96**, ancora da unire.
 
-## ✅ SUBITO (#89): chiudere la PR #96 (v85 ruoli + Bar)
-- Se `prove` è verde: squash della PR #96 → subito `git fetch origin main && git merge origin/main` sul ramo + push → controllo online `APP_VER=85` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33). Se rosso: capire la causa e correggere.
-- Prove già fatte in #88, tutte verdi: `test-bar` (35 PASS, anche TZ Roma), `test-cantina`, `test-news`, `test-demo`, `test-campi-16`, `test-giro`. Non rifarle.
-- Dopo: in `docs/DA-FARE.md` togliere la riga D35-D36. Poi dire a Mario in breve cosa c'è di nuovo (v84 + v85) e mandargli una foto del Bar (Playwright su `/#demo` → `demoGo` → Fornitori → `brOpen`; in demo ci sono 10 bottiglie, Havana a ⅓ «da riordinare»).
+## ✅ SUBITO (#90): chiudere la PR #96 (v85 ruoli + Bar)
+- La #89 è durata pochissimo (avviso del contesto pieno subito). Le prove su GitHub della PR #96 sono state annullate 3 volte perché arrivavano commit nuovi (consegne #88, D37, consegne #89). Con l'ultimo push (consegne #89) ripartono: **aspettare il controllo `prove` sull'ultimo commit del ramo** (`curl https://api.github.com/repos/Kur0ChanX/jona-ordini/commits/<sha>/check-runs`, ~15 min) SENZA fare altri push nel frattempo (ogni push annulla e riparte).
+- Verde → squash PR #96 (titolo «v85: ruoli nuovi e Bar (cocktail + inventario alcolici)») → subito `git fetch origin main && git merge origin/main` sul ramo + push → controllo online `APP_VER=85` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33). Rosso → capire la causa e correggere.
+- La PR #96 ora contiene anche D37 (solo `.claude/agents/ottimizza.md` e `tools/misura-velocita.mjs`: non toccano l'app).
+- Prove dell'app già fatte in #88, tutte verdi. Non rifarle.
+- Dopo: in `docs/DA-FARE.md` togliere D35-D36 e D37 (se proposta fatta). Poi dire a Mario cosa c'è di nuovo (v84 Cantina + v85 Bar) e mandargli la foto del Bar: script pronto da rifare (Playwright 390×844, `deviceScaleFactor:2`: `/#demo` → `[data-a="demoGo"]` → `nav [data-a="tab"][data-v="fornitori"]` → `main [data-a="brOpen"]`; poi riga «Negroni»; poi Escape, `brOpen`, `[data-a="brV"][data-v="inv"]`; 3 foto affiancate con PIL). In #89 la foto era venuta bene (lista cocktail, scheda Negroni «in casa», inventario 33 bottiglie, 435,83 €, «Da riordinare: Havana ⅓»).
+
+## Fatto in #89 (11/10, 22:47-22:55)
+- **D37 parte 1 – agente**: `.claude/agents/ottimizza.md` (agente «ottimizza»: misura, trova cosa pesa, max 3 proposte; non fa commit; regole di sicurezza). Si carica dalle sessioni nuove (#90 in poi: `Agent` con `subagent_type: ottimizza`).
+- `tools/misura-velocita.mjs`: telefono economico simulato (CPU ×4, 4G lento 1,6 Mbit/s, latenza 150 ms) con un piccolo server proprio su :8766 che comprime i file come Cloudflare (python http.server non comprime: con lui i numeri erano falsi, 8,4 s). Tetti in `TETTI`; esce con 1 se superati. Numeri di oggi: index.html 857 KB (285 KB compresso); primo avvio 480 KB scaricati, prima schermata 3,5 s, blocco più lungo 287 ms, memoria 5 MB; demo 334 KB, 2,7 s. Tutto entro i tetti. NON ancora nelle prove di GitHub (decidere dopo qualche misura: i tempi su GitHub cambiano).
+- Fatto nuovo: CLAUDE.md dice index.html «~260 KB», in realtà **857 KB** (666 KB di script, 189 KB di CSS). Le librerie `lib/` si caricano già solo al bisogno (`LIB` in index.html), `cocktail.json` solo nel Bar. Da correggere la riga in CLAUDE.md.
+- Lanciata un'analisi con l'agente (in background): il risultato NON è arrivato prima della chiusura. Da rifare nella #90 con `subagent_type: ottimizza`, solo analisi, poi proporre a Mario le 3 idee migliori.
+- **D37 parte 2 – strumenti MCP** (ricerca fatta, proposta da fare a Mario nel testo, E38). Collegato oggi: solo Google Drive. Utili trovati:
+  - **Ovvia**: niente di nuovo (scatola nera + prove su GitHub bastano).
+  - **Furba**: connettore **Cloudflare Developer Platform** (claude.ai → Impostazioni → Connettori): leggerei da solo la scatola nera (`/errori`, tabella `err` nel D1), i log del Worker e le righe «Vecchio indirizzo» di D30, senza chiedere niente a Mario. Rischio: dà anche il permesso di cancellare (D1, Worker) → si usa solo in lettura, regola da scrivere.
+  - **Geniale**: Cloudflare + una routine settimanale che legge la scatola nera e manda a Mario un riassunto «errori della settimana» (e chiude D30 da sola quando non arriva più nessuno dal vecchio indirizzo).
+  - Scartato: Sentry (doppione della scatola nera, account in più).
+  - Raccomandazione: Furba (poi Geniale se va bene).
+- Messaggio della #88 ricevuto (D37) e gestito.
 
 ## Fatto in #88 (11/10, 22:26-22:50 ora italiana)
 - Unita la scorta (solo `docs/ULTIMO-MESSAGGIO.md`, richiesta D34-D36 già salvata).
@@ -24,7 +39,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 
 ## Prossimi lavori (in ordine, da soli, poi pubblicare in automatico se le prove sono verdi)
 1. PR #96 (sopra).
-2. **D37** (richiesta di Mario arrivata nella #87 alle 22:29, girata qui): «Aggiungi un agente per ottimizzare e velocizzare. se vuoi consigliarmi Tool Search mcp di claude se qualcosa può tornare utile al progetto o migliorarlo o evolverlo ecc»
+2. **D37** (agente fatto in #89; resta: analisi con l'agente + proposta MCP a Mario, vedi «Fatto in #89») (richiesta di Mario arrivata nella #87 alle 22:29, girata qui): «Aggiungi un agente per ottimizzare e velocizzare. se vuoi consigliarmi Tool Search mcp di claude se qualcosa può tornare utile al progetto o migliorarlo o evolverlo ecc»
    - Fare: agente `.claude/agents/` per ottimizzare e velocizzare (peso e velocità dell'app sui telefoni economici, regola «non appesantire»); poi cercare strumenti MCP/plugin utili (ToolSearch, SearchMcpRegistry, SearchPlugins) e proporli a Mario con 3 strade (ovvia, furba, geniale). Domande nel testo (E38).
 3. Idee possibili per il Bar (non chieste, da proporre a Mario solo se utili): «Cocktail della casa» (ricette scritte dal bartender), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
 4. D33 (funzioni smart per orari e agenda): proposta con 3 strade (dettagli sotto).
@@ -50,7 +65,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = staff segna i giorni in cui
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #88 `session_0199ANgsgVouZX79Xd7QJFZX` (chiusa), #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiusa), #86 `session_01XaFfJiACdkE4pXQs6PbCok` (chiusa), #85 `session_01YBt4KxQa3Z4RMeKrQdvghK`, #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #89 `session_01Y1ek4ZACQwmsRsQn8vWqyn` (chiusa; catena di sessioni al limite: «lineage depth 8, limit 8», E12 → la #90 la apre Mario a mano), #88 `session_0199ANgsgVouZX79Xd7QJFZX` (chiusa), #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiusa), #86 `session_01XaFfJiACdkE4pXQs6PbCok` (chiusa), #85 `session_01YBt4KxQa3Z4RMeKrQdvghK`, #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp`. Una sessione ferma su una domanda o un permesso non legge i messaggi delle altre finché Mario non risponde lì.
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 - D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sotto).

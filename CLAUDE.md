@@ -119,7 +119,7 @@ Istruzioni per me (Cosa devo fare io): Se devo fare dei test o delle azioni, scr
 App degli ordini di cucina e sala del Jona Ristorante (Mario sviluppatore, Maurizio amministratore/chef, staff). App statica in un solo file, senza build, pubblicata su Cloudflare Pages: https://jona-ristorante-by-ynoy-corp.pages.dev/ (si installa come app, schermo intero; workflow `.github/workflows/cloudflare-pages.yml` a ogni push su `main`, file nuovi dell'app vanno aggiunti al passo «Prepara i file»). Il vecchio indirizzo GitHub Pages passa da solo al nuovo (script in `<head>`, v37). Firma visibile «Jona_Ristorante By YNOY CORP» (senza «&», scelta di Mario v53).
 
 ## Struttura
-- `index.html`: tutta l'app (~260 KB, righe lunghissime). Non leggerla per intero: `grep -n -o '.\{0,80\}PAROLA.\{0,200\}'` e `sed -n 'A,Bp' | cut -c1-1500`; modifiche con sostituzioni Python che controllano che il pezzo compaia una volta sola.
+- `index.html`: tutta l'app (~860 KB, 285 KB compresso, righe lunghissime; peso e velocità: agente `ottimizza` e `node tools/misura-velocita.mjs`, D37). Non leggerla per intero: `grep -n -o '.\{0,80\}PAROLA.\{0,200\}'` e `sed -n 'A,Bp' | cut -c1-1500`; modifiche con sostituzioni Python che controllano che il pezzo compaia una volta sola.
 - Ruoli: `staff`, `gm` (amministratore, chef), `dev` (sviluppatore). Lo sviluppatore ha la barra **Test** (`viewAs`: Admin Chef / F&B Mauro / Staff / Sviluppatore; «F&B Mauro» = staff del reparto `fb`, v43) per simulare tutto.
 - Dati: interfaccia unica `S.db.collection(c).doc(id).set/update/delete` e `orderBy().limit().onSnapshot()`. Due versioni:
   - `LocalStore`: tutto in localStorage (`jona_db_v2`), solo sul telefono.
