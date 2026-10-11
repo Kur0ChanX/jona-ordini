@@ -51,4 +51,4 @@ Elenco completo in `docs/DA-FARE.md`. NON chiedere a Mario prove dal vero (M…)
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-(scritto nella #83 chiusa, girato qui) «sì, la usano ogni giorno» (risposta a: la reception usa già RVC ogni giorno?)
+(nella #84 dopo l'handoff) «non ho cliccato il touch della risposta è si è persa... dove trovo la domanda e perché non c'è stata la regola doppio tocco». Risposta: in #84 le domande erano nel testo, non a tocco (errore E37). La #85 rifà con lo strumento + doppio tocco la domanda D10/C7.
