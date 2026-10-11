@@ -20,6 +20,9 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - Orari dei responsabili (`resp.<id>`, striscia «Chi c'è adesso» `rsStrip`/`rsChat`) + orari per reparto (sopra). Dettagli in CLAUDE.md (riga v83). `APP_VER=83`, `CACHE` v87.
 - Foto per Mario (non nel repo): script nello scratchpad della #86, si rifanno con Playwright se servono.
 
+## D34-D36 — richiesta nuova di Mario (scritta per sbaglio nella #86, girata alla #87 alle 22:12)
+Cantina Vini (D34), ruolo Chef de rang e ruoli mancanti (D35), Cocktail e inventario alcolici per il Bartender (D36). Testo parola per parola in `docs/richieste/cantina-vini-cocktail.md`. Da fare «in coda senza fermarsi» dopo la v83. Domande a Mario scritte nel testo (E38); chiedere solo cose del ristorante (es. vendite da scontrini o cassa).
+
 ## D33 — funzioni smart per orari e agenda (chiesto da Mario, ancora da proporre)
 Proporre con immagine + domanda a tocco con doppio tocco (3 strade: ovvia/furba/geniale). Controllato che NON esistono già: richieste di indisponibilità/ferie dallo staff; promemoria del turno (sera prima / 1 ora prima); turni proposti in automatico dai coperti dell'agenda; costo del personale della settimana. Esistono già: «Copia settimana prima», turni tipo, assenze (R/F/M/P), cambi turno, timbratura QR, «In turno oggi», agenda con ripetizioni e appunti, coperti in ordine suggerito.
 Idee: Ovvia = promemoria del turno via push; Furba = staff segna i giorni in cui non può + il pianificatore li mostra; Geniale = «Proponi la settimana» (bozza automatica da coperti dell'agenda, contratti, indisponibilità e settimana prima, il gestore corregge e pubblica).
