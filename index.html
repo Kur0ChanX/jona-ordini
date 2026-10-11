@@ -609,6 +609,18 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .vn-tav{padding:14px 16px;border-radius:16px;background:linear-gradient(120deg,var(--lagoon-soft),var(--surface) 80%);margin:4px 0 12px}
 .vn-tav p{margin:6px 0 0}.vn-tl{font:600 12px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--lagoon)}
 .vn-inv{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}.vn-inv .row-i{flex:1;min-width:0}
+.br-bot{flex:none;position:relative;width:12px;height:28px;margin:6px 2px 0;border:2px solid var(--ink2);border-radius:4px 4px 3px 3px;background:linear-gradient(to top,var(--ocra) var(--l),transparent var(--l))}
+.br-bot::before{content:'';position:absolute;top:-7px;left:50%;width:4px;height:5px;margin-left:-2px;border-radius:1px;background:var(--ink2)}.br-vuota{opacity:.45}
+.br-met{flex:none;font-size:12px;color:var(--muted);padding:4px 9px;border-radius:999px;background:var(--sunk);white-space:nowrap}
+.br-iba{font:600 10px var(--font);letter-spacing:.05em;color:var(--lagoon);border:1px solid currentColor;border-radius:6px;padding:1px 4px;vertical-align:2px}
+.br-piu{width:100%;margin-top:10px}.br-f{margin-top:10px}
+.br-tav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.br-tav b{display:block;font-size:14.5px;margin-top:2px;overflow-wrap:anywhere}
+.br-ing{border-top:1px solid var(--line);margin-bottom:6px}.br-ir{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.br-ir b{flex:none;min-width:84px;font-variant-numeric:tabular-nums}.br-ir span{flex:1;min-width:0;overflow-wrap:anywhere}.br-ir i{flex:none;font-style:normal;font-size:12px;padding:2px 8px;border-radius:999px}
+.br-ok{background:var(--lagoon-soft);color:var(--lagoon)}.br-no{background:var(--sunk);color:var(--corallo)}.br-pas{margin-top:6px}
+.br-casa{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:linear-gradient(120deg,var(--lagoon-soft),var(--surface) 80%);margin:4px 0 8px}
+.br-casa b{display:block;font:600 22px var(--font)}.br-casa .br-bot{width:18px;height:40px}
+.br-step{display:flex;align-items:center;gap:18px;margin-bottom:6px}.br-step b{font:600 24px var(--font);min-width:40px;text-align:center}.br-liv{margin-bottom:12px}.br-fin{width:100%}
 .vn-inv1{flex-wrap:wrap;border:0}.vn-inv1 .row-i{flex-basis:100%}.vn-inv1 .btn{flex:1}
 .vn-pm{font:600 22px var(--font);width:44px;height:44px;border:1px solid var(--line);border-radius:12px}
 .vn-n{min-width:32px;text-align:center;font:600 18px var(--font)}
@@ -1183,7 +1195,7 @@ chevl:'<path d="m14.5 5.5-6.5 6.5 6.5 6.5"/>',
 sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
 rain:'<path d="M7 15.5h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6-1.3A4.5 4.5 0 0 0 7 15.5z"/><path d="M8.5 18.5l-1 2.2M12.5 18.5l-1 2.2M16.5 18.5l-1 2.2"/>',
 pot:'<path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M9 7.2c0-1.6 1.3-2.7 3-2.7s3 1.1 3 2.7"/>',
-wine:'<path d="M7.5 3h9c.4 3.8 0 7.7-4.5 9.3C7.5 10.7 7.1 6.8 7.5 3z"/><path d="M12 12.3V20M8.5 20.5h7M7.6 6.5h8.8"/>',
+cocktail:'<path d="M4 4h16l-8 8.5z"/><path d="M12 12.5V20M8 20.5h8M15.5 4l2.5-2.5"/>',wine:'<path d="M7.5 3h9c.4 3.8 0 7.7-4.5 9.3C7.5 10.7 7.1 6.8 7.5 3z"/><path d="M12 12.3V20M8.5 20.5h7M7.6 6.5h8.8"/>',
 glass:'<path d="M7 3h10l-1 7.5a4 4 0 0 1-8 0z"/><path d="M12 14.5V20M8.5 20.5h7M7.5 7h9"/>',
 msg:'<path d="M4.5 5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h-1A1.5 1.5 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5z"/><path d="M7.5 9.5h9M7.5 12.5h6"/>',
 play:'<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
@@ -1195,8 +1207,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=84;
+const APP_VER=85;
 const NEWS=[
+  {v:85,data:'2026-10-11',titolo:'Bar e nuovi ruoli',
+    tutti:['Nuovi ruoli: Chef de rang, Commis di sala, Runner, Hostess, Chef de partie, Commis di cucina, Pizzaiolo, Bartender e Barback.','Per i bartender: «Bar» in «Cosa serve?» con oltre 200 cocktail famosi: dosi, bicchiere, guarnizione e come si fanno. Cerca per nome o ingrediente.','Inventario del bar: per ogni bottiglia segni quelle intere e quanto resta di quella aperta (⅓, ½, ⅔). «Si possono fare» mostra i cocktail con gli alcolici che ci sono.'],
+    chef:['«Bar: cocktail e alcolici» è in Fornitori: inventario delle bottiglie, bottiglie usate nel mese, valore al prezzo d\'acquisto e quelle da riordinare.','Lo vedono gestori, responsabili e chi ha la mansione Bartender o Barback. Si spegne in Impostazioni → Funzioni.'],
+    dev:{aggiunte:['D35: `MANSIONI_G` (gruppi con optgroup, `mansOpt` tiene le mansioni vecchie come «Barman» o «Commis»), `isBar`.','D36: `data/cocktail.json` (212 cocktail, da `tools/cocktail.txt` con `tools/cocktail.py`, scaricato solo all\'apertura, in `FILES` di sw.js e nel deploy), `BR_CAT` tipi di alcolici, `brOpen` (Cocktail | Inventario), `brShowC`, `brShowB`, `brSet` (`config/bar` {b:{<id>:{n,cat,cl,pi,ap,min,pc}}}, movimenti `config/bar_mov_<AAAA-MM>` con `d`), `brFattibile`. Prova `tools/test-bar.mjs`.']}},
   {v:84,data:'2026-10-11',titolo:'Cantina Vini',
     tutti:['Nuovo: «Cantina Vini» (per la sala, in «Cosa serve?»). Per ogni vino c\'è «Al tavolo in 10 secondi»: la frase da dire al cliente, 3 parole chiave, con cosa va e come si serve.','In «Consiglia» tocchi cosa mangia il cliente (carne, pesce, dolce…) e vedi i vini in casa adatti.','Quando vendi una bottiglia tocca «− Venduta»: l\'app tiene il conto di quelle in casa.'],
     chef:['«Cantina Vini» è in Fornitori. Fotografa l\'etichetta: l\'IA scrive la scheda (cantina, annata, gradi, vitigni, storia, gusto, profumi, abbinamenti, servizio). Tu controlli e salvi.','In «Inventario»: bottiglie in casa, vendute nel mese, i più venduti, valore al prezzo d\'acquisto e i vini da riordinare.','Il prezzo d\'acquisto lo vedono solo i gestori. La funzione si spegne in Impostazioni → Funzioni.'],
@@ -1491,7 +1507,9 @@ const NEWS=[
 
 /* ================= constants ================= */
 const REPARTI={cucina:'Cucina',sala:'Sala',fb:'F&B Manager',resp:'Responsabile',altro:'Altro'};
-const MANSIONI=['Chef','Sous chef','Cuoco','Commis','Pasticcere','Lavapiatti','Maître','Cameriere','Sommelier','Barman','F&B manager','Altro'];
+const MANSIONI_G=[['Cucina',['Chef','Sous chef','Chef de partie','Cuoco','Commis di cucina','Pasticcere','Pizzaiolo','Lavapiatti']],['Sala',['Maître','Chef de rang','Commis di sala','Cameriere','Runner','Hostess','Sommelier']],['Bar',['Bartender','Barback']],['Gestione',['F&B manager']],['Altro',['Altro']]];
+const MANSIONI=MANSIONI_G.flatMap(g=>g[1]);
+const mansOpt=v=>(v&&!MANSIONI.includes(v)?`<option selected>${esc(v)}</option>`:'')+MANSIONI_G.map(([g,l])=>`<optgroup label="${g}">${l.map(m=>`<option ${v===m?'selected':''}>${esc(m)}</option>`).join('')}</optgroup>`).join('');
 const CATS=['Pesce','Carne','Verdura e frutta','Latticini e uova','Secco e dispensa','Bevande','Caffè','Pulizia e monouso','Altro'];
 const METODI={modulo:{l:'Modulo d\'ordine compilato',i:'file'},whatsapp:{l:'WhatsApp',i:'chat'},email:{l:'Email',i:'mail'},excel:{l:'File Excel per email',i:'sheet'},word:{l:'File Word per email',i:'file'},pdf:{l:'PDF per email',i:'file'},sito:{l:'Sito del fornitore',i:'globe'},telefono:{l:'Telefono',i:'phone'}};
 const PAL=['#1F7F86','#3B7A57','#AE4E37','#94661C','#5B6FA8','#8A5A8C','#6B7F3A','#B0705A'];
@@ -2127,7 +2145,7 @@ function profileForm(p,o={}){
   <div><label class="lbl" for="${p}-cognome">Cognome</label><input class="inp" id="${p}-cognome" autocomplete="family-name" value="${esc(f.cognome||'')}" data-in="form" data-k="cognome"></div></div>
   ${o.roles?`<span class="lbl">Ruolo</span><div class="seg wide">${o.roles.map(k=>`<button type="button" aria-pressed="${f.ruolo===k}" data-a="formset" data-k="ruolo" data-v="${k}">${RUOLI[k]}</button>`).join('')}</div><p class="muted small" style="margin:6px 0 0">${({staff:'Cerca prodotti, invia richieste e controlla la merce in arrivo. Non vede i prezzi.',gm:'Approva le richieste, ordina ai fornitori, gestisce tutto.',dev:'Carica listini e gestisce fornitori e profili. Non approva e non ordina.'})[f.ruolo]||''}</p>`:''}
   ${(f.ruolo||'staff')==='staff'&&!o.noRep?`<span class="lbl">Reparto</span><div class="seg wide rep">${Object.entries(REPARTI).map(([k,l])=>`<button type="button" aria-pressed="${f.reparto===k}" data-a="formset" data-k="reparto" data-v="${k}">${l}</button>`).join('')}</div>
-  <label class="lbl" for="${p}-mans">Mansione</label><select class="inp" id="${p}-mans" data-ch="formsel" data-k="mansione">${MANSIONI.map(m=>`<option ${f.mansione===m?'selected':''}>${esc(m)}</option>`).join('')}</select>`:''}
+  <label class="lbl" for="${p}-mans">Mansione</label><select class="inp" id="${p}-mans" data-ch="formsel" data-k="mansione">${mansOpt(f.mansione)}</select>`:''}
   ${o.contr&&withContr(f)?orContrForm(p):''}
   ${o.user!==false?`<label class="lbl" for="${p}-user">Nome utente <span class="muted small">(serve per entrare)</span></label><input class="inp" id="${p}-user" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="es. marco.rossi" value="${esc(f.username||'')}" data-in="form" data-k="username">`:''}
   ${o.invOpt?`<span class="lbl">Password</span><div class="seg wide">${[[1,'La sceglie lui (invito WhatsApp)'],['','La scrivo io']].map(([k,l])=>`<button type="button" aria-pressed="${!!f._inv===!!k}" data-a="formset" data-k="_inv" data-v="${k}">${l}</button>`).join('')}</div>`:''}
@@ -2254,7 +2272,7 @@ function vCatalogo(me){
   const ps=prods();
   if(!ps.length)return`<h1 class="vt">Cosa serve?</h1>`+empty('store','Il catalogo è vuoto','Lo chef deve ancora caricare i listini dei fornitori. Intanto puoi chiedere un prodotto scrivendolo qui sotto.')+catSearch([])+`<div id="results">${catResults()}</div>`;
   const cats=[...new Set(ps.map(p=>p.categoria||'Altro'))].sort((a,b)=>CATS.indexOf(a)-CATS.indexOf(b));
-  return`<h1 class="vt">Cosa serve?</h1>${me&&me.reparto!=='cucina'?vnCta(me):''}${isMgr(me)?'<p class="vsub">Cerca, scegli il fornitore e aggiungi al carrello.</p>':stepsHint()}${catSearch(cats)}<div id="results">${catResults()}</div>`;
+  return`<h1 class="vt">Cosa serve?</h1>${me&&me.reparto!=='cucina'?vnCta(me):''}${me&&!isMgr(me)?brCta(me):''}${isMgr(me)?'<p class="vsub">Cerca, scegli il fornitore e aggiungi al carrello.</p>':stepsHint()}${catSearch(cats)}<div id="results">${catResults()}</div>`;
 }
 const stepsHint=()=>`<ol class="steps3" aria-label="Come si fa"><li><b>1</b>Cerca</li><li><b>2</b>Premi +</li><li><b>3</b>Invia allo chef</li></ol>`;
 function catSearch(cats){
@@ -3093,7 +3111,7 @@ function vFornitori(){
   const fs=Object.values(D().fornitori).sort(byNome);const cnt={};for(const p of prods())cnt[p.fornitoreId]=(cnt[p.fornitoreId]||0)+1;
   return`<div class="vhead"><div><h1 class="vt">Fornitori</h1><p class="vsub">${fs.length} fornitori, ${prods().length} prodotti a listino</p></div><button type="button" class="btn ghost" data-a="fnew">${ic('plus')} Nuovo</button></div>
   <button type="button" class="sug-cta" data-a="imp" data-f="">${ic('upload')}<div><b>Importa listini</b><span>Excel, CSV, fattura XML, tabella preparata con Gemini o foto</span></div>${ic('chev')}</button>
-  ${rcCta(meU())}${vnCta(meU())}
+  ${rcCta(meU())}${vnCta(meU())}${brCta(meU())}
   ${fs.length?`<div class="fgrid">${fs.map(f=>{const m=METODI[f.metodo],n=cnt[f.id]||0;return`<button type="button" class="fcard" data-a="fopen" data-f="${f.id}" style="--c:${fcolor(f.id)}" aria-label="${esc(f.nome)}">
     <span class="fc-top">${f.logo?`<img src="${esc(f.logo)}" alt="">`:`<b>${esc(f.nome.charAt(0))}</b>`}</span>
     <span class="fc-b"><span class="fc-n">${esc(f.nome)}</span><span class="fc-m">${m?ic(m.i)+esc(m.l):'Invio da definire'}</span>
@@ -4686,7 +4704,7 @@ async function demoSeed(){
   const C40={ore:40,pausa:30,liberi:1};
   const U=[['demo_gm','Ospite','','gm','cucina','Chef',{libero:true}],['demo_fb','Paolo','Serra','staff','fb','F&B Manager',{libero:true}],
     ['demo_s1','Luca','Bianchi','staff','cucina','Cuoco',C40],['demo_s2','Sara','Conti','staff','sala','Cameriera',C40],
-    ['demo_s3','Giulia','Marras','staff','cucina','Pasticcera',C40],['demo_s4','Andrea','Piras','staff','sala','Barman',C40]];
+    ['demo_s3','Giulia','Marras','staff','cucina','Pasticcera',C40],['demo_s4','Andrea','Piras','staff','sala','Bartender',C40]];
   for(const [id,nome,cognome,ruolo,reparto,mansione,contratto] of U)jobs.push(()=>put('staff',id,{nome,cognome,username:'demo.'+id.slice(5),ruolo,reparto,mansione,foto:'',stato:'attivo',pass:uid(),contratto,creato:t-30*G,creatoDa:'demo_gm'}));
   const nm=id=>{const u=U.find(x=>x[0]===id);return u[1]+' '+u[2]};
   const R=[['demo_r1','demo_s1',[it('mar05',4),it('mar12',6),it('demo05',3)],'Per il servizio di stasera','inviata',t-25*60000],
@@ -4714,6 +4732,8 @@ async function demoSeed(){
   const cv={};for(const [id,n,cant,ann,gr,tipo,den,vit,storia,palato,naso,colore,abb,abbT,prod,serv,frase,parole,pv,pc,q,min] of VI)cv[id]={id,n,cant,ann,gr,tipo,den,vit,storia,palato,naso,colore,abb,abbT,prod,serv,frase,parole,pv,pc,q,min,ia:'',da:'demo_gm',cr:t-20*G,mod:t-20*G};
   jobs.push(()=>put('config','cantina',{tipo:'cantina',v:cv}));
   jobs.push(()=>put('config','cantina_mov_'+today(new Date(t)).slice(0,7),{tipo:'cantina_mov',m:{demo_mv1:{v:'demo_v1',q:1,t:'ven',da:'demo_s2',ts:t-5*H},demo_mv2:{v:'demo_v1',q:1,t:'ven',da:'demo_s2',ts:t-3*H},demo_mv3:{v:'demo_v2',q:1,t:'ven',da:'demo_s4',ts:t-2*H}}}));
+  jobs.push(()=>put('config','bar',{tipo:'bar',b:Object.fromEntries([['demo_b1','Tanqueray London Dry','Gin',3,.5,1,16],['demo_b2','Belvedere','Vodka',2,2/3,1,24],['demo_b3','Campari','Campari',2,1/3,1,13],['demo_b4','Carpano Antica Formula','Vermouth rosso',1,.5,1,19],['demo_b5','Aperol','Aperol',4,1,2,11],['demo_b6','Prosecco Valdobbiadene','Prosecco',12,0,6,7],['demo_b7','Havana Club 3 Años','Rum bianco',0,1/3,1,14],['demo_b8','Cointreau','Triple sec',1,.5,0,20],['demo_b9','Patrón Silver','Tequila',1,2/3,0,32],['demo_b10','Mirto Zedda Piras','Mirto',2,.5,1,12]].map(([id,n,cat,pi,ap,min,pc])=>[id,{id,n,cat,cl:cat==='Prosecco'?75:70,pi,ap,min,pc,da:'demo_gm',cr:t,mod:t}]))}));
+  jobs.push(()=>put('config','bar_mov_'+today(new Date(t)).slice(0,7),{tipo:'bar_mov',m:{demo_bm1:{b:'demo_b3',d:-1/3,t:'conta',da:'demo_s4',ts:t-6*H},demo_bm2:{b:'demo_b5',d:-.5,t:'fin',da:'demo_s4',ts:t-4*H},demo_bm3:{b:'demo_b1',d:-1/6,t:'conta',da:'demo_s4',ts:t-2*H}}}));
   // agenda e funzioni accese
   const gd=n=>today(new Date(t+n*G)),ev={};
   [['ev','Matrimonio Sanna, 120 coperti',2,'19:30',120,'Menù degustazione, torta a cura della pasticceria.','tutti',[]],['op','Consegna Metro anticipata alle 7',1,'07:00',0,'','rep',['cucina']],
@@ -5036,7 +5056,7 @@ function voiceSheet(){
    config/app.funz {agenda:true}: le funzioni nuove partono spente. Conta d'uso in config/uso_<AAAA-MM> {agenda:{<persona>:giorni}}, al massimo una scrittura al giorno per telefono (jona_uso).
    Agenda: config/agenda_<AAAA-MM> {tipo:'agenda',e:{<id>:ev}}, ricorrenti in config/agenda_ric. ev={t,g:'AAAA-MM-GG',h:'HH:MM'|'',cop,note,vis:'io'|'tutti'|'rep',rep:[],da,cr,mod,r:''|'s'|'m'}.
    Cancellare = e.<id>: null. Per reparto: lo staff vede i suoi, i gestori tutti. «Solo io» è nascosto solo nell'interfaccia (tutti i membri leggono config). */
-const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'cantina',l:'Cantina Vini',d:'Schede dei vini scritte con l\'IA da una foto dell\'etichetta, cosa consigliare al tavolo in base al piatto e inventario delle bottiglie (vendute e in casa).',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
+const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'cantina',l:'Cantina Vini',d:'Schede dei vini scritte con l\'IA da una foto dell\'etichetta, cosa consigliare al tavolo in base al piatto e inventario delle bottiglie (vendute e in casa).',on:true},{id:'bar',l:'Bar: cocktail e alcolici',d:'Oltre 200 cocktail con dosi, bicchiere e passaggi, e l\'inventario delle bottiglie del bar (intere e quanto resta di quella aperta). Per gestori, responsabili e bartender.',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
 const funzOn=k=>{const f=cfg().funz||{};return k in f?!!f[k]:!!(FUNZ.find(x=>x.id===k)||{}).on};
 async function funzSet(k,on){const f=FUNZ.find(x=>x.id===k);if(!f)return;
   await put('config','app',Object.assign({},cfg(),{funz:Object.assign({},cfg().funz||{},{[k]:!!on})}));toast(f.l+(on?' accesa':' spenta'))}
@@ -5643,8 +5663,110 @@ async function vnDel(){const f=S.vnf;if(!f||!f.id)return closeSheet();
 async function vnConta(id){const v=vnGet(id);if(!v)return;const r=await ask('Quante bottiglie ci sono?','Conta le bottiglie di «'+v.n+'» e scrivi il numero giusto.','Salva',false,{label:'Bottiglie in casa',value:String(+v.q||0)});
   if(!r||!String(r.v).trim())return;const n=Math.round(num(r.v));if(!(n>=0))return toast('Scrivi un numero.','warn');await vnMov(id,'conta',n)}
 
+/* ================= bar: cocktail e inventario alcolici (v85, D36) =================
+   data/cocktail.json (file statico, scaricato solo quando si apre il Bar; si rifà con tools/cocktail.py da tools/cocktail.txt):
+     {v,c:[[nome,famiglia,metodo,bicchiere,[[q,unità,nome,alcolico?]],guarnizione,passaggi,iba]]}.
+   config/bar {b:{<id>:{id,n,cat,cl,pi,ap,min,pc,da,cr,mod}}}: pi bottiglie intere chiuse, ap quanto resta di quella aperta (0, 1/3, 1/2, 2/3, 1).
+   config/bar_mov_<AAAA-MM> {m:{<id>:{b,d,t:'car'|'conta'|'fin',da,ts}}}: d = bottiglie in più o in meno; usate nel mese = somma dei d negativi. */
+const BR_CAT=[['Gin',['Gin']],['Vodka',['Vodka']],['Rum',['Rum bianco','Rum scuro','Cachaça']],['Tequila',['Tequila','Mezcal']],['Whisky',['Bourbon','Rye whiskey','Scotch whisky','Scotch whisky torbato','Whisky irlandese']],
+  ['Brandy',['Cognac','Brandy','Calvados','Pisco','Grappa']],['Aperitivi e vermouth',['Campari','Aperol','Vermouth rosso','Vermouth dry','Lillet blanc','Suze','Pimm\'s','Porto']],
+  ['Liquori',['Triple sec','Amaretto','Liquore al caffè','Crema di whisky','Maraschino','Galliano','Chartreuse verde','Chartreuse gialla','Bénédictine','Drambuie','Crème de cassis','Crème de mûre','Crème de cacao','Crème de menthe','Crème de violette','Cherry brandy','Liquore all\'albicocca','Liquore alla pesca','Liquore al melone','Liquore alla mela verde','Liquore al lampone','Liquore ai fiori di sambuco','Liquore al frutto della passione','Liquore all\'uovo','Blue curaçao','Falernum','Absinthe','Sambuca','Limoncello','Mirto']],
+  ['Amari e bitter',['Fernet','Amaro','Jägermeister','Angostura','Orange bitters','Peychaud\'s bitters']],['Vini e birre',['Prosecco','Champagne','Vino bianco','Vino rosso','Birra','Birra scura']]];
+const BR_FAM=[['','Tutti'],['gin','Gin'],['vodka','Vodka'],['rum','Rum'],['teq','Tequila'],['whisky','Whisky'],['brandy','Brandy'],['aper','Aperitivi e bollicine'],['liq','Liquori e shot'],['zero','Analcolici']];
+const BR_MET={S:['Shakerato','Shaker pieno di ghiaccio: shakera forte 10-12 secondi e filtra.'],M:['Mescolato','Mixing glass con molto ghiaccio: mescola 20-30 secondi e filtra.'],C:['Nel bicchiere','Si prepara direttamente nel bicchiere.'],F:['Frullato','Nel frullatore con il ghiaccio.'],P:['Pestato','Si pesta nel bicchiere con il pestello.']};
+const BR_EQ=[['Cognac','Brandy'],['Prosecco','Champagne'],['Bourbon','Rye whiskey']];
+const BR_LIV=[[0,'Nessuna'],[1/3,'⅓'],[0.5,'½'],[2/3,'⅔'],[1,'Piena']];
+const BR_CL=[70,75,100,150];
+const isBar=u=>!!u&&/^(bartender|barman|barback)/i.test(u.mansione||'');
+const brCan=me=>!!me&&(isMgr(me)||['fb','resp'].includes(me.reparto)||isBar(me));
+const brOn=me=>funzOn('bar')&&!!me&&!!realU()&&!S.wallMode&&brCan(me);
+const brAll=()=>Object.values((D().config.bar||{}).b||{}).filter(b=>b&&b.id).sort((a,b)=>String(a.n).localeCompare(String(b.n),'it'));
+const brGet=id=>((D().config.bar||{}).b||{})[id];
+const brTot=b=>Math.max(0,+b.pi||0)+Math.max(0,+b.ap||0);
+const brMese=()=>'bar_mov_'+today().slice(0,7);
+const brBase=n=>String(n||'').replace(/\s*\(.*\)$/,'');
+const brLiv=x=>{x=+x||0;return BR_LIV.reduce((a,b)=>Math.abs(b[0]-x)<Math.abs(a[0]-x)?b:a)};
+function brQ(b){const pi=Math.max(0,+b.pi||0),ap=+b.ap||0;if(!ap||ap>=1)return String(pi+(ap>=1?1:0));return pi?pi+' + '+brLiv(ap)[1]:brLiv(ap)[1]}
+const brN=x=>{const i=Math.floor(x+1e-6),r=x-i;if(r<0.1)return String(i);const l=brLiv(r)[1];return i?i+' '+l:l};
+const brBot=b=>{const ap=+b.ap||0,l=ap?Math.round(ap*100):(+b.pi?100:0);return`<span class="br-bot${!brTot(b)?' br-vuota':''}" style="--l:${l}%" aria-hidden="true"></span>`};
+let BR_CK=null,BR_CKP=null;
+function brCk(){if(BR_CK)return Promise.resolve(BR_CK);
+  if(!BR_CKP)BR_CKP=fetch('data/cocktail.json').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.json()}).then(j=>{
+    BR_CK=j.c.map((c,i)=>({i,n:c[0],f:c[1],m:c[2],g:c[3],ing:c[4],gu:c[5],p:c[6],iba:!!c[7],k:norm(c[0]+' '+c[4].map(x=>x[2]).join(' '))}));return BR_CK}).catch(e=>{BR_CKP=null;throw e});
+  return BR_CKP}
+function brHave(){const s=new Set();for(const b of brAll())if(brTot(b)>0)s.add(b.cat);for(const [a,b] of BR_EQ){if(s.has(a))s.add(b);else if(s.has(b))s.add(a)}return s}
+const brFattibile=(c,h)=>c.ing.every(x=>!x[3]||h.has(brBase(x[2])));
+function brUsate(){let n=0;for(const m of Object.values((D().config[brMese()]||{}).m||{}))if(m&&+m.d<0)n-=+m.d;return n}
+const brCta=me=>{if(!brOn(me))return'';const l=brAll(),n=l.reduce((s,b)=>s+brTot(b),0);return`<button type="button" class="sug-cta" data-a="brOpen">${ic('cocktail')}<div><b>Bar: cocktail e alcolici</b><span>${l.length?Math.round(n)+(Math.round(n)===1?' bottiglia':' bottiglie')+' in casa · oltre 200 cocktail con dosi':'Oltre 200 cocktail con dosi e passaggi, inventario delle bottiglie'}</span></div>${ic('chev')}</button>`};
+function brOpen(v){if(!funzOn('bar'))return;S.br={v:v||'ck',q:'',f:'',fat:false,n:60,iq:''};usoSegna('bar');openSheet({cls:'tall',live:()=>true,render:brList});
+  brCk().then(()=>refreshSheet()).catch(()=>{if(S.br)S.br.err=1;refreshSheet()})}
+function brList(){const V=S.br,me=meU(),all=brAll(),can=brCan(me);
+  const head=`<div class="grab"></div><div class="sh-h"><div class="sh-t">Bar<div class="sh-s">${BR_CK?BR_CK.length+' cocktail · ':''}${brN(all.reduce((s,b)=>s+brTot(b),0))} bottiglie in casa</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <div class="seg wide vn-seg">${[['ck','Cocktail'],['inv','Inventario']].map(([k,l])=>`<button type="button" aria-pressed="${V.v===k}" data-a="brV" data-v="${k}">${l}</button>`).join('')}</div>`;
+  if(V.v==='inv'){const tot=all.reduce((s,b)=>s+brTot(b),0),val=all.reduce((s,b)=>s+brTot(b)*(+b.pc||0),0),bassi=all.filter(b=>b.min>0&&brTot(b)<=b.min),us=brUsate(),q=norm(V.iq);
+    const l=all.filter(b=>!q||norm(b.n+' '+b.cat).includes(q));
+    const grp=BR_CAT.map(([g,cs])=>[g,l.filter(b=>cs.includes(b.cat))]).concat([['Altro',l.filter(b=>!BR_CAT.some(([,cs])=>cs.includes(b.cat)))]]).filter(x=>x[1].length);
+    return head+`<div class="rc-tot vn-tot"><div><span>Bottiglie in casa</span><b>${brN(tot)}</b></div><div><span>Usate questo mese</span><b>${brN(us)}</b></div>${isMgr(me)&&val?`<div><span>Valore (prezzo d'acquisto)</span><b>${eur(val)}</b></div>`:''}</div>
+    ${bassi.length?`<p class="vn-al">${ic('warn')} Da riordinare: ${bassi.map(b=>esc(b.n)+' ('+brQ(b)+')').join(', ')}</p>`:''}
+    ${can?`<div class="btns vn-add"><button type="button" class="btn primary big" data-a="brNew">${ic('plus')} Aggiungi una bottiglia</button></div>`:''}
+    ${all.length>12?`<div class="search rc-cerca">${ic('search')}<input id="briq" type="search" placeholder="Cerca una bottiglia" value="${esc(V.iq)}" data-in="briq" autocomplete="off"></div>`:''}
+    <p class="muted small vn-hint">Tocca una bottiglia per contarla: quelle intere e quanto resta di quella aperta.</p>
+    ${grp.length?grp.map(([g,bs])=>`<span class="lbl">${esc(g)}</span>${bs.map(b=>`<button type="button" class="prow br-r" data-a="brB" data-v="${b.id}">${brBot(b)}<div class="row-i"><div class="row-t">${esc(b.n)}</div><div class="row-m">${esc(b.cat||'')}${b.cl?' · '+b.cl+' cl':''}</div></div><div class="vn-q"><b class="${!brTot(b)?'vn-zero':b.min>0&&brTot(b)<=b.min?'vn-basso':''}">${brQ(b)}</b><span>in casa</span></div></button>`).join('')}`).join('')
+      :`<p class="muted">${all.length?'Nessuna bottiglia trovata.':can?'Ancora nessuna bottiglia. Tocca «Aggiungi una bottiglia»: poi i cocktail ti dicono cosa puoi fare con quello che c\'è.':'Ancora nessuna bottiglia.'}</p>`}`}
+  if(V.err&&!BR_CK)return head+`<p class="muted">Non riesco a caricare i cocktail. Controlla la connessione e riapri il Bar.</p>`;
+  if(!BR_CK)return head+`<p class="muted">${ic('clock')} Carico i cocktail…</p>`;
+  const h=brHave(),q=norm(V.q),l=BR_CK.filter(c=>(!V.f||c.f===V.f)&&(!q||c.k.includes(q))&&(!V.fat||brFattibile(c,h)));
+  return head+`<div class="search rc-cerca">${ic('search')}<input id="brq" type="search" placeholder="Cerca cocktail o ingrediente" value="${esc(V.q)}" data-in="brq" autocomplete="off"></div>
+  <div class="chips br-f">${all.length?`<button type="button" class="chip" aria-pressed="${V.fat}" data-a="brFat">Si possono fare</button>`:''}${BR_FAM.map(([k,t])=>`<button type="button" class="chip" aria-pressed="${V.f===k}" data-a="brF" data-v="${k}">${t}</button>`).join('')}</div>
+  ${V.fat?`<p class="muted small vn-hint">Solo i cocktail con tutti gli alcolici in casa (succhi, sciroppi e frutta non li conto).</p>`:''}
+  <div>${l.length?l.slice(0,V.n).map(c=>`<button type="button" class="prow br-r" data-a="brC" data-v="${c.i}"><div class="row-i"><div class="row-t">${esc(c.n)}${c.iba?' <span class="br-iba">IBA</span>':''}</div><div class="row-m">${esc(c.ing.filter(x=>x[3]).map(x=>brBase(x[2])).join(' · ')||'Analcolico')}</div></div><span class="br-met">${BR_MET[c.m][0]}</span></button>`).join('')
+    +(l.length>V.n?`<button type="button" class="btn ghost br-piu" data-a="brPiu">Mostra altri ${Math.min(60,l.length-V.n)} (${l.length-V.n} in tutto)</button>`:'')
+    :`<p class="muted">Nessun cocktail trovato.${V.fat?' Togli «Si possono fare» per vederli tutti.':''}</p>`}</div>`}
+function brShowC(i){S.brC=+i;openSheet({cls:'tall',live:()=>true,render:()=>{const c=BR_CK&&BR_CK[S.brC];if(!c)return`<div class="grab"></div><p class="muted">Cocktail non trovato.</p>`;
+  const inv=brAll().length?brHave():null,met=BR_MET[c.m]||['',''];
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(c.n)}<div class="sh-s">${esc((BR_FAM.find(x=>x[0]===c.f)||['',''])[1])}${c.iba?' · ricetta ufficiale IBA':''}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <div class="vn-tav br-tav"><div><span class="vn-tl">Metodo</span><b>${esc(met[0])}</b></div><div><span class="vn-tl">Bicchiere</span><b>${esc(c.g)}</b></div><div><span class="vn-tl">Guarnizione</span><b>${esc(c.gu)}</b></div></div>
+  <span class="lbl">Ingredienti</span><div class="br-ing">${c.ing.map(x=>{const ok=inv&&x[3]?inv.has(brBase(x[2])):null;
+    return`<div class="br-ir"><b>${esc(x[0]==='top'?'top':x[0]+(x[1]?' '+x[1]:''))}</b><span>${esc(x[2])}</span>${ok===null?'':ok?`<i class="br-ok">in casa</i>`:`<i class="br-no">manca</i>`}</div>`}).join('')}</div>
+  <span class="lbl">Come si fa</span><p class="vn-tx">${esc(met[1])}</p><p class="vn-tx br-pas">${esc(c.p)}</p>`}})}
+async function brPut(b){if(D().config.bar)await upd('config','bar',{['b.'+b.id]:b});else await put('config','bar',{tipo:'bar',b:{[b.id]:b}})}
+async function brSet(id,pi,ap,t){const b=brGet(id),me=realU();if(!b||!me)return;pi=Math.max(0,Math.round(pi));ap=Math.min(1,Math.max(0,+ap||0));
+  const d=Math.round((pi+ap-brTot(b))*1000)/1000;if(!d&&pi===(+b.pi||0))return;
+  await upd('config','bar',{['b.'+id+'.pi']:pi,['b.'+id+'.ap']:ap,['b.'+id+'.mod']:now()});
+  if(d){const doc=brMese(),m={b:id,d,t,da:me.id,ts:now()};if(D().config[doc])await upd('config',doc,{['m.'+uid()]:m});else await put('config',doc,{tipo:'bar_mov',m:{[uid()]:m}})}}
+function brShowB(id){S.brB=id;openSheet({cls:'tall',live:()=>true,render:()=>{const b=brGet(S.brB),me=meU(),can=brCan(me);if(!b)return`<div class="grab"></div><p class="muted">Bottiglia eliminata.</p>`;
+  const pi=+b.pi||0,ap=+b.ap||0,lv=brLiv(ap)[0];
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(b.n)}<div class="sh-s">${esc(b.cat||'')}${b.cl?' · '+b.cl+' cl':''}${isMgr(me)&&b.pc?' · acquisto '+eur(b.pc):''}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <div class="br-casa">${brBot(b)}<div><span class="vn-tl">In casa</span><b>${brQ(b)} ${brTot(b)===1?'bottiglia':'bottiglie'}</b></div></div>
+  ${can?`<span class="lbl">Bottiglie intere (chiuse)</span><div class="br-step"><button type="button" class="icon-btn vn-pm" data-a="brPi" data-v="-1" aria-label="Una intera in meno">−</button><b>${pi}</b><button type="button" class="icon-btn vn-pm" data-a="brPi" data-v="1" aria-label="Arrivata una bottiglia">+</button></div>
+  <span class="lbl">Bottiglia aperta: quanto resta?</span><div class="chips br-liv">${BR_LIV.map(([x,l])=>`<button type="button" class="chip" aria-pressed="${Math.abs(lv-x)<0.01}" data-a="brAp" data-v="${x}">${l}</button>`).join('')}</div>
+  ${pi>0?`<button type="button" class="btn ghost br-fin" data-a="brFin">Finita: apro la prossima</button>`:''}
+  <div class="sheet-foot btns" style="margin-top:18px"><button type="button" class="btn primary" data-a="brEdit" data-v="${b.id}">${ic('pencil')} Modifica</button></div>`:''}`}})}
+function brForm(b){const sv=x=>x==null||x===''?'':String(x).replace('.',',');const f=b?clone(b):{n:'',cat:'Gin',cl:70,pi:'',ap:0,min:'',pc:''};
+  for(const k of ['pi','min','pc'])f[k]=sv(f[k]);S.brf=f;openSheet({cls:'tall',live:()=>true,render:brFormH})}
+function brFormH(){const f=S.brf,me=meU(),num_=(k,l,ph)=>`<label><span class="lbl">${l}</span><input class="inp" id="brf-${k}" inputmode="decimal" data-in="brf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"></label>`;
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica bottiglia':'Nuova bottiglia'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <label class="lbl" for="brf-n">Nome</label><input class="inp" id="brf-n" data-in="brf" data-k="n" value="${esc(f.n)}" placeholder="Es. Tanqueray London Dry">
+  <label class="lbl" for="brf-cat">Tipo</label><select class="inp" id="brf-cat" data-ch="brfcat">${BR_CAT.map(([g,cs])=>`<optgroup label="${esc(g)}">${cs.map(c=>`<option ${f.cat===c?'selected':''}>${esc(c)}</option>`).join('')}</optgroup>`).join('')}</select>
+  <p class="muted small">Il tipo serve ai cocktail per capire cosa si può fare.</p>
+  <span class="lbl">Formato</span><div class="chips">${BR_CL.map(c=>`<button type="button" class="chip" aria-pressed="${+f.cl===c}" data-a="brfCl" data-v="${c}">${c} cl</button>`).join('')}</div>
+  <div class="ag-2">${num_('pi','Bottiglie intere','0')}${num_('min','Avvisa sotto','Es. 1')}</div>
+  <span class="lbl">Bottiglia aperta</span><div class="chips br-liv">${BR_LIV.map(([x,l])=>`<button type="button" class="chip" aria-pressed="${Math.abs(brLiv(f.ap)[0]-x)<0.01}" data-a="brfAp" data-v="${x}">${l}</button>`).join('')}</div>
+  ${isMgr(me)?num_('pc','Prezzo d\'acquisto € (a bottiglia)','Es. 18'):''}
+  <div class="sheet-foot btns" style="margin-top:18px">${f.id?`<button type="button" class="btn ghost danger" data-a="brDel">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary big" data-a="brSave">${ic('check')} Salva</button></div>`}
+async function brSave(){const f=S.brf,me=realU();if(!f||!me)return;const n=String(f.n||'').trim();if(!n){toast('Scrivi il nome della bottiglia','err');return}
+  const old=f.id&&brGet(f.id),pi=Math.max(0,Math.round(num(f.pi)||0)),ap=Math.min(1,Math.max(0,+f.ap||0));
+  if(old&&(pi!==(+old.pi||0)||Math.abs(ap-(+old.ap||0))>0.001))await brSet(f.id,pi,ap,'conta');
+  const b={id:f.id||uid(),n,cat:f.cat||'Gin',cl:+f.cl||70,pi,ap,min:Math.max(0,num(f.min)||0),pc:isMgr(meU())?(num(f.pc)>0?num(f.pc):null):(old&&old.pc)||null,da:f.da||me.id,cr:f.cr||now(),mod:now()};
+  await brPut(b);closeSheet();toast('Bottiglia salvata')}
+async function brDel(){const f=S.brf;if(!f||!f.id)return closeSheet();
+  if(!await ask('Eliminare la bottiglia?','«'+f.n+'» sparisce dall\'inventario del bar.','Elimina',true))return;
+  await upd('config','bar',{['b.'+f.id]:null});closeSheet();closeSheet();toast('Bottiglia eliminata')}
+
 const A={
   closeSheet:()=>closeSheet(),
+  brOpen:()=>brOpen(),brV:d=>{S.br.v=d.v;refreshSheet()},brF:d=>{S.br.f=d.v;S.br.n=60;refreshSheet()},brFat:()=>{S.br.fat=!S.br.fat;S.br.n=60;refreshSheet()},brPiu:()=>{S.br.n+=60;refreshSheet()},brC:d=>brShowC(d.v),brB:d=>brShowB(d.v),brNew:()=>brForm(null),brEdit:d=>{const b=brGet(d.v);if(b)brForm(b)},brSave:()=>brSave(),brDel:()=>brDel(),
+  brPi:d=>{const b=brGet(S.brB);if(b)brSet(b.id,(+b.pi||0)+(+d.v),+b.ap||0,+d.v>0?'car':'conta')},brAp:d=>{const b=brGet(S.brB);if(b)brSet(b.id,+b.pi||0,+d.v,'conta')},brFin:()=>{const b=brGet(S.brB);if(b&&+b.pi>0)brSet(b.id,(+b.pi)-1,1,'fin')},brfCl:d=>{S.brf.cl=+d.v;refreshSheet()},brfAp:d=>{S.brf.ap=+d.v;refreshSheet()},
   funzSet:d=>funzSet(d.k,d.v==='1'),agOpen:()=>agOpen(),
   rcOpen:()=>rcOpen(),rcNew:()=>rcForm(null),rcEdit:d=>{const r=((D().config.ricette||{}).r||{})[d.v];if(r)rcForm(r)},rcPick:()=>rcPick(),rcAdd:d=>rcAdd(d.v),rcIngDel:d=>{S.rcf.ing.splice(+d.v,1);refreshSheet()},rcSave:()=>rcSave(),rcDel:()=>rcDel(),rcVisto:()=>rcVisto(),
   vnOpen:()=>vnOpen(),vnV:d=>{S.vn.v=d.v;refreshSheet()},vnTipo:d=>{S.vn.tipo=d.v;refreshSheet()},vnCasa:()=>{S.vn.casa=!S.vn.casa;refreshSheet()},vnAbb:d=>{S.vn.abb=S.vn.abb===d.v?'':d.v;refreshSheet()},
@@ -5839,7 +5961,7 @@ const IN={
   pe:t=>{S.pe[t.dataset.k]=t.value},
   rv:t=>{if(S.rev)S.rev.items[+t.dataset.i][t.dataset.k]=t.dataset.k==='prezzo'?num(t.value):t.value},
   pkq:t=>{S.pkq=t.value;refreshSheet()},
-  rcq:t=>{S.rc.q=t.value;refreshSheet()},vnq:t=>{S.vn.q=t.value;refreshSheet()},vnf:t=>{if(S.vnf)S.vnf[t.dataset.k]=t.value},rcpq:t=>{S.rcpq=t.value;refreshSheet()},rcf:t=>{S.rcf[t.dataset.k]=t.value;refreshSheet()},rcfq:t=>{const g=S.rcf.ing[+t.dataset.i];if(g){g.q=t.value;refreshSheet()}},
+  rcq:t=>{S.rc.q=t.value;refreshSheet()},vnq:t=>{S.vn.q=t.value;refreshSheet()},brq:t=>{S.br.q=t.value;S.br.n=60;refreshSheet()},briq:t=>{S.br.iq=t.value;refreshSheet()},brf:t=>{if(S.brf)S.brf[t.dataset.k]=t.value},vnf:t=>{if(S.vnf)S.vnf[t.dataset.k]=t.value},rcpq:t=>{S.rcpq=t.value;refreshSheet()},rcf:t=>{S.rcf[t.dataset.k]=t.value;refreshSheet()},rcfq:t=>{const g=S.rcf.ing[+t.dataset.i];if(g){g.q=t.value;refreshSheet()}},
   imptxt:t=>{S.imp.txt=t.value},
   askv:t=>{S.askVal=t.value},
   cfgName:t=>{S.cfgName=t.value},
@@ -5847,7 +5969,7 @@ const IN={
 };
 const CH={
   rcu:t=>{const g=S.rcf&&S.rcf.ing[+t.dataset.i];if(g){g.u=t.value;refreshSheet()}},
-  formsel:t=>{S.form[t.dataset.k]=t.value},
+  formsel:t=>{S.form[t.dataset.k]=t.value},brfcat:t=>{if(S.brf)S.brf.cat=t.value},
   cv:t=>{const v=num(t.value);setCart(t.dataset.p,v==null?0:v)},
   cunit:t=>{const c=S.cart.find(x=>x.pid===t.dataset.p);if(c){c.unita=t.value.trim();saveCart()}},
   vqv:t=>{const r=S.voice&&S.voice.rows[+t.dataset.i];const v=num(t.value);if(r&&v>0)r.qta=v;const o=sheets[sheets.length-1];if(o)o.last='';refreshSheet()},

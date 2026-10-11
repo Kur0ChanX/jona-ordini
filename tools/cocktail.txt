@@ -1,0 +1,224 @@
+# Cocktail per il bar (D36). Una riga per cocktail:
+# Nome | metodo (S shakerato, M mescolato, C costruito, F frullato, P pestato) | bicchiere | ingredienti separati da ; | guarnizione | passaggi in breve | IBA
+# I nomi degli alcolici devono essere quelli di BR_CAT in index.html (controllo in tools/cocktail.py).
+# --- Gin
+Negroni|C|Old fashioned|3 cl Gin;3 cl Campari;3 cl Vermouth rosso|Mezza fetta d'arancia|Versa sul ghiaccio e mescola qualche secondo.|IBA
+Dry Martini|M|Coppa martini|6 cl Gin;1 cl Vermouth dry|Oliva o scorza di limone|Mescola nel mixing glass con molto ghiaccio, filtra nella coppa fredda.|IBA
+Gibson|M|Coppa martini|6 cl Gin;1 cl Vermouth dry|Due cipolline|Come il Dry Martini, ma con le cipolline.|
+Dirty Martini|M|Coppa martini|6 cl Gin;1 cl Vermouth dry;1,5 cl Salamoia delle olive|Olive|Mescola con ghiaccio e filtra. Si può fare anche con la vodka.|
+Gin Tonic|C|Balloon|5 cl Gin;15 cl Acqua tonica|Scorza di limone o cetriolo|Balloon pieno di ghiaccio, gin, poi tonica versata piano lungo il cucchiaio.|
+Gin Lemon|C|Highball|5 cl Gin;15 cl Lemon soda|Fetta di limone|Ghiaccio, gin, completa con lemon soda.|
+Gin Fizz|S|Highball|4,5 cl Gin;3 cl Succo di limone;1 cl Sciroppo di zucchero;top Soda|Fetta di limone|Shakera gin, limone e sciroppo, versa nel bicchiere con ghiaccio, completa con soda.|IBA
+Tom Collins|C|Collins|4,5 cl Gin;3 cl Succo di limone;1,5 cl Sciroppo di zucchero;6 cl Soda|Fetta di limone e ciliegina|Versa tutto sul ghiaccio, soda per ultima, mescola piano.|
+Gin Sour|S|Old fashioned|4,5 cl Gin;2,5 cl Succo di limone;2 cl Sciroppo di zucchero;1 Albume (facoltativo)|Scorza di limone|Con l'albume: prima shakera senza ghiaccio, poi con ghiaccio. Filtra sul ghiaccio.|
+Gimlet|S|Coppetta|6 cl Gin;2 cl Succo di lime;1,5 cl Sciroppo di zucchero|Rotella di lime|Shakera e filtra nella coppetta fredda.|
+Gin Rickey|C|Highball|5 cl Gin;1,5 cl Succo di lime;top Soda|Mezzo lime spremuto nel bicchiere|Ghiaccio, gin e lime, completa con soda.|
+Bee's Knees|S|Coppetta|6 cl Gin;2,25 cl Succo di limone;2,25 cl Sciroppo di miele|Scorza di limone|Shakera e filtra.|
+Southside|S|Coppetta|6 cl Gin;3 cl Succo di lime;1,5 cl Sciroppo di zucchero;6 Foglie di menta|Foglia di menta|Shakera con la menta, filtra due volte (colino fine).|IBA
+Bramble|C|Old fashioned|4 cl Gin;1,5 cl Succo di limone;1 cl Sciroppo di zucchero;1,5 cl Crème de mûre|More e fetta di limone|Gin, limone e sciroppo su ghiaccio tritato, poi la crème de mûre a filo sopra.|IBA
+Gin Basil Smash|S|Old fashioned|6 cl Gin;2,5 cl Succo di limone;2 cl Sciroppo di zucchero;10 Foglie di basilico|Rametto di basilico|Pesta il basilico nello shaker, aggiungi il resto, shakera e filtra due volte sul ghiaccio.|
+Clover Club|S|Coppetta|4,5 cl Gin;1,5 cl Sciroppo di lampone;1,5 cl Succo di limone;1 Albume|Lamponi|Shakera prima senza ghiaccio, poi con ghiaccio. Filtra.|IBA
+Pink Lady|S|Coppetta|4,5 cl Gin;1,5 cl Calvados;1,5 cl Succo di limone;1 cl Granatina;1 Albume|Ciliegina|Shakera prima senza ghiaccio, poi con ghiaccio. Filtra.|
+White Lady|S|Coppetta|4 cl Gin;3 cl Triple sec;2 cl Succo di limone|Scorza di limone|Shakera e filtra.|IBA
+Aviation|S|Coppetta|4,5 cl Gin;1,5 cl Maraschino;1 cl Crème de violette;1,5 cl Succo di limone|Ciliegina al maraschino|Shakera e filtra.|IBA
+Last Word|S|Coppetta|2,25 cl Gin;2,25 cl Chartreuse verde;2,25 cl Maraschino;2,25 cl Succo di lime|Nessuna|Dosi uguali. Shakera e filtra.|IBA
+Corpse Reviver #2|S|Coppetta|3 cl Gin;3 cl Triple sec;3 cl Lillet blanc;3 cl Succo di limone;1 goccia Absinthe|Scorza d'arancia|Shakera e filtra.|IBA
+Paradise|S|Coppetta|3,5 cl Gin;2 cl Liquore all'albicocca;1,5 cl Succo d'arancia|Scorza d'arancia|Shakera e filtra.|IBA
+Casino|S|Coppetta|4 cl Gin;1 cl Maraschino;1 cl Succo di limone;2 dash Orange bitters|Scorza di limone e ciliegina|Shakera e filtra.|IBA
+Monkey Gland|S|Coppetta|5 cl Gin;3 cl Succo d'arancia;2 gocce Absinthe;2 gocce Granatina|Scorza d'arancia|Shakera e filtra.|IBA
+Angel Face|S|Coppetta|3 cl Gin;3 cl Liquore all'albicocca;3 cl Calvados|Nessuna|Dosi uguali. Shakera e filtra.|IBA
+Tuxedo|M|Coppetta|3 cl Gin;3 cl Vermouth dry;1 cucchiaino Maraschino;2 gocce Absinthe;3 dash Orange bitters|Ciliegina e scorza di limone|Mescola con ghiaccio e filtra.|IBA
+Martinez|M|Coppetta|4,5 cl Gin;4,5 cl Vermouth rosso;1 cucchiaino Maraschino;2 dash Orange bitters|Scorza di limone|Mescola con ghiaccio e filtra.|IBA
+Hanky Panky|M|Coppetta|4,5 cl Gin;4,5 cl Vermouth rosso;0,75 cl Fernet|Scorza d'arancia|Mescola con ghiaccio e filtra.|IBA
+Bijou|M|Coppetta|3 cl Gin;3 cl Vermouth rosso;3 cl Chartreuse verde;1 dash Orange bitters|Ciliegina e scorza di limone|Mescola con ghiaccio e filtra.|
+Cardinale|M|Coppetta|4 cl Gin;2 cl Vermouth dry;2 cl Campari|Scorza di limone|Mescola con ghiaccio e filtra.|
+White Negroni|M|Old fashioned|3 cl Gin;2 cl Lillet blanc;1,5 cl Suze|Scorza di limone|Mescola con ghiaccio e versa sul ghiaccio.|
+Breakfast Martini|S|Coppa martini|5 cl Gin;1,5 cl Triple sec;1,5 cl Succo di limone;1 cucchiaino Marmellata d'arancia|Scorza d'arancia|Sciogli la marmellata nello shaker, shakera e filtra due volte.|
+Pegu Club|S|Coppetta|4,5 cl Gin;2 cl Triple sec;1,5 cl Succo di lime;1 dash Angostura;1 dash Orange bitters|Rotella di lime|Shakera e filtra.|
+French 75|S|Flûte|3 cl Gin;1,5 cl Succo di limone;1,5 cl Sciroppo di zucchero;6 cl Champagne|Scorza di limone|Shakera gin, limone e sciroppo, filtra nella flûte, completa con Champagne.|IBA
+Singapore Sling|S|Highball|3 cl Gin;1,5 cl Cherry brandy;0,75 cl Triple sec;0,75 cl Bénédictine;12 cl Succo d'ananas;1,5 cl Succo di lime;1 cl Granatina;1 dash Angostura|Fetta d'ananas e ciliegina|Shakera e versa nel bicchiere con ghiaccio.|IBA
+Ramos Gin Fizz|S|Highball|4,5 cl Gin;1,5 cl Succo di lime;1,5 cl Succo di limone;3 cl Sciroppo di zucchero;6 cl Panna;1 Albume;3 gocce Acqua di fiori d'arancio;top Soda|Nessuna|Shakera a lungo senza ghiaccio, poi con ghiaccio. Versa e completa piano con soda: la schiuma sale.|IBA
+London Mule|C|Tazza di rame|5 cl Gin;1 cl Succo di lime;12 cl Ginger beer|Fetta di lime|Ghiaccio, gin e lime, completa con ginger beer.|
+Gin Gin Mule|S|Highball|4,5 cl Gin;2,5 cl Succo di lime;2 cl Sciroppo di zucchero;8 Foglie di menta;top Ginger beer|Rametto di menta|Shakera gin, lime, sciroppo e menta, versa sul ghiaccio e completa con ginger beer.|
+Vesper|S|Coppa martini|4,5 cl Gin;1,5 cl Vodka;0,75 cl Lillet blanc|Scorza di limone lunga|Shakera con ghiaccio e filtra nella coppa fredda.|IBA
+# --- Vodka
+Moscow Mule|C|Tazza di rame|4,5 cl Vodka;1 cl Succo di lime;12 cl Ginger beer|Fetta di lime e menta|Ghiaccio, vodka e lime, completa con ginger beer.|IBA
+Bloody Mary|C|Highball|4,5 cl Vodka;9 cl Succo di pomodoro;1,5 cl Succo di limone;2 dash Worcestershire;2 gocce Tabasco;1 pizzico Sale al sedano e pepe|Gambo di sedano e limone|Versa tutto sul ghiaccio e travasa da un bicchiere all'altro (rolling) per mescolare senza schiumare.|IBA
+Cosmopolitan|S|Coppa martini|4 cl Vodka;1,5 cl Triple sec;1,5 cl Succo di lime;3 cl Succo di mirtillo rosso|Scorza di lime o d'arancia|Shakera e filtra nella coppa fredda.|IBA
+Sea Breeze|C|Highball|4 cl Vodka;12 cl Succo di mirtillo rosso;3 cl Succo di pompelmo|Spicchio di lime|Versa sul ghiaccio e mescola.|IBA
+Sex on the Beach|S|Highball|4 cl Vodka;2 cl Liquore alla pesca;4 cl Succo d'arancia;4 cl Succo di mirtillo rosso|Fetta d'arancia|Shakera e versa sul ghiaccio.|IBA
+Black Russian|C|Old fashioned|5 cl Vodka;2 cl Liquore al caffè|Nessuna|Versa sul ghiaccio e mescola.|IBA
+White Russian|C|Old fashioned|5 cl Vodka;2 cl Liquore al caffè;3 cl Panna|Nessuna|Vodka e liquore sul ghiaccio, poi la panna appena montata sopra.|
+Espresso Martini|S|Coppa martini|5 cl Vodka;3 cl Liquore al caffè;1 cl Sciroppo di zucchero;1 Caffè espresso|Tre chicchi di caffè|Shakera forte con il caffè appena fatto, filtra: deve fare la schiuma.|IBA
+French Martini|S|Coppa martini|4,5 cl Vodka;1,5 cl Liquore al lampone;1,5 cl Succo d'ananas|Scorza di limone|Shakera forte e filtra: schiuma in superficie.|IBA
+Lemon Drop Martini|S|Coppa martini|2,5 cl Vodka;2 cl Triple sec;1,5 cl Succo di limone|Bordo di zucchero e limone|Bordo del bicchiere con lo zucchero, shakera e filtra.|IBA
+Kamikaze|S|Coppetta|3 cl Vodka;3 cl Triple sec;3 cl Succo di lime|Spicchio di lime|Shakera e filtra. Si serve anche come shot.|
+Screwdriver|C|Highball|5 cl Vodka;10 cl Succo d'arancia|Fetta d'arancia|Versa sul ghiaccio e mescola.|
+Harvey Wallbanger|C|Highball|4,5 cl Vodka;9 cl Succo d'arancia;1,5 cl Galliano|Fetta d'arancia e ciliegina|Vodka e arancia sul ghiaccio, il Galliano a filo sopra.|
+Woo Woo|C|Highball|4 cl Vodka;2 cl Liquore alla pesca;12 cl Succo di mirtillo rosso|Spicchio di lime|Versa sul ghiaccio e mescola.|
+Appletini|S|Coppa martini|4 cl Vodka;2 cl Liquore alla mela verde;1 cl Succo di limone|Fettina di mela verde|Shakera e filtra.|
+Bay Breeze|C|Highball|4 cl Vodka;8 cl Succo d'ananas;4 cl Succo di mirtillo rosso|Spicchio di lime|Versa sul ghiaccio e mescola.|
+Cape Codder|C|Highball|4,5 cl Vodka;12 cl Succo di mirtillo rosso;1 cl Succo di lime|Spicchio di lime|Versa sul ghiaccio e mescola.|
+Madras|C|Highball|4,5 cl Vodka;9 cl Succo di mirtillo rosso;3 cl Succo d'arancia|Fetta d'arancia|Versa sul ghiaccio e mescola.|
+Greyhound|C|Highball|4,5 cl Vodka;12 cl Succo di pompelmo|Spicchio di pompelmo|Versa sul ghiaccio e mescola.|
+Salty Dog|C|Highball|4,5 cl Vodka;12 cl Succo di pompelmo|Bordo di sale|Bordo del bicchiere con il sale, poi come il Greyhound.|
+Godmother|C|Old fashioned|3,5 cl Vodka;3,5 cl Amaretto|Nessuna|Versa sul ghiaccio e mescola.|
+Caipiroska|P|Old fashioned|5 cl Vodka;½ Lime a spicchi;2 cucchiaini Zucchero di canna|Spicchio di lime|Pesta lime e zucchero nel bicchiere, ghiaccio tritato, vodka, mescola.|
+Caipiroska alla fragola|P|Old fashioned|5 cl Vodka;4 Fragole;½ Lime a spicchi;2 cucchiaini Zucchero di canna|Fragola|Pesta fragole, lime e zucchero, ghiaccio tritato, vodka, mescola.|
+Blue Lagoon|C|Highball|4 cl Vodka;2 cl Blue curaçao;top Lemon soda|Fetta di limone|Ghiaccio, vodka e curaçao, completa con lemon soda.|
+Vodka Tonic|C|Highball|5 cl Vodka;15 cl Acqua tonica|Spicchio di lime|Ghiaccio, vodka, completa con tonica.|
+Vodka Martini|M|Coppa martini|6 cl Vodka;1 cl Vermouth dry|Scorza di limone o oliva|Mescola con molto ghiaccio e filtra nella coppa fredda.|
+Pornstar Martini|S|Coppa martini|4 cl Vodka;1,5 cl Liquore al frutto della passione;1,5 cl Succo di lime;1 cl Sciroppo di vaniglia;½ Frutto della passione;6 cl Prosecco (a parte)|Mezzo frutto della passione|Svuota il frutto nello shaker, shakera, filtra. Il Prosecco si serve a parte in un bicchierino.|IBA
+Russian Spring Punch|S|Highball|2,5 cl Vodka;2,5 cl Succo di limone;1,5 cl Crème de cassis;1 cl Sciroppo di zucchero;top Champagne|Fetta di limone e more|Shakera tutto tranne lo Champagne, versa sul ghiaccio, completa con Champagne.|IBA
+Spicy Fifty|S|Coppetta|5 cl Vodka;1,5 cl Liquore ai fiori di sambuco;1,5 cl Succo di lime;1 cl Sciroppo di miele;2 fettine Peperoncino rosso|Fettina di peperoncino|Shakera con il peperoncino e filtra due volte.|IBA
+Mudslide|S|Old fashioned|3 cl Vodka;3 cl Liquore al caffè;3 cl Crema di whisky;3 cl Panna|Cacao in polvere|Shakera e versa sul ghiaccio.|
+Sgroppino|F|Flûte|4 cl Vodka;6 cl Prosecco;1 pallina Sorbetto al limone|Scorza di limone|Frusta il sorbetto con la vodka in una ciotola fredda, aggiungi il Prosecco e versa.|
+# --- Rum e cachaça
+Mojito|P|Highball|4,5 cl Rum bianco;2 cl Succo di lime;6 Foglie di menta;2 cucchiaini Zucchero di canna;top Soda|Rametto di menta e lime|Pesta piano menta, lime e zucchero (senza rompere le foglie), ghiaccio tritato, rum, completa con soda.|IBA
+Mojito alla fragola|P|Highball|4,5 cl Rum bianco;3 Fragole;2 cl Succo di lime;6 Foglie di menta;2 cucchiaini Zucchero di canna;top Soda|Fragola e menta|Come il Mojito, pestando anche le fragole.|
+Daiquiri|S|Coppetta|6 cl Rum bianco;2 cl Succo di lime;1,5 cl Sciroppo di zucchero|Rotella di lime|Shakera forte e filtra nella coppetta fredda.|IBA
+Frozen Daiquiri|F|Coppa margarita|5 cl Rum bianco;2 cl Succo di lime;2 cl Sciroppo di zucchero|Rotella di lime|Frulla con una tazza di ghiaccio fino a farlo cremoso.|
+Daiquiri alla fragola|F|Coppa margarita|5 cl Rum bianco;5 Fragole;2 cl Succo di lime;2 cl Sciroppo di zucchero|Fragola|Frulla con il ghiaccio fino a farlo cremoso.|
+Hemingway Special|S|Coppetta|6 cl Rum bianco;4 cl Succo di pompelmo;1,5 cl Maraschino;1,5 cl Succo di lime|Rotella di lime|Shakera e filtra.|IBA
+Mary Pickford|S|Coppetta|6 cl Rum bianco;1 cl Maraschino;6 cl Succo d'ananas;1 cl Granatina|Ciliegina|Shakera e filtra.|IBA
+El Presidente|M|Coppetta|4,5 cl Rum bianco;2 cl Vermouth dry;1 cl Triple sec;1 dash Granatina|Scorza d'arancia|Mescola con ghiaccio e filtra.|
+Bacardi Cocktail|S|Coppetta|4,5 cl Rum bianco;2 cl Succo di lime;1 cl Granatina|Nessuna|Shakera e filtra.|
+Cuba Libre|C|Highball|5 cl Rum bianco;12 cl Cola;1 cl Succo di lime|Spicchio di lime|Ghiaccio, rum e lime, completa con cola.|IBA
+Caipirissima|P|Old fashioned|5 cl Rum bianco;½ Lime a spicchi;2 cucchiaini Zucchero di canna|Spicchio di lime|Pesta lime e zucchero, ghiaccio tritato, rum, mescola.|
+Piña Colada|F|Hurricane|5 cl Rum bianco;3 cl Crema di cocco;5 cl Succo d'ananas|Fetta d'ananas e ciliegina|Frulla con ghiaccio, oppure shakera forte e versa sul ghiaccio tritato.|IBA
+Blue Hawaiian|F|Hurricane|3 cl Rum bianco;1,5 cl Blue curaçao;6 cl Succo d'ananas;3 cl Crema di cocco|Fetta d'ananas|Frulla con ghiaccio.|
+Mai Tai|S|Old fashioned|3 cl Rum bianco;3 cl Rum scuro;1,5 cl Triple sec;1,5 cl Sciroppo d'orzata;1 cl Succo di lime|Menta e mezzo lime|Shakera e versa su ghiaccio tritato. Il rum scuro si può versare a filo sopra.|IBA
+Zombie|S|Tiki|3 cl Rum bianco;4,5 cl Rum scuro;1,5 cl Falernum;2 cl Succo di lime;1,5 cl Succo di pompelmo;1 cl Sciroppo alla cannella;1 cl Granatina;1 dash Angostura;6 gocce Absinthe|Menta|Shakera e versa su ghiaccio tritato. Forte: al massimo uno a persona.|IBA
+Planter's Punch|C|Highball|4,5 cl Rum scuro;3 cl Succo di lime;1,5 cl Sciroppo di zucchero;3 dash Angostura;top Soda|Fetta d'arancia e ciliegina|Versa rum, lime, sciroppo e Angostura sul ghiaccio, completa con soda.|IBA
+Rum Punch|S|Highball|4,5 cl Rum scuro;3 cl Succo di lime;3 cl Sciroppo di zucchero;6 cl Succo d'ananas;1 dash Angostura|Fetta d'arancia|Shakera e versa sul ghiaccio. Noce moscata sopra.|
+Hurricane|S|Hurricane|5 cl Rum bianco;5 cl Rum scuro;5 cl Succo di frutto della passione;3 cl Succo d'arancia;1,5 cl Succo di lime;1,5 cl Sciroppo di zucchero;1 cl Granatina|Fetta d'arancia e ciliegina|Shakera e versa sul ghiaccio.|
+Painkiller|S|Tiki|6 cl Rum scuro;12 cl Succo d'ananas;3 cl Succo d'arancia;3 cl Crema di cocco|Noce moscata grattugiata|Shakera e versa su ghiaccio tritato.|
+Jungle Bird|S|Old fashioned|4,5 cl Rum scuro;2,25 cl Campari;4,5 cl Succo d'ananas;1,5 cl Succo di lime;1,5 cl Sciroppo di zucchero|Fetta d'ananas|Shakera e versa sul ghiaccio.|
+Dark 'n' Stormy|C|Highball|6 cl Rum scuro;10 cl Ginger beer|Spicchio di lime|Ghiaccio e ginger beer, il rum scuro versato sopra a filo.|IBA
+Old Cuban|S|Coppetta|4,5 cl Rum scuro;2,25 cl Succo di lime;3 cl Sciroppo di zucchero;6 Foglie di menta;2 dash Angostura;6 cl Champagne|Foglia di menta|Shakera tutto tranne lo Champagne, filtra due volte, completa con Champagne.|IBA
+Barracuda|S|Coppa margarita|4,5 cl Rum scuro;1,5 cl Galliano;6 cl Succo d'ananas;1 cl Succo di lime;top Prosecco|Fetta d'ananas|Shakera tutto tranne il Prosecco, versa e completa con Prosecco.|IBA
+Yellow Bird|S|Coppetta|3 cl Rum bianco;1,5 cl Galliano;1,5 cl Triple sec;1,5 cl Succo di lime|Rotella di lime|Shakera e filtra.|
+Canchánchara|C|Old fashioned|6 cl Rum bianco;1,5 cl Miele;1,5 cl Succo di lime;5 cl Acqua|Spicchio di lime|Sciogli il miele con lime e acqua, aggiungi ghiaccio e rum, mescola.|IBA
+Scorpion|S|Tiki|4,5 cl Rum bianco;1,5 cl Brandy;3 cl Succo d'arancia;2 cl Succo di limone;1,5 cl Sciroppo d'orzata|Gardenia o fetta d'arancia|Shakera e versa su ghiaccio tritato.|
+Caipirinha|P|Old fashioned|6 cl Cachaça;½ Lime a spicchi;2 cucchiaini Zucchero di canna|Spicchio di lime|Pesta lime e zucchero nel bicchiere, ghiaccio tritato, cachaça, mescola.|IBA
+Batida de coco|F|Highball|5 cl Cachaça;5 cl Latte di cocco;3 cl Latte condensato|Cocco grattugiato|Frulla con ghiaccio.|
+# --- Tequila e mezcal
+Margarita|S|Coppa margarita|5 cl Tequila;2 cl Triple sec;1,5 cl Succo di lime|Bordo di sale (metà) e lime|Bordo con il sale, shakera e filtra.|IBA
+Tommy's Margarita|S|Old fashioned|6 cl Tequila;3 cl Succo di lime;3 cl Sciroppo d'agave|Spicchio di lime|Shakera e versa sul ghiaccio. Sale sul bordo se il cliente lo chiede.|IBA
+Frozen Margarita|F|Coppa margarita|5 cl Tequila;2 cl Triple sec;2 cl Succo di lime;1 cl Sciroppo di zucchero|Bordo di sale e lime|Frulla con una tazza di ghiaccio.|
+Margarita alla fragola|F|Coppa margarita|5 cl Tequila;2 cl Triple sec;5 Fragole;2 cl Succo di lime;1 cl Sciroppo di zucchero|Fragola, bordo di zucchero|Frulla con il ghiaccio.|
+Blue Margarita|S|Coppa margarita|5 cl Tequila;2 cl Blue curaçao;1,5 cl Succo di lime|Bordo di sale|Shakera e filtra.|
+Paloma|C|Highball|5 cl Tequila;0,5 cl Succo di lime;1 pizzico Sale;10 cl Soda al pompelmo|Spicchio di pompelmo|Bordo di sale se si vuole, ghiaccio, tequila e lime, completa con soda al pompelmo.|IBA
+Cantarito|C|Highball|5 cl Tequila;3 cl Succo d'arancia;2 cl Succo di pompelmo;1,5 cl Succo di lime;1 pizzico Sale;top Soda al pompelmo|Spicchi di agrumi|Succhi e tequila sul ghiaccio, completa con soda al pompelmo.|
+Batanga|C|Highball|5 cl Tequila;1,5 cl Succo di lime;top Cola|Bordo di sale|Bordo di sale, ghiaccio, tequila e lime, completa con cola.|
+Tequila Sunrise|C|Highball|4,5 cl Tequila;9 cl Succo d'arancia;1,5 cl Granatina|Fetta d'arancia|Tequila e arancia sul ghiaccio, la granatina versata piano: scende sul fondo e fa l'alba.|IBA
+Matador|S|Coppetta|4,5 cl Tequila;9 cl Succo d'ananas;1,5 cl Succo di lime|Fetta d'ananas|Shakera e filtra.|
+El Diablo|C|Highball|4,5 cl Tequila;1,5 cl Crème de cassis;1,5 cl Succo di lime;top Ginger beer|Spicchio di lime|Tequila e lime sul ghiaccio, ginger beer, cassis a filo sopra.|
+Mexican Mule|C|Tazza di rame|5 cl Tequila;1 cl Succo di lime;12 cl Ginger beer|Fetta di lime|Ghiaccio, tequila e lime, completa con ginger beer.|
+Bloody Maria|C|Highball|4,5 cl Tequila;9 cl Succo di pomodoro;1,5 cl Succo di lime;2 dash Worcestershire;2 gocce Tabasco;1 pizzico Sale al sedano e pepe|Sedano e lime|Come il Bloody Mary, con la tequila.|
+Oaxaca Old Fashioned|M|Old fashioned|4,5 cl Tequila;1,5 cl Mezcal;1 cucchiaino Sciroppo d'agave;2 dash Angostura|Scorza d'arancia fiammata|Mescola con ghiaccio e versa su un cubo grande.|
+Mezcal Negroni|C|Old fashioned|3 cl Mezcal;3 cl Campari;3 cl Vermouth rosso|Scorza d'arancia|Versa sul ghiaccio e mescola.|
+Naked and Famous|S|Coppetta|2,25 cl Mezcal;2,25 cl Chartreuse gialla;2,25 cl Aperol;2,25 cl Succo di lime|Nessuna|Dosi uguali. Shakera e filtra.|IBA
+Illegal|S|Coppetta|3 cl Mezcal;1,5 cl Rum bianco;1,5 cl Falernum;2,25 cl Succo di lime;1,5 cl Sciroppo di zucchero;0,75 cl Maraschino;1 Albume (facoltativo)|Nessuna|Shakera e filtra.|IBA
+# --- Whisky
+Old Fashioned|M|Old fashioned|4,5 cl Bourbon;1 Zolletta di zucchero;3 dash Angostura;1 spruzzo Acqua|Scorza d'arancia e ciliegina|Sciogli la zolletta con Angostura e acqua, aggiungi ghiaccio e whisky, mescola a lungo.|IBA
+Manhattan|M|Coppetta|5 cl Rye whiskey;2 cl Vermouth rosso;1 dash Angostura|Ciliegina|Mescola con ghiaccio e filtra nella coppetta fredda.|IBA
+Rob Roy|M|Coppetta|5 cl Scotch whisky;2,5 cl Vermouth rosso;1 dash Angostura|Ciliegina|Mescola con ghiaccio e filtra.|
+Bobby Burns|M|Coppetta|4,5 cl Scotch whisky;4,5 cl Vermouth rosso;1 cucchiaino Bénédictine|Scorza di limone|Mescola con ghiaccio e filtra.|
+Boulevardier|M|Old fashioned|4,5 cl Bourbon;3 cl Campari;3 cl Vermouth rosso|Scorza d'arancia|Mescola con ghiaccio e versa sul ghiaccio (o filtra in coppetta).|IBA
+Old Pal|M|Coppetta|3 cl Rye whiskey;3 cl Campari;3 cl Vermouth dry|Scorza di limone|Mescola con ghiaccio e filtra.|
+Whiskey Sour|S|Old fashioned|4,5 cl Bourbon;2,5 cl Succo di limone;2 cl Sciroppo di zucchero;1 Albume (facoltativo)|Mezza fetta d'arancia e ciliegina|Con l'albume: prima shakera senza ghiaccio, poi con ghiaccio. Versa sul ghiaccio.|IBA
+New York Sour|S|Old fashioned|6 cl Rye whiskey;3 cl Succo di limone;2 cl Sciroppo di zucchero;1 Albume;3 cl Vino rosso|Scorza di limone|Shakera e versa sul ghiaccio. Il vino rosso versato piano sul cucchiaio: resta sopra.|IBA
+John Collins|C|Collins|4,5 cl Bourbon;3 cl Succo di limone;1,5 cl Sciroppo di zucchero;6 cl Soda|Fetta di limone e ciliegina|Versa tutto sul ghiaccio, soda per ultima.|IBA
+Mint Julep|P|Julep|6 cl Bourbon;1 cucchiaino Zucchero;4 Rametti di menta;1 spruzzo Acqua|Rametto di menta|Pesta piano menta, zucchero e acqua, riempi di ghiaccio tritato, bourbon, mescola fino a far brinare il bicchiere.|IBA
+Whiskey Smash|P|Old fashioned|6 cl Bourbon;½ Limone a spicchi;2 cl Sciroppo di zucchero;6 Foglie di menta|Rametto di menta|Pesta limone e menta nello shaker, aggiungi il resto, shakera e filtra due volte sul ghiaccio.|
+Penicillin|S|Old fashioned|6 cl Scotch whisky;2,25 cl Succo di limone;2,25 cl Sciroppo di miele e zenzero;0,75 cl Scotch whisky torbato|Zenzero candito|Shakera tutto tranne il torbato, versa sul ghiaccio, il torbato a filo sopra.|IBA
+Rusty Nail|C|Old fashioned|4,5 cl Scotch whisky;2,5 cl Drambuie|Scorza di limone|Versa sul ghiaccio e mescola.|IBA
+Godfather|C|Old fashioned|3,5 cl Scotch whisky;3,5 cl Amaretto|Nessuna|Versa sul ghiaccio e mescola.|
+Blood and Sand|S|Coppetta|2,25 cl Scotch whisky;2,25 cl Cherry brandy;2,25 cl Vermouth rosso;2,25 cl Succo d'arancia|Scorza d'arancia|Dosi uguali. Shakera e filtra.|
+Paper Plane|S|Coppetta|3 cl Bourbon;3 cl Aperol;3 cl Amaro;3 cl Succo di limone|Nessuna|Dosi uguali (amaro tipo Nonino). Shakera e filtra.|IBA
+Gold Rush|S|Old fashioned|6 cl Bourbon;2,25 cl Succo di limone;2,25 cl Sciroppo di miele|Scorza di limone|Shakera e versa su un cubo grande.|
+Brown Derby|S|Coppetta|4,5 cl Bourbon;3 cl Succo di pompelmo;1,5 cl Sciroppo di miele|Scorza di pompelmo|Shakera e filtra.|
+Ward Eight|S|Coppetta|6 cl Rye whiskey;1,5 cl Succo di limone;1,5 cl Succo d'arancia;1 cl Granatina|Ciliegina|Shakera e filtra.|
+Tipperary|M|Coppetta|5 cl Whisky irlandese;2,5 cl Vermouth rosso;1,5 cl Chartreuse verde;2 dash Angostura|Scorza d'arancia|Mescola con ghiaccio e filtra.|IBA
+Irish Coffee|C|Irish coffee|5 cl Whisky irlandese;12 cl Caffè caldo;1 cucchiaino Zucchero di canna;5 cl Panna leggermente montata|Panna sopra|Scalda il bicchiere, sciogli lo zucchero nel caffè, whisky, poi la panna sul dorso del cucchiaio: non va mescolato.|IBA
+Hot Toddy|C|Tazza|4,5 cl Scotch whisky;1,5 cl Succo di limone;1,5 cl Miele;12 cl Acqua calda|Fetta di limone con chiodi di garofano|Sciogli il miele nell'acqua calda, aggiungi limone e whisky.|
+Whisky Highball|C|Highball|5 cl Scotch whisky;15 cl Soda molto fredda|Scorza di limone|Bicchiere pieno di ghiaccio, whisky, mescola, poi soda versata piano.|
+Kentucky Mule|C|Tazza di rame|5 cl Bourbon;1 cl Succo di lime;12 cl Ginger beer|Menta e lime|Ghiaccio, bourbon e lime, completa con ginger beer.|
+Trinidad Sour|S|Coppetta|4,5 cl Angostura;3 cl Sciroppo d'orzata;2,25 cl Succo di limone;1,5 cl Rye whiskey|Nessuna|Sì, 4,5 cl di Angostura: è giusto così. Shakera e filtra.|IBA
+# --- Brandy, cognac, pisco, grappa
+Sidecar|S|Coppetta|5 cl Cognac;2 cl Triple sec;2 cl Succo di limone|Bordo di zucchero (facoltativo)|Shakera e filtra.|IBA
+Alexander|S|Coppetta|3 cl Cognac;3 cl Crème de cacao;3 cl Panna|Noce moscata grattugiata|Shakera forte e filtra.|IBA
+Stinger|M|Coppetta|5 cl Cognac;2 cl Crème de menthe|Foglia di menta|Mescola con ghiaccio e filtra (o servi sul ghiaccio tritato).|IBA
+Between the Sheets|S|Coppetta|3 cl Rum bianco;3 cl Cognac;3 cl Triple sec;2 cl Succo di limone|Scorza di limone|Shakera e filtra.|IBA
+Vieux Carré|M|Old fashioned|3 cl Rye whiskey;3 cl Cognac;3 cl Vermouth rosso;1 cucchiaino Bénédictine;2 dash Peychaud's bitters|Scorza di limone e ciliegina|Mescola con ghiaccio e versa sul ghiaccio.|IBA
+Sazerac|M|Old fashioned|5 cl Cognac;1 Zolletta di zucchero;3 dash Peychaud's bitters;1 cl Absinthe|Scorza di limone|Sciacqua il bicchiere freddo con l'absinthe e buttala. Nel mixing glass zolletta, bitters, cognac e ghiaccio: mescola e filtra nel bicchiere senza ghiaccio.|IBA
+French Connection|C|Old fashioned|3,5 cl Cognac;3,5 cl Amaretto|Nessuna|Versa sul ghiaccio e mescola.|IBA
+Horse's Neck|C|Highball|4 cl Cognac;12 cl Ginger ale;1 dash Angostura|Spirale lunga di scorza di limone|Metti la spirale nel bicchiere, ghiaccio, cognac, completa con ginger ale.|IBA
+Brandy Crusta|S|Coppetta|5 cl Brandy;0,75 cl Maraschino;1 cl Triple sec;1,5 cl Succo di limone;1 cucchiaino Sciroppo di zucchero;2 dash Angostura|Bordo di zucchero e scorza di limone|Bordo di zucchero, shakera e filtra.|IBA
+Jack Rose|S|Coppetta|4,5 cl Calvados;1,5 cl Succo di limone;1,5 cl Granatina|Scorza di limone|Shakera e filtra.|
+Porto Flip|S|Coppetta|1,5 cl Brandy;4,5 cl Porto;1 Tuorlo d'uovo|Noce moscata grattugiata|Shakera forte e filtra.|IBA
+Suffering Bastard|C|Highball|3 cl Cognac;3 cl Gin;1,5 cl Succo di lime;2 dash Angostura;top Ginger beer|Menta e fetta d'arancia|Versa sul ghiaccio e completa con ginger beer.|IBA
+Pisco Sour|S|Old fashioned|6 cl Pisco;3 cl Succo di limone;2 cl Sciroppo di zucchero;1 Albume;3 gocce Angostura|Gocce di Angostura sulla schiuma|Shakera prima senza ghiaccio, poi con ghiaccio. Filtra, Angostura sopra.|IBA
+Chilcano|C|Highball|5 cl Pisco;1,5 cl Succo di lime;12 cl Ginger ale;2 dash Angostura|Spicchio di lime|Ghiaccio, pisco e lime, completa con ginger ale, Angostura sopra.|
+Ve.n.to|S|Old fashioned|4,5 cl Grappa;2,25 cl Succo di limone;1,5 cl Sciroppo di miele;1,5 cl Camomilla fredda;1 Albume (facoltativo)|Uva bianca|Shakera e versa sul ghiaccio.|IBA
+Bombardino|C|Tazza|4 cl Liquore all'uovo;2 cl Brandy;3 cl Panna montata|Cannella in polvere|Scalda liquore all'uovo e brandy (vapore o pentolino), versa nella tazza, panna sopra.|
+# --- Aperitivi e bollicine
+Spritz|C|Calice|9 cl Prosecco;6 cl Aperol;1 spruzzo Soda|Fetta d'arancia|Calice pieno di ghiaccio, prima il Prosecco, poi l'Aperol, uno spruzzo di soda.|IBA
+Campari Spritz|C|Calice|9 cl Prosecco;6 cl Campari;1 spruzzo Soda|Fetta d'arancia|Come lo Spritz, con il Campari.|
+Hugo|C|Calice|2 cl Liquore ai fiori di sambuco;10 cl Prosecco;1 spruzzo Soda;6 Foglie di menta|Menta e fetta di lime|Menta nel calice, ghiaccio, liquore, Prosecco e soda, mescola piano.|
+Limoncello Spritz|C|Calice|6 cl Limoncello;9 cl Prosecco;1 spruzzo Soda|Fetta di limone e menta|Ghiaccio, limoncello, Prosecco e soda.|
+Mirto Spritz|C|Calice|6 cl Mirto;9 cl Prosecco;1 spruzzo Soda|Bacche di mirto o fetta d'arancia|Ghiaccio, mirto, Prosecco e soda. Il tocco sardo.|
+Americano|C|Old fashioned|3 cl Campari;3 cl Vermouth rosso;top Soda|Mezza fetta d'arancia e scorza di limone|Campari e vermouth sul ghiaccio, completa con soda.|IBA
+Negroni Sbagliato|C|Old fashioned|3 cl Campari;3 cl Vermouth rosso;3 cl Prosecco|Mezza fetta d'arancia|Campari e vermouth sul ghiaccio, Prosecco al posto del gin.|
+Milano-Torino|C|Old fashioned|4,5 cl Campari;4,5 cl Vermouth rosso|Scorza d'arancia|Versa sul ghiaccio e mescola.|
+Garibaldi|C|Highball|4,5 cl Campari;12 cl Succo d'arancia fresco|Fetta d'arancia|Arancia appena spremuta e sbattuta (spumosa), versata su Campari e ghiaccio.|
+Campari Seltz|C|Highball|4 cl Campari;top Soda|Fetta d'arancia|Ghiaccio, Campari, completa con soda.|
+Campari Orange|C|Highball|4 cl Campari;12 cl Succo d'arancia|Fetta d'arancia|Versa sul ghiaccio e mescola.|
+Bicicletta|C|Calice|6 cl Campari;9 cl Vino bianco;1 spruzzo Soda|Fetta d'arancia|Ghiaccio, Campari e vino bianco, uno spruzzo di soda.|
+Aperol Sour|S|Old fashioned|4,5 cl Aperol;2 cl Succo di limone;1 cl Sciroppo di zucchero;1 Albume|Fetta d'arancia|Shakera prima senza ghiaccio, poi con ghiaccio. Versa sul ghiaccio.|
+Bellini|C|Flûte|10 cl Prosecco;5 cl Purea di pesca bianca|Nessuna|Purea fredda nella flûte, Prosecco versato piano, mescola dal basso.|IBA
+Rossini|C|Flûte|10 cl Prosecco;5 cl Purea di fragola|Fragola|Purea fredda nella flûte, Prosecco versato piano.|
+Puccini|C|Flûte|10 cl Prosecco;5 cl Succo di mandarino|Scorza di mandarino|Succo nella flûte, Prosecco versato piano.|
+Tintoretto|C|Flûte|10 cl Prosecco;5 cl Succo di melograno|Chicchi di melograno|Succo nella flûte, Prosecco versato piano.|
+Mimosa|C|Flûte|7,5 cl Champagne;7,5 cl Succo d'arancia|Scorza d'arancia|Arancia fredda nella flûte, Champagne versato piano.|IBA
+Kir|C|Calice|9 cl Vino bianco;1 cl Crème de cassis|Nessuna|Cassis nel calice, vino bianco freddo sopra.|IBA
+Kir Royal|C|Flûte|9 cl Champagne;1 cl Crème de cassis|Nessuna|Cassis nella flûte, Champagne sopra.|
+Champagne Cocktail|C|Flûte|9 cl Champagne;1 cl Cognac;2 dash Angostura;1 Zolletta di zucchero|Scorza d'arancia|Zolletta imbevuta di Angostura nella flûte, cognac, poi Champagne.|IBA
+Black Velvet|C|Flûte|7,5 cl Birra scura;7,5 cl Champagne|Nessuna|Metà birra scura, poi lo Champagne versato piano.|
+Sangria|C|Calice|9 cl Vino rosso;2 cl Brandy;2 cl Triple sec;3 cl Succo d'arancia;1 cucchiaino Zucchero;top Soda|Frutta a pezzetti|Meglio in brocca preparata qualche ora prima. Ghiaccio e uno spruzzo di soda al momento.|
+Vin brulé|C|Tazza|15 cl Vino rosso;1 cucchiaio Zucchero;1 Scorza d'arancia;2 Chiodi di garofano;1 Stecca di cannella|Fetta d'arancia|Scalda tutto piano senza far bollire per 10 minuti, filtra nella tazza.|
+White Port Tonic|C|Highball|5 cl Porto;10 cl Acqua tonica|Fetta di limone e menta|Ghiaccio, porto bianco, completa con tonica.|
+Pimm's Cup|C|Highball|5 cl Pimm's;15 cl Ginger ale;3 Fette di cetriolo;2 Fragole;3 Foglie di menta|Cetriolo, fragola e menta|Frutta e menta nel bicchiere, ghiaccio, Pimm's, completa con ginger ale.|
+Michelada|C|Highball|33 cl Birra;3 cl Succo di lime;2 dash Worcestershire;2 gocce Tabasco;1 pizzico Sale|Bordo di sale e lime|Bordo di sale, lime e salse nel bicchiere con ghiaccio, completa con birra fredda.|
+Radler|C|Boccale|15 cl Birra;15 cl Lemon soda|Fetta di limone|Metà birra, metà lemon soda, ben fredde.|
+# --- Liquori, amari e shot
+Amaretto Sour|S|Old fashioned|4,5 cl Amaretto;3 cl Succo di limone;1 cl Sciroppo di zucchero;1 Albume|Fetta di limone e ciliegina|Shakera prima senza ghiaccio, poi con ghiaccio. Versa sul ghiaccio.|
+Midori Sour|S|Old fashioned|4 cl Liquore al melone;2 cl Succo di limone;2 cl Succo di lime;top Soda|Ciliegina|Shakera liquore e succhi, versa sul ghiaccio, uno spruzzo di soda.|
+Fuzzy Navel|C|Highball|4,5 cl Liquore alla pesca;12 cl Succo d'arancia|Fetta d'arancia|Versa sul ghiaccio e mescola.|
+Golden Dream|S|Coppetta|2 cl Galliano;2 cl Triple sec;2 cl Succo d'arancia;1 cl Panna|Nessuna|Shakera e filtra.|IBA
+Grasshopper|S|Coppetta|2 cl Crème de menthe;2 cl Crème de cacao;2 cl Panna|Foglia di menta|Crème de menthe verde e cacao bianco. Shakera e filtra.|IBA
+Fernandito|C|Highball|5 cl Fernet;top Cola|Nessuna|Ghiaccio, Fernet, completa con cola. Amato in Argentina.|IBA
+Long Island Iced Tea|C|Highball|1,5 cl Vodka;1,5 cl Tequila;1,5 cl Rum bianco;1,5 cl Gin;1,5 cl Triple sec;2,5 cl Succo di limone;3 cl Sciroppo di zucchero;top Cola|Fetta di limone|Tutto sul ghiaccio, un dito di cola sopra. Forte: avvisa il cliente.|IBA
+Long Beach Iced Tea|C|Highball|1,5 cl Vodka;1,5 cl Tequila;1,5 cl Rum bianco;1,5 cl Gin;1,5 cl Triple sec;2,5 cl Succo di limone;3 cl Sciroppo di zucchero;top Succo di mirtillo rosso|Fetta di limone|Come il Long Island, con il mirtillo al posto della cola.|
+AMF (Adios)|C|Highball|1,5 cl Vodka;1,5 cl Tequila;1,5 cl Rum bianco;1,5 cl Gin;1,5 cl Blue curaçao;2,5 cl Succo di limone;top Lemon soda|Fetta di limone|Tutto sul ghiaccio, completa con lemon soda. Molto forte.|
+B-52|C|Shot|2 cl Liquore al caffè;2 cl Crema di whisky;2 cl Triple sec|Nessuna|Tre strati: caffè, poi crema di whisky e triple sec versati piano sul dorso del cucchiaio.|
+Baby Guinness|C|Shot|3 cl Liquore al caffè;1 cl Crema di whisky|Nessuna|Liquore al caffè, la crema versata piano sul cucchiaio: sembra una piccola birra scura.|
+Slippery Nipple|C|Shot|2,5 cl Sambuca;1,5 cl Crema di whisky|Nessuna|Sambuca, poi la crema versata piano sul cucchiaio.|
+Jägerbomb|C|Highball|4 cl Jägermeister;10 cl Energy drink|Nessuna|Energy drink nel bicchiere, lo shot di Jägermeister lasciato cadere dentro.|
+Mudslide frozen|F|Hurricane|3 cl Vodka;3 cl Liquore al caffè;3 cl Crema di whisky;2 palline Gelato alla vaniglia|Cioccolato a scaglie|Frulla con poco ghiaccio.|
+# --- Analcolici
+Virgin Mojito|P|Highball|2 cl Succo di lime;6 Foglie di menta;2 cucchiaini Zucchero di canna;top Soda|Menta e lime|Come il Mojito, senza rum: più soda.|
+Virgin Colada|F|Hurricane|3 cl Crema di cocco;9 cl Succo d'ananas;1 cl Succo di lime|Fetta d'ananas|Frulla con ghiaccio.|
+Virgin Mary|C|Highball|12 cl Succo di pomodoro;1,5 cl Succo di limone;2 dash Worcestershire;2 gocce Tabasco;1 pizzico Sale al sedano e pepe|Sedano|Come il Bloody Mary, senza vodka.|
+Virgin Mule|C|Tazza di rame|2 cl Succo di lime;6 Foglie di menta;15 cl Ginger beer|Lime e menta|Lime e menta sul ghiaccio, completa con ginger beer.|
+Shirley Temple|C|Highball|15 cl Ginger ale;1,5 cl Granatina|Ciliegina e fetta d'arancia|Ghiaccio, ginger ale, la granatina versata sopra.|
+Roy Rogers|C|Highball|15 cl Cola;1,5 cl Granatina|Ciliegina|Ghiaccio, cola, granatina sopra.|
+San Francisco|S|Highball|4 cl Succo d'arancia;4 cl Succo d'ananas;4 cl Succo di pesca;2 cl Succo di limone;1 cl Granatina|Fetta d'arancia e ciliegina|Shakera e versa sul ghiaccio.|
+Florida|S|Highball|6 cl Succo d'arancia;3 cl Succo di pompelmo;1,5 cl Succo di limone;1 cl Sciroppo di zucchero;top Soda|Fetta d'arancia|Shakera i succhi, versa sul ghiaccio, completa con soda.|
+Cenerentola|S|Highball|6 cl Succo d'arancia;6 cl Succo d'ananas;2 cl Succo di limone;1 cl Granatina;top Soda|Fetta d'ananas|Shakera i succhi, versa sul ghiaccio, uno spruzzo di soda.|
+Pussyfoot|S|Coppetta|6 cl Succo d'arancia;2 cl Succo di limone;1 cl Succo di lime;1 cl Granatina;1 Tuorlo d'uovo|Ciliegina|Shakera forte e filtra.|
+Arnold Palmer|C|Highball|9 cl Tè freddo;9 cl Limonata|Fetta di limone|Metà tè, metà limonata, sul ghiaccio.|
+Limonata fresca|C|Highball|4 cl Succo di limone;3 cl Sciroppo di zucchero;12 cl Acqua frizzante|Fetta di limone e menta|Limone e sciroppo sul ghiaccio, completa con acqua frizzante.|
+Espresso Tonic|C|Highball|1 Caffè espresso;12 cl Acqua tonica|Scorza d'arancia|Ghiaccio e tonica, il caffè appena fatto versato piano sopra: fa due strati.|
+Caffè shakerato|S|Coppa martini|1 Caffè espresso doppio;1 cl Sciroppo di zucchero|Tre chicchi di caffè|Shakera forte il caffè caldo con zucchero e ghiaccio, filtra: schiuma densa.|
