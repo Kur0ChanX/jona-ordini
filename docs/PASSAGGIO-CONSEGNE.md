@@ -2,7 +2,7 @@
 
 Sessione attuale: #84
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v80** (controllato in #83: `APP_VER=80`). **v81 pronta sul ramo, NON ancora pubblicata.**
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v81** (#84: PR #92 squash `e13dfc1`, controllato online `APP_VER=81` alle 17:33). M42 5stelle: vedi `docs/DA-FARE.md`.
 
 ## Fatto in #83 (11/10, ~17:00-17:35 ora italiana)
 - Unita la scorta, controllo online v80 ok.
