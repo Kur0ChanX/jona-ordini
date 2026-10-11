@@ -64,5 +64,12 @@ const r2=await A.evaluate(async id=>(await fbInit().fs.doc('messaggi/'+id).get({
 ok(r2&&Object.keys(r2).length===0,'server: reazione cancellata, non «null»');
 const n=await A.evaluate(async()=>(await fbInit().fs.collection('messaggi').where('creato','>',0).get({source:'server'})).size);
 ok(n===2,'server: 2 messaggi');
+// v86 (D37): un cambio solo di rete (cache/server) senza messaggi cambiati non rifà la lista (niente ridisegno); un messaggio nuovo sì
+await B.evaluate(()=>{chClose&&chClose();window._m0=CHAT.msgs});
+await B.evaluate(async()=>{await fbInit().fs.disableNetwork();await new Promise(r=>setTimeout(r,800));await fbInit().fs.enableNetwork()});await wait(2500);
+ok(await B.evaluate(()=>CHAT.on&&CHAT.msgs===window._m0),'solo rete cambiata: chat non ridisegnata');
+await A.click('[data-a="chBack"]').catch(()=>{});await A.waitForTimeout(300);await A.click('.cht-it[data-c="tutti"]');await A.waitForTimeout(300);
+await A.fill('#ch-ta','Secondo messaggio');await A.keyboard.press('Enter');await wait(2500);
+ok(await B.evaluate(()=>CHAT.msgs!==window._m0&&CHAT.msgs.some(m=>m.t==='Secondo messaggio')),'messaggio nuovo: la chat si aggiorna');
 ok(A.errs.length===0&&B.errs.length===0,'nessun errore '+A.errs.concat(B.errs).join(' | '));
 await b.close();
