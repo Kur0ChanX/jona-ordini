@@ -2,7 +2,7 @@
 
 Sessione attuale: #87
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v82**. Sul ramo, pronta e approvata da Mario: **v83**.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v83** (pubblicata in #87, PR #94, 11/10 sera).
 
 ## ✅ SUBITO (#87): pubblicare la v83 — Mario ha scritto «si vai»
 - Mario ha visto le 7 foto e ha detto di pubblicare. Passi: PR dal ramo verso `main` → controllo `prove` verde → squash → subito `git fetch origin main && git merge origin/main` sul ramo + push → controllo online `APP_VER=83` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33).
