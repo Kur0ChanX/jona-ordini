@@ -1,6 +1,3 @@
-# Ultimo messaggio di Mario (11/10/2026 18:32 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 18:50 ora italiana)
 
-nooo
-aspetta
-non ho cliccato nulla e mi succede spesso 
-perché?
+foto mi servono
