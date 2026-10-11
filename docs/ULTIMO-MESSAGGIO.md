@@ -1,5 +1,3 @@
-# Ultimo messaggio di Mario (11/10/2026 16:58 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 ~17:12 ora italiana, scritto nella #83 chiusa)
 
-git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
-Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #83).
-Poi attendi le istruzioni di Mario.
+«Quali sono le opzioni? Uno è l'API e poi le altre? Si possono trovare altre soluzioni se non mi danno API per in modo automatico rilevare checkout, check-in, tutto quanto, le informazioni? Secondo te qualche stratagemma intelligente?»
