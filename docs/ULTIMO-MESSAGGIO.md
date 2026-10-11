@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (11/10/2026 ~17:14 ora italiana, scritto nella #83 chiusa)
+# Ultimo messaggio di Mario (11/10/2026 ~17:47 ora italiana, nella #84 chiusa)
 
-«sì, la usano ogni giorno» (risposta a: la reception usa già RVC ogni giorno?)
+«non ho cliccato il touch della risposta è si è persa... dove trovo la domanda e perché non c'è stata la regola doppio tocco»

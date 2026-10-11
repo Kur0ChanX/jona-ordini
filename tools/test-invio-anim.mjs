@@ -44,6 +44,7 @@ async function run(opts={}){
   await pg.waitForSelector('.sheet .done',{timeout:8000}).catch(()=>{});
   const dt=Date.now()-t0;
   ok(await pg.locator('.snd-anim').count()===0&&await pg.locator('.sheet .done').count()===1,'then the usual «Inviato allo chef» sheet ('+dt+' ms)');
+  ok(await pg.locator('.sheet .done [data-a="logout"]').count()===0&&await pg.locator('.sheet .done button.primary[data-a="closeSheet"]').count()===1,'only «Continua» in the sheet, no «Esci dal profilo» (D10)');
   ok(dt<8500,'whole animation under 8.5 s');
   // dark theme + tap to skip
   await pg.click('.sheet [data-a="closeSheet"].btn');await pg.waitForTimeout(300);

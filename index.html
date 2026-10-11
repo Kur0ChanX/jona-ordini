@@ -1167,8 +1167,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=81;
+const APP_VER=82;
 const NEWS=[
+  {v:82,data:'2026-10-11',titolo:'Invio allo chef più semplice',
+    tutti:['Dopo «Invia allo chef» c\'è solo il pulsante «Continua»: niente più «Esci dal profilo» toccato per sbaglio.'],
+    dev:{aggiunte:['Foglio «Inviato allo chef»: tolto il pulsante `logout`, resta solo `closeSheet` («Continua», primario). Prova in `tools/test-invio-anim.mjs`.']}},
   {v:81,data:'2026-10-11',titolo:'Agenda: ripetizioni e appunti veloci',
     chef:['Un evento ora si ripete ogni giorno, solo in certi giorni (es. lunedì e mercoledì), ogni settimana, mese o anno, anche «fino al» giorno che scegli. Se un giorno salta, apri l\'evento da quel giorno e tocca «Salta solo…».','Nelle cose da fare di un evento ripetuto la spunta vale solo per quel giorno.','Nella riga veloce puoi scrivere «ogni lunedì» o «tutti i giorni».','In alto c\'è «Appunto»: scrivi un appunto di oggi senza aprire l\'agenda.','Ordine suggerito: conta i coperti degli eventi in agenda. La prima volta scrivi quanti coperti fai in un giorno normale; «Ignora» se non vuoi.'],
     dev:{aggiunte:['`AG_R` (g, gs con `rg`, s, m, a), `rf` «fino al», `rx` giorni saltati (`agSkip`), `agOnDay`/`agRLbl` riscritte; spunta per giorno `ckd.d<AAAAMMGG>` (`agCkK`, `agCkOk`, potata oltre 60 giorni); `agParse` restituisce `r`. Striscia `.ag-can` con «Appunto» (`agNtQuick`), dettatura anche per gli appunti (`agMic(dst)`). `sugAgenda`/`sugAgH`: coperti dell\'agenda nell\'ordine suggerito, `config/app.copNorm`. Prova in `tools/test-agenda-v81.mjs`.']}},
@@ -2311,7 +2314,7 @@ async function sendCart(){
   else await notify('gm','Nuova richiesta da '+me.nome,`${REPARTI[me.reparto]||''}, ${items.length} ${items.length===1?'articolo':'articoli'}${nf?' da '+nf+(nf===1?' fornitore':' fornitori'):''}${dup.length?' (possibile doppione)':''}`,'richiesta',id);
   S.cart=[];saveCart();S.cnote='';S.tab='miei';render();window.scrollTo(0,0);
   await sendAnim();
-  openSheet({render:()=>`<div class="grab"></div><div class="done">${ic('check','big')}<h2>Inviato allo chef</h2><p class="muted">Riceverai una notifica quando approva o rifiuta la richiesta.</p><div class="btns col"><button type="button" class="btn primary block" data-a="logout">${ic('logout')} Esci dal profilo</button><button type="button" class="btn ghost block" data-a="closeSheet">Continua</button></div></div>`});
+  openSheet({render:()=>`<div class="grab"></div><div class="done">${ic('check','big')}<h2>Inviato allo chef</h2><p class="muted">Riceverai una notifica quando approva o rifiuta la richiesta.</p><div class="btns col"><button type="button" class="btn primary block" data-a="closeSheet">Continua</button></div></div>`});
 }
 
 // Richieste delle ultime 24 ore (non rifiutate, di chiunque) con lo stesso prodotto: stesso pid o un'alternativa
