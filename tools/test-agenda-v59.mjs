@@ -1,9 +1,11 @@
 // v59 (modalità locale): agenda per pianificare. Giorno a ore con «Appunti del giorno» personali (spunta, togli, sposta a domani),
 // ora vuota → evento a quell'ora, Settimana con giorni toccabili e «+», Mese con «apri il giorno», «Torna a oggi», scorrimento col dito, Enter, 320 px.
+import { oraFissa } from './ora-fissa.mjs';
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const ctx=await b.newContext({viewport:{width:390,height:800},serviceWorkers:'block',hasTouch:true});
+await oraFissa(ctx);
 const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const wait=ms=>pg.waitForTimeout(ms);

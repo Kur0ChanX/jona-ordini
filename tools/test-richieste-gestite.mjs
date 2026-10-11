@@ -1,9 +1,11 @@
 // D9 / v50: scheda Richieste (Da approvare / Gestite per giorno)
+import { oraFissa } from './ora-fissa.mjs';
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 import { readFileSync } from 'fs';
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const _nc=b.newContext.bind(b);b.newContext=async o=>{const c=await _nc(o);await c.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));return c};
 const ctx=await b.newContext({viewport:{width:390,height:800}});
+await oraFissa(ctx);
 const pg=await ctx.newPage();
 const errs=[];pg.on('pageerror',e=>errs.push(e.message));
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
