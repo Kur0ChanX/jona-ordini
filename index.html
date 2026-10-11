@@ -1169,8 +1169,8 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 const APP_VER=79;
 const NEWS=[
   {v:79,data:'2026-10-11',titolo:'Ricette e costo dei piatti',
-    chef:['In alto c\'è la pentola: «Ricette e costo dei piatti». Scrivi il piatto, scegli gli ingredienti dai listini e le quantità: l\'app calcola il costo a porzione e il food cost.','Se un fornitore alza un prezzo e il costo di un piatto sale di più del 3%, compare un avviso in alto.','Si spegne in Impostazioni → Funzioni.'],
-    dev:{aggiunte:['D26: `config/ricette` {r:{<id>:{n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG}}}; `rcPrezzo` (listino, poi stesso `gkey` e unità: prima stesso fornitore, poi il più economico, poi ultimo prezzo `pz`), `rcCalc` (g/kg, ml/l; food cost su prezzo / 1,10), `rcSalito` (≥3% sopra `rif`), striscia `rcStrip` con «Ok, visto» (`rcSnap`), icona `rcBtn`, fogli `rcList`/`rcFormH`/`rcPick`. Funzione `ricette` accesa di partenza: `FUNZ[].on` e `funzOn` legge il valore di partenza se non è mai stata toccata. Prova `tools/test-ricette.mjs`.']}},
+    chef:['In Fornitori c\'è «Ricette e costo dei piatti». Scrivi il piatto, scegli gli ingredienti dai listini e le quantità: l\'app calcola il costo a porzione e il food cost.','Se un fornitore alza un prezzo e il costo di un piatto sale di più del 3%, compare un avviso in alto.','Si spegne in Impostazioni → Funzioni.'],
+    dev:{aggiunte:['D26: `config/ricette` {r:{<id>:{n,por,pv,ing:[{pid,nome,fid,pu,q,u,pz}],rif,rifG}}}; `rcPrezzo` (listino, poi stesso `gkey` e unità: prima stesso fornitore, poi il più economico, poi ultimo prezzo `pz`), `rcCalc` (g/kg, ml/l; food cost su prezzo / 1,10), `rcSalito` (≥3% sopra `rif`), striscia `rcStrip` con «Ok, visto» (`rcSnap`), ingresso `rcCta` in Fornitori, fogli `rcList`/`rcFormH`/`rcPick`. Funzione `ricette` accesa di partenza: `FUNZ[].on` e `funzOn` legge il valore di partenza se non è mai stata toccata. Prova `tools/test-ricette.mjs`.']}},
   {v:78,data:'2026-10-11',titolo:'Logo YNOY CORP con 4 lune',
     tutti:['All\'apertura dell\'app e nelle schermate d\'ingresso torna il logo YNOY CORP con le 4 lune.'],
     dev:{correzioni:['Rimessi `media/ynoy.svg`, `media/ynoy.png`, la riga della schermata di apertura (`S.splash`) e gli script `tools/logo-ynoy.py`, `tools/ynoy-html.py`, `tools/ynoy-tratti.py`, `tools/test-logo-nitido.mjs` com\'erano prima della v75 (logo a 4 lune, foto di Mario `docs/img/logo/vecchi/ynoy-coda-mario-2026-10-10.jpg`).']}},
@@ -2183,7 +2183,7 @@ function shell(me){
   const V={catalogo:vCatalogo,carrello:vCarrello,miei:vMiei,arrivi:vArrivi,richieste:vRichieste,invii:vInvii,fornitori:vFornitori,staff:vStaff,storico:vStorico,orari:vMieiOrari};
   const nc=!isMgr(me)&&S.tab!=='carrello'?cartLines().length:0;
   return`<nav class="nav n${tabs.length}" aria-label="Sezioni"><div class="nav-brand"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div></div>${tabs.map(t=>{const b=t.b?t.b():0;return`<button type="button" data-a="tab" data-v="${t.id}" ${S.tab===t.id?'aria-current="page"':''}>${ic(t.i)}<span>${t.l}</span>${b?`<span class="badge">${b>99?'99+':b}</span>`:''}</button>`}).join('')}</nav>
-  <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}${agBtn(me)}${rcBtn(me)}${htBtn(me)}
+  <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}${agBtn(me)}${htBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
   <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${oldUrl()}${pushAsk()}${errStrip()}${phStrip(me)}${agStrip(me)}${rcStrip(me)}${htStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
@@ -3033,6 +3033,7 @@ function vFornitori(){
   const fs=Object.values(D().fornitori).sort(byNome);const cnt={};for(const p of prods())cnt[p.fornitoreId]=(cnt[p.fornitoreId]||0)+1;
   return`<div class="vhead"><div><h1 class="vt">Fornitori</h1><p class="vsub">${fs.length} fornitori, ${prods().length} prodotti a listino</p></div><button type="button" class="btn ghost" data-a="fnew">${ic('plus')} Nuovo</button></div>
   <button type="button" class="sug-cta" data-a="imp" data-f="">${ic('upload')}<div><b>Importa listini</b><span>Excel, CSV, fattura XML, tabella preparata con Gemini o foto</span></div>${ic('chev')}</button>
+  ${rcCta(meU())}
   ${fs.length?`<div class="fgrid">${fs.map(f=>{const m=METODI[f.metodo],n=cnt[f.id]||0;return`<button type="button" class="fcard" data-a="fopen" data-f="${f.id}" style="--c:${fcolor(f.id)}" aria-label="${esc(f.nome)}">
     <span class="fc-top">${f.logo?`<img src="${esc(f.logo)}" alt="">`:`<b>${esc(f.nome.charAt(0))}</b>`}</span>
     <span class="fc-b"><span class="fc-n">${esc(f.nome)}</span><span class="fc-m">${m?ic(m.i)+esc(m.l):'Invio da definire'}</span>
@@ -5339,7 +5340,7 @@ function rcSnap(r){const ing=(r.ing||[]).map(g=>{const p=rcPrezzo(g);return Obje
   return Object.assign({},r,{ing,rif:!c.manca&&c.cp>0?Math.round(c.cp*1e4)/1e4:null,rifG:today()})}
 async function rcPut(r){if(D().config.ricette)await upd('config','ricette',{['r.'+r.id]:r});else await put('config','ricette',{tipo:'ricette',r:{[r.id]:r}})}
 const rcOn=me=>funzOn('ricette')&&isMgr(me)&&!!realU()&&!S.wallMode;
-const rcBtn=me=>rcOn(me)?`<button type="button" class="icon-btn" data-a="rcOpen" aria-label="Ricette e costo dei piatti">${ic('pot')}</button>`:'';
+const rcCta=me=>{if(!rcOn(me))return'';const n=rcAll().length;return`<button type="button" class="sug-cta" data-a="rcOpen">${ic('pot')}<div><b>Ricette e costo dei piatti</b><span>${n?n+(n===1?' ricetta':' ricette')+' · costo a porzione e food cost':'Quanto costa ogni piatto, con i prezzi dei listini'}</span></div>${ic('chev')}</button>`};
 function rcStrip(me){if(!rcOn(me))return'';const l=rcAll().map(r=>({r,s:rcSalito(r)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);if(!l.length)return'';
   return`<div class="ag-strip ag-nuovo rc-strip">${ic('pot')}<button type="button" class="ag-st-t" data-a="rcOpen"><b>Costo dei piatti salito</b> ${l.slice(0,2).map(x=>esc(x.r.n)+' +'+rcPct(x.s*100)).join(' — ')}${l.length>2?' — +'+(l.length-2):''}</button><button type="button" class="btn primary sm" data-a="rcVisto">Ok, visto</button></div>`}
 async function rcVisto(){for(const r of rcAll())if(rcSalito(r)>0)await rcPut(rcSnap(r));toast('Costi aggiornati')}

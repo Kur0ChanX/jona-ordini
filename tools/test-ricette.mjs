@@ -21,16 +21,18 @@ await pg.evaluate(async()=>{
   await P('u1','Uova fresche','fb',0.3,'pz');await P('v2','Vongole veraci','fb',19,'kg');
   await new Promise(r=>setTimeout(r,300));rebuildIndex();
 });
-// accesa di partenza: icona per il gestore, niente per lo staff
+// accesa di partenza: ingresso in Fornitori per il gestore, niente per lo staff
 ok(await pg.evaluate(()=>funzOn('ricette')&&!(cfg().funz||{}).hasOwnProperty('ricette')),'funzione «ricette» accesa di partenza senza scrivere niente');
 ok(await pg.evaluate(()=>!funzOn('agenda')&&!funzOn('hotel')),'agenda e hotel restano spente di partenza');
 await pg.click('.testbar [data-a="viewAs"][data-v="gm"]');await wait(300);
-ok(await pg.locator('header [data-a="rcOpen"]').count()===1,'chef: icona «Ricette e costo dei piatti» in alto');
+ok(await pg.locator('header [data-a="rcOpen"]').count()===0,'niente icona in alto (barra piena a 390 px)');
+await pg.click('nav [data-a="tab"][data-v="fornitori"]');await wait(300);
+ok(await pg.locator('main .sug-cta[data-a="rcOpen"]').count()===1&&/Ricette e costo dei piatti Quanto costa ogni piatto/.test(await txt()),'chef: «Ricette e costo dei piatti» in Fornitori');
 await pg.click('.testbar [data-a="viewAs"][data-v="staff"]');await wait(300);
-ok(await pg.locator('[data-a="rcOpen"]').count()===0,'staff: niente icona delle ricette');
+ok(await pg.locator('[data-a="rcOpen"]').count()===0,'staff: niente ingresso delle ricette');
 await pg.click('.testbar [data-a="viewAs"][data-v="gm"]');await wait(300);
 // nuova ricetta dall'interfaccia
-await pg.click('header [data-a="rcOpen"]');await wait(350);
+await pg.click('nav [data-a="tab"][data-v="fornitori"]');await wait(300);await pg.click('main [data-a="rcOpen"]');await wait(350);
 ok(/Nessuna ricetta/.test(await txt('.sheet')),'lista vuota con spiegazione');
 await pg.click('.sheet [data-a="rcNew"]');await wait(350);
 await pg.fill('#rcf-n','Spaghetti alle vongole');await pg.fill('#rcf-por','4');await pg.fill('#rcf-pv','18');
@@ -56,6 +58,7 @@ await pg.click('.sheet [data-a="closeSheet"]');await wait(300);
 // il fornitore alza il prezzo: costo salito
 await pg.evaluate(async()=>{await upd('prodotti','v1',{prezzo:20});await new Promise(r=>setTimeout(r,200));rebuildIndex();render()});await wait(300);
 t=await txt();
+ok(/1 ricetta · costo a porzione e food cost/.test(t),'Fornitori: numero delle ricette');
 ok(/Costo dei piatti salito Spaghetti alle vongole \+9,7%/.test(t),'striscia «Costo dei piatti salito … +9,7%» (2,84 contro 2,59)');
 await pg.click('.testbar [data-a="viewAs"][data-v="staff"]');await wait(300);
 ok(!/Costo dei piatti/.test(await txt()),'staff: niente striscia');
@@ -68,7 +71,7 @@ await pg.evaluate(async()=>{await upd('prodotti','v1',{prezzo:20.5});await new P
 ok(!/Costo dei piatti salito/.test(await txt()),'aumento sotto il 3%: niente avviso');
 // prodotto tolto dal listino: prezzo dallo stesso prodotto di un altro fornitore, poi l'ultimo salvato
 await pg.evaluate(async()=>{await del('prodotti','v1');await new Promise(r=>setTimeout(r,200));rebuildIndex()});
-await pg.click('header [data-a="rcOpen"]');await wait(350);await pg.click('.sheet [data-a="rcEdit"]');await wait(350);
+await pg.click('nav [data-a="tab"][data-v="fornitori"]');await wait(300);await pg.click('main .sug-cta[data-a="rcOpen"]');await wait(350);await pg.click('.sheet [data-a="rcEdit"]');await wait(350);
 t=await txt('.sheet');
 ok(/19,00 € \/ kg · da Beta/.test(t),'vongole tolte da Alfa: prezzo di Beta (stesso prodotto, stessa unità)');
 await pg.evaluate(async()=>{await del('prodotti','v2');await new Promise(r=>setTimeout(r,200));rebuildIndex();refreshSheet()});await wait(300);
@@ -95,6 +98,6 @@ ok(await pg.evaluate(()=>rcAll().length===0),'ricetta eliminata');
 ok(await pg.evaluate(()=>{const c=rcCalc({por:'2',pv:'',ing:[{pid:'x',nome:'Latte intero',pu:'l',u:'ml',q:'250',pz:1.6}]});return Math.abs(c.tot-0.4)<1e-9&&Math.abs(c.cp-0.2)<1e-9&&c.fc===null}),'250 ml di latte a 1,60 €/l = 0,40 €, 2 porzioni = 0,20 €, senza prezzo nel menù niente food cost');
 // spenta: icona sparisce
 await pg.evaluate(()=>funzSet('ricette',false));await wait(400);
-ok(await pg.locator('[data-a="rcOpen"]').count()===0,'funzione spenta: niente icona');
+ok(await pg.locator('[data-a="rcOpen"]').count()===0,'funzione spenta: niente ingresso');
 ok(!errs.length,'nessun errore nella pagina '+errs.join(' | '));
 await b.close();

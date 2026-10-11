@@ -12,7 +12,7 @@ Aggiornato: 2026-10-10 (sessione #52: v67 online (PR #77, squash `e66274c`), D21
 |----|------|--------|--------|
 | M39 | v76 online: Fornitori → **Importa listini** → **Fattura elettronica XML** → scegli una o più fatture (.xml o .p7m firmate). Dimmi se le righe e i fornitori tornano | Mario | quando hai una fattura XML o .p7m |
 | M40 | v77 online: alla prossima consegna, in **Arrivi** → **Controlla** → foto della bolla → **Confronta la bolla con l'ordine**. Dimmi se segna giusto e mandami la foto se sbaglia | Mario (o chi riceve la merce) | alla prossima consegna |
-| M41 | v79 online: tocca la **pentola** in alto → **Nuova ricetta** → scegli gli ingredienti e le quantità di un piatto vero. Dimmi se il costo torna | Mario o Maurizio | quando hai 5 minuti |
+| M41 | v79 online: in **Fornitori** tocca **Ricette e costo dei piatti** → **Nuova ricetta** → scegli gli ingredienti e le quantità di un piatto vero. Dimmi se il costo torna | Mario o Maurizio | quando hai 5 minuti |
 | M33 | v71 online (18:53): riapri l'app e guarda se il logo JONA all'apertura ora è nitido | Mario | ora |
 | M31 | Scegliere la miglioria del logo: Ovvia (logo più grande all'apertura), Furba (lune che cadono con rimbalzo), Geniale (4 lune come segno di attesa nell'app, consigliata), Nessuna | Mario | quando vuoi |
 | D29 | Ottimizzare l'app per Android, iPhone, Mac e Windows (Mario #60, strada 2 «Furba» #64). **v72 online (#67, PR #83)**: campi a 16 px (niente zoom su iPhone, prova `test-campi-16`), giro con WebKit e su computer 1280/1440 su GitHub. Resta solo (b) barra di stato su iPhone installata: non toccata (zona in alto già cambiata e tolta in v54); si guarda solo con una foto da un iPhone con l'app installata | Claude da solo | ora |
