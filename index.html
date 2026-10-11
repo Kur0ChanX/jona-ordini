@@ -906,6 +906,7 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .sug-d{flex:1 0 56px;display:grid;justify-items:center;gap:2px;padding:8px 4px;border-radius:12px;background:var(--sunk);font-size:12px;color:var(--muted);text-transform:capitalize}
 .sug-d .ic{width:22px;height:22px;color:var(--ocra)}.sug-d b{font:500 15px var(--font);color:var(--ink)}.sug-d i{font-style:normal;color:var(--lagoon)}
 .sug-wxr{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;justify-content:space-between;font-size:14px;color:var(--ink2);margin:2px 0 2px}
+.sug-lnk{border:0;background:none;padding:6px 2px;color:var(--lagoon);font:500 14px var(--font);text-decoration:underline;cursor:pointer}.ag-skip{margin-top:10px}
 .sug-list{margin-top:12px}
 .sug-r{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:10px 0;border-top:1px solid var(--line)}
 .sug-r.off .sug-i,.sug-r.off .step{opacity:.5}
@@ -1166,8 +1167,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=80;
+const APP_VER=81;
 const NEWS=[
+  {v:81,data:'2026-10-11',titolo:'Agenda: ripetizioni e appunti veloci',
+    chef:['Un evento ora si ripete ogni giorno, solo in certi giorni (es. lunedì e mercoledì), ogni settimana, mese o anno, anche «fino al» giorno che scegli. Se un giorno salta, apri l\'evento da quel giorno e tocca «Salta solo…».','Nelle cose da fare di un evento ripetuto la spunta vale solo per quel giorno.','Nella riga veloce puoi scrivere «ogni lunedì» o «tutti i giorni».','In alto c\'è «Appunto»: scrivi un appunto di oggi senza aprire l\'agenda.','Ordine suggerito: conta i coperti degli eventi in agenda. La prima volta scrivi quanti coperti fai in un giorno normale; «Ignora» se non vuoi.'],
+    dev:{aggiunte:['`AG_R` (g, gs con `rg`, s, m, a), `rf` «fino al», `rx` giorni saltati (`agSkip`), `agOnDay`/`agRLbl` riscritte; spunta per giorno `ckd.d<AAAAMMGG>` (`agCkK`, `agCkOk`, potata oltre 60 giorni); `agParse` restituisce `r`. Striscia `.ag-can` con «Appunto» (`agNtQuick`), dettatura anche per gli appunti (`agMic(dst)`). `sugAgenda`/`sugAgH`: coperti dell\'agenda nell\'ordine suggerito, `config/app.copNorm`. Prova in `tools/test-agenda-v81.mjs`.']}},
   {v:80,data:'2026-10-11',titolo:'Chiedi a Jona conosce le ricette',
     chef:['«Chiedi a Jona» ora conosce le tue ricette e il loro costo. Prova: «Quale piatto ha il food cost più alto?» o «Quanto mi costa una porzione di spaghetti alle vongole?».'],
     dev:{aggiunte:['`jonaRc()` aggiunge a `jonaCtx` `ricette` (piatto, porzioni, prezzo, costo a porzione, food cost, prezzo al 30%, ingredienti con costo e fornitore), solo per i gestori e con la funzione `ricette` accesa. Suggerimento `JONA_TIP_RC` se ci sono ricette. C3: `test-firebase-bulk` e `test-firebase-sync` ora con controlli PASS/FAIL. Prova in `tools/test-ricette.mjs`.']}},
@@ -2883,22 +2887,35 @@ function wxFactor(d,cad){
   if(tx>=27&&p<30)return{f:1.1,t:'Sole e caldo: +10%'};
   return{f:1,t:'Tempo normale: nessuna correzione'};
 }
+/* v81 coperti degli eventi in agenda nei giorni coperti dall'ordine (da domani, come il meteo): correzione = 1 + coperti degli eventi /
+   (coperti di un giorno normale × giorni), al massimo ×3. Senza i coperti di un giorno normale (config/app.copNorm) solo l'elenco. */
+function sugAgenda(cad){if(!funzOn('agenda'))return null;const me=meU(),t=today(),n=Math.max(1,cad),ev=[];
+  for(let i=1;i<=n;i++){const g=agAdd(t,i);for(const e of agDay(g,me))if(Number(e.cop)>0)ev.push({g,t:e.t,cop:Math.round(Number(e.cop))})}
+  if(!ev.length)return null;const tot=ev.reduce((a,x)=>a+x.cop,0),norm=Math.round(Number(cfg().copNorm)||0),f=norm>0?Math.min(3,1+tot/(norm*n)):1;
+  return{ev,tot,norm,f}}
+function sugAgH(st){const G=S.sug,ca=sugAgenda(st.cad);if(!ca)return'';
+  const l=ca.ev.slice(0,3).map(x=>esc(agCap(AG_GG[agWd(x.g)].slice(0,3))+' '+x.t+' '+x.cop)).join(' · ')+(ca.ev.length>3?' · +'+(ca.ev.length-3):'');
+  const ed=!ca.norm||G.cnEdit;
+  return`<div class="sug-ag"><p class="muted small" style="margin:10px 0 0"><b>In agenda: ${ca.tot} coperti</b> · ${l}</p>
+  ${ed?`<div class="ag-q"><input class="inp" id="sug-cn" data-in="sugCn" inputmode="numeric" value="${esc(G.cn)}" placeholder="Coperti in un giorno normale" aria-label="Coperti in un giorno normale"><button type="button" class="btn ghost sm" data-a="sugCnSave">Salva</button></div>
+  <p class="muted small" style="margin:4px 0 0">Scrivi quanti coperti fai in un giorno normale: l'app aumenta le quantità per gli eventi.</p>`
+  :`<div class="sug-wxr"><span>Eventi: +${Math.round((ca.f-1)*100)}% (giorno normale ${ca.norm} coperti · <button type="button" class="sug-lnk" data-a="sugCnEdit">cambia</button>)</span><div class="seg" role="group" aria-label="Usa l'agenda">${[[1,'Usa l\'agenda'],[0,'Ignora']].map(([k,l])=>`<button type="button" aria-pressed="${!!G.useAg===!!k}" data-a="sugAg" data-v="${k}">${l}</button>`).join('')}</div></div>`}</div>`}
 function sugRows(){
   const G=S.sug,st=sugStats(G.fid);if(!st.items)return[];
-  const wf=G.useWx?wxFactor(G.wx,st.cad).f:1,cur=D().ordini['aperto_'+G.fid];
+  const ca=G.useAg?sugAgenda(st.cad):null,wf=(G.useWx?wxFactor(G.wx,st.cad).f:1)*(ca?ca.f:1),cur=D().ordini['aperto_'+G.fid];
   return st.items.map(x=>{const inO=cur&&cur.items.find(l=>(l.key||l.pid)===x.pid)?.qta||0;
     const base=sugRound(x.day*st.cad*G.gente*wf-inO,x.unita);const p=x.pid?D().prodotti[x.pid]:null;
     const q=G.q[x.k]!=null?G.q[x.k]:base;const sel=G.sel[x.k]!=null?G.sel[x.k]:(x.n>=2&&base>0&&!!p);
     return Object.assign({},x,{p,inO,base,q,sel})}).filter(x=>x.p).sort((a,b)=>(b.sel-a.sel)||(b.n-a.n)||String(a.nome).localeCompare(String(b.nome),'it'));
 }
 function sugSheet(){
-  S.sug={fid:'',gente:1,useWx:true,wx:null,q:{},sel:{}};
+  S.sug={fid:'',gente:1,useWx:true,useAg:true,cn:'',cnEdit:false,wx:null,q:{},sel:{}};
   meteo().then(d=>{if(S.sug){S.sug.wx=d;refreshSheet()}});
   openSheet({cls:'tall',live:()=>true,onClose:()=>{S.sug=null},render:()=>{const G=S.sug;if(!G)return'';
     const head=(t,s,back)=>`<div class="grab"></div><div class="sh-h">${back?`<button type="button" class="icon-btn" data-a="sugBack" aria-label="Indietro">${ic('back')}</button>`:''}<div class="sh-t">${t}<div class="sh-s">${s}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>`;
     if(!G.fid){
       const fs=Object.values(D().fornitori).map(f=>({f,st:sugStats(f.id)})).sort((a,b)=>((b.st.due?2:0)+(b.st.n>=2?1:0))-((a.st.due?2:0)+(a.st.n>=2?1:0))||byNome(a.f,b.f));
-      return head('Ordine suggerito','Scegli il fornitore')+`<p class="muted" style="margin-top:0">L'app guarda gli ordini degli ultimi 2 mesi, ogni quanti giorni ordini e quanto usi, poi corregge con la gente prevista e il meteo. Tu controlli e cambi le quantità.</p>
+      return head('Ordine suggerito','Scegli il fornitore')+`<p class="muted" style="margin-top:0">L'app guarda gli ordini degli ultimi 2 mesi, ogni quanti giorni ordini e quanto usi, poi corregge con la gente prevista${funzOn('agenda')?', il meteo e i coperti degli eventi in agenda':' e il meteo'}. Tu controlli e cambi le quantità.</p>
       <div class="panel" style="box-shadow:none;border:1px solid var(--line)">${fs.map(({f,st})=>st.n>=2?`<button type="button" class="row link" data-a="sugF" data-f="${f.id}">${fDot(f.id)}<div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">Di solito ogni ${st.cad===1?'giorno':st.cad+' giorni'} · ultimo ${ago(st.last)}</div></div>${st.due?pill('wait','da riordinare'):''}${ic('chev')}</button>`
         :`<div class="row dim">${fDot(f.id)}<div class="row-i"><div class="row-t">${esc(f.nome)}</div><div class="row-m">${st.n?'Solo 1 ordine':'Nessun ordine'} negli ultimi 2 mesi: servono almeno 2</div></div></div>`).join('')}</div>`}
     const f=forn(G.fid),st=sugStats(G.fid),rows=sugRows(),wf=wxFactor(G.wx,st.cad),nsel=rows.filter(r=>r.sel&&r.q>0).length;
@@ -2906,7 +2923,7 @@ function sugSheet(){
     return head('Ordine suggerito',esc(f.nome)+' · copre '+(st.cad===1?'1 giorno':st.cad+' giorni')+', fino a '+fino,true)+`
     <div class="sug-wx">${G.wx?G.wx.slice(1,1+Math.min(6,Math.max(3,st.cad))).map(d=>`<div class="sug-d"><span>${new Date(d.t+'T12:00').toLocaleDateString('it-IT',{weekday:'short'})}</span>${ic(wxIc(d.c))}<b>${d.tx}°</b><i>${d.p}%</i></div>`).join(''):`<p class="muted small" style="margin:0">${G.wx===null?'Meteo non disponibile (serve la rete).':'Carico il meteo…'}</p>`}</div>
     ${G.wx?`<div class="sug-wxr"><span>${esc(wf.t)}</span><div class="seg" role="group" aria-label="Usa il meteo">${[[1,'Usa il meteo'],[0,'Ignora']].map(([k,l])=>`<button type="button" aria-pressed="${!!G.useWx===!!k}" data-a="sugWx" data-v="${k}">${l}</button>`).join('')}</div></div>`:''}
-    <span class="lbl">Quanta gente ti aspetti?</span><div class="seg wide" role="group" aria-label="Gente prevista">${SUG_GENTE.map(([k,l])=>`<button type="button" aria-pressed="${G.gente===k}" data-a="sugG" data-v="${k}">${l}</button>`).join('')}</div>${htSugH()}
+    <span class="lbl">Quanta gente ti aspetti?</span><div class="seg wide" role="group" aria-label="Gente prevista">${SUG_GENTE.map(([k,l])=>`<button type="button" aria-pressed="${G.gente===k}" data-a="sugG" data-v="${k}">${l}</button>`).join('')}</div>${htSugH()}${sugAgH(st)}
     <div class="sug-list">${rows.length?rows.map(r=>`<div class="sug-r${r.sel?'':' off'}"><input type="checkbox" class="rv-c" id="sg-${esc(r.k)}" data-ch="sugSel" data-k="${esc(r.k)}" ${r.sel?'checked':''} aria-label="Ordina ${esc(r.nome)}">
       <label class="sug-i" for="sg-${esc(r.k)}"><b>${esc(r.nome)}</b><span>${r.n>=2?`di solito ${fq(r.tip)} ${esc(r.unita)} a ordine · si usano circa ${fq(Math.round(r.day*st.cad*10)/10)} ${esc(r.unita)} ${st.cad===1?'al giorno':'ogni '+st.cad+' giorni'}`:'ordinato una volta sola'}${r.inO?` · già in ordine ${fq(r.inO)}`:''}</span></label>
       ${stepper('sugQ',esc(r.k).replace(/[^\w-]/g,'_'),r.q,`data-k="${esc(r.k)}"`)}<span class="ln-u">${esc(r.unita)}</span></div>`).join(''):'<p class="muted">Nessun prodotto da proporre.</p>'}</div>
@@ -4965,7 +4982,17 @@ const agSee=(e,me)=>!!me&&(e.da===me.id||e.vis==='tutti'||(e.vis==='rep'&&(isMgr
 const agDest=e=>e.vis==='io'?[]:Object.values(D().staff).filter(u=>u&&u.stato==='attivo'&&u.id!==e.da&&(e.vis==='rep'?(e.rep||[]).includes(u.reparto)||(e.per||[]).includes(u.id):agSee(e,u)));
 const agVisto=(e,id)=>!!(e.visto&&e.visto[id]>=(e.mod||0));
 const agVisLbl=e=>e.vis==='tutti'?'Tutti':e.vis==='rep'?(e.rep||[]).map(r=>REPARTI[r]||r).join(', '):e.vis==='pers'?(e.per||[]).map(id=>{const u=D().staff[id];return u?u.nome||fullName(u):'?'}).join(', '):'Solo io';
-const agOnDay=(e,g)=>e.r==='s'?e.g<=g&&agWd(e.g)===agWd(g):e.r==='m'?e.g<=g&&agD(e.g).getDate()===agD(g).getDate():e.g===g;
+/* v81 ripetizioni: r ''|'g' ogni giorno|'gs' giorni scelti (rg, 0=lun..6=dom)|'s' settimana|'m' mese|'a' anno; rf «fino al» (compreso); rx giorni saltati */
+const AG_R=[['','No'],['g','Ogni giorno'],['gs','Giorni scelti'],['s','Ogni settimana'],['m','Ogni mese'],['a','Ogni anno']];
+const agRg=e=>Array.isArray(e.rg)&&e.rg.length?e.rg:[agWd(e.g)];
+const agOnDay=(e,g)=>{if(!e.r)return e.g===g;if(g<e.g||(e.rf&&g>e.rf)||(Array.isArray(e.rx)&&e.rx.includes(g)))return false;
+  if(e.r==='g')return true;if(e.r==='gs')return agRg(e).includes(agWd(g));if(e.r==='s')return agWd(e.g)===agWd(g);
+  const a=agD(e.g),b=agD(g);return e.r==='m'?a.getDate()===b.getDate():e.r==='a'?a.getDate()===b.getDate()&&a.getMonth()===b.getMonth():e.g===g};
+const agRLbl=e=>{const gs=agRg(e),r=e.r==='g'||(e.r==='gs'&&gs.length===7)?'ogni giorno':e.r==='gs'?'ogni '+gs.slice().sort().map(i=>AG_GG[i].slice(0,3)).join(', '):e.r==='s'?'ogni settimana':e.r==='m'?'ogni mese':e.r==='a'?'ogni anno':'';
+  return r&&e.rf?r+' fino al '+agD(e.rf).getDate()+' '+AG_MESI[agD(e.rf).getMonth()]:r};
+/* cose da fare: negli eventi ripetuti la spunta vale solo per quel giorno (ckd.d<AAAAMMGG> = indici fatti) */
+const agCkK=g=>'d'+String(g||'').replace(/-/g,'');
+const agCkOk=(e,i,g)=>e.r?!!(e.ckd&&Array.isArray(e.ckd[agCkK(g)])&&e.ckd[agCkK(g)].includes(i)):!!(e.cl[i]&&e.cl[i].ok);
 const agDay=(g,me)=>agAll().filter(e=>agSee(e,me)&&agOnDay(e,g)).sort((a,b)=>(a.h||'99').localeCompare(b.h||'99')||a.t.localeCompare(b.t));
 /* v58 avvisi: minuti prima dell'evento (senza ora = le 09:00), «cose da fare» per evento (cl) */
 const AG_AV=[[0,'All\'ora'],[15,'15 min prima'],[30,'30 min prima'],[60,'1 ora prima'],[120,'2 ore prima'],[1440,'1 giorno prima']];
@@ -5011,6 +5038,8 @@ function agParse(txt,base=new Date()){let s=' '+String(txt||'').replace(/\s+/g,'
   const cut=re=>{const m=s.match(re);if(m)s=s.replace(re,' ');return m};
   let m=cut(/\s(\d{1,4})\s*(?:coperti|persone|pax|ospiti)\b/i);if(m)cop=+m[1];
   m=cut(/\s(?:alle\s+ore|alle|ore|h)\s*(\d{1,2})(?:[:.,](\d{2}))?(?=\s)/i);if(m&&+m[1]<24&&(!m[2]||+m[2]<60))h=String(m[1]).padStart(2,'0')+':'+(m[2]||'00');
+  let r='';if(cut(/\s(?:ogni\s+giorno|tutti\s+i\s+giorni)(?=\s)/i))r='g';else if(cut(/\sogni\s+settimana(?=\s)/i))r='s';else if(cut(/\sogni\s+mese(?=\s)/i))r='m';else if(cut(/\sogni\s+anno(?=\s)/i))r='a';
+  else if(/\s(?:ogni|tutti\s+i)\s+(?:luned[iì]|marted[iì]|mercoled[iì]|gioved[iì]|venerd[iì]|sabato|domenica)(?=\s)/i.test(s)){r='s';s=s.replace(/\s(?:ogni|tutti\s+i)(?=\s+(?:luned|marted|mercoled|gioved|venerd|sabato|domenica))/i,' ')}
   if(cut(/\sdopodomani(?=\s)/i))g=agAdd(oggi,2);else if(cut(/\sdomani(?=\s)/i))g=agAdd(oggi,1);else if(cut(/\soggi(?=\s)/i))g=oggi;
   if(!g){m=cut(/\s(?:il\s+|giorno\s+)?(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)(?:\s+(\d{4}))?(?=\s)/i);
     if(m){const d=+m[1],mo=AG_MESI.indexOf(m[2].toLowerCase());let y=m[3]?+m[3]:base.getFullYear();let c=today(new Date(y,mo,d));if(!m[3]&&c<oggi)c=today(new Date(y+1,mo,d));if(agD(c).getDate()===d)g=c}}
@@ -5021,21 +5050,26 @@ function agParse(txt,base=new Date()){let s=' '+String(txt||'').replace(/\s+/g,'
   if(!g){m=cut(/\s(?:il\s+|giorno\s+)?(\d{1,2})(?=\s)/);
     if(m&&+m[1]>=1&&+m[1]<=31){const d=+m[1];let c=today(new Date(base.getFullYear(),base.getMonth(),d));if(c<oggi)c=today(new Date(base.getFullYear(),base.getMonth()+1,d));if(agD(c).getDate()===d)g=c}}
   const t=s.replace(/\s(?:il|alle|per|di|del|da)\s*$/i,' ').replace(/^\s*(?:il|alle|per)\s/i,' ').replace(/\s+/g,' ').trim();
-  return{t:t?t[0].toUpperCase()+t.slice(1):'',g:g||oggi,h,cop}}
+  return{t:t?t[0].toUpperCase()+t.slice(1):'',g:g||oggi,h,cop,r}}
 
+/* v81 appunti veloci: gli appunti di oggi dalla striscia in alto, senza aprire l'agenda */
+function agNtQuick(){if(!funzOn('agenda'))return;S.ag={v:'oggi',g:today(),sel:'',q:'',nt:''};usoSegna('agenda');
+  openSheet({live:()=>true,onClose:()=>agMicStop(),render:()=>S.ag?`<div class="grab"></div><div class="sh-h"><div class="sh-t">Appunti di oggi<div class="sh-s">${esc(agCap(agLbl(S.ag.g)))}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${agNotesH(S.ag.g)}<div class="btns" style="margin-top:16px"><button type="button" class="btn ghost block" data-a="agFull">${ic('calendar')} Apri l'agenda</button></div>`:''});
+  setTimeout(()=>{const i=$('#ag-nt');if(i)i.focus()},200)}
 function agOpen(){if(!funzOn('agenda'))return;S.ag={v:'oggi',g:today(),sel:'',q:'',nt:''};usoSegna('agenda');openSheet({cls:'tall',live:()=>true,render:agSheet,onClose:()=>agMicStop()})}
-function agEvH(e,me,mgr,next){const vis=agVisLbl(e),dst=mgr&&e.vis!=='io'?agDest(e):[],vst=dst.filter(u=>agVisto(e,u.id)).length;
-  const k=agK(e),av=agAvLbl(e.av),cl=Array.isArray(e.cl)?e.cl:[],fatte=cl.filter(x=>x.ok).length;
-  const inner=`<span class="ag-h">${e.h?esc(e.h):'—'}</span><span class="ag-b">${k!=='ev'?`<span class="ag-k ag-k-${k}">${AG_K[k]}</span>`:''}<b>${esc(e.t)}</b><span class="muted small">${e.cop?esc(e.cop)+' coperti · ':''}${esc(vis)}${e.r?' · ogni '+(e.r==='s'?'settimana':'mese'):''}${av?' · avviso '+esc(av):''}${cl.length?' · '+fatte+'/'+cl.length+' fatte':''}${dst.length?' · visto da '+vst+'/'+dst.length:''}${e.note?' · '+esc(e.note):''}</span></span>`;
-  const main=mgr?`<button type="button" class="ag-ev" data-a="agEdit" data-v="${e.id}">${inner}</button>`:`<div class="ag-ev">${inner}</div>`;
-  const lst=cl.length?`<div class="ag-cl">${cl.map((x,i)=>{const b=`<span class="ag-bx">${x.ok?ic('check'):''}</span><span class="ag-ct${x.ok?' ok':''}">${esc(x.t)}</span>`;
-    return mgr?`<button type="button" class="ag-ck" aria-pressed="${!!x.ok}" data-a="agCk" data-v="${e.id}|${i}">${b}</button>`:`<div class="ag-ck">${b}</div>`}).join('')}</div>`:'';
+function agEvH(e,me,mgr,next,g){const vis=agVisLbl(e),dst=mgr&&e.vis!=='io'?agDest(e):[],vst=dst.filter(u=>agVisto(e,u.id)).length;
+  const k=agK(e),av=agAvLbl(e.av),cl=Array.isArray(e.cl)?e.cl:[],fatte=cl.filter((x,i)=>agCkOk(e,i,g)).length;
+  const inner=`<span class="ag-h">${e.h?esc(e.h):'—'}</span><span class="ag-b">${k!=='ev'?`<span class="ag-k ag-k-${k}">${AG_K[k]}</span>`:''}<b>${esc(e.t)}</b><span class="muted small">${e.cop?esc(e.cop)+' coperti · ':''}${esc(vis)}${e.r?' · '+esc(agRLbl(e)):''}${av?' · avviso '+esc(av):''}${cl.length?' · '+fatte+'/'+cl.length+' fatte':''}${dst.length?' · visto da '+vst+'/'+dst.length:''}${e.note?' · '+esc(e.note):''}</span></span>`;
+  const main=mgr?`<button type="button" class="ag-ev" data-a="agEdit" data-v="${e.id}" data-g="${g||''}">${inner}</button>`:`<div class="ag-ev">${inner}</div>`;
+  const lst=cl.length?`<div class="ag-cl">${cl.map((x,i)=>{const ok=agCkOk(e,i,g),b=`<span class="ag-bx">${ok?ic('check'):''}</span><span class="ag-ct${ok?' ok':''}">${esc(x.t)}</span>`;
+    return mgr?`<button type="button" class="ag-ck" aria-pressed="${ok}" data-a="agCk" data-v="${e.id}|${i}|${g||''}">${b}</button>`:`<div class="ag-ck">${b}</div>`}).join('')}</div>`:'';
   return`<div class="ag-w${next?' ag-next':''}">${main}${lst}</div>`}
-function agList(g,me,mgr){const l=agDay(g,me),hm=agHm(),nx=g===today()?l.findIndex(e=>e.h&&e.h>=hm):-1;return l.length?l.map((e,i)=>agEvH(e,me,mgr,i===nx)).join(''):`<p class="muted small ag-vuoto">Niente in agenda.</p>`}
+function agList(g,me,mgr){const l=agDay(g,me),hm=agHm(),nx=g===today()?l.findIndex(e=>e.h&&e.h>=hm):-1;return l.length?l.map((e,i)=>agEvH(e,me,mgr,i===nx,g)).join(''):`<p class="muted small ag-vuoto">Niente in agenda.</p>`}
 function agNotesH(g){const u=realU(),l=agNotes(g,u),todo=l.filter(x=>!x.ok).length;
   return`<div class="ag-sec">Appunti del giorno <span class="muted small">· li vedi solo tu</span></div>
   ${l.map((x,i)=>`<div class="ag-ntr"><button type="button" class="ag-ck" aria-pressed="${!!x.ok}" data-a="agNtCk" data-v="${i}"><span class="ag-bx">${x.ok?ic('check'):''}</span><span class="ag-ct${x.ok?' ok':''}">${esc(x.t)}</span></button><button type="button" class="icon-btn" data-a="agNtSend" data-v="${i}" aria-label="Manda a qualcuno: ${esc(x.t)}">${ic('send')}</button><button type="button" class="icon-btn" data-a="agNtDel" data-v="${i}" aria-label="Togli ${esc(x.t)}">${ic('x')}</button></div>`).join('')}
-  <div class="ag-q"><input class="inp" id="ag-nt" data-in="agNt" value="${esc(S.ag.nt||'')}" placeholder="Scrivi un appunto" aria-label="Nuovo appunto" enterkeyhint="done"><button type="button" class="btn ghost sm" data-a="agNtAdd">${ic('plus')} Aggiungi</button></div>
+  <div class="ag-q"><input class="inp" id="ag-nt" data-in="agNt" value="${esc(S.ag.nt||'')}" placeholder="Scrivi un appunto" aria-label="Nuovo appunto" enterkeyhint="done">${vSR()?`<button type="button" class="icon-btn${S.ag.mic==='nt'?' on':''}" data-a="agMic" data-v="nt" aria-label="Detta un appunto">${ic('mic')}</button>`:''}<button type="button" class="btn ghost sm" data-a="agNtAdd">${ic('plus')} Aggiungi</button></div>
   ${todo?`<button type="button" class="btn ghost sm ag-mv" data-a="agNtMove">Sposta a domani i non fatti (${todo})</button>`:''}`}
 /* Giorno: appunti, «Tutto il giorno» e le ore dalle 7 alle 23 (tocca un'ora vuota per un evento nuovo) */
 function agDayH(g,me,mgr){if(!mgr)return agList(g,me,mgr);
@@ -5043,8 +5077,8 @@ function agDayH(g,me,mgr){if(!mgr)return agList(g,me,mgr);
   let h0=7,h1=23;for(const e of ore){const h=+e.h.slice(0,2);if(h<h0)h0=h;if(h>h1)h1=h}
   const p2=h=>String(h).padStart(2,'0');let righe='';
   for(let h=h0;h<=h1;h++){const ev=ore.filter(e=>+e.h.slice(0,2)===h);
-    righe+=`<div class="ag-hr${h===ch?' ora':''}"><span class="ag-hl">${p2(h)}:00</span><div class="ag-hs">${ev.length?ev.map(e=>agEvH(e,me,mgr,ore.indexOf(e)===nx)).join(''):`<button type="button" class="ag-add" data-a="agNewAt" data-v="${p2(h)}:00" aria-label="Nuovo evento alle ${p2(h)}:00"></button>`}</div></div>`}
-  return agNotesH(g)+(tutto.length?`<div class="ag-sec">Tutto il giorno</div>${tutto.map(e=>agEvH(e,me,mgr,false)).join('')}`:'')+`<div class="ag-sec">Ore</div>${l.length?'':'<p class="muted small ag-vuoto">Niente in agenda. Tocca un\'ora per segnare un evento.</p>'}<div class="ag-tl">${righe}</div>`}
+    righe+=`<div class="ag-hr${h===ch?' ora':''}"><span class="ag-hl">${p2(h)}:00</span><div class="ag-hs">${ev.length?ev.map(e=>agEvH(e,me,mgr,ore.indexOf(e)===nx,g)).join(''):`<button type="button" class="ag-add" data-a="agNewAt" data-v="${p2(h)}:00" aria-label="Nuovo evento alle ${p2(h)}:00"></button>`}</div></div>`}
+  return agNotesH(g)+(tutto.length?`<div class="ag-sec">Tutto il giorno</div>${tutto.map(e=>agEvH(e,me,mgr,false,g)).join('')}`:'')+`<div class="ag-sec">Ore</div>${l.length?'':'<p class="muted small ag-vuoto">Niente in agenda. Tocca un\'ora per segnare un evento.</p>'}<div class="ag-tl">${righe}</div>`}
 function agSheet(){const A_=S.ag,me=meU(),mgr=agCan(me);let nav='',body='';
   if(A_.v==='oggi'){nav=A_.g===today()?'Oggi, '+agLbl(A_.g):agCap(agLbl(A_.g));body=agDayH(A_.g,me,mgr)}
   else if(A_.v==='sett'){const l=agLun(A_.g);nav='Settimana dal '+agD(l).getDate()+' '+AG_MESI[agD(l).getMonth()];
@@ -5055,7 +5089,7 @@ function agSheet(){const A_=S.ag,me=meU(),mgr=agCan(me);let nav='',body='';
     for(let i=0;i<n;i++){const g=agAdd(p,i),k=agDay(g,me).length+(mgr?agNotes(g,realU()).filter(x=>!x.ok).length:0);c+=`<button type="button" class="ag-c${g===today()?' oggi':''}" aria-pressed="${A_.sel===g}" data-a="agSel" data-v="${g}" aria-label="${agLbl(g)}${k?', '+k+' eventi':''}">${i+1}${k?`<i>${k>3?'•••':'•'.repeat(k)}</i>`:''}</button>`}
     body=`<div class="ag-grid">${c}</div>`+(A_.sel?`<div class="ag-dt"><button type="button" class="ag-dl" data-a="agDayGo" data-v="${A_.sel}">${agCap(agLbl(A_.sel))} · apri il giorno ›</button></div>${agList(A_.sel,me,mgr)}`:`<p class="muted small ag-vuoto">Tocca un giorno per vedere gli eventi.</p>`)}
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Agenda<div class="sh-s">${mgr?'Eventi, gruppi e cose da ricordare':'Gli eventi che ti riguardano'}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${mgr?`<div class="ag-q"><input class="inp" id="ag-q" data-in="agQ" value="${esc(A_.q)}" placeholder="Es. domani ore 20 gruppo Rossi 40 coperti" aria-label="Scrivi o detta un evento" enterkeyhint="done">${vSR()?`<button type="button" class="icon-btn${A_.mic?' on':''}" data-a="agMic" aria-label="Detta">${ic('mic')}</button>`:''}<button type="button" class="btn primary sm" data-a="agQuick">Aggiungi</button></div>
+  ${mgr?`<div class="ag-q"><input class="inp" id="ag-q" data-in="agQ" value="${esc(A_.q)}" placeholder="Es. domani ore 20 gruppo Rossi 40 coperti" aria-label="Scrivi o detta un evento" enterkeyhint="done">${vSR()?`<button type="button" class="icon-btn${A_.mic==='q'?' on':''}" data-a="agMic" data-v="q" aria-label="Detta">${ic('mic')}</button>`:''}<button type="button" class="btn primary sm" data-a="agQuick">Aggiungi</button></div>
   <div class="ag-2" style="margin:8px 0 4px"><button type="button" class="btn ghost sm" data-a="agFoto">${ic('camera')} Foto dell'agenda</button><button type="button" class="btn ghost sm" data-a="agNew">${ic('plus')} Nuovo evento</button></div>`:''}
   <div class="seg wide" style="margin-top:10px">${[['oggi','Giorno'],['sett','Settimana'],['mese','Mese']].map(([k,l])=>`<button type="button" aria-pressed="${A_.v===k}" data-a="agV" data-v="${k}">${l}</button>`).join('')}</div>
   <div class="ag-nav"><button type="button" class="icon-btn" data-a="agGo" data-v="-1" aria-label="Prima">‹</button><b>${esc(nav)}</b><button type="button" class="icon-btn" data-a="agGo" data-v="1" aria-label="Dopo">›</button></div>
@@ -5071,16 +5105,17 @@ function agGo(n){const A_=S.ag;if(A_.v==='oggi')A_.g=agAdd(A_.g,n);else if(A_.v=
 
 let agRec=null;
 function agMicStop(){const r=agRec;agRec=null;if(S.ag)S.ag.mic=false;if(r)try{r.abort()}catch(e){}}
-function agMic(){const C=vSR();if(!C)return;if(agRec){agMicStop();refreshSheet();return}
+function agMic(dst){const C=vSR();if(!C||!S.ag)return;dst=dst==='nt'?'nt':'q';if(agRec){agMicStop();refreshSheet();return}
   let r;try{r=new C()}catch(e){return toast(VERR.other[1],'warn')}
-  agRec=r;r.lang='it-IT';r.interimResults=false;r.continuous=false;S.ag.mic=true;refreshSheet();
-  r.onresult=e=>{if(agRec!==r)return;const t=String((e.results[0]&&e.results[0][0]&&e.results[0][0].transcript)||'').trim();agMicStop();if(t){S.ag.q=t;agQuick()}else refreshSheet()};
+  agRec=r;r.lang='it-IT';r.interimResults=false;r.continuous=false;S.ag.mic=dst;refreshSheet();
+  r.onresult=e=>{if(agRec!==r)return;const t=String((e.results[0]&&e.results[0][0]&&e.results[0][0].transcript)||'').trim();agMicStop();if(!t||!S.ag)return refreshSheet();
+    if(dst==='nt'){S.ag.nt=t;guard(()=>A.agNtAdd({}))}else{S.ag.q=t;agQuick()}};
   r.onerror=e=>{if(agRec!==r)return;agMicStop();refreshSheet();if(e.error!=='aborted')toast((VERR[e.error]||VERR.other)[1],'warn')};
   r.onend=()=>{if(agRec===r){agMicStop();refreshSheet()}};
   try{r.start()}catch(e){agMicStop();refreshSheet()}}
 function agQuick(){const q=String(S.ag.q||'').trim();if(!q)return toast('Scrivi o detta l\'evento, es. «domani ore 20 gruppo Rossi».','warn');
   const p=agParse(q);S.ag.q='';agForm(Object.assign({vis:'tutti',k:'ev'},p))}
-function agForm(e){S.agf=Object.assign({t:'',g:S.ag?S.ag.sel||S.ag.g:today(),h:'',cop:'',note:'',vis:'tutti',rep:[],r:'',k:'ev'},e||{});S.agf.cop=S.agf.cop?String(S.agf.cop):'';
+function agForm(e){S.agf=Object.assign({t:'',g:S.ag?S.ag.sel||S.ag.g:today(),h:'',cop:'',note:'',vis:'tutti',rep:[],r:'',rg:[],rf:'',k:'ev'},e||{});S.agf.rg=Array.isArray(S.agf.rg)?S.agf.rg.map(Number):[];S.agf.cop=S.agf.cop?String(S.agf.cop):'';
   S.agf.av=e&&(e.id||Array.isArray(e.av))?agAvOk(e.av):[30];S.agf.per=Array.isArray(e&&e.per)?e.per.slice():[];S.agf.subito=!(e&&e.id);S.agf.cl=Array.isArray(e&&e.cl)?e.cl.map(x=>({t:String(x.t||''),ok:!!x.ok})):[];S.agf.clt='';
   openSheet({render:()=>{const f=S.agf;
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica evento':'Nuovo evento'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
@@ -5094,7 +5129,10 @@ function agForm(e){S.agf=Object.assign({t:'',g:S.ag?S.ag.sel||S.ag.g:today(),h:'
   ${f.vis==='rep'?`<div class="chips" role="group" aria-label="Reparti">${Object.entries(REPARTI).map(([k,l])=>`<button type="button" class="chip" aria-pressed="${f.rep.includes(k)}" data-a="agfRep" data-v="${k}">${esc(l)}</button>`).join('')}</div>`:''}
   ${f.vis!=='io'?`<span class="lbl">Avvisa subito</span><div class="seg wide">${[[1,'Sì, appena salvo'],[0,'No']].map(([v,l])=>`<button type="button" aria-pressed="${!!f.subito===!!v}" data-a="agfSub" data-v="${v}">${l}</button>`).join('')}</div>`:''}
   ${f.id?agVistoH(f.id):''}
-  <span class="lbl">Ripeti</span><div class="seg wide">${[['','No'],['s','Ogni settimana'],['m','Ogni mese']].map(([k,l])=>`<button type="button" aria-pressed="${f.r===k}" data-a="agfSet" data-k="r" data-v="${k}">${l}</button>`).join('')}</div>
+  <span class="lbl">Ripeti</span><div class="chips ag-wrap" role="group" aria-label="Ripeti">${AG_R.map(([k,l])=>`<button type="button" class="chip" aria-pressed="${f.r===k}" data-a="agfR" data-v="${k}">${l}</button>`).join('')}</div>
+  ${f.r==='gs'?`<div class="chips ag-wrap" role="group" aria-label="Giorni">${AG_GG.map((n,i)=>`<button type="button" class="chip" aria-pressed="${f.rg.includes(i)}" data-a="agfRg" data-v="${i}" aria-label="${n}">${agCap(n.slice(0,3))}</button>`).join('')}</div>`:''}
+  ${f.r?`<label class="lbl" for="agf-rf">Fino al (facoltativo)</label><input type="date" class="inp" id="agf-rf" data-in="agf" data-k="rf" value="${esc(f.rf)}" min="${esc(f.g)}">`:''}
+  ${f.id&&f.dg&&(agGet(f.id)||{}).r?`<button type="button" class="btn ghost sm ag-skip" data-a="agSkip">Salta solo ${esc(agLbl(f.dg))}</button>`:''}
   <span class="lbl">Avvisi</span><div class="chips ag-wrap" role="group" aria-label="Avvisi">${AG_AV.map(([m,l])=>`<button type="button" class="chip" aria-pressed="${f.av.includes(m)}" data-a="agfAv" data-v="${m}">${l}</button>`).join('')}</div>
   <p class="muted small" style="margin:4px 0 0">L\'avviso arriva anche con l\'app chiusa. Senza ora arriva alle 09:00.</p>
   <span class="lbl">Cose da fare</span>${f.cl.map((x,i)=>`<div class="ag-ci"><span class="ag-ct">${esc(x.t)}</span><button type="button" class="icon-btn" data-a="agClDel" data-v="${i}" aria-label="Togli ${esc(x.t)}">${ic('x')}</button></div>`).join('')}
@@ -5111,13 +5149,21 @@ async function agSave(){const f=S.agf,me=realU();if(!f||!me)return;const t=f.t.t
   if(f.vis==='rep'&&!f.rep.length)return toast('Scegli almeno un reparto.','warn');if(f.vis==='pers'&&!f.per.length)return toast('Scegli almeno una persona.','warn');
   const cop=f.cop===''?0:num(f.cop);if(cop==null||cop<0)return toast('I coperti devono essere un numero.','warn');
   const old=f.id?agGet(f.id):null,id=f.id||uid();
-  const ev={k:AG_K[f.k]?f.k:'ev',t,g:f.g,h:/^\d{2}:\d{2}$/.test(f.h||'')?f.h:'',cop:Math.round(cop),note:String(f.note||'').trim(),vis:f.vis,rep:f.vis==='rep'?f.rep.slice():[],per:f.vis==='pers'?f.per.slice():[],visto:old&&old.visto?old.visto:{},da:old?old.da:me.id,cr:old?old.cr:now(),mod:now(),r:f.r||'',av:agAvOk(f.av),cl:(f.cl||[]).concat(String(f.clt||'').trim()?[{t:f.clt,ok:false}]:[]).map(x=>({t:String(x.t||'').trim().slice(0,80),ok:!!x.ok})).filter(x=>x.t).slice(0,30)};
+  const ev={k:AG_K[f.k]?f.k:'ev',t,g:f.g,h:/^\d{2}:\d{2}$/.test(f.h||'')?f.h:'',cop:Math.round(cop),note:String(f.note||'').trim(),vis:f.vis,rep:f.vis==='rep'?f.rep.slice():[],per:f.vis==='pers'?f.per.slice():[],visto:old&&old.visto?old.visto:{},da:old?old.da:me.id,cr:old?old.cr:now(),mod:now(),r:AG_R.some(x=>x[0]===f.r)?f.r:'',av:agAvOk(f.av),cl:(f.cl||[]).concat(String(f.clt||'').trim()?[{t:f.clt,ok:false}]:[]).map(x=>({t:String(x.t||'').trim().slice(0,80),ok:!!x.ok})).filter(x=>x.t).slice(0,30)};
+  if(ev.r){if(ev.r==='gs'){ev.rg=[...new Set((f.rg||[]).map(Number).filter(i=>i>=0&&i<7))].sort();if(!ev.rg.length)return toast('Scegli almeno un giorno.','warn')}
+    if(/^\d{4}-\d{2}-\d{2}$/.test(f.rf||'')){if(f.rf<ev.g)return toast('«Fino al» viene prima della data dell\'evento.','warn');ev.rf=f.rf}
+    if(old&&old.r){const rx=(Array.isArray(old.rx)?old.rx:[]).filter(x=>x>=ev.g&&(!ev.rf||x<=ev.rf));if(rx.length)ev.rx=rx;if(old.ckd)ev.ckd=old.ckd}}
   const doc=ev.r?'agenda_ric':'agenda_'+ev.g.slice(0,7);
   if(old&&old.doc!==doc)await upd('config',old.doc,{['e.'+id]:null});
   await agPut(doc,{[id]:ev});
-  if(f.subito&&ev.vis!=='io'){const ds=agDest(Object.assign({id},ev)).map(u=>u.id),tt=(f.id?'Cambiato in agenda: ':'Nuovo in agenda: ')+t,tx=agCap(agLbl(ev.g))+(ev.h?' alle '+ev.h:'');
+  if(f.subito&&ev.vis!=='io'){const ds=agDest(Object.assign({id},ev)).map(u=>u.id),tt=(f.id?'Cambiato in agenda: ':'Nuovo in agenda: ')+t,tx=agCap(agLbl(ev.g))+(ev.h?' alle '+ev.h:'')+(ev.r?' · '+agRLbl(ev):'');
     if(ds.length){for(const a of ds)await put('notifiche',uid(),{a,titolo:tt,testo:tx,tipo:'agenda',rif:id,letta:false,creato:now(),da:me.id});pushSend(ds,tt,tx).catch(()=>{})}}
   closeSheet();if(S.ag){S.ag.g=ev.g;if(S.ag.v==='mese')S.ag.sel=ev.g}refreshSheet();toast('Evento salvato');htAgenda(id,ev)}
+/* v81 salta un solo giorno di un evento ripetuto (rx) */
+async function agSkip(){const f=S.agf,old=f&&f.id?agGet(f.id):null;if(!old||!old.r||!f.dg)return;
+  if(!await ask('Saltare solo questo giorno?','«'+old.t+'» non ci sarà '+agLbl(f.dg)+'. Gli altri giorni restano.','Salta il giorno'))return;
+  const rx=[...new Set((Array.isArray(old.rx)?old.rx:[]).filter(x=>x>=old.g).concat([f.dg]))].sort().slice(-200);
+  await upd('config',old.doc,{['e.'+old.id+'.rx']:rx});closeSheet();refreshSheet();toast('Giorno saltato: gli altri restano')}
 async function agDel(){const f=S.agf,old=f&&f.id?agGet(f.id):null;if(!old)return closeSheet();
   if(!await ask('Eliminare l\'evento?','«'+old.t+'» sparisce dall\'agenda'+(old.r?' per tutte le ripetizioni':'')+'.','Elimina',true))return;
   await upd('config',old.doc,{['e.'+old.id]:null});closeSheet();refreshSheet();toast('Evento eliminato');htAgDel(old.id)}
@@ -5180,7 +5226,11 @@ function agNuovi(me){const r=realU();if(!me||!r)return[];const out=[],vis=new Se
   return out}
 function agStrip(me){if(!funzOn('agenda')||!realU()||S.wallMode)return'';
   const nv=agNuovi(me);if(nv.length)return`<div class="ag-strip ag-nuovo">${ic('calendar')}<button type="button" class="ag-st-t" data-a="agOpenG" data-v="${nv[0].gg}"><b>Per te in agenda</b> ${nv.slice(0,2).map(e=>esc((e.gg===today()?'oggi':e.gg===agAdd(today(),1)?'domani':agLbl(e.gg))+(e.h?' '+e.h:'')+' · '+e.t)).join(' — ')}${nv.length>2?' — +'+(nv.length-2):''}</button><button type="button" class="btn primary sm" data-a="agVistoOk">Ok, visto</button></div>`;
-  const l=agDay(today(),me);if(!l.length)return'';
+  const l=agDay(today(),me);
+  /* v81 chi scrive in agenda ha «Appunto» nella striscia; senza eventi oggi la striscia c'è solo nella prima scheda */
+  if(agCan(me)){const nt=agNotes(today(),realU()).filter(x=>!x.ok).length,tabs=isGM(me)?GM_TABS:isDev(me)?DEV_TABS:STAFF_TABS;if(!l.length&&S.tab!==tabs[0].id)return'';
+    return`<div class="ag-strip ag-can">${ic('calendar')}<button type="button" class="ag-st-t" data-a="agOpen">${l.length?`<b>Oggi in hotel</b> ${l.slice(0,3).map(e=>esc((e.h?e.h+' ':'')+(agK(e)!=='ev'?AG_K[agK(e)]+': ':'')+e.t)).join(' · ')}${l.length>3?' · +'+(l.length-3):''}`:'<b>Oggi</b> niente in agenda'}${nt?` · ${nt} ${nt===1?'appunto':'appunti'}`:''}</button><button type="button" class="btn ghost sm" data-a="agNtQ">${ic('plus')} Appunto</button></div>`}
+  if(!l.length)return'';
   return`<button type="button" class="ag-strip" data-a="agOpen">${ic('calendar')}<span><b>Oggi in hotel</b> ${l.slice(0,3).map(e=>esc((e.h?e.h+' ':'')+(agK(e)!=='ev'?AG_K[agK(e)]+': ':'')+e.t)).join(' · ')}${l.length>3?' · +'+(l.length-3):''}</span></button>`}
 const agBtn=me=>funzOn('agenda')&&agCan(me)?`<button type="button" class="icon-btn" data-a="agOpen" aria-label="Agenda">${ic('calendar')}</button>`:'';
 
@@ -5402,11 +5452,16 @@ const A={
   agOpenG:d=>{agOpen();if(S.ag){S.ag.g=d.v;refreshSheet()}},
   agNtMove:async()=>{const u=realU(),g=S.ag.g,d2=agAdd(g,1),l=agNotes(g,u),no=l.filter(x=>!x.ok);if(!no.length)return;
     await agNotesPut(d2,u,agNotes(d2,u).concat(no.map(x=>({t:x.t,ok:false}))));await agNotesPut(g,u,l.filter(x=>x.ok));refreshSheet();toast(no.length+(no.length===1?' appunto spostato':' appunti spostati')+' a '+agLbl(d2))},agGo:d=>agGo(+d.v),agSel:d=>{S.ag.sel=S.ag.sel===d.v?'':d.v;refreshSheet()},
-  agQuick:()=>agQuick(),agMic:()=>agMic(),agNew:()=>agForm(),agEdit:d=>{const e=agGet(d.v);if(e)agForm({id:e.id,k:agK(e),t:e.t,g:e.g,h:e.h||'',cop:e.cop||'',note:e.note||'',vis:e.vis||'io',rep:(e.rep||[]).slice(),per:(e.per||[]).slice(),r:e.r||'',av:e.av||[],cl:e.cl||[]})},
+  agQuick:()=>agQuick(),agMic:d=>agMic(d.v),agNtQ:()=>agNtQuick(),agFull:()=>{closeSheet();agOpen()},agNew:()=>agForm(),agEdit:d=>{const e=agGet(d.v);if(e)agForm({id:e.id,k:agK(e),t:e.t,g:e.g,h:e.h||'',cop:e.cop||'',note:e.note||'',vis:e.vis||'io',rep:(e.rep||[]).slice(),per:(e.per||[]).slice(),r:e.r||'',rg:(e.rg||[]).slice(),rf:e.rf||'',dg:d.g||'',av:e.av||[],cl:e.cl||[]})},
+  agfR:d=>{const f=S.agf;f.r=d.v;if(d.v==='gs'&&!f.rg.length&&/^\d{4}-\d{2}-\d{2}$/.test(f.g||''))f.rg=[agWd(f.g)];refreshSheet()},
+  agfRg:d=>{const l=S.agf.rg,i=l.indexOf(+d.v);if(i<0)l.push(+d.v);else l.splice(i,1);refreshSheet()},agSkip:()=>agSkip(),
   agfSet:d=>{S.agf[d.k]=d.v;refreshSheet()},agfPer:d=>{const l=S.agf.per,i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},agfSub:d=>{S.agf.subito=d.v==='1';refreshSheet()},agfAv:d=>{const l=S.agf.av,m=+d.v,i=l.indexOf(m);if(i<0)l.push(m);else l.splice(i,1);refreshSheet()},
   agClAdd:()=>{const f=S.agf,t=String(f.clt||'').trim();if(!t)return toast('Scrivi la cosa da fare.','warn');if(f.cl.length>=30)return toast('Al massimo 30 cose da fare.','warn');f.cl.push({t:t.slice(0,80),ok:false});f.clt='';refreshSheet()},
   agClDel:d=>{S.agf.cl.splice(+d.v,1);refreshSheet()},
-  agCk:async d=>{const [id,i]=String(d.v).split('|'),e=agGet(id);if(!e||!agCan(realU()))return;const cl=(Array.isArray(e.cl)?e.cl:[]).map(x=>({t:x.t,ok:!!x.ok}));if(!cl[+i])return;cl[+i].ok=!cl[+i].ok;const ev=Object.assign({},e);delete ev.id;delete ev.doc;ev.cl=cl;await agPut(e.doc,{[id]:ev});refreshSheet()},agfK:d=>{const f=S.agf;f.k=d.v;if(d.v==='memo')f.vis='io';refreshSheet()},agfRep:d=>{const l=S.agf.rep;const i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},
+  agCk:async d=>{const [id,i,g]=String(d.v).split('|'),e=agGet(id);if(!e||!agCan(realU()))return;const cl=(Array.isArray(e.cl)?e.cl:[]).map(x=>({t:x.t,ok:!!x.ok}));if(!cl[+i])return;const ev=Object.assign({},e);delete ev.id;delete ev.doc;
+    if(e.r&&g){const k=agCkK(g),lim=agCkK(agAdd(today(),-60)),ckd={};for(const [x,v] of Object.entries(e.ckd||{}))if(x>=lim&&Array.isArray(v))ckd[x]=v;const l=(ckd[k]||[]).slice(),j=l.indexOf(+i);if(j<0)l.push(+i);else l.splice(j,1);ckd[k]=l;ev.ckd=ckd}
+    else{cl[+i].ok=!cl[+i].ok;ev.cl=cl}
+    await agPut(e.doc,{[id]:ev});refreshSheet()},agfK:d=>{const f=S.agf;f.k=d.v;if(d.v==='memo')f.vis='io';refreshSheet()},agfRep:d=>{const l=S.agf.rep;const i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},
   agSave:()=>agSave(),agDel:()=>agDel(),agFoto:()=>agFoto(),agPT:d=>{const e=S.agp.l[+d.v];if(e){e.on=!e.on;refreshSheet()}},agPV:d=>{S.agp.vis=d.v;refreshSheet()},agPAdd:()=>agFotoAdd(),
   register:()=>registerSheet('self'),
   addProfile:()=>registerSheet('admin'),
@@ -5555,7 +5610,7 @@ rbest:d=>rswapTo(d.r,d.i,d.p),
   notifDel:async()=>{const ns=Object.values(D().notifiche).filter(n=>n.letta);await runPool(ns.map(n=>()=>del('notifiche',n.id)));toast('Notifiche pulite')}
 };
 const IN={
-  agQ:t=>{S.ag.q=t.value},agNt:t=>{S.ag.nt=t.value},agf:t=>{S.agf[t.dataset.k]=t.value},
+  agQ:t=>{S.ag.q=t.value},agNt:t=>{S.ag.nt=t.value},sugCn:t=>{if(S.sug)S.sug.cn=t.value},agf:t=>{S.agf[t.dataset.k]=t.value},
   sc:t=>{S.sc[t.dataset.k]=t.value},
   q:t=>{S.q=t.value;const r=$('#results');if(r)r.innerHTML=catResults();else render()},
   login:t=>{S.login[t.dataset.k]=t.value},
@@ -5674,7 +5729,9 @@ Object.assign(A,{
   sugF:d=>{Object.assign(S.sug,{fid:d.f,q:{},sel:{}});refreshSheet()},
   sugBack:()=>{S.sug.fid='';refreshSheet()},
   sugWx:d=>{S.sug.useWx=d.v==='1';refreshSheet()},
-  sugG:d=>{S.sug.gente=+d.v;refreshSheet()},
+  sugG:d=>{S.sug.gente=+d.v;refreshSheet()},sugAg:d=>{S.sug.useAg=d.v==='1';refreshSheet()},
+  sugCnEdit:()=>{S.sug.cnEdit=true;S.sug.cn=String(cfg().copNorm||'');refreshSheet()},
+  sugCnSave:async()=>{const n=Math.round(num(S.sug.cn));if(!(n>0&&n<5000))return toast('Scrivi quanti coperti, es. 60.','warn');await put('config','app',Object.assign({},cfg(),{copNorm:n}));S.sug.cnEdit=false;S.sug.q={};refreshSheet();toast('Salvato: giorno normale '+n+' coperti')},
   sugQ:d=>{const r=sugRows().find(x=>x.k===d.k);if(!r)return;const v=Math.max(0,r3(r.q+(sugUnitHalf(r.unita)?0.5:1)*Number(d.d)));S.sug.q[d.k]=v;S.sug.sel[d.k]=v>0;refreshSheet()},
   sugAdd:()=>sugAdd()
 });
