@@ -13,6 +13,7 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
 | D34 | Cantina Vini: **online v84** (PR #95). Resta solo la domanda a Mario: come registrate oggi i vini venduti (cassa? quale programma?) per collegare le vendite | Mario risponde | dopo |
+| D38 | 🔴 Bordo chiaro a destra e in basso nell'apertura (intro), foto `docs/img/sessione-90/intro-bordo-bianco.jpg` (Mario #90). Correggere nella v87 con prova che l'apertura copre tutto lo schermo; insieme «Più venduti» allineati in Cantina (aggiornare `test-cantina` riga 111) | Claude da solo | subito dopo la PR #97 |
 | D37 | Agente `ottimizza` e `tools/misura-velocita.mjs` fatti (#89). **#90: v86 fatta (prove legate e giro verdi), PR aperta**: sfocatura spenta sui telefoni lenti, controllo ogni minuto saltato con l'app in secondo piano, chat leggera a chat chiusa. **Context7**: scelto da Mario, `.mcp.json` nel repo, ma nelle sessioni cloud resta «Pending approval» (verificato #90 con `claude mcp list`): per averlo davvero Mario lo aggiunge come connettore su claude.ai (M43) | Claude da solo | ora |
 | D33 | Funzioni smart per orari e agenda (richiesta di Mario #85): proporre 3 strade + idee (vedi consegne) | Claude, dopo la tua scelta | prossimo |
 | M43 | Aggiungere **Context7** come connettore personalizzato su https://claude.ai/customize/connectors (URL `https://mcp.context7.com/mcp`), in tutti e due gli account: così funziona in Jona, RVC e SPA | Mario a mano | quando vuoi |
