@@ -1,41 +1,32 @@
-# Passaggio di consegne (2026-10-11, fine sessione #87)
+# Passaggio di consegne (2026-10-11, fine sessione #88)
 
-Sessione attuale: #88
+Sessione attuale: #89
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v83** (PR #94, squash `4507927`, 11/10 ~22:00). **v84 Cantina Vini nella PR #95** (aperta 22:24, controllo `prove` in corso).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v84** Cantina Vini (PR #95, squash `050db8d`, online alle 22:46). **v85 nella PR #96** (aperta ~22:45, controllo `prove` in corso sul commit `9757eee`).
 
-## ✅ SUBITO (#88): chiudere la PR #95 (v84 Cantina Vini)
-- Controllo `prove` sul commit `56a1c1a` partito alle 22:24 ora italiana. Se è verde: squash della PR #95 → subito `git fetch origin main && git merge origin/main` sul ramo + push → controllo online `APP_VER=84` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33). Se rosso: capire la causa e correggere (non saltare prove).
-- Prove già fatte in #87, tutte verdi: `test-cantina` (43 PASS, anche con TZ Roma), `test-news`, `test-demo`, `test-campi-16`, `test-ricette`, `test-giro`. Non rifarle.
-- Dopo la pubblicazione: in `docs/DA-FARE.md` segnare D34 come fatta (resta solo la domanda delle vendite, sotto).
+## ✅ SUBITO (#89): chiudere la PR #96 (v85 ruoli + Bar)
+- Se `prove` è verde: squash della PR #96 → subito `git fetch origin main && git merge origin/main` sul ramo + push → controllo online `APP_VER=85` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33). Se rosso: capire la causa e correggere.
+- Prove già fatte in #88, tutte verdi: `test-bar` (35 PASS, anche TZ Roma), `test-cantina`, `test-news`, `test-demo`, `test-campi-16`, `test-giro`. Non rifarle.
+- Dopo: in `docs/DA-FARE.md` togliere la riga D35-D36. Poi dire a Mario in breve cosa c'è di nuovo (v84 + v85) e mandargli una foto del Bar (Playwright su `/#demo` → `demoGo` → Fornitori → `brOpen`; in demo ci sono 10 bottiglie, Havana a ⅓ «da riordinare»).
 
-## Ultima richiesta di Mario (#87, 22:2x): grafica e leggerezza — vale per D34-D36 e d'ora in poi
-«cura la grafica in stile moderno e attinente all'app e non appesantire l'app deve andare su anche telefoni normali non troppo performanti ultimi usciti» + «Vai avanti da solo chiedimi solo scelte importanti».
-- Quindi: aspetto moderno nello stile dell'app (variabili `--lagoon`, `--ocra`, `--surface`, `.sug-cta`, `.chip`, `.seg`, fogli `.sheet`); niente immagini pesanti, niente librerie nuove, niente animazioni continue; liste lunghe (es. 200 cocktail) senza appesantire: dati compatti, filtro/ricerca, al massimo ~60 righe disegnate alla volta (come `rcPick` fa con `slice(0,80)`).
-- Possibile controllo per D34: guardare la Cantina Vini anche in tema scuro e a 320 px (foto fatta solo a 390 chiaro: andava bene). Se serve una rifinitura, in una versione piccola dopo la v84.
-- Mario vuole che si vada avanti da soli: chiedere solo scelte importanti (gusti grossi, soldi, cose del ristorante). Domande scritte nel testo (E38).
-
-## Fatto in #87 (11/10, 21:50-22:30 ora italiana)
-- Unita la scorta della #86 (solo `docs/ULTIMO-MESSAGGIO.md`, messaggio delle 20:09 già gestito).
-- **v83 pubblicata**: PR #94 → prove verdi → squash → ramo riallineato → online `APP_VER=83`. D32 tolta da DA-FARE.
-- **Richiesta nuova di Mario** arrivata dalla #86 (scritta lì per sbaglio, girata con send_message): salvata parola per parola in `docs/richieste/cantina-vini-cocktail.md`; in DA-FARE: **D34** Cantina Vini, **D35** Chef de rang e ruoli mancanti, **D36** Bartender: Cocktail (~200 più famosi) + inventario alcolici (bottiglie intera / 2/3 / metà / 1/3).
-- **v84 Cantina Vini (D34)** fatta (dettagli in CLAUDE.md, riga v84; NEWS v84; `CACHE` v88; demo con 4 vini e 3 vendite). Scelte prese e perché:
-  - Dati in `config/cantina` (un documento, come le ricette: le regole Firestore permettono già `config` a ogni membro, niente regole nuove) + movimenti per mese in `config/cantina_mov_<AAAA-MM>` (vendite del mese senza documenti enormi).
-  - Niente foto salvate (peserebbero sul documento e sul telefono): pallino colorato per tipo di vino.
-  - IA: `gemCall` (stessa via di agenda e listini; con Firebase passa dal Worker `/gemini`, niente chiave sul telefono). Prompt: premi mai inventati, annata e gradi solo se letti; `sicuro:false` → avviso «controlla bene». Riempie solo i campi vuoti (non cancella quello scritto a mano). Doppione (stesso nome, cantina, annata) → apre quello già in cantina.
-  - «Supporto al tavolo» inventato per Mario: riquadro «Al tavolo in 10 secondi» (frase da dire ≤25 parole + 3 parole chiave + va con + servizio + prezzo), e «Consiglia» per piatto con solo i vini in casa, i più venduti prima.
-  - Vendite: per ora pulsante «− Venduta» (e − / + nell'Inventario); vendita con 0 in casa chiede conferma, mai sotto zero.
-  - Chi vede: gestori in Fornitori; staff non di cucina in «Cosa serve?» (Catalogo). Modifica: gestori, `fb`, `resp`, `sala` (`vnCan`). Prezzo d'acquisto solo `isMgr`; se l'F&B salva, il prezzo d'acquisto resta.
-- Foto per Mario: `cantina-v84.png` (Carta, Consiglia «Pesce», scheda, Inventario) mandata; script nello scratchpad della #87 (si rifà con Playwright su `/#demo` → `demoGo` → Fornitori → `vnOpen`).
+## Fatto in #88 (11/10, 22:26-22:50 ora italiana)
+- Unita la scorta (solo `docs/ULTIMO-MESSAGGIO.md`, richiesta D34-D36 già salvata).
+- **v84 pubblicata** (PR #95 verde → squash → ramo riallineato → online).
+- **v85 (D35 + D36)** fatta. Scelte e perché:
+  - D35: niente reparto `bar` nuovo (toccherebbe chat `rep_`, orari per reparto, `OR_PLAN`, prove: rischio alto per poco). Il Bartender è una **mansione** (reparto Sala). Mansioni in gruppi con optgroup: Cucina (Chef, Sous chef, Chef de partie, Cuoco, Commis di cucina, Pasticcere, Pizzaiolo, Lavapiatti), Sala (Maître, Chef de rang, Commis di sala, Cameriere, Runner, Hostess, Sommelier), Bar (Bartender, Barback), Gestione (F&B manager), Altro. «Barman» e «Commis» dei profili vecchi restano (`mansOpt` li mette in cima scelti, non cambiano da soli). Demo: Andrea = Bartender.
+  - D36: 212 cocktail (89 IBA) scritti in `tools/cocktail.txt` (una riga per cocktail, facile da correggere) → `python3 tools/cocktail.py` → `data/cocktail.json` (44 KB, scaricato solo quando si apre il Bar: l'app non pesa di più). Lista disegnata 60 alla volta («Mostra altri»). Ricerca per nome o ingrediente, filtri per famiglia (Gin, Vodka, Rum, Tequila, Whisky, Brandy, Aperitivi e bollicine, Liquori e shot, Analcolici; 14 analcolici + tocco sardo «Mirto Spritz»).
+  - Inventario: per bottiglia `pi` intere chiuse + `ap` quanto resta dell'aperta (Nessuna/⅓/½/⅔/Piena), «Finita: apro la prossima», «Avvisa sotto», prezzo d'acquisto solo gestori; «Usate questo mese» dai movimenti negativi. Idea furba aggiunta: «Si possono fare» = cocktail con tutti gli alcolici in casa (il tipo della bottiglia `cat` è uguale ai nomi degli ingredienti; Cognac≈Brandy, Prosecco≈Champagne, Bourbon≈Rye). Nella scheda del cocktail «in casa / manca» per ogni alcolico.
+  - Chi vede: gestori (Fornitori), fb, resp, bartender/barman/barback (in «Cosa serve?»). Funzione `bar` accesa di partenza (Impostazioni → Funzioni).
+  - `test-cantina` e `test-bar` aggiunte alle prove veloci di GitHub (`tools/prova-ci.sh`): prima test-cantina non c'era.
 
 ## Domanda aperta a Mario (scritta nel testo in #87, ancora senza risposta)
 «Oggi come registrate i vini venduti? Scontrino di cassa (con quale programma?), comanda su carta, oppure niente?» → serve per collegare le vendite (es. foto della chiusura di cassa letta dall'IA). Fino alla risposta resta «− Venduta».
 
 ## Prossimi lavori (in ordine, da soli, poi pubblicare in automatico se le prove sono verdi)
-1. PR #95 (sopra).
-2. **D35 ruoli**: `MANSIONI` (index.html, riga ~1465) oggi = Chef, Sous chef, Cuoco, Commis, Pasticcere, Lavapiatti, Maître, Cameriere, Sommelier, Barman, F&B manager, Altro. Aggiungere almeno **Chef de rang**, **Bartender** (Mario usa questa parola; tenere «Barman» per i profili vecchi o rinominare con cura), Commis di sala, Chef de partie, Pizzaiolo?, Barback?, Receptionist/Hostess? (scegliere da soli quelli tipici di un ristorante d'hotel). Valutare un reparto `bar` in `REPARTI` (oggi cucina, sala, fb, resp, altro): attenzione a chat `rep_<reparto>`, `OR_PLAN`, orari per reparto, `newsFor`, prove `test-orari-reparto`/`test-responsabile`.
-3. **D36 Bartender**: sezione **Cocktail** (circa 200 cocktail famosi: ingredienti con dosi, metodo, bicchiere, guarnizione, passaggi brevi da manuale IBA) — dati in un file statico leggero (es. `data/cocktail.json` caricato solo quando si apre, aggiunto a `FILES` di `sw.js` e al passo «Prepara i file» del workflow Cloudflare), ricerca e filtri; + **inventario alcolici** con bottiglia intera / 2/3 / metà / 1/3 (simile a `vnMov`, con `config/bar` e movimenti). Ingresso per chi ha mansione Bartender/Barman (e gestori).
-4. D33 (funzioni smart per orari e agenda): proposta con 3 strade (dettagli sotto).
+1. PR #96 (sopra).
+2. Idee possibili per il Bar (non chieste, da proporre a Mario solo se utili): «Cocktail della casa» (ricette scritte dal bartender), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
+3. D33 (funzioni smart per orari e agenda): proposta con 3 strade (dettagli sotto).
+4. Controllo Cantina Vini e Bar in tema scuro e a 320 px (foto), rifinitura se serve.
 
 ## v83 (D32) — riassunto
 - Orari dei responsabili (`resp.<id>`, striscia «Chi c'è adesso» `rsStrip`/`rsChat`) + orari per reparto (sopra). Dettagli in CLAUDE.md (riga v83). `APP_VER=83`, `CACHE` v87.
@@ -57,7 +48,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = staff segna i giorni in cui
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiusa), #86 `session_01XaFfJiACdkE4pXQs6PbCok` (chiusa), #85 `session_01YBt4KxQa3Z4RMeKrQdvghK`, #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #88 `session_0199ANgsgVouZX79Xd7QJFZX` (chiusa), #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiusa), #86 `session_01XaFfJiACdkE4pXQs6PbCok` (chiusa), #85 `session_01YBt4KxQa3Z4RMeKrQdvghK`, #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp`. Una sessione ferma su una domanda o un permesso non legge i messaggi delle altre finché Mario non risponde lì.
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 - D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sotto).
@@ -82,4 +73,4 @@ Risposte a tocco arrivate senza che Mario toccasse (#85). Causa non capita. Finc
 «cura la grafica in stile moderno e attinente all'app e non appesantire l'app deve andare su anche telefoni normali non troppo performanti ultimi usciti
 
 Vai avanti da solo chiedimi solo scelte importanti»
-(Arrivato dopo il messaggio sulla v84 e la domanda sulle vendite dei vini.)
+(Arrivato in #87 dopo il messaggio sulla v84. In #88 nessun messaggio nuovo di Mario.)
