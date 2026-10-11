@@ -8,6 +8,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - Unita la scorta. Script del Drive risponde **v2** (M38 fatta: tolta).
 - Riordino `Jona/Loghi` FATTO: sottocartelle `JONA`, `YNOY CORP` (Originale, Vettoriale, PNG alta risoluzione, Animazione, LEGGIMI.txt: spostate da «YNOY CORP 3 lune» + animazione caricata), `Vecchi` (gli 8 file sparsi + `docs/img/logo/vecchi/*`). «YNOY CORP 3 lune» è vuota: il cestino è stato negato dal controllo automatico → la cestina Mario a mano. Link: https://drive.google.com/drive/folders/1ecGLASRvK65nJ2o5yyNprtZT-oVqHStq
 
+- D31: Mario ha scelto la strada «Furba» (11/10): regola «FILE IMPORTANTI ANCHE NEL DRIVE» in CLAUDE.md. Mario: «nessun problema» sulla cartella vuota (la cestina lui).
+
 ## Fatto in #74 (11/10, 1:49-2:00 ora italiana)
 - Unita la scorta (solo `ULTIMO-MESSAGGIO.md`). Rinominate #74 e #73.
 - Script del Drive risponde ancora **v1** (`elenco` → «servono nome e dati»). Aggiunta **M38** in `DA-FARE.md` (guida: Salva → Gestisci deployment → matita → Nuova versione, URL uguale), guida data a Mario.
