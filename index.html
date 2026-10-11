@@ -1167,8 +1167,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=80;
+const APP_VER=81;
 const NEWS=[
+  {v:81,data:'2026-10-11',titolo:'Agenda: ripetizioni e appunti veloci',
+    chef:['Un evento ora si ripete ogni giorno, solo in certi giorni (es. lunedì e mercoledì), ogni settimana, mese o anno, anche «fino al» giorno che scegli. Se un giorno salta, apri l\'evento da quel giorno e tocca «Salta solo…».','Nelle cose da fare di un evento ripetuto la spunta vale solo per quel giorno.','Nella riga veloce puoi scrivere «ogni lunedì» o «tutti i giorni».','In alto c\'è «Appunto»: scrivi un appunto di oggi senza aprire l\'agenda.','Ordine suggerito: conta i coperti degli eventi in agenda. La prima volta scrivi quanti coperti fai in un giorno normale; «Ignora» se non vuoi.'],
+    dev:{aggiunte:['`AG_R` (g, gs con `rg`, s, m, a), `rf` «fino al», `rx` giorni saltati (`agSkip`), `agOnDay`/`agRLbl` riscritte; spunta per giorno `ckd.d<AAAAMMGG>` (`agCkK`, `agCkOk`, potata oltre 60 giorni); `agParse` restituisce `r`. Striscia `.ag-can` con «Appunto» (`agNtQuick`), dettatura anche per gli appunti (`agMic(dst)`). `sugAgenda`/`sugAgH`: coperti dell\'agenda nell\'ordine suggerito, `config/app.copNorm`. Prova in `tools/test-agenda-v81.mjs`.']}},
   {v:80,data:'2026-10-11',titolo:'Chiedi a Jona conosce le ricette',
     chef:['«Chiedi a Jona» ora conosce le tue ricette e il loro costo. Prova: «Quale piatto ha il food cost più alto?» o «Quanto mi costa una porzione di spaghetti alle vongole?».'],
     dev:{aggiunte:['`jonaRc()` aggiunge a `jonaCtx` `ricette` (piatto, porzioni, prezzo, costo a porzione, food cost, prezzo al 30%, ingredienti con costo e fornitore), solo per i gestori e con la funzione `ricette` accesa. Suggerimento `JONA_TIP_RC` se ci sono ricette. C3: `test-firebase-bulk` e `test-firebase-sync` ora con controlli PASS/FAIL. Prova in `tools/test-ricette.mjs`.']}},
