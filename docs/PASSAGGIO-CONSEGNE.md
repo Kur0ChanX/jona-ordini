@@ -1,8 +1,15 @@
-# Passaggio di consegne (2026-10-11, fine sessione #81)
+# Passaggio di consegne (2026-10-11, fine sessione #82)
 
-Sessione attuale: #82
+Sessione attuale: #83
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). App: **v80 unita in `main`** (PR #91, squash `f0a4541`, 16:2x ora italiana); alle 16:25 il sito diceva ancora `APP_VER=79` (deploy Cloudflare in corso). **PRIMA COSA della #82**: controllare `https://jona-ristorante-by-ynoy-corp.pages.dev/` → `APP_VER=80`. Poi finire la **v81** (sotto).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). App: **v80 unita in `main`** (PR #91, squash `f0a4541`). **PRIMA COSA della #83**: controllare `https://jona-ristorante-by-ynoy-corp.pages.dev/` → `APP_VER=80`. Poi finire la **v81** (sotto). La #82 non ha toccato codice.
+
+## Fatto in #82 (11/10, ~16:21-16:58 ora italiana)
+- Handoff presto: l'hook ha segnato ~150k token già al 4° messaggio (il contesto di partenza è grande). Niente lavoro sulla v81.
+- Regola nuova dei titoli (da #81, già in `CLAUDE.md`, commit `afacab2`): simbolo del progetto al posto del pallino. **Jona 👨🏻‍🍳**, RVC 🛎️, SPA 🫒 (es. `👨🏻‍🍳 ▶ ATTIVA · #83 · Jona Ordini · …`).
+- Unita la scorta (`docs/ULTIMO-MESSAGGIO.md`) e pushata.
+- Mario ha girato 2 foto della mail GitHub «Prove: All jobs have failed» di **RVC** PR 17 (run #147, 16:31). Girato alla RVC #78: risposta «giro vecchio, già corretto (E41 di RVC); sull'ultima versione `c8592c2` prove VERDI alle 16:52». Detto a Mario: non toccare **Re-run jobs**. Foto non salvate (solo stato, regola FOTO DEI PASSI).
+- A Mario è rimasta la domanda: «Parto con la v81 (Agenda passo 2)?» — scelta già fatta in #81 (doppio tocco), quindi la #83 può partire appena Mario scrive.
 
 ## Fatto in #81 (11/10, ~15:59-16:25 ora italiana)
 - Unita la scorta (solo `ULTIMO-MESSAGGIO.md`).
@@ -34,8 +41,8 @@ Tutto in `index.html`. Già verdi (in locale, TZ Roma): `test-agenda`, `test-age
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #81 `session_014yinZg1B2R2g39VnAWDWH5` (chiusa). #80 `session_01B4hWXa4uTY1e2ik1qt27Qq`, #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC attiva: **#75** `session_01WavGbXKh2pPo9jSrRipbbc`. SPA attiva: #08 `session_01Ta4N7WcGt86qybK8z3uJG4` (per la regola «regole per tutti i progetti»).
+- Jona #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiusa), #81 `session_014yinZg1B2R2g39VnAWDWH5` (chiusa). #80 `session_01B4hWXa4uTY1e2ik1qt27Qq`, #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: #08 `session_01Ta4N7WcGt86qybK8z3uJG4` (per la regola «regole per tutti i progetti»).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto** (mancano gli account Firebase e Cloudflare dell'hotel, li crea Mario con la guida di RVC). `PONTE_KEY` serve solo quando il Worker RVC va online → prove dell'anno prossimo.
 
 ## Prossimi passi (in ordine)
@@ -59,6 +66,5 @@ Elenco completo in `docs/DA-FARE.md`. NON chiedere a Mario prove dal vero (M…)
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-Risposte a tocco (doppio tocco) di Mario in #81:
-- «RVC dice che mi hai dato 2 regole per tutti i progetti… Le scrivo anche in Jona?» → «Sì, tutte e due (Consigliato)» · «Sì, confermo le regole».
-- «Le prove dal vero sono rimandate all'anno prossimo. Da cosa parto per completare l'app?» → «Agenda passo 2 (Consigliato)» · «Sì, confermo da dove parto».
+(con 2 foto: mail GitHub «[RVC-Operation-by-YNOY-CORP/RVC] Prove workflow run — Prove: All jobs have failed» e pagina del run #147 di RVC)
+«è Normale?»
