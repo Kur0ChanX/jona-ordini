@@ -1,28 +1,25 @@
-# Passaggio di consegne (2026-10-11, fine sessione #84)
+# Passaggio di consegne (2026-10-11, fine sessione #85)
 
-Sessione attuale: #85
+Sessione attuale: #86
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v81** (PR #92 squash `e13dfc1`, controllato `APP_VER=81` alle 17:33). Ramo riallineato a `main` dopo lo squash.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v82** (PR #93 squash `f3e3809`, controllato `APP_VER=82` ~18:10). Ramo riallineato a `main`. Sul ramo, NON ancora online: **v83** (committata).
 
-## Fatto in #84 (11/10, ~17:05-17:45 ora italiana)
-- Unite due scorte (contenevano solo `docs/ULTIMO-MESSAGGIO.md`).
-- Le prove legate della v81 le aveva già finite la #83 (tutte verdi, TZ Roma: test-agenda 61, -v58 26, -v59 30, -v61 22, -v81 39, test-v16 42, test-hotel 43, test-demo 30, test-news 94, test-giro ok): fermato il mio doppione (regola MENO CONTROLLI DOPPI).
-- PR #92 v81 → controllo GitHub `prove` verde su `c0b922d` → push di un merge della scorta con file identici (stesso albero `66523607…`, controllato) → squash `e13dfc1` → merge di `main` nel ramo + push → online v81.
-- `docs/DA-FARE.md`: D11 chiusa; nuova **M42 5stelle**.
-- Mario ha continuato a scrivere nella #83 chiusa; la #83 mi ha girato i messaggi con send_message e io le ho chiesto di rimandarlo alla sessione attiva.
+## Fatto in #85 (11/10, ~17:45-18:10 ora italiana)
+- Unite scorte. Mario chiedeva perché l'icona 🫒 non cambiava in SPA: la SPA #08 era ferma su una domanda/permesso e non leggeva i messaggi delle altre sessioni (una sessione bloccata li legge solo dopo la risposta di Mario). Ora SPA #08 chiusa e #09 attiva hanno 🫒. Detto a Mario di rispondere alla domanda aperta in SPA #09.
+- La #84 ha aggiunto E37 (domande scritte nel testo invece che a tocco). Rifatta la domanda a tocco con doppio tocco: Mario ha scelto **D10**.
+- **v82 online** (D10): foglio «Inviato allo chef» solo «Continua» (tolto «Esci dal profilo»). Prova in `tools/test-invio-anim.mjs`.
 
-## 5stelle (M42, tema dell'hotel → progetto RVC, ponte P1)
-- Mario vuole sapere in automatico check-in, check-out, walk-in, camere occupate da 5stelle (gestionale dell'hotel).
-- 3 strade date (dalla #83): Ovvia = API di 5stelle; **Furba (consigliata)** = rapporto automatico per email ogni mattina (PDF/Excel) letto dall'app; Geniale = dati che 5stelle manda già fuori (channel manager con API, Alloggiati Web, chiavi elettroniche); ripiego = foto del foglio arrivi letta da Gemini. Avviso privacy (dati ospiti).
-- Mario: «se arriva un walk-in… si aggiorna solo la mattina, l'app diventa quasi inutile». Risposta: soluzione mista. Base da 5stelle (email, chiedere anche ogni ora; API se la danno) + novità in tempo reale: la reception tocca in RVC «Check-in camera 12, 2 ospiti» → ponte P1 → Jona in pochi secondi. Con l'API il tocco sparisce, il ponte resta uguale.
-- Mario: la reception usa **già RVC ogni giorno** → strada mista confermata come direzione; la #83 l'ha girata alla sessione RVC.
-- Mario deve chiedere alla reception: rapporti per email da 5stelle (anche ogni ora?) e quale channel manager usano; risposte nella sessione RVC.
+## v83 in corso (D32) — orari di Mauro e Chef, strada «3 Geniale»
+- Richiesta di Mario (vedi ultimo messaggio). Immagine con 3 strade (Ovvia: nel pianificatore come tutti; Furba: riga «Responsabili» in cima, ognuno scrive il suo; **Geniale: Furba + striscia «Chi c'è adesso» in tutta l'app con «Scrivi»**). Mario ha scelto **3 Geniale** (doppio tocco confermato).
+- Fatto (index.html): `config/orari_<lun>.resp.<id>` = riga di 7 giorni per chi ha `contratto.libero` (`orFree`): scritta subito, niente bozza/pubblicazione/controlli ore. `orResp`, `orRRow`, `orRCan` (la persona stessa o `isMgr`), `orCellSheet(id,g,lun)` in modo `resp` (nota «lo vedono subito tutti», salvataggio separato in `orSaveCell`), azione `orRCell`. Pianificatore (`vOrari`): gruppo «Responsabili · lo vedono subito tutti» in cima alla tabella (`cellR`/`whoR`, colore `.rep-resp` #B5654A). `orOggi`: responsabili da `resp` con «Responsabile ·». `vMieiOrari`: per i responsabili 7 giorni da toccare («Scrivi quando ci sei») e settimana prossima sempre disponibile. `rsStrip(me)` dopo `agStrip` in `screenApp`: «Mauro in servizio fino alle…» / «arriva alle…», bottone «Scrivi» → `rsChat` → `chOpen(chDm(me,u))`; non mostra se stessi; niente se riposo/finito. Firestore: va bene così (`config` già permesso).
+- `APP_VER=83`, `CACHE` v87, voce `NEWS` v83 (chef + tutti + dev).
+- Prove: nuova `tools/test-orari-resp.mjs` (20 PASS, anche TZ Roma); `tools/test-responsabile.mjs` aggiornata (prima diceva «Mauro non nel pianificatore» e «Orario libero»: comportamento cambiato su richiesta); test-orari, test-v16, test-news verdi.
+- **Prossimo**: far girare `test-giro` e `test-demo` (la striscia nuova sta in alto: E35) e `test-firebase-orari` (emulatore), poi PR dal ramo → `prove` verde → squash → merge `main` nel ramo → controllo online `APP_VER=83`. Pubblicare da soli (regola).
+- Da aggiungere a CLAUDE.md (Struttura) dopo l'unione: riga «v83 orari dei responsabili» con i nomi qui sopra.
 
-## Prossimi passi (in ordine)
-1. Chiedere a Mario a tocco (doppio tocco) da cosa ripartire: candidati **D10** (riquadro «Inviato allo chef» solo «Continua», immagine già mandata in #41) e **C7** (rifiniture, riga «“Oggi si ordina” arriva a» più chiara, A, C, G…).
-2. D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sotto).
-3. M42: aspettare le risposte della reception (lavoro in RVC).
-Elenco completo in `docs/DA-FARE.md`. NON chiedere a Mario prove dal vero (M…).
+## D33 — funzioni smart per orari e agenda (chiesto da Mario, ancora da proporre)
+Proporre con immagine + domanda a tocco con doppio tocco (3 strade: ovvia/furba/geniale). Controllato che NON esistono già: richieste di indisponibilità/ferie dallo staff; promemoria del turno (sera prima / 1 ora prima); turni proposti in automatico dai coperti dell'agenda; costo del personale della settimana. Esistono già: «Copia settimana prima», turni tipo, assenze (R/F/M/P), cambi turno, timbratura QR, «In turno oggi», agenda con ripetizioni e appunti, coperti in ordine suggerito.
+Idee: Ovvia = promemoria del turno via push; Furba = staff segna i giorni in cui non può + il pianificatore li mostra; Geniale = «Proponi la settimana» (bozza automatica da coperti dell'agenda, contratti, indisponibilità e settimana prima, il gestore corregge e pubblica).
 
 ## D30: Jona fuori dall'account personale (in corso)
 - Organizzazione **`Jona-Ristorante-by-YNOY`** creata dall'account del ristorante **`JonaRistorante-Ynoy`** (jona.ristorante@gmail.com, Owner, 2FA attiva); Kur0ChanX Owner; app Claude installata sull'organizzazione (Save fatto, #68/#69).
@@ -33,9 +30,10 @@ Elenco completo in `docs/DA-FARE.md`. NON chiedere a Mario prove dal vero (M…)
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #84 `session_01YDpAVby2ft8GwjUK4qGiUZ` (chiusa), #83 `session_01LzEDJuhMnDxtkkFmJoMu1G` (chiusa), #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiusa), #81 `session_014yinZg1B2R2g39VnAWDWH5` (chiusa). #80 `session_01B4hWXa4uTY1e2ik1qt27Qq`, #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (#08 `session_01Ta4N7WcGt86qybK8z3uJG4` chiusa). Una sessione ferma su una domanda a tocco o su un permesso non legge i messaggi delle altre finché Mario non risponde lì (per la regola «regole per tutti i progetti»).
-- Ponte con l'hotel: RVC dice che **D5 non è fatto** (mancano gli account Firebase e Cloudflare dell'hotel, li crea Mario con la guida di RVC). `PONTE_KEY` serve solo quando il Worker RVC va online → prove dell'anno prossimo.
+- Jona #85 `session_01YBt4KxQa3Z4RMeKrQdvghK` (chiusa), #84 `session_01YDpAVby2ft8GwjUK4qGiUZ`, #83 `session_01LzEDJuhMnDxtkkFmJoMu1G`, #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp`. Una sessione ferma su una domanda o un permesso non legge i messaggi delle altre finché Mario non risponde lì.
+- Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
+- D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sotto).
 
 ## Note tecniche
 - Drive: `JONA_DRIVE_URL=… bash tools/drive/carica.sh "Jona/<cartella>" file…` (risposta JSON `{ok,link,cartella}`; per avere il link di una cartella si carica un file dentro). `cairosvg` e `potracer` vanno installati con pip a ogni sessione.
@@ -51,4 +49,5 @@ Elenco completo in `docs/DA-FARE.md`. NON chiedere a Mario prove dal vero (M…)
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-(nella #84 dopo l'handoff) «non ho cliccato il touch della risposta è si è persa... dove trovo la domanda e perché non c'è stata la regola doppio tocco». Risposta: in #84 le domande erano nel testo, non a tocco (errore E37). La #85 rifà con lo strumento + doppio tocco la domanda D10/C7.
+«anche mauro abilitano agli orari metti il programma orari di mauro e chef in un punto visibile e controlla se c'è bisogno di migliorie o funzioni, funzioni evolute smart nel programma orari e agenda»
+(La prima parte = D32 v83, la seconda = D33 da proporre.)

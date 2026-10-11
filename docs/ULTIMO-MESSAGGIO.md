@@ -1,5 +1,3 @@
-# Ultimo messaggio di Mario (11/10/2026 17:44 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 ~18:00 ora italiana)
 
-git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
-Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #85).
-Poi attendi le istruzioni di Mario.
+anche mauro abilitano agli orari metti il programma orari di mauro e chef in un punto visibile e controlla se c'è bisogno di migliorie o funzioni, funzioni evolute smart nel programma orari e agenda
