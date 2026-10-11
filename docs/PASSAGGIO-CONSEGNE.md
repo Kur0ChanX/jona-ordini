@@ -1,14 +1,16 @@
-# Passaggio di consegne (2026-10-11, fine sessione #74)
+# Passaggio di consegne (2026-10-11, fine sessione #75)
 
-Sessione attuale: #75
+Sessione attuale: #76
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v75** (PR #86 unita con squash `aed77cc`, controllato online `APP_VER=75`). `main` già unito nel ramo di lavoro. Nessuna PR aperta.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App online: **v76** (PR #87 unita con squash `0d3f8b5`, controllato online `APP_VER=76` alle ~2:58). `main` già unito nel ramo di lavoro (`c5e3c44`). Nessuna PR aperta.
 
-## Fatto in #75 (11/10 ora italiana)
-- Unita la scorta. Script del Drive risponde **v2** (M38 fatta: tolta).
-- Riordino `Jona/Loghi` FATTO: sottocartelle `JONA`, `YNOY CORP` (Originale, Vettoriale, PNG alta risoluzione, Animazione, LEGGIMI.txt: spostate da «YNOY CORP 3 lune» + animazione caricata), `Vecchi` (gli 8 file sparsi + `docs/img/logo/vecchi/*`). «YNOY CORP 3 lune» è vuota: il cestino è stato negato dal controllo automatico → la cestina Mario a mano. Link: https://drive.google.com/drive/folders/1ecGLASRvK65nJ2o5yyNprtZT-oVqHStq
-
-- D31: Mario ha scelto la strada «Furba» (11/10): regola «FILE IMPORTANTI ANCHE NEL DRIVE» in CLAUDE.md. Mario: «nessun problema» sulla cartella vuota (la cestina lui).
+## Fatto in #75 (11/10, 1:52-2:59 ora italiana)
+- Unita la scorta. Script del Drive risponde **v2** (M38 fatta: tolta da DA-FARE).
+- Riordino `Jona/Loghi` FATTO: sottocartelle `JONA`, `YNOY CORP` (Originale, Vettoriale, PNG alta risoluzione, Animazione, LEGGIMI.txt: spostate da «YNOY CORP 3 lune», più l'animazione caricata), `Vecchi` (gli 8 file sparsi + `docs/img/logo/vecchi/*`). La cartella «YNOY CORP 3 lune» è vuota. Il controllo automatico ha negato il cestino (`azione.sh cestina`, «Cloud Storage Mass Delete»): la cestina Mario a mano, ha risposto «nessun problema». Non riprovare il cestino. Link: https://drive.google.com/drive/folders/1ecGLASRvK65nJ2o5yyNprtZT-oVqHStq
+- **D31 regola scelta da Mario: strada «Furba»** (doppio tocco confermato). Scritta in CLAUDE.md, «FILE IMPORTANTI ANCHE NEL DRIVE»: i file da tenere vanno da soli in `Claude Code Lavoro/Jona/<tema>`, poi do il link; mai codice, prove, appunti o segreti. Scartate: Ovvia (solo su richiesta), Geniale (caricamento automatico a ogni versione + PDF delle novità). Resta da dirla a RVC, insieme a D28.
+- RVC: #60 e #61 sono chiuse. La #61 chiede a Mario di aprire **a mano** la RVC #62 (repo RVC, ramo `claude/rvc-ramo-definitivo`). Per ora nessuna sessione RVC attiva: non ho mandato messaggi.
+- **v76 online (D23)**: in «Fattura elettronica XML» si scelgono più file insieme (`PICK.xml.multiple`). Si aprono anche i `.p7m` firmati: `p7mXml` legge la busta CAdES (DER, BER a lunghezza indefinita con pezzi, base64/PEM) e prende l'eContent. `xmlText` usa la codifica scritta nell'XML (UTF-8 o ISO-8859-1). I file rotti si saltano, con avviso e nome del file. Prova nuova `tools/test-p7m.mjs` (14 controlli) con file finti in `tools/fatture-prova` (firmati con openssl, certificato finto, nessuna chiave nel repo); aggiunta a `VELOCI` in `tools/prova-ci.sh`. Prove locali verdi: test-p7m, test-fatture, test-news, test-giro. «prove» su GitHub verde. Aggiunta **M39** (Mario prova con una fattura vera .p7m).
+- Scelta tecnica: leggere la busta ASN.1 invece di cercare `<?xml` nel file. Così il testo spezzato in pezzi da 1000 byte (BER) non si rompe. Nessuna libreria esterna.
 
 ## Fatto in #74 (11/10, 1:49-2:00 ora italiana)
 - Unita la scorta (solo `ULTIMO-MESSAGGIO.md`). Rinominate #74 e #73.
@@ -38,14 +40,14 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni RVC
-- RVC attiva: **#60** `session_01PgR2wPAzKZQDrzHfcJHbUM` (prossimo: C33 dettatura Porter). Ha mandato a Jona il codice del filtro segreti. Le ho scritto (#72) di far incollare a Mario **Codice.gs v2** PRIMA del nuovo deployment dello script del Drive (lo script è UNO per Jona e RVC), e che il nuovo URL va in `JONA_DRIVE_URL` di tutti e due gli ambienti.
-- Jona #71 `session_01MKFn44AvJMKQKuSQyqcqvW` (chiusa). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC: #60 `session_01PgR2wPAzKZQDrzHfcJHbUM` e #61 `session_01S3gEsaM9Vb1csRwXBfN2Dg` CHIUSE (11/10). La #62 la apre Mario a mano. Prima: #60 (C33 dettatura Porter). Ha mandato a Jona il codice del filtro segreti. Le ho scritto (#72) di far incollare a Mario **Codice.gs v2** PRIMA del nuovo deployment dello script del Drive (lo script è UNO per Jona e RVC), e che il nuovo URL va in `JONA_DRIVE_URL` di tutti e due gli ambienti.
+- Jona #75 `session_01QPzuujHhDE3xqGshobfAn3` (chiusa). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 
 ## Prossimi passi (in ordine)
-1. Provare subito `bash tools/drive/azione.sh elenco "Jona/Loghi"`. Se v2: passo 2 (i loghi JONA sono già caricati, resta il riordino). Se ancora v1: dire a Mario di fare M38 (Nuova versione del deployment, salvando prima il codice v2). Vecchio testo: M37 è fatto: controllare che lo script risponda v2 con il nuovo URL. Se risponde ancora v1 o «Page Not Found», dirlo a Mario (variabile non aggiornata nell'ambiente). Prima era: attendere M37: Mario aggiorna lo script del Drive a v2 (forse insieme al nuovo deployment guidato da RVC #60). Controllo: `bash tools/drive/azione.sh elenco "Jona/Loghi"` → se risponde `{"ok":false,"errore":"servono nome e dati"}` è ancora v1. Se l'URL è cambiato serve la variabile nuova: le variabili d'ambiente si leggono solo all'avvio della sessione (`[ -n "$JONA_DRIVE_URL" ]`, mai stampare l'URL).
-2. Con lo script v2: caricare `docs/img/logo/jona/{png,vettoriale}` in `Jona/Loghi/JONA/…`, i file di `docs/img/logo/vecchi/` (+ `git show 87eff38:docs/img/logo/ynoy-animazione.svg`) in `Jona/Loghi/Vecchi`, YNOY CORP in `Jona/Loghi/YNOY CORP/{PNG alta risoluzione,Vettoriale,Originale,Animazione}`; spostare i 7 file vecchi sparsi in `Jona/Loghi` dentro `Vecchi` (prima `elenco`, poi `sposta`), cestinare la cartella «YNOY CORP 3 lune» solo se vuota. Poi mandare a Mario il link della cartella.
-3. D30: attesa della scatola nera, poi Transfer (sopra).
-4. Proporre a Mario la regola «file importanti anche nel Drive» (D31).
+1. Attendere Mario. Se dà una fattura .p7m vera (M39): salvarla in `docs/img/listini/` o `tools/fatture-prova/` solo se non ci sono dati sensibili, e aggiungerla alla prova.
+2. D30: attesa della scatola nera (righe «Vecchio indirizzo»), poi Transfer (sopra).
+3. Quando c'è una sessione RVC attiva (#62): dirle D28 (regola dei rami) e D31 (regola del Drive, `sotto="RVC/…"`).
+4. Lavori «Claude da solo» già approvati: D25 (foto della bolla confrontata con l'ordine), D26 (costo dei piatti dalle ricette). Proporre a Mario quale prima.
 5. Ponte con l'hotel: quando RVC ha D5, guida per `PONTE_KEY`. Elenco completo in `docs/DA-FARE.md`.
 
 ## Note tecniche
@@ -62,6 +64,4 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente). App onli
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-«prova link aggiornato» (11/10, ~2:00, nella #74). Prima aveva ricevuto la guida M38.
-
-Ultima richiesta vera (11/10 01:19, nella #71): «mandami anche il logo jona ad alta risoluzione PNG bianco nero e trasparente e vettoriale salva la vecchia scritta YNOY con l'animazione se non c'è in drive cosi se ti dico metti la vecchia fai subito» → logo fatto, mandato e caricato nel Drive; la vecchia YNOY c'era già; resta il riordino (serve v2).
+«nessun problema andiamo avanti» (11/10, ~2:05, nella #75, risposta sul cestino della cartella vuota). Poi ha scelto con il doppio tocco la regola Drive «Furba (consigliata)».

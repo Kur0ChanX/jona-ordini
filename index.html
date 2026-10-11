@@ -626,6 +626,8 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .sem-b:focus-visible{outline:2px solid var(--lagoon);outline-offset:-2px;border-radius:12px}
 .sem-d{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--k);color:#fff}.sem.s-no .sem-d{background:transparent;border:2px dashed var(--sand)}.sem-d .ic{width:20px;height:20px}
 .sem-i{flex:1;min-width:0}.sem-n{display:block;font:500 16.5px/1.25 var(--font);color:var(--ink)}.sem-m{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.bol-r{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}.bol-r.ko{color:var(--corallo);font-weight:600}b.bol-r,.ln-m .bol-r{display:inline}
+.bol-ok{background:var(--mirto-soft,var(--sunk));border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14.5px;line-height:1.45}
 .sem-l{font:600 14px var(--font);color:var(--k);white-space:nowrap}.sem.s-no .sem-l{color:var(--muted);font-weight:500}
 .sem-q{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 12px 12px 58px;font-size:14px;color:var(--ink2)}
 .bolla{display:grid;gap:8px;justify-items:start;margin:4px 0}
@@ -1163,8 +1165,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=76;
+const APP_VER=77;
 const NEWS=[
+  {v:77,data:'2026-10-11',titolo:'Bolla letta da sola',
+    tutti:['In Arrivi → Controllo merce, dopo la foto della bolla tocca «Confronta la bolla con l\'ordine»: l\'app legge la bolla e segna da sola cosa c\'è, cosa manca e cosa è arrivato in meno.','In rosso i prodotti che non sono sulla bolla e quelli sulla bolla ma non ordinati. Controlla e correggi prima di inviare.'],
+    chef:['Nel controllo arrivato vedi anche il prezzo scritto sulla bolla: in rosso se è diverso da quello dell\'ordine.'],
+    dev:{aggiunte:['D25: `bolLeggi` (foto della bolla → `gemCall` con i lettori `GEM_LETT` e `geminiPrompt`, `parseTable`/`mapRows`), `bolMatch` (codice senza zeri davanti, poi parole del nome ≥50%, ogni riga della bolla una volta), precompila solo le righe non toccate (tolleranza 5%). `ricezione.bolla` {lett,righe:[{nome,codice,unita,q,prezzo,i}],extra,auto} e `prezziDiversi` (`bolPrezzoDiv`, stessa unità, ≥1%) per il gestore; `bolRiga` nel controllo inviato. Prova `tools/test-bolla.mjs`.']}},
   {v:76,data:'2026-10-11',titolo:'Fatture XML: più insieme e firmate',
     chef:['In Importa listini → «Fattura elettronica XML» puoi scegliere più fatture insieme: ogni riga va al suo fornitore.','Ora si aprono anche le fatture firmate (.p7m), così come arrivano dal cassetto fiscale.','Se un file non si legge, l\'app ti dice quale e carica gli altri.'],
     dev:{aggiunte:['`p7mXml`: legge la busta CAdES (DER, BER a lunghezza indefinita con OCTET STRING a pezzi, base64/PEM) e prende l\'eContent (OID data); `xmlText` usa la codifica scritta nell\'XML (UTF-8 o ISO-8859-1). `PICK.xml.multiple`; `impRun` unisce le righe di tutti i file, salta quelli rotti con avviso. Prova `tools/test-p7m.mjs` con le fatture finte di `tools/fatture-prova` (firmate con openssl).']}},
@@ -2924,7 +2930,7 @@ function vArrivi(){
   return`<h1 class="vt">Arrivi</h1><p class="vsub">${pend.length?(pend.length===1?'Una consegna':pend.length+' consegne')+' da controllare':'Nessuna consegna in attesa'}</p>
   ${pend.length?`<div class="panel">${pend.map(o=>`<button type="button" class="row link" data-a="rcvOpen" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${o.items.length} ${o.items.length===1?'articolo':'articoli'}, ordinato ${ago(o.inviato)}${o.consegna?', consegna '+consegnaTxt(o.consegna):''}</div></div><span class="btn primary sm">Controlla</span></button>`).join('')}</div>`
   :empty('box','Niente in arrivo','Quando Maurizio invia un ordine a un fornitore, compare qui per il controllo della merce.')}
-  ${done.length?`<h2 class="sec">Controllati di recente</h2><div class="panel">${done.map(o=>`<button type="button" class="row link" data-a="rcvView" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${esc(o.ricevutoNome||'')} ${ago(o.ricevuto)}</div></div>${o.differenze?pill('wait',o.differenze===1?'1 differenza':o.differenze+' differenze'):o.nonControllati?pill('wait',o.nonControllati+' non controllati'):pill('ok','tutto ok')}</button>`).join('')}</div>`:''}`;
+  ${done.length?`<h2 class="sec">Controllati di recente</h2><div class="panel">${done.map(o=>`<button type="button" class="row link" data-a="rcvView" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${esc(o.ricevutoNome||'')} ${ago(o.ricevuto)}</div></div>${o.prezziDiversi&&showPrices()?pill('ko',o.prezziDiversi===1?'1 prezzo diverso':o.prezziDiversi+' prezzi diversi'):''}${o.differenze?pill('wait',o.differenze===1?'1 differenza':o.differenze+' differenze'):o.nonControllati?pill('wait',o.nonControllati+' non controllati'):pill('ok','tutto ok')}</button>`).join('')}</div>`:''}`;
 }
 function receiveSheet(oid){
   openSheet({cls:'tall',render:()=>{const o=D().ordini[oid];if(!o)return'<p class="muted">Ordine non trovato.</p>';const f=forn(o.fornitoreId);
@@ -2936,17 +2942,49 @@ function receiveSheet(oid){
     <h2 class="sec">Oppure tocca ogni prodotto</h2>
     <div class="sem-leg"><span style="--k:var(--mirto)"><i></i>1 tocco: c'è</span><span style="--k:var(--corallo)"><i></i>2 tocchi: manca</span><span style="--k:var(--ocra)"><i></i>3 tocchi: ne è arrivato meno</span></div>
     <div class="sem-top"><div class="sem-bar" aria-hidden="true"><i style="width:${tot?Math.round(fatti*100/tot):0}%"></i></div><span class="sem-cnt" id="sem-cnt">${fatti} di ${tot}</span></div>
-    <div>${o.items.map((l,i)=>{const L=R.lines[i];const [k,t,icn]=SEM[L.st||''];return`<div class="sem s-${k}"><button type="button" class="sem-b" id="sem-${oid}-${i}" data-a="rst" data-o="${oid}" data-i="${i}" aria-label="${esc(l.nome)}: ${t}. Tocca per cambiare"><span class="sem-d">${icn?ic(icn):''}</span><span class="sem-i"><span class="sem-n">${esc(l.nome)}</span><span class="sem-m">ordinati ${fq(l.qta)} ${esc(l.unita||'')}${l.codice?', cod. '+esc(l.codice):''}</span></span><span class="sem-l">${t}</span></button>
+    <div>${o.items.map((l,i)=>{const L=R.lines[i];const [k,t,icn]=SEM[L.st||''];return`<div class="sem s-${k}"><button type="button" class="sem-b" id="sem-${oid}-${i}" data-a="rst" data-o="${oid}" data-i="${i}" aria-label="${esc(l.nome)}: ${t}. Tocca per cambiare"><span class="sem-d">${icn?ic(icn):''}</span><span class="sem-i"><span class="sem-n">${esc(l.nome)}</span><span class="sem-m">ordinati ${fq(l.qta)} ${esc(l.unita||'')}${l.codice?', cod. '+esc(l.codice):''}</span>${R.bol?(L.bno?'<span class="bol-r ko">Non è sulla bolla</span>':L.bq!=null?`<span class="bol-r${Math.abs(L.bq-l.qta)>l.qta*.05?' ko':''}">Sulla bolla: ${fq(L.bq)} ${esc(l.unita||'')}</span>`:''):''}</span><span class="sem-l">${t}</span></button>
       ${L.st==='meno'?`<div class="sem-q"><span>Quanti ne sono arrivati?</span>${stepper('rq2',oid+'-'+i,L.arr,`data-o="${oid}" data-i="${i}"`)}<span>${esc(l.unita||'')}</span></div>`:''}</div>`}).join('')}</div>
     <label class="lbl" for="rcv-note">Note</label><textarea class="inp" id="rcv-note" rows="2" placeholder="Es. pomodori troppo maturi" data-in="rcvnote" data-o="${oid}">${esc(R.note)}</textarea>
     <span class="lbl">Foto della bolla (facoltativa)</span>
-    ${R.foto?`<div class="bolla"><img src="${R.foto}" alt="Foto della bolla"><button type="button" class="btn ghost sm danger" data-a="bollaDel" data-o="${oid}">${ic('trash')} Togli</button></div>`:`<div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="bollaCam" data-o="${oid}">${ic('camera')} Fotocamera</button><button type="button" class="btn ghost sm" data-a="bollaLib" data-o="${oid}">${ic('image')} Galleria</button></div>`}
+    ${R.foto?`<div class="bolla"><img src="${R.foto}" alt="Foto della bolla"><button type="button" class="btn ghost sm danger" data-a="bollaDel" data-o="${oid}">${ic('trash')} Togli</button></div>
+    ${R.bolErr?`<div class="err">${esc(R.bolErr)}</div>`:''}
+    ${R.bolBusy?`<div class="banner" role="status"><div>⏳ Gemini sta leggendo la bolla…</div></div>`:R.bol?`<div class="bol-ok" id="bol-esito">${ic('check')} Bolla letta: ${R.bol.auto===1?'1 prodotto segnato':R.bol.auto+' prodotti segnati'} da solo. Controlla e correggi se serve.${R.lines.some(x=>x.bno)?`<br><b class="bol-r ko">${R.lines.filter(x=>x.bno).length} non sulla bolla</b>: tocca tu se ci sono.`:''}${R.bol.extra.length?`<br><b class="bol-r ko">Sulla bolla ma non ordinati:</b> ${esc(R.bol.extra.join(', '))}`:''}</div>`
+      :gemOn()?`<button type="button" class="btn primary block" data-a="bolLeggi" data-o="${oid}">${ic('sparkle')} Confronta la bolla con l'ordine</button>`:''}`:`<div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="bollaCam" data-o="${oid}">${ic('camera')} Fotocamera</button><button type="button" class="btn ghost sm" data-a="bollaLib" data-o="${oid}">${ic('image')} Galleria</button></div>`}
     <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Più tardi</button><button type="button" class="btn wrapt ${nd?'dark':'primary'}" data-a="rcvGo" data-o="${oid}" ${fatti?'':'disabled'}>${ic('send')} ${nd?'Invia con '+(nd===1?'1 differenza':nd+' differenze'):'Invia controllo'}</button></div>`}});
 }
 async function setBolla(oid,fs){
   const img=await loadImg(fs[0]);const sc=Math.min(1,1400/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-  rcvState(oid).foto=c.toDataURL('image/jpeg',.6);refreshSheet();
+  const R=rcvState(oid);R.foto=c.toDataURL('image/jpeg',.6);R.bol=null;R.bolErr='';R.bolImg=null;try{R.bolImg=await shrinkImg(fs[0])}catch(e){}gemSrvOk();refreshSheet();
 }
+/* v77 (D25): la foto della bolla letta da Gemini e confrontata con l'ordine. Si leggono le righe con lo stesso testo dei listini
+   (geminiPrompt: nome, codice, quantità, prezzo), si abbinano alle righe dell'ordine (codice uguale, altrimenti parole del nome)
+   e si precompilano solo i prodotti non ancora toccati: chi controlla la merce guarda e corregge. I prezzi li vede solo il gestore. */
+const bolTok=n=>new Set(norm(n).split(' ').filter(x=>x.length>2&&!STOP.has(x)&&!/^\d/.test(x)));
+const bolCod=c=>String(c||'').replace(/\s/g,'').replace(/^0+(?=.)/,'').toLowerCase();
+function bolMatch(items,rows){
+  const cand=[];items.forEach((l,i)=>{const a=bolTok(l.nome),c=bolCod(l.codice);rows.forEach((r,j)=>{
+    let sc=0;if(c&&c===bolCod(r.codice))sc=2;else{const b=bolTok(r.nome);let k=0;a.forEach(x=>{if(b.has(x))k++});if(a.size&&b.size)sc=k/Math.min(a.size,b.size)}
+    if(sc>=.5)cand.push([sc,i,j])})});
+  cand.sort((x,y)=>y[0]-x[0]);const ri=new Map(),usate=new Set();
+  for(const [,i,j] of cand)if(!ri.has(i)&&!usate.has(j)){ri.set(i,j);usate.add(j)}
+  return{ri,extra:rows.filter((r,j)=>!usate.has(j)&&!isSpesa(r.nome))}}
+// prezzo diverso: solo con la stessa unità (o senza unità sulla bolla) e almeno 1% di differenza
+const bolPrezzoDiv=(l,r)=>r&&r.prezzo>0&&l.prezzo>0&&(!r.unita||normUnita(r.unita)===normUnita(l.unita||''))&&Math.abs(r.prezzo-l.prezzo)/l.prezzo>=.01;
+async function bolLeggi(oid){const R=rcvState(oid),o=D().ordini[oid];if(!o||!R.foto||R.bolBusy)return;
+  R.bolBusy=true;R.bolErr='';refreshSheet();
+  try{const data=R.bolImg?await b64(R.bolImg):R.foto.split(',')[1];
+    const body={contents:[{parts:[{text:geminiPrompt()},{inline_data:{mime_type:'image/jpeg',data}}]}],generationConfig:{temperature:0}};
+    let g=null;for(const [l] of GEM_LETT){g=await gemCall(body,l);if(g.salta){g=null;continue}if(g.txt||!GEM_RETRY.test(String(g.st)))break}
+    if(!g||!g.txt){R.bolErr=(g&&g.err)||'Gemini non è riuscito a leggere la bolla. Riprova tra un minuto o controlla a mano.';return}
+    const rows=(mapRows(parseTable(g.txt))||[]).map(r=>({nome:pulisciNome(r.nome),codice:r.codice,unita:normUnita(r.unita),q:r.q,prezzo:r.prezzo})).filter(r=>r.nome);
+    if(!rows.length){R.bolErr='Sulla foto non trovo righe di prodotti: rifai la foto più vicina e dritta.';return}
+    const {ri,extra}=bolMatch(o.items,rows);let n=0;
+    o.items.forEach((l,i)=>{const L=R.lines[i];const r=ri.has(i)?rows[ri.get(i)]:null;L.bq=r?r.q:undefined;L.bno=!r;
+      if(L.st||!r||r.q==null)return;n++;
+      if(r.q<=0)L.st='ko';else if(r.q<l.qta*.95){L.st='meno';L.arr=r3(r.q)}else L.st='ok'});
+    R.bol={lett:g.lettore||'',righe:rows.map((r,j)=>({nome:r.nome,codice:r.codice||'',unita:r.unita||'',q:r.q,prezzo:r.prezzo,i:[...ri].find(x=>x[1]===j)?.[0]??-1})),extra:extra.map(r=>r.nome),auto:n};
+  }catch(e){R.bolErr='Non riesco a contattare Gemini. Controlla la connessione.'}
+  finally{R.bolBusy=false;refreshSheet()}}
 const rcvDiffTxt=d=>d.nome+': '+(d.motivo==='mancante'?'manca':'arrivati '+fq(d.arr)+' su '+fq(d.qta));
 async function confirmReceipt(oid,all){
   const o=D().ordini[oid];if(!o||o.ricevuto)return;const R=rcvState(oid);const me=meU();const f=forn(o.fornitoreId);
@@ -2955,11 +2993,11 @@ async function confirmReceipt(oid,all){
   const righe=o.items.map((l,i)=>{const L=all?{st:'ok'}:R.lines[i];
     const arr=L.st==='ko'?0:L.st==='meno'?L.arr:l.qta;const motivo=!L.st?'nonctrl':L.st==='ko'?'mancante':arr!==l.qta?'quantita':'';
     return{nome:l.nome,codice:l.codice||'',unita:l.unita||'',qta:l.qta,arr,motivo,key:l.key||'',da:[...new Set((l.da||[]).map(x=>firstName(x.n||'')).filter(Boolean))]}});
-  const diffs=righe.filter(r=>r.motivo&&r.motivo!=='nonctrl');const nc=righe.length-righe.filter(r=>r.motivo!=='nonctrl').length;
-  await upd('ordini',oid,{ricevuto:now(),ricevutoDa:me.id,ricevutoNome:fullName(me),ricezione:{righe,note:all?'':R.note.trim(),foto:all?'':R.foto},differenze:diffs.length,nonControllati:nc});
+  const diffs=righe.filter(r=>r.motivo&&r.motivo!=='nonctrl');const bp=!all&&R.bol?o.items.filter((l,i)=>{const b=R.bol.righe.find(x=>x.i===i);return bolPrezzoDiv(l,b)}).length:0;const nc=righe.length-righe.filter(r=>r.motivo!=='nonctrl').length;
+  await upd('ordini',oid,Object.assign({ricevuto:now(),ricevutoDa:me.id,ricevutoNome:fullName(me),ricezione:Object.assign({righe,note:all?'':R.note.trim(),foto:all?'':R.foto},!all&&R.bol?{bolla:R.bol}:{}),differenze:diffs.length,nonControllati:nc},bp?{prezziDiversi:bp}:{}));
   for(const rid of o.richieste||[]){const r=D().richieste[rid];if(r)await upd('richieste',rid,{arrivati:Object.assign({},r.arrivati||{},{[o.fornitoreId]:now()})})}
   await notify('gm',diffs.length?`Consegna ${f.nome}: ${diffs.length===1?'1 differenza':diffs.length+' differenze'}`:`Consegna ${f.nome} arrivata`,
-    (diffs.length?diffs.slice(0,5).map(d=>rcvDiffTxt(d)+(d.da.length?' (chiesto da '+d.da.join(', ')+')':'')).join('; ')+(diffs.length>5?'; …e altri '+(diffs.length-5):'')+'. Controllata da '+me.nome:'Controllata da '+me.nome+(nc?'':', tutto ok'))+(nc?(diffs.length?'; ':', ')+nc+' non controllati':''),'arrivo',oid);
+    (diffs.length?diffs.slice(0,5).map(d=>rcvDiffTxt(d)+(d.da.length?' (chiesto da '+d.da.join(', ')+')':'')).join('; ')+(diffs.length>5?'; …e altri '+(diffs.length-5):'')+'. Controllata da '+me.nome:'Controllata da '+me.nome+(nc?'':', tutto ok'))+(nc?(diffs.length?'; ':', ')+nc+' non controllati':'')+(bp?'. Sulla bolla '+(bp===1?'1 prezzo diverso':bp+' prezzi diversi')+' dall\'ordine':''),'arrivo',oid);
   // Chi aveva chiesto un prodotto mancante o arrivato in meno riceve un avviso solo per i suoi prodotti.
   if(diffs.length){const per=new Map();
     for(const rid of o.richieste||[]){const r=D().richieste[rid];if(!r||!r.utenteId||r.utenteId===me.id)continue;
@@ -2973,9 +3011,14 @@ function receiptView(oid){
   openSheet({cls:'tall',render:()=>{const o=D().ordini[oid];if(!o||!o.ricevuto)return'<p class="muted">Controllo non trovato.</p>';const f=forn(o.fornitoreId);const rz=o.ricezione||{righe:[]};
     return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Consegna ${esc(f.nome)}<div class="sh-s">Controllata da ${esc(o.ricevutoNome||'')} ${ago(o.ricevuto)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     ${o.differenze||o.nonControllati?'':`<p>${pill('ok','tutto arrivato')}</p>`}
-    <div>${rz.righe.map(r=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(r.nome)}</div><div class="ln-m">ordinati ${fq(r.qta)}, arrivati ${fq(r.arr)} ${esc(r.unita||'')}${r.motivo&&r.motivo!=='nonctrl'&&r.da&&r.da.length?`<br>chiesto da ${esc(r.da.join(', '))}`:''}</div></div>${r.motivo?pill(r.motivo==='danneggiato'||r.motivo==='mancante'?'ko':'wait',MOTIVI[r.motivo]||r.motivo):pill('ok','ok')}</div>`).join('')}</div>
-    ${rz.note?`<p class="gm-note"><b>Note:</b> ${esc(rz.note)}</p>`:''}${rz.foto?`<div class="bolla"><img src="${rz.foto}" alt="Foto della bolla"></div>`:''}`}});
+    <div>${rz.righe.map((r,i)=>`<div class="line"><div class="ln-i"><div class="ln-n">${esc(r.nome)}</div><div class="ln-m">ordinati ${fq(r.qta)}, arrivati ${fq(r.arr)} ${esc(r.unita||'')}${r.motivo&&r.motivo!=='nonctrl'&&r.da&&r.da.length?`<br>chiesto da ${esc(r.da.join(', '))}`:''}${bolRiga(o,rz,i)}</div></div>${r.motivo?pill(r.motivo==='danneggiato'||r.motivo==='mancante'?'ko':'wait',MOTIVI[r.motivo]||r.motivo):pill('ok','ok')}</div>`).join('')}</div>
+    ${rz.note?`<p class="gm-note"><b>Note:</b> ${esc(rz.note)}</p>`:''}${rz.bolla&&rz.bolla.extra&&rz.bolla.extra.length?`<p class="gm-note"><b class="bol-r ko">Sulla bolla ma non ordinati:</b> ${esc(rz.bolla.extra.join(', '))}</p>`:''}${rz.foto?`<div class="bolla"><img src="${rz.foto}" alt="Foto della bolla"></div>`:''}`}});
 }
+// riga della bolla nel controllo già inviato: quantità per tutti, prezzo solo per il gestore (rosso se diverso dall'ordine)
+function bolRiga(o,rz,i){const B=rz.bolla;if(!B)return'';const b=B.righe.find(x=>x.i===i),l=(o.items||[])[i]||{};
+  if(!b)return'<br><span class="bol-r ko">Non era sulla bolla</span>';
+  const pr=showPrices()&&b.prezzo>0?(bolPrezzoDiv(l,b)?` · <span class="bol-r ko">prezzo bolla ${eur(b.prezzo)}, ordine ${eur(l.prezzo)}</span>`:` · prezzo bolla ${eur(b.prezzo)}`):'';
+  return`<br><span class="bol-r">Sulla bolla: ${b.q!=null?fq(b.q)+' '+esc(l.unita||b.unita||''):'quantità non letta'}</span>${pr}`}
 </script>
 <script>
 /* ================= fornitori ================= */
@@ -5377,7 +5420,8 @@ rbest:d=>rswapTo(d.r,d.i,d.p),
   rst:d=>{const L=rcvState(d.o).lines[+d.i];L.st=SEM_NEXT[L.st||''];if(L.st==='meno')L.arr=L.qta>1?r3(L.qta-1):r3(L.qta/2);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}refreshSheet()},
   bollaCam:d=>pickFile({accept:'image/*',capture:'environment'},fs=>setBolla(d.o,fs)),
   bollaLib:d=>pickFile({accept:'image/*'},fs=>setBolla(d.o,fs)),
-  bollaDel:d=>{rcvState(d.o).foto='';refreshSheet()},
+  bollaDel:d=>{const R=rcvState(d.o);R.foto='';R.bol=null;R.bolErr='';R.bolImg=null;R.lines.forEach(L=>{delete L.bq;delete L.bno});refreshSheet()},
+  bolLeggi:d=>bolLeggi(d.o),
   fnew:()=>newSupSheet(),
   fopen:d=>supSheet(d.f,d.t),
   suptab:d=>{S.supTab=d.v;if(d.v==='contatti'){S.fe=clone(D().fornitori[S.supFid]||{});delete S.fe.id}refreshSheet()},
