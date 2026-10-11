@@ -28,7 +28,10 @@ for(const w of [320,390]){
   s=await stato(p,3000);ok(s&&s.tN===0&&s.y0===1&&s.oY===1&&s.oS===1&&s.oH===1,`${w}px: a 3 s YNOY è scritto e tutto si vede ${JSON.stringify(s)}`);
   s=await stato(p,3610);ok(s&&s.oH<.01&&s.oY>.5&&s.oS>.5,`${w}px: a 3,6 s JONA è sfumata e la firma si vede ancora ${JSON.stringify(s)}`);
   s=await stato(p,3790);ok(s&&s.oY<.01&&s.oS<.01&&s.sw<=s.cw,`${w}px: a 3,8 s anche la firma è sfumata ${JSON.stringify(s)}`);
-  await p.waitForTimeout(4200);ok(!(await p.locator('.splash').count())&&!(await p.locator('.wall h1').count()),`${w}px: poi si apre l'app`);
+  // v87 (D38): durante la scossa la pagina non deve mai diventare scorrevole (su Android comparivano le barre di scorrimento grigie a destra e in basso)
+  const sc=await p.evaluate(()=>{const out=[],e=document.scrollingElement;for(let t=0;t<=3800;t+=20){for(const a of document.getAnimations()){a.pause();a.currentTime=t}if(e.scrollWidth>e.clientWidth||e.scrollHeight>e.clientHeight)out.push([t,e.scrollWidth-e.clientWidth,e.scrollHeight-e.clientHeight])}for(const a of document.getAnimations())a.play();return out});
+  ok(!sc.length,`${w}px: in nessun istante dell'apertura la pagina scorre (niente barre di scorrimento) ${JSON.stringify(sc.slice(0,5))}`);
+  await p.waitForTimeout(4200);ok(!(await p.locator('.splash').count())&&!(await p.locator('.wall h1').count()),`${w}px: poi si apre l'app`);ok(!(await p.evaluate(()=>document.documentElement.classList.contains('on-splash'))),`${w}px: dopo l'apertura il taglio (on-splash) è tolto`);
   ok(!errs.length,`${w}px: errori ${errs}`);await c.close();
 }
 // schermata d'ingresso (non entrato): JONA sale come prima, la firma resta

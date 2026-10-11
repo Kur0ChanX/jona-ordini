@@ -1,0 +1,45 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body{margin:0;background:#2b2321;font-family:system-ui,sans-serif;color:#EDE6DF;width:1200px;padding:28px 24px 30px;box-sizing:border-box}
+h1{font-weight:300;letter-spacing:.06em;font-size:30px;margin:0 0 4px}
+.sub{color:#B9AEA2;font-size:16px;margin:0 0 22px}
+.row{display:flex;gap:18px}
+.col{flex:1}
+.col h2{font-size:19px;font-weight:600;margin:0 0 2px}.col p{margin:0 0 10px;color:#B9AEA2;font-size:14px;min-height:38px}
+.paper{border-radius:14px;padding:16px 10px 8px;background-color:#f7f2e8;
+ background-image:radial-gradient(rgba(120,95,60,.07) 1px,transparent 1.2px),radial-gradient(rgba(120,95,60,.05) 1px,transparent 1.2px),repeating-linear-gradient(180deg,transparent 0 33px,rgba(90,130,170,.20) 33px 34px),linear-gradient(90deg,transparent 30px,rgba(200,80,80,.28) 30px 31.5px,transparent 31.5px);
+ background-size:7px 7px,11px 11px,auto,auto;background-position:0 0,3px 5px,0 0,0 0;box-shadow:inset 0 0 40px rgba(120,90,50,.12)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 0}
+.it{text-align:center;color:#4a3f38;font-size:15px;padding-bottom:6px}
+.it svg{width:104px;height:104px;display:block;margin:0 auto}
+.rec{margin-top:16px;font-size:15px;color:#EDE6DF;background:#3A2F2C;border-radius:12px;padding:12px 16px;line-height:1.5}
+.rec b{color:#fff}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.8"/></filter>
+ <filter id="rough2"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="2.2"/></filter>
+ <filter id="wash" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="5"/><feGaussianBlur stdDeviation=".7"/></filter>
+ <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="1.4" height="4" fill="currentColor"/></pattern>
+ <path id="leaf" d="M0 0C6-8 18-9 25-2C18 6 6 6 0 0Z"/>
+</defs></svg>
+<h1>Disegni per gli ingredienti del Bar · scegli lo stile</h1>
+<p class="sub">Stessi 6 disegni in 3 stili, sul «foglio di carta» (fatto solo con CSS, peso zero). Ogni disegno pesa circa 1 KB.</p>
+<div class="row" id="row"></div>
+<div class="rec">👉 <b>Consiglio: B · Inchiostro e acquerello.</b> Si riconosce subito anche piccolo e ha i colori veri (lime verde, ciliegia rossa). A è il più «disegnato a mano». C è il più leggero ed elegante, come il logo JONA, ma senza colore si distinguono meno gli ingredienti. Sui telefoni economici (classe <i>lite</i>) lo stile resta uguale ma senza l'effetto acquerello.</div>
+<script>
+const G={
+ lime:{c:'#8DB33A',f:`<circle cx="32" cy="32" r="26"/>`,d:`<circle cx="32" cy="32" r="26"/><circle cx="32" cy="32" r="21.5"/>${[0,45,90,135,180,225,270,315].map(a=>{const r=a*Math.PI/180;return`<path d="M${32+3*Math.cos(r)} ${32+3*Math.sin(r)}L${(32+19*Math.cos(r)).toFixed(1)} ${(32+19*Math.sin(r)).toFixed(1)}"/>`}).join('')}`,n:'Lime'},
+ menta:{c:'#4FA36B',f:`<g transform="translate(32 46) rotate(-25)"><use href="#leaf"/></g><g transform="translate(32 46) scale(-1 1) rotate(-25)"><use href="#leaf"/></g><g transform="translate(32 30) rotate(-30) scale(.85)"><use href="#leaf"/></g><g transform="translate(32 30) scale(-1 1) rotate(-30) scale(.85)"><use href="#leaf"/></g><g transform="translate(32 14) rotate(-90) scale(.6)"><use href="#leaf"/></g>`,
+   d:`<path d="M32 60C31 46 33 30 32 9"/><g transform="translate(32 46) rotate(-25)"><use href="#leaf"/><path d="M2 0L21-2"/></g><g transform="translate(32 46) scale(-1 1) rotate(-25)"><use href="#leaf"/><path d="M2 0L21-2"/></g><g transform="translate(32 30) rotate(-30) scale(.85)"><use href="#leaf"/><path d="M2 0L21-2"/></g><g transform="translate(32 30) scale(-1 1) rotate(-30) scale(.85)"><use href="#leaf"/><path d="M2 0L21-2"/></g><g transform="translate(32 14) rotate(-90) scale(.6)"><use href="#leaf"/></g>`,n:'Menta'},
+ ghiaccio:{c:'#8EC3DD',f:`<path d="M32 10L52 20L52 42L32 52L12 42L12 20Z"/>`,d:`<path d="M32 10L52 20L32 30L12 20Z"/><path d="M12 20L12 42L32 52L32 30M52 20L52 42L32 52"/><path d="M17 26L17 36M47 26L47 31"/>`,n:'Ghiaccio'},
+ arancia:{c:'#F0A23A',f:`<path d="M6 42A26 26 0 0 1 58 42Z"/>`,d:`<path d="M6 42A26 26 0 0 1 58 42Z"/><path d="M10.5 42A21.5 21.5 0 0 1 53.5 42"/>${[150,120,90,60,30].map(a=>{const r=a*Math.PI/180;return`<path d="M32 40L${(32+18*Math.cos(r)).toFixed(1)} ${(42-18*Math.sin(r)).toFixed(1)}"/>`}).join('')}`,n:'Arancia'},
+ ciliegia:{c:'#C8323C',f:`<circle cx="22" cy="47" r="10"/><circle cx="43" cy="49" r="10"/>`,d:`<circle cx="22" cy="47" r="10"/><circle cx="43" cy="49" r="10"/><path d="M22 37C24 24 30 15 38 10M43 39C41 27 39 18 38 10"/><path d="M38 10C44 3 54 5 57 9C51 14 43 14 38 10Z"/><path d="M18 43Q19 41 21 41"/>`,n:'Ciliegia'},
+ gin:{c:'#9BC8C0',f:`<path d="M28 9L28 20C28 24 18 26 18 32L18 57Q18 60 21 60L43 60Q46 60 46 57L46 32C46 26 36 24 36 20L36 9Z"/>`,d:`<path d="M28 9L28 20C28 24 18 26 18 32L18 57Q18 60 21 60L43 60Q46 60 46 57L46 32C46 26 36 24 36 20L36 9Z"/><rect x="27" y="4" width="10" height="6" rx="1"/><rect x="21" y="37" width="22" height="13" rx="1.5"/><path d="M25 42H39M27 46H37"/>`,n:'Gin'}};
+const S=[
+ {t:'A · Matita colorata',p:'Tratto a matita un po\' tremolante, colore a righette come i pastelli.',
+  svg:g=>`<defs><pattern id="h${g.n}" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="1.6" height="3.2" fill="${g.c}"/></pattern></defs><g fill="url(#h${g.n})" opacity=".9" filter="url(#rough2)">${g.f}</g><g fill="none" stroke="#5b524c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)">${g.d}</g><g fill="none" stroke="#5b524c" stroke-width=".8" opacity=".45" stroke-linecap="round" filter="url(#rough2)" transform="translate(.6 .4)">${g.d}</g>`},
+ {t:'B · Inchiostro e acquerello',p:'Contorno a penna nera, colore ad acquerello che esce un po\' dai bordi.',
+  svg:g=>`<g fill="${g.c}" opacity=".6" filter="url(#wash)" transform="translate(1.5 1.5)">${g.f}</g><g fill="none" stroke="#2a2420" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${g.d}</g>`},
+ {t:'C · Linea unica',p:'Linea sottile color cacao, pulita, come il logo JONA. Niente colore.',
+  svg:g=>`<g fill="none" stroke="#3A2F2C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">${g.d}</g>`}];
+row.innerHTML=S.map(s=>`<div class="col"><h2>${s.t}</h2><p>${s.p}</p><div class="paper"><div class="grid">${Object.values(G).map(g=>`<div class="it"><svg viewBox="0 0 64 64">${s.svg(g)}</svg>${g.n}</div>`).join('')}</div></div></div>`).join('');
+</script></body></html>
