@@ -1,23 +1,23 @@
-# Passaggio di consegne (2026-10-11, fine sessione #82)
+# Passaggio di consegne (2026-10-11, fine sessione #83)
 
-Sessione attuale: #83
+Sessione attuale: #84
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). App: **v80 unita in `main`** (PR #91, squash `f0a4541`). **PRIMA COSA della #83**: controllare `https://jona-ristorante-by-ynoy-corp.pages.dev/` → `APP_VER=80`. Poi finire la **v81** (sotto). La #82 non ha toccato codice.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v80** (controllato in #83: `APP_VER=80`). **v81 pronta sul ramo, NON ancora pubblicata.**
 
-## Fatto in #82 (11/10, ~16:21-16:58 ora italiana)
-- Handoff presto: l'hook ha segnato ~150k token già al 4° messaggio (il contesto di partenza è grande). Niente lavoro sulla v81.
-- Regola nuova dei titoli (da #81, già in `CLAUDE.md`, commit `afacab2`): simbolo del progetto al posto del pallino. **Jona 👨🏻‍🍳**, RVC 🛎️, SPA 🫒 (es. `👨🏻‍🍳 ▶ ATTIVA · #83 · Jona Ordini · …`).
-- Unita la scorta (`docs/ULTIMO-MESSAGGIO.md`) e pushata.
-- Mario ha girato 2 foto della mail GitHub «Prove: All jobs have failed» di **RVC** PR 17 (run #147, 16:31). Girato alla RVC #78: risposta «giro vecchio, già corretto (E41 di RVC); sull'ultima versione `c8592c2` prove VERDI alle 16:52». Detto a Mario: non toccare **Re-run jobs**. Foto non salvate (solo stato, regola FOTO DEI PASSI).
-- A Mario è rimasta la domanda: «Parto con la v81 (Agenda passo 2)?» — scelta già fatta in #81 (doppio tocco), quindi la #83 può partire appena Mario scrive.
+## Fatto in #83 (11/10, ~17:00-17:35 ora italiana)
+- Unita la scorta, controllo online v80 ok.
+- Via libera di Mario per la v81 arrivato dalla #82 («ok vai», girato con send_message).
+- Scritta `tools/test-agenda-v81.mjs` (39 PASS, anche con `TZ=Europe/Rome`): agOnDay per ogni tipo, etichette, `agParse` «ogni lunedì / tutti i giorni / ogni mese / tutti i venerdì», modulo (6 chip Ripeti, 7 giorni, «Scegli almeno un giorno», «fino al» prima), «Salta solo…», spunta per giorno (`ckd`), striscia con «Appunto» (dev sì, staff no, vuota solo nella prima scheda), foglio «Appunti di oggi», coperti nell'ordine suggerito (`copNorm` 60, +22%, «Ignora»), 320 px, agenda spenta → `sugAgenda` null. Aggiunta a `VELOCI` in `tools/prova-ci.sh`.
+- `APP_VER=81`, NEWS v81 (chef + dev), `CACHE` `jona-ordini-v85` in `sw.js`, riga v81 in `CLAUDE.md`. Commit e push sul ramo.
+- Lanciate in background le prove legate (test-agenda, -v58, -v59, -v61, -v81, test-v16 (ordine suggerito), test-hotel, test-demo, test-news, test-giro) con TZ Roma: **l'esito è rimasto nella #83** (handoff scattato a 142k). La #84 le rilancia.
+- Mario ha chiesto come collegare **5stelle** (il programma gestionale dell'hotel, PMS). Risposto in breve: serve un'interfaccia (API) dal fornitore di 5stelle; è un tema dell'hotel → va nel progetto RVC (ponte, P2 addebiti in `docs/PONTE-RVC.md`, «no per ora» da #30). Datogli un messaggio da mandare al fornitore. Aspettare la sua risposta (documentazione API, costi).
 
-## Fatto in #81 (11/10, ~15:59-16:25 ora italiana)
-- Unita la scorta (solo `ULTIMO-MESSAGGIO.md`).
-- **PR #91 rossa** su `7f2e823`: `test-agenda-v61` «Avvisa subito: No: nessuna notifica in più». Causa: prova legata all'ora. L'evento di prova è alle 16:00 con avviso «30 min prima»; alle 15:44 il controllo automatico (`deadlineTick`, a 4 s e ogni 60 s) creava il promemoria per chi l'ha scritto e la prova lo contava. L'app era giusta. Riprodotto con una copia della prova nello scratchpad (evento a «adesso + 14 min» + `deadlineTick()` forzato). Corretto in `tools/test-agenda-v61.mjs`: conta solo le notifiche «Nuovo/Cambiato in agenda» e chiama `deadlineTick()` apposta. **E36** in `docs/ERRORI.md`. Prove GitHub verdi su `65f3b91` → squash merge della #91 → `main` unito nel ramo (`6176d85`).
-- **Mario ha confermato (doppio tocco)** le 2 regole girate da RVC #75: scritte in `CLAUDE.md` (REGOLE TRASVERSALI): «FOTO IN HD SENZA PIÙ TOKEN» e «REGOLE PER TUTTI I PROGETTI» (per ogni nuova regola su come lavoro: domanda a tocco «La mando anche a RVC e SPA Sensorial?», se sì `send_message` alle sessioni attive). Non le ho rimandate a RVC/SPA: vengono da RVC.
-- **Mario ha scelto (doppio tocco): «Agenda passo 2 (D11)»** come prossimo lavoro. Le prove dal vero restano rimandate all'anno prossimo.
+## Da fare in #84 (in ordine)
+1. Rilanciare le prove legate qui sopra (TZ=Europe/Rome). Se verdi: PR dal ramo unico verso `main`, controllo GitHub «prove» verde → squash merge → SUBITO `git fetch origin main && git merge origin/main` + push → controllo online `APP_VER=81` (PUBBLICA SEMPRE IN AUTOMATICO).
+2. `docs/DA-FARE.md`: togliere D11 quando online; aggiungere voce per 5stelle (Mario: chiedere API al fornitore; poi Claude studia con RVC).
+3. Poi chiedere a Mario a tocco (doppio tocco) da cosa ripartire (candidati D10, C7).
 
-## v81 (D11) in corso: codice scritto, commit `5d2b011`
+## v81 (D11): codice (commit `5d2b011`) + prova e versione (commit di #83)
 Tutto in `index.html`. Già verdi (in locale, TZ Roma): `test-agenda`, `test-agenda-v58`, `test-agenda-v59`, `test-agenda-v61`.
 1. **Ripetizioni complete**: `AG_R` (No, Ogni giorno `g`, Giorni scelti `gs` con `rg` 0=lun..6=dom, Ogni settimana `s`, Ogni mese `m`, Ogni anno `a`), `rf` «Fino al» (facoltativo, compreso), `rx` giorni saltati. `agOnDay` riscritta, `agRg`, `agRLbl` (etichetta «ogni lun, mer» / «fino al 3 novembre»). Modulo: chip «Ripeti» (`agfR`), chip dei giorni (`agfRg`), campo `#agf-rf`, pulsante «Salta solo <giorno>» (`agSkip`, `.ag-skip`) se l'evento salvato è ripetuto e aperto da un giorno (`agEdit` passa `dg` da `data-g`). `agSave` controlla: almeno un giorno per `gs`, «fino al» non prima della data; tiene `rx` e `ckd`. «Avvisa subito» aggiunge «· ogni …» al testo.
    - **Cose da fare negli eventi ripetuti**: la spunta vale solo per quel giorno (`ckd.d<AAAAMMGG>` = indici fatti, potati oltre 60 giorni; `agCkK`, `agCkOk`). `agEvH(e,me,mgr,next,g)` ha ora il giorno `g`; `agCk` riceve `id|i|g`.
@@ -25,12 +25,6 @@ Tutto in `index.html`. Già verdi (in locale, TZ Roma): `test-agenda`, `test-age
 2. **Appunti veloci dalla home**: per chi scrive in agenda (`agCan`) la striscia diventa `.ag-strip.ag-can` con il testo (eventi di oggi o «Oggi niente in agenda» + «N appunti») e il pulsante **Appunto** (`agNtQ` → `agNtQuick`: foglio «Appunti di oggi» con `agNotesH`, tastiera subito aperta, «Apri l'agenda» `agFull`). Senza eventi oggi la striscia c'è solo nella prima scheda (`GM_TABS[0]`/`DEV_TABS[0]`/`STAFF_TABS[0]`). Lo staff semplice ha la striscia di prima. Dettatura anche per gli appunti: `agMic(dst)` con `dst` `q` (riga veloce) o `nt` (appunto, poi `A.agNtAdd`), `S.ag.mic` ora vale `'q'|'nt'|false`.
 3. **Coperti in agenda → ordine suggerito**: `sugAgenda(cad)` somma i coperti degli eventi da domani per `cad` giorni (come il meteo); fattore = 1 + coperti / (coperti di un giorno normale × giorni), max ×3, moltiplicato al meteo in `sugRows`. `sugAgH(st)` sotto «Quanta gente ti aspetti?»: «In agenda: N coperti · sab Gruppo Rossi 40…»; se manca `config/app.copNorm` campo «Coperti in un giorno normale» + Salva (`sugCnSave`), altrimenti «Eventi: +X% (giorno normale N coperti · cambia)» con «Usa l'agenda / Ignora» (`sugAg`, `S.sug.useAg`). Solo con la funzione agenda accesa. Scelta mia: i coperti degli eventi contano «in più» rispetto a un giorno normale (gruppi, matrimoni); il gestore può sempre toccare «Ignora».
    - CSS nuovi: `.sug-lnk`, `.ag-skip`. IN nuovo: `sugCn`.
-
-**Da fare per chiudere la v81** (in ordine):
-1. Prova nuova `tools/test-agenda-v81.mjs` (modalità locale, come `test-agenda-v61`): `agOnDay` per tutti i tipi (giorno, giorni scelti, anno, fino al, saltati), modulo (chip, giorni, «Scegli almeno un giorno», «fino al» prima della data), «Salta solo …», spunta per giorno negli eventi ripetuti, `agParse` «ogni lunedì»/«tutti i giorni», striscia con «Appunto» (gestore sì, staff no; vuota solo nella prima scheda), foglio appunti veloci (aggiungi, spunta), ordine suggerito con coperti (servono 2+ ordini inviati del fornitore: vedi come fa `test-v40`/`test-hotel` per `sugStats`), `copNorm` salvato, «Ignora», 320 px senza scorrimento. Rilanciare anche con `TZ=Europe/Rome` (E18). Aggiungerla a `VELOCI` in `tools/prova-ci.sh`.
-2. `APP_VER=81`, voce NEWS v81 (chef + dev), `CACHE` v85 in `sw.js`, riga v81 in `CLAUDE.md`.
-3. Prove legate: test-agenda*, test-v40 (ordine suggerito?), test-hotel (usa `htSugH`), test-demo, test-giro (la striscia cambia: E35). Poi PR dal ramo unico, «prove» verde → squash → `git fetch origin main && git merge origin/main` → push → controllo online.
-4. `docs/DA-FARE.md`: togliere D11 quando online.
 
 ## D30: Jona fuori dall'account personale (in corso)
 - Organizzazione **`Jona-Ristorante-by-YNOY`** creata dall'account del ristorante **`JonaRistorante-Ynoy`** (jona.ristorante@gmail.com, Owner, 2FA attiva); Kur0ChanX Owner; app Claude installata sull'organizzazione (Save fatto, #68/#69).
@@ -41,7 +35,7 @@ Tutto in `index.html`. Già verdi (in locale, TZ Roma): `test-agenda`, `test-age
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiusa), #81 `session_014yinZg1B2R2g39VnAWDWH5` (chiusa). #80 `session_01B4hWXa4uTY1e2ik1qt27Qq`, #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #83 `session_01LzEDJuhMnDxtkkFmJoMu1G` (chiusa), #82 `session_01WCJjhdxi1ghKYpkvJFJEd6` (chiusa), #81 `session_014yinZg1B2R2g39VnAWDWH5` (chiusa). #80 `session_01B4hWXa4uTY1e2ik1qt27Qq`, #79 `session_016ZY2JpTeYidZNnv7E1hABh` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: #08 `session_01Ta4N7WcGt86qybK8z3uJG4` (per la regola «regole per tutti i progetti»).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto** (mancano gli account Firebase e Cloudflare dell'hotel, li crea Mario con la guida di RVC). `PONTE_KEY` serve solo quando il Worker RVC va online → prove dell'anno prossimo.
 
@@ -66,5 +60,4 @@ Elenco completo in `docs/DA-FARE.md`. NON chiedere a Mario prove dal vero (M…)
 - URL del Drive: se finisse in un file pubblico, chiunque potrebbe caricare file nella cartella di Mario → in quel caso Mario fa un nuovo deployment e l'URL vecchio si spegne.
 
 ## Ultimo messaggio di Mario, parola per parola
-(con 2 foto: mail GitHub «[RVC-Operation-by-YNOY-CORP/RVC] Prove workflow run — Prove: All jobs have failed» e pagina del run #147 di RVC)
-«è Normale?»
+«/Btw come collego il progtamma a 5 stelle cosí mi porto avanti»
