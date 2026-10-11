@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (11/10/2026 16:56 ora italiana)
+# Ultimo messaggio di Mario (11/10/2026 17:04 ora italiana)
 
-è Normale?
+/Btw come collego il progtamma a 5 stelle cosí mi porto avanti
