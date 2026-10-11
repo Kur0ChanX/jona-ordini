@@ -594,6 +594,30 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .ag-c i{font-style:normal;font-size:10px;line-height:1;color:var(--lagoon)}.ag-c.oggi{outline:2px solid var(--lagoon)}.ag-c[aria-pressed="true"]{background:var(--lagoon);color:var(--on-lagoon)}.ag-c[aria-pressed="true"] i{color:inherit}
 .rc-cerca{box-shadow:none;border-color:var(--line);margin-top:12px}.rc-l{margin-top:10px}.rc-alto{color:var(--corallo);font-weight:600}.rc-ing{padding:10px 0;border-top:1px solid var(--line)}.rc-in{display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere}.rc-q{display:flex;align-items:center;gap:8px;margin-top:6px}.rc-q .inp.sm{width:86px;flex:none}.rc-q select.inp.sm{width:78px;flex:none}.rc-u{min-width:28px;color:var(--ink2)}.rc-c{flex:1;text-align:right;font-weight:600;white-space:nowrap}.rc-tot{display:grid;gap:6px;margin:14px 0 6px;padding:12px 14px;border-radius:12px;background:var(--sunk)}.rc-tot div{display:flex;justify-content:space-between;gap:10px}
 .ag-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vn-seg{margin:4px 0 12px}.vn-add{margin:0 0 4px;flex-wrap:wrap}.vn-add .btn{flex:1 1 auto}
+.vn-dot{flex:none;display:inline-block;width:12px;height:12px;border-radius:50%;background:#7a1f2b;vertical-align:0}
+.vn-dot.vn-bianco{background:#e3c860}.vn-dot.vn-rosato{background:#e79aa0}.vn-dot.vn-bollicine{background:#f1e2a6;box-shadow:inset 0 0 0 2px #c9a94a}.vn-dot.vn-dolce{background:#c0782a}
+.vn-q{flex:none;display:flex;flex-direction:column;align-items:flex-end;font-size:12.5px;color:var(--muted);text-align:right;line-height:1.3}
+.vn-q b{font:600 18px var(--font);color:var(--ink)}.vn-zero{color:var(--corallo)!important}.vn-basso{color:var(--ocra)!important}
+.vn-par{color:var(--ocra);font-size:13.5px;margin:4px 0 0}
+.vn-abb{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.vn-hint{margin:0 0 10px}
+.vn-card{all:unset;box-sizing:border-box;display:block;width:100%;padding:14px 16px;margin:0 0 10px;border-radius:16px;background:var(--surface);border:1px solid var(--line);cursor:pointer}
+.vn-card:focus-visible{outline:2px solid var(--lagoon)}
+.vn-ct{display:flex;align-items:center;gap:8px;font-size:16px}.vn-ct b{flex:1;min-width:0}.vn-pv{color:var(--muted);font-size:14px}
+.vn-fr{font:italic 400 17px/1.4 var(--font);margin:8px 0 0;color:var(--ink)}
+.vn-tav{padding:14px 16px;border-radius:16px;background:linear-gradient(120deg,var(--lagoon-soft),var(--surface) 80%);margin:4px 0 12px}
+.vn-tav p{margin:6px 0 0}.vn-tl{font:600 12px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--lagoon)}
+.vn-inv{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}.vn-inv .row-i{flex:1;min-width:0}
+.vn-inv1{flex-wrap:wrap;border:0}.vn-inv1 .row-i{flex-basis:100%}.vn-inv1 .btn{flex:1}
+.vn-pm{font:600 22px var(--font);width:44px;height:44px;border:1px solid var(--line);border-radius:12px}
+.vn-n{min-width:32px;text-align:center;font:600 18px var(--font)}
+.vn-tx{margin:0;white-space:pre-line;line-height:1.45}
+.vn-ta{min-height:76px;resize:vertical}
+.vn-al{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--sunk);color:var(--ink2);font-size:14px;margin:8px 0}
+.vn-al .ic{flex:none;color:var(--ocra)}
+.vn-busy{display:flex;gap:8px;align-items:center;padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}
+.vn-top{margin:0;padding-left:22px;line-height:1.7}
 .ag-2>*{min-width:0}.ag-2 .btn{white-space:normal;text-align:center;justify-content:center}
 .sc-row{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px}.sc-row>div{min-width:0}.sc-row b{display:block;font-weight:500}.sc-row span{display:block}
 .setrow:first-of-type{border-top:0}
@@ -1159,6 +1183,7 @@ chevl:'<path d="m14.5 5.5-6.5 6.5 6.5 6.5"/>',
 sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
 rain:'<path d="M7 15.5h10a4 4 0 0 0 .5-8 5.5 5.5 0 0 0-10.6-1.3A4.5 4.5 0 0 0 7 15.5z"/><path d="M8.5 18.5l-1 2.2M12.5 18.5l-1 2.2M16.5 18.5l-1 2.2"/>',
 pot:'<path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M9 7.2c0-1.6 1.3-2.7 3-2.7s3 1.1 3 2.7"/>',
+wine:'<path d="M7.5 3h9c.4 3.8 0 7.7-4.5 9.3C7.5 10.7 7.1 6.8 7.5 3z"/><path d="M12 12.3V20M8.5 20.5h7M7.6 6.5h8.8"/>',
 glass:'<path d="M7 3h10l-1 7.5a4 4 0 0 1-8 0z"/><path d="M12 14.5V20M8.5 20.5h7M7.5 7h9"/>',
 msg:'<path d="M4.5 5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h-1A1.5 1.5 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5z"/><path d="M7.5 9.5h9M7.5 12.5h6"/>',
 play:'<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
@@ -1170,8 +1195,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=83;
+const APP_VER=84;
 const NEWS=[
+  {v:84,data:'2026-10-11',titolo:'Cantina Vini',
+    tutti:['Nuovo: «Cantina Vini» (per la sala, in «Cosa serve?»). Per ogni vino c\'è «Al tavolo in 10 secondi»: la frase da dire al cliente, 3 parole chiave, con cosa va e come si serve.','In «Consiglia» tocchi cosa mangia il cliente (carne, pesce, dolce…) e vedi i vini in casa adatti.','Quando vendi una bottiglia tocca «− Venduta»: l\'app tiene il conto di quelle in casa.'],
+    chef:['«Cantina Vini» è in Fornitori. Fotografa l\'etichetta: l\'IA scrive la scheda (cantina, annata, gradi, vitigni, storia, gusto, profumi, abbinamenti, servizio). Tu controlli e salvi.','In «Inventario»: bottiglie in casa, vendute nel mese, i più venduti, valore al prezzo d\'acquisto e i vini da riordinare.','Il prezzo d\'acquisto lo vedono solo i gestori. La funzione si spegne in Impostazioni → Funzioni.'],
+    dev:{aggiunte:['D34: `config/cantina` {v:{<id>:vino}} e `config/cantina_mov_<AAAA-MM>` {m:{<id>:{v,q,t:ven|car|conta,da,ts}}}; `vnOpen` (Carta | Consiglia | Inventario), `vnShow`, `vnForm`, `vnIaGo` (`vnPrompt`/`vnLeggi`, `gemCall` con foto o col nome; riempie solo i campi vuoti, `ia:\'dubbio\'` se non sicuro), `vnMov`, `vnCta` (Fornitori; Catalogo per lo staff non di cucina). Modifica: `vnCan` (gestori, fb, resp, sala). Prova `tools/test-cantina.mjs`.']}},
   {v:83,data:'2026-10-11',titolo:'Orari dei responsabili e «Chi c\'è adesso»',
     chef:['Chef e F&B Manager (orario libero) ora scrivono il loro orario in «I miei orari»: lo vedono subito tutti, senza controlli sulle ore.','Nella scheda Orari c\'è il gruppo «Responsabili» in cima: puoi scrivere anche tu i loro orari.','Orari per reparto: in alto scegli Cucina o Sala. Ogni reparto si pubblica per conto suo.','Mauro (F&B Manager) prepara e pubblica i turni della sala: quando lo fa ricevi un avviso.'],
     fb:['In «Orari» c\'è «Turni della sala»: prepari i turni della sala e li pubblichi tu. Lo chef riceve un avviso.'],
@@ -2225,7 +2254,7 @@ function vCatalogo(me){
   const ps=prods();
   if(!ps.length)return`<h1 class="vt">Cosa serve?</h1>`+empty('store','Il catalogo è vuoto','Lo chef deve ancora caricare i listini dei fornitori. Intanto puoi chiedere un prodotto scrivendolo qui sotto.')+catSearch([])+`<div id="results">${catResults()}</div>`;
   const cats=[...new Set(ps.map(p=>p.categoria||'Altro'))].sort((a,b)=>CATS.indexOf(a)-CATS.indexOf(b));
-  return`<h1 class="vt">Cosa serve?</h1>${isMgr(me)?'<p class="vsub">Cerca, scegli il fornitore e aggiungi al carrello.</p>':stepsHint()}${catSearch(cats)}<div id="results">${catResults()}</div>`;
+  return`<h1 class="vt">Cosa serve?</h1>${me&&me.reparto!=='cucina'?vnCta(me):''}${isMgr(me)?'<p class="vsub">Cerca, scegli il fornitore e aggiungi al carrello.</p>':stepsHint()}${catSearch(cats)}<div id="results">${catResults()}</div>`;
 }
 const stepsHint=()=>`<ol class="steps3" aria-label="Come si fa"><li><b>1</b>Cerca</li><li><b>2</b>Premi +</li><li><b>3</b>Invia allo chef</li></ol>`;
 function catSearch(cats){
@@ -3064,7 +3093,7 @@ function vFornitori(){
   const fs=Object.values(D().fornitori).sort(byNome);const cnt={};for(const p of prods())cnt[p.fornitoreId]=(cnt[p.fornitoreId]||0)+1;
   return`<div class="vhead"><div><h1 class="vt">Fornitori</h1><p class="vsub">${fs.length} fornitori, ${prods().length} prodotti a listino</p></div><button type="button" class="btn ghost" data-a="fnew">${ic('plus')} Nuovo</button></div>
   <button type="button" class="sug-cta" data-a="imp" data-f="">${ic('upload')}<div><b>Importa listini</b><span>Excel, CSV, fattura XML, tabella preparata con Gemini o foto</span></div>${ic('chev')}</button>
-  ${rcCta(meU())}
+  ${rcCta(meU())}${vnCta(meU())}
   ${fs.length?`<div class="fgrid">${fs.map(f=>{const m=METODI[f.metodo],n=cnt[f.id]||0;return`<button type="button" class="fcard" data-a="fopen" data-f="${f.id}" style="--c:${fcolor(f.id)}" aria-label="${esc(f.nome)}">
     <span class="fc-top">${f.logo?`<img src="${esc(f.logo)}" alt="">`:`<b>${esc(f.nome.charAt(0))}</b>`}</span>
     <span class="fc-b"><span class="fc-n">${esc(f.nome)}</span><span class="fc-m">${m?ic(m.i)+esc(m.l):'Invio da definire'}</span>
@@ -4677,6 +4706,14 @@ async function demoSeed(){
   const lun=orLun(),V=['10:00-15:00','18:00-23:30','10:00-15:00,18:00-23:00','R'],tt={};
   ['demo_s1','demo_s2','demo_s3','demo_s4'].forEach((id,j)=>{const r={};for(let g=0;g<7;g++)r[g]=V[(g+j)%7===6?3:(g+j)%3];tt[id]=r});
   jobs.push(()=>put('config','orari_'+lun,{tipo:'orari',lun,t:tt,tp:clone(tt),pub:t-2*G,pubDa:'demo_gm',mod:t-2*G}));
+  // cantina vini
+  const VI=[['demo_v1','Vermentino di Gallura Superiore','Cantina di esempio','2023',13.5,'bianco','Vermentino di Gallura DOCG','100% Vermentino','Il Vermentino di Gallura è l\'unica DOCG della Sardegna: nasce sui terreni di granito vicino al mare.','Fresco e sapido, corpo medio, finale leggermente amarognolo.','Fiori bianchi, pesca, erbe della macchia mediterranea.','Giallo paglierino con riflessi verdi.',['pesce','crudi','primi','aperitivo'],'Con crudi, crostacei e primi di mare: la sapidità pulisce il palato.','Acciaio a temperatura controllata, qualche mese sulle fecce fini.','10-12 °C, calice da bianco, niente decantazione.','Il bianco della Gallura: fresco e sapido, perfetto con il pesce di oggi.','Fresco · Sapido · Fiori bianchi',38,14,9,3],
+    ['demo_v2','Cannonau di Sardegna Riserva','Cantina di esempio','2019',14.5,'rosso','Cannonau di Sardegna DOC','100% Cannonau','Il Cannonau è il vitigno rosso simbolo dell\'isola, coltivato da secoli in Barbagia.','Caldo e morbido, tannino vellutato, buona freschezza.','Ciliegia matura, mirto, pepe, spezie dolci.','Rosso rubino con riflessi granati.',['carne','formaggi'],'Con carni rosse, porceddu e formaggi stagionati: struttura e tannino reggono i sapori decisi.','Almeno 2 anni di affinamento, in parte in botte grande.','16-18 °C, calice ampio da rosso, aprire 30 minuti prima.','Il rosso della Sardegna: morbido e speziato, ideale con la carne.','Morbido · Ciliegia · Spezie',45,18,4,2],
+    ['demo_v3','Franciacorta Brut','Cantina di esempio','',12.5,'bollicine','Franciacorta DOCG','Chardonnay, Pinot nero','Metodo classico lombardo, rifermentato in bottiglia come lo Champagne.','Bollicina fine, fresco e cremoso.','Crosta di pane, agrumi, mela.','Giallo paglierino, perlage fine.',['aperitivo','crudi','pesce'],'Con aperitivo, ostriche e fritture: la bollicina sgrassa.','Rifermentazione in bottiglia, almeno 18 mesi sui lieviti.','6-8 °C, calice a tulipano.','Una bollicina italiana di metodo classico: per iniziare la serata.','Fresco · Crosta di pane · Agrumi',55,22,0,2],
+    ['demo_v4','Moscato di Sardegna','Cantina di esempio','2022',13,'dolce','Moscato di Sardegna DOC','100% Moscato bianco','Vino dolce della tradizione sarda, si beve a fine pasto.','Dolce ma fresco, corpo leggero.','Albicocca, miele, fiori d\'arancio.','Giallo dorato.',['dolce','formaggi'],'Con seadas, pasticceria secca e formaggi erborinati.','Fermentazione fermata per tenere gli zuccheri.','8-10 °C, calice piccolo.','Per chiudere in dolcezza con le seadas.','Dolce · Albicocca · Miele',32,12,6,2]];
+  const cv={};for(const [id,n,cant,ann,gr,tipo,den,vit,storia,palato,naso,colore,abb,abbT,prod,serv,frase,parole,pv,pc,q,min] of VI)cv[id]={id,n,cant,ann,gr,tipo,den,vit,storia,palato,naso,colore,abb,abbT,prod,serv,frase,parole,pv,pc,q,min,ia:'',da:'demo_gm',cr:t-20*G,mod:t-20*G};
+  jobs.push(()=>put('config','cantina',{tipo:'cantina',v:cv}));
+  jobs.push(()=>put('config','cantina_mov_'+today(new Date(t)).slice(0,7),{tipo:'cantina_mov',m:{demo_mv1:{v:'demo_v1',q:1,t:'ven',da:'demo_s2',ts:t-5*H},demo_mv2:{v:'demo_v1',q:1,t:'ven',da:'demo_s2',ts:t-3*H},demo_mv3:{v:'demo_v2',q:1,t:'ven',da:'demo_s4',ts:t-2*H}}}));
   // agenda e funzioni accese
   const gd=n=>today(new Date(t+n*G)),ev={};
   [['ev','Matrimonio Sanna, 120 coperti',2,'19:30',120,'Menù degustazione, torta a cura della pasticceria.','tutti',[]],['op','Consegna Metro anticipata alle 7',1,'07:00',0,'','rep',['cucina']],
@@ -4999,7 +5036,7 @@ function voiceSheet(){
    config/app.funz {agenda:true}: le funzioni nuove partono spente. Conta d'uso in config/uso_<AAAA-MM> {agenda:{<persona>:giorni}}, al massimo una scrittura al giorno per telefono (jona_uso).
    Agenda: config/agenda_<AAAA-MM> {tipo:'agenda',e:{<id>:ev}}, ricorrenti in config/agenda_ric. ev={t,g:'AAAA-MM-GG',h:'HH:MM'|'',cop,note,vis:'io'|'tutti'|'rep',rep:[],da,cr,mod,r:''|'s'|'m'}.
    Cancellare = e.<id>: null. Per reparto: lo staff vede i suoi, i gestori tutti. «Solo io» è nascosto solo nell'interfaccia (tutti i membri leggono config). */
-const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
+const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'cantina',l:'Cantina Vini',d:'Schede dei vini scritte con l\'IA da una foto dell\'etichetta, cosa consigliare al tavolo in base al piatto e inventario delle bottiglie (vendute e in casa).',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
 const funzOn=k=>{const f=cfg().funz||{};return k in f?!!f[k]:!!(FUNZ.find(x=>x.id===k)||{}).on};
 async function funzSet(k,on){const f=FUNZ.find(x=>x.id===k);if(!f)return;
   await put('config','app',Object.assign({},cfg(),{funz:Object.assign({},cfg().funz||{},{[k]:!!on})}));toast(f.l+(on?' accesa':' spenta'))}
@@ -5493,10 +5530,127 @@ async function rcDel(){const f=S.rcf;if(!f||!f.id)return closeSheet();
   if(!await ask('Eliminare la ricetta?','«'+f.n+'» sparisce dalle ricette.','Elimina',true))return;
   await upd('config','ricette',{['r.'+f.id]:null});closeSheet();toast('Ricetta eliminata')}
 
+/* ================= cantina vini (v84, D34) =================
+   config/cantina {v:{<id>:vino}}: vino={id,n,cant,ann,gr,tipo,den,vit,storia,palato,naso,colore,abb:[VN_ABB],abbT,prod,serv,frase,parole,pv,pc,q,min,ia,da,cr,mod}.
+   config/cantina_mov_<AAAA-MM> {m:{<id>:{v,q,t:'ven'|'car'|'conta',da,ts}}}: vendite, carichi e conte del mese (venduti e storico).
+   Scheda scritta dall'IA (foto dell'etichetta o nome) con gemCall; la persona controlla e salva. Prezzo d'acquisto (pc) solo ai gestori. */
+const VN_TIPI={rosso:'Rosso',bianco:'Bianco',rosato:'Rosato',bollicine:'Bollicine',dolce:'Dolce'};
+const VN_ABB=[['carne','Carne rossa'],['bianca','Carne bianca'],['pesce','Pesce'],['crudi','Crudi e crostacei'],['primi','Primi'],['formaggi','Formaggi'],['dolce','Dolce'],['aperitivo','Aperitivo']];
+const VN_CAMPI=[['storia','Storia, aneddoti e premi'],['palato','Gusto (palato)'],['naso','Profumi (naso)'],['colore','Colore'],['abbT','Abbinamento cibo'],['prod','Come nasce'],['serv','Servizio in tavola']];
+const vnAll=()=>Object.values((D().config.cantina||{}).v||{}).filter(v=>v&&v.id).sort((a,b)=>String(a.n).localeCompare(String(b.n),'it')||String(a.ann||'').localeCompare(String(b.ann||'')));
+const vnGet=id=>((D().config.cantina||{}).v||{})[id];
+const vnOn=me=>funzOn('cantina')&&!!me&&!!realU()&&!S.wallMode;
+const vnCan=me=>!!me&&(isMgr(me)||['fb','resp','sala'].includes(me.reparto));
+const vnMese=(d=new Date())=>'cantina_mov_'+today(d).slice(0,7);
+const vnTit=v=>esc(v.n)+(v.ann?' '+esc(v.ann):'');
+const vnSub=v=>[v.cant,v.den,v.gr?fq(v.gr)+'% vol':''].filter(Boolean).map(esc).join(' · ');
+function vnVenduti(){const r={};for(const m of Object.values((D().config[vnMese()]||{}).m||{}))if(m&&m.t==='ven')r[m.v]=(r[m.v]||0)+(+m.q||0);return r}
+async function vnPut(v){if(D().config.cantina)await upd('config','cantina',{['v.'+v.id]:v});else await put('config','cantina',{tipo:'cantina',v:{[v.id]:v}})}
+async function vnMov(id,t,q){const v=vnGet(id),me=realU();if(!v||!me)return;const old=+v.q||0,nq=t==='conta'?Math.max(0,q):Math.max(0,old+(t==='ven'?-q:q));
+  if(t==='ven'&&old<q&&!await ask('In casa ne risultano '+old,'Segno lo stesso la vendita? Il conto delle bottiglie va a zero.','Sì, venduta'))return;
+  await upd('config','cantina',{['v.'+id+'.q']:nq,['v.'+id+'.mod']:now()});
+  const doc=vnMese(),m={v:id,q:t==='conta'?nq:q,t,da:me.id,ts:now()};
+  if(D().config[doc])await upd('config',doc,{['m.'+uid()]:m});else await put('config',doc,{tipo:'cantina_mov',m:{[uid()]:m}});
+  toast(t==='ven'?'Venduta: in casa '+nq:t==='car'?'Caricate: in casa '+nq:'Conta salvata: '+nq)}
+const vnCta=me=>{if(!vnOn(me))return'';const l=vnAll(),n=l.reduce((s,v)=>s+(+v.q||0),0);return`<button type="button" class="sug-cta" data-a="vnOpen">${ic('wine')}<div><b>Cantina Vini</b><span>${l.length?l.length+(l.length===1?' vino':' vini')+' · '+n+(n===1?' bottiglia':' bottiglie')+' in casa':'Schede dei vini, cosa consigliare al tavolo e inventario'}</span></div>${ic('chev')}</button>`};
+function vnOpen(v){if(!funzOn('cantina'))return;S.vn={v:v||'carta',q:'',tipo:'',casa:true,abb:''};usoSegna('cantina');openSheet({cls:'tall',live:()=>true,render:vnList})}
+function vnRow(v,ven){const me=meU(),q=+v.q||0,basso=v.min>0&&q<=v.min;
+  return`<button type="button" class="prow vn-r" data-a="vnShow" data-v="${v.id}"><span class="vn-dot vn-${esc(v.tipo||'rosso')}" aria-hidden="true"></span><div class="row-i"><div class="row-t">${vnTit(v)}</div><div class="row-m">${vnSub(v)||'&nbsp;'}</div>${v.parole?`<div class="row-m vn-par">${esc(v.parole)}</div>`:''}</div><div class="vn-q"><b class="${!q?'vn-zero':basso?'vn-basso':''}">${q}</b><span>${q===1?'bottiglia':'bottiglie'}</span>${v.pv?`<span>${eur(v.pv)}</span>`:''}${ven?`<span>${ven} vend.</span>`:''}</div></button>`}
+function vnList(){const V=S.vn,me=meU(),all=vnAll(),can=vnCan(me),ven=vnVenduti();
+  const head=`<div class="grab"></div><div class="sh-h"><div class="sh-t">Cantina Vini<div class="sh-s">${all.length} ${all.length===1?'vino':'vini'} · ${all.reduce((s,v)=>s+(+v.q||0),0)} bottiglie in casa</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <div class="seg wide vn-seg">${[['carta','Carta'],['consiglia','Consiglia'],['inv','Inventario']].map(([k,l])=>`<button type="button" aria-pressed="${V.v===k}" data-a="vnV" data-v="${k}">${l}</button>`).join('')}</div>`;
+  const add=can?`<div class="btns vn-add"><button type="button" class="btn primary big" data-a="vnFoto">${ic('camera')} Fotografa una bottiglia</button><button type="button" class="btn ghost" data-a="vnNew">${ic('plus')} Scrivi il nome</button></div>`:'';
+  if(V.v==='consiglia'){const l=V.abb?all.filter(v=>(v.abb||[]).includes(V.abb)&&(+v.q||0)>0).sort((a,b)=>(ven[b.id]||0)-(ven[a.id]||0)||String(a.n).localeCompare(String(b.n),'it')):[];
+    return head+`<p class="muted small vn-hint">Cosa mangia il cliente? Ti mostro i vini in casa che ci stanno bene, con la frase da dire.</p>
+    <div class="vn-abb">${VN_ABB.map(([k,l])=>`<button type="button" class="chip" aria-pressed="${V.abb===k}" data-a="vnAbb" data-v="${k}">${l}</button>`).join('')}</div>
+    ${V.abb?(l.length?l.map(v=>`<button type="button" class="vn-card" data-a="vnShow" data-v="${v.id}"><div class="vn-ct"><span class="vn-dot vn-${esc(v.tipo||'rosso')}" aria-hidden="true"></span><b>${vnTit(v)}</b>${v.pv?`<span class="vn-pv">${eur(v.pv)}</span>`:''}</div>${v.frase?`<p class="vn-fr">«${esc(v.frase)}»</p>`:''}${v.parole?`<p class="vn-par">${esc(v.parole)}</p>`:''}</button>`).join(''):`<p class="muted">Nessun vino in casa per questo piatto.${can?' Apri un vino e scegli i suoi abbinamenti.':''}</p>`):''}`}
+  if(V.v==='inv'){const tot=all.reduce((s,v)=>s+(+v.q||0),0),val=all.reduce((s,v)=>s+(+v.q||0)*(+v.pc||0),0),nv=Object.values(ven).reduce((s,x)=>s+x,0),bassi=all.filter(v=>v.min>0&&(+v.q||0)<=v.min);
+    const top=Object.entries(ven).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([id,n])=>{const v=vnGet(id);return v?`<li>${vnTit(v)} <b>${n}</b></li>`:''}).join('');
+    return head+`<div class="rc-tot vn-tot"><div><span>Bottiglie in casa</span><b>${tot}</b></div><div><span>Vendute questo mese</span><b>${nv}</b></div>${isMgr(me)&&val?`<div><span>Valore (prezzo d'acquisto)</span><b>${eur(val)}</b></div>`:''}</div>
+    ${bassi.length?`<p class="vn-al">${ic('warn')} Da riordinare: ${bassi.map(v=>vnTit(v)+' ('+(+v.q||0)+')').join(', ')}</p>`:''}
+    ${top?`<span class="lbl">Più venduti questo mese</span><ol class="vn-top">${top}</ol>`:''}
+    <span class="lbl">Conta veloce</span><p class="muted small">− quando vendi una bottiglia, + quando arrivano.</p>
+    <div>${all.map(v=>`<div class="vn-inv"><div class="row-i"><div class="row-t">${vnTit(v)}</div><div class="row-m">${esc(v.cant||'')}${ven[v.id]?' · '+ven[v.id]+' vendute':''}</div></div><button type="button" class="icon-btn vn-pm" data-a="vnVen" data-v="${v.id}" aria-label="Venduta una bottiglia di ${esc(v.n)}">−</button><b class="vn-n ${!(+v.q)?'vn-zero':v.min>0&&(+v.q||0)<=v.min?'vn-basso':''}">${+v.q||0}</b><button type="button" class="icon-btn vn-pm" data-a="vnCar" data-v="${v.id}" aria-label="Arrivata una bottiglia di ${esc(v.n)}">+</button></div>`).join('')||'<p class="muted">Ancora nessun vino.</p>'}</div>`}
+  const q=norm(V.q),l=all.filter(v=>(!V.tipo||v.tipo===V.tipo)&&(!V.casa||(+v.q||0)>0)&&(!q||norm([v.n,v.cant,v.den,v.vit,v.ann].join(' ')).includes(q)));
+  return head+add+`<div class="search rc-cerca">${ic('search')}<input id="vnq" type="search" placeholder="Cerca vino, cantina o vitigno" value="${esc(V.q)}" data-in="vnq" autocomplete="off"></div>
+  <div class="chips">${[['','Tutti']].concat(Object.entries(VN_TIPI)).map(([k,t])=>`<button type="button" class="chip" aria-pressed="${V.tipo===k}" data-a="vnTipo" data-v="${k}">${t}</button>`).join('')}<button type="button" class="chip" aria-pressed="${V.casa}" data-a="vnCasa">Solo in casa</button></div>
+  <div>${l.length?l.map(v=>vnRow(v,ven[v.id])).join(''):`<p class="muted">${all.length?'Nessun vino trovato.'+(V.casa?' Togli «Solo in casa» per vedere anche quelli finiti.':''):can?'La cantina è vuota. Tocca «Fotografa una bottiglia»: l\'IA scrive la scheda del vino, tu controlli e salvi.':'La cantina è vuota: i vini li aggiunge il responsabile.'}</p>`}</div>`}
+function vnShow(id){S.vnId=id;openSheet({cls:'tall',live:()=>true,render:()=>{const v=vnGet(S.vnId),me=meU();if(!v)return`<div class="grab"></div><p class="muted">Vino eliminato.</p>`;
+  const q=+v.q||0,abb=VN_ABB.filter(x=>(v.abb||[]).includes(x[0])).map(x=>x[1]),ven=vnVenduti()[v.id]||0;
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t"><span class="vn-dot vn-${esc(v.tipo||'rosso')}" aria-hidden="true"></span> ${vnTit(v)}<div class="sh-s">${vnSub(v)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <div class="vn-tav"><span class="vn-tl">Al tavolo in 10 secondi</span>${v.frase?`<p class="vn-fr">«${esc(v.frase)}»</p>`:''}${v.parole?`<p class="vn-par">${esc(v.parole)}</p>`:''}
+    ${abb.length?`<p><b>Va con:</b> ${abb.map(esc).join(', ')}</p>`:''}${v.serv?`<p><b>Servizio:</b> ${esc(v.serv)}</p>`:''}${v.pv?`<p><b>Prezzo in carta:</b> ${eur(v.pv)}</p>`:''}</div>
+  <div class="vn-inv vn-inv1"><div class="row-i"><div class="row-t">In casa: ${q} ${q===1?'bottiglia':'bottiglie'}</div><div class="row-m">${ven?ven+' vendute questo mese':'Nessuna vendita questo mese'}${isMgr(me)&&v.pc?' · acquisto '+eur(v.pc):''}</div></div>
+    <button type="button" class="btn primary" data-a="vnVen" data-v="${v.id}">− Venduta</button><button type="button" class="btn ghost" data-a="vnCar" data-v="${v.id}">+ Arrivata</button></div>
+  ${v.vit?`<span class="lbl">Denominazione e vitigni</span><p class="vn-tx">${esc([v.den,v.vit].filter(Boolean).join(' — '))}</p>`:''}
+  ${VN_CAMPI.filter(([k])=>v[k]&&k!=='serv').map(([k,l])=>`<span class="lbl">${l}</span><p class="vn-tx">${esc(v[k])}</p>`).join('')}
+  ${v.ia?`<p class="muted small">Scheda scritta con l'IA${v.ia==='dubbio'?': il vino non era sicuro, controlla bene':''}.</p>`:''}
+  ${vnCan(me)?`<div class="sheet-foot btns" style="margin-top:18px"><button type="button" class="btn ghost" data-a="vnConta" data-v="${v.id}">Correggi il numero</button><button type="button" class="btn primary" data-a="vnEdit" data-v="${v.id}">${ic('pencil')} Modifica</button></div>`:''}`}})}
+function vnForm(v){const sv=x=>x==null||x===''?'':String(x).replace('.',',');const f=v?clone(v):{n:'',cant:'',ann:'',gr:'',tipo:'rosso',den:'',vit:'',storia:'',palato:'',naso:'',colore:'',abb:[],abbT:'',prod:'',serv:'',frase:'',parole:'',pv:'',pc:'',q:'',min:''};
+  for(const k of ['gr','pv','pc','q','min'])f[k]=sv(f[k]);f.abb=(f.abb||[]).slice();S.vnf=f;openSheet({cls:'tall',live:()=>true,render:vnFormH})}
+function vnFormH(){const f=S.vnf,me=meU(),inp=(k,l,ph,x)=>`<label class="lbl" for="vnf-${k}">${l}</label><input class="inp" id="vnf-${k}" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"${x||''}>`,
+  ta=(k,l,ph)=>`<label class="lbl" for="vnf-${k}">${l}</label><textarea class="inp vn-ta" id="vnf-${k}" data-in="vnf" data-k="${k}" rows="3" placeholder="${esc(ph||'')}">${esc(f[k])}</textarea>`,num_=(k,l,ph)=>`<label><span class="lbl">${l}</span><input class="inp" id="vnf-${k}" inputmode="decimal" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"></label>`;
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica vino':'Nuovo vino'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${f.busy?`<div class="vn-busy">${ic('clock')} L'IA sta scrivendo la scheda del vino…</div>`:`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} Foto dell'etichetta</button><button type="button" class="btn ghost" data-a="vnIa">${ic('sparkle')} Completa con l'IA</button></div>`}
+  ${f.ia?`<p class="vn-al">${ic('warn')} Scritto dall'IA${f.ia==='dubbio'?', che non era sicura del vino':''}: controlla annata, gradi e premi prima di salvare.</p>`:''}
+  ${inp('n','Nome del vino','Es. Tignanello')}${inp('cant','Cantina','Es. Antinori')}
+  <div class="ag-2">${num_('ann','Annata','Es. 2020')}${num_('gr','Gradi (% vol)','Es. 14,5')}</div>
+  <span class="lbl">Tipo</span><div class="chips">${Object.entries(VN_TIPI).map(([k,t])=>`<button type="button" class="chip" aria-pressed="${f.tipo===k}" data-a="vnfTipo" data-v="${k}">${t}</button>`).join('')}</div>
+  ${inp('den','Denominazione','Es. Toscana IGT')}${inp('vit','Vitigni','Es. 80% Sangiovese, 15% Cabernet Sauvignon')}
+  ${inp('frase','Frase da dire al tavolo','Una frase breve per proporlo al cliente')}${inp('parole','3 parole chiave','Es. Strutturato · Ciliegia · Vaniglia')}
+  <span class="lbl">Va con</span><div class="vn-abb">${VN_ABB.map(([k,l])=>`<button type="button" class="chip" aria-pressed="${f.abb.includes(k)}" data-a="vnfAbb" data-v="${k}">${l}</button>`).join('')}</div>
+  ${VN_CAMPI.map(([k,l])=>ta(k,l)).join('')}
+  <div class="ag-2">${num_('pv','Prezzo in carta €','Es. 60')}${isMgr(me)?num_('pc','Prezzo d\'acquisto €','Es. 28'):''}</div>
+  <div class="ag-2">${num_('q','Bottiglie in casa','0')}${num_('min','Avvisa sotto','Es. 2')}</div>
+  <div class="sheet-foot btns" style="margin-top:18px">${f.id?`<button type="button" class="btn ghost danger" data-a="vnDel">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary big" data-a="vnSave">${ic('check')} Salva</button></div>`}
+function vnPrompt(nome){return'Sei un sommelier esperto e aiuti i camerieri di un ristorante a Porto Cervo (Sardegna) a proporre i vini al tavolo. '+
+  (nome?'Il vino è: '+nome+'. ':'Questa è la foto dell\'etichetta (o della bottiglia) di un vino. ')+
+  'Rispondi SOLO con JSON valido, senza altro testo, con queste chiavi: {"nome":"nome del vino senza la cantina","cantina":"","annata":"AAAA oppure vuoto","gradi":numero oppure 0,"tipo":"rosso|bianco|rosato|bollicine|dolce",'+
+  '"denominazione":"es. Toscana IGT, Vermentino di Gallura DOCG","vitigni":"es. 85% Cabernet Sauvignon, 15% Cabernet Franc","storia":"2-3 frasi: storia della cantina o del vino, un aneddoto e i premi più noti","palato":"corpo, tannino, acidità e freschezza in 1-2 frasi",'+
+  '"naso":"i 3 o 4 profumi principali","colore":"colore nel bicchiere","abbinamento":"piatti con cui proporlo e perché si bilanciano, 1-2 frasi","abbinamenti":["carne","bianca","pesce","crudi","primi","formaggi","dolce","aperitivo"] (solo quelli adatti),'+
+  '"produzione":"come nasce: vinificazione e affinamento","servizio":"temperatura, tipo di calice, se decantare","frase":"una frase da dire al cliente al tavolo, al massimo 25 parole","parole":"3 parole chiave separate da · (es. Strutturato · Ciliegia · Vaniglia)","sicuro":true}. '+
+  'Annata e gradi: scrivili solo se li leggi sull\'etichetta o sono nel nome, altrimenti vuoto e 0. Premi: solo quelli che conosci con certezza, mai inventati. '+
+  'Se non riconosci il vino con certezza metti "sicuro":false e scrivi le parti generali in base a denominazione e vitigno. Testi in italiano semplice.'}
+function vnLeggi(txt){let a;try{const m=String(txt).match(/\{[\s\S]*\}/);a=JSON.parse(m?m[0]:txt)}catch(e){return null}if(!a||typeof a!=='object')return null;
+  const s=(k,n)=>String(a[k]==null?'':a[k]).trim().slice(0,n||600),tipo=String(a.tipo||'').toLowerCase(),gr=Number(String(a.gradi||'').replace(',','.'));
+  const r={n:s('nome',120),cant:s('cantina',120),ann:/^(19|20)\d{2}$/.test(s('annata'))?s('annata'):'',gr:gr>3&&gr<25?String(gr).replace('.',','):'',tipo:VN_TIPI[tipo]?tipo:/bollic|spumant|champ/.test(tipo)?'bollicine':'',
+    den:s('denominazione',160),vit:s('vitigni',200),storia:s('storia'),palato:s('palato'),naso:s('naso',300),colore:s('colore',200),abbT:s('abbinamento'),prod:s('produzione'),serv:s('servizio',300),frase:s('frase',220),parole:s('parole',120),
+    abb:(Array.isArray(a.abbinamenti)?a.abbinamenti:[]).map(x=>String(x).toLowerCase()).filter(x=>VN_ABB.some(y=>y[0]===x)),ia:a.sicuro===false?'dubbio':'si'};
+  return r.n||r.cant?r:null}
+function vnUnisci(f,r){for(const [k,x] of Object.entries(r)){if(k==='abb'){if(!f.abb.length)f.abb=x.slice();continue}if(k==='ia'){f.ia=x;continue}if(x&&!String(f[k]||'').trim())f[k]=x}
+  if(r.tipo&&!f.id&&!f._tipo)f.tipo=r.tipo}
+async function vnIaGo(files){const f=S.vnf;if(!f||f.busy)return;const nome=[f.n,f.cant,f.ann].map(x=>String(x||'').trim()).filter(Boolean).join(' ');
+  if(!files&&!nome)return toast('Scrivi prima il nome del vino (e la cantina).','warn');
+  f.busy=true;refreshSheet();try{const parts=[{text:vnPrompt(files?'':nome)}];if(files)for(const x of files.slice(0,2))parts.push({inline_data:{mime_type:'image/jpeg',data:await b64(await shrinkImg(x))}});
+    const g=await gemCall({contents:[{parts}],generationConfig:{temperature:0.2}});f.busy=false;
+    if(!g.txt){refreshSheet();return toast((g.err||'L\'IA non ha risposto.')+' Riprova.','warn')}
+    const r=vnLeggi(g.txt);if(!r){refreshSheet();return toast(files?'Non riconosco il vino nella foto. Riprova con l\'etichetta ben dritta e nitida.':'Non trovo questo vino. Controlla il nome.','warn')}
+    const dop=!f.id&&vnAll().find(v=>norm(v.n)===norm(r.n)&&norm(v.cant||'')===norm(r.cant||'')&&String(v.ann||'')===String(r.ann||''));
+    if(dop){closeSheet();toast('Questo vino è già in cantina.');return vnShow(dop.id)}
+    vnUnisci(f,r);refreshSheet()}
+  catch(e){f.busy=false;refreshSheet();toast(e&&e.code==='img'?'La foto non si apre: prova a rifarla.':'Non riesco a contattare l\'IA. Controlla la connessione.','warn')}}
+function vnFoto(nuovo){if(!gemOn())return toast('Per leggere le foto serve l\'IA del ristorante (Gemini): chiedi allo sviluppatore. Intanto scrivi il nome.','warn');
+  pickFile({accept:'image/*',capture:'environment'},fs=>{if(nuovo)vnForm(null);vnIaGo(fs)})}
+async function vnSave(){const f=S.vnf,me=realU();if(!f||!me)return;const n=f.n.trim();if(!n){toast('Scrivi il nome del vino','err');return}
+  const nn=x=>num(x)>0?num(x):null,old=f.id&&vnGet(f.id);
+  const v={id:f.id||uid(),n,cant:f.cant.trim(),ann:String(f.ann||'').trim(),gr:nn(f.gr),tipo:VN_TIPI[f.tipo]?f.tipo:'rosso',den:f.den.trim(),vit:f.vit.trim(),abb:f.abb.slice(),pv:nn(f.pv),pc:isMgr(meU())?nn(f.pc):(old&&old.pc)||null,
+    q:Math.max(0,Math.round(num(f.q)||0)),min:Math.max(0,Math.round(num(f.min)||0)),ia:f.ia||'',da:f.da||me.id,cr:f.cr||now(),mod:now()};
+  for(const [k] of VN_CAMPI)v[k]=String(f[k]||'').trim();v.frase=String(f.frase||'').trim();v.parole=String(f.parole||'').trim();
+  await vnPut(v);closeSheet();toast('Vino salvato');if(!f.id)vnShow(v.id)}
+async function vnDel(){const f=S.vnf;if(!f||!f.id)return closeSheet();
+  if(!await ask('Eliminare il vino?','«'+f.n+'» sparisce dalla cantina.','Elimina',true))return;
+  await upd('config','cantina',{['v.'+f.id]:null});closeSheet();closeSheet();toast('Vino eliminato')}
+async function vnConta(id){const v=vnGet(id);if(!v)return;const r=await ask('Quante bottiglie ci sono?','Conta le bottiglie di «'+v.n+'» e scrivi il numero giusto.','Salva',false,{label:'Bottiglie in casa',value:String(+v.q||0)});
+  if(!r||!String(r.v).trim())return;const n=Math.round(num(r.v));if(!(n>=0))return toast('Scrivi un numero.','warn');await vnMov(id,'conta',n)}
+
 const A={
   closeSheet:()=>closeSheet(),
   funzSet:d=>funzSet(d.k,d.v==='1'),agOpen:()=>agOpen(),
-  rcOpen:()=>rcOpen(),rcNew:()=>rcForm(null),rcEdit:d=>{const r=((D().config.ricette||{}).r||{})[d.v];if(r)rcForm(r)},rcPick:()=>rcPick(),rcAdd:d=>rcAdd(d.v),rcIngDel:d=>{S.rcf.ing.splice(+d.v,1);refreshSheet()},rcSave:()=>rcSave(),rcDel:()=>rcDel(),rcVisto:()=>rcVisto(),agV:d=>{S.ag.v=d.v;S.ag.sel='';refreshSheet()},agToday:()=>{S.ag.g=today();S.ag.sel='';refreshSheet()},
+  rcOpen:()=>rcOpen(),rcNew:()=>rcForm(null),rcEdit:d=>{const r=((D().config.ricette||{}).r||{})[d.v];if(r)rcForm(r)},rcPick:()=>rcPick(),rcAdd:d=>rcAdd(d.v),rcIngDel:d=>{S.rcf.ing.splice(+d.v,1);refreshSheet()},rcSave:()=>rcSave(),rcDel:()=>rcDel(),rcVisto:()=>rcVisto(),
+  vnOpen:()=>vnOpen(),vnV:d=>{S.vn.v=d.v;refreshSheet()},vnTipo:d=>{S.vn.tipo=d.v;refreshSheet()},vnCasa:()=>{S.vn.casa=!S.vn.casa;refreshSheet()},vnAbb:d=>{S.vn.abb=S.vn.abb===d.v?'':d.v;refreshSheet()},
+  vnShow:d=>vnShow(d.v),vnNew:()=>vnForm(null),vnEdit:d=>{const v=vnGet(d.v);if(v)vnForm(v)},vnFoto:()=>vnFoto(true),vnFotoF:()=>vnFoto(false),vnIa:()=>vnIaGo(null),vnSave:()=>vnSave(),vnDel:()=>vnDel(),
+  vnfTipo:d=>{S.vnf.tipo=d.v;S.vnf._tipo=1;refreshSheet()},vnfAbb:d=>{const l=S.vnf.abb,i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},
+  vnVen:d=>vnMov(d.v,'ven',1),vnCar:d=>vnMov(d.v,'car',1),vnConta:d=>vnConta(d.v),agV:d=>{S.ag.v=d.v;S.ag.sel='';refreshSheet()},agToday:()=>{S.ag.g=today();S.ag.sel='';refreshSheet()},
   agDayGo:d=>{S.ag.v='oggi';S.ag.g=d.v;S.ag.sel='';refreshSheet();const b=document.querySelector('.sheet.tall');if(b)b.scrollTop=0},
   agNewAt:d=>agForm({g:d.g||S.ag.g,h:d.v||''}),
   agNtAdd:async()=>{const u=realU(),g=S.ag.g,t=String(S.ag.nt||'').trim();if(!u)return;if(!t)return toast('Scrivi l\'appunto.','warn');const l=agNotes(g,u);if(l.length>=60)return toast('Al massimo 60 appunti al giorno.','warn');
@@ -5685,7 +5839,7 @@ const IN={
   pe:t=>{S.pe[t.dataset.k]=t.value},
   rv:t=>{if(S.rev)S.rev.items[+t.dataset.i][t.dataset.k]=t.dataset.k==='prezzo'?num(t.value):t.value},
   pkq:t=>{S.pkq=t.value;refreshSheet()},
-  rcq:t=>{S.rc.q=t.value;refreshSheet()},rcpq:t=>{S.rcpq=t.value;refreshSheet()},rcf:t=>{S.rcf[t.dataset.k]=t.value;refreshSheet()},rcfq:t=>{const g=S.rcf.ing[+t.dataset.i];if(g){g.q=t.value;refreshSheet()}},
+  rcq:t=>{S.rc.q=t.value;refreshSheet()},vnq:t=>{S.vn.q=t.value;refreshSheet()},vnf:t=>{if(S.vnf)S.vnf[t.dataset.k]=t.value},rcpq:t=>{S.rcpq=t.value;refreshSheet()},rcf:t=>{S.rcf[t.dataset.k]=t.value;refreshSheet()},rcfq:t=>{const g=S.rcf.ing[+t.dataset.i];if(g){g.q=t.value;refreshSheet()}},
   imptxt:t=>{S.imp.txt=t.value},
   askv:t=>{S.askVal=t.value},
   cfgName:t=>{S.cfgName=t.value},
