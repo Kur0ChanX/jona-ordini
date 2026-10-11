@@ -14,7 +14,7 @@ const stato=(p,t)=>p.evaluate(t=>{const l=document.querySelector('.splash .logo-
   for(const a of document.getAnimations()){a.pause();a.currentTime=t}
   const sl=getComputedStyle(l),sb=getComputedStyle(by),yn=document.querySelector('.splash .yn'),ps=[...document.querySelectorAll('.splash .ywr path')],dash=e=>+(+getComputedStyle(e).strokeDashoffset.replace('px','')).toFixed(2);const m=x=>x==='none'?new DOMMatrix():new DOMMatrix(x);const op=q=>+(+getComputedStyle(document.querySelector(q)).opacity).toFixed(3);
   const ml=m(sl.transform);return{anL:sl.animationName,anB:sb.animationName,sL:+ml.a.toFixed(3),sx:+ml.a.toFixed(3),sy:+ml.d.toFixed(3),oL:+(+sl.opacity).toFixed(3),sB:+m(sb.transform).a.toFixed(3),oB:+(+sb.opacity).toFixed(3),
-    rg:op('.splash .jrg'),d:Math.max(...[...document.querySelectorAll('.splash .jpb')].map(e=>+getComputedStyle(e).opacity)),np:document.querySelectorAll('.splash .jpb').length,vecchi:document.querySelectorAll('.splash .jfl,.splash .jd').length,nt:ps.length,t1:dash(ps[0]),tN:dash(ps[ps.length-1]),y0:op('.splash .y0'),oY:op('.splash .yn'),oS:op('.splash .wall-by>span'),sh:op('.splash .jsh'),oH:op('.splash .jhit'),shake:getComputedStyle(sp).transform!=='none',sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}},t);
+    rg:op('.splash .jrg'),d:Math.max(...[...document.querySelectorAll('.splash .jpb')].map(e=>+getComputedStyle(e).opacity)),np:document.querySelectorAll('.splash .jpb').length,vecchi:document.querySelectorAll('.splash .jfl,.splash .jd').length,nt:ps.length,t1:dash(ps[0]),tN:dash(ps[ps.length-1]),y0:op('.splash .y0'),oY:op('.splash .yn'),oS:op('.splash .wall-by>span'),sh:op('.splash .jsh'),oH:op('.splash .jhit'),shake:getComputedStyle(sp).transform!=='none',mt:getComputedStyle(sp).transform,sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}},t);
 for(const w of [320,390]){
   const {p,c,errs}=await apri(w,true);
   let s=await stato(p,0);ok(s&&s.anL==='jonaIn'&&s.nt===22&&s.np===34&&!s.vecchi,`${w}px: jonaIn, 22 tratti di YNOY (v70: coda con 4 lune), 34 granelli, niente bagliore né puntini vecchi ${JSON.stringify(s)}`);
@@ -23,6 +23,8 @@ for(const w of [320,390]){
   s=await stato(p,300);ok(s&&s.sL>1.2&&s.sw<=s.cw,`${w}px: mentre JONA è grande niente scorrimento di lato ${JSON.stringify(s)}`);
   s=await stato(p,640);ok(s&&s.sx>1.03&&s.sy<.95,`${w}px: al colpo JONA si schiaccia ${JSON.stringify(s)}`);
   ok(s&&s.rg>.3&&s.d>.3&&s.sh>.5&&s.shake,`${w}px: al colpo onde, granelli, ombra e scossa ${JSON.stringify(s)}`);
+  {const m=[];for(let t=560;t<=960;t+=40){const q=await stato(p,t);const v=(q.mt.match(/-?[\d.e-]+/g)||[]).map(Number);m.push(q.mt==='none'?[0,0]:[v[4],v[5]])}
+   ok(m.every(([x,y])=>Math.abs(x)<.01&&y>-1.5&&y<4.5)&&Math.max(...m.map(v=>v[1]))>2.5&&m[m.length-1][1]===0,`${w}px: v88 un solo colpo verticale (niente zig-zag), finito a 0,96 s ${JSON.stringify(m)}`)}
   s=await stato(p,2400);ok(s&&s.sL===1&&s.oL===1&&s.rg<.01,`${w}px: a 2,4 s JONA è ferma al suo posto ${JSON.stringify(s)}`);
   ok(s&&s.t1===0&&s.tN>0&&s.y0<.01,`${w}px: a 2,4 s YNOY è a metà scrittura (primo tratto fatto, ultimo no) ${JSON.stringify(s)}`);
   s=await stato(p,3000);ok(s&&s.tN===0&&s.y0===1&&s.oY===1&&s.oS===1&&s.oH===1,`${w}px: a 3 s YNOY è scritto e tutto si vede ${JSON.stringify(s)}`);

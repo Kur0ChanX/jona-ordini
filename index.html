@@ -96,7 +96,7 @@ img{max-width:100%}
 .splash .jsh{left:8%;right:8%;bottom:-14%;height:20%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.6),rgba(0,0,0,0));opacity:0}
 .splash .jrg{left:-4%;right:-4%;bottom:-16%;height:26%;border-radius:50%;border:2px solid rgba(237,230,223,.7);opacity:0}
 .splash .jpb{left:50%;bottom:-6%;width:var(--s);height:var(--s);border-radius:50%;background:#EDE6DF;opacity:0}
-.intro .splash{animation:jShake .5s .55s linear both}
+.intro .splash{animation:jShake .34s .55s cubic-bezier(.25,.6,.3,1) both}
 .intro .splash .logo-full{transform-origin:50% 88%;animation:jonaIn 1.2s linear both}
 .intro .splash .jsh{animation:jShadow 1.2s linear both}
 .intro .splash .jhit{animation:jAway .35s 3.25s cubic-bezier(.5,0,.75,0) forwards}
@@ -109,7 +109,7 @@ img{max-width:100%}
 @keyframes jShadow{0%{opacity:0;transform:scale(.15);animation-timing-function:cubic-bezier(.55,0,.95,.5)}46%{opacity:.75;transform:scale(1);animation-timing-function:ease-out}53%{opacity:1;transform:scaleX(1.3)}100%{opacity:.5;transform:none}}
 @keyframes jRing{0%{opacity:.9;transform:scale(.45);border-width:3px}100%{opacity:0;transform:scale(2.6);border-width:.5px}}
 @keyframes jPb{0%{opacity:0;transform:none}10%{opacity:var(--o)}60%{opacity:calc(var(--o)*.7)}100%{opacity:0;transform:translate(var(--x),var(--y))}}
-@keyframes jShake{0%,100%{transform:none}12%{transform:translate(0,7px)}28%{transform:translate(-4px,-3px)}44%{transform:translate(3px,2px)}62%{transform:translate(-2px,-1px)}80%{transform:translate(1px,0)}}
+@keyframes jShake{0%,100%{transform:none}20%{transform:translateY(4px)}48%{transform:translateY(-1px)}74%{transform:translateY(.4px)}}
 /* firma: prima «BY» (le due lettere cadono una alla volta), poi YNOY si scrive come a mano, tratto dopo tratto nell'ordine della scrittura (SVG: tratti di tools/ynoy-tratti.py che scoprono il logo), poi il riflesso; esce per ultima: prima sfuma JONA (3,25-3,6 s), poi BY e YNOY (3,48-3,78 s) */
 .splash .wall-by{opacity:1}
 .splash .wall-by span{color:#B9AEA2}
@@ -1212,8 +1212,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=87;
+const APP_VER=88;
 const NEWS=[
+  {v:88,data:'2026-10-12',titolo:'Colpo dell\'apertura più elegante',
+    tutti:['All\'apertura il logo dà un solo colpo verso il basso, breve e morbido, invece di far tremare lo schermo.'],
+    dev:{correzioni:['D40: `jShake` = un colpo verticale smorzato (4 px giù, rimbalzo 1 px, 0,34 s, `cubic-bezier(.25,.6,.3,1)`), niente zig-zag a destra/sinistra. Scelta di Mario (A Ovvia) dal video `docs/img/sessione-92/d40-confronto.mp4` (`tools/colpo-d40.mjs`). Prova in `tools/test-apertura-v62.mjs`.']}},
   {v:87,data:'2026-10-12',titolo:'Apertura pulita',
     tutti:['All\'apertura dell\'app non compaiono più le righe grigie a destra e in basso.','Cantina Vini: in «Più venduti» il numero sta a destra, sulla stessa riga del vino.'],
     dev:{correzioni:['D38: la scossa `jShake` spostava la `.splash` di 1-6 px e rendeva la pagina scorrevole (560-980 ms): Android mostrava le barre di scorrimento. Classe `on-splash` su `<html>` (in `render()`, con `S.splash`) e `html.on-splash #app{overflow:clip}`. Prova in `tools/test-apertura-v62.mjs`.','`.vn-top`: numero in `<b>` con `float:right` prima del nome. Prova in `tools/test-cantina.mjs`.']}},
