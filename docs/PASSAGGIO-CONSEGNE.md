@@ -1,31 +1,35 @@
-# Passaggio di consegne (2026-10-12, fine sessione #92)
+# Passaggio di consegne (2026-10-12, fine sessione #93)
 
-Sessione attuale: #93
+Sessione attuale: #94
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v88** (controllato `APP_VER=88` su https://jona-ristorante-by-ynoy-corp.pages.dev/ ). Nessuna PR aperta.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v88**. **PR #99 (v89) aperta**, da unire appena il controllo `prove` è verde.
 
-## ✅ SUBITO (#93)
-1. Niente di bloccante. Guardare il prossimo giro delle prove del lunedì (3:17): se rosso, priorità.
-2. **D39 disegni degli ingredienti del Bar**: si aspetta la scelta di Mario sullo stile (immagine `docs/img/sessione-91/d39-stili.png`, sorgente `tools/d39-stili.html`): A matita colorata, **B inchiostro e acquerello (consigliato)**, C linea unica. Chiedere a tocco con doppio tocco se non ha risposto, poi costruire solo quello scelto (riga D39 in `docs/DA-FARE.md`).
-3. Poi D33 (sotto): proposta con immagine e 3 strade.
+## ✅ SUBITO (#94)
+1. **PR #99 (v89, D39 disegni del Bar)**: aspettare il controllo `prove` (minuscolo, E33) sull'ultimo commit del ramo. Se verde → squash merge da solo (regola «pubblica sempre in automatico»), controllo online (`APP_VER=89` su https://jona-ristorante-by-ynoy-corp.pages.dev/ ), poi `git fetch origin main && git merge origin/main` sul ramo e push normale. Se rosso → capire la causa (E41: prove a mezzanotte? usare `tools/ora-fissa.mjs`). Mentre `prove` gira NON fare push sul ramo (E39). Dire a Mario in 2 righe che v89 è online.
+2. Poi D33 (sotto): proposta con immagine e 3 strade.
+3. Guardare il giro delle prove del lunedì (3:17): se rosso, priorità.
 
-## Fatto in #92 (12/10, ~0:15-0:55 ora italiana)
-- Scorta unita all'avvio (conflitto su `docs/ULTIMO-MESSAGGIO.md`: tenuto il messaggio più nuovo, quello della scossa).
-- **E41 risolto**: le prove rosse della PR #97 (`test-agenda-v59` «Settimana: domani mostra 1 appunto», `test-richieste-gestite` «Gestite: Oggi poi Ieri» e «3 giorni») erano girate alle 0:00 in punto (22:00 UTC). Causa: la prova calcola oggi/domani all'inizio e il giorno cambia a metà; `now-60000` subito dopo mezzanotte cade in «Ieri». App giusta. Nuovo `tools/ora-fissa.mjs`: `await oraFissa(ctx)` sostituisce `Date` nella pagina in modo che parta alle 12:00 di oggi e poi scorra normale. Usato nelle due prove. Riprodotto il fallimento spostando l'ora a 23:59:52 e 0:00:20 (stessi FAIL di GitHub), verde a mezzogiorno. Riga E41 in `docs/ERRORI.md`. Da usare in ogni prova nuova con giorni/settimane.
-- **PR #97 (v86+v87) unita** (squash `b0133e0`), v87 online. Titolo aggiornato «v86-v87: app più leggera, apertura pulita».
-- **D40 fatto, v88** (PR #98, squash `04d9f3c`, online): video di confronto `docs/img/sessione-92/d40-confronto.mp4` (Attuale | A Ovvia | B Furba micro-zoom | C Geniale colpo+zoom+ombra ai bordi; velocità vera poi rallentato ×4; script `tools/colpo-d40.mjs`). Mario ha scelto a tocco **A Ovvia** (confermata col doppio tocco). Ora `jShake` = `0%,100% none; 20% translateY(4px); 48% translateY(-1px); 74% translateY(.4px)`, `.intro .splash{animation:jShake .34s .55s cubic-bezier(.25,.6,.3,1) both}`. `APP_VER=88`, `CACHE` `jona-ordini-v92`, NEWS v88 «Colpo dell'apertura più elegante», riga v88 in CLAUDE.md. Prova nuova in `tools/test-apertura-v62.mjs`: da 560 a 960 ms ogni 40 ms la traslazione orizzontale è 0, verticale tra -1,5 e 4,5, massimo >2,5, a 960 ms ferma.
-- Vibrazione del telefono al colpo: NON fatta. Chrome blocca `navigator.vibrate` senza un tocco dell'utente, e all'apertura non c'è. Detto a Mario.
-- Mario ha chiesto se Context7 è installato: sì (`.mcp.json`, strumenti attivi). Risposto.
-- Dopo ogni squash: main identico al ramo (controllato con `git diff`), quindi unito con `git merge` tenendo il ramo, poi push normale.
+## Fatto in #93 (12/10, ~0:55-1:40 ora italiana)
+- Avvio: scorta unita due volte (conflitto solo sull'intestazione di `docs/ULTIMO-MESSAGGIO.md`, tenuta la più nuova). Push confermati.
+- Mario ha detto «vai»: rimandata l'immagine `docs/img/sessione-91/d39-stili.png`, domanda a tocco con doppio tocco. **Scelta: B · Inchiostro e acquerello, confermata** («Sì, confermo lo stile»). Ripetuta in chiaro nel testo (E38).
+- **D39 fatto, v89** (commit `4d88b2a`, PR #99):
+  - `tools/bar-disegni.mjs` → `data/bar-disegni.json` (43 disegni, 91 regole, 26 KB) e `tools/bar-disegni-anteprima.html` (foglio con tutti i disegni grandi e a 44 px). Disegni: lime, limone, arancia, pompelmo (fetta rosa a 10 spicchi), ananas, mirtillo, fragola, pesca, ciliegia, melograno, pomodoro, cocco, mela, passione, uva, cetriolo, peperoncino, oliva, menta, cannella, fiore, zucchero, miele, sciroppo, uovo, panna, caffe, soda, acqua, ghiaccio, sale, bitter, gin, vodka, rum, agave (tequila/mezcal), whisky, brandy, liquore (bottiglia tonda, colore dalla regola), bottiglia (aperitivi/vermouth/amari), vino, spumante, birra.
+  - Principio delle regole: alcolici → bottiglia o bicchiere (colore secondo il prodotto), analcolici → frutto/oggetto. Prima regola che corrisponde vince (es. «cherry brandy» e «crema di whisky» prima di brandy/whisky). Senza regola: liquore se alcolico, acqua se no.
+  - index.html: `brDisLoad` (fetch all'apertura del Bar e in `brShowC`, inietta una volta `<svg id="br-defs">` con il filtro `#br-wash`), `brDisK`, `brDis(nome,alc)`. Scheda del cocktail: `.br-ing.br-carta` (carta chiara anche nel tema scuro, testo #2a2420, margine rosso a 60 px), disegno 44 px per ingrediente. Inventario: `.lbl.br-gl` con disegno 30 px (linee `var(--ink2)`, così si vedono nel tema scuro). `html.lite` spegne il filtro e i puntini della carta.
+  - sw.js: `CACHE` `jona-ordini-v93`, `./data/bar-disegni.json` in `FILES`. Il deploy copia già tutta `data`.
+  - `APP_VER=89`, NEWS v89 «Bar: ingredienti disegnati», riga v89 in CLAUDE.md, D39 aggiornata in `docs/DA-FARE.md`.
+  - Prova `tools/test-bar-disegni.mjs` (24 PASS; ogni ingrediente di `cocktail.json` e ogni tipo di `BR_CAT` ha una regola; lite spegne l'acquerello; tema scuro; file mancante con `serviceWorkers:'block'` → lista di prima senza errori). Aggiunta a `VELOCI` in `tools/prova-ci.sh`.
+  - Verdi in locale: test-bar-disegni, test-bar, test-news, test-demo, test-leggera, test-giro.
+  - Foto mandata a Mario: Negroni, Mojito, inventario, chiaro e scuro (rifarla: demo → Fornitori → Bar → cerca nel campo `#brq`).
 
 ## Domanda aperta a Mario (scritta nel testo in #87, ancora senza risposta)
 «Oggi come registrate i vini venduti? Scontrino di cassa (con quale programma?), comanda su carta, oppure niente?» → serve per collegare le vendite (es. foto della chiusura di cassa letta dall'IA). Fino alla risposta resta «− Venduta».
 
 ## Prossimi lavori (in ordine, da soli, pubblicare in automatico se le prove sono verdi)
-1. D39 dopo la scelta di Mario.
-2. D33 (funzioni smart per orari e agenda): proposta con immagine + 3 strade (sotto). È una scelta di Mario: domanda nel testo (E38).
-3. Idee per il Bar (da proporre solo se utili): «Cocktail della casa» (ricette del bartender), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
-4. `tools/misura-velocita.mjs` nelle prove di GitHub? Decidere dopo qualche misura (i tempi su GitHub cambiano).
+1. Unire PR #99 (sopra).
+2. D33 (funzioni smart per orari e agenda): proposta con immagine + 3 strade (sotto). È una scelta di Mario: domanda a tocco con doppio tocco, ripetendo in chiaro la scelta prima di costruire (E37/E38).
+3. Idee per il Bar (da proporre solo se utili): «Cocktail della casa» (ricette del bartender, con disegni già pronti), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
+4. `tools/misura-velocita.mjs` nelle prove di GitHub? Decidere dopo qualche misura.
 
 ## D33 — funzioni smart per orari e agenda (chiesto da Mario, ancora da proporre)
 Controllato che NON esistono già: richieste di indisponibilità/ferie dallo staff; promemoria del turno (sera prima / 1 ora prima); turni proposti in automatico dai coperti dell'agenda; costo del personale della settimana. Esistono già: «Copia settimana prima», turni tipo, assenze (R/F/M/P), cambi turno, timbratura QR, «In turno oggi», agenda con ripetizioni e appunti, coperti in ordine suggerito.
@@ -38,7 +42,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = lo staff segna i giorni in 
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #92 `session_01XEe2wGYr9SNdFKhqLniFbG` (chiusa), #91 `session_01DWN2LgoPJUedg9xmjS3opj`, #90 `session_01MAqfbJ8neGEZiNgRVBCjCA`, #89 `session_01Y1ek4ZACQwmsRsQn8vWqyn`, #88 `session_0199ANgsgVouZX79Xd7QJFZX`, #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #93 `session_01Q2KYN7TKMEbWP23X6HfPYB` (chiusa), #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj`, #90 `session_01MAqfbJ8neGEZiNgRVBCjCA`, #89 `session_01Y1ek4ZACQwmsRsQn8vWqyn`, #88 `session_0199ANgsgVouZX79Xd7QJFZX`, #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -59,6 +63,5 @@ Idee: Ovvia = promemoria del turno via push; Furba = lo staff segna i giorni in 
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-«hai installato context 7?»
-(12/10/2026 ~0:40 ora italiana, in #92). Già risposto: sì.
-Prima, a tocco: scossa «A Ovvia», confermata. Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+«vai»
+(12/10/2026 ~0:55 ora italiana, in #93, in risposta a «vuoi che ti rimandi l'immagine dei 3 stili?»). Poi, a tocco: stile **B Inchiostro**, «Sì, confermo lo stile». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
