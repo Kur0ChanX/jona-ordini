@@ -58,6 +58,9 @@ await pg.locator('.sheet .br-r',{hasText:/^Negroni/}).first().click();await wait
 t=await txt('.sheet');
 ok(/Negroni/.test(t)&&/IBA/.test(t)&&/3 cl Gin/.test(t)&&/Old fashioned/.test(t)&&/Mezza fetta d'arancia/.test(t),'scheda: dosi, bicchiere e guarnizione');
 ok(!/in casa|manca/.test(t),'senza inventario niente «in casa / manca»');
+ok(await pg.locator('.sheet .br-ol li').count()===4&&await pg.locator('.sheet .br-pas').count()===0,'scheda: 4 passaggi numerati (D43)');
+ok(await pg.evaluate(()=>{const l=document.querySelector('.sheet .br-ol li');return l&&getComputedStyle(l,'::before').content==='counter(n)'&&l.getBoundingClientRect().width<=document.documentElement.clientWidth}),'passaggi con il numero nel cerchietto, dentro lo schermo');
+ok(/Mescola con il cucchiaio lungo per 10-15 secondi/.test(t),'testo del passaggio');
 await sc('[data-a="closeSheet"]');await wait(300);
 // inventario
 await sc('[data-a="brV"][data-v="inv"]');await wait(200);

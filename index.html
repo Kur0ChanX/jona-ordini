@@ -623,7 +623,7 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .br-tav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.br-tav b{display:block;font-size:14.5px;margin-top:2px;overflow-wrap:anywhere}
 .br-ing{border-top:1px solid var(--line);margin-bottom:6px}.br-ir{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
 .br-ir b{flex:none;min-width:84px;font-variant-numeric:tabular-nums}.br-ir span{flex:1;min-width:0;overflow-wrap:anywhere}.br-ir i{flex:none;font-style:normal;font-size:12px;padding:2px 8px;border-radius:999px}
-.br-ok{background:var(--lagoon-soft);color:var(--lagoon)}.br-no{background:var(--sunk);color:var(--corallo)}.br-pas{margin-top:6px}
+.br-ok{background:var(--lagoon-soft);color:var(--lagoon)}.br-no{background:var(--sunk);color:var(--corallo)}.br-pas{margin-top:6px}.br-ol{margin:8px 0 0;padding:0;list-style:none;counter-reset:n}.br-ol li{counter-increment:n;display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);line-height:1.4}.br-ol li:last-child{border:0}.br-ol li::before{content:counter(n);flex:none;width:26px;height:26px;border-radius:50%;background:var(--lagoon);color:var(--on-lagoon);font-weight:600;font-size:14px;display:grid;place-items:center}
 .br-dis{flex:none;width:44px;height:44px;overflow:visible}.br-dis .wa{opacity:.62;filter:url(#br-wash)}.br-dis .ink{fill:none;stroke:#2a2420;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.br-dis .inkp{fill:#2a2420}
 html.lite .br-dis .wa{filter:none}
 .br-gl{display:flex;align-items:center;gap:8px}.br-gl .br-dis{width:30px;height:30px}.br-gl .br-dis .ink{stroke:var(--ink2)}.br-gl .br-dis .inkp{fill:var(--ink2)}
@@ -1231,8 +1231,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=93;
+const APP_VER=94;
 const NEWS=[
+  {v:94,data:'2026-10-12',titolo:'Bar: passaggi numerati',
+    tutti:['Ogni cocktail ha i passaggi numerati, uno per riga, con i trucchi del bancone.'],
+    dev:['D43: `tools/cocktail.txt` campo 6 = passi separati da « / » (3-5, controllo in `tools/cocktail.py`), `data/cocktail.json` `c[6]` lista; `brCk` li mostra in `.br-ol` (il vecchio file con la frase va ancora). Prova in `tools/test-bar.mjs`.']},
   {v:93,data:'2026-10-12',titolo:'Cantina: fronte e retro della bottiglia',
     tutti:['Fotografando un vino ora puoi aggiungere anche il retro dell\'etichetta (fino a 3 foto): l\'IA le legge insieme e la scheda viene più precisa.','Ogni foto si può togliere prima di leggere; c\'è anche «Galleria» per le foto già fatte.'],
     dev:['D44: `vnFotoAdd`/`vnFotoH` (riquadro con le miniature, `VN_FMAX` 3, «Leggi con l\'IA» `vnFotoGo`), `vnIaGo` usa i lettori `GEM_LETT` come i listini (tutte le foto in una richiesta; Cloudflare riprova con la sola prima foto), lettore dal vivo nel riquadro «L\'IA sta…». Prova in `tools/test-cantina.mjs`.','Barra Test: vista «Bar» in fondo (`VIEW_AS.bar`, staff di sala con mansione Bartender) per provare ciò che vede il barista (prova `tools/test-testbar.mjs`).']},
@@ -5841,7 +5844,7 @@ function brShowC(i){S.brC=+i;if(!BR_DIS)brDisLoad().then(()=>refreshSheet()).cat
   ${(d=>d?`<div class="br-ckbig">${d}</div>`:'')(brCkDis(c))}<div class="vn-tav br-tav"><div><span class="vn-tl">Metodo</span><b>${esc(met[0])}</b></div><div><span class="vn-tl">Bicchiere</span><b>${esc(c.g)}</b></div><div><span class="vn-tl">Guarnizione</span><b>${esc(c.gu)}</b></div></div>
   <span class="lbl">Ingredienti</span><div class="br-ing${BR_DIS?' br-carta':''}">${c.ing.map(x=>{const ok=inv&&x[3]?inv.has(brBase(x[2])):null;
     return`<div class="br-ir">${brDis(brBase(x[2]),x[3])}<b>${esc(x[0]==='top'?'top':x[0]+(x[1]?' '+x[1]:''))}</b><span>${esc(x[2])}</span>${ok===null?'':ok?`<i class="br-ok">in casa</i>`:`<i class="br-no">manca</i>`}</div>`}).join('')}</div>
-  <span class="lbl">Come si fa</span><p class="vn-tx">${esc(met[1])}</p><p class="vn-tx br-pas">${esc(c.p)}</p>`}})}
+  <span class="lbl">Come si fa</span><p class="vn-tx">${esc(met[1])}</p>${Array.isArray(c.p)?`<ol class="br-ol">${c.p.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:`<p class="vn-tx br-pas">${esc(c.p)}</p>`}`}})}
 async function brPut(b){if(D().config.bar)await upd('config','bar',{['b.'+b.id]:b});else await put('config','bar',{tipo:'bar',b:{[b.id]:b}})}
 async function brSet(id,pi,ap,t){const b=brGet(id),me=realU();if(!b||!me)return;pi=Math.max(0,Math.round(pi));ap=Math.min(1,Math.max(0,+ap||0));
   const d=Math.round((pi+ap-brTot(b))*1000)/1000;if(!d&&pi===(+b.pi||0))return;
