@@ -1,16 +1,18 @@
-# Passaggio di consegne (2026-10-12, fine sessione #111)
+# Passaggio di consegne (2026-10-12, sessione #112)
 
 Sessione attuale: #112
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v96 nella PR #106** (vedi SUBITO 1). v95 online (controllato: `APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/). Nel ramo: `APP_VER` 96, `CACHE` `jona-ordini-v100`.
 
 ## ✅ SUBITO (#112)
-1. 🔴 **PR #106 (v96, D45)**: controllare il controllo «prove» sull'ultimo commit della PR (in #111: `7415c27`, giro partito ~14:40 ora italiana; se c'è un commit di consegne dopo, il giro è ripartito su quello). Se VERDE: squash (titolo «v96: foto del vino su iPhone non fa più ripartire l'app (D45)»), subito `git fetch origin main && git merge origin/main` nel ramo + push, controllo online `APP_VER` 96 su https://jona-ristorante-by-ynoy-corp.pages.dev/. Se ROSSO: il log di GitHub mostra solo le prime 5 righe FAIL (`grep -m5 '^FAIL'` in `tools/prova-ci.sh`); se una prova cade senza FAIL (eccezione) il registro intero è nell'artifact `registri-prove` dell'esecuzione.
-2. Poi dire a Mario: v96 online → riprovare Cantina → **Fotografa una bottiglia** sull'iPhone; se l'IA passa al lettore di riserva la scheda scrive il motivo vero.
-3. `test-dispositivi` (D46) era VERDE su GitHub già nel giro di `1ebde2e` (iPhone 15, iPad, Desktop Safari, Pixel 7, Galaxy Tab S4).
-4. Dopo: difetto 18 (Americano: arancia e scorza sovrapposte) e proposta SMART cocktail «bellissimi» (vedi «Idee»).
-5. Mario (#106): «pubblica ogni tanto gli aggiornamenti».
-6. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+1. ✅ v96 ONLINE (PR #106 squash `9879904`, main unito nel ramo, `APP_VER` 96 controllato online 16:20 ora italiana). Prove GitHub verdi su `54fd0ed` (test-foto-vino 72 PASS su PC, Mac, iPhone, iPad, tablet e telefono Android).
+2. Detto a Mario: riprovare Cantina → **Fotografa una bottiglia** sull'iPhone.
+3. Dopo: difetto 18 (Americano: arancia e scorza sovrapposte) e proposta SMART cocktail «bellissimi» (vedi «Idee»).
+4. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+
+## Fatto in #112 (12/10, ~15:20-16:20 ora italiana)
+- Scorta unita (vecchia, solo ULTIMO-MESSAGGIO). Il giro «bloccato» della #111 non lo era: 31 minuti di installazione dei browser su GitHub.
+- Giro su `4014f1b`: `test-foto-vino` Mac «page.reload: Page crashed» (ricarica con la finestra dei file aperta). Corretto: «fotocamera aperta + app chiusa» = pagina nuova nello stesso contesto (`nuova()`), la vecchia chiusa (`54fd0ed`). E49 in ERRORI.
 
 ## Fatto in #111 (12/10, ~13:25-14:45 ora italiana)
 - Avvio: scorta unita (solo ULTIMO-MESSAGGIO «via»), push.
