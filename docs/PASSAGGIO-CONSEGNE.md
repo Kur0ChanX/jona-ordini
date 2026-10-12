@@ -8,8 +8,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 
 ## ✅ SUBITO (#116)
 0. **PR #108 v98 (cannuccia al centro)** aperta alle 20:18 dal ramo unico, prove su GitHub in corso. Se verdi: squash merge, SUBITO `git fetch origin main && git merge origin/main` + push, controllo `APP_VER` 98 online, avvisare Mario. Se rosse: capire e correggere. Iscriviti alla PR (`subscribe_pr_activity` 108): la #115 si è tolta e ha cancellato il suo controllo di sicurezza.
-1. 🆕 **Mario ha approvato lo stile della prova «cocktail bellissimi»** (scritto nella #114 chiusa, ~20:20): «si è quello che volevo dimmi come hai fatto questo stile che salvo il prompt di questi disegni bellissimi che sistema hai cambiato per disegnare cosí?». La #114 gli ha già risposto (SVG scritti a mano, niente IA, prompt da salvare). Da fare (nuovo D, più sessioni): portare lo stile di `tools/bozze/cocktail-bellissimi.mjs` in TUTTI i 212 cocktail rifacendo il generatore `tools/bar-disegni.mjs`: sfumature del drink, vetro trasparente, luce a pennellata piena, cubo di ghiaccio trasparente col colore del drink, frutta/menta dentro, bolle, gocce, acquerello (feTurbulence, spento con `lite`). Vincoli: peso `data/bar-disegni.json` < 30 KB compressi (prova), lista a 44 px leggibile, regola di stile #101 (niente tratti neri), cannuccia dal centro (v98), prove `test-bar-disegni` da aggiornare. Prima: piano a passi (es. bicchieri → ghiaccio → frutta → luce) con foto prima/dopo a ogni passo; voce **D48** in `docs/DA-FARE.md`.
-2. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
+1. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
 
 ## Fatto in #115 (12/10, ~20:12-20:32 ora italiana)
 - Scorta unita due volte (solo ULTIMO-MESSAGGIO).
@@ -69,6 +68,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - #103: regola di stile applicata ai pezzi dei cocktail (`c`/`cf`/`cp` col tono scuro del pezzo, `LEGNO`), tazza di rame dei Mule (`rm|`, `sf|`, `oc`), niente `badge`, cannuccia e ombrellino, agrumi con albedo e `twist`. Dettagli nella riga v92 di CLAUDE.md e nella storia dei commit.
 
 ## Idee (da #100)
+- **D48 cocktail «bellissimi» per tutti i 212** — RIMANDATA da Mario 12/10 ~20:45 («tienila come opzione la faremo più avanti»). Bozza `tools/bozze/cocktail-bellissimi.mjs`, foto `docs/img/sessione-114/cocktail-prova-1di2.png` e `-2di2.png`. Piano: rifare `tools/bar-disegni.mjs` a passi (bicchieri → ghiaccio → frutta → luce) con sfumature, vetro trasparente, luce a pennellata, cubo trasparente col colore del drink, frutta/menta dentro, bolle, gocce, acquerello (feTurbulence, spento con `lite`); vincoli peso < 30 KB compressi, lista 44 px, regola #101, cannuccia dal centro. Voce D48 in DA-FARE.
 - **SMART per cocktail «bellissimi»** (Mario «non bellissime… mi accontento»): UNA strada più ambiziosa, con bozza ferma e domanda (E19/E38). Spunti: ghiaccio a tanti cerchietti chiari, frutta grande DENTRO il bicchiere (spicchi di lime nel Mojito), contorni delle guarnizioni colorati, tratto a pennello con spessore che cambia, superficie schiumosa, ciliegina con riflesso.
 
 ## Fatto in #100-#102 (riassunto)
@@ -110,6 +110,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+(12/10/2026 ~20:45 ora italiana, nella #115 chiusa, girato dalla #115) «tienila come opzione la faremo più avanti, però tieni l'idea e salvala,la facciamo piú avanti» (su D48 cocktail bellissimi).
 (12/10/2026 ~20:40 ora italiana, nella #115 chiusa, girato dalla #115) «Ok, però utilizzerò utilizzando il token per fare tutti i disegni, giusto?» → la #115: sì, token solo mentre si lavora al generatore (stima 2-4 sessioni), non i 212 a mano; dopo, guardarli nell'app non costa token; si risparmia lavorando a passi, foto piccole, prove col collaudo.
 (12/10/2026 ~20:35 ora italiana, nella #115 chiusa, girato dalla #115) «No, sì, allora il prompt è molto chiaro, però tipo, perché prima facevi delle linee, cioè, che facevano, non erano belle, erano proprio minimal. E adesso i disegni sono molto più belli, cioè, che cosa è cambiato? Sembra che è cambiato il motore di disegno. E cosa è cambiato? Cioè, sembra che prima avevi tipo una versione light e adesso la versione avanzata. Cosa hai fatto per disegnare così bene i dettagli e tutto?» → la #115 ha risposto: stesso motore (SVG), prima generatore automatico per 212 con limiti (peso, lista 44 px, pezzi riusati, colori piatti), la prova è a mano su 3 senza limiti; per D48 servono quelle tecniche nel generatore badando al peso.
 (12/10/2026 ~20:20 ora italiana, nella #114 chiusa, girato dalla #114) «si è quello che volevo dimmi come hai fatto questo stile che salvo il prompt di questi disegni bellissimi che sistema hai cambiato per disegnare cosí?»
