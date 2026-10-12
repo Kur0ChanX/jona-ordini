@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~0:55 ora italiana, sessione #93)
+# Ultimo messaggio di Mario (12/10/2026 07:02 ora italiana)
 
-vai
+This session's worker process was restarted. If your previous turn was already complete, take no action and wait for the next event. Otherwise, continue from where you left off.
