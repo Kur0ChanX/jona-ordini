@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~9:58 ora italiana, sessione #99)
+# Ultimo messaggio di Mario (12/10/2026 ~10:00 ora italiana, sessione #99 chiusa)
 
-Non bellissime fai la C mi accontento.... (risposta a tocco: stile C dei cocktail, confermata «Sì, confermo lo stile»)
+Aggiungi i passaggi come si fà nei  cocktail in modo piú chiaro con qualche dettaglio in piú senza essere troppo corto al troppo lungo
