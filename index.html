@@ -1231,8 +1231,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=94;
+const APP_VER=95;
 const NEWS=[
+  {v:95,data:'2026-10-12',titolo:'Bar: colori dei cocktail più giusti',
+    tutti:['I disegni dei cocktail hanno colori più fedeli: Kir rosa, Blue Lagoon blu, Bramble e El Diablo rosso-viola, Arnold Palmer color tè.','White Russian con la panna ben visibile, Espresso Tonic con il caffè sopra, schiume più pulite.'],
+    dev:['Difetti #101 (5-15, 19, 21): `COLX` e `LAY` in `tools/bar-disegni.mjs`, onda della schiuma `wavy` color vetro, Painkiller crema/arancio, fiamma della scorza attaccata (Oaxaca). Prova `tools/test-bar-disegni.mjs`.']},
   {v:94,data:'2026-10-12',titolo:'Bar: passaggi numerati',
     tutti:['Ogni cocktail ha i passaggi numerati, uno per riga, con i trucchi del bancone.'],
     dev:['D43: `tools/cocktail.txt` campo 6 = passi separati da « / » (3-5, controllo in `tools/cocktail.py`), `data/cocktail.json` `c[6]` lista; `brCk` li mostra in `.br-ol` (il vecchio file con la frase va ancora). Prova in `tools/test-bar.mjs`.']},

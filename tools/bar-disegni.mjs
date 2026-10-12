@@ -320,7 +320,10 @@ const R = [...R0,
 ];
 for (const [, k] of R) if (!G[k]) throw new Error('disegno mancante: ' + k);
 // ── cocktail (v90): bicchiere + colore del drink calcolato dagli ingredienti + ghiaccio, bollicine, guarnizione
-const CKS = JSON.parse(readFileSync(new URL('../data/cocktail.json', import.meta.url), 'utf8')).c;
+// v94: c[6] ora è la lista dei passaggi (D43), che confonde le regole del disegno («shaker senza ghiaccio», «filtra» nei long drink):
+// i disegni leggono la vecchia frase della preparazione (tools/cocktail-frasi.json); per un cocktail nuovo i passaggi uniti
+const FRASI = JSON.parse(readFileSync(new URL('./cocktail-frasi.json', import.meta.url), 'utf8'));
+const CKS = JSON.parse(readFileSync(new URL('../data/cocktail.json', import.meta.url), 'utf8')).c.map(c => { const x = [...c]; x[6] = FRASI[c[0]] ?? (Array.isArray(c[6]) ? c[6].join(' ') : c[6]); return x; });
 const BIC = {
   'Old fashioned': { o: 'M15 24L18 58H46L49 24', liq: 'M15.8 33L18 58H46L48.2 33Z', top: 33, rim: [47, 24], ice: [[24, 40], [37, 42]], extra: L('M18 58H46') },
   'Highball': { o: 'M20 8L22 59H42L44 8', liq: 'M20.5 17L22 59H42L43.5 17Z', top: 17, rim: [42.5, 8], ice: [[27, 26], [36, 36], [28, 46]] },
@@ -505,7 +508,7 @@ function umbrella(g, col) {
   return joinX({ d: L(`M${cx} ${cy - 1}L${f1(cx + 8)} ${f1(g.top + 10)}`) }, { w: [[col, pa(can), .92]], d: L(can), f: L(`M${cx} ${cy}L${cx - 5} ${cy + 6.6}M${cx} ${cy}V${cy + 6.8}M${cx} ${cy}L${cx + 5} ${cy + 6.6}`) });
 }
 // schiuma (albume, crema del caffè, arancia sbattuta): fascia chiara in cima al liquido
-const wavy = y => `<path d="M0 ${f1(y)}${Array.from({ length: 8 }, (_, i) => `Q${4 + i * 8} ${f1(y + (i % 2 ? 1 : -1))} ${8 + i * 8} ${f1(y)}`).join('')}" style="fill:none;stroke:var(--ink2,#3a302b);stroke-width:.8"/>`;
+const wavy = y => `<path d="M0 ${f1(y)}${Array.from({ length: 8 }, (_, i) => `Q${4 + i * 8} ${f1(y + (i % 2 ? 1 : -1))} ${8 + i * 8} ${f1(y)}`).join('')}" style="fill:none;stroke:var(--vetro2,#8DB5BB);stroke-width:.8"/>`;
 const foam = (g, c = '#FBF6EC', h = 4.5) => ({ q: [[c, band(g.top - 2, g.top + h) + wavy(g.top + h), .95]], w: [[c, E(32, g.top, g.sx, 1.9), 1]] });
 // schiuma che sale sopra il bordo (Ramos Gin Fizz)
 const foamTall = g => { const d = `M${32 - g.rx} ${g.y0}C${32 - g.rx} ${g.y0 - 10} ${32 + g.rx} ${g.y0 - 10} ${32 + g.rx} ${g.y0}`; return { q: [['#FBF6EC', band(g.top - 2, g.top + 9), .95]], w: [['#FBF6EC', pa(d + 'Z'), 1]], d: sw(1.4, L(d)), f: C(28, g.y0 - 3, .6) + C(34, g.y0 - 5, .5) + C(38, g.y0 - 2, .6) + C(31, g.top + 4, .5) }; };
@@ -542,11 +545,14 @@ const cinnamon = g => ({ w: [['#A0623A', `<rect x="38" y="${g.y0 - 9}" width="3.
 const LAY = {
   'Tequila Sunrise': [['#C8283A', .58, 1, .85], ['#E0503A', .4, .6, .55]], 'B-52': [['#5A3420', .66, 1, .95], ['#E6D3B0', .33, .66, .95]],
   'Baby Guinness': [['#EDE0C4', 0, .3, .95]], 'Slippery Nipple': [['#D8BE94', 0, .45, .9]], 'Black Velvet': [['#3A2418', .42, 1, .92]],
-  "Dark 'n' Stormy": [['#6B3A1E', 0, .3, .85]], 'White Russian': [['#F4EEE2', 0, .3, .95]], 'New York Sour': [['#7A1E2E', 0, .24, .92]],
+  "Dark 'n' Stormy": [['#6B3A1E', 0, .3, .85]], 'White Russian': [['#F7F2E8', 0, .46, .97]], 'Espresso Tonic': [['#3A2418', 0, .34, .95]], 'New York Sour': [['#7A1E2E', 0, .24, .92]],
   'Shirley Temple': [['#C8283A', .78, 1, .8]], 'Roy Rogers': [['#A8202E', .78, 1, .75]], 'Sex on the Beach': [['#B8283A', .7, 1, .55]], 'Bay Breeze': [['#B8283A', 0, .28, .5]],
 };
 // colore del liquido scelto a mano (strati, bicchieri dentro altri)
-const COLX = { 'White Russian': '#5E3E2A', 'Black Russian': '#3B2416', 'Piña Colada': '#F2E6C2', 'Virgin Colada': '#F4EBCB', 'Batida de coco': '#F1ECDF', 'Blue Hawaiian': '#5FB8D0', 'B-52': '#E8A03A', 'Baby Guinness': '#2E1C14', 'Slippery Nipple': '#EFEBDD', 'Black Velvet': '#E9D08A', "Dark 'n' Stormy": '#D9B878', 'Jägerbomb': '#D9BC52', 'Tequila Sunrise': '#F0A030' };
+const COLX = { 'White Russian': '#7A5236', 'Black Russian': '#3B2416', 'Piña Colada': '#F2E6C2', 'Virgin Colada': '#F4EBCB', 'Batida de coco': '#F1ECDF', 'Blue Hawaiian': '#5FB8D0', 'B-52': '#E8A03A', 'Baby Guinness': '#2E1C14', 'Slippery Nipple': '#EFEBDD', 'Black Velvet': '#E9D08A', "Dark 'n' Stormy": '#D9B878', 'Jägerbomb': '#D9BC52', 'Tequila Sunrise': '#F0A030',
+  Kir: '#D8687A', 'Kir Royal': '#C2385A', 'Blue Lagoon': '#2E8ED6', 'AMF (Adios)': '#3A9FD8', 'White Port Tonic': '#F0DC98', 'Oaxaca Old Fashioned': '#C27A2C',
+  'Russian Spring Punch': '#B23A5E', 'El Diablo': '#9C2C4C', 'Mirto Spritz': '#7C2848', Bramble: '#8C2244', 'Espresso Tonic': '#E6E0CC',
+  'Woo Woo': '#E8607E', 'Cape Codder': '#A8142C', Stinger: '#C88A3C', 'Arnold Palmer': '#A8682E' };
 const SCHIUMA = { Garibaldi: '#F8D7A8', 'Espresso Martini': '#C8A27A', 'Caffè shakerato': '#D8B48A', Sgroppino: '#FBF3D2' };
 const CREMA = /panna|latte|crema di cocco|gelato|purea|tuorlo|liquore all'uovo|crema di whisky/i;
 // una frase della guarnizione → [tipo, dettagli]
@@ -603,7 +609,7 @@ function garn(txt, bk, nome) {
     if (R0) { const [x, y] = rim(); at = '@' + f1(x) + ',' + f1(y); if (k === 'agrumi') rim(); }
     if (k === 'agrume') { key += a + b + (c ? 'c' : ''); p = b === 's' ? wedge(a, 0, 0) : wheel(a, 0, 0, 6.2, b === 'm'); if (b === 'm') key = a === 'arancia' ? 'aranciaM' : a + 'M'; if (c) p = joinX(p, { p: [[-2, -2], [2.4, -1], [0, 2.6]].map(([u, v]) => C(u, v, .8)).join('') });
       if (flag === t) { p = joinX(p, { d: sw(1.1, L('M1-13L-1 3')) }, cherry(.6, -9, 2.4, false)); key += 'C'; } }
-    else if (k === 'scorza') { const col = { limone: '#F2CF3B', lime: '#8DBA3A', arancia: '#F0A23A', pompelmo: '#E8826A' }[a]; key += a + (b ? 'F' : ''); p = b ? joinX(twist(0, 0, col, a), flame(9, -9)) : twist(0, 0, col, a); }
+    else if (k === 'scorza') { const col = { limone: '#F2CF3B', lime: '#8DBA3A', arancia: '#F0A23A', pompelmo: '#E8826A' }[a]; key += a + (b ? 'F' : ''); p = b ? joinX(twist(0, 0, col, a), flame(.6, -6.2)) : twist(0, 0, col, a); }
     else if (k === 'ananas') { p = pine(0, 0); if (flag) { p = joinX(p, cherry(-1, -11, 2.4)); key += 'C'; } }
     else if (k === 'fragola') p = strawb(0, 0);
     else if (k === 'mela') p = appleFan(-4, 1);
@@ -676,6 +682,7 @@ const COL = {};
 // le tazze tiki hanno colori diversi (D42): Zombie, Painkiller, Scorpion non sembrano più uguali
 const TIKI = ['#B07A4A', '#6E9A6A', '#C9A46A', '#4F8FA8', '#B85A4A'].map(viv);
 CKS.filter(c => c[3] === 'Tiki').forEach((c, i) => { COL[c[0]] = TIKI[i % TIKI.length]; });
+if (COL.Painkiller) COL.Painkiller = viv('#E2A65E');
 const tinta = (h, t, a) => '#' + hex(h).map(x => Math.round(x * (1 - a) + t * a).toString(16).padStart(2, '0')).join('').toUpperCase();
 function cocktail(ck) {
   const [nome, , , bic, ing, gar, prep] = ck; const bk = BIC[bic] ? bic : 'Old fashioned', B = BIC[bk], D = DET[bk], g = geo(bk), col = COL[nome];
