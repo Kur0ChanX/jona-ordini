@@ -9,7 +9,7 @@ import datetime, json, os, subprocess, sys, re
 
 CWD = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
 FILE_MSG = "docs/ULTIMO-MESSAGGIO.md"
-AVVISI_DI_SISTEMA = ("<task-notification", "<system-reminder", "<wake ", "[SYSTEM NOTIFICATION", "[AVVIO]", "<cross-session-message", "<agent-message")
+AVVISI_DI_SISTEMA = ("<task-notification", "<system-reminder", "<wake ", "[SYSTEM NOTIFICATION", "[AVVIO]", "<cross-session-message", "<agent-message", "This session's worker process was restarted")
 # Un segreto incollato in chat non deve mai arrivare su GitHub con la scorta (il repo è pubblico). Stesso codice di RVC.
 TOLTO = "[segreto tolto dalla scorta]"
 SEGRETI = [re.compile(p, re.S) for p in (

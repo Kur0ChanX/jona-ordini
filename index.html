@@ -626,6 +626,7 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .br-dis{flex:none;width:44px;height:44px;overflow:visible}.br-dis .wa{opacity:.62;filter:url(#br-wash)}.br-dis .ink{fill:none;stroke:#2a2420;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.br-dis .inkp{fill:#2a2420}
 html.lite .br-dis .wa{filter:none}
 .br-gl{display:flex;align-items:center;gap:8px}.br-gl .br-dis{width:30px;height:30px}.br-gl .br-dis .ink{stroke:var(--ink2)}.br-gl .br-dis .inkp{fill:var(--ink2)}
+.br-ckd .ink,.br-ckbig .ink{stroke:var(--ink2)}.br-ckd .inkp,.br-ckbig .inkp{fill:var(--ink2)}.br-ckd .wa{filter:none}.br-r .br-ckd{margin:-4px 2px -4px -4px}.br-ckbig{display:flex;justify-content:center;margin:2px 0 10px}.br-ckbig .br-dis{width:128px;height:128px}
 .br-carta{--carta:#f7f2e8;border:0;border-radius:14px;padding:4px 12px 4px 8px;color:#3a302b;background-color:var(--carta);box-shadow:inset 0 0 36px rgba(120,90,50,.12);
  background-image:radial-gradient(rgba(120,95,60,.07) 1px,transparent 1.2px),radial-gradient(rgba(120,95,60,.05) 1px,transparent 1.2px),linear-gradient(90deg,transparent 60px,rgba(200,80,80,.28) 60px 61.5px,transparent 61.5px);background-size:7px 7px,11px 11px,auto;background-position:0 0,3px 5px,0 0}
 html.lite .br-carta{background-image:linear-gradient(90deg,transparent 60px,rgba(200,80,80,.28) 60px 61.5px,transparent 61.5px);box-shadow:none}
@@ -1222,8 +1223,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=89;
+const APP_VER=90;
 const NEWS=[
+  {v:90,data:'2026-10-12',titolo:'Bar: ogni cocktail il suo disegno',
+    tutti:['Ogni cocktail ha il suo disegno: il bicchiere giusto, il colore del drink, ghiaccio, bollicine e guarnizione. Lo vedi nella lista e in grande nella scheda.','Ogni liquore ha la sua bottiglia, con il simbolo del sapore sull\'etichetta. Anche whisky, brandy, grappa e prosecco ora si distinguono.'],
+    dev:['v90 (D41): `data/bar-disegni.json` v2 con `b` bicchieri, `pz` pezzi e `k` cocktail → [bicchiere, colore, pezzi], generati da `node tools/bar-disegni.mjs` (colore = media pesata degli ingredienti). `brSvg`, `brCkDis`; nella lista acquerello spento (`.br-ckd`) per non pesare. Corretto: ginger beer/ale prendevano il disegno del gin. Prova `tools/test-bar-disegni.mjs`.']},
   {v:89,data:'2026-10-12',titolo:'Bar: ingredienti disegnati',
     tutti:['Nella scheda di ogni cocktail gli ingredienti sono disegnati a penna e acquerello, su un foglio di carta: lime, menta, ghiaccio, gin… si riconoscono a colpo d\'occhio.','Anche i gruppi dell\'inventario del bar hanno il loro disegno.'],
     dev:{aggiunte:['D39 (stile B scelto da Mario): `data/bar-disegni.json` (43 disegni SVG 64×64 + regole nome→disegno con colore, da `tools/bar-disegni.mjs`), scaricato solo all\'apertura del Bar (`brDisLoad`, in `FILES` di sw.js). `brDis(nome,alcolico)`: prima regola che corrisponde, altrimenti liquore/acqua. Filtro acquerello `#br-wash` (spento con `lite`), carta solo CSS `.br-carta`. Prova `tools/test-bar-disegni.mjs`.']}},
@@ -5721,11 +5725,14 @@ let BR_CK=null,BR_CKP=null,BR_DIS=null,BR_DISP=null;
 function brDisLoad(){if(BR_DIS)return Promise.resolve(BR_DIS);
   if(!BR_DISP)BR_DISP=fetch('data/bar-disegni.json').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.json()}).then(j=>{
     if(!document.getElementById('br-defs'))document.body.insertAdjacentHTML('beforeend','<svg id="br-defs" width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="br-wash" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="5"/><feGaussianBlur stdDeviation=".7"/></filter></defs></svg>');
-    BR_DIS={g:j.g,r:j.r.map(x=>[new RegExp(x[0]),x[1],x[2]])};return BR_DIS}).catch(e=>{BR_DISP=null;throw e});
+    BR_DIS={g:j.g,r:j.r.map(x=>[new RegExp(x[0]),x[1],x[2]]),b:j.b||{},pz:j.pz||{},k:j.k||{}};return BR_DIS}).catch(e=>{BR_DISP=null;throw e});
   return BR_DISP}
 const brDisK=n=>{const s=String(n||'').toLowerCase();return BR_DIS&&BR_DIS.r.find(x=>x[0].test(s))};
+const brSvg=(w,d,p,cl)=>`<svg class="br-dis${cl?' '+cl:''}" viewBox="0 0 64 64" aria-hidden="true">${w.map(x=>`<g class="wa" transform="translate(1.5 1.5)" fill="${x[0]}">${x[1]}</g>`).join('')}<g class="ink">${d}</g>${p?`<g class="inkp">${p}</g>`:''}</svg>`;
 function brDis(n,alc){if(!BR_DIS)return'';const r=brDisK(n),g=BR_DIS.g[r?r[1]:alc?'liquore':'acqua'];if(!g)return'';
-  return`<svg class="br-dis" viewBox="0 0 64 64" aria-hidden="true">${g.w.map((w,i)=>`<g class="wa" transform="translate(1.5 1.5)" fill="${i===0&&r&&r[2]||w[0]}">${w[1]}</g>`).join('')}<g class="ink">${g.d}</g>${g.p?`<g class="inkp">${g.p}</g>`:''}</svg>`}
+  return brSvg(g.w.map((w,i)=>[i===0&&r&&r[2]||w[0],w[1]]),g.d,g.p)}
+function brCkDis(c,cl){const k=BR_DIS&&BR_DIS.k[c.n],B=k&&BR_DIS.b[k[0]];if(!B)return'';const ps=k.slice(2).map(x=>BR_DIS.pz[x]).filter(Boolean);
+  return brSvg([[B.op||k[1],`<path d="${B.l}"/>`]].concat(...ps.map(x=>x.w||[])),B.d+ps.map(x=>x.d||'').join(''),ps.map(x=>x.p||'').join(''),cl)}
 function brCk(){if(BR_CK)return Promise.resolve(BR_CK);
   if(!BR_CKP)BR_CKP=fetch('data/cocktail.json').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.json()}).then(j=>{
     BR_CK=j.c.map((c,i)=>({i,n:c[0],f:c[1],m:c[2],g:c[3],ing:c[4],gu:c[5],p:c[6],iba:!!c[7],k:norm(c[0]+' '+c[4].map(x=>x[2]).join(' '))}));return BR_CK}).catch(e=>{BR_CKP=null;throw e});
@@ -5755,13 +5762,13 @@ function brList(){const V=S.br,me=meU(),all=brAll(),can=brCan(me);
   return head+`<div class="search rc-cerca">${ic('search')}<input id="brq" type="search" placeholder="Cerca cocktail o ingrediente" value="${esc(V.q)}" data-in="brq" autocomplete="off"></div>
   <div class="chips br-f">${all.length?`<button type="button" class="chip" aria-pressed="${V.fat}" data-a="brFat">Si possono fare</button>`:''}${BR_FAM.map(([k,t])=>`<button type="button" class="chip" aria-pressed="${V.f===k}" data-a="brF" data-v="${k}">${t}</button>`).join('')}</div>
   ${V.fat?`<p class="muted small vn-hint">Solo i cocktail con tutti gli alcolici in casa (succhi, sciroppi e frutta non li conto).</p>`:''}
-  <div>${l.length?l.slice(0,V.n).map(c=>`<button type="button" class="prow br-r" data-a="brC" data-v="${c.i}"><div class="row-i"><div class="row-t">${esc(c.n)}${c.iba?' <span class="br-iba">IBA</span>':''}</div><div class="row-m">${esc(c.ing.filter(x=>x[3]).map(x=>brBase(x[2])).join(' · ')||'Analcolico')}</div></div><span class="br-met">${BR_MET[c.m][0]}</span></button>`).join('')
+  <div>${l.length?l.slice(0,V.n).map(c=>`<button type="button" class="prow br-r" data-a="brC" data-v="${c.i}">${brCkDis(c,'br-ckd')}<div class="row-i"><div class="row-t">${esc(c.n)}${c.iba?' <span class="br-iba">IBA</span>':''}</div><div class="row-m">${esc(c.ing.filter(x=>x[3]).map(x=>brBase(x[2])).join(' · ')||'Analcolico')}</div></div><span class="br-met">${BR_MET[c.m][0]}</span></button>`).join('')
     +(l.length>V.n?`<button type="button" class="btn ghost br-piu" data-a="brPiu">Mostra altri ${Math.min(60,l.length-V.n)} (${l.length-V.n} in tutto)</button>`:'')
     :`<p class="muted">Nessun cocktail trovato.${V.fat?' Togli «Si possono fare» per vederli tutti.':''}</p>`}</div>`}
 function brShowC(i){S.brC=+i;if(!BR_DIS)brDisLoad().then(()=>refreshSheet()).catch(()=>{});openSheet({cls:'tall',live:()=>true,render:()=>{const c=BR_CK&&BR_CK[S.brC];if(!c)return`<div class="grab"></div><p class="muted">Cocktail non trovato.</p>`;
   const inv=brAll().length?brHave():null,met=BR_MET[c.m]||['',''];
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(c.n)}<div class="sh-s">${esc((BR_FAM.find(x=>x[0]===c.f)||['',''])[1])}${c.iba?' · ricetta ufficiale IBA':''}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  <div class="vn-tav br-tav"><div><span class="vn-tl">Metodo</span><b>${esc(met[0])}</b></div><div><span class="vn-tl">Bicchiere</span><b>${esc(c.g)}</b></div><div><span class="vn-tl">Guarnizione</span><b>${esc(c.gu)}</b></div></div>
+  ${(d=>d?`<div class="br-ckbig">${d}</div>`:'')(brCkDis(c))}<div class="vn-tav br-tav"><div><span class="vn-tl">Metodo</span><b>${esc(met[0])}</b></div><div><span class="vn-tl">Bicchiere</span><b>${esc(c.g)}</b></div><div><span class="vn-tl">Guarnizione</span><b>${esc(c.gu)}</b></div></div>
   <span class="lbl">Ingredienti</span><div class="br-ing${BR_DIS?' br-carta':''}">${c.ing.map(x=>{const ok=inv&&x[3]?inv.has(brBase(x[2])):null;
     return`<div class="br-ir">${brDis(brBase(x[2]),x[3])}<b>${esc(x[0]==='top'?'top':x[0]+(x[1]?' '+x[1]:''))}</b><span>${esc(x[2])}</span>${ok===null?'':ok?`<i class="br-ok">in casa</i>`:`<i class="br-no">manca</i>`}</div>`}).join('')}</div>
   <span class="lbl">Come si fa</span><p class="vn-tx">${esc(met[1])}</p><p class="vn-tx br-pas">${esc(c.p)}</p>`}})}
