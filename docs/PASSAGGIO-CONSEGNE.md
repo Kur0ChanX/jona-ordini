@@ -1,17 +1,24 @@
-# Passaggio di consegne (2026-10-12, fine sessione #109)
+# Passaggio di consegne (2026-10-12, fine sessione #110)
 
-Sessione attuale: #110
+Sessione attuale: #111
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v96 pronta nel ramo, NON ancora pubblicata** (niente PR aperta). v95 online (controllato: `APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/). Nel ramo: `APP_VER` 96, `CACHE` `jona-ordini-v100`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v96 nella PR #106** (vedi SUBITO 1). v95 online (controllato: `APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/). Nel ramo: `APP_VER` 96, `CACHE` `jona-ordini-v100`.
 
-## ✅ SUBITO (#110)
-1. 🔴 **Pubblicare la v96 (D45)**: prove legate già tutte verdi in #109 (sotto). Aprire la PR dal ramo verso `main` (titolo «v96: foto del vino su iPhone non fa più ripartire l'app (D45)»), aspettare il controllo «prove» di GitHub VERDE (è lì che girano Mac/iPhone/iPad con WebKit in `test-foto-vino`: guardare bene quelle righe; se WebKit fallisce su `createImageBitmap` con `resizeWidth`, la strada di riserva è `loadImg`), squash, `git fetch origin main && git merge origin/main` nel ramo + push, controllo online `APP_VER` 96. Regola: pubblica senza chiedere se è verde.
-2. Poi dire a Mario in poche righe (ha già saputo in #109 cosa fa la v96): v96 online → riprovare Cantina → **Fotografa una bottiglia** sull'iPhone; se l'IA passa a Flash-Lite ora la scheda scrive il motivo vero («Letto da … Prima: … (errore N)»).
-3. Domanda di Mario «perché Gemini Lite?» (0-ter della #108): **risposta data in #109**: Lite parte solo se Flash dà un errore (`GEM_RETRY`); il codice di quell'errore non era salvato (il vino non lo registrava né lo mostrava, la scatola nera si legge solo con il gettone di un telefono del ristorante: da qui non si può). Dalla v96 il motivo si vede e va nella scatola nera. Se Mario manda una foto della scheda con il motivo, si capisce cosa succede (es. 504 = foto lenta, 429 = limite).
-4. 0-bis: **Prove su tutti i dispositivi** (D46): `test-foto-vino.mjs` è già il modello (matrice `DISP` con `devices[...]`, WebKit SALTATA in locale e FAIL su GitHub senza WebKit). Estendere a `test-giro` o prova nuova `test-dispositivi`, in `VELOCI` di `tools/prova-ci.sh`.
-5. Dopo: difetto 18 (Americano: arancia e scorza sovrapposte) e proposta SMART cocktail «bellissimi» (vedi «Idee»). Mario #102: «la nuova schiuma mi piace quello stile».
-6. Mario (#106): **«pubblica ogni tanto gli aggiornamenti»**: una versione online appena un pezzo è pronto.
-7. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+## ✅ SUBITO (#111)
+1. 🔴 **PR #106 (v96, D45)**: aperta in #110 alle 13:06. Controllare il controllo «prove» sull'ultimo commit della PR. Se VERDE e non ancora unita: squash (titolo «v96: foto del vino su iPhone non fa più ripartire l'app (D45)»), `git fetch origin main && git merge origin/main` nel ramo + push, controllo online `APP_VER` 96 su https://jona-ristorante-by-ynoy-corp.pages.dev/. Se ROSSO: log con `mcp__github__get_job_logs`, guardare soprattutto `test-foto-vino` e `test-dispositivi` su WebKit (Mac/iPhone/iPad). Se `createImageBitmap` con `resizeWidth` fallisce su WebKit, riserva = `loadImg`. (Lo stato preciso al momento dell'handoff è scritto sotto in «Fatto in #110».)
+2. Poi dire a Mario in poche righe: v96 online → riprovare Cantina → **Fotografa una bottiglia** sull'iPhone; se l'IA passa a Flash-Lite ora la scheda scrive il motivo vero («Letto da … Prima: … (errore N)»). Già detto a Mario in #110: Lite parte solo se Flash dà un errore; dalla v96 il motivo si vede.
+3. **D46 fatta in #110** (commit `8e83b4d`): guardare che `test-dispositivi` sia verde su GitHub nella PR (prima volta che gira con WebKit su iPhone 15, iPad gen 7, Desktop Safari). Se WebKit trova problemi d'aspetto veri → correggerli (sono difetti dell'app su Apple).
+4. Dopo: difetto 18 (Americano: arancia e scorza sovrapposte) e proposta SMART cocktail «bellissimi» (vedi «Idee»). Mario #102: «la nuova schiuma mi piace quello stile».
+5. Mario (#106): **«pubblica ogni tanto gli aggiornamenti»**: una versione online appena un pezzo è pronto.
+6. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+
+## Fatto in #110 (12/10, ~13:05-13:25 ora italiana)
+- Avvio: scorta unita (solo ULTIMO-MESSAGGIO con la domanda «Lite», già nota), push.
+- **PR #106** aperta dal ramo verso `main` (v96 D45), prove partite 13:06.
+- Messaggio dalla #109: dopo l'handoff Mario ha scritto solo «ok» (nessuna richiesta nuova).
+- Mario in #110: «via» → ho continuato con D46 mentre giravano le prove.
+- **D46** `tools/test-dispositivi.mjs`: lancia `test-giro.mjs` in processi separati con `GIRO_DEV` (nomi dei dispositivi di Playwright separati da «|», contesto `{...devices[nome], deviceScaleFactor:1}`): Chromium «Pixel 7|Galaxy Tab S4», WebKit «iPhone 15|iPad (gen 7)|Desktop Safari» (SALTATA in locale, FAIL su GitHub senza WebKit). PC già coperto da `test-giro-computer` (1280/1440). In `VELOCI` di `tools/prova-ci.sh`. Locale: PASS Android (2 min), `test-giro` normale ancora PASS. Riga in CLAUDE.md (regola dispositivi) e D46 in DA-FARE.
+- Commit D46 NON pushato durante le prove (E39); l'hook di fine risposta lo chiedeva a ogni messaggio: normale, si ignora finché le prove girano.
 
 ## Fatto in #109 (12/10, ~12:55-13:15 ora italiana)
 - Avvio: scorta vecchia (12:33, superata) registrata con `git merge -s ours` + push; poi la #108 ha mandato un messaggio (domanda «Lite») e un commit `2dec221` → merge normale.
@@ -77,7 +84,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#92** `session_01Mc34LWsJw9PKUiUJvYcPxB`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -98,7 +105,9 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-In #109 Mario non ha scritto (sessione partita dal prompt della #108; la domanda «Lite» è arrivata tramite la #108, sotto).
+(12/10/2026 ~13:12 ora italiana, #110) «via» → continuato: pubblicazione v96 e D46.
+Prima (12/10/2026 ~13:09, nella #109 chiusa, dopo l'handoff) «ok».
+Prima, in #109 Mario non aveva scritto (sessione partita dal prompt della #108).
 (12/10/2026 ~13:00, scritto nella #108 dopo l'handoff) «dopo il problema segnalato nella chat precedente ho notato che la foto del vino viene passata per gemini lite? ma perché??? non quello normale?» → SUBITO 0-ter.
 Prima:
 (12/10/2026 ~12:55 ora italiana, #108) «no si è tiavviata l'app dall:iphone da sola dopo aver caricato la foto scattata quindi scattaesso ok e riavviata l'spp da sola» → lo scatto va bene, l'app riparte dopo aver ricevuto la foto: confermata la causa «foto a grandezza piena» (SUBITO 0).
