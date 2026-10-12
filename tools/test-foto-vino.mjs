@@ -20,7 +20,8 @@ for(const [nome,mot,dev] of DISP){
   const gemReq=[];
   await ctx.route('https://generativelanguage.googleapis.com/**',async r=>{gemReq.push(JSON.parse(r.request().postData()||'{}'));
     await r.fulfill({contentType:'application/json',body:JSON.stringify({candidates:[{content:{parts:[{text:'```json\n'+JSON.stringify(GEM)+'\n```'}]}}]})})});
-  const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));pg.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,160))});
+  const errs=[],nuova=async()=>{const p=await ctx.newPage();p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,160))});return p};
+  let pg=await nuova();
   const wait=ms=>pg.waitForTimeout(ms),P=nome+': ';
   await pg.goto('http://localhost:8765/index.html');
   await pg.click('[data-a="formset"][data-v="dev"]');
@@ -68,8 +69,9 @@ for(const [nome,mot,dev] of DISP){
   // fotocamera aperta e app chiusa dal telefono (ricarica senza foto) → nota «fotocamera» e «Galleria»
   await pg.evaluate(()=>{vnForm(null)});await wait(300);await pg.fill('.sheet input[data-k="n"]','Brunello');
   await Promise.all([pg.waitForEvent('filechooser'),pg.locator('.sheet [data-a="vnFotoF"]').first().click()]);await wait(200);
-  // WebKit desktop: con la finestra dei file aperta l'evento «load» non arriva → si aspetta solo l'inizio della ricarica
-  await pg.reload({waitUntil:'commit'});await pg.waitForSelector('.sheet .vn-rip',{timeout:25000}).catch(()=>{});await wait(300);
+  // app chiusa dal telefono con la fotocamera aperta = pagina chiusa e app riaperta in una pagina nuova
+  // (WebKit desktop: ricaricare con la finestra dei file aperta fa cadere la pagina, «Page crashed»)
+  await wait(400);{const vec=pg;pg=await nuova();await vec.close().catch(()=>{});await pg.goto('http://localhost:8765/index.html')}await pg.waitForSelector('.sheet .vn-rip',{timeout:25000}).catch(()=>{});await wait(300);
   r=await pg.evaluate(()=>({n:(document.querySelector('.sheet input[data-k="n"]')||{}).value,t:(document.querySelector('.sheet .vn-rip')||{}).textContent||'',g:document.querySelectorAll('.sheet .vn-add [data-a="vnFotoG"]').length}));
   ok(r.n==='Brunello'&&/fotocamera/.test(r.t)&&/Galleria/.test(r.t)&&r.g===1,P+'fotocamera aperta + ricarica: scheda ripresa, nota e pulsante «Galleria»');
   await pg.locator('.sheet [data-a="closeSheet"]').last().click();await wait(300);
