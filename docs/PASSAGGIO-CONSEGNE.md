@@ -37,29 +37,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - PR #107 v97: prove verdi su `428cc55` → squash `c7b631e` (17:13), `main` unito nel ramo + push, **v97 online alle 17:14** (controllato). Routine di controllo `trig_01ArZvGTU7DCKwEGRiWtpKL8` cancellata, iscrizione alla PR tolta.
 - Handoff per l'avviso dell'hook (contesto ~140k) subito dopo la richiesta nuova di Mario.
 
-## Fatto in #112 (12/10, ~15:20-16:20 ora italiana)
-- Scorta unita (vecchia, solo ULTIMO-MESSAGGIO). Il giro «bloccato» della #111 non lo era: 31 minuti di installazione dei browser su GitHub.
-- v96 ONLINE (PR #106 squash `9879904`, 16:13; main unito nel ramo).
-- v97 difetto 18: in `garn` di `tools/bar-disegni.mjs` la scorza con `slot > 1` (dopo una fetta) va `x -= 10` (distanza 24 invece di 14). Nel JSON cambia solo `k.Americano` (controllato). Controllo nuovo in `test-bar-disegni` (73 PASS); test-bar 38, test-news 94, test-testbar 13. Solo l'Americano ha fetta + scorza. Foto prima/dopo mandata a Mario. NEWS v97, `APP_VER` 97, `CACHE` v101, riga v97 in CLAUDE.md, D42 in DA-FARE aggiornato.
-- Giro su `4014f1b`: `test-foto-vino` Mac «page.reload: Page crashed» (ricarica con la finestra dei file aperta). Corretto: «fotocamera aperta + app chiusa» = pagina nuova nello stesso contesto (`nuova()`), la vecchia chiusa (`54fd0ed`). E49 in ERRORI.
-
-## Fatto in #111 (12/10, ~13:25-14:45 ora italiana)
-- Avvio: scorta unita (solo ULTIMO-MESSAGGIO «via»), push.
-- `test-news` rossa: lo staff vedeva «Gemini» nella NEWS v96 → testo «Se l'IA passa a un lettore di riserva, la scheda dice il motivo vero.» (94 PASS).
-- `test-foto-vino` rossa solo sul Mac (WebKit desktop), 3 giri su GitHub per capire:
-  1. `1ebde2e`: attesa della richiesta all'IA da 1,2 s a fino a 10 s (non era quello).
-  2. `0ee5b06`: diagnosi DENTRO la riga FAIL (GitHub mostra solo le righe FAIL) + errori console → «richieste 0, console 400»: la richiesta andava al vero Google con la chiave finta.
-  3. `dd7f978`: causa = service worker attivo: Playwright su WebKit desktop non intercetta (route) la richiesta. Contesto con `serviceWorkers:'block'` (come test-agenda*). L'app vera non c'entra: sw.js lascia passare POST e altri siti. E48 in ERRORI. Risultato: passati foto all'IA e «Chiudi», poi `page.reload` scaduto (30 s) alla riga «fotocamera aperta + ricarica»: con la finestra dei file aperta WebKit desktop non dà «load».
-  4. `7415c27`: quella ricarica con `{waitUntil:'commit'}` (poi aspetta `.vn-rip`). In locale 36 PASS (WebKit SALTATA). Su GitHub il giro di `7415c27` era ANCORA IN CORSO dopo 40 minuti (di solito ~20): probabile prova bloccata sul Mac (WebKit desktop) senza tempo massimo, forse `test-foto-vino` dopo la ricarica con la finestra dei file aperta. Il push delle consegne ha fatto ripartire il giro: se si blocca ancora, nella vista Mac saltare il solo passo «fotocamera aperta + ricarica» NON si fa (vietato spegnere prove): mettere un tempo massimo a quel passo, chiudere prima la finestra dei file in WebKit desktop (es. `fc.setFiles([])` dove serve) oppure aprire una pagina nuova al posto della ricarica, e capire la causa.
-- Handoff fatto per il contesto (avviso dell'hook) mentre girava il giro di `7415c27`.
-
-## Fatto in #110 (12/10, ~13:05-13:25 ora italiana)
-- Avvio: scorta unita (solo ULTIMO-MESSAGGIO con la domanda «Lite», già nota), push.
-- **PR #106** aperta dal ramo verso `main` (v96 D45), prove partite 13:06, ROSSE alle 13:23 (test-foto-vino Mac, test-news: vedi SUBITO 1).
-- Messaggio dalla #109: dopo l'handoff Mario ha scritto solo «ok» (nessuna richiesta nuova).
-- Mario in #110: «via» → ho continuato con D46 mentre giravano le prove.
-- **D46** `tools/test-dispositivi.mjs`: lancia `test-giro.mjs` in processi separati con `GIRO_DEV` (nomi dei dispositivi di Playwright separati da «|», contesto `{...devices[nome], deviceScaleFactor:1}`): Chromium «Pixel 7|Galaxy Tab S4», WebKit «iPhone 15|iPad (gen 7)|Desktop Safari» (SALTATA in locale, FAIL su GitHub senza WebKit). PC già coperto da `test-giro-computer` (1280/1440). In `VELOCI` di `tools/prova-ci.sh`. Locale: PASS Android (2 min), `test-giro` normale ancora PASS. Riga in CLAUDE.md (regola dispositivi) e D46 in DA-FARE.
-- Commit D46 NON pushato durante le prove (E39); l'hook di fine risposta lo chiedeva a ogni messaggio: normale, si ignora finché le prove girano.
+## Fatto in #110-#112 (riassunto)
+- v96 online (PR #106, 16:13). v97 Americano (riga v97 di CLAUDE.md). D46 `tools/test-dispositivi.mjs`. Prove Mac di `test-foto-vino`: E48 (service worker bloccato nel contesto), E49 (pagina nuova invece di ricaricare con la finestra dei file aperta).
 
 ## Fatto in #109 (riassunto)
 - v96 D45 scritta (`fotoPiccola`, bozza del vino, lettori falliti). Dettagli nella riga v96 di CLAUDE.md e in E47.
