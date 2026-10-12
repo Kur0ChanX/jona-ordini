@@ -1,14 +1,22 @@
-# Passaggio di consegne (2026-10-12, fine sessione #112)
+# Passaggio di consegne (2026-10-12, fine sessione #113)
 
-Sessione attuale: #113
+Sessione attuale: #114
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v96 nella PR #106** (vedi SUBITO 1). v95 online (controllato: `APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/). Nel ramo: `APP_VER` 96, `CACHE` `jona-ordini-v100`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v97 online** (controllato `APP_VER` 97 su https://jona-ristorante-by-ynoy-corp.pages.dev/ alle 17:14). Nel ramo: `APP_VER` 97, `CACHE` `jona-ordini-v101`, nessuna PR aperta.
 
-## ✅ SUBITO (#113)
-1. ✅ v97 ONLINE (#113: PR #107 squash `c7b631e`, 17:14; main unito nel ramo; `APP_VER` 97 controllato online).
-2. Mario proverà la foto del vino sull'iPhone (v96) quando torna in hotel («non sono in hotel ora»). Gli ho detto che va bene anche una bottiglia a casa.
-3. Dopo: proposta SMART cocktail «bellissimi» (vedi «Idee»), con bozza ferma e domanda.
+## ✅ SUBITO (#114)
+1. 🆕 **Richiesta di Mario (#113, 17:16)**: «metti cantina vini e cocktail anche dallo chef ovviamente». Stato oggi (letto in #113, niente cambiato):
+   - Gestori (`isMgr`, quindi Maurizio Admin Chef) vedono già Ricette, Cantina e Bar come pulsanti nella scheda **Fornitori** (`${rcCta(meU())}${vnCta(meU())}${brCta(meU())}`).
+   - Staff: in «Cosa serve?» `vnCta` solo se `me.reparto!=='cucina'`, `brCta` per chi non è gestore ma il Bar si apre solo con `brCan` (gestori, fb, resp, bartender/barman/barback). Quindi **il personale di cucina non vede né Cantina né Cocktail**.
+   - Interpretazione più probabile: dare Cantina (sola lettura: carta, «Consiglia», scheda «Al tavolo») e Cocktail (lettura, ricette e passaggi) anche al reparto `cucina` / alla vista «Admin Chef» in modo visibile. Da chiarire con UNA domanda (E38: scritta nel testo, risposta a parole): «Per "chef" intendi Maurizio (Admin Chef, oggi li trova in Fornitori) o tutta la cucina (cuochi, che oggi non li vedono)?». Se tutta la cucina: in sola lettura o anche modifica/inventario? Poi fare la versione v98 (NEWS, `APP_VER` 98, `CACHE` v102, riga in CLAUDE.md), prove `test-cantina`, `test-bar`, `test-testbar`, `test-news`, `test-giro` + `test-dispositivi`.
+2. Mario proverà la foto del vino sull'iPhone (v96) quando torna in hotel («non sono in hotel ora»). Va bene anche una bottiglia a casa.
+3. Domanda fatta in #113 senza risposta: «Ora preparo un disegno di prova per i cocktail "bellissimi", senza toccare l'app. Ti va bene?» (Mario ha risposto con la richiesta sopra, non con sì/no). Proposta SMART: vedi «Idee».
 4. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+
+## Fatto in #113 (12/10, ~16:49-17:16 ora italiana)
+- Avvio: scorta unita due volte (solo ULTIMO-MESSAGGIO: «non sono in hotel ora», poi «ok»).
+- PR #107 v97: prove verdi su `428cc55` → squash `c7b631e` (17:13), `main` unito nel ramo + push, **v97 online alle 17:14** (controllato). Routine di controllo `trig_01ArZvGTU7DCKwEGRiWtpKL8` cancellata, iscrizione alla PR tolta.
+- Handoff per l'avviso dell'hook (contesto ~140k) subito dopo la richiesta nuova di Mario.
 
 ## Fatto in #112 (12/10, ~15:20-16:20 ora italiana)
 - Scorta unita (vecchia, solo ULTIMO-MESSAGGIO). Il giro «bloccato» della #111 non lo era: 31 minuti di installazione dei browser su GitHub.
@@ -71,7 +79,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#92** `session_01Mc34LWsJw9PKUiUJvYcPxB`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -92,8 +100,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(12/10/2026 ~16:30 ora italiana, #112) «non sono in hotel ora» (risposta a: prova la foto del vino sull'iPhone).
-(12/10/2026 ~14:45 ora italiana, #111) «ok» (dopo il mio avviso: nuovo giro su GitHub, se verde pubblico la v96).
-Prima, in #111 nessun altro messaggio (sessione partita dal prompt della #110).
-(12/10/2026 ~13:12 ora italiana, #110) «via» → continuato: pubblicazione v96 e D46.
+(12/10/2026 ~17:16 ora italiana, #113) «metti cantina vini e cocktail anche dallo chef ovviamente»
+(12/10/2026 ~16:51, #113) «ok» (dopo: controllo di sicurezza alle 17:41).
+(12/10/2026 ~16:30, #112) «non sono in hotel ora» (risposta a: prova la foto del vino sull'iPhone).
 Messaggi più vecchi: nella storia di questo file. Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
