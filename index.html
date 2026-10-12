@@ -651,6 +651,7 @@ html.lite .br-carta{background-image:linear-gradient(90deg,transparent 60px,rgba
 .vn-al{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--sunk);color:var(--ink2);font-size:14px;margin:8px 0}
 .vn-al .ic{flex:none;color:var(--ocra)}
 .vn-busy{display:flex;gap:8px;align-items:center;padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}
+.vn-fotos{padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}.vn-ft{display:flex;gap:8px;margin:0 0 10px;flex-wrap:wrap}.vn-fi{position:relative;width:84px;text-align:center;font-size:13px}.vn-fi img{width:84px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 0 4px}.vn-fx{position:absolute;top:4px;right:4px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;padding:0}.vn-fx svg{width:16px;height:16px}
 .vn-top{margin:0;padding-left:22px;line-height:1.7}.vn-top b{float:right;margin-left:12px}
 .ag-2>*{min-width:0}.ag-2 .btn{white-space:normal;text-align:center;justify-content:center}
 .sc-row{display:flex;align-items:center;gap:10px;justify-content:space-between;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:14px}.sc-row>div{min-width:0}.sc-row b{display:block;font-weight:500}.sc-row span{display:block}
@@ -1230,8 +1231,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=92;
+const APP_VER=93;
 const NEWS=[
+  {v:93,data:'2026-10-12',titolo:'Cantina: fronte e retro della bottiglia',
+    tutti:['Fotografando un vino ora puoi aggiungere anche il retro dell\'etichetta (fino a 3 foto): l\'IA le legge insieme e la scheda viene più precisa.','Ogni foto si può togliere prima di leggere; c\'è anche «Galleria» per le foto già fatte.'],
+    dev:['D44: `vnFotoAdd`/`vnFotoH` (riquadro con le miniature, `VN_FMAX` 3, «Leggi con l\'IA» `vnFotoGo`), `vnIaGo` usa i lettori `GEM_LETT` come i listini (tutte le foto in una richiesta; Cloudflare riprova con la sola prima foto), lettore dal vivo nel riquadro «L\'IA sta…». Prova in `tools/test-cantina.mjs`.']},
   {v:92,data:'2026-10-12',titolo:'Bar: cocktail disegnati con più dettagli',
     tutti:['I cocktail del Bar hanno disegni più belli: colori vivi, vetro sottile, cubetti di ghiaccio, menta con le venature, fette di agrumi con gli spicchi.','Aprendo un cocktail lo vedi in grande, come un acquerello: colore che sfuma e goccioline di freddo.','Ogni cocktail ha la sua guarnizione vera (ombrellino, ananas, sedano, scorza a spirale…) e si vede cosa c\'è dentro: schiuma dei sour, strati, frutta.','Linee sottili del colore di ogni frutto, tazza di rame vera per i Mule, scorze d\'agrume arricciate.'],
     dev:['D42 «A lista + B scheda»: `tools/bar-disegni.mjs` → `data/bar-disegni.json` (bicchieri con `f` linee fini, `h` riflessi, `m` superficie, `sh` ombra, `x` macchia, `dr` goccioline; pezzi con `f`/`h`); `brCkDis` senza classe = scheda con sfumatura (`brTinta`), macchia e goccioline. Stile C (#99): linee di ghiaccio e bollicine in `vd`/`vf` → gruppo `.br-v` color vetro (`--vetro`), tratto `vector-effect:non-scaling-stroke`, colori `viv()`, guarnizioni del bordo ×1,35 (`brMove`). #101-#102: cupola dei frullati, panna (`cream`), vapore, sale del bordo e bollicine dei calici con linee color vetro; spirale a nastro (`ribbon`); menta pestata senza contorno. #103 (regola di stile di Mario): `joinX`/`colora` trasformano `d`/`f`/`p` dei pezzi in `c`/`cf`/`cp` [[colore, forme]] col tono scuro del pezzo (`scuro`), disegnati da `brCol` (`.br-c` sottile); bicchieri pieni con `oc` (`.br-o`); colore `*`/`*l` = drink (`k[1]`); tazza di rame `rm|`+`sf|`, niente etichetta `m|`. Prova `tools/test-bar-disegni.mjs`.']},
@@ -5680,7 +5684,7 @@ function vnForm(v){const sv=x=>x==null||x===''?'':String(x).replace('.',',');con
 function vnFormH(){const f=S.vnf,me=meU(),inp=(k,l,ph,x)=>`<label class="lbl" for="vnf-${k}">${l}</label><input class="inp" id="vnf-${k}" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"${x||''}>`,
   ta=(k,l,ph)=>`<label class="lbl" for="vnf-${k}">${l}</label><textarea class="inp vn-ta" id="vnf-${k}" data-in="vnf" data-k="${k}" rows="3" placeholder="${esc(ph||'')}">${esc(f[k])}</textarea>`,num_=(k,l,ph)=>`<label><span class="lbl">${l}</span><input class="inp" id="vnf-${k}" inputmode="decimal" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"></label>`;
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica vino':'Nuovo vino'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${f.busy?`<div class="vn-busy">${ic('clock')} L'IA sta scrivendo la scheda del vino…</div>`:`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} Foto dell'etichetta</button><button type="button" class="btn ghost" data-a="vnIa">${ic('sparkle')} Completa con l'IA</button></div>`}
+  ${f.busy?`<div class="vn-busy">${ic('clock')} <span>L'IA sta ${(f.fotos||[]).length?'leggendo le foto':'scrivendo la scheda del vino'}…${f.bl?` <span class="muted small">(${esc(gemNome(f.bl))})</span>`:''}</span></div>`:(f.fotos||[]).length?vnFotoH(f):`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} Foto dell'etichetta</button><button type="button" class="btn ghost" data-a="vnIa">${ic('sparkle')} Completa con l'IA</button></div>`}
   ${f.ia?`<p class="vn-al">${ic('warn')} Scritto dall'IA${f.ia==='dubbio'?', che non era sicura del vino':''}: controlla annata, gradi e premi prima di salvare.</p>`:''}
   ${inp('n','Nome del vino','Es. Tignanello')}${inp('cant','Cantina','Es. Antinori')}
   <div class="ag-2">${num_('ann','Annata','Es. 2020')}${num_('gr','Gradi (% vol)','Es. 14,5')}</div>
@@ -5692,8 +5696,8 @@ function vnFormH(){const f=S.vnf,me=meU(),inp=(k,l,ph,x)=>`<label class="lbl" fo
   <div class="ag-2">${num_('pv','Prezzo in carta €','Es. 60')}${isMgr(me)?num_('pc','Prezzo d\'acquisto €','Es. 28'):''}</div>
   <div class="ag-2">${num_('q','Bottiglie in casa','0')}${num_('min','Avvisa sotto','Es. 2')}</div>
   <div class="sheet-foot btns" style="margin-top:18px">${f.id?`<button type="button" class="btn ghost danger" data-a="vnDel">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary big" data-a="vnSave">${ic('check')} Salva</button></div>`}
-function vnPrompt(nome){return'Sei un sommelier esperto e aiuti i camerieri di un ristorante a Porto Cervo (Sardegna) a proporre i vini al tavolo. '+
-  (nome?'Il vino è: '+nome+'. ':'Questa è la foto dell\'etichetta (o della bottiglia) di un vino. ')+
+function vnPrompt(nome,n){return'Sei un sommelier esperto e aiuti i camerieri di un ristorante a Porto Cervo (Sardegna) a proporre i vini al tavolo. '+
+  (nome?'Il vino è: '+nome+'. ':n>1?'Queste sono '+n+' foto della stessa bottiglia di vino (fronte e retro): leggi le scritte di tutte e unisci le informazioni, usando le foto dell\'etichetta. ':'Questa è la foto dell\'etichetta (o della bottiglia) di un vino. ')+
   'Rispondi SOLO con JSON valido, senza altro testo, con queste chiavi: {"nome":"nome del vino senza la cantina","cantina":"","annata":"AAAA oppure vuoto","gradi":numero oppure 0,"tipo":"rosso|bianco|rosato|bollicine|dolce",'+
   '"denominazione":"es. Toscana IGT, Vermentino di Gallura DOCG","vitigni":"es. 85% Cabernet Sauvignon, 15% Cabernet Franc","storia":"2-3 frasi: storia della cantina o del vino, un aneddoto e i premi più noti","palato":"corpo, tannino, acidità e freschezza in 1-2 frasi",'+
   '"naso":"i 3 o 4 profumi principali","colore":"colore nel bicchiere","abbinamento":"piatti con cui proporlo e perché si bilanciano, 1-2 frasi","abbinamenti":["carne","bianca","pesce","crudi","primi","formaggi","dolce","aperitivo"] (solo quelli adatti),'+
@@ -5710,16 +5714,33 @@ function vnUnisci(f,r){for(const [k,x] of Object.entries(r)){if(k==='abb'){if(!f
   if(r.tipo&&!f.id&&!f._tipo)f.tipo=r.tipo}
 async function vnIaGo(files){const f=S.vnf;if(!f||f.busy)return;const nome=[f.n,f.cant,f.ann].map(x=>String(x||'').trim()).filter(Boolean).join(' ');
   if(!files&&!nome)return toast('Scrivi prima il nome del vino (e la cantina).','warn');
-  f.busy=true;refreshSheet();try{const parts=[{text:vnPrompt(files?'':nome)}];if(files)for(const x of files.slice(0,2))parts.push({inline_data:{mime_type:'image/jpeg',data:await b64(await shrinkImg(x))}});
-    const g=await gemCall({contents:[{parts}],generationConfig:{temperature:0.2}});f.busy=false;
+  f.busy=true;f.bl='';refreshSheet();try{const im=[];if(files)for(const x of files.slice(0,VN_FMAX))im.push({inline_data:{mime_type:'image/jpeg',data:await b64(await shrinkImg(x))}});
+    const body=p=>({contents:[{parts:[{text:vnPrompt(files?'':nome,p.length)}].concat(p)}],generationConfig:{temperature:0.2}});
+    // D44: stessi lettori dei listini (Flash → Flash-Lite → Cloudflare), tutte le foto nella stessa richiesta
+    let g={};for(const [l] of GEM_LETT){f.bl=l;refreshSheet();let r=await gemCall(body(im),l);
+      // Cloudflare (Llama 4) potrebbe non accettare più foto insieme: riprova con la sola prima foto (il fronte)
+      if(l==='cf'&&im.length>1&&!r.txt&&!r.salta)r=await gemCall(body(im.slice(0,1)),l);
+      if(r.salta)continue;g=r;if(r.txt||!GEM_RETRY.test(String(r.st)))break}
+    f.busy=false;f.bl='';
     if(!g.txt){refreshSheet();return toast((g.err||'L\'IA non ha risposto.')+' Riprova.','warn')}
     const r=vnLeggi(g.txt);if(!r){refreshSheet();return toast(files?'Non riconosco il vino nella foto. Riprova con l\'etichetta ben dritta e nitida.':'Non trovo questo vino. Controlla il nome.','warn')}
     const dop=!f.id&&vnAll().find(v=>norm(v.n)===norm(r.n)&&norm(v.cant||'')===norm(r.cant||'')&&String(v.ann||'')===String(r.ann||''));
     if(dop){closeSheet();toast('Questo vino è già in cantina.');return vnShow(dop.id)}
-    vnUnisci(f,r);refreshSheet()}
+    if(files)vnFotoVia(f);vnUnisci(f,r);refreshSheet()}
   catch(e){f.busy=false;refreshSheet();toast(e&&e.code==='img'?'La foto non si apre: prova a rifarla.':'Non riesco a contattare l\'IA. Controlla la connessione.','warn')}}
-function vnFoto(nuovo){if(!gemOn())return toast('Per leggere le foto serve l\'IA del ristorante (Gemini): chiedi allo sviluppatore. Intanto scrivi il nome.','warn');
-  pickFile({accept:'image/*',capture:'environment'},fs=>{if(nuovo)vnForm(null);vnIaGo(fs)})}
+// D44: fino a VN_FMAX foto della stessa bottiglia (fronte, retro…), lette insieme con «Leggi con l'IA»
+const VN_FMAX=3;
+function vnFoto(nuovo,gal){if(!gemOn())return toast('Per leggere le foto serve l\'IA del ristorante (Gemini): chiedi allo sviluppatore. Intanto scrivi il nome.','warn');
+  pickFile(gal?{accept:'image/*',multiple:true}:{accept:'image/*',capture:'environment'},fs=>{if(nuovo)vnForm(null);vnFotoAdd(fs)})}
+function vnFotoAdd(fs){const f=S.vnf;if(!f)return;f.fotos=f.fotos||[];
+  for(const x of fs){if(f.fotos.length>=VN_FMAX){toast('Bastano '+VN_FMAX+' foto per una bottiglia.','warn');break}f.fotos.push({file:x,url:URL.createObjectURL(x)})}refreshSheet()}
+function vnFotoDel(i){const f=S.vnf,x=f&&f.fotos&&f.fotos.splice(+i,1)[0];if(x)URL.revokeObjectURL(x.url);refreshSheet()}
+function vnFotoVia(f){for(const x of f.fotos||[])URL.revokeObjectURL(x.url);f.fotos=[]}
+function vnFotoH(f){const n=f.fotos.length;
+  return`<div class="vn-fotos"><p class="muted small" style="margin:0 0 8px">${n===1?'Fronte pronto. Se dietro c\'è un\'altra etichetta, fotografa anche il retro: l\'IA legge tutte e due.':n+' foto della stessa bottiglia: l\'IA le legge insieme.'}</p>
+  <div class="vn-ft">${f.fotos.map((x,i)=>`<div class="vn-fi"><img src="${x.url}" alt="Foto ${i+1}"><span>${i===0?'Fronte':i===1?'Retro':'Foto '+(i+1)}</span><button type="button" class="vn-fx" data-a="vnFotoDel" data-v="${i}" aria-label="Togli la foto ${i+1}">${ic('x')}</button></div>`).join('')}</div>
+  ${n<VN_FMAX?`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} ${n===1?'Fotografa il retro':'Un\'altra foto'}</button><button type="button" class="btn ghost" data-a="vnFotoG">${ic('image')} Galleria</button></div>`:''}
+  <button type="button" class="btn primary block big" data-a="vnFotoGo" style="margin-top:8px">${ic('sparkle')} Leggi ${n===1?'la foto':'le '+n+' foto'} con l'IA</button></div>`}
 async function vnSave(){const f=S.vnf,me=realU();if(!f||!me)return;const n=f.n.trim();if(!n){toast('Scrivi il nome del vino','err');return}
   const nn=x=>num(x)>0?num(x):null,old=f.id&&vnGet(f.id);
   const v={id:f.id||uid(),n,cant:f.cant.trim(),ann:String(f.ann||'').trim(),gr:nn(f.gr),tipo:VN_TIPI[f.tipo]?f.tipo:'rosso',den:f.den.trim(),vit:f.vit.trim(),abb:f.abb.slice(),pv:nn(f.pv),pc:isMgr(meU())?nn(f.pc):(old&&old.pc)||null,
@@ -5862,7 +5883,7 @@ const A={
   funzSet:d=>funzSet(d.k,d.v==='1'),agOpen:()=>agOpen(),
   rcOpen:()=>rcOpen(),rcNew:()=>rcForm(null),rcEdit:d=>{const r=((D().config.ricette||{}).r||{})[d.v];if(r)rcForm(r)},rcPick:()=>rcPick(),rcAdd:d=>rcAdd(d.v),rcIngDel:d=>{S.rcf.ing.splice(+d.v,1);refreshSheet()},rcSave:()=>rcSave(),rcDel:()=>rcDel(),rcVisto:()=>rcVisto(),
   vnOpen:()=>vnOpen(),vnV:d=>{S.vn.v=d.v;refreshSheet()},vnTipo:d=>{S.vn.tipo=d.v;refreshSheet()},vnCasa:()=>{S.vn.casa=!S.vn.casa;refreshSheet()},vnAbb:d=>{S.vn.abb=S.vn.abb===d.v?'':d.v;refreshSheet()},
-  vnShow:d=>vnShow(d.v),vnNew:()=>vnForm(null),vnEdit:d=>{const v=vnGet(d.v);if(v)vnForm(v)},vnFoto:()=>vnFoto(true),vnFotoF:()=>vnFoto(false),vnIa:()=>vnIaGo(null),vnSave:()=>vnSave(),vnDel:()=>vnDel(),
+  vnShow:d=>vnShow(d.v),vnNew:()=>vnForm(null),vnEdit:d=>{const v=vnGet(d.v);if(v)vnForm(v)},vnFoto:()=>vnFoto(true),vnFotoF:()=>vnFoto(false),vnFotoG:()=>vnFoto(false,true),vnFotoDel:d=>vnFotoDel(d.v),vnFotoGo:()=>{const f=S.vnf;if(f&&f.fotos&&f.fotos.length)vnIaGo(f.fotos.map(x=>x.file))},vnIa:()=>vnIaGo(null),vnSave:()=>vnSave(),vnDel:()=>vnDel(),
   vnfTipo:d=>{S.vnf.tipo=d.v;S.vnf._tipo=1;refreshSheet()},vnfAbb:d=>{const l=S.vnf.abb,i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},
   vnVen:d=>vnMov(d.v,'ven',1),vnCar:d=>vnMov(d.v,'car',1),vnConta:d=>vnConta(d.v),agV:d=>{S.ag.v=d.v;S.ag.sel='';refreshSheet()},agToday:()=>{S.ag.g=today();S.ag.sel='';refreshSheet()},
   agDayGo:d=>{S.ag.v='oggi';S.ag.g=d.v;S.ag.sel='';refreshSheet();const b=document.querySelector('.sheet.tall');if(b)b.scrollTop=0},
