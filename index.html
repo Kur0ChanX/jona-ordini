@@ -623,6 +623,16 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .br-ing{border-top:1px solid var(--line);margin-bottom:6px}.br-ir{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
 .br-ir b{flex:none;min-width:84px;font-variant-numeric:tabular-nums}.br-ir span{flex:1;min-width:0;overflow-wrap:anywhere}.br-ir i{flex:none;font-style:normal;font-size:12px;padding:2px 8px;border-radius:999px}
 .br-ok{background:var(--lagoon-soft);color:var(--lagoon)}.br-no{background:var(--sunk);color:var(--corallo)}.br-pas{margin-top:6px}
+.br-dis{flex:none;width:44px;height:44px;overflow:visible}.br-dis .wa{opacity:.62;filter:url(#br-wash)}.br-dis .ink{fill:none;stroke:#2a2420;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.br-dis .inkp{fill:#2a2420}
+html.lite .br-dis .wa{filter:none}
+.br-gl{display:flex;align-items:center;gap:8px}.br-gl .br-dis{width:30px;height:30px}.br-gl .br-dis .ink{stroke:var(--ink2)}.br-gl .br-dis .inkp{fill:var(--ink2)}
+.br-carta{--carta:#f7f2e8;border:0;border-radius:14px;padding:4px 12px 4px 8px;color:#3a302b;background-color:var(--carta);box-shadow:inset 0 0 36px rgba(120,90,50,.12);
+ background-image:radial-gradient(rgba(120,95,60,.07) 1px,transparent 1.2px),radial-gradient(rgba(120,95,60,.05) 1px,transparent 1.2px),linear-gradient(90deg,transparent 60px,rgba(200,80,80,.28) 60px 61.5px,transparent 61.5px);background-size:7px 7px,11px 11px,auto;background-position:0 0,3px 5px,0 0}
+html.lite .br-carta{background-image:linear-gradient(90deg,transparent 60px,rgba(200,80,80,.28) 60px 61.5px,transparent 61.5px);box-shadow:none}
+.br-carta .br-ir{align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid rgba(90,130,170,.25)}.br-carta .br-ir:last-child{border-bottom:0}.br-carta .br-ir b{min-width:64px;color:#2a2420}
+.br-carta .br-ok{background:#d9eee8;color:#1d6a5f}.br-carta .br-no{background:#f5e0da;color:#ad3d2c}
+[data-theme="dark"] .br-carta{--carta:#e9e1d1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .br-carta{--carta:#e9e1d1}}
 .br-casa{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:linear-gradient(120deg,var(--lagoon-soft),var(--surface) 80%);margin:4px 0 8px}
 .br-casa b{display:block;font:600 22px var(--font)}.br-casa .br-bot{width:18px;height:40px}
 .br-step{display:flex;align-items:center;gap:18px;margin-bottom:6px}.br-step b{font:600 24px var(--font);min-width:40px;text-align:center}.br-liv{margin-bottom:12px}.br-fin{width:100%}
@@ -1212,8 +1222,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=88;
+const APP_VER=89;
 const NEWS=[
+  {v:89,data:'2026-10-12',titolo:'Bar: ingredienti disegnati',
+    tutti:['Nella scheda di ogni cocktail gli ingredienti sono disegnati a penna e acquerello, su un foglio di carta: lime, menta, ghiaccio, gin… si riconoscono a colpo d\'occhio.','Anche i gruppi dell\'inventario del bar hanno il loro disegno.'],
+    dev:{aggiunte:['D39 (stile B scelto da Mario): `data/bar-disegni.json` (43 disegni SVG 64×64 + regole nome→disegno con colore, da `tools/bar-disegni.mjs`), scaricato solo all\'apertura del Bar (`brDisLoad`, in `FILES` di sw.js). `brDis(nome,alcolico)`: prima regola che corrisponde, altrimenti liquore/acqua. Filtro acquerello `#br-wash` (spento con `lite`), carta solo CSS `.br-carta`. Prova `tools/test-bar-disegni.mjs`.']}},
   {v:88,data:'2026-10-12',titolo:'Colpo dell\'apertura più elegante',
     tutti:['All\'apertura il logo dà un solo colpo verso il basso, breve e morbido, invece di far tremare lo schermo.'],
     dev:{correzioni:['D40: `jShake` = un colpo verticale smorzato (4 px giù, rimbalzo 1 px, 0,34 s, `cubic-bezier(.25,.6,.3,1)`), niente zig-zag a destra/sinistra. Scelta di Mario (A Ovvia) dal video `docs/img/sessione-92/d40-confronto.mp4` (`tools/colpo-d40.mjs`). Prova in `tools/test-apertura-v62.mjs`.']}},
@@ -5704,7 +5717,15 @@ const brLiv=x=>{x=+x||0;return BR_LIV.reduce((a,b)=>Math.abs(b[0]-x)<Math.abs(a[
 function brQ(b){const pi=Math.max(0,+b.pi||0),ap=+b.ap||0;if(!ap||ap>=1)return String(pi+(ap>=1?1:0));return pi?pi+' + '+brLiv(ap)[1]:brLiv(ap)[1]}
 const brN=x=>{const i=Math.floor(x+1e-6),r=x-i;if(r<0.1)return String(i);const l=brLiv(r)[1];return i?i+' '+l:l};
 const brBot=b=>{const ap=+b.ap||0,l=ap?Math.round(ap*100):(+b.pi?100:0);return`<span class="br-bot${!brTot(b)?' br-vuota':''}" style="--l:${l}%" aria-hidden="true"></span>`};
-let BR_CK=null,BR_CKP=null;
+let BR_CK=null,BR_CKP=null,BR_DIS=null,BR_DISP=null;
+function brDisLoad(){if(BR_DIS)return Promise.resolve(BR_DIS);
+  if(!BR_DISP)BR_DISP=fetch('data/bar-disegni.json').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.json()}).then(j=>{
+    if(!document.getElementById('br-defs'))document.body.insertAdjacentHTML('beforeend','<svg id="br-defs" width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="br-wash" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="5"/><feGaussianBlur stdDeviation=".7"/></filter></defs></svg>');
+    BR_DIS={g:j.g,r:j.r.map(x=>[new RegExp(x[0]),x[1],x[2]])};return BR_DIS}).catch(e=>{BR_DISP=null;throw e});
+  return BR_DISP}
+const brDisK=n=>{const s=String(n||'').toLowerCase();return BR_DIS&&BR_DIS.r.find(x=>x[0].test(s))};
+function brDis(n,alc){if(!BR_DIS)return'';const r=brDisK(n),g=BR_DIS.g[r?r[1]:alc?'liquore':'acqua'];if(!g)return'';
+  return`<svg class="br-dis" viewBox="0 0 64 64" aria-hidden="true">${g.w.map((w,i)=>`<g class="wa" transform="translate(1.5 1.5)" fill="${i===0&&r&&r[2]||w[0]}">${w[1]}</g>`).join('')}<g class="ink">${g.d}</g>${g.p?`<g class="inkp">${g.p}</g>`:''}</svg>`}
 function brCk(){if(BR_CK)return Promise.resolve(BR_CK);
   if(!BR_CKP)BR_CKP=fetch('data/cocktail.json').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.json()}).then(j=>{
     BR_CK=j.c.map((c,i)=>({i,n:c[0],f:c[1],m:c[2],g:c[3],ing:c[4],gu:c[5],p:c[6],iba:!!c[7],k:norm(c[0]+' '+c[4].map(x=>x[2]).join(' '))}));return BR_CK}).catch(e=>{BR_CKP=null;throw e});
@@ -5714,7 +5735,7 @@ const brFattibile=(c,h)=>c.ing.every(x=>!x[3]||h.has(brBase(x[2])));
 function brUsate(){let n=0;for(const m of Object.values((D().config[brMese()]||{}).m||{}))if(m&&+m.d<0)n-=+m.d;return n}
 const brCta=me=>{if(!brOn(me))return'';const l=brAll(),n=l.reduce((s,b)=>s+brTot(b),0);return`<button type="button" class="sug-cta" data-a="brOpen">${ic('cocktail')}<div><b>Bar: cocktail e alcolici</b><span>${l.length?Math.round(n)+(Math.round(n)===1?' bottiglia':' bottiglie')+' in casa · oltre 200 cocktail con dosi':'Oltre 200 cocktail con dosi e passaggi, inventario delle bottiglie'}</span></div>${ic('chev')}</button>`};
 function brOpen(v){if(!funzOn('bar'))return;S.br={v:v||'ck',q:'',f:'',fat:false,n:60,iq:''};usoSegna('bar');openSheet({cls:'tall',live:()=>true,render:brList});
-  brCk().then(()=>refreshSheet()).catch(()=>{if(S.br)S.br.err=1;refreshSheet()})}
+  brCk().then(()=>refreshSheet()).catch(()=>{if(S.br)S.br.err=1;refreshSheet()});brDisLoad().then(()=>refreshSheet()).catch(()=>{})}
 function brList(){const V=S.br,me=meU(),all=brAll(),can=brCan(me);
   const head=`<div class="grab"></div><div class="sh-h"><div class="sh-t">Bar<div class="sh-s">${BR_CK?BR_CK.length+' cocktail · ':''}${brN(all.reduce((s,b)=>s+brTot(b),0))} bottiglie in casa</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <div class="seg wide vn-seg">${[['ck','Cocktail'],['inv','Inventario']].map(([k,l])=>`<button type="button" aria-pressed="${V.v===k}" data-a="brV" data-v="${k}">${l}</button>`).join('')}</div>`;
@@ -5726,7 +5747,7 @@ function brList(){const V=S.br,me=meU(),all=brAll(),can=brCan(me);
     ${can?`<div class="btns vn-add"><button type="button" class="btn primary big" data-a="brNew">${ic('plus')} Aggiungi una bottiglia</button></div>`:''}
     ${all.length>12?`<div class="search rc-cerca">${ic('search')}<input id="briq" type="search" placeholder="Cerca una bottiglia" value="${esc(V.iq)}" data-in="briq" autocomplete="off"></div>`:''}
     <p class="muted small vn-hint">Tocca una bottiglia per contarla: quelle intere e quanto resta di quella aperta.</p>
-    ${grp.length?grp.map(([g,bs])=>`<span class="lbl">${esc(g)}</span>${bs.map(b=>`<button type="button" class="prow br-r" data-a="brB" data-v="${b.id}">${brBot(b)}<div class="row-i"><div class="row-t">${esc(b.n)}</div><div class="row-m">${esc(b.cat||'')}${b.cl?' · '+b.cl+' cl':''}</div></div><div class="vn-q"><b class="${!brTot(b)?'vn-zero':b.min>0&&brTot(b)<=b.min?'vn-basso':''}">${brQ(b)}</b><span>in casa</span></div></button>`).join('')}`).join('')
+    ${grp.length?grp.map(([g,bs])=>`<span class="lbl br-gl">${brDis(((BR_CAT.find(x=>x[0]===g)||[])[1]||[])[0]||'',1)}${esc(g)}</span>${bs.map(b=>`<button type="button" class="prow br-r" data-a="brB" data-v="${b.id}">${brBot(b)}<div class="row-i"><div class="row-t">${esc(b.n)}</div><div class="row-m">${esc(b.cat||'')}${b.cl?' · '+b.cl+' cl':''}</div></div><div class="vn-q"><b class="${!brTot(b)?'vn-zero':b.min>0&&brTot(b)<=b.min?'vn-basso':''}">${brQ(b)}</b><span>in casa</span></div></button>`).join('')}`).join('')
       :`<p class="muted">${all.length?'Nessuna bottiglia trovata.':can?'Ancora nessuna bottiglia. Tocca «Aggiungi una bottiglia»: poi i cocktail ti dicono cosa puoi fare con quello che c\'è.':'Ancora nessuna bottiglia.'}</p>`}`}
   if(V.err&&!BR_CK)return head+`<p class="muted">Non riesco a caricare i cocktail. Controlla la connessione e riapri il Bar.</p>`;
   if(!BR_CK)return head+`<p class="muted">${ic('clock')} Carico i cocktail…</p>`;
@@ -5737,12 +5758,12 @@ function brList(){const V=S.br,me=meU(),all=brAll(),can=brCan(me);
   <div>${l.length?l.slice(0,V.n).map(c=>`<button type="button" class="prow br-r" data-a="brC" data-v="${c.i}"><div class="row-i"><div class="row-t">${esc(c.n)}${c.iba?' <span class="br-iba">IBA</span>':''}</div><div class="row-m">${esc(c.ing.filter(x=>x[3]).map(x=>brBase(x[2])).join(' · ')||'Analcolico')}</div></div><span class="br-met">${BR_MET[c.m][0]}</span></button>`).join('')
     +(l.length>V.n?`<button type="button" class="btn ghost br-piu" data-a="brPiu">Mostra altri ${Math.min(60,l.length-V.n)} (${l.length-V.n} in tutto)</button>`:'')
     :`<p class="muted">Nessun cocktail trovato.${V.fat?' Togli «Si possono fare» per vederli tutti.':''}</p>`}</div>`}
-function brShowC(i){S.brC=+i;openSheet({cls:'tall',live:()=>true,render:()=>{const c=BR_CK&&BR_CK[S.brC];if(!c)return`<div class="grab"></div><p class="muted">Cocktail non trovato.</p>`;
+function brShowC(i){S.brC=+i;if(!BR_DIS)brDisLoad().then(()=>refreshSheet()).catch(()=>{});openSheet({cls:'tall',live:()=>true,render:()=>{const c=BR_CK&&BR_CK[S.brC];if(!c)return`<div class="grab"></div><p class="muted">Cocktail non trovato.</p>`;
   const inv=brAll().length?brHave():null,met=BR_MET[c.m]||['',''];
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(c.n)}<div class="sh-s">${esc((BR_FAM.find(x=>x[0]===c.f)||['',''])[1])}${c.iba?' · ricetta ufficiale IBA':''}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <div class="vn-tav br-tav"><div><span class="vn-tl">Metodo</span><b>${esc(met[0])}</b></div><div><span class="vn-tl">Bicchiere</span><b>${esc(c.g)}</b></div><div><span class="vn-tl">Guarnizione</span><b>${esc(c.gu)}</b></div></div>
-  <span class="lbl">Ingredienti</span><div class="br-ing">${c.ing.map(x=>{const ok=inv&&x[3]?inv.has(brBase(x[2])):null;
-    return`<div class="br-ir"><b>${esc(x[0]==='top'?'top':x[0]+(x[1]?' '+x[1]:''))}</b><span>${esc(x[2])}</span>${ok===null?'':ok?`<i class="br-ok">in casa</i>`:`<i class="br-no">manca</i>`}</div>`}).join('')}</div>
+  <span class="lbl">Ingredienti</span><div class="br-ing${BR_DIS?' br-carta':''}">${c.ing.map(x=>{const ok=inv&&x[3]?inv.has(brBase(x[2])):null;
+    return`<div class="br-ir">${brDis(brBase(x[2]),x[3])}<b>${esc(x[0]==='top'?'top':x[0]+(x[1]?' '+x[1]:''))}</b><span>${esc(x[2])}</span>${ok===null?'':ok?`<i class="br-ok">in casa</i>`:`<i class="br-no">manca</i>`}</div>`}).join('')}</div>
   <span class="lbl">Come si fa</span><p class="vn-tx">${esc(met[1])}</p><p class="vn-tx br-pas">${esc(c.p)}</p>`}})}
 async function brPut(b){if(D().config.bar)await upd('config','bar',{['b.'+b.id]:b});else await put('config','bar',{tipo:'bar',b:{[b.id]:b}})}
 async function brSet(id,pi,ap,t){const b=brGet(id),me=realU();if(!b||!me)return;pi=Math.max(0,Math.round(pi));ap=Math.min(1,Math.max(0,+ap||0));

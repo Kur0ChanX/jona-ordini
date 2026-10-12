@@ -1,31 +1,35 @@
-# Passaggio di consegne (2026-10-12, fine sessione #91)
+# Passaggio di consegne (2026-10-12, fine sessione #93)
 
-Sessione attuale: #92
+Sessione attuale: #94
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v85**. PR #97 = v86 + v87, prove da far tornare verdi (punto 1).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v88**. **PR #99 (v89) aperta**, da unire appena il controllo `prove` è verde.
 
-## ✅ SUBITO (#92)
-1. **PR #97 (v86) NON unita**: le prove `prove` sul commit `a4394e9` sono **fallite alle 0:12** (ora italiana, 12/10) con `test-agenda-v59` e `test-richieste-gestite` (tutte le altre verdi). Girate da 23:55 a 0:12, cioè **a cavallo della mezzanotte domenica→lunedì** (cambia giorno E settimana degli orari). Alle 0:13 in locale (TZ Europe/Rome) le due prove passano → quasi certamente prove legate all'ora come E26/E36, non un errore dell'app. DA FARE: (a) scaricare i registri (`registri-prove`, run 38178330071, artifact 11717357408, oppure `mcp__github__get_job_logs` job 114585404981 con più righe e cercare `FAIL`) e capire quale controllo dipende dall'ora/giorno/settimana; (b) correggere la PROVA (non spegnerla) perché regga la mezzanotte, es. fissare la data nella prova o evitare di creare dati «oggi» e controllarli dopo il cambio di giorno; (c) riga E41 in `docs/ERRORI.md`. Dopo il push di #91 la PR #97 contiene anche la v87 (commit `17484e4`): titolo della PR da aggiornare a «v86-v87: app più leggera, apertura pulita», squash con `expectedHeadSha` di 40 caratteri SOLO con `prove` verde sull'ultimo commit, poi `git fetch origin main && git merge origin/main` + push, controllo online `APP_VER=87` su https://jona-ristorante-by-ynoy-corp.pages.dev/ . Ricorda E39: mentre `prove` gira, niente push.
-2. **Richiesta nuova di Mario (D40, ultimo messaggio)**: «Fai il colpo che fa tremare un pò lo schermo in modo professionale da app non pacchiano». Cioè rifare la scossa dell'apertura (`@keyframes jShake` riga ~112 di index.html: oggi `12% translate(0,7px) 28% (-4px,-3px) 44% (3px,2px) 62% (-2px,-1px) 80% (1px,0)`, `.intro .splash{animation:jShake .5s .55s linear both}`) in modo più fine, stile app professionale (pensa all'«impatto» di iOS/haptic): un solo colpo verticale breve e smorzato (es. 3-4 px giù, rimbalzo 1 px, ~300-350 ms, curva morbida `cubic-bezier`), niente zig-zag a destra/sinistra; magari un leggero `scale(.995)` invece di spostare tutto, o la scossa solo sul contenuto (`.jhit`/logo + onde) e non sullo sfondo. Vibrazione del telefono `navigator.vibrate(12)` al colpo SOLO se l'app la usa già altrove (controllare; se no proporla, non aggiungerla senza dirlo). Prima di costruire: GIF/immagine o video breve di confronto (2-3 varianti: «Ovvia» colpo verticale smorzato, «Furba» micro-zoom, «Geniale» colpo + vibrazione leggera + onde) con `tools/colpo-varianti.mjs` (esiste già, fu usato per la v62) e scelta di Mario a parole (E38). Il taglio `html.on-splash #app{overflow:clip}` della v87 resta comunque. Aggiornare `tools/test-apertura-v62.mjs` (controlla `shake:true` a 640 ms e la pagina che non scorre).
-3. **v87 (già fatta in #91, prove legate e `test-giro` verdi)**: commit `17484e4` «niente barre di scorrimento nell'apertura (D38), «Più venduti» allineati», ora dentro la PR #97 (punto 1). D40 va dopo, come v88, se la PR #97 è già partita con le prove (E39). `CACHE` già `jona-ordini-v91`; se si aggiunge D40 aggiornare solo la voce NEWS v87 (non cambiare numero).
-4. **D39 disegni degli ingredienti del Bar**: immagine con 3 stili mandata a Mario (`docs/img/sessione-91/d39-stili.png`, sorgente `tools/d39-stili.html` con i 6 disegni SVG riusabili). Domanda nel testo: A matita colorata, **B inchiostro e acquerello (consigliato)**, C linea unica. Aspettare la sua risposta, poi costruire solo lo stile scelto (vedi riga D39 in `docs/DA-FARE.md`).
+## ✅ SUBITO (#94)
+1. **PR #99 (v89, D39 disegni del Bar)**: aspettare il controllo `prove` (minuscolo, E33) sull'ultimo commit del ramo. Se verde → squash merge da solo (regola «pubblica sempre in automatico»), controllo online (`APP_VER=89` su https://jona-ristorante-by-ynoy-corp.pages.dev/ ), poi `git fetch origin main && git merge origin/main` sul ramo e push normale. Se rosso → capire la causa (E41: prove a mezzanotte? usare `tools/ora-fissa.mjs`). Mentre `prove` gira NON fare push sul ramo (E39). Dire a Mario in 2 righe che v89 è online.
+2. Poi D33 (sotto): proposta con immagine e 3 strade.
+3. Guardare il giro delle prove del lunedì (3:17): se rosso, priorità.
 
-## Fatto in #91 (12/10, 23:55-0:10 ora italiana)
-- **D38 risolta (v87, non ancora online)**: il «bordo bianco» della foto di Mario erano le **barre di scorrimento di Android** (striscia grigia (93,89,86) larga 12 px fisici ≈ 4,6 dp a destra dal bordo superiore al fondo e in basso). Causa: `jShake` trasla la `.splash` di 1-6 px tra 560 e 980 ms → la pagina diventa scorrevole (misurato: `scrollHeight-clientHeight` fino a 6 px, `scrollWidth` fino a 2 px) → Android mostra le barre sottili. Prima ipotesi scartata: il fondo `html.on-wall` (cocoa liscio) scoperto dalla traslazione (misurato: stesso colore, non è quello). Correzione: in `render()` `document.documentElement.classList.toggle('on-splash',!!S.splash)` e CSS `html.on-splash #app{overflow:hidden;overflow:clip}` (solo durante l'apertura, così l'ingresso con i profili scorre normale). Prova nuova in `tools/test-apertura-v62.mjs`: in nessun istante 0-3800 ms la pagina scorre + `on-splash` tolta dopo (fallisce col codice vecchio: verificato). 34 controlli verdi.
-- **«Più venduti» della Cantina** (rifinitura #90): `<li><b>${n}</b>${vnTit(v)}</li>` + `.vn-top b{float:right;margin-left:12px}`; `tools/test-cantina.mjs` riga 111 aggiornata (controlla nome, `<b>`=2 e `float:right`). Verde.
-- v87: `APP_VER=87`, `CACHE` `jona-ordini-v91`, voce NEWS v87 «Apertura pulita» (data 2026-10-12), riga v87 in CLAUDE.md. Prove: test-apertura-v62, test-cantina, test-news, test-giro tutte verdi.
-- **D39 salvata** in `docs/DA-FARE.md` (messaggio di Mario arrivato dalla #90 dopo il suo handoff, con la valutazione già data da #90: niente PNG da internet, SVG nostri ~1 KB, ~40 ingredienti più usati, carta solo CSS). Immagine dei 3 stili fatta e mandata.
-- `docs/ULTIMO-MESSAGGIO.md` aggiornato a mano col messaggio di Mario della #90 (la scorta salta i messaggi tra sessioni).
-- Push: per tutta la #91 NON ho fatto push mentre `prove` girava sulla PR #97 (E39); il lavoro era nella scorta.
+## Fatto in #93 (12/10, ~0:55-1:40 ora italiana)
+- Avvio: scorta unita due volte (conflitto solo sull'intestazione di `docs/ULTIMO-MESSAGGIO.md`, tenuta la più nuova). Push confermati.
+- Mario ha detto «vai»: rimandata l'immagine `docs/img/sessione-91/d39-stili.png`, domanda a tocco con doppio tocco. **Scelta: B · Inchiostro e acquerello, confermata** («Sì, confermo lo stile»). Ripetuta in chiaro nel testo (E38).
+- **D39 fatto, v89** (commit `4d88b2a`, PR #99):
+  - `tools/bar-disegni.mjs` → `data/bar-disegni.json` (43 disegni, 91 regole, 26 KB) e `tools/bar-disegni-anteprima.html` (foglio con tutti i disegni grandi e a 44 px). Disegni: lime, limone, arancia, pompelmo (fetta rosa a 10 spicchi), ananas, mirtillo, fragola, pesca, ciliegia, melograno, pomodoro, cocco, mela, passione, uva, cetriolo, peperoncino, oliva, menta, cannella, fiore, zucchero, miele, sciroppo, uovo, panna, caffe, soda, acqua, ghiaccio, sale, bitter, gin, vodka, rum, agave (tequila/mezcal), whisky, brandy, liquore (bottiglia tonda, colore dalla regola), bottiglia (aperitivi/vermouth/amari), vino, spumante, birra.
+  - Principio delle regole: alcolici → bottiglia o bicchiere (colore secondo il prodotto), analcolici → frutto/oggetto. Prima regola che corrisponde vince (es. «cherry brandy» e «crema di whisky» prima di brandy/whisky). Senza regola: liquore se alcolico, acqua se no.
+  - index.html: `brDisLoad` (fetch all'apertura del Bar e in `brShowC`, inietta una volta `<svg id="br-defs">` con il filtro `#br-wash`), `brDisK`, `brDis(nome,alc)`. Scheda del cocktail: `.br-ing.br-carta` (carta chiara anche nel tema scuro, testo #2a2420, margine rosso a 60 px), disegno 44 px per ingrediente. Inventario: `.lbl.br-gl` con disegno 30 px (linee `var(--ink2)`, così si vedono nel tema scuro). `html.lite` spegne il filtro e i puntini della carta.
+  - sw.js: `CACHE` `jona-ordini-v93`, `./data/bar-disegni.json` in `FILES`. Il deploy copia già tutta `data`.
+  - `APP_VER=89`, NEWS v89 «Bar: ingredienti disegnati», riga v89 in CLAUDE.md, D39 aggiornata in `docs/DA-FARE.md`.
+  - Prova `tools/test-bar-disegni.mjs` (24 PASS; ogni ingrediente di `cocktail.json` e ogni tipo di `BR_CAT` ha una regola; lite spegne l'acquerello; tema scuro; file mancante con `serviceWorkers:'block'` → lista di prima senza errori). Aggiunta a `VELOCI` in `tools/prova-ci.sh`.
+  - Verdi in locale: test-bar-disegni, test-bar, test-news, test-demo, test-leggera, test-giro.
+  - Foto mandata a Mario: Negroni, Mojito, inventario, chiaro e scuro (rifarla: demo → Fornitori → Bar → cerca nel campo `#brq`).
 
 ## Domanda aperta a Mario (scritta nel testo in #87, ancora senza risposta)
 «Oggi come registrate i vini venduti? Scontrino di cassa (con quale programma?), comanda su carta, oppure niente?» → serve per collegare le vendite (es. foto della chiusura di cassa letta dall'IA). Fino alla risposta resta «− Venduta».
 
 ## Prossimi lavori (in ordine, da soli, pubblicare in automatico se le prove sono verdi)
-1. PR #97 e v87 + D40 (sopra), D39 dopo la scelta di Mario.
-2. D33 (funzioni smart per orari e agenda): proposta con immagine + 3 strade (sotto). È una scelta di Mario: domanda nel testo (E38).
-3. Idee per il Bar (da proporre solo se utili): «Cocktail della casa» (ricette del bartender), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
-4. `tools/misura-velocita.mjs` nelle prove di GitHub? Decidere dopo qualche misura (i tempi su GitHub cambiano).
+1. Unire PR #99 (sopra).
+2. D33 (funzioni smart per orari e agenda): proposta con immagine + 3 strade (sotto). È una scelta di Mario: domanda a tocco con doppio tocco, ripetendo in chiaro la scelta prima di costruire (E37/E38).
+3. Idee per il Bar (da proporre solo se utili): «Cocktail della casa» (ricette del bartender, con disegni già pronti), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
+4. `tools/misura-velocita.mjs` nelle prove di GitHub? Decidere dopo qualche misura.
 
 ## D33 — funzioni smart per orari e agenda (chiesto da Mario, ancora da proporre)
 Controllato che NON esistono già: richieste di indisponibilità/ferie dallo staff; promemoria del turno (sera prima / 1 ora prima); turni proposti in automatico dai coperti dell'agenda; costo del personale della settimana. Esistono già: «Copia settimana prima», turni tipo, assenze (R/F/M/P), cambi turno, timbratura QR, «In turno oggi», agenda con ripetizioni e appunti, coperti in ordine suggerito.
@@ -38,7 +42,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = lo staff segna i giorni in 
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiusa), #90 `session_01MAqfbJ8neGEZiNgRVBCjCA`, #89 `session_01Y1ek4ZACQwmsRsQn8vWqyn`, #88 `session_0199ANgsgVouZX79Xd7QJFZX`, #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #93 `session_01Q2KYN7TKMEbWP23X6HfPYB` (chiusa), #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj`, #90 `session_01MAqfbJ8neGEZiNgRVBCjCA`, #89 `session_01Y1ek4ZACQwmsRsQn8vWqyn`, #88 `session_0199ANgsgVouZX79Xd7QJFZX`, #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -59,8 +63,5 @@ Idee: Ovvia = promemoria del turno via push; Furba = lo staff segna i giorni in 
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-«Fai il colpo che fa tremare un pò lo schermo in modo professionale da app non pacchiano»
-(12/10/2026 ~0:10 ora italiana, in #91, dopo la mia risposta sul bordo dell'apertura e l'immagine D39).
-
-Prima (in #90 dopo il suo handoff, girato alla #91): «quanti agenti hai in aiuto? che dicie se aggiungiamo agli ingredienti un Png per ogni ingrediente oreso da internet tutti innerenti tranloro come grafica o disegno sarebbe bello in stole disegno ogni ingrediente e lo sfondo è un effetto foglio pagina come se ha disegnato su un foglio riesci a trovare un Png per ogni ingrediente? senza appesantire app che dici valuta e rinnomina la sessione e Rispondimi quanti agenti lavoro in questo progetto ora? vai avanti da solo leggi tutte le mie richieste e fermatinsolo per scelte importanti» (già risposto da #90; D39).
-Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+«vai»
+(12/10/2026 ~0:55 ora italiana, in #93, in risposta a «vuoi che ti rimandi l'immagine dei 3 stili?»). Poi, a tocco: stile **B Inchiostro**, «Sì, confermo lo stile». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
