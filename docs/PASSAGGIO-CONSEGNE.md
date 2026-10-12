@@ -80,4 +80,4 @@ Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro:
 
 ## Ultimo messaggio di Mario, parola per parola
 (12/10/2026 ~9:35 ora italiana, #98, con un'immagine salvata in `docs/img/sessione-98/spunto-cocktail-mario.jpg`: 6 cocktail disegnati a mano e acquerellati — Mojito, Cosmopolitan, Old Fashioned con ciliegie, Margarita col lime, drink arancio con ciliegia/ananas/foglie, calice giallo con ananas, ciliegia e cannuccia rossa) «vedi ad esemlio questi per prendere spunto che dettagli e carini»
-Prima (#97): «Cerca di mettere meno foto simili possibili e falle inerenti al cocktail». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+Prima (#97): «Cerca di mettere meno foto simili possibili e falle inerenti al cocktail». Mario l'ha riscritto anche nella #97 già chiusa (~9:21 ora italiana, girato dalla #97 con send_message): «Cerca di mettere meno foto png simili possibili e falle inerenti al cocktail» (stessa richiesta, fatta in #98). Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
