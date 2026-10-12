@@ -5793,7 +5793,7 @@ function brDis(n,alc){if(!BR_DIS)return'';const r=brDisK(n),g=BR_DIS.g[r?r[1]:al
 const brTinta=(h,t,a)=>'#'+[1,3,5].map(i=>Math.round(parseInt(h.slice(i,i+2),16)*(1-a)+t*a).toString(16).padStart(2,'0')).join('');
 let BR_LG=0;
 const brMove=(p,t)=>{const g=s=>`<g transform="translate(${t.replace(',',' ')}) scale(1.35)">${s}</g>`,o={};for(const k in p)o[k]=Array.isArray(p[k])?p[k].map(w=>[w[0],g(w[1]),w[2]]):g(p[k]);return o};
-// v92 regola di stile (Mario): contorni dei pezzi sottili e del loro colore, niente nero grosso. c/cf/cp = [[colore, forme]]
+// v92 regola di stile (#101): contorni dei pezzi sottili e del loro colore, niente nero grosso. c/cf/cp = [[colore, forme]]
 function brCol(ps,x,cl,pr){const m={};for(const p of ps)for(const[k,v]of p[x]||[])m[k]=(m[k]||'')+v;return Object.keys(m).map(k=>`<g class="${cl}" style="${pr}:${k}">${m[k]}</g>`).join('')}
 function brCkDis(c,cl){const k=BR_DIS&&BR_DIS.k[c.n],B=k&&BR_DIS.b[k[0]];if(!B)return'';const ps=k.slice(2).map(x=>{const[id,t]=x.split('@'),p=BR_DIS.pz[id];return p&&t?brMove(p,t):p}).filter(Boolean),big=!cl,col=B.op||k[1];
   const wa=(f,s,o)=>`<g class="wa"${o?` style="opacity:${o}"`:''} fill="${f==='*'?k[1]:f==='*l'?brTinta(k[1],255,.1):f}">${s}</g>`,all=x=>ps.map(p=>p[x]||'').join('');
