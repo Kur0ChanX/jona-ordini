@@ -1,20 +1,26 @@
-# Passaggio di consegne (2026-10-12, fine sessione #110)
+# Passaggio di consegne (2026-10-12, fine sessione #111)
 
-Sessione attuale: #111
+Sessione attuale: #112
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v96 nella PR #106** (vedi SUBITO 1). v95 online (controllato: `APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/). Nel ramo: `APP_VER` 96, `CACHE` `jona-ordini-v100`.
 
-## ✅ SUBITO (#111)
-1. 🔴 **PR #106 (v96, D45): prove ROSSE** (giro 13:06-13:23, commit `48b5ab5` = head prima di D46; job https://github.com/Kur0ChanX/jona-ordini/actions/runs/38240505803/job/114781637153). Due prove fallite, NON pubblicare finché non sono corrette:
-   - `test-foto-vino`: «FAIL Mac: all'IA arriva la foto ripresa, ≤ 2000 px e dritta (undefined×undefined)». Solo Mac (WebKit desktop, `devices['Desktop Safari']`); iPhone e iPad passati (il registro mostra solo le prime 5 righe FAIL: rilanciare il giro per vedere tutto). Caso: foto ripresa dalla bozza (IndexedDB `jona-kv`/`vn_fotos`, `vnRestore`) dopo il ricaricamento → all'IA arriva una foto senza misure. Capire se è WebKit desktop che non ridà il Blob da IndexedDB, o la prova che legge le misure in modo diverso su Mac. Riprodurre: WebKit solo su GitHub (aggiungere log nella prova o lanciare `workflow_dispatch`).
-   - `test-news`: «FAIL staff: no technical words -> Gemini»: lo staff vede la parola «Gemini» (probabilmente nel testo NEWS v96 o nella riga `.vn-lt` «Letto da Gemini…» mostrata allo staff). In #109 in locale era PASS 94: controllare cosa vede lo staff e togliere «Gemini» dai testi dello staff (dire «l'IA»).
-   Dopo le correzioni: push (fa ripartire le prove della PR, che ora includono anche `test-dispositivi`), aspettare «prove» VERDE, poi quanto sotto.
-   Testo di prima: PR aperta in #110 alle 13:06. Controllare il controllo «prove» sull'ultimo commit della PR. Se VERDE e non ancora unita: squash (titolo «v96: foto del vino su iPhone non fa più ripartire l'app (D45)»), `git fetch origin main && git merge origin/main` nel ramo + push, controllo online `APP_VER` 96 su https://jona-ristorante-by-ynoy-corp.pages.dev/. Se ROSSO: log con `mcp__github__get_job_logs`, guardare soprattutto `test-foto-vino` e `test-dispositivi` su WebKit (Mac/iPhone/iPad). Se `createImageBitmap` con `resizeWidth` fallisce su WebKit, riserva = `loadImg`. (Lo stato preciso al momento dell'handoff è scritto sotto in «Fatto in #110».)
-2. Poi dire a Mario in poche righe: v96 online → riprovare Cantina → **Fotografa una bottiglia** sull'iPhone; se l'IA passa a Flash-Lite ora la scheda scrive il motivo vero («Letto da … Prima: … (errore N)»). Già detto a Mario in #110: Lite parte solo se Flash dà un errore; dalla v96 il motivo si vede.
-3. **D46 fatta in #110** (commit `8e83b4d`): guardare che `test-dispositivi` sia verde su GitHub nella PR (prima volta che gira con WebKit su iPhone 15, iPad gen 7, Desktop Safari). Se WebKit trova problemi d'aspetto veri → correggerli (sono difetti dell'app su Apple).
-4. Dopo: difetto 18 (Americano: arancia e scorza sovrapposte) e proposta SMART cocktail «bellissimi» (vedi «Idee»). Mario #102: «la nuova schiuma mi piace quello stile».
-5. Mario (#106): **«pubblica ogni tanto gli aggiornamenti»**: una versione online appena un pezzo è pronto.
+## ✅ SUBITO (#112)
+1. 🔴 **PR #106 (v96, D45)**: controllare il controllo «prove» sull'ultimo commit della PR (in #111: `7415c27`, giro partito ~14:40 ora italiana; se c'è un commit di consegne dopo, il giro è ripartito su quello). Se VERDE: squash (titolo «v96: foto del vino su iPhone non fa più ripartire l'app (D45)»), subito `git fetch origin main && git merge origin/main` nel ramo + push, controllo online `APP_VER` 96 su https://jona-ristorante-by-ynoy-corp.pages.dev/. Se ROSSO: il log di GitHub mostra solo le prime 5 righe FAIL (`grep -m5 '^FAIL'` in `tools/prova-ci.sh`); se una prova cade senza FAIL (eccezione) il registro intero è nell'artifact `registri-prove` dell'esecuzione.
+2. Poi dire a Mario: v96 online → riprovare Cantina → **Fotografa una bottiglia** sull'iPhone; se l'IA passa al lettore di riserva la scheda scrive il motivo vero.
+3. `test-dispositivi` (D46) era VERDE su GitHub già nel giro di `1ebde2e` (iPhone 15, iPad, Desktop Safari, Pixel 7, Galaxy Tab S4).
+4. Dopo: difetto 18 (Americano: arancia e scorza sovrapposte) e proposta SMART cocktail «bellissimi» (vedi «Idee»).
+5. Mario (#106): «pubblica ogni tanto gli aggiornamenti».
 6. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+
+## Fatto in #111 (12/10, ~13:25-14:45 ora italiana)
+- Avvio: scorta unita (solo ULTIMO-MESSAGGIO «via»), push.
+- `test-news` rossa: lo staff vedeva «Gemini» nella NEWS v96 → testo «Se l'IA passa a un lettore di riserva, la scheda dice il motivo vero.» (94 PASS).
+- `test-foto-vino` rossa solo sul Mac (WebKit desktop), 3 giri su GitHub per capire:
+  1. `1ebde2e`: attesa della richiesta all'IA da 1,2 s a fino a 10 s (non era quello).
+  2. `0ee5b06`: diagnosi DENTRO la riga FAIL (GitHub mostra solo le righe FAIL) + errori console → «richieste 0, console 400»: la richiesta andava al vero Google con la chiave finta.
+  3. `dd7f978`: causa = service worker attivo: Playwright su WebKit desktop non intercetta (route) la richiesta. Contesto con `serviceWorkers:'block'` (come test-agenda*). L'app vera non c'entra: sw.js lascia passare POST e altri siti. E48 in ERRORI. Risultato: passati foto all'IA e «Chiudi», poi `page.reload` scaduto (30 s) alla riga «fotocamera aperta + ricarica»: con la finestra dei file aperta WebKit desktop non dà «load».
+  4. `7415c27`: quella ricarica con `{waitUntil:'commit'}` (poi aspetta `.vn-rip`). In locale 36 PASS (WebKit SALTATA). Esito su GitHub in attesa all'handoff.
+- Handoff fatto per il contesto (avviso dell'hook) mentre girava il giro di `7415c27`.
 
 ## Fatto in #110 (12/10, ~13:05-13:25 ora italiana)
 - Avvio: scorta unita (solo ULTIMO-MESSAGGIO con la domanda «Lite», già nota), push.
@@ -88,7 +94,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#92** `session_01Mc34LWsJw9PKUiUJvYcPxB`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -109,6 +115,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+(12/10/2026 ~14:45 ora italiana, #111) «ok» (dopo il mio avviso: nuovo giro su GitHub, se verde pubblico la v96).
+Prima, in #111 nessun altro messaggio (sessione partita dal prompt della #110).
 (12/10/2026 ~13:12 ora italiana, #110) «via» → continuato: pubblicazione v96 e D46.
 Prima (12/10/2026 ~13:09, nella #109 chiusa, dopo l'handoff) «ok».
 Prima, in #109 Mario non aveva scritto (sessione partita dal prompt della #108).
