@@ -1,10 +1,11 @@
-# Passaggio di consegne (2026-10-12, fine sessione #113)
+# Passaggio di consegne (2026-10-12, fine sessione #114)
 
-Sessione attuale: #114
+Sessione attuale: #115
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v97 online** (controllato `APP_VER` 97 su https://jona-ristorante-by-ynoy-corp.pages.dev/ alle 17:14). Nel ramo: `APP_VER` 97, `CACHE` `jona-ordini-v101`, nessuna PR aperta.
 
-## ✅ SUBITO (#114)
+## ✅ SUBITO (#115)
+0. 🆕 **Richiesta di Mario (#114, ~18:20)** sulla prova dei cocktail: «la cannuccia sempre centro il cerchio alto del bicchiere». Cioè: la cannuccia deve uscire dal CENTRO dell'apertura (l'ellisse in alto del bicchiere), non vicino al bordo. Da fare: (a) nella bozza `tools/bozze/cocktail-bellissimi.mjs` (Mojito: `rotate(16 66 60)` della cannuccia → farla passare per il centro dell'ellisse `cx=60 cy=20`, es. ruotare attorno a (60,20) e partire più in basso dentro il drink), rifare le foto e mandarle (servono prima le foto «oggi»: script in Note tecniche, ritaglio quadrato al centro di `.br-ckbig`); (b) controllare la stessa regola nell'app: `tools/bar-disegni.mjs` (cannuccia oggi «dentro l'apertura, pendenza ≤0,35») → se non esce dal centro dell'ellisse, è un difetto da correggere in una versione (v98) con prova in `test-bar-disegni` (punto dove la cannuccia incrocia l'altezza del bordo ≈ centro dell'apertura). Poi chiedere ancora «Ti piace la prova?» (domanda #114 senza risposta).
 1. ✅ CHIUSO in #114: Mario ha visto che Cantina e Cocktail sono già in Fornitori («scusa visto ora che si trova in fornitori»). Niente da cambiare. Vecchia nota: **Richiesta di Mario (#113, 17:16)**: «metti cantina vini e cocktail anche dallo chef ovviamente». Stato oggi (letto in #113, niente cambiato):
    - Gestori (`isMgr`, quindi Maurizio Admin Chef) vedono già Ricette, Cantina e Bar come pulsanti nella scheda **Fornitori** (`${rcCta(meU())}${vnCta(meU())}${brCta(meU())}`).
    - Staff: in «Cosa serve?» `vnCta` solo se `me.reparto!=='cucina'`, `brCta` per chi non è gestore ma il Bar si apre solo con `brCan` (gestori, fb, resp, bartender/barman/barback). Quindi **il personale di cucina non vede né Cantina né Cocktail**.
@@ -12,6 +13,12 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 2. Mario proverà la foto del vino sull'iPhone (v96) quando torna in hotel («non sono in hotel ora»). Va bene anche una bottiglia a casa.
 3. #114: Mario «si» alla prova → bozza `tools/bozze/cocktail-bellissimi.mjs` (Spritz, Mojito, Negroni disegnati a mano: vetro trasparente, luce a pennello, ghiaccio che rifrange, frutta dentro, goccioline, linee colorate; foto `docs/img/sessione-114/cocktail-prova-*.png`, servono le foto «oggi» dall'app demo). Domanda: «Ti piace? Così per tutti i 212 è un lavoro grande.» In attesa. Vecchia domanda: «Ora preparo un disegno di prova per i cocktail "bellissimi", senza toccare l'app. Ti va bene?» (Mario ha risposto con la richiesta sopra, non con sì/no). Proposta SMART: vedi «Idee».
 4. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+
+## Fatto in #114 (12/10, ~18:05-18:20 ora italiana)
+- Avvio: scorta unita (due volte, solo ULTIMO-MESSAGGIO), push. Titolo sessione messo.
+- Richiesta «cantina e cocktail allo chef»: chiesto chi è lo chef; Mario «scusa visto ora che si trova in fornitori» → niente da fare (chiusa).
+- Prova «cocktail bellissimi» (Mario «si»): bozza `tools/bozze/cocktail-bellissimi.mjs`, foto `docs/img/sessione-114/cocktail-prova-1di2.png` e `-2di2.png` mandate (oggi a sinistra, prova a destra). Pezzi: `ruota` (agrume con albedo e vescicole), `foglia` (menta con venature), `cubo` (ghiaccio trasparente col colore del drink, parametro `k` per drink scuri), `bolle`, `gocce`, `luce` (riflesso a pennello pieno), acquerello con feTurbulence. Avvertito Mario: per tutti i 212 serve rifare il generatore, lavoro di più sessioni; nella lista (44 px) i dettagli si vedono poco.
+- Handoff per l'avviso dell'hook (contesto ~150k).
 
 ## Fatto in #113 (12/10, ~16:49-17:16 ora italiana)
 - Avvio: scorta unita due volte (solo ULTIMO-MESSAGGIO: «non sono in hotel ora», poi «ok»).
@@ -79,7 +86,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#92** `session_01Mc34LWsJw9PKUiUJvYcPxB`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -100,6 +107,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+(12/10/2026 ~18:20 ora italiana, #114) «la cannuccia sempre centro il cerchio alto del bicchiere» (dopo le foto della prova dei cocktail).
+(12/10/2026 ~18:15, #114) «si» (alla prova dei cocktail più belli). (~18:10) «scusa visto ora che si trova in fornitori».
 (12/10/2026 ~17:16 ora italiana, #113) «metti cantina vini e cocktail anche dallo chef ovviamente»
 (12/10/2026 ~16:51, #113) «ok» (dopo: controllo di sicurezza alle 17:41).
 (12/10/2026 ~16:30, #112) «non sono in hotel ora» (risposta a: prova la foto del vino sull'iPhone).
