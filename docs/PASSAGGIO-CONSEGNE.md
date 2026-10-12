@@ -6,7 +6,11 @@ La #117 (aperta a mano da Mario, profondità 0) apre la #118.
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v97 online, v98+v99 in PR #108 con prove ROSSE** (solo `test-chat-tastiera` su iPhone/iPad, errore della prova, non dell'app). Nel ramo: `APP_VER` 99, `CACHE` `jona-ordini-v103`.
 
-## ✅ SUBITO (#118)
+## Fatto in #118 (12/10, ~21:23-21:55 ora italiana)
+- `tools/test-chat-tastiera.mjs`: misura solo a chat ferma (`fermo()` = `transform==='none'` e nessuna animazione in corso), commit `1332874`. Prove PR #108 verdi → squash `b670d89`, `main` e scorta uniti nel ramo, push `fd860a7`. **v99 online alle ~21:50** (controllato). Iscrizione alla PR e controllo programmato tolti.
+- Chiesto a Mario di riprovare la tastiera in chat (punto 2 sotto resta aperto finché non risponde).
+
+## ✅ SUBITO (#118, punti 0-1 FATTI)
 0. 🔴 **Correggere `tools/test-chat-tastiera.mjs`** (prove della PR #108 rosse, run 38294445440 su `bd39060`). FAIL solo iPhone 15 e iPad (WebKit, solo su GitHub): `hTop` 14, poi 7 e 4 = `transform:translateY(14px)` dell'apertura di `.cht` (`.cht.open{transform:none}`, transizione .22 s) non ancora finita. Riga 24: dopo `chOpen('tutti')` c'è `waitForTimeout(400)` fisso. Correzione: `await pg.waitForFunction(()=>getComputedStyle(document.querySelector('.cht')).transform==='none',null,{timeout:5000})` al posto dell'attesa fissa (e prima di ogni misura, per sicurezza). Pixel 7/Galaxy Tab in locale devono restare PASS 10; iPhone/iPad si vedono solo su GitHub. Commento già scritto sulla PR #108 (non scriverne un altro). Poi push e attesa delle prove.
 1. **PR #108 = v98 (cannuccia al centro) + v99 (tastiera in chat, D49)**, dal ramo unico. Iscriviti (`subscribe_pr_activity` 108; la #117 si è disiscritta). Se verdi: squash merge, SUBITO `git fetch origin main && git merge origin/main` + push, controllo `APP_VER` 99 online, avvisare Mario e chiedergli la prova della tastiera (apri chat → tocca **Scrivi un messaggio** → il campo resta sopra la tastiera?). Se rosse: capire e correggere (attenzione a `test-chat-tastiera` su WebKit iPhone/iPad, provato solo su GitHub).
 2. 🔴 **D49 tastiera in chat**: fatta in #116 (vedi sotto), aspetta online + prova di Mario sul telefono Android (app installata a schermo intero). Se non basta sul telefono vero: provare anche `interactive-widget=resizes-content` nel viewport (scartato per ora: cambierebbe tutte le schermate dell'app, la barra in basso salirebbe sopra la tastiera ovunque).
