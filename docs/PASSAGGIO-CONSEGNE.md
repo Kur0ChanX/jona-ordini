@@ -2,10 +2,10 @@
 
 Sessione attuale: #106
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v92 = PR #102** (vedi sotto se già unita). **v93 committata sul ramo, prove legate VERDI, da pubblicare SUBITO** (Mario #105: «ok poi pubblica direttamente»). `APP_VER`=93, `CACHE` `jona-ordini-v97`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v92 ONLINE** (PR #102, prove verdi 11:16, squash `4dac802`, `main` riunito nel ramo). **v93 committata sul ramo, prove legate VERDI, da pubblicare SUBITO** (Mario #105: «ok poi pubblica direttamente»). `APP_VER`=93, `CACHE` `jona-ordini-v97`.
 
 ## ✅ SUBITO (#106)
-1. **Controllare la v92**: PR #102 (https://github.com/Kur0ChanX/jona-ordini/pull/102). Se la #105 l'ha già unita (squash) e riallineata, `main` ha la v92: controllo online `https://jona-ristorante-by-ynoy-corp.pages.dev/` (`APP_VER` 92 o 93). Se è ancora aperta: aspettare `prove` verdi → squash → `git fetch origin main && git merge origin/main` + push.
+1. **v92 unita dalla #105** (squash `4dac802`): fare solo il controllo online. Testo vecchio: PR #102 (https://github.com/Kur0ChanX/jona-ordini/pull/102). Se la #105 l'ha già unita (squash) e riallineata, `main` ha la v92: controllo online `https://jona-ristorante-by-ynoy-corp.pages.dev/` (`APP_VER` 92 o 93). Se è ancora aperta: aspettare `prove` verdi → squash → `git fetch origin main && git merge origin/main` + push.
 2. **Pubblicare la v93 SUBITO, senza chiedere** (Mario #105). Prove legate già verdi in #105: `test-cantina` (53 PASS), `test-news`, `test-campi-16`, `test-giro` 320/390 chiaro/scuro, `test-testbar` (tutte PASS). → nuova PR dal ramo unico → `prove` verdi → squash → controllo online → `git fetch origin main && git merge origin/main` + push. Niente push sul ramo mentre `prove` gira (E39).
 3. **D43 passaggi → v94** (dettagli in «Dettagli da #100», invariati).
 4. Resti dell'elenco #101 dei cocktail (colori 5-8, 13-15, 21 → `COLX`; 9 White Russian, 10 Illegal, 11 Painkiller, 12 Oaxaca fiamma staccata, 15 schiume grigie `wavy` → color vetro, 19 Woo Woo/Cape Codder; sedano della Bloody Maria fuori posto a sinistra) in una versione dopo. Mario (#102): «Fatti aiutare da un agente per fare prima».
