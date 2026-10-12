@@ -1,17 +1,24 @@
-# Passaggio di consegne (2026-10-12, fine sessione #104)
+# Passaggio di consegne (2026-10-12, fine sessione #105)
 
-Sessione attuale: #105
+Sessione attuale: #106
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). **v91 online** (PR #101). **v92 committata e pushata, prove legate VERDI, NON ancora pubblicata.** `APP_VER`=92, `CACHE` `jona-ordini-v96`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v92 = PR #102** (vedi sotto se già unita). **v93 committata sul ramo, prove legate VERDI, da pubblicare SUBITO** (Mario #105: «ok poi pubblica direttamente»). `APP_VER`=93, `CACHE` `jona-ordini-v97`.
 
-## ✅ SUBITO (#105)
-1. **Pubblicare la v92**: collaudo in #104 sul commit `0c83f7e` (= v92 + sola unione della scorta): test-bar-disegni PASS (anche TZ Roma), test-bar, test-news, test-demo, test-giro 320/390 chiaro e scuro PASS. Dopo `0c83f7e` cambiano solo consegne e `tools/bozze/`. → PR dal ramo unico → «prove» verdi su GitHub → squash → controllo online (`https://jona-ristorante-by-ynoy-corp.pages.dev/`) → `git fetch origin main && git merge origin/main` + push. Niente push sul ramo mentre `prove` gira (E39).
-2. **D44 = v93** (Mario #104: «vai con la D44 dopo la v92»). **Già scritta in bozza, da applicare DOPO il merge di v92 + riallineamento**: `python3 tools/bozze/d44-modifiche.py` (modifica `index.html`: `vnPrompt(nome,n)`, `VN_FMAX`=3, `vnFoto(nuovo,gal)`, `vnFotoAdd`/`vnFotoDel`/`vnFotoVia`/`vnFotoH`, `vnIaGo` con la catena `GEM_LETT` + ripiego Cloudflare con la sola prima foto, lettore dal vivo nel riquadro «L'IA sta…», azioni `vnFotoG`/`vnFotoDel`/`vnFotoGo`, CSS `.vn-fotos`/`.vn-ft`/`.vn-fi`/`.vn-fx`, `APP_VER` 93, NEWS v93) e `python3 tools/bozze/d44-prova.py` (aggiunge a `tools/test-cantina.mjs`: fotocamera, «Fronte pronto» senza partire da solo, «Retro», Galleria multipla, massimo 3, X toglie, 2 foto in una richiesta, Flash 503 → Lite, Cloudflare 2 foto → riprova col fronte). Gli script si fermano se un pezzo non c'è una volta sola. Poi a mano: `CACHE` in `sw.js` → `jona-ordini-v97`; riga v93 in CLAUDE.md («v93 fronte e retro del vino (D44): …»); togliere D44 da `docs/DA-FARE.md`; rimuovere i 2 script da `tools/bozze/` (o lasciarli: decidi). Prove: `test-cantina`, `test-news`, `test-giro`, `test-campi-16` → collaudo → PR → pubblicazione automatica. **MAI provate**: se falliscono, correggere.
-   - Scelte tecniche D44 (mie): foto prima raccolte e poi lette con un tocco («Leggi le 2 foto con l'IA»), perché leggere subito il fronte e poi «riempire solo i vuoti» col retro non avrebbe corretto annata/gradi/vitigni. Massimo 3 foto: Vertex AI dichiara 3 immagini per Llama 4; per Workers AI nessun limite scritto trovato (Context7 a quota finita, ricerca web) → ripiego col solo fronte. Il Worker NON cambia (`leggiCf` passa già tutte le immagini; il ramo Gemini inoltra il corpo) → niente giro completo extra.
-3. **D43 passaggi → ora v94** (dettagli sotto, invariati, cambiare solo il numero).
-4. Resti dell'elenco #101 (colori 5-8, 13-15, 21 → `COLX`; 9 White Russian, 10 Illegal, 11 Painkiller, 12 Oaxaca fiamma staccata, 15 schiume grigie `wavy` → color vetro, 19 Woo Woo/Cape Codder; sedano della Bloody Maria fuori posto a sinistra) in una versione dopo. Mario (#102): «Fatti aiutare da un agente per fare prima».
+## ✅ SUBITO (#106)
+1. **Controllare la v92**: PR #102 (https://github.com/Kur0ChanX/jona-ordini/pull/102). Se la #105 l'ha già unita (squash) e riallineata, `main` ha la v92: controllo online `https://jona-ristorante-by-ynoy-corp.pages.dev/` (`APP_VER` 92 o 93). Se è ancora aperta: aspettare `prove` verdi → squash → `git fetch origin main && git merge origin/main` + push.
+2. **Pubblicare la v93 SUBITO, senza chiedere** (Mario #105). Prove legate già verdi in #105: `test-cantina` (53 PASS), `test-news`, `test-campi-16`, `test-giro` 320/390 chiaro/scuro, `test-testbar` (tutte PASS). → nuova PR dal ramo unico → `prove` verdi → squash → controllo online → `git fetch origin main && git merge origin/main` + push. Niente push sul ramo mentre `prove` gira (E39).
+3. **D43 passaggi → v94** (dettagli in «Dettagli da #100», invariati).
+4. Resti dell'elenco #101 dei cocktail (colori 5-8, 13-15, 21 → `COLX`; 9 White Russian, 10 Illegal, 11 Painkiller, 12 Oaxaca fiamma staccata, 15 schiume grigie `wavy` → color vetro, 19 Woo Woo/Cape Codder; sedano della Bloody Maria fuori posto a sinistra) in una versione dopo. Mario (#102): «Fatti aiutare da un agente per fare prima».
 5. Chiedere a Mario a tocco + doppio tocco: «L'aiutante collaudo lo mando anche a RVC e SPA Sensorial?» (non ancora chiesto).
 6. Dopo v92-v94: proposta SOLUZIONE SMART per cocktail «bellissimi» (vedi «Dettagli da #100»). Mario #102: «la nuova schiuma mi piace quello stile».
+7. Mario prova la D44 quando è online: Cantina → **Fotografa una bottiglia** → fronte → **Fotografa il retro** → **Leggi le 2 foto con l'IA** (voce D44 in `docs/DA-FARE.md`).
+
+## Fatto in #105 (12/10, ~10:47-11:15 ora italiana)
+- Avvio: scorta più vecchia (ULTIMO-MESSAGGIO 10:43) in conflitto → tenuta la versione di #104; push confermato (`880e7d1`).
+- **PR #102 v92** aperta (prove partite 10:48). Durante la v93 `test-testbar` ha trovato un FAIL della v92: commento `// v92 regola di stile (Mario)` in `index.html` (la prova vieta «Mario» nei testi dell'app, toglie solo i commenti `/* */`). Corretto in `(#101)` con un worktree a parte sopra `origin` (commit `a741e1e`, test-testbar 7 PASS), push → prove ripartite alle 10:58. Poi unito nel lavoro v93 con un merge normale.
+- **v93 D44** applicata dalle bozze (`tools/bozze/d44-modifiche.py`, `d44-prova.py`: gli script restano in `tools/bozze/`), `CACHE` v97, riga v93 in CLAUDE.md, D44 in `docs/DA-FARE.md` → «fatto in #105 (v93)». Il collaudo ha trovato un errore della PROVA (non dell'app): il blocco «Cloudflare non accetta 2 foto» chiama `vnForm(null)` che apre un'altra scheda sopra il Turriga; la prova ne chiudeva una sola → aggiunto un secondo `closeSheet` (commit `24a1f48`).
+- **Barra Test: vista «Bar» in fondo** (Mario #105: «Nel mio test aggiungi Bar alla fine ha lui quella funzione cocktail ecc mauro ha cantina vini anche Maurizio»): `VIEW_AS.bar={ruolo:'staff',reparto:'sala',mansione:'Bartender'}`, pulsante `['bar','Bar']` dopo «Sviluppatore» (solo barra dello sviluppatore, la barra della demo invariata). Scelta di Mario a tocco + conferma: il barista vede **Bar e Cantina Vini**, «e deve avere anche la possibilità di ordinare la sua roba e inviarla a Maurizio» → già così (staff: Catalogo, Carrello, «Invia allo chef» = approvazione del gestore). Prove nuove in `tools/test-testbar.mjs` (ordine gm,fb,staff,dev,bar; barista non gestore con `brOn`/`vnOn`; dentro 320 px; Catalogo/Carrello/I miei ordini; `cadd` → «Invia allo chef»). Nota dev nella NEWS v93, riga v93 in CLAUDE.md.
+- Lezione: un'occhiata a `test-testbar` (controllo del nome) va fatta anche dopo commenti nuovi nel codice.
 
 ## Fatto in #104 (12/10, ~10:43-11:00 ora italiana)
 - Avvio: scorta con un ULTIMO-MESSAGGIO più vecchio (10:26) in conflitto → tenuto quello di #103 (10:45). Push confermato.
@@ -87,5 +94,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(12/10/2026 ~10:50 ora italiana, #104) «vai con la D44 dopo la v92»
+(12/10/2026 ~11:05 ora italiana, #105) «ok poi pubblica direttamente» (= pubblica v92 e poi la v93 senza chiedere).
+Prima (#105, ~10:55): «Nel mio test aggiungi Bar alla fine ha lui quella funzione cocktail ecc mauro ha cantina vini anche Maurizio»; a tocco: «si tutti e 2 e 2 e deve avere anche la possibilità di ordinare la sua roba e inviarla a Maurizio» (fatto).
+Prima (#104, ~10:50): «vai con la D44 dopo la v92»
 Prima (#103, ~10:45): «in coda nell app dammi la possibilità di fare piú foto del vino per prendere anche il retro per caricare scheda del vino, poi domanda: quando lavora l'intelligenza artificiale nell'app lavora con il sistema scansione listini con tutte le ia un'ordine di priorità senza usare i token claude giusto?» (risposta data in #103). Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
