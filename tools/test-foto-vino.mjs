@@ -68,7 +68,8 @@ for(const [nome,mot,dev] of DISP){
   // fotocamera aperta e app chiusa dal telefono (ricarica senza foto) → nota «fotocamera» e «Galleria»
   await pg.evaluate(()=>{vnForm(null)});await wait(300);await pg.fill('.sheet input[data-k="n"]','Brunello');
   await Promise.all([pg.waitForEvent('filechooser'),pg.locator('.sheet [data-a="vnFotoF"]').first().click()]);await wait(200);
-  await pg.reload();await pg.waitForSelector('.sheet .vn-rip',{timeout:25000}).catch(()=>{});await wait(300);
+  // WebKit desktop: con la finestra dei file aperta l'evento «load» non arriva → si aspetta solo l'inizio della ricarica
+  await pg.reload({waitUntil:'commit'});await pg.waitForSelector('.sheet .vn-rip',{timeout:25000}).catch(()=>{});await wait(300);
   r=await pg.evaluate(()=>({n:(document.querySelector('.sheet input[data-k="n"]')||{}).value,t:(document.querySelector('.sheet .vn-rip')||{}).textContent||'',g:document.querySelectorAll('.sheet .vn-add [data-a="vnFotoG"]').length}));
   ok(r.n==='Brunello'&&/fotocamera/.test(r.t)&&/Galleria/.test(r.t)&&r.g===1,P+'fotocamera aperta + ricarica: scheda ripresa, nota e pulsante «Galleria»');
   await pg.locator('.sheet [data-a="closeSheet"]').last().click();await wait(300);
