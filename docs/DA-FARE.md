@@ -12,6 +12,7 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| D46 | Prove su tutti i dispositivi (PC, Mac, tablet, Android, iPhone, iPad): matrice di Playwright in `test-giro` o `test-dispositivi`, anche su GitHub. Regola di Mario del 12/10. |
 | D45 | 🔴 iPhone: dopo la foto di un vino (Cantina → Fotografa una bottiglia) l'app si riavvia. Segnalato da Mario il 12/10 dopo la #107. Dettagli e ipotesi in `docs/PASSAGGIO-CONSEGNE.md` (SUBITO 0). |
 | D44 | Cantina, fronte e retro del vino: **fatto in #105, online in #106 (v93)**. Poi Mario prova: Cantina → **Fotografa una bottiglia** → fronte, **Fotografa il retro**, **Leggi le 2 foto con l'IA**. | Claude → Mario | ora |
 | D43 | Passaggi dei cocktail numerati (3-5 per ognuno dei 212): **fatto in #106 (v94)**, online dopo le prove. |
