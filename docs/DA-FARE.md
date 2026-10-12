@@ -12,11 +12,13 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| D49 | 🔴 Chat: la tastiera copriva «Scrivi un messaggio» (Android, app a schermo intero, foto `docs/img/sessione-116/`). **Corretta in #116 (v99, `chVV`), in PR #108 con la v98.** Poi Mario prova sul telefono: apri una chat, tocca il campo, scrivi | Claude, poi Mario | ora |
+| D47 | **Chiusa in #114** (Mario: «visto ora che si trova in fornitori», niente da fare). Cantina vini e Cocktail anche per lo chef (richiesta di Mario #113): oggi la cucina non li vede (`vnCta` escluso per `reparto==="cucina"`, Bar solo `brCan`); i gestori li hanno in Fornitori. Prima una domanda: Maurizio o tutta la cucina, sola lettura o modifica? Poi v98. | Claude, dopo la tua scelta | ora |
 | D46 | Prove su tutti i dispositivi: **fatto in #110**: `tools/test-dispositivi.mjs` (giro di ogni scheda su Pixel 7, Galaxy Tab S4, iPhone 15, iPad, Mac Safari; WebKit solo su GitHub), nelle prove veloci. PC già in `test-giro-computer`. | Claude | fatto |
 | D45 | iPhone, l'app ripartiva dopo la foto di un vino: **corretto in #109, online dal 12/10 16:13 (v96)**: foto rimpicciolita subito (`fotoPiccola`) e bozza del vino ripresa se il telefono chiude l'app. Poi Mario riprova: Cantina → **Fotografa una bottiglia**. | Claude → Mario | ora |
 | D44 | Cantina, fronte e retro del vino: **fatto in #105, online in #106 (v93)**. Poi Mario prova: Cantina → **Fotografa una bottiglia** → fronte, **Fotografa il retro**, **Leggi le 2 foto con l'IA**. | Claude → Mario | ora |
 | D43 | Passaggi dei cocktail numerati (3-5 per ognuno dei 212): **fatto in #106 (v94)**, online dopo le prove. |
-| D42 | Disegni dei cocktail: v92 online; **#107: difetti #101 dei colori (5-8, 13-15, 21), White Russian, Illegal, Painkiller, Oaxaca, Woo Woo/Cape Codder corretti → v95**. Il 18 (Americano) corretto in #112 → v97. Poi proposta SMART «cocktail bellissimi». |
+| D42 | Disegni dei cocktail: v92 online; **#107: difetti #101 dei colori (5-8, 13-15, 21), White Russian, Illegal, Painkiller, Oaxaca, Woo Woo/Cape Codder corretti → v95**. Il 18 (Americano) corretto in #112 → v97, online in #113. Poi proposta SMART «cocktail bellissimi». |
 | D34 | Cantina Vini: **online v84** (PR #95). Resta solo la domanda a Mario: come registrate oggi i vini venduti (cassa? quale programma?) per collegare le vendite | Mario risponde | dopo |
 | D38 | Bordo chiaro nell'apertura (v87) e scossa elegante D40 (v88, «A Ovvia»): **fatti e online** (#92). |
 | D39 | Disegni degli ingredienti del Bar: **fatti in #93, v89** (stile **B inchiostro e acquerello**, scelto da Mario a tocco e confermato). 43 disegni SVG in `data/bar-disegni.json` (da `tools/bar-disegni.mjs`), ingredienti del cocktail su foglio di carta, disegno sui gruppi dell'inventario. Prova `tools/test-bar-disegni.mjs`. Resta: pubblicare (PR) se le prove sono verdi | Claude | ora |
@@ -66,6 +68,7 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 | D4 | Contratto visibile anche ai Responsabili; segreto vero? | Claude, dopo la tua scelta | da decidere |
 | D6 | Video dell'invio: migliorarli ancora (macchiolina tra le maniche) | Claude, quando lo chiedi | più avanti |
 | D3 | Sicurezza del Worker (`/invia`, `/promemoria`) | Claude, solo se lo chiedi | in pausa |
+| D48 | ⏸ **RIMANDATA da Mario 12/10, idea salvata, si fa più avanti** («tienila come opzione la faremo più avanti»). Cocktail «bellissimi» per tutti i 212: rifare `tools/bar-disegni.mjs` con lo stile della bozza `tools/bozze/cocktail-bellissimi.mjs` (foto `docs/img/sessione-114/`), a passi con foto prima/dopo, peso < 30 KB compressi. 2-4 sessioni. | Claude | più avanti |
 
 
 ---

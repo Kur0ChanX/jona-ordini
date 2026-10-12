@@ -1,38 +1,52 @@
-# Passaggio di consegne (2026-10-12, fine sessione #112)
+# Passaggio di consegne (2026-10-12, fine sessione #117)
 
-Sessione attuale: #113
+Sessione attuale: #118
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v96 nella PR #106** (vedi SUBITO 1). v95 online (controllato: `APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/). Nel ramo: `APP_VER` 96, `CACHE` `jona-ordini-v100`.
+La #117 (aperta a mano da Mario, profondità 0) apre la #118.
 
-## ✅ SUBITO (#113)
-1. 🔴 **PR #107 (v97, difetto 18 Americano)** aperta dal ramo. Prove partite ~16:45 sul commit `2c666e5`; il push delle consegne le ha fatte ripartire sull'ultimo commit. Se VERDE: squash (titolo «v97: Americano, mezza fetta e scorza non più sovrapposte (difetto 18)»), subito `git fetch origin main && git merge origin/main` nel ramo + push, controllo online `APP_VER` 97 (`curl -sL https://jona-ristorante-by-ynoy-corp.pages.dev/ | grep -o 'APP_VER=[0-9]*'`: serve `-L`). Poi dirlo a Mario.
-2. Mario proverà la foto del vino sull'iPhone (v96) quando torna in hotel («non sono in hotel ora»). Gli ho detto che va bene anche una bottiglia a casa.
-3. Dopo: proposta SMART cocktail «bellissimi» (vedi «Idee»), con bozza ferma e domanda.
-4. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v97 online, v98+v99 in PR #108 con prove ROSSE** (solo `test-chat-tastiera` su iPhone/iPad, errore della prova, non dell'app). Nel ramo: `APP_VER` 99, `CACHE` `jona-ordini-v103`.
 
-## Fatto in #112 (12/10, ~15:20-16:20 ora italiana)
-- Scorta unita (vecchia, solo ULTIMO-MESSAGGIO). Il giro «bloccato» della #111 non lo era: 31 minuti di installazione dei browser su GitHub.
-- v96 ONLINE (PR #106 squash `9879904`, 16:13; main unito nel ramo).
-- v97 difetto 18: in `garn` di `tools/bar-disegni.mjs` la scorza con `slot > 1` (dopo una fetta) va `x -= 10` (distanza 24 invece di 14). Nel JSON cambia solo `k.Americano` (controllato). Controllo nuovo in `test-bar-disegni` (73 PASS); test-bar 38, test-news 94, test-testbar 13. Solo l'Americano ha fetta + scorza. Foto prima/dopo mandata a Mario. NEWS v97, `APP_VER` 97, `CACHE` v101, riga v97 in CLAUDE.md, D42 in DA-FARE aggiornato.
-- Giro su `4014f1b`: `test-foto-vino` Mac «page.reload: Page crashed» (ricarica con la finestra dei file aperta). Corretto: «fotocamera aperta + app chiusa» = pagina nuova nello stesso contesto (`nuova()`), la vecchia chiusa (`54fd0ed`). E49 in ERRORI.
+## ✅ SUBITO (#118)
+0. 🔴 **Correggere `tools/test-chat-tastiera.mjs`** (prove della PR #108 rosse, run 38294445440 su `bd39060`). FAIL solo iPhone 15 e iPad (WebKit, solo su GitHub): `hTop` 14, poi 7 e 4 = `transform:translateY(14px)` dell'apertura di `.cht` (`.cht.open{transform:none}`, transizione .22 s) non ancora finita. Riga 24: dopo `chOpen('tutti')` c'è `waitForTimeout(400)` fisso. Correzione: `await pg.waitForFunction(()=>getComputedStyle(document.querySelector('.cht')).transform==='none',null,{timeout:5000})` al posto dell'attesa fissa (e prima di ogni misura, per sicurezza). Pixel 7/Galaxy Tab in locale devono restare PASS 10; iPhone/iPad si vedono solo su GitHub. Commento già scritto sulla PR #108 (non scriverne un altro). Poi push e attesa delle prove.
+1. **PR #108 = v98 (cannuccia al centro) + v99 (tastiera in chat, D49)**, dal ramo unico. Iscriviti (`subscribe_pr_activity` 108; la #117 si è disiscritta). Se verdi: squash merge, SUBITO `git fetch origin main && git merge origin/main` + push, controllo `APP_VER` 99 online, avvisare Mario e chiedergli la prova della tastiera (apri chat → tocca **Scrivi un messaggio** → il campo resta sopra la tastiera?). Se rosse: capire e correggere (attenzione a `test-chat-tastiera` su WebKit iPhone/iPad, provato solo su GitHub).
+2. 🔴 **D49 tastiera in chat**: fatta in #116 (vedi sotto), aspetta online + prova di Mario sul telefono Android (app installata a schermo intero). Se non basta sul telefono vero: provare anche `interactive-widget=resizes-content` nel viewport (scartato per ora: cambierebbe tutte le schermate dell'app, la barra in basso salirebbe sopra la tastiera ovunque).
+3. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
+4. Aiutanti: stato «aiutanti sì» con annuncio (regola nuova in CLAUDE.md, da RVC #94).
 
-## Fatto in #111 (12/10, ~13:25-14:45 ora italiana)
-- Avvio: scorta unita (solo ULTIMO-MESSAGGIO «via»), push.
-- `test-news` rossa: lo staff vedeva «Gemini» nella NEWS v96 → testo «Se l'IA passa a un lettore di riserva, la scheda dice il motivo vero.» (94 PASS).
-- `test-foto-vino` rossa solo sul Mac (WebKit desktop), 3 giri su GitHub per capire:
-  1. `1ebde2e`: attesa della richiesta all'IA da 1,2 s a fino a 10 s (non era quello).
-  2. `0ee5b06`: diagnosi DENTRO la riga FAIL (GitHub mostra solo le righe FAIL) + errori console → «richieste 0, console 400»: la richiesta andava al vero Google con la chiave finta.
-  3. `dd7f978`: causa = service worker attivo: Playwright su WebKit desktop non intercetta (route) la richiesta. Contesto con `serviceWorkers:'block'` (come test-agenda*). L'app vera non c'entra: sw.js lascia passare POST e altri siti. E48 in ERRORI. Risultato: passati foto all'IA e «Chiudi», poi `page.reload` scaduto (30 s) alla riga «fotocamera aperta + ricarica»: con la finestra dei file aperta WebKit desktop non dà «load».
-  4. `7415c27`: quella ricarica con `{waitUntil:'commit'}` (poi aspetta `.vn-rip`). In locale 36 PASS (WebKit SALTATA). Su GitHub il giro di `7415c27` era ANCORA IN CORSO dopo 40 minuti (di solito ~20): probabile prova bloccata sul Mac (WebKit desktop) senza tempo massimo, forse `test-foto-vino` dopo la ricarica con la finestra dei file aperta. Il push delle consegne ha fatto ripartire il giro: se si blocca ancora, nella vista Mac saltare il solo passo «fotocamera aperta + ricarica» NON si fa (vietato spegnere prove): mettere un tempo massimo a quel passo, chiudere prima la finestra dei file in WebKit desktop (es. `fc.setFiles([])` dove serve) oppure aprire una pagina nuova al posto della ricarica, e capire la causa.
-- Handoff fatto per il contesto (avviso dell'hook) mentre girava il giro di `7415c27`.
+## Fatto in #117 (12/10, ~20:57-21:25 ora italiana)
+- Avvio: scorta unita (solo ULTIMO-MESSAGGIO «per schermo intero è ancora cosí»), push `bd39060` → le prove della PR #108 sono ripartite (E39). Iscritta alla PR, titolo messo.
+- Foto di Mario `docs/img/sessione-116/chat-tastiera-*.jpg` guardate: campo «Scrivi un messaggio» mezzo sotto la tastiera, intestazione della chat fuori in alto (la pagina è stata spostata dal telefono = caso `vv.offsetTop>0`, già coperto da `chVV`). Sono della versione vecchia.
+- Codice di `chVV` (index.html riga ~4650) riletto: giusto (`top=vv.offsetTop`, `height=vv.height`, classe `kb`).
+- RVC #95 (`session_01FkfToE8frofY9A1By5DgXK`) ha chiesto come funzionano le versioni in Jona (C76): risposto con send_message (`APP_VER`, `NEWS`, `newsFor`, `newsBtn`/`newsSheet`, `jona_news_<id>`, «App da aggiornare», `test-news`).
+- Prove rosse (vedi SUBITO 0), commento sulla PR #108 con la causa. Handoff per l'avviso dell'hook (~140k).
 
-## Fatto in #110 (12/10, ~13:05-13:25 ora italiana)
-- Avvio: scorta unita (solo ULTIMO-MESSAGGIO con la domanda «Lite», già nota), push.
-- **PR #106** aperta dal ramo verso `main` (v96 D45), prove partite 13:06, ROSSE alle 13:23 (test-foto-vino Mac, test-news: vedi SUBITO 1).
-- Messaggio dalla #109: dopo l'handoff Mario ha scritto solo «ok» (nessuna richiesta nuova).
-- Mario in #110: «via» → ho continuato con D46 mentre giravano le prove.
-- **D46** `tools/test-dispositivi.mjs`: lancia `test-giro.mjs` in processi separati con `GIRO_DEV` (nomi dei dispositivi di Playwright separati da «|», contesto `{...devices[nome], deviceScaleFactor:1}`): Chromium «Pixel 7|Galaxy Tab S4», WebKit «iPhone 15|iPad (gen 7)|Desktop Safari» (SALTATA in locale, FAIL su GitHub senza WebKit). PC già coperto da `test-giro-computer` (1280/1440). In `VELOCI` di `tools/prova-ci.sh`. Locale: PASS Android (2 min), `test-giro` normale ancora PASS. Riga in CLAUDE.md (regola dispositivi) e D46 in DA-FARE.
-- Commit D46 NON pushato durante le prove (E39); l'hook di fine risposta lo chiedeva a ogni messaggio: normale, si ignora finché le prove girano.
+## Fatto in #116 (12/10, ~20:32-20:55 ora italiana)
+- Avvio: scorta unita (conflitto solo nell'intestazione di ULTIMO-MESSAGGIO, risolto), iscritta alla PR #108. `send_later` e `create_session` negati: profondità 8 (E12).
+- Messaggi di Mario girati dalla #115 (chiusa) salvati sotto. D48 «cocktail bellissimi» RIMANDATA da Mario (in Idee e in DA-FARE, in fondo).
+- **v99 D49** (Mario: «mi risolvi questo problema della tastiera che va sopra la scrittura», foto `docs/img/sessione-116/chat-tastiera-1.jpg` e `-2.jpg`: Android, app installata, tema scuro, chat con Mauro Loi, barra di scrittura sotto la tastiera). Causa: con `display: fullscreen` (e in generale `resizes-visual`) Android non accorcia la pagina, `.cht` usa `100dvh`. Correzione in `index.html`: `chVV()` dopo `chClose` su `visualViewport` resize/scroll: se `innerHeight − vv.height > 60` → `CHAT.box.style.top=vv.offsetTop`, `height=vv.height`, `bottom:auto`, classe `kb`, scorre `#ch-m` in fondo quando si apre; tastiera chiusa → stili tolti. CSS `.cht.kb .cht-l,.cht.kb .cht-c{height:100%}.cht.kb .cht-in{padding-bottom:8px}`. Su iPhone se `innerHeight` si accorcia insieme alla tastiera non cambia niente (come prima). Scelta di non usare `interactive-widget` (vedi SUBITO 1).
+- Prova nuova `tools/test-chat-tastiera.mjs` (visualViewport finto con `__kb(k,offset)`; Pixel 7 e Galaxy Tab S4 PASS 10, iPhone 15 e iPad SALTATA in locale; sul codice vecchio 4 FAIL), aggiunta a `VELOCI` in `tools/prova-ci.sh`. test-news e test-testbar PASS. NEWS v99, `APP_VER` 99, `CACHE` `jona-ordini-v103`, riga v99 in CLAUDE.md, D49 in DA-FARE. Titolo PR #108 aggiornato.
+- Regole nuove da RVC #94 (approvate da Mario per tutti i progetti) scritte in CLAUDE.md: MOTORE IN SILENZIO, INTERRUTTORE DEGLI AIUTANTI.
+- Handoff per l'avviso dell'hook (~155k).
+
+## Fatto in #115 (12/10, ~20:12-20:32 ora italiana)
+- Scorta unita due volte (solo ULTIMO-MESSAGGIO).
+- v98: in `tools/bar-disegni.mjs` la cannuccia (`s|`: Mojito Highball, Scorpion Tiki, Mint Julep) passa per il centro dell'apertura (32, `g.y0`); pendenza `min(.3,(rx-4)/(y1-y0))`, opachi .25; `x1/x2` = 30.9 ± … (1.1 = metà larghezza). Prova nuova in `tools/test-bar-disegni.mjs` «cannucce dal centro dell'apertura» (FAIL sul vecchio JSON, controllato). NEWS v98, `APP_VER` 98, `CACHE` v102, riga v98 in CLAUDE.md. Foto `docs/img/sessione-115/cannuccia-prima-dopo.png` mandata. Prove locali: test-bar-disegni 74, test-bar 38, test-news 94, test-testbar 13 PASS. Commit `6749eb8`, PR #108.
+- Bozza: Mojito di `tools/bozze/cocktail-bellissimi.mjs` con `rotate(16 60 20)` e rect x=58 (centro dell'ellisse 60,20). Foto prova rifatta e mandata in 2 pezzi (le foto «oggi» si fanno con un overlay `.br-ckbig` sulla pagina demo dopo `brOpen`, `brCkDis({n})`).
+- Handoff per l'avviso dell'hook (~141k).
+
+## Fatto in #114 (12/10, ~18:05-18:20 ora italiana)
+- Avvio: scorta unita (due volte, solo ULTIMO-MESSAGGIO), push. Titolo sessione messo.
+- Richiesta «cantina e cocktail allo chef»: chiesto chi è lo chef; Mario «scusa visto ora che si trova in fornitori» → niente da fare (chiusa).
+- Prova «cocktail bellissimi» (Mario «si»): bozza `tools/bozze/cocktail-bellissimi.mjs`, foto `docs/img/sessione-114/cocktail-prova-1di2.png` e `-2di2.png` mandate (oggi a sinistra, prova a destra). Pezzi: `ruota` (agrume con albedo e vescicole), `foglia` (menta con venature), `cubo` (ghiaccio trasparente col colore del drink, parametro `k` per drink scuri), `bolle`, `gocce`, `luce` (riflesso a pennello pieno), acquerello con feTurbulence. Avvertito Mario: per tutti i 212 serve rifare il generatore, lavoro di più sessioni; nella lista (44 px) i dettagli si vedono poco.
+- Handoff per l'avviso dell'hook (contesto ~150k).
+
+## Fatto in #113 (12/10, ~16:49-17:16 ora italiana)
+- Avvio: scorta unita due volte (solo ULTIMO-MESSAGGIO: «non sono in hotel ora», poi «ok»).
+- PR #107 v97: prove verdi su `428cc55` → squash `c7b631e` (17:13), `main` unito nel ramo + push, **v97 online alle 17:14** (controllato). Routine di controllo `trig_01ArZvGTU7DCKwEGRiWtpKL8` cancellata, iscrizione alla PR tolta.
+- Handoff per l'avviso dell'hook (contesto ~140k) subito dopo la richiesta nuova di Mario.
+
+## Fatto in #110-#112 (riassunto)
+- v96 online (PR #106, 16:13). v97 Americano (riga v97 di CLAUDE.md). D46 `tools/test-dispositivi.mjs`. Prove Mac di `test-foto-vino`: E48 (service worker bloccato nel contesto), E49 (pagina nuova invece di ricaricare con la finestra dei file aperta).
 
 ## Fatto in #109 (riassunto)
 - v96 D45 scritta (`fotoPiccola`, bozza del vino, lettori falliti). Dettagli nella riga v96 di CLAUDE.md e in E47.
@@ -51,6 +65,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - #103: regola di stile applicata ai pezzi dei cocktail (`c`/`cf`/`cp` col tono scuro del pezzo, `LEGNO`), tazza di rame dei Mule (`rm|`, `sf|`, `oc`), niente `badge`, cannuccia e ombrellino, agrumi con albedo e `twist`. Dettagli nella riga v92 di CLAUDE.md e nella storia dei commit.
 
 ## Idee (da #100)
+- **D48 cocktail «bellissimi» per tutti i 212** — RIMANDATA da Mario 12/10 ~20:45 («tienila come opzione la faremo più avanti»). Bozza `tools/bozze/cocktail-bellissimi.mjs`, foto `docs/img/sessione-114/cocktail-prova-1di2.png` e `-2di2.png`. Piano: rifare `tools/bar-disegni.mjs` a passi (bicchieri → ghiaccio → frutta → luce) con sfumature, vetro trasparente, luce a pennellata, cubo trasparente col colore del drink, frutta/menta dentro, bolle, gocce, acquerello (feTurbulence, spento con `lite`); vincoli peso < 30 KB compressi, lista 44 px, regola #101, cannuccia dal centro. Voce D48 in DA-FARE.
 - **SMART per cocktail «bellissimi»** (Mario «non bellissime… mi accontento»): UNA strada più ambiziosa, con bozza ferma e domanda (E19/E38). Spunti: ghiaccio a tanti cerchietti chiari, frutta grande DENTRO il bicchiere (spicchi di lime nel Mojito), contorni delle guarnizioni colorati, tratto a pennello con spessore che cambia, superficie schiumosa, ciliegina con riflesso.
 
 ## Fatto in #100-#102 (riassunto)
@@ -71,8 +86,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC attiva: **#92** `session_01Mc34LWsJw9PKUiUJvYcPxB`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
+- Jona #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC attiva: **#95** `session_01FkfToE8frofY9A1By5DgXK`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
 ## Note tecniche
@@ -92,8 +107,16 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(12/10/2026 ~16:30 ora italiana, #112) «non sono in hotel ora» (risposta a: prova la foto del vino sull'iPhone).
-(12/10/2026 ~14:45 ora italiana, #111) «ok» (dopo il mio avviso: nuovo giro su GitHub, se verde pubblico la v96).
-Prima, in #111 nessun altro messaggio (sessione partita dal prompt della #110).
-(12/10/2026 ~13:12 ora italiana, #110) «via» → continuato: pubblicazione v96 e D46.
+(12/10/2026 ~20:57 ora italiana, #117, prompt di avvio incollato da Mario) «git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo). Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #117). Poi fai il punto «SUBITO» 0 (PR #108 v98+v99: iscriviti, se verde pubblica).» Ultimo messaggio vero, in attesa: quello qui sotto.
+(12/10/2026 ~20:55 ora italiana, #116, foto `docs/img/sessione-116/chat-tastiera-3-schermo-intero.jpg`: campo ancora mezzo sotto la tastiera) «per schermo intero è ancora cosí» → la v99 NON era ancora online (PR #108 in prova): la foto è della versione vecchia. Dopo l'online chiedergli di riprovare (chiudere e riaprire l'app). Se resta così anche con la v99: il problema è nello schermo intero di Android → strada di riserva `interactive-widget=resizes-content` o `manifest` `display: standalone` solo per… (decidere).
+(12/10/2026 ~20:50 ora italiana, nella #115 chiusa, girato dalla #115, foto `docs/img/sessione-116/chat-tastiera-1.jpg` e `-2.jpg`) «Per ora mi risolvi questo problema della tastiera che va sopra la scrittura.»
+(12/10/2026 ~20:45 ora italiana, nella #115 chiusa, girato dalla #115) «tienila come opzione la faremo più avanti, però tieni l'idea e salvala,la facciamo piú avanti» (su D48 cocktail bellissimi).
+(12/10/2026 ~20:40 ora italiana, nella #115 chiusa, girato dalla #115) «Ok, però utilizzerò utilizzando il token per fare tutti i disegni, giusto?» → la #115: sì, token solo mentre si lavora al generatore (stima 2-4 sessioni), non i 212 a mano; dopo, guardarli nell'app non costa token; si risparmia lavorando a passi, foto piccole, prove col collaudo.
+(12/10/2026 ~20:35 ora italiana, nella #115 chiusa, girato dalla #115) «No, sì, allora il prompt è molto chiaro, però tipo, perché prima facevi delle linee, cioè, che facevano, non erano belle, erano proprio minimal. E adesso i disegni sono molto più belli, cioè, che cosa è cambiato? Sembra che è cambiato il motore di disegno. E cosa è cambiato? Cioè, sembra che prima avevi tipo una versione light e adesso la versione avanzata. Cosa hai fatto per disegnare così bene i dettagli e tutto?» → la #115 ha risposto: stesso motore (SVG), prima generatore automatico per 212 con limiti (peso, lista 44 px, pezzi riusati, colori piatti), la prova è a mano su 3 senza limiti; per D48 servono quelle tecniche nel generatore badando al peso.
+(12/10/2026 ~20:20 ora italiana, nella #114 chiusa, girato dalla #114) «si è quello che volevo dimmi come hai fatto questo stile che salvo il prompt di questi disegni bellissimi che sistema hai cambiato per disegnare cosí?»
+(12/10/2026 ~18:20 ora italiana, #114) «la cannuccia sempre centro il cerchio alto del bicchiere» (dopo le foto della prova dei cocktail).
+(12/10/2026 ~18:15, #114) «si» (alla prova dei cocktail più belli). (~18:10) «scusa visto ora che si trova in fornitori».
+(12/10/2026 ~17:16 ora italiana, #113) «metti cantina vini e cocktail anche dallo chef ovviamente»
+(12/10/2026 ~16:51, #113) «ok» (dopo: controllo di sicurezza alle 17:41).
+(12/10/2026 ~16:30, #112) «non sono in hotel ora» (risposta a: prova la foto del vino sull'iPhone).
 Messaggi più vecchi: nella storia di questo file. Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
