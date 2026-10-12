@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~0:40 ora italiana, sessione #92)
+# Ultimo messaggio di Mario (12/10/2026 ~0:55 ora italiana, sessione #93)
 
-hai installato context 7?
+vai
