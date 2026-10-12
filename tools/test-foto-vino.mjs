@@ -56,10 +56,11 @@ for(const [nome,mot,dev] of DISP){
   await pg.reload();await pg.waitForSelector('.sheet .vn-rip',{timeout:25000}).catch(()=>{});await wait(300);
   r=await pg.evaluate(()=>({n:(document.querySelector('.sheet input[data-k="n"]')||{}).value,fi:document.querySelectorAll('.sheet .vn-fi img').length,t:(document.querySelector('.sheet .vn-rip')||{}).textContent||''}));
   ok(r.n==='Barolo'&&r.fi===1&&/ho ripreso la scheda del vino/.test(r.t),P+'dopo la ricarica: scheda ripresa con nome e foto');
-  gemReq.length=0;await pg.locator('.sheet [data-a="vnFotoGo"]').first().click();await wait(1200);
+  gemReq.length=0;await pg.locator('.sheet [data-a="vnFotoGo"]').first().click();for(let i=0;i<50&&!gemReq.length;i++)await wait(200);
   const im=gemReq.length?gemReq[0].contents[0].parts.filter(p=>p.inline_data):[];
   r=im.length?await pg.evaluate(async({d,esame})=>{const ES=eval(esame),b=await (await fetch('data:image/jpeg;base64,'+d)).blob();return ES(b)},{d:im[0].inline_data.data,esame}):{};
   ok(im.length===1&&giusta(r,2000),P+'all\'IA arriva la foto ripresa, ≤ 2000 px e dritta ('+r.w+'×'+r.h+')');
+  if(!(im.length===1&&giusta(r,2000)))console.log('  '+P+'richieste '+gemReq.length+', errori '+JSON.stringify(errs.slice(-3))+', scheda: '+(await pg.evaluate(()=>(document.querySelector('.sheet')||{}).textContent||'')).replace(/\s+/g,' ').slice(0,400));
   // Chiudi → bozza cancellata
   await pg.locator('.sheet [data-a="closeSheet"]').last().click();await wait(500);
   r=await pg.evaluate(async()=>({l:ls('jona_vn'),f:await idbKv(VN_IDB())}));

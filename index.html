@@ -1234,7 +1234,7 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 const APP_VER=96;
 const NEWS=[
   {v:96,data:'2026-10-12',titolo:'iPhone: la foto del vino non fa più ripartire l\'app',
-    tutti:['Cantina Vini: dopo la foto della bottiglia l\'app su iPhone non riparte più da sola. La foto viene subito rimpicciolita.','Se il telefono chiude lo stesso l\'app, la scheda del vino riparte da dove eri (nome e foto già fatte).','Se l\'IA passa a un altro lettore (es. Gemini Flash-Lite), la scheda dice il motivo vero.'],
+    tutti:['Cantina Vini: dopo la foto della bottiglia l\'app su iPhone non riparte più da sola. La foto viene subito rimpicciolita.','Se il telefono chiude lo stesso l\'app, la scheda del vino riparte da dove eri (nome e foto già fatte).','Se l\'IA passa a un lettore di riserva, la scheda dice il motivo vero.'],
     dev:['D45: `fotoPiccola(file,max,mini)` (EXIF da `jpgInfo`, `createImageBitmap` con `resizeWidth`, giro a mano se resta coricata, tela svuotata), usata anche da `shrinkImg`. Vino: solo foto piccole + miniatura (`VN_PIC`), bozza `jona_vn` + IndexedDB `jona-kv` (`vnBozza`, `vnRestore`). Prova `tools/test-foto-vino.mjs` su PC, Android, tablet, Mac, iPhone, iPad.']},
   {v:95,data:'2026-10-12',titolo:'Bar: colori dei cocktail più giusti',
     tutti:['I disegni dei cocktail hanno colori più fedeli: Kir rosa, Blue Lagoon blu, Bramble e El Diablo rosso-viola, Arnold Palmer color tè.','White Russian con la panna ben visibile, Espresso Tonic con il caffè sopra, schiume più pulite.'],
