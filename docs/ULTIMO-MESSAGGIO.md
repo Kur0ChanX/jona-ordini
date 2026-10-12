@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~9:30 ora italiana, sessione #97)
+# Ultimo messaggio di Mario (12/10/2026 ~9:58 ora italiana, sessione #99)
 
-Cerca di mettere meno foto simili possibili e falle inerenti al cocktail
+Non bellissime fai la C mi accontento.... (risposta a tocco: stile C dei cocktail, confermata «Sì, confermo lo stile»)
