@@ -122,6 +122,8 @@ const cf=await pg.evaluate(async()=>{const vero=gemCall,log=[];
     await vnIaGo([new File([bl],'f.png',{type:'image/png'}),new File([bl],'r.png',{type:'image/png'})]);return{log:log.join(),n:S.vnf.n}}finally{gemCall=vero}});
 ok(cf.log==='flash2,lite2,cf2,cf1'&&cf.n==='Prova CF','D44: Cloudflare non accetta 2 foto → riprova col fronte: '+cf.log);
 await sc('[data-a="closeSheet"]');await wait(300);
+// la prova Cloudflare ha aperto un'altra scheda sopra il Turriga: chiude anche quella
+await sc('[data-a="closeSheet"]');await wait(300);
 // carta: solo in casa, tipo, ricerca
 t=await txt('.sheet');
 ok(/Vermentino di Gallura 2023/.test(t)&&!/Tignanello/.test(t),'Carta: «Solo in casa» nasconde il Tignanello finito');
