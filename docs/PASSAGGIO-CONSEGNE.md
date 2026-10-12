@@ -5,6 +5,7 @@ Sessione attuale: #108
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v94 ONLINE, v95 PRONTA** (commit `225dd67` + consegne) e **PR della v95 aperta** dalla #107 subito dopo il push di queste consegne (numero: guardare le PR aperte). `APP_VER` 95, `CACHE` `jona-ordini-v99`.
 
 ## ✅ SUBITO (#108)
+0. 🔴 **BUG iPhone (Mario, 12/10 dopo l'handoff, scritto nella #107 chiusa)**: «correggi nel iphone quando scatta a un vino dopo la foto si riavvia l'applicazione». Cantina → **Fotografa una bottiglia** (v93, D44): dopo lo scatto l'app installata su iPhone ripartisce da capo. Ipotesi da verificare (#107 ha solo guardato il codice, niente prove): `vnFotoAdd` (index.html ~riga 5741) tiene il file originale della fotocamera (12-48 MP) e mostra le miniature con `URL.createObjectURL(file)` a piena risoluzione → iOS decodifica foto enormi e, con la fotocamera aperta sopra l'app installata, chiude la pagina per memoria → al ritorno la ricarica. Rimedi da valutare insieme: (a) rimpicciolire SUBITO ogni foto (es. `shrink(file,1600)` già in index.html ~riga 1172, o `createImageBitmap`) e tenere solo il blob piccolo per miniature e IA; (b) salvare la bozza prima di aprire la fotocamera (come `jona_reg` della registrazione, stesso problema già risolto lì) e riaprire la scheda del vino dopo un riavvio; (c) foto già lette salvate in IndexedDB. Prova nuova (es. in `tools/test-cantina.mjs`: foto grande 4000×3000 → miniatura e invio piccoli; bozza ripresa dopo ricarica). È un bug dell'app in uso: viene PRIMA della v95 se le prove della PR #105 non sono ancora verdi; altrimenti pubblicare la v95 e poi correggere come v96.
 1. **Pubblicare la v95**: aspettare il controllo `prove` sulla PR aperta (NON pushare sul ramo mentre gira: E39), poi squash, controllo online (`APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/), poi `git fetch origin main && git merge origin/main` + push. Se `prove` è rosso: capire la causa e correggere. Poi dire a Mario in 2 righe che la v95 è online (le foto prima/dopo le ha già ricevute in #107).
 2. Dopo la v95: difetto 18 rimasto (Americano: fetta d'arancia e scorza di limone sovrapposte sul bordo) e proposta SOLUZIONE SMART per cocktail «bellissimi» (vedi «Idee»: bozza ferma + domanda a tocco con doppio tocco, E19/E38). Mario #102: «la nuova schiuma mi piace quello stile».
 3. Mario (#106): **«pubblica ogni tanto gli aggiornamenti»** = non accumulare: una versione online appena un pezzo è pronto e provato.
@@ -91,7 +92,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-In #107 Mario non ha scritto (sessione partita dal prompt di avvio della #106). L'ultimo resta quello qui sotto.
+(12/10/2026, scritto nella #107 già chiusa, dopo l'handoff) «correggi nel iphone quando scatta a un vino dopo la foto si riavvia l'applicazione» → SUBITO 0.
+Prima, in #107 Mario non aveva scritto (sessione partita dal prompt di avvio della #106).
 (12/10/2026 ~12:05 ora italiana, #106) «ok» (risposta alle 2 domande scritte nel testo: collaudo anche a RVC e SPA = sì; sistemare i difetti rimasti nei disegni dei cocktail = sì).
 Prima (#106, 11:35): «ok poi vai con la D43  comunque pubblica ogni tanto gli aggiornamenti» (fatto: v94 online).
 Prima (#106, 11:33): «quanto tempo resta?» (risposto).

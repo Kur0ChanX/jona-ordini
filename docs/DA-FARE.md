@@ -12,6 +12,7 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| D45 | 🔴 iPhone: dopo la foto di un vino (Cantina → Fotografa una bottiglia) l'app si riavvia. Segnalato da Mario il 12/10 dopo la #107. Dettagli e ipotesi in `docs/PASSAGGIO-CONSEGNE.md` (SUBITO 0). |
 | D44 | Cantina, fronte e retro del vino: **fatto in #105, online in #106 (v93)**. Poi Mario prova: Cantina → **Fotografa una bottiglia** → fronte, **Fotografa il retro**, **Leggi le 2 foto con l'IA**. | Claude → Mario | ora |
 | D43 | Passaggi dei cocktail numerati (3-5 per ognuno dei 212): **fatto in #106 (v94)**, online dopo le prove. |
 | D42 | Disegni dei cocktail: v92 online; **#107: difetti #101 dei colori (5-8, 13-15, 21), White Russian, Illegal, Painkiller, Oaxaca, Woo Woo/Cape Codder corretti → v95**. Resta il 18 (Americano: arancia e scorza sovrapposte). Poi proposta SMART «cocktail bellissimi». |
