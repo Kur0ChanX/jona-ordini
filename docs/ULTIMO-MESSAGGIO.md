@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~10:50 ora italiana, sessione #100)
+# Ultimo messaggio di Mario (12/10/2026 10:19 ora italiana)
 
-ok vai
+segui le linee del disegno non mettere a caso tratti neri grossi perché perde il senso dello stile mantieni coerente la foto
