@@ -606,7 +606,8 @@ function garn(txt, bk, nome) {
     if (k === 'bordo') continue;
     // guarnizioni sul bordo: disegnate una volta intorno a (0,0) e spostate al loro posto con «@x,y» (file più leggero)
     const R0 = /^(agrume|scorza|ananas|fragola|mela|fiore|cetriolo|sedano|rametto|agrumi)$/.test(k);
-    if (R0) { const [x, y] = rim(); at = '@' + f1(x) + ',' + f1(y); if (k === 'agrumi') rim(); }
+    // #112 difetto 18 (Americano): la scorza dopo una fetta pende verso destra e la toccava → 10 più a sinistra
+    if (R0) { let [x, y] = rim(); if (k === 'scorza' && slot > 1) x -= 10; at = '@' + f1(x) + ',' + f1(y); if (k === 'agrumi') rim(); }
     if (k === 'agrume') { key += a + b + (c ? 'c' : ''); p = b === 's' ? wedge(a, 0, 0) : wheel(a, 0, 0, 6.2, b === 'm'); if (b === 'm') key = a === 'arancia' ? 'aranciaM' : a + 'M'; if (c) p = joinX(p, { p: [[-2, -2], [2.4, -1], [0, 2.6]].map(([u, v]) => C(u, v, .8)).join('') });
       if (flag === t) { p = joinX(p, { d: sw(1.1, L('M1-13L-1 3')) }, cherry(.6, -9, 2.4, false)); key += 'C'; } }
     else if (k === 'scorza') { const col = { limone: '#F2CF3B', lime: '#8DBA3A', arancia: '#F0A23A', pompelmo: '#E8826A' }[a]; key += a + (b ? 'F' : ''); p = b ? joinX(twist(0, 0, col, a), flame(.6, -6.2)) : twist(0, 0, col, a); }

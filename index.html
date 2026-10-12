@@ -1231,8 +1231,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=96;
+const APP_VER=97;
 const NEWS=[
+  {v:97,data:'2026-10-12',titolo:'Bar: Americano più ordinato',
+    tutti:['Nel disegno dell\'Americano la mezza fetta d\'arancia e la scorza di limone non si toccano più.'],
+    dev:['Difetto 18 (#101): in `garn` di `tools/bar-disegni.mjs` la scorza dopo una fetta va 10 più a sinistra. Prova in `tools/test-bar-disegni.mjs`.']},
   {v:96,data:'2026-10-12',titolo:'iPhone: la foto del vino non fa più ripartire l\'app',
     tutti:['Cantina Vini: dopo la foto della bottiglia l\'app su iPhone non riparte più da sola. La foto viene subito rimpicciolita.','Se il telefono chiude lo stesso l\'app, la scheda del vino riparte da dove eri (nome e foto già fatte).','Se l\'IA passa a un lettore di riserva, la scheda dice il motivo vero.'],
     dev:['D45: `fotoPiccola(file,max,mini)` (EXIF da `jpgInfo`, `createImageBitmap` con `resizeWidth`, giro a mano se resta coricata, tela svuotata), usata anche da `shrinkImg`. Vino: solo foto piccole + miniatura (`VN_PIC`), bozza `jona_vn` + IndexedDB `jona-kv` (`vnBozza`, `vnRestore`). Prova `tools/test-foto-vino.mjs` su PC, Android, tablet, Mac, iPhone, iPad.']},
