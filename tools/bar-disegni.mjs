@@ -362,7 +362,9 @@ function mix(ing) {
 // v92 (D42, scelta di Mario #97 «A lista + B scheda»): w = [colore, forme, opacità?], d = penna, f = penna fine, p = punti, h = riflessi bianchi
 const PZ = {}, K = {};
 const joinX = (...p) => { const o = { w: p.flatMap(x => x.w || []) }, q = p.flatMap(x => x.q || []); if (q.length) o.q = q; for (const k of ['d', 'f', 'p', 'h']) { const s = p.map(x => x[k] || '').join(''); if (s) o[k] = s; } return o; };
-const put = (key, part) => { if (!PZ[key]) PZ[key] = joinX(...[].concat(part)); return key; };
+// stile C (D42, scelta di Mario #99): linee di ghiaccio e bollicine in vd/vf, l'app le colora come il vetro
+const VETRO = /^(i|it|b)\|/;
+const put = (key, part) => { if (!PZ[key]) { const p = PZ[key] = joinX(...[].concat(part)); if (VETRO.test(key)) for (const [a, b] of [['d', 'vd'], ['f', 'vf']]) if (p[a]) { p[b] = p[a]; delete p[a]; } } return key; };
 const sw = (w, s) => `<g style="stroke-width:${w}">${s}</g>`;
 // cubetto di ghiaccio con le facce (davanti, sopra, lato) e un riflesso
 function iceC(x, y, s, a = 0) {
@@ -633,11 +635,20 @@ function separa(lista) {
   }
   lista.forEach((x, i) => { x.c = fromLab(L1[i]); });
 }
+// colori più pieni (stile C): saturazione ×1,6 +0,1, luce un po' giù; prima di separa, così la misura delle somiglianze resta giusta
+function viv(h) {
+  let [r, g, b] = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let H = 0, Sa = 0, L = (mx + mn) / 2;
+  if (mx !== mn) { const d = mx - mn; Sa = L > .5 ? d / (2 - mx - mn) : d / (mx + mn); H = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; H /= 6; }
+  Sa = Math.min(1, Sa * 1.6 + .1); L = L > .78 ? L - .05 : L * .97;
+  const q = L < .5 ? L * (1 + Sa) : L + Sa - L * Sa, pp = 2 * L - q, t = x => { x = (x + 1) % 1; return x < 1 / 6 ? pp + (q - pp) * 6 * x : x < .5 ? q : x < 2 / 3 ? pp + (q - pp) * (2 / 3 - x) * 6 : pp; };
+  return '#' + [t(H + 1 / 3), t(H), t(H - 1 / 3)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+}
 const COL = {};
-{ const lista = CKS.map(ck => ({ n: ck[0], bk: BIC[ck[3]] ? ck[3] : 'Old fashioned', c: COLX[ck[0]] || mix(ck[4]), fisso: !!COLX[ck[0]] || !!BIC[ck[3]]?.opaco }));
+{ const lista = CKS.map(ck => ({ n: ck[0], bk: BIC[ck[3]] ? ck[3] : 'Old fashioned', c: viv(COLX[ck[0]] || mix(ck[4])), fisso: !!COLX[ck[0]] || !!BIC[ck[3]]?.opaco }));
   separa(lista); for (const x of lista) COL[x.n] = x.c; }
 // le tazze tiki hanno colori diversi (D42): Zombie, Painkiller, Scorpion non sembrano più uguali
-const TIKI = ['#B07A4A', '#6E9A6A', '#C9A46A', '#4F8FA8', '#B85A4A'];
+const TIKI = ['#B07A4A', '#6E9A6A', '#C9A46A', '#4F8FA8', '#B85A4A'].map(viv);
 CKS.filter(c => c[3] === 'Tiki').forEach((c, i) => { COL[c[0]] = TIKI[i % TIKI.length]; });
 const tinta = (h, t, a) => '#' + hex(h).map(x => Math.round(x * (1 - a) + t * a).toString(16).padStart(2, '0')).join('').toUpperCase();
 function cocktail(ck) {
