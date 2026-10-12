@@ -45,5 +45,13 @@ const br=await pg.evaluate(()=>{const u=meU();return{r:u.ruolo,rep:u.reparto,bar
 ok(br.r==='staff'&&br.rep==='sala'&&br.bar&&!br.mgr&&br.br&&br.vn&&br.txt==='Bar','vista Bar: barista, vede Bar e Cantina, non gestore: '+JSON.stringify(br));
 const ov2=await pg.evaluate(()=>[document.documentElement.scrollWidth,innerWidth]);
 ok(ov2[0]<=ov2[1],'vista Bar dentro 320 px: '+JSON.stringify(ov2));
+// il barista ordina la sua roba e la manda allo chef (Maurizio): Catalogo, Carrello, «Invia allo chef»
+const tabs=await pg.evaluate(()=>[...document.querySelectorAll('[data-a="tab"]')].map(b=>b.dataset.v));
+ok(['catalogo','carrello','miei'].every(t=>tabs.includes(t)),'vista Bar: Catalogo, Carrello e I miei ordini: '+tabs.join());
+await pg.click('[data-a="tab"][data-v="catalogo"]');await pg.waitForTimeout(300);
+const add=pg.locator('[data-a="cadd"]').first();
+ok(await add.count()===1,'vista Bar: nel catalogo si aggiungono prodotti');
+if(await add.count()){await add.click();await pg.waitForTimeout(300);
+  ok(/Invia allo chef/.test(await pg.locator('.cartbar').innerText().catch(()=>'')),'vista Bar: compare «Invia allo chef»');}
 ok(!errs.length,'nessun errore: '+errs.join(' | '));
 await b.close();
