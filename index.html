@@ -1235,7 +1235,7 @@ const APP_VER=93;
 const NEWS=[
   {v:93,data:'2026-10-12',titolo:'Cantina: fronte e retro della bottiglia',
     tutti:['Fotografando un vino ora puoi aggiungere anche il retro dell\'etichetta (fino a 3 foto): l\'IA le legge insieme e la scheda viene più precisa.','Ogni foto si può togliere prima di leggere; c\'è anche «Galleria» per le foto già fatte.'],
-    dev:['D44: `vnFotoAdd`/`vnFotoH` (riquadro con le miniature, `VN_FMAX` 3, «Leggi con l\'IA» `vnFotoGo`), `vnIaGo` usa i lettori `GEM_LETT` come i listini (tutte le foto in una richiesta; Cloudflare riprova con la sola prima foto), lettore dal vivo nel riquadro «L\'IA sta…». Prova in `tools/test-cantina.mjs`.']},
+    dev:['D44: `vnFotoAdd`/`vnFotoH` (riquadro con le miniature, `VN_FMAX` 3, «Leggi con l\'IA» `vnFotoGo`), `vnIaGo` usa i lettori `GEM_LETT` come i listini (tutte le foto in una richiesta; Cloudflare riprova con la sola prima foto), lettore dal vivo nel riquadro «L\'IA sta…». Prova in `tools/test-cantina.mjs`.','Barra Test: vista «Bar» in fondo (`VIEW_AS.bar`, staff di sala con mansione Bartender) per provare ciò che vede il barista (prova `tools/test-testbar.mjs`).']},
   {v:92,data:'2026-10-12',titolo:'Bar: cocktail disegnati con più dettagli',
     tutti:['I cocktail del Bar hanno disegni più belli: colori vivi, vetro sottile, cubetti di ghiaccio, menta con le venature, fette di agrumi con gli spicchi.','Aprendo un cocktail lo vedi in grande, come un acquerello: colore che sfuma e goccioline di freddo.','Ogni cocktail ha la sua guarnizione vera (ombrellino, ananas, sedano, scorza a spirale…) e si vede cosa c\'è dentro: schiuma dei sour, strati, frutta.','Linee sottili del colore di ogni frutto, tazza di rame vera per i Mule, scorze d\'agrume arricciate.'],
     dev:['D42 «A lista + B scheda»: `tools/bar-disegni.mjs` → `data/bar-disegni.json` (bicchieri con `f` linee fini, `h` riflessi, `m` superficie, `sh` ombra, `x` macchia, `dr` goccioline; pezzi con `f`/`h`); `brCkDis` senza classe = scheda con sfumatura (`brTinta`), macchia e goccioline. Stile C (#99): linee di ghiaccio e bollicine in `vd`/`vf` → gruppo `.br-v` color vetro (`--vetro`), tratto `vector-effect:non-scaling-stroke`, colori `viv()`, guarnizioni del bordo ×1,35 (`brMove`). #101-#102: cupola dei frullati, panna (`cream`), vapore, sale del bordo e bollicine dei calici con linee color vetro; spirale a nastro (`ribbon`); menta pestata senza contorno. #103 (regola di stile di Mario): `joinX`/`colora` trasformano `d`/`f`/`p` dei pezzi in `c`/`cf`/`cp` [[colore, forme]] col tono scuro del pezzo (`scuro`), disegnati da `brCol` (`.br-c` sottile); bicchieri pieni con `oc` (`.br-o`); colore `*`/`*l` = drink (`k[1]`); tazza di rame `rm|`+`sf|`, niente etichetta `m|`. Prova `tools/test-bar-disegni.mjs`.']},
@@ -1597,7 +1597,7 @@ async function fileToLogo(file){const img=await loadImg(file);const sc=Math.min(
 const cfg=()=>Object.assign({nomeLocale:'Jona Ristorante',luogoConsegna:''},D().config.app||{});
 const realU=()=>S.me?D().staff[S.me]:null;
 // Test per lo sviluppatore: vede l'app come l'amministratore (chef) senza cambiare il suo profilo.
-const VIEW_AS={gm:{ruolo:'gm',reparto:'cucina',mansione:'Chef'},staff:{ruolo:'staff',reparto:'cucina',mansione:'Cuoco'},fb:{ruolo:'staff',reparto:'fb',mansione:'F&B Manager'}};
+const VIEW_AS={gm:{ruolo:'gm',reparto:'cucina',mansione:'Chef'},staff:{ruolo:'staff',reparto:'cucina',mansione:'Cuoco'},fb:{ruolo:'staff',reparto:'fb',mansione:'F&B Manager'},bar:{ruolo:'staff',reparto:'sala',mansione:'Bartender'}};
 const meU=()=>{const u=realU();return u&&(isDev(u)||DEMO)&&VIEW_AS[S.viewAs]?Object.assign({},u,VIEW_AS[S.viewAs]):u};
 const isGM=u=>!!u&&u.ruolo==='gm';
 const isDev=u=>!!u&&u.ruolo==='dev';
@@ -2309,7 +2309,7 @@ function testBar(){
   const u=realU();if(DEMO&&u)return`<div class="demobar" role="region" aria-label="Anteprima"><div class="demobar-t"><b>Anteprima</b><span>Dati di esempio: niente arriva al ristorante.</span><button type="button" class="btn ghost sm" data-a="demoOut">Esci</button></div>
   <div class="seg" role="group" aria-label="Guarda l'app come">${[['gm','Chef'],['fb','F&B Manager'],['staff','Staff']].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'gm')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
   if(!isDev(u))return'';
-  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['fb','F&B Mauro'],['staff','Staff'],['dev','Sviluppatore '+u.nome]].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
+  return`<div class="testbar"><span class="muted small">Test</span><div class="seg" role="group" aria-label="Vedi l'app come">${[['gm','Admin Chef'],['fb','F&B Mauro'],['staff','Staff'],['dev','Sviluppatore '+u.nome],['bar','Bar']].map(([k,l])=>`<button type="button" aria-pressed="${(VIEW_AS[S.viewAs]?S.viewAs:'dev')===k}" data-a="viewAs" data-v="${k}">${esc(l)}</button>`).join('')}</div></div>`;
 }
 
 /* ================= staff: catalogo ================= */

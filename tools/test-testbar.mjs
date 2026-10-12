@@ -36,6 +36,14 @@ const fb=await pg.evaluate(()=>{const u=meU();return{r:u.ruolo,rep:u.reparto,mgr
 ok(fb.r==='staff'&&fb.rep==='fb'&&!fb.mgr&&fb.ag&&fb.txt==='F&B Mauro','vista F&B: staff reparto fb, crea in agenda, non gestore: '+JSON.stringify(fb));
 await pg.setViewportSize({width:320,height:700});await pg.waitForTimeout(300);
 const ov=await pg.evaluate(()=>[document.documentElement.scrollWidth,innerWidth,...[...document.querySelectorAll('.testbar [data-a="viewAs"]')].map(b=>Math.round(b.getBoundingClientRect().right))]);
-ok(ov[0]<=ov[1]&&ov.slice(2).every(r=>r<=ov[1]),'barra Test con 4 viste dentro 320 px: '+JSON.stringify(ov));
+ok(ov[0]<=ov[1]&&ov.slice(2).every(r=>r<=ov[1]),'barra Test con 5 viste dentro 320 px: '+JSON.stringify(ov));
+// v93: vista «Bar» in fondo = barista (staff di sala, Bartender): vede il Bar e la Cantina, non è gestore
+const ord=await pg.evaluate(()=>[...document.querySelectorAll('.testbar [data-a="viewAs"]')].map(b=>b.dataset.v).join());
+ok(ord==='gm,fb,staff,dev,bar','vista «Bar» in fondo alla barra Test: '+ord);
+await pg.click('.testbar [data-a="viewAs"][data-v="bar"]');await pg.waitForTimeout(300);
+const br=await pg.evaluate(()=>{const u=meU();return{r:u.ruolo,rep:u.reparto,bar:isBar(u),mgr:isMgr(u),br:brOn(u),vn:vnOn(u),txt:document.querySelector('.testbar [aria-pressed="true"]')?.textContent,cta:!!document.querySelector('[data-a="brOpen"]')}});
+ok(br.r==='staff'&&br.rep==='sala'&&br.bar&&!br.mgr&&br.br&&br.vn&&br.txt==='Bar','vista Bar: barista, vede Bar e Cantina, non gestore: '+JSON.stringify(br));
+const ov2=await pg.evaluate(()=>[document.documentElement.scrollWidth,innerWidth]);
+ok(ov2[0]<=ov2[1],'vista Bar dentro 320 px: '+JSON.stringify(ov2));
 ok(!errs.length,'nessun errore: '+errs.join(' | '));
 await b.close();
