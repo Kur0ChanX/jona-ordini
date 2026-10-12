@@ -1,12 +1,15 @@
-import { chromium, webkit } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+import { chromium, webkit, devices } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 // Giro di ogni scheda per Sviluppatore, Admin Chef e Staff, a 320 e 390 px, tema chiaro e scuro: errori, scorrimento orizzontale, elementi fuori schermo, «undefined/NaN», campi con testo sotto 16 px (iPhone ingrandisce la pagina, v72); foto in /tmp/giro-*.png
 // v72: GIRO_BROWSER=webkit (motore di Safari) e GIRO_W=1280,1440 (computer); usati da test-giro-safari e test-giro-computer
-const BR=process.env.GIRO_BROWSER||'chromium',WS=(process.env.GIRO_W||'320,390').split(',').map(Number);
-const OUT='/tmp/giro-'+(BR==='chromium'?'':BR+'-');
+// D46: GIRO_DEV=nomi dei dispositivi di Playwright separati da «|» (es. «iPhone 15|iPad (gen 7)»): misure, tocco e motore del telefono vero; usato da test-dispositivi
+const DEV=process.env.GIRO_DEV?process.env.GIRO_DEV.split('|'):null;
+const BR=process.env.GIRO_BROWSER||'chromium',WS=DEV||(process.env.GIRO_W||'320,390').split(',').map(Number);
+const OUT='/tmp/giro-'+(BR==='chromium'?'':BR+'-')+(DEV?'dev-':'');
 const b=BR==='webkit'?await webkit.launch():await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const issues=[];
 for(const theme of ['light','dark'])for(const W of WS){
- const ctx=await b.newContext({viewport:{width:W,height:760},deviceScaleFactor:1,colorScheme:theme});
+ if(DEV&&!devices[W])throw new Error('Dispositivo sconosciuto: '+W);
+ const ctx=await b.newContext(DEV?{...devices[W],deviceScaleFactor:1,colorScheme:theme}:{viewport:{width:W,height:760},deviceScaleFactor:1,colorScheme:theme});
  await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
  await ctx.route(/open-meteo|generativelanguage|workers\.dev/,r=>r.abort());
  const pg=await ctx.newPage();const errs=[];
@@ -31,7 +34,7 @@ for(const theme of ['light','dark'])for(const W of WS){
   if(r.over.length)issues.push(`${theme} ${W} ${name}: fuori schermo ${r.over.join(' | ')}`);
   if(r.und)issues.push(`${theme} ${W} ${name}: testo sospetto ${r.und.join(',')}`);
   if(r.small.length)issues.push(`${theme} ${W} ${name}: campo sotto 16 px (iPhone ingrandisce) ${[...new Set(r.small)].join(' | ')}`);
-  await pg.screenshot({path:`${OUT}${theme}-${W}-${name}.png`,fullPage:true});
+  await pg.screenshot({path:`${OUT}${theme}-${String(W).replace(/\W+/g,'_')}-${name}.png`,fullPage:true});
  };
  for(const role of ['dev','gm','staff']){
   await pg.evaluate(()=>{while(sheets.length)closeSheet(true)});await pg.click(`[data-a="viewAs"][data-v="${role}"]`);await w(400);{const va=await pg.evaluate(()=>S.viewAs||'dev');if(va!==role)issues.push(`${theme} ${W} viewAs ${role} -> ${va}`)}
