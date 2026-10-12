@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~10:35 ora italiana, sessione #100)
+# Ultimo messaggio di Mario (12/10/2026 ~10:45 ora italiana, sessione #100)
 
-Come le foto (Recommended) (risposta a tocco: passaggi dei cocktail 4-5 passi, confermata «Sì, confermo la lunghezza»)
+in pina colada esemlio perche ha quel l'arco nero sopra il bicchiere stona un pò non capisco cosa volevi fare.... attenzione anche al resto
