@@ -99,6 +99,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+(12/10/2026 ~20:55 ora italiana, #116, foto `docs/img/sessione-116/chat-tastiera-3-schermo-intero.jpg`: campo ancora mezzo sotto la tastiera) «per schermo intero è ancora cosí» → la v99 NON era ancora online (PR #108 in prova): la foto è della versione vecchia. Dopo l'online chiedergli di riprovare (chiudere e riaprire l'app). Se resta così anche con la v99: il problema è nello schermo intero di Android → strada di riserva `interactive-widget=resizes-content` o `manifest` `display: standalone` solo per… (decidere).
 (12/10/2026 ~20:50 ora italiana, nella #115 chiusa, girato dalla #115, foto `docs/img/sessione-116/chat-tastiera-1.jpg` e `-2.jpg`) «Per ora mi risolvi questo problema della tastiera che va sopra la scrittura.»
 (12/10/2026 ~20:45 ora italiana, nella #115 chiusa, girato dalla #115) «tienila come opzione la faremo più avanti, però tieni l'idea e salvala,la facciamo piú avanti» (su D48 cocktail bellissimi).
 (12/10/2026 ~20:40 ora italiana, nella #115 chiusa, girato dalla #115) «Ok, però utilizzerò utilizzando il token per fare tutti i disegni, giusto?» → la #115: sì, token solo mentre si lavora al generatore (stima 2-4 sessioni), non i 212 a mano; dopo, guardarli nell'app non costa token; si risparmia lavorando a passi, foto piccole, prove col collaudo.
