@@ -363,7 +363,8 @@ function mix(ing) {
 const PZ = {}, K = {};
 const joinX = (...p) => { const o = { w: p.flatMap(x => x.w || []) }, q = p.flatMap(x => x.q || []); if (q.length) o.q = q; for (const k of ['d', 'f', 'p', 'h']) { const s = p.map(x => x[k] || '').join(''); if (s) o[k] = s; } return o; };
 // stile C (D42, scelta di Mario #99): linee di ghiaccio e bollicine in vd/vf, l'app le colora come il vetro
-const VETRO = /^(i|it|b)\|/;
+// linee color vetro (D42 stile C): ghiaccio, bollicine; #101: anche cupola dei frullati, schiuma alta e vapore (in nero sembravano archi che stonano)
+const VETRO = /^(i|it|b|dm|ft|vp)\|/;
 const put = (key, part) => { if (!PZ[key]) { const p = PZ[key] = joinX(...[].concat(part)); if (VETRO.test(key)) for (const [a, b] of [['d', 'vd'], ['f', 'vf']]) if (p[a]) { p[b] = p[a]; delete p[a]; } } return key; };
 const sw = (w, s) => `<g style="stroke-width:${w}">${s}</g>`;
 // cubetto di ghiaccio con le facce (davanti, sopra, lato) e un riflesso
@@ -489,7 +490,7 @@ const foam = (g, c = '#FBF6EC', h = 4.5) => ({ q: [[c, band(g.top - 2, g.top + h
 // schiuma che sale sopra il bordo (Ramos Gin Fizz)
 const foamTall = g => { const d = `M${32 - g.rx} ${g.y0}C${32 - g.rx} ${g.y0 - 10} ${32 + g.rx} ${g.y0 - 10} ${32 + g.rx} ${g.y0}`; return { q: [['#FBF6EC', band(g.top - 2, g.top + 9), .95]], w: [['#FBF6EC', pa(d + 'Z'), 1]], d: sw(1.4, L(d)), f: C(28, g.y0 - 3, .6) + C(34, g.y0 - 5, .5) + C(38, g.y0 - 2, .6) + C(31, g.top + 4, .5) }; };
 // frullato: cupola cremosa sopra la superficie
-const dome = (g, c) => { const d = `M${f1(32 - g.sx)} ${g.top}C${f1(32 - g.sx * .8)} ${g.top - 15} ${f1(32 + g.sx * .8)} ${g.top - 15} ${f1(32 + g.sx)} ${g.top}`; return { w: [[c, pa(d + 'Z'), .95]], d: sw(1.4, L(d)), f: [[-6, -3], [-1, -8], [4, -5], [8, -2], [-9, -1.4], [1, -2.4], [-4, -6.5], [6, -8]].map(([a, b]) => C(32 + a, g.top + b, .5)).join('') }; };
+const dome = (g, c) => { const d = `M${f1(32 - g.sx)} ${g.top}C${f1(32 - g.sx * .8)} ${g.top - 11} ${f1(32 + g.sx * .8)} ${g.top - 11} ${f1(32 + g.sx)} ${g.top}`; return { w: [[c, pa(d + 'Z'), .95]], d: sw(1.4, L(d)), f: [[-6, -3], [-1, -6.5], [4, -5], [8, -2], [-9, -1.4], [1, -2.4], [-4, -5], [6, -6]].map(([a, b]) => C(32 + a, g.top + b, .5)).join('') }; };
 const steam = y => ({ f: [24, 32, 40].map((x, i) => L(`M${x} ${y - 3 - i % 2}C${x - 3} ${y - 7} ${x + 3} ${y - 9} ${x} ${y - 13 - i % 2}`)).join('') });
 const dust = (g, c) => ({ w: [[c, [[-8, 0], [-3, -1], [2, 0], [7, -1], [-5, 1], [5, 1], [0, 1], [-10, .6], [10, .4]].filter(([a]) => Math.abs(a) < g.sx - 1).map(([a, b]) => C(32 + a, g.top + b - .6, .8)).join(''), 1]] });
 const flakes = (g, c, o) => { const s = [[-8, 0, 20], [-3, -1, -30], [2, 0, 50], [7, -1, 0], [-5, 1.2, 70], [5, 1, -50], [0, -2, 10]].filter(([a]) => Math.abs(a) < g.sx - 1).map(([a, b, r]) => `<rect x="${f1(32 + a - 1.3)}" y="${f1(g.top + b - 1.6)}" width="2.6" height="1.4" transform="rotate(${r} ${f1(32 + a)} ${f1(g.top + b - 1)})"/>`).join(''); return { w: [[c, s, 1]], f: o ? s : '' }; };
@@ -682,7 +683,7 @@ function cocktail(ck) {
   if (!B.opaco) {
     if (nome === 'Ramos Gin Fizz') ks.push(put('ft|' + bk, foamTall(g)));
     else if (SCHIUMA[nome] || /albume/i.test(ingT) && !LAY[nome]) { const c = SCHIUMA[nome] || '#FBF6EC'; ks.push(put('fo|' + bk + '|' + c, foam(g, c))); }
-    if (frullato) ks.push(put('dm|' + bk + '|' + col, dome(g, tinta(col, 255, .25))));
+    if (frullato) ks.push(put('dm|' + bk + '|' + col, dome(g, tinta(col, 255, .1))));
   }
   if (/panna montata/i.test(ingT)) ks.push(put('pm|' + bk, { d: L(`M16 ${g.top}C18 ${g.top - 9} 26 ${g.top - 10} 30 ${g.top - 8}C34 ${g.top - 12} 42 ${g.top - 8} 42 ${g.top}`), w: [['#FBF6EC', L(`M16 ${g.top}C18 ${g.top - 9} 26 ${g.top - 10} 30 ${g.top - 8}C34 ${g.top - 12} 42 ${g.top - 8} 42 ${g.top}Z`), 1]], f: L(`M22 ${g.top - 4}Q26 ${g.top - 7} 30 ${g.top - 5}`) }));
   if (/^(Tazza|Irish coffee)$/.test(bk) || /cald/i.test(ingT)) ks.push(put('vp|' + bk, steam(g.y0)));
@@ -715,6 +716,23 @@ const somiglia = (a, b) => { if (a[0] !== b[0]) return 99; const pa_ = pezzi(a),
       if (r && !K[n].some(p => /^m\|/.test(p))) K[n].push(put('m|' + bk + '|' + r, badge(r, 32 - g.rx * .45, Math.min(g.yb - 4, g.top + 12), 6.5))); } } }
 let simili = []; { const N = CKS.map(c => c[0]); for (let i = 0; i < N.length; i++) for (let j = i + 1; j < N.length; j++) { const s = somiglia(K[N[i]], K[N[j]]); if (s < SIMILE) simili.push([N[i], N[j], +s.toFixed(1)]); } }
 if (process.argv.includes('--simili')) console.log('simili', simili.length, JSON.stringify(simili));
+// #101: le guarnizioni spostate (×1,35 nell'app, brMove) non devono uscire dal disegno (Piña Colada: ananas tagliato in alto).
+// Misura il riquadro di ogni pezzo con il browser (getBBox) e, se esce troppo, lo sposta dentro: sopra può uscire di 5 (la scheda ha spazio, .br-ckbig), ai lati di 2, sotto mai.
+{ const ids = [...new Set(Object.values(K).flatMap(k => k.slice(2).filter(x => x.includes('@')).map(x => x.split('@')[0])))];
+  const { createRequire } = await import('module'), { chromium } = createRequire('/opt/node22/lib/node_modules/')('playwright');
+  const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }), pg = await br.newPage();
+  const tutto = p => Object.values(p).map(v => Array.isArray(v) ? v.map(w => w[1]).join('') : v).join('');
+  await pg.setContent(`<svg viewBox="0 0 64 64">${ids.map((id, i) => `<g id="m${i}">${tutto(PZ[id])}</g>`).join('')}</svg>`);
+  const bb = await pg.evaluate(n => Array.from({ length: n }, (_, i) => { const r = document.getElementById('m' + i).getBBox(); return [r.x, r.y, r.x + r.width, r.y + r.height]; }), ids.length);
+  await br.close(); const BB = Object.fromEntries(ids.map((id, i) => [id, bb[i]])), S = 1.35, M = 1, MT = -5, MX = -2;
+  for (const k of Object.values(K)) for (let i = 2; i < k.length; i++) if (k[i].includes('@')) {
+    const [id, t] = k[i].split('@'); let [x0, y0, x1, y1] = BB[id]; let [x, y] = t.split(',').map(Number);
+    // pezzo alto (ananas con ciliegina): invece di farlo scendere nel bicchiere lo si rimpicciolisce sul bordo (copia «~<scala>»)
+    let nid = id; if (y0 < 0 && MT - S * y0 - y > 2) { const sc = Math.max(.75, Math.round((y - MT) / (-S * y0) * 20) / 20); if (sc < 1) { nid = id + '~' + sc;
+      if (!PZ[nid]) { const z = v => `<g transform="scale(${sc})">${v}</g>`; PZ[nid] = Object.fromEntries(Object.entries(PZ[id]).map(([q, v]) => [q, Array.isArray(v) ? v.map(w => [w[0], z(w[1]), w[2]]) : z(v)])); }
+      x0 *= sc; y0 *= sc; x1 *= sc; y1 *= sc; } }
+    x = Math.min(Math.max(x, MX - S * x0), 64 - MX - S * x1); y = Math.min(Math.max(y, MT - S * y0), 64 - M - S * y1);
+    k[i] = nid + '@' + f1(x) + ',' + f1(y); } }
 const out = { v: 2, g: G, r: R, b: BO, pz: PZ, k: K };
 writeFileSync(new URL('../data/bar-disegni.json', import.meta.url), JSON.stringify(out));
 // anteprima per l'occhio (non va nell'app)

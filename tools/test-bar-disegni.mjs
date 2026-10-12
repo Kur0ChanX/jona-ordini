@@ -37,7 +37,7 @@ const generici=tutti.filter(n=>/^(liquore|bottiglia)$/.test(k(n)));
 ok(!generici.length,'ogni liquore ha la sua bottiglia, nessuna bottiglia generica'+(generici.length?': '+generici.join(', '):''));
 const simili=[['Bourbon','Rye whiskey','Scotch whisky','Scotch whisky torbato','Whisky irlandese'],['Calvados','Brandy','Cognac'],['Pisco','Grappa'],['Rum bianco','Cachaça'],['Champagne','Prosecco'],['Fernet','Amaro','Jägermeister'],['Vermouth dry','Lillet blanc'],['Crème de mûre','Mirto'],['Chartreuse verde','Absinthe','Liquore alla mela verde','Liquore al melone'],['Tabasco','Peperoncino rosso'],['Granatina','Succo di melograno']];
 for(const g of simili)ok(new Set(g.map(col)).size===g.length,'disegni diversi: '+g.join(', '));
-const pid=p=>p.split('@')[0];
+const pid=p=>p.split('@')[0].replace(/~[\d.]+$/,'');
 const ckSvg=c=>{const x=J.k[c[0]];if(!x||!J.b[x[0]])return null;return JSON.stringify([J.b[x[0]].op||x[1],x[0],x.slice(2).map(p=>[J.pz[pid(p)],p.split('@')[1]])])};
 const imp=CK.c.map(ckSvg);
 ok(imp.every(Boolean)&&x2(J.k).every(x=>x.slice(2).every(p=>J.pz[pid(p)]&&(!p.includes('@')||/@-?[\d.]+,-?[\d.]+$/.test(p)))),'ogni cocktail ha il suo disegno, pezzi tutti presenti ('+CK.c.length+')');
@@ -51,10 +51,10 @@ ok(J.k['Negroni'].some(p=>/^g\|aranciaM@/.test(p))&&J.k['Mojito'].some(p=>/^ml\|
    const la=lab(J.b[a[0]].op||a[1]),lb=lab(J.b[b[0]].op||b[1]),d=Math.hypot(la[0]-lb[0],la[1]-lb[1],la[2]-lb[2])+12*n;if(d<10)sim.push(N[i]+' ~ '+N[j])}
  ok(!sim.length,'nessuna coppia di cocktail troppo simile'+(sim.length?': '+sim.join(', '):''));
  const ha=(n,re)=>J.k[n]&&J.k[n].some(p=>re.test(p));
- const SEGNI=[['Tequila Sunrise',/^st\|/,'strati'],['B-52',/^st\|/,'strati'],['Black Velvet',/^st\|/,'strati'],['White Russian',/^st\|/,'panna sopra'],['Piña Colada',/^g\|ananasC@/,'ananas e ciliegina'],['Piña Colada',/^u\|/,'ombrellino'],
+ const SEGNI=[['Tequila Sunrise',/^st\|/,'strati'],['B-52',/^st\|/,'strati'],['Black Velvet',/^st\|/,'strati'],['White Russian',/^st\|/,'panna sopra'],['Piña Colada',/^g\|ananasC(~[\d.]+)?@/,'ananas e ciliegina'],['Piña Colada',/^u\|/,'ombrellino'],
   ['Whiskey Sour',/^fo\|/,'schiuma'],['Pisco Sour',/^g\|.*angostura/,'gocce di angostura'],['Horse\'s Neck',/^g\|.*spirale/,'spirale di scorza'],['Manhattan',/^g\|.*ciliegiaF/,'ciliegina sul fondo'],['Jägerbomb',/^jb\|/,'shot dentro'],
   ['Irish Coffee',/^vp\|/,'vapore'],['Ramos Gin Fizz',/^ft\|/,'schiuma alta'],['Frozen Daiquiri',/^dm\|/,'frullato'],['Espresso Martini',/chicchi/,'chicchi'],['Champagne Cocktail',/^zo\|/,'zolletta'],['Caipirinha',/^ls\|/,'lime nel bicchiere'],
-  ['Bloody Mary',/sedano/,'sedano'],['Oaxaca Old Fashioned',/scorzaaranciaF/,'scorza fiammata'],['Clover Club',/bacche/,'lamponi'],['Sangria',/pezzetti/,'frutta a pezzetti'],["Pimm's Cup",/^cu\|/,'cetriolo dentro'],['Tom Collins',/agrumelimonefC@/,'fetta e ciliegina'],
+  ['Bloody Mary',/sedano/,'sedano'],['Oaxaca Old Fashioned',/scorzaaranciaF/,'scorza fiammata'],['Clover Club',/bacche/,'lamponi'],['Sangria',/pezzetti/,'frutta a pezzetti'],["Pimm's Cup",/^cu\|/,'cetriolo dentro'],['Tom Collins',/agrumelimonefC(~[\d.]+)?@/,'fetta e ciliegina'],
   ['Spicy Fifty',/peperoncino/,'peperoncino'],['Appletini',/^g\|mela@/,'fettine di mela'],['Scorpion',/^g\|fiore@/,'gardenia'],['Dry Martini',/oliva/,'oliva'],['Vodka Martini',/scorzalimone/,'scorza (prima scelta)']];
  const no=SEGNI.filter(([n,re])=>!ha(n,re));ok(!no.length,'cocktail famosi con il loro segno ('+SEGNI.length+')'+(no.length?': manca '+no.map(x=>x[0]+' '+x[2]).join(', '):''));
  const tk=CK.c.filter(c=>c[3]==='Tiki').map(c=>J.k[c[0]][1]);ok(new Set(tk).size===tk.length&&!J.b.Tiki.op,'tazze tiki di colori diversi');}
@@ -86,7 +86,18 @@ async function cocktail(pg,nome){await sh(pg).locator('input#brq').fill(nome);aw
   const big=sh(pg).locator('.br-ckbig .br-dis');
   ok(await big.locator('linearGradient').count()===1&&/url\(#br-lg\d+\)/.test(await big.locator('.wa').nth(1).getAttribute('fill')),'scheda: colore del drink che sfuma');
   ok(await big.locator('.br-dr ellipse').count()>=2&&await big.locator('.br-sh').count()===1,'scheda: goccioline e ombra');
-  ok(await big.locator('.br-h path').count()>=1&&await big.locator('.br-f').count()===1,'scheda: riflessi e linee fini del vetro');
+  ok(await big.locator('.br-h path').count()>=1&&await big.locator('.br-v.br-f').count()===1,'scheda: riflessi e linee fini del vetro');
+  // v92 stile C: vetro azzurrino, tratto fisso, guarnizione ingrandita
+  ok(await big.locator('.br-v').first().evaluate(e=>getComputedStyle(e).stroke)===await pg.evaluate(()=>{const d=document.createElement('div');d.style.color='var(--vetro)';document.body.appendChild(d);const c=getComputedStyle(d).color;d.remove();return c}),'stile C: linee del vetro color --vetro');
+  ok(await big.locator('.ink').first().evaluate(e=>getComputedStyle(e).vectorEffect)==='non-scaling-stroke','stile C: tratto con spessore fisso');
+  ok(await big.locator('g[transform*="scale(1.35)"]').count()>=1,'stile C: guarnizione del bordo ingrandita (×1,35)');
+  // #101: nessun disegno esce troppo (guarnizioni ×1,35: sopra max 5, ai lati max 2, sotto niente) e cupola dei frullati senza arco nero
+  const fuori=await pg.evaluate(()=>{const d=document.createElement('div');d.style.cssText='position:absolute;left:-999px;top:0';document.body.appendChild(d);const r=[];
+    for(const n of Object.keys(BR_DIS.k)){d.innerHTML=brCkDis({n});for(const g of d.querySelectorAll('g[transform^="translate("]')){const m=g.getAttribute('transform').match(/translate\(([-\d.]+) ([-\d.]+)\) scale\((1\.35)\)$/);if(!m)continue;const[tx,ty,sc]=m.slice(1).map(Number),b=g.getBBox();if(!b.width)continue;
+      const x0=tx+sc*b.x,y0=ty+sc*b.y,x1=tx+sc*(b.x+b.width),y1=ty+sc*(b.y+b.height);if(y0<-5.6||x0<-2.6||x1>66.6||y1>64.6){r.push(n+' '+[x0,y0,x1,y1].map(v=>v.toFixed(1)).join(','));break}}}d.remove();return r});
+  ok(fuori.length===0,'nessuna guarnizione del bordo esce dal suo spazio ('+(fuori.slice(0,4).join(' | ')||'0')+')');
+  const nero=await pg.evaluate(()=>Object.entries(BR_DIS.k).filter(([,k])=>k.slice(2).some(x=>/^(dm|ft|vp)\|/.test(x)&&BR_DIS.pz[x.split('@')[0]].d)).map(([n])=>n));
+  ok(nero.length===0,'cupola dei frullati, schiuma alta e vapore con linee color vetro, non nere ('+(nero.join(', ')||'0')+')');
   ok(await sh(pg).locator('.br-ing.br-carta').count()===1,'Negroni: ingredienti sul foglio di carta');
   ok(await big.locator('g[transform^="translate("]').count()>=1,'Negroni: mezza fetta d\'arancia spostata sul bordo (@x,y)');
   ok(await sh(pg).locator('.br-ir .br-dis').count()===3,'Negroni: 3 ingredienti, 3 disegni');
