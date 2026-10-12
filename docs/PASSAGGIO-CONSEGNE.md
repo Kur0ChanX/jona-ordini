@@ -1,34 +1,34 @@
-# Passaggio di consegne (2026-10-12, fine sessione #93)
+# Passaggio di consegne (2026-10-12, fine sessione #94)
 
-Sessione attuale: #94
+Sessione attuale: #95
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v88**. **PR #99 (v89) aperta**, da unire appena il controllo `prove` è verde.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). **v89 unita** (PR #99 squash `910e862`, prove verdi). Alle ~7:40 online c'era ancora v88 (pubblicazione in corso).
 
-## ✅ SUBITO (#94)
-1. **PR #99 (v89, D39 disegni del Bar)**: aspettare il controllo `prove` (minuscolo, E33) sull'ultimo commit del ramo. Se verde → squash merge da solo (regola «pubblica sempre in automatico»), controllo online (`APP_VER=89` su https://jona-ristorante-by-ynoy-corp.pages.dev/ ), poi `git fetch origin main && git merge origin/main` sul ramo e push normale. Se rosso → capire la causa (E41: prove a mezzanotte? usare `tools/ora-fissa.mjs`). Mentre `prove` gira NON fare push sul ramo (E39). Dire a Mario in 2 righe che v89 è online.
-2. Poi D33 (sotto): proposta con immagine e 3 strade.
-3. Guardare il giro delle prove del lunedì (3:17): se rosso, priorità.
+## ✅ SUBITO (#95)
+1. Controllare che sia online `APP_VER=89` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33: senza index.html). Se sì, dirlo a Mario in 1 riga.
+2. **D41 = v90 Bar** (scelta di Mario a tocco + doppio tocco: «Sì, falla così» / «Sì, confermo la prova»). Costruirla e pubblicarla da sola se le prove sono verdi:
+   - Bozza funzionante in **`tools/bar-prova-v90.mjs`** (scrive `/tmp/bar-prova-liquori.html` e `/tmp/bar-prova-cocktail.html`). Foto mostrate a Mario: `docs/img/sessione-94/liquori-piccola.png`, `cocktail-piccola.png`.
+   - **Liquori**: tabella `LQ` nome → [sagoma, colore, simbolo]. 7 sagome `SAG` (tonda, alta, quadra, monaco, goccia, fiasca, aperitivo) con etichetta tonda; simbolo = disegno esistente rimpicciolito (`mini`) o simboli nuovi `SIMB` (cacao, anice, mandorla, croce, erbe, stella, fumo, spezie, scritta). 40 prodotti (tutti quelli che prima erano «liquore»/«bottiglia»). Da portare in `tools/bar-disegni.mjs`: un disegno per liquore (es. `G['lq_amaretto']`) e regole che puntano lì; le regole vecchie con colore restano solo come riserva.
+   - **Cocktail**: `cocktail(ck)` = bicchiere `BIC` (17 tipi = campo 3 di `cocktail.json`) + colore del drink `mix()` (media pesata per cl in spazio lineare; trasparenti ×0,15, colori forti ×3) + guarnizione `GAR`/`garn()` (max 2, dal campo 5) + ghiaccio (se la preparazione dice ghiaccio) + bollicine + bordo di sale/zucchero. Da fare nell'app: generare il disegno a runtime (bicchieri e simboli dentro `data/bar-disegni.json`, funzione in index.html), mostrarlo nella lista dei cocktail e in cima alla scheda del cocktail.
+   - **Doppioni**: 212 cocktail → 209 disegni. Restano uguali London Mule=Mexican Mule e Moscow/Kentucky/Virgin Mule (tazza di rame opaca): aggiungere un segno del distillato (es. piccolo simbolo o colore del bordo) per renderli diversi. La prova deve controllare 212 disegni diversi.
+   - **Bug v89 trovato**: «ginger beer»/«ginger ale» prendono il disegno del gin (regola `'^gin'`). Correggere con `'^gin(?!ger)'` + controllo nella prova.
+   - Altri doppioni veri tra ingredienti (stesso disegno e colore): whisky (bourbon, rye, scotch, torbato, irlandese), brandy (calvados, brandy, cognac), pisco=grappa, rum bianco=cachaça, champagne=prosecco. Mario ha detto «controlla i doppioni… senza doppioni o provaci»: renderli diversi anche questi (es. simbolo `fumo` per il torbato, mela per il calvados).
+   - Ricordare: `CACHE` in sw.js, `APP_VER=90`, NEWS v90, riga in CLAUDE.md, aggiornare `tools/test-bar-disegni.mjs`, `test-giro`, foto HD a Mario (chiaro e scuro).
+3. Poi D33 (sotto): proposta con immagine e 3 strade.
+4. Guardare il giro delle prove del lunedì (3:17 del 12/10).
 
-## Fatto in #93 (12/10, ~0:55-1:40 ora italiana)
-- Avvio: scorta unita due volte (conflitto solo sull'intestazione di `docs/ULTIMO-MESSAGGIO.md`, tenuta la più nuova). Push confermati.
-- Mario ha detto «vai»: rimandata l'immagine `docs/img/sessione-91/d39-stili.png`, domanda a tocco con doppio tocco. **Scelta: B · Inchiostro e acquerello, confermata** («Sì, confermo lo stile»). Ripetuta in chiaro nel testo (E38).
-- **D39 fatto, v89** (commit `4d88b2a`, PR #99):
-  - `tools/bar-disegni.mjs` → `data/bar-disegni.json` (43 disegni, 91 regole, 26 KB) e `tools/bar-disegni-anteprima.html` (foglio con tutti i disegni grandi e a 44 px). Disegni: lime, limone, arancia, pompelmo (fetta rosa a 10 spicchi), ananas, mirtillo, fragola, pesca, ciliegia, melograno, pomodoro, cocco, mela, passione, uva, cetriolo, peperoncino, oliva, menta, cannella, fiore, zucchero, miele, sciroppo, uovo, panna, caffe, soda, acqua, ghiaccio, sale, bitter, gin, vodka, rum, agave (tequila/mezcal), whisky, brandy, liquore (bottiglia tonda, colore dalla regola), bottiglia (aperitivi/vermouth/amari), vino, spumante, birra.
-  - Principio delle regole: alcolici → bottiglia o bicchiere (colore secondo il prodotto), analcolici → frutto/oggetto. Prima regola che corrisponde vince (es. «cherry brandy» e «crema di whisky» prima di brandy/whisky). Senza regola: liquore se alcolico, acqua se no.
-  - index.html: `brDisLoad` (fetch all'apertura del Bar e in `brShowC`, inietta una volta `<svg id="br-defs">` con il filtro `#br-wash`), `brDisK`, `brDis(nome,alc)`. Scheda del cocktail: `.br-ing.br-carta` (carta chiara anche nel tema scuro, testo #2a2420, margine rosso a 60 px), disegno 44 px per ingrediente. Inventario: `.lbl.br-gl` con disegno 30 px (linee `var(--ink2)`, così si vedono nel tema scuro). `html.lite` spegne il filtro e i puntini della carta.
-  - sw.js: `CACHE` `jona-ordini-v93`, `./data/bar-disegni.json` in `FILES`. Il deploy copia già tutta `data`.
-  - `APP_VER=89`, NEWS v89 «Bar: ingredienti disegnati», riga v89 in CLAUDE.md, D39 aggiornata in `docs/DA-FARE.md`.
-  - Prova `tools/test-bar-disegni.mjs` (24 PASS; ogni ingrediente di `cocktail.json` e ogni tipo di `BR_CAT` ha una regola; lite spegne l'acquerello; tema scuro; file mancante con `serviceWorkers:'block'` → lista di prima senza errori). Aggiunta a `VELOCI` in `tools/prova-ci.sh`.
-  - Verdi in locale: test-bar-disegni, test-bar, test-news, test-demo, test-leggera, test-giro.
-  - Foto mandata a Mario: Negroni, Mojito, inventario, chiaro e scuro (rifarla: demo → Fornitori → Bar → cerca nel campo `#brq`).
+## Fatto in #94 (12/10, ~7:15-7:45 ora italiana)
+- Avvio: scorta unita. Conteneva come «ultimo messaggio» l'avviso «This session's worker process was restarted…» (non di Mario) → **E42**: aggiunto ad `AVVISI_DI_SISTEMA` in `.claude/hooks/scorta.py`, prova 3c-quater in `tools/test-scorta.py` (25 controlli ok), ripristinato «vai».
+- Prove PR #99 verdi → squash merge, `main` unito nel ramo.
+- Mario: «bastano solo 40 immagini di ingredienti?» → contati: 143 ingredienti, tutti con disegno (43 disegni, 91 regole); il «liquore» copriva 30 prodotti, «bottiglia» 10, «soda» 10. Fatta la prova liquori+cocktail, mandata in HD, scelta e confermata.
 
 ## Domanda aperta a Mario (scritta nel testo in #87, ancora senza risposta)
-«Oggi come registrate i vini venduti? Scontrino di cassa (con quale programma?), comanda su carta, oppure niente?» → serve per collegare le vendite (es. foto della chiusura di cassa letta dall'IA). Fino alla risposta resta «− Venduta».
+«Oggi come registrate i vini venduti? Scontrino di cassa (con quale programma?), comanda su carta, oppure niente?» → serve per collegare le vendite. Fino alla risposta resta «− Venduta».
 
 ## Prossimi lavori (in ordine, da soli, pubblicare in automatico se le prove sono verdi)
-1. Unire PR #99 (sopra).
-2. D33 (funzioni smart per orari e agenda): proposta con immagine + 3 strade (sotto). È una scelta di Mario: domanda a tocco con doppio tocco, ripetendo in chiaro la scelta prima di costruire (E37/E38).
-3. Idee per il Bar (da proporre solo se utili): «Cocktail della casa» (ricette del bartender, con disegni già pronti), costo del cocktail dal prezzo delle bottiglie (come le ricette), foto della bottiglia letta dall'IA per aggiungerla.
+1. D41 v90 (sopra).
+2. D33 (funzioni smart per orari e agenda): proposta con immagine + 3 strade. Domanda a tocco con doppio tocco, ripetendo in chiaro la scelta prima di costruire (E37/E38).
+3. Idee per il Bar (solo se utili): «Cocktail della casa», costo del cocktail dal prezzo delle bottiglie, foto della bottiglia letta dall'IA.
 4. `tools/misura-velocita.mjs` nelle prove di GitHub? Decidere dopo qualche misura.
 
 ## D33 — funzioni smart per orari e agenda (chiesto da Mario, ancora da proporre)
@@ -42,7 +42,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = lo staff segna i giorni in 
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #93 `session_01Q2KYN7TKMEbWP23X6HfPYB` (chiusa), #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj`, #90 `session_01MAqfbJ8neGEZiNgRVBCjCA`, #89 `session_01Y1ek4ZACQwmsRsQn8vWqyn`, #88 `session_0199ANgsgVouZX79Xd7QJFZX`, #87 `session_01FbQSi6stujDtWxnvcAYerS` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #94 `session_01KtgXU5jt71weBBriYJGSpK` (chiusa), #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -63,5 +63,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = lo staff segna i giorni in 
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-«vai»
-(12/10/2026 ~0:55 ora italiana, in #93, in risposta a «vuoi che ti rimandi l'immagine dei 3 stili?»). Poi, a tocco: stile **B Inchiostro**, «Sì, confermo lo stile». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+«si
+
+bastano solo 40 immagini di ingredienti?»
+(12/10/2026 ~7:25 ora italiana, in #94). Poi, a tocco: «controlla i doppioni e se riesci fallo anche per i cooktail nello stesso stile senza doppioni o provaci» / «manda prova cocktail e liquori». Dopo la foto, a tocco: «Sì, falla così (Consigliato)» + «Sì, confermo la prova». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
