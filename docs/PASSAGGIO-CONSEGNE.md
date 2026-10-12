@@ -80,5 +80,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+(12/10/2026 ~9:45, #98) «vai apri» (la #98 non può aprire sessioni: limite 8 della catena, E12; Mario apre la #99 a mano). Prima, sempre in #98:
 (12/10/2026 ~9:40 ora italiana, #98) «se ti aiuta aggiungi un aiutante per il tuo progetto e valuta tu cosa fargli fare per ottimizzare al meglio tutto tempi e qualità» → punto 0 di SUBITO.
 Prima (#98, ~9:35, con l'immagine `docs/img/sessione-98/spunto-cocktail-mario.jpg`: 6 cocktail disegnati a mano e acquerellati) «vedi ad esemlio questi per prendere spunto che dettagli e carini». Prima ancora (#97): «Cerca di mettere meno foto (png) simili possibili e falle inerenti al cocktail». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
