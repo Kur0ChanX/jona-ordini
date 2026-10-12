@@ -115,6 +115,8 @@ const lastP=gemReq[gemReq.length-1].contents[0].parts;
 ok(lastP.length===3&&lastP[1].inline_data&&lastP[2].inline_data&&/2 foto della stessa bottiglia/.test(lastP[0].text),'D44: le 2 foto vanno all\'IA nella stessa richiesta');
 ok(gemUrl.slice(-2).map(u=>u.includes('/gemini-flash-latest:')?'flash':u.includes('/gemini-flash-lite-latest:')?'lite':'?').join()==='flash,lite','D44: Flash sovraccarico → legge Flash-Lite (stessi lettori dei listini)');
 ok(await pg.inputValue('#vnf-n')==='Turriga'&&await pg.inputValue('#vnf-den')==='Isola dei Nuraghi IGT'&&await pg.locator('.sheet .vn-fi').count()===0,'D44: scheda riempita, riquadro delle foto chiuso');
+// v96: il motivo vero del passaggio a Flash-Lite si vede nel foglio e va nella scatola nera (Mario: «perché Lite?»)
+ok(/Letto da Gemini Flash-Lite\. Prima: Gemini Flash — Google ha risposto «sovraccarico» \(errore 503\)/.test(await txt('.sheet'))&&await pg.evaluate(()=>Object.keys(ERR.seen).some(k=>/Vino: Gemini Flash non ha letto \(errore 503\)/.test(k))),'v96: «Letto da Gemini Flash-Lite» con il motivo vero (503) nel foglio e nella scatola nera');
 // Cloudflare con più foto che non risponde: riprova con il solo fronte
 const cf=await pg.evaluate(async()=>{const vero=gemCall,log=[];
   gemCall=async(b,l)=>{const n=b.contents[0].parts.length-1;log.push(l+n);return l==='cf'?(n>1?{st:400,msg:'troppe immagini'}:{txt:'{"nome":"Prova CF","cantina":"X","sicuro":true}',lettore:'cf'}):{st:503}};

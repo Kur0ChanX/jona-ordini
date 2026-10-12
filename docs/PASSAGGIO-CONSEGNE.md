@@ -1,16 +1,51 @@
-# Passaggio di consegne (2026-10-12, fine sessione #107)
+# Passaggio di consegne (2026-10-12, fine sessione #111)
 
-Sessione attuale: #108
+Sessione attuale: #112
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v94 ONLINE, v95 PRONTA** (commit `225dd67` + consegne) e **PR della v95 aperta** dalla #107 subito dopo il push di queste consegne (numero: guardare le PR aperte). `APP_VER` 95, `CACHE` `jona-ordini-v99`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v96 nella PR #106** (vedi SUBITO 1). v95 online (controllato: `APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/). Nel ramo: `APP_VER` 96, `CACHE` `jona-ordini-v100`.
 
-## ✅ SUBITO (#108)
-0. 🔴 **BUG iPhone (Mario, 12/10 dopo l'handoff, scritto nella #107 chiusa)**: «correggi nel iphone quando scatta a un vino dopo la foto si riavvia l'applicazione». Cantina → **Fotografa una bottiglia** (v93, D44): dopo lo scatto l'app installata su iPhone ripartisce da capo. Ipotesi da verificare (#107 ha solo guardato il codice, niente prove): `vnFotoAdd` (index.html ~riga 5741) tiene il file originale della fotocamera (12-48 MP) e mostra le miniature con `URL.createObjectURL(file)` a piena risoluzione → iOS decodifica foto enormi e, con la fotocamera aperta sopra l'app installata, chiude la pagina per memoria → al ritorno la ricarica. Rimedi da valutare insieme: (a) rimpicciolire SUBITO ogni foto (es. `shrink(file,1600)` già in index.html ~riga 1172, o `createImageBitmap`) e tenere solo il blob piccolo per miniature e IA; (b) salvare la bozza prima di aprire la fotocamera (come `jona_reg` della registrazione, stesso problema già risolto lì) e riaprire la scheda del vino dopo un riavvio; (c) foto già lette salvate in IndexedDB. Prova nuova (es. in `tools/test-cantina.mjs`: foto grande 4000×3000 → miniatura e invio piccoli; bozza ripresa dopo ricarica). È un bug dell'app in uso: viene PRIMA della v95 se le prove della PR #105 non sono ancora verdi; altrimenti pubblicare la v95 e poi correggere come v96.
-0-bis. **Prove su tutti i dispositivi (regola nuova di Mario, in CLAUDE.md «PROVE SU TUTTI I DISPOSITIVI»)**: oggi esistono solo `test-giro` (Chromium 320/390), `test-giro-safari` (WebKit, solo GitHub) e `test-giro-computer` (1280/1440). Da fare: un giro con la matrice PC, Mac, tablet Android, telefono Android, iPhone, iPad (descrittori `devices` di Playwright, `hasTouch`/`isMobile`) dentro `test-giro` o una prova nuova `test-dispositivi`, in `tools/prova-ci.sh veloce` e `prove.yml` (WebKit già installato lì). La correzione D45 va provata su tutta la matrice. Mario ha detto sì a mandarla anche a RVC e SPA: mandata dalla #107 con `send_message` a RVC #92 e SPA #14 (consegnata).
-1. **Pubblicare la v95**: aspettare il controllo `prove` sulla PR aperta (NON pushare sul ramo mentre gira: E39), poi squash, controllo online (`APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/), poi `git fetch origin main && git merge origin/main` + push. Se `prove` è rosso: capire la causa e correggere. Poi dire a Mario in 2 righe che la v95 è online (le foto prima/dopo le ha già ricevute in #107).
-2. Dopo la v95: difetto 18 rimasto (Americano: fetta d'arancia e scorza di limone sovrapposte sul bordo) e proposta SOLUZIONE SMART per cocktail «bellissimi» (vedi «Idee»: bozza ferma + domanda a tocco con doppio tocco, E19/E38). Mario #102: «la nuova schiuma mi piace quello stile».
-3. Mario (#106): **«pubblica ogni tanto gli aggiornamenti»** = non accumulare: una versione online appena un pezzo è pronto e provato.
-4. Mario prova la D44 (v93) quando può (Cantina → **Fotografa una bottiglia** → fronte → **Fotografa il retro** → **Leggi le 2 foto con l'IA**) e la D43 (Fornitori → Bar → un cocktail → passaggi numerati).
+## ✅ SUBITO (#112)
+1. 🔴 **PR #106 (v96, D45)**: controllare il controllo «prove» sull'ultimo commit della PR (in #111: `7415c27`, giro partito ~14:40 ora italiana; se c'è un commit di consegne dopo, il giro è ripartito su quello). Se VERDE: squash (titolo «v96: foto del vino su iPhone non fa più ripartire l'app (D45)»), subito `git fetch origin main && git merge origin/main` nel ramo + push, controllo online `APP_VER` 96 su https://jona-ristorante-by-ynoy-corp.pages.dev/. Se ROSSO: il log di GitHub mostra solo le prime 5 righe FAIL (`grep -m5 '^FAIL'` in `tools/prova-ci.sh`); se una prova cade senza FAIL (eccezione) il registro intero è nell'artifact `registri-prove` dell'esecuzione.
+2. Poi dire a Mario: v96 online → riprovare Cantina → **Fotografa una bottiglia** sull'iPhone; se l'IA passa al lettore di riserva la scheda scrive il motivo vero.
+3. `test-dispositivi` (D46) era VERDE su GitHub già nel giro di `1ebde2e` (iPhone 15, iPad, Desktop Safari, Pixel 7, Galaxy Tab S4).
+4. Dopo: difetto 18 (Americano: arancia e scorza sovrapposte) e proposta SMART cocktail «bellissimi» (vedi «Idee»).
+5. Mario (#106): «pubblica ogni tanto gli aggiornamenti».
+6. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
+
+## Fatto in #111 (12/10, ~13:25-14:45 ora italiana)
+- Avvio: scorta unita (solo ULTIMO-MESSAGGIO «via»), push.
+- `test-news` rossa: lo staff vedeva «Gemini» nella NEWS v96 → testo «Se l'IA passa a un lettore di riserva, la scheda dice il motivo vero.» (94 PASS).
+- `test-foto-vino` rossa solo sul Mac (WebKit desktop), 3 giri su GitHub per capire:
+  1. `1ebde2e`: attesa della richiesta all'IA da 1,2 s a fino a 10 s (non era quello).
+  2. `0ee5b06`: diagnosi DENTRO la riga FAIL (GitHub mostra solo le righe FAIL) + errori console → «richieste 0, console 400»: la richiesta andava al vero Google con la chiave finta.
+  3. `dd7f978`: causa = service worker attivo: Playwright su WebKit desktop non intercetta (route) la richiesta. Contesto con `serviceWorkers:'block'` (come test-agenda*). L'app vera non c'entra: sw.js lascia passare POST e altri siti. E48 in ERRORI. Risultato: passati foto all'IA e «Chiudi», poi `page.reload` scaduto (30 s) alla riga «fotocamera aperta + ricarica»: con la finestra dei file aperta WebKit desktop non dà «load».
+  4. `7415c27`: quella ricarica con `{waitUntil:'commit'}` (poi aspetta `.vn-rip`). In locale 36 PASS (WebKit SALTATA). Su GitHub il giro di `7415c27` era ANCORA IN CORSO dopo 40 minuti (di solito ~20): probabile prova bloccata sul Mac (WebKit desktop) senza tempo massimo, forse `test-foto-vino` dopo la ricarica con la finestra dei file aperta. Il push delle consegne ha fatto ripartire il giro: se si blocca ancora, nella vista Mac saltare il solo passo «fotocamera aperta + ricarica» NON si fa (vietato spegnere prove): mettere un tempo massimo a quel passo, chiudere prima la finestra dei file in WebKit desktop (es. `fc.setFiles([])` dove serve) oppure aprire una pagina nuova al posto della ricarica, e capire la causa.
+- Handoff fatto per il contesto (avviso dell'hook) mentre girava il giro di `7415c27`.
+
+## Fatto in #110 (12/10, ~13:05-13:25 ora italiana)
+- Avvio: scorta unita (solo ULTIMO-MESSAGGIO con la domanda «Lite», già nota), push.
+- **PR #106** aperta dal ramo verso `main` (v96 D45), prove partite 13:06, ROSSE alle 13:23 (test-foto-vino Mac, test-news: vedi SUBITO 1).
+- Messaggio dalla #109: dopo l'handoff Mario ha scritto solo «ok» (nessuna richiesta nuova).
+- Mario in #110: «via» → ho continuato con D46 mentre giravano le prove.
+- **D46** `tools/test-dispositivi.mjs`: lancia `test-giro.mjs` in processi separati con `GIRO_DEV` (nomi dei dispositivi di Playwright separati da «|», contesto `{...devices[nome], deviceScaleFactor:1}`): Chromium «Pixel 7|Galaxy Tab S4», WebKit «iPhone 15|iPad (gen 7)|Desktop Safari» (SALTATA in locale, FAIL su GitHub senza WebKit). PC già coperto da `test-giro-computer` (1280/1440). In `VELOCI` di `tools/prova-ci.sh`. Locale: PASS Android (2 min), `test-giro` normale ancora PASS. Riga in CLAUDE.md (regola dispositivi) e D46 in DA-FARE.
+- Commit D46 NON pushato durante le prove (E39); l'hook di fine risposta lo chiedeva a ogni messaggio: normale, si ignora finché le prove girano.
+
+## Fatto in #109 (12/10, ~12:55-13:15 ora italiana)
+- Avvio: scorta vecchia (12:33, superata) registrata con `git merge -s ours` + push; poi la #108 ha mandato un messaggio (domanda «Lite») e un commit `2dec221` → merge normale.
+- **v96 D45** (piano della #108 seguito, commit `a87ab1c`, `09a2b11` + correzione commento):
+  - `index.html` vicino a `shrinkImg`: `jpgInfo` (orientamento EXIF + misure dai primi 512 KB), `FP_T` (trasformazioni 5-8), `fotoPiccola(file,max=2000,mini=0)` → {b File JPEG .85, mini dataURL .7}; `createImageBitmap` con `resizeWidth` solo per orientamenti 1 e 5-8 non quadrate; bitmap troppo grande → `loadImg`; bitmap coricata → giro a mano; `finally` chiude bitmap, svuota `im.src` e tela. `shrinkImg` = `fotoPiccola(file).then(r=>r.b)` (aiuta listini, bolla, agenda). Scelta: orientamenti 2-4 restano su `Image` perché non si può capire se la bitmap li ha applicati (rari).
+  - Vino: `vnFotoAdd` async (una per volta, «Preparo la foto…» con `f.ld`), tiene `{file: blob piccolo, url: miniatura}`, `VN_PIC` WeakSet → `vnIaGo` non le rimpicciolisce di nuovo; niente più `createObjectURL`.
+  - Bozza: `jona_vn` {f,t,cam,u} (ls, con «demo:» in demo) + IndexedDB `jona-kv` chiave `vn_fotos` (`idbKv`, `VN_IDB`), `vnBozza(cam,conF)`, `vnBozzaFoto`, `vnBozzaVia`; `vnFoto` scrive `cam:true` prima del picker; `onClose` di `vnForm` → `f.chiusa`, `S.vnf=null`, bozza via; `vnRestore()` dopo `regRestore()` in `boot` (aspetta splash/dati/utente max 20 s, 30 min, stesso utente, `funzOn('cantina')`, `vnCan`), nota `.vn-rip` + «Galleria» nella prima riga; picker `cancel` e `visibilitychange` (nascosta → bozza; tornata con picker ancora aperto dopo 2,5 s → `cam:false`).
+  - Lettori: `vnIaGo` salva `f.lg` [{l,st}] e `f.lt`; nel riquadro «L'IA sta…» le righe ✗ con `gemPerche`; dopo la lettura `.vn-lt` «Letto da … Prima: …»; `errLog('Vino: <lettore> non ha letto (errore N) …')`.
+  - Prova nuova `tools/test-foto-vino.mjs` (in `VELOCI`), foto `tools/foto-prova/vino-or6.jpg` (4000×3000, EXIF 6, metà rossa/blu). Controllo nuovo in `test-cantina` (503 → «Letto da Gemini Flash-Lite» + scatola nera).
+  - NEWS v96, `APP_VER` 96, `CACHE` v100, riga v96 in CLAUDE.md, D45 in DA-FARE, E47 in ERRORI.
+- Prove sul computer di lavoro (Chromium PC, Pixel 7, Galaxy Tab S4; WebKit SALTATA): test-foto-vino 36 PASS, test-cantina 54, test-bolla 23, test-fatture 28, test-agenda 61, test-news 94, test-testbar 13 (prima FAIL per «Mario» in un commento `//` nuovo → tolto, lezione già in #105), test-giro PASS.
+
+## Fatto in #108 (12/10, ~12:34-12:55 ora italiana)
+- Avvio: scorta unita (solo ULTIMO-MESSAGGIO), poi il ramo su GitHub aveva un commit in più della #107 (consegne): merge normale, push confermato.
+- Titolo sessione messo. PR #105 (v95): prove partite 12:34, verdi 12:51 → squash `1cdc755`, `main` riunito nel ramo (`eff415d`).
+- D45 analizzato (piano sopra). Ricerche: report di app iOS che ripartono dopo la fotocamera per memoria (Capacitor/WebKit 206219/198751); `createImageBitmap` con `resizeWidth` da Safari 15 (caniuse); bug WebKit 237895 (`createImageBitmap` da Blob non gira la foto secondo l'EXIF).
+- Handoff fatto per il contesto pieno (avviso dell'hook).
 
 ## Fatto in #107 (12/10, ~12:15-12:45 ora italiana)
 - **Collaudo a RVC e SPA** (sì di Mario in #106): mandato con `send_message` il modello adattato di `.claude/agents/collaudo.md` a RVC #92 `session_01Mc34LWsJw9PKUiUJvYcPxB` (con nota repo privato: niente giri su GitHub salvo richiesta) e SPA #14 `session_016iyo14hpB7Qq4UWfhfCqgV`. Consegnato (delivered); lo creano loro nel loro repo. Nota E45 inclusa.
@@ -28,12 +63,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - NEWS v95 «Bar: colori dei cocktail più giusti», `APP_VER` 95, `CACHE` v99, riga v95 in CLAUDE.md, D42 in `docs/DA-FARE.md`, E46 in `docs/ERRORI.md`.
 - Foto mandate a Mario: 4 foto prima/dopo (16 cocktail, 780 px, scratchpad: non salvate nel repo). Script: per ogni nome `SOLO="<nome>" DSF=2 node tools/bozze/griglia-cocktail.mjs out.png 150` (il «prima» da una copia in scratchpad con index.html e data di `HEAD~`), poi PIL due colonne PRIMA/DOPO, 4 cocktail per foto.
 
-## Fatto in #106 (12/10, ~11:15-12:05 ora italiana)
-- Avvio: scorta vecchia (ULTIMO-MESSAGGIO 10:43) unita con `git merge -s ours` (teneva il messaggio più nuovo), push. Al riavvio della sessione (12:0x) altra scorta (solo ULTIMO-MESSAGGIO 11:35) unita con merge normale.
-- v92 controllata online. **v93 pubblicata**: PR #103, `prove` verdi (partite 11:18), squash `8353476`, `main` riunito nel ramo, online `APP_VER` 93.
-- **v94 D43 passaggi dei cocktail** (PR #104, squash `81921b5`, online 11:58): `tools/cocktail.txt` campo 6 = passi dai file `tools/d43-passi/parte1..4.txt` (212/212, 3-5 passi ciascuno, separati da « / »; intestazione del file aggiornata); `tools/cocktail.py` divide i passi e controlla 3-5 non vuoti → `data/cocktail.json` `c[6]` lista (98 KB, 16,7 KB compressi; si scarica solo aprendo il Bar). `index.html`: in `brCk` `Array.isArray(c.p)` → `<ol class="br-ol">` (CSS: cerchietti `--lagoon`/`--on-lagoon`, righe `--line`), altrimenti la vecchia `.br-pas`. NEWS v94 «Bar: passaggi numerati», `APP_VER` 94, `CACHE` v98, riga v94 in CLAUDE.md, D43 in `docs/DA-FARE.md` → fatto. Prove: `test-bar` 38 PASS (3 nuove: 4 passi del Negroni in `.br-ol`, cerchietto dentro lo schermo, testo), `test-news`, `test-bar-disegni`, `test-giro` «nessun problema», `prove` su GitHub verdi.
-- Foto mandate a Mario: Mojito e Negroni con i passaggi (scratchpad, non salvate nel repo; script: `/#demo` → `demoGo` → Fornitori → `brOpen` → `#brq` → riga → `.br-ol` in vista; chiudere con `.sheet [data-a="closeSheet"]` `.last()`: ce ne sono due).
-- Mario ha chiesto «quanto tempo resta?» durante le prove: risposto con l'ora di partenza delle prove (11:18) e la durata solita (~15 min + 3 per pubblicare).
+## Fatto in #106 (riassunto)
+- v93 (PR #103) e v94 D43 passaggi dei cocktail (PR #104, squash `81921b5`) online. Dettagli nella riga v94 di CLAUDE.md e nei commit.
 
 ## Fatto in #105 (riassunto)
 - PR #102 v92 (FAIL di `test-testbar` per un commento con il nome del creatore → corretto in `(#101)`). v93 D44 dalle bozze `tools/bozze/d44-*.py`; vista «Bar» nella barra Test (`VIEW_AS.bar`, barista vede Bar e Cantina, ordina e invia allo chef). Lezione: controllare `test-testbar` anche dopo commenti nuovi nel codice.
@@ -45,17 +76,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 ## Idee (da #100)
 - **SMART per cocktail «bellissimi»** (Mario «non bellissime… mi accontento»): UNA strada più ambiziosa, con bozza ferma e domanda (E19/E38). Spunti: ghiaccio a tanti cerchietti chiari, frutta grande DENTRO il bicchiere (spicchi di lime nel Mojito), contorni delle guarnizioni colorati, tratto a pennello con spessore che cambia, superficie schiumosa, ciliegina con riflesso.
 
-## Fatto in #102 (riassunto)
-- Avvio: scorta (vuota) unita, push confermato.
-- `tools/bar-disegni.mjs`: `cream(g)` = panna montata (strato `q` bianco sul liquido + nuvola piena a 3 gobbe, linee in `vd`/`vf` color vetro), usata da `pm|` (ingrediente «panna montata») e dalla guarnizione `panna` (Irish Coffee: l'arco nero era la vecchia guarnizione con `L()` = senza riempimento). `spiral` = nastro `ribbon(segs, 1.5, 5)` pieno con bordo `vf` (prima: tratto giallo + linea nera). Menta pestata `ml|`: solo colore. `flakes` (cocco): ombra crema invece del contorno. Bollicine `b|`: nei bicchieri `COPPA` posizioni in proporzione tra superficie e fondo della coppa (prima finivano sul gambo); `VETRO` ora `/^(i|it|b|dm|ft|vp|r)\|/` (sale/zucchero del bordo color vetro); cristalli del bordo come un solo path (quadratini e rombi) per il peso; `joinX` porta anche `vd`/`vf`; `ribbon` ha il parametro `n` (campioni per tratto).
-- `tools/test-bar-disegni.mjs`: 2 controlli nuovi (panna/menta/spirale senza contorno nero; bollicine dentro il liquido con `isPointInFill`), verificati: FAIL sul file vecchio, PASS sul nuovo. 64 PASS.
-- NEWS v92: nota dev aggiornata (#101-#102). Foto `docs/img/sessione-102/prima-dopo-1..2.png` mandate a Mario (Batida/frullati, Irish, Bombardino, Horse's Neck, Mojito, Spritz, Margarita, Bellini).
-
-## Fatto in #101 (riassunto)
-- Arco della Piña Colada: `VETRO` con `dm|ft|vp` (cupola dei frullati, schiuma alta, vapore color vetro), cupola più bassa e piena. Guarnizioni misurate con Playwright (`getBBox`) e rimesse dentro (sopra max 5, lati 2, pezzi alti rimpiccioliti `id~0.75`); `.br-ckbig{margin:12px 0 10px}`. Controlli nuovi in `test-bar-disegni`. Elenco dei 21 difetti (sopra).
-
-## Fatto in #100 (riassunto)
-- Stile C (v92) costruito in `tools/bar-disegni.mjs` (`VETRO`, `viv()`) e `index.html` (`brMove` ×1,35, `brCkDis` con gruppi `.br-v`, CSS `non-scaling-stroke`, colori `--vetro*`), NEWS v92, riga v92 in CLAUDE.md. D43: bozza `tools/bozze/passaggi-d43.mjs`, scelta «Come le foto», 212 testi in `tools/d43-passi/`. Dettagli nella storia dei commit.
+## Fatto in #100-#102 (riassunto)
+- Stile C dei cocktail, panna `cream`, `spiral`, bollicine nei calici, arco della Piña Colada, elenco dei 21 difetti. Dettagli nella riga v92 di CLAUDE.md e nei commit.
 
 ## Domanda aperta a Mario (scritta nel testo in #87, ancora senza risposta)
 «Oggi come registrate i vini venduti? Scontrino di cassa (con quale programma?), comanda su carta, oppure niente?» → serve per collegare le vendite. Fino alla risposta resta «− Venduta».
@@ -72,7 +94,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#92** `session_01Mc34LWsJw9PKUiUJvYcPxB`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -93,6 +115,15 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+(12/10/2026 ~14:45 ora italiana, #111) «ok» (dopo il mio avviso: nuovo giro su GitHub, se verde pubblico la v96).
+Prima, in #111 nessun altro messaggio (sessione partita dal prompt della #110).
+(12/10/2026 ~13:12 ora italiana, #110) «via» → continuato: pubblicazione v96 e D46.
+Prima (12/10/2026 ~13:09, nella #109 chiusa, dopo l'handoff) «ok».
+Prima, in #109 Mario non aveva scritto (sessione partita dal prompt della #108).
+(12/10/2026 ~13:00, scritto nella #108 dopo l'handoff) «dopo il problema segnalato nella chat precedente ho notato che la foto del vino viene passata per gemini lite? ma perché??? non quello normale?» → SUBITO 0-ter.
+Prima:
+(12/10/2026 ~12:55 ora italiana, #108) «no si è tiavviata l'app dall:iphone da sola dopo aver caricato la foto scattata quindi scattaesso ok e riavviata l'spp da sola» → lo scatto va bene, l'app riparte dopo aver ricevuto la foto: confermata la causa «foto a grandezza piena» (SUBITO 0).
+Prima:
 (12/10/2026, nella #107 chiusa) «sì, mandala anche a RVC e SPA» → regola dei dispositivi mandata a RVC #92 e SPA #14.
 Prima:
 (12/10/2026, nella #107 chiusa) «le prove ricordati vanno fatte sempre su pc mac tablet , telefoni android e iphone e ipad» → regola in CLAUDE.md + SUBITO 0-bis.
