@@ -361,10 +361,10 @@ function mix(ing) {
 // pezzi del disegno, salvati una volta sola (PZ) e richiamati per nome da ogni cocktail (K)
 // v92 (D42, scelta di Mario #97 «A lista + B scheda»): w = [colore, forme, opacità?], d = penna, f = penna fine, p = punti, h = riflessi bianchi
 const PZ = {}, K = {};
-const joinX = (...p) => { const o = { w: p.flatMap(x => x.w || []) }, q = p.flatMap(x => x.q || []); if (q.length) o.q = q; for (const k of ['d', 'f', 'p', 'h']) { const s = p.map(x => x[k] || '').join(''); if (s) o[k] = s; } return o; };
+const joinX = (...p) => { const o = { w: p.flatMap(x => x.w || []) }, q = p.flatMap(x => x.q || []); if (q.length) o.q = q; for (const k of ['d', 'f', 'p', 'h', 'vd', 'vf']) { const s = p.map(x => x[k] || '').join(''); if (s) o[k] = s; } return o; };
 // stile C (D42, scelta di Mario #99): linee di ghiaccio e bollicine in vd/vf, l'app le colora come il vetro
 // linee color vetro (D42 stile C): ghiaccio, bollicine; #101: anche cupola dei frullati, schiuma alta e vapore (in nero sembravano archi che stonano)
-const VETRO = /^(i|it|b|dm|ft|vp)\|/;
+const VETRO = /^(i|it|b|dm|ft|vp|r)\|/;
 const put = (key, part) => { if (!PZ[key]) { const p = PZ[key] = joinX(...[].concat(part)); if (VETRO.test(key)) for (const [a, b] of [['d', 'vd'], ['f', 'vf']]) if (p[a]) { p[b] = p[a]; delete p[a]; } } return key; };
 const sw = (w, s) => `<g style="stroke-width:${w}">${s}</g>`;
 // cubetto di ghiaccio con le facce (davanti, sopra, lato) e un riflesso
@@ -463,8 +463,8 @@ function appleFan(x, y) {
 }
 // scorza: nastro d'agrume che si arriccia sul bordo e scende fuori dal bicchiere (bordi calcolati dalla linea di mezzo)
 const bez = (p0, p1, p2, p3, t) => [0, 1].map(i => (1 - t) ** 3 * p0[i] + 3 * (1 - t) ** 2 * t * p1[i] + 3 * (1 - t) * t * t * p2[i] + t ** 3 * p3[i]);
-function ribbon(segs, w) {
-  const pts = segs.flatMap((s, k) => Array.from({ length: 9 }, (_, i) => bez(...s, (i + (k ? 1 : 0)) / (k ? 9 : 8))).slice(0, k ? 9 : 9));
+function ribbon(segs, w, n = 9) {
+  const pts = segs.flatMap((s, k) => Array.from({ length: n }, (_, i) => bez(...s, (i + (k ? 1 : 0)) / (k ? n : n - 1))));
   const side = sg => pts.map((p, i) => { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, ww = w * Math.min(1, .35 + i / 4, .35 + (pts.length - 1 - i) / 4); return [p[0] - dy / l * ww * sg, p[1] + dx / l * ww * sg]; });
   const A = side(1), Bb = side(-1).reverse(), poly = 'M' + [...A, ...Bb].map(p => P(...p)).join('L') + 'Z', mid = 'M' + pts.map(p => P(...p)).join('L');
   return { poly, mid };
@@ -475,9 +475,11 @@ const flame = (x, y) => { const s = tg(x, y, 0, 1, pa('M0 0C-3.4-2.6-2.4-6.4 0-1
 // spirale lunga di scorza che scende nel bicchiere (Horse's Neck)
 function spiral(g, col) {
   const n = 5, pts = Array.from({ length: n + 1 }, (_, i) => [i % 2 ? 39 : 25, g.y0 + 5 + i * (g.yb - g.y0 - 9) / n]);
-  let d = `M${P(46, g.y0 - 3)}Q${P(33, g.y0 - 4)} ${P(...pts[0])}`;
-  for (let i = 1; i <= n; i++) { const [a, b] = pts[i - 1], [c, e] = pts[i]; d += `C${P(a + (a < 32 ? -3 : 3), b + 5)} ${P(c + (c < 32 ? -3 : 3), e - 5)} ${P(c, e)}`; }
-  return { w: [[col, `<path d="${d}" style="fill:none;stroke:${col};stroke-width:3.4"/>`, .95]], d: sw(1, L(d)) };
+  const p0 = [46, g.y0 - 3], q = [33, g.y0 - 4], segs = [[p0, p0.map((v, k) => v + 2 / 3 * (q[k] - v)), pts[0].map((v, k) => v + 2 / 3 * (q[k] - v)), pts[0]]];
+  for (let i = 1; i <= n; i++) { const [a, b] = pts[i - 1], [c, e] = pts[i]; segs.push([[a, b], [a + (a < 32 ? -3 : 3), b + 5], [c + (c < 32 ? -3 : 3), e - 5], [c, e]]); }
+  // nastro pieno con il bordo sottile color vetro (si vede attraverso il bicchiere): niente linea nera
+  const { poly } = ribbon(segs, 1.5, 5);
+  return { w: [[col, pa(poly), 1]], vf: pa(poly) };
 }
 const UMB = ['#E85C8A', '#3FA7D6', '#F2C230', '#7BC86C', '#F08A3C', '#9A6FD0'];
 function umbrella(g, col) {
@@ -491,9 +493,13 @@ const foam = (g, c = '#FBF6EC', h = 4.5) => ({ q: [[c, band(g.top - 2, g.top + h
 const foamTall = g => { const d = `M${32 - g.rx} ${g.y0}C${32 - g.rx} ${g.y0 - 10} ${32 + g.rx} ${g.y0 - 10} ${32 + g.rx} ${g.y0}`; return { q: [['#FBF6EC', band(g.top - 2, g.top + 9), .95]], w: [['#FBF6EC', pa(d + 'Z'), 1]], d: sw(1.4, L(d)), f: C(28, g.y0 - 3, .6) + C(34, g.y0 - 5, .5) + C(38, g.y0 - 2, .6) + C(31, g.top + 4, .5) }; };
 // frullato: cupola cremosa sopra la superficie
 const dome = (g, c) => { const d = `M${f1(32 - g.sx)} ${g.top}C${f1(32 - g.sx * .8)} ${g.top - 11} ${f1(32 + g.sx * .8)} ${g.top - 11} ${f1(32 + g.sx)} ${g.top}`; return { w: [[c, pa(d + 'Z'), .95]], d: sw(1.4, L(d)), f: [[-6, -3], [-1, -6.5], [4, -5], [8, -2], [-9, -1.4], [1, -2.4], [-4, -5], [6, -6]].map(([a, b]) => C(32 + a, g.top + b, .5)).join('') }; };
+// panna montata (Irish Coffee, Bombardino): strato bianco sul liquido + nuvola piena a tre gobbe sopra
+const cream = g => { const a = 32 - g.sx + .6, b = 32 + g.sx - .6, w = (b - a) / 3, t = g.top, h = 6.5;
+  const d = `M${f1(a)} ${t}C${f1(a - 1)} ${f1(t - h * .7)} ${f1(a + w * .6)} ${f1(t - h)} ${f1(a + w)} ${f1(t - h * .62)}C${f1(a + w * 1.3)} ${f1(t - h * 1.15)} ${f1(a + w * 1.9)} ${f1(t - h * 1.1)} ${f1(a + w * 2)} ${f1(t - h * .62)}C${f1(a + w * 2.4)} ${f1(t - h)} ${f1(b + 1)} ${f1(t - h * .7)} ${f1(b)} ${t}`;
+  return { q: [['#FBF6EC', band(t - 2, t + 4), 1]], w: [['#FFFDF6', pa(d + 'Z'), 1]], vd: L(d), vf: L(`M${f1(a + w * .5)} ${f1(t - h * .45)}Q${f1(a + w)} ${f1(t - h * .8)} ${f1(a + w * 1.4)} ${f1(t - h * .55)}`) }; };
 const steam = y => ({ f: [24, 32, 40].map((x, i) => L(`M${x} ${y - 3 - i % 2}C${x - 3} ${y - 7} ${x + 3} ${y - 9} ${x} ${y - 13 - i % 2}`)).join('') });
 const dust = (g, c) => ({ w: [[c, [[-8, 0], [-3, -1], [2, 0], [7, -1], [-5, 1], [5, 1], [0, 1], [-10, .6], [10, .4]].filter(([a]) => Math.abs(a) < g.sx - 1).map(([a, b]) => C(32 + a, g.top + b - .6, .8)).join(''), 1]] });
-const flakes = (g, c, o) => { const s = [[-8, 0, 20], [-3, -1, -30], [2, 0, 50], [7, -1, 0], [-5, 1.2, 70], [5, 1, -50], [0, -2, 10]].filter(([a]) => Math.abs(a) < g.sx - 1).map(([a, b, r]) => `<rect x="${f1(32 + a - 1.3)}" y="${f1(g.top + b - 1.6)}" width="2.6" height="1.4" transform="rotate(${r} ${f1(32 + a)} ${f1(g.top + b - 1)})"/>`).join(''); return { w: [[c, s, 1]], f: o ? s : '' }; };
+const flakes = (g, c, o) => { const s = [[-8, 0, 20], [-3, -1, -30], [2, 0, 50], [7, -1, 0], [-5, 1.2, 70], [5, 1, -50], [0, -2, 10]].filter(([a]) => Math.abs(a) < g.sx - 1).map(([a, b, r]) => `<rect x="${f1(32 + a - 1.3)}" y="${f1(g.top + b - 1.6)}" width="2.6" height="1.4" transform="rotate(${r} ${f1(32 + a)} ${f1(g.top + b - 1)})"/>`).join(''); return { w: o ? [['#CDBB94', `<g transform="translate(.4 .5)">${s}</g>`, .9], [c, s, 1]] : [[c, s, 1]] }; };
 const angoDrops = g => ({ w: [['#7A1E14', C(26, g.top - .7, 1.4) + C(32, g.top - 1, 1.5) + C(38, g.top - .7, 1.4) + `<path d="M24 ${f1(g.top - .7)}L40 ${f1(g.top - .7)}" style="fill:none;stroke:#7A1E14;stroke-width:.6"/>`, .95]] });
 const passion = g => ({ w: [['#6B3A6E', E(35, g.top - 1.2, 6, 2.8), .92], ['#F2B630', E(35, g.top - 1.4, 4.7, 2), 1]], d: sw(1.3, E(35, g.top - 1.2, 6, 2.8)), p: [[-2.4, -.4], [0, -1], [2.4, -.2], [-1, .6], [1.4, .7]].map(([a, b]) => C(35 + a, g.top - 1.4 + b, .45)).join('') });
 const berry = (x, y, c) => { const o = [[0, 0], [-1.7, -.9], [1.7, -.9], [-1, -2.6], [1, -2.6], [0, 1.6], [-1.7, .9], [1.7, .9]], s = o.map(([a, b]) => C(x + a, y + b, 1.15)).join(''); return { w: [[c, s, .95]], f: s }; };
@@ -598,7 +604,7 @@ function garn(txt, bk, nome) {
     else if (k === 'chicchi') p = joinX(bean(26, g.top - .4, -15), bean(32, g.top - 1.2, 5), bean(38, g.top - .4, 20));
     else if (k === 'melograno') p = seeds(g);
     else if (k === 'polvere') { key += a; p = dust(g, a); }
-    else if (k === 'panna') p = { d: L(`M18 ${g.top}Q32 ${g.top - 7} 46 ${g.top}`), w: [['#FBF6EC', L(`M18 ${g.top}Q32 ${g.top - 7} 46 ${g.top}Z`), .95]], f: L(`M23 ${g.top - 2}Q28 ${g.top - 4.5} 33 ${g.top - 3}`) };
+    else if (k === 'panna') p = cream(g);
     else if (k === 'cocco') p = flakes(g, '#FFFDF6', 1);
     else if (k === 'scaglie') p = flakes(g, '#4A2C1E');
     else if (k === 'passione') p = passion(g);
@@ -674,9 +680,10 @@ function cocktail(ck) {
   // foglie pestate dentro il bicchiere
   const pesta = ing.find(i => /foglie di (menta|basilico)/i.test(i[2])) && /pesta|nel bicchiere/i.test(prep);
   if (pesta && !B.opaco && D.bot) { const b = D.bot, c = /basilico/i.test(ingT) ? '#3F8F4E' : '#4E9A5E';
-    ks.push(put('ml|' + bk + '|' + c, [leafX(25, b - 5, -30, .45, c), leafX(40, b - 8, 200, .42, c), leafX(29, b - 10, 20, .38, '#5FAE6E')])); }
+    ks.push(put('ml|' + bk + '|' + c, [leafX(25, b - 5, -30, .45, c), leafX(40, b - 8, 200, .42, c), leafX(29, b - 10, 20, .38, '#5FAE6E')].map(x => ({ w: x.w.map(([k, v]) => [k, v, .95]) })))); }
   if ((B.bub || /soda|tonica|ginger|prosecco|champagne|cola|frizzante|lemon|birra|energy/i.test(ingT)) && !B.opaco && !LAY[nome]?.some(l => l[1] === 0)) {
-    const pts = [[-4, 10, .9], [3, 16, .8], [-1, 22, .7], [5, 27, .8], [-6, 30, .6]].map(([a, b, r]) => [32 + a, B.top + b, r]).filter(([, y]) => !D.bot || y < D.bot - 1);
+    // nei calici le bollicine stanno nella coppa: posizioni in proporzione tra superficie e fondo del liquido
+    const pts = (COPPA.test(bk) ? [[-.45, .15, .8], [.4, .32, .75], [-.1, .5, .7], [.35, .66, .65], [-.3, .8, .55]].map(([a, t, r]) => { const y = g.top + t * (g.yb - g.top); return [32 + a * g.sx * (g.yb - y) / (g.yb - g.top), y, r]; }) : [[-4, 10, .9], [3, 16, .8], [-1, 22, .7], [5, 27, .8], [-6, 30, .6]].map(([a, b, r]) => [32 + a, B.top + b, r])).filter(([x, y]) => COPPA.test(bk) ? y < g.yb - 2 && Math.abs(x - 32) + 1.2 < g.sx * (g.yb - y) / (g.yb - g.top) : !D.bot || y < D.bot - 1);
     ks.push(put('b|' + bk, [{ w: [['#fff', pts.map(([x, y, r]) => C(x, y, r)).join(''), .5]], f: pts.map(([x, y, r]) => C(x, y, r)).join('') }]));
   }
   // sopra: schiuma, frullato
@@ -685,7 +692,7 @@ function cocktail(ck) {
     else if (SCHIUMA[nome] || /albume/i.test(ingT) && !LAY[nome]) { const c = SCHIUMA[nome] || '#FBF6EC'; ks.push(put('fo|' + bk + '|' + c, foam(g, c))); }
     if (frullato) ks.push(put('dm|' + bk + '|' + col, dome(g, tinta(col, 255, .1))));
   }
-  if (/panna montata/i.test(ingT)) ks.push(put('pm|' + bk, { d: L(`M16 ${g.top}C18 ${g.top - 9} 26 ${g.top - 10} 30 ${g.top - 8}C34 ${g.top - 12} 42 ${g.top - 8} 42 ${g.top}`), w: [['#FBF6EC', L(`M16 ${g.top}C18 ${g.top - 9} 26 ${g.top - 10} 30 ${g.top - 8}C34 ${g.top - 12} 42 ${g.top - 8} 42 ${g.top}Z`), 1]], f: L(`M22 ${g.top - 4}Q26 ${g.top - 7} 30 ${g.top - 5}`) }));
+  if (/panna montata/i.test(ingT)) ks.push(put('pm|' + bk, cream(g)));
   if (/^(Tazza|Irish coffee)$/.test(bk) || /cald/i.test(ingT)) ks.push(put('vp|' + bk, steam(g.y0)));
   if (/cannella/i.test(ingT) && /^Tazza$/.test(bk)) ks.push(put('cn|' + bk, cinnamon(g)));
   if (/Tiki|Hurricane/.test(bk) && !/fiore|gardenia/i.test(gar) && /rum|ananas|cocco|passione/i.test(ingT)) ks.push(put('u|' + bk + '|' + UMB[hash(nome) % UMB.length], umbrella(g, UMB[hash(nome) % UMB.length])));
@@ -693,7 +700,8 @@ function cocktail(ck) {
   if (/bordo/i.test(gar)) {
     const [x0, y0] = B.o.match(/^M([\d.]+) ([\d.]+)/).slice(1).map(Number), rx = 32 - x0, ry = Math.max(1.2, rx * .1), half = /metà/i.test(gar), n = half ? 7 : 12, zuc = /zucchero/i.test(gar);
     const pts = Array.from({ length: n }, (_, i) => { const x = x0 + 2 + i * (half ? rx - 2 : 2 * rx - 4) / (n - 1); return [x, y0 + ry * Math.sqrt(Math.max(0, 1 - ((x - 32) / rx) ** 2)) + (i % 2) * .5]; });
-    const sq = pts.map(([x, y]) => `<rect x="${f1(x - .8)}" y="${f1(y - .8)}" width="1.6" height="1.6" transform="rotate(${Math.round(x * 37 % 90)} ${f1(x)} ${f1(y)})"/>`).join('');
+    // cristalli: quadratini e rombi alternati (più leggeri dei quadrati ruotati uno per uno)
+    const sq = pa(pts.map(([x, y], i) => i % 2 ? `M${f1(x)} ${f1(y - 1.1)}l1.1 1.1-1.1 1.1-1.1-1.1z` : `M${f1(x - .8)} ${f1(y - .8)}h1.6v1.6h-1.6z`).join(''));
     ks.push(put('r|' + bk + (half ? '|m' : '') + (zuc ? '|z' : ''), [{ w: [[zuc ? '#F6E7C4' : '#fff', sq, 1]], f: `<g style="stroke-width:.5">${sq}</g>` }]));
   }
   ks.push(...garn(gar, bk, nome));

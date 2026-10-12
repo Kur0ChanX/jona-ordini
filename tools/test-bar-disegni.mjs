@@ -98,6 +98,13 @@ async function cocktail(pg,nome){await sh(pg).locator('input#brq').fill(nome);aw
   ok(fuori.length===0,'nessuna guarnizione del bordo esce dal suo spazio ('+(fuori.slice(0,4).join(' | ')||'0')+')');
   const nero=await pg.evaluate(()=>Object.entries(BR_DIS.k).filter(([,k])=>k.slice(2).some(x=>/^(dm|ft|vp)\|/.test(x)&&BR_DIS.pz[x.split('@')[0]].d)).map(([n])=>n));
   ok(nero.length===0,'cupola dei frullati, schiuma alta e vapore con linee color vetro, non nere ('+(nero.join(', ')||'0')+')');
+  // #102: niente linee nere su panna, menta pestata, spirale; bollicine solo dentro il liquido
+  const nero2=Object.keys(J.pz).filter(id=>/^(ml|pm)\||\|panna|spirale/.test(id)&&(J.pz[id].d||/^ml\|/.test(id)&&J.pz[id].f));
+  ok(nero2.length===0,'panna, menta pestata e spirale senza contorno nero ('+(nero2.join(', ')||'0')+')');
+  const bolle=await pg.evaluate(()=>{const ns='http://www.w3.org/2000/svg',sv=document.createElementNS(ns,'svg'),pa=document.createElementNS(ns,'path');sv.appendChild(pa);document.body.appendChild(sv);const r=[];
+    for(const[n,k]of Object.entries(BR_DIS.k)){const id=k.slice(2).find(x=>/^b\|/.test(x));if(!id)continue;pa.setAttribute('d',BR_DIS.b[k[0]].l);
+      for(const m of ((BR_DIS.pz[id].f||'')+(BR_DIS.pz[id].vf||'')).matchAll(/cx="([\d.]+)" cy="([\d.]+)"/g)){const pt=sv.createSVGPoint();pt.x=+m[1];pt.y=+m[2];if(!pa.isPointInFill(pt)){r.push(n);break}}}sv.remove();return r});
+  ok(bolle.length===0,'bollicine solo dentro il liquido, mai sul gambo ('+(bolle.slice(0,5).join(', ')||'0')+')');
   ok(await sh(pg).locator('.br-ing.br-carta').count()===1,'Negroni: ingredienti sul foglio di carta');
   ok(await big.locator('g[transform^="translate("]').count()>=1,'Negroni: mezza fetta d\'arancia spostata sul bordo (@x,y)');
   ok(await sh(pg).locator('.br-ir .br-dis').count()===3,'Negroni: 3 ingredienti, 3 disegni');
