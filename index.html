@@ -1231,8 +1231,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=95;
+const APP_VER=96;
 const NEWS=[
+  {v:96,data:'2026-10-12',titolo:'iPhone: la foto del vino non fa più ripartire l\'app',
+    tutti:['Cantina Vini: dopo la foto della bottiglia l\'app su iPhone non riparte più da sola. La foto viene subito rimpicciolita.','Se il telefono chiude lo stesso l\'app, la scheda del vino riparte da dove eri (nome e foto già fatte).'],
+    dev:['D45: `fotoPiccola(file,max,mini)` (EXIF da `jpgInfo`, `createImageBitmap` con `resizeWidth`, giro a mano se resta coricata, tela svuotata), usata anche da `shrinkImg`. Vino: solo foto piccole + miniatura (`VN_PIC`), bozza `jona_vn` + IndexedDB `jona-kv` (`vnBozza`, `vnRestore`). Prova `tools/test-foto-vino.mjs` su PC, Android, tablet, Mac, iPhone, iPad.']},
   {v:95,data:'2026-10-12',titolo:'Bar: colori dei cocktail più giusti',
     tutti:['I disegni dei cocktail hanno colori più fedeli: Kir rosa, Blue Lagoon blu, Bramble e El Diablo rosso-viola, Arnold Palmer color tè.','White Russian con la panna ben visibile, Espresso Tonic con il caffè sopra, schiume più pulite.'],
     dev:['Difetti #101 (5-15, 19, 21): `COLX` e `LAY` in `tools/bar-disegni.mjs`, onda della schiuma `wavy` color vetro, Painkiller crema/arancio, fiamma della scorza attaccata (Oaxaca). Prova `tools/test-bar-disegni.mjs`.']},
@@ -3308,10 +3311,30 @@ function fotoStage(I){const k=gemKey(),srv=!k&&gemOn(),n=I.photos.length;
   <h2 class="sec">Trascrizione automatica</h2>
   <p class="muted small" style="margin-top:0">${k?'Gemini è collegato su questo telefono.':srv?'Gemini è collegato per tutto il ristorante: non serve nessuna chiave.':'Con una chiave Gemini gratuita (aistudio.google.com/apikey) l\'app trascrive da sola, senza copiare e incollare. La chiave resta solo su questo telefono.'}</p>
   <div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="gemKey">${ic('pencil')} ${k?'Cambia o togli la chiave':'Inserisci la chiave Gemini'}</button><button type="button" class="btn ghost sm" data-a="impBack">Indietro</button></div>`}
-function shrinkImg(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),im=new Image();
-  im.onload=()=>{const m=2000,r=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);
-    c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>b?res(new File([b],(file.name||'foto').replace(/\.\w+$/,'')+'.jpg',{type:'image/jpeg'})):rej({code:'img'}),'image/jpeg',.85)};
-  im.onerror=()=>{URL.revokeObjectURL(url);rej({code:'img'})};im.src=url})}
+// v96 (D45): foto ridotte senza aprirle a grandezza piena (12-48 MP su iPhone = Safari ricaricava la pagina).
+// jpgInfo legge solo l'inizio del JPEG: orientamento EXIF (0x0112) e misure (SOF). null = non è un JPEG leggibile.
+function jpgInfo(file){return file.slice(0,524288).arrayBuffer().then(b=>{const v=new DataView(b);if(v.getUint16(0)!==0xFFD8)return null;let p=2,o=1;
+  while(p+9<v.byteLength){if(v.getUint8(p)!==0xFF){p++;continue}const m=v.getUint8(p+1);if(m===0xFF||m===0x01||(m>=0xD0&&m<=0xD8)){p+=m===0xFF?1:2;continue}const L=v.getUint16(p+2);
+    if(m===0xE1&&v.getUint32(p+4)===0x45786966){const t=p+10,le=v.getUint16(t)===0x4949,d=t+v.getUint32(t+4,le),n=v.getUint16(d,le);
+      for(let i=0;i<n;i++){const e=d+2+i*12;if(v.getUint16(e,le)===0x0112){o=v.getUint16(e+8,le);break}}}
+    else if(m>=0xC0&&m<=0xCF&&m!==0xC4&&m!==0xC8&&m!==0xCC)return{o,h:v.getUint16(p+5),w:v.getUint16(p+7)};
+    p+=2+L}return null}).catch(()=>null)}
+const FP_T={5:[0,1,1,0,0,0],6:[0,1,-1,0,1,0],7:[0,-1,-1,0,1,1],8:[0,-1,1,0,0,1]};
+// Uscita: {b: File JPEG con il lato lungo ≤ max, mini: dataURL ≤ mini px (se chiesto)}. Errore: {code:'img'}.
+async function fotoPiccola(file,max=2000,mini=0){const inf=await jpgInfo(file),c=document.createElement('canvas'),x=c.getContext('2d');let bm=null,im=null;
+  try{const sw=!!inf&&inf.o>=5,W=inf?(sw?inf.h:inf.w):0,H=inf?(sw?inf.w:inf.h):0,r=inf?Math.min(1,max/Math.max(W,H)):1;
+    // createImageBitmap con resizeWidth riduce senza tenere la foto intera (come la foto profilo v46). Non sempre gira la foto
+    // secondo l'EXIF (bug WebKit 237895): se è rimasta coricata la giro a mano. Orientamenti 2-4 e quadrate: strada Image.
+    if(inf&&self.createImageBitmap&&(inf.o===1||sw)&&W!==H){try{bm=await createImageBitmap(file,{resizeWidth:Math.max(1,Math.round(W*r)),resizeQuality:'high',imageOrientation:'from-image'})}catch(e){bm=null}
+      if(bm&&(Math.max(bm.width,bm.height)>max+2||!bm.width)){bm.close();bm=null}}
+    if(bm){if(sw&&bm.width>bm.height){const t=FP_T[inf.o];c.width=bm.height;c.height=bm.width;x.setTransform(t[0],t[1],t[2],t[3],t[4]*bm.height,t[5]*bm.width)}else{c.width=bm.width;c.height=bm.height}x.drawImage(bm,0,0)}
+    else{im=await loadImg(file);const k=Math.min(1,max/Math.max(im.width,im.height));c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));x.drawImage(im,0,0,c.width,c.height)}
+    const b=await new Promise(res=>c.toBlob(res,'image/jpeg',.85));if(!b)throw 0;let m='';
+    if(mini){const q=document.createElement('canvas'),k=Math.min(1,mini/Math.max(c.width,c.height));q.width=Math.max(1,Math.round(c.width*k));q.height=Math.max(1,Math.round(c.height*k));q.getContext('2d').drawImage(c,0,0,q.width,q.height);m=q.toDataURL('image/jpeg',.7);q.width=q.height=0}
+    return{b:new File([b],(file.name||'foto').replace(/\.\w+$/,'')+'.jpg',{type:'image/jpeg'}),mini:m}}
+  catch(e){throw{code:'img'}}
+  finally{if(bm)bm.close();if(im)im.src='';c.width=c.height=0}}
+function shrinkImg(file){return fotoPiccola(file).then(r=>r.b)}
 async function gemAdd(files){const I=S.imp;if(!I)return;I.err='';for(const f of files){try{I.photos.push(await shrinkImg(f))}catch(e){I.err='Una foto non si apre: prova a rifarla.'}}I.stage='foto';refreshSheet()}
 const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
 // v65: una foto per volta (ogni richiesta resta sotto i 100 s di Cloudflare), una seconda prova se Gemini è lento o occupato,
@@ -5686,11 +5709,12 @@ function vnShow(id){S.vnId=id;openSheet({cls:'tall',live:()=>true,render:()=>{co
   ${v.ia?`<p class="muted small">Scheda scritta con l'IA${v.ia==='dubbio'?': il vino non era sicuro, controlla bene':''}.</p>`:''}
   ${vnCan(me)?`<div class="sheet-foot btns" style="margin-top:18px"><button type="button" class="btn ghost" data-a="vnConta" data-v="${v.id}">Correggi il numero</button><button type="button" class="btn primary" data-a="vnEdit" data-v="${v.id}">${ic('pencil')} Modifica</button></div>`:''}`}})}
 function vnForm(v){const sv=x=>x==null||x===''?'':String(x).replace('.',',');const f=v?clone(v):{n:'',cant:'',ann:'',gr:'',tipo:'rosso',den:'',vit:'',storia:'',palato:'',naso:'',colore:'',abb:[],abbT:'',prod:'',serv:'',frase:'',parole:'',pv:'',pc:'',q:'',min:''};
-  for(const k of ['gr','pv','pc','q','min'])f[k]=sv(f[k]);f.abb=(f.abb||[]).slice();S.vnf=f;openSheet({cls:'tall',live:()=>true,render:vnFormH})}
+  for(const k of ['gr','pv','pc','q','min'])f[k]=sv(f[k]);f.abb=(f.abb||[]).slice();S.vnf=f;openSheet({cls:'tall',live:()=>true,render:vnFormH,onClose:()=>{f.chiusa=true;if(S.vnf===f)S.vnf=null;vnBozzaVia()}})}
 function vnFormH(){const f=S.vnf,me=meU(),inp=(k,l,ph,x)=>`<label class="lbl" for="vnf-${k}">${l}</label><input class="inp" id="vnf-${k}" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"${x||''}>`,
   ta=(k,l,ph)=>`<label class="lbl" for="vnf-${k}">${l}</label><textarea class="inp vn-ta" id="vnf-${k}" data-in="vnf" data-k="${k}" rows="3" placeholder="${esc(ph||'')}">${esc(f[k])}</textarea>`,num_=(k,l,ph)=>`<label><span class="lbl">${l}</span><input class="inp" id="vnf-${k}" inputmode="decimal" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"></label>`;
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica vino':'Nuovo vino'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${f.busy?`<div class="vn-busy">${ic('clock')} <span>L'IA sta ${(f.fotos||[]).length?'leggendo le foto':'scrivendo la scheda del vino'}…${f.bl?` <span class="muted small">(${esc(gemNome(f.bl))})</span>`:''}</span></div>`:(f.fotos||[]).length?vnFotoH(f):`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} Foto dell'etichetta</button><button type="button" class="btn ghost" data-a="vnIa">${ic('sparkle')} Completa con l'IA</button></div>`}
+  ${f.busy?`<div class="vn-busy">${ic('clock')} <span>L'IA sta ${(f.fotos||[]).length?'leggendo le foto':'scrivendo la scheda del vino'}…${f.bl?` <span class="muted small">(${esc(gemNome(f.bl))})</span>`:''}</span></div>`:(f.fotos||[]).length?vnFotoH(f):`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} Foto dell'etichetta</button>${f.rip?`<button type="button" class="btn ghost" data-a="vnFotoG">${ic('image')} Galleria</button>`:''}<button type="button" class="btn ghost" data-a="vnIa">${ic('sparkle')} Completa con l'IA</button></div>`}
+  ${f.rip?`<p class="vn-al vn-rip">${ic('warn')} ${f.rip==='cam'?'Il telefono ha chiuso l\'app mentre c\'era la fotocamera. Ho ripreso la scheda: rifai la foto. Se succede ancora: scatta con la Fotocamera del telefono, poi qui tocca «Galleria».':'Il telefono aveva chiuso l\'app: ho ripreso la scheda del vino.'}</p>`:''}
   ${f.ia?`<p class="vn-al">${ic('warn')} Scritto dall'IA${f.ia==='dubbio'?', che non era sicura del vino':''}: controlla annata, gradi e premi prima di salvare.</p>`:''}
   ${inp('n','Nome del vino','Es. Tignanello')}${inp('cant','Cantina','Es. Antinori')}
   <div class="ag-2">${num_('ann','Annata','Es. 2020')}${num_('gr','Gradi (% vol)','Es. 14,5')}</div>
@@ -5720,7 +5744,7 @@ function vnUnisci(f,r){for(const [k,x] of Object.entries(r)){if(k==='abb'){if(!f
   if(r.tipo&&!f.id&&!f._tipo)f.tipo=r.tipo}
 async function vnIaGo(files){const f=S.vnf;if(!f||f.busy)return;const nome=[f.n,f.cant,f.ann].map(x=>String(x||'').trim()).filter(Boolean).join(' ');
   if(!files&&!nome)return toast('Scrivi prima il nome del vino (e la cantina).','warn');
-  f.busy=true;f.bl='';refreshSheet();try{const im=[];if(files)for(const x of files.slice(0,VN_FMAX))im.push({inline_data:{mime_type:'image/jpeg',data:await b64(await shrinkImg(x))}});
+  f.busy=true;f.bl='';refreshSheet();try{const im=[];if(files)for(const x of files.slice(0,VN_FMAX))im.push({inline_data:{mime_type:'image/jpeg',data:await b64(VN_PIC.has(x)?x:await shrinkImg(x))}});
     const body=p=>({contents:[{parts:[{text:vnPrompt(files?'':nome,p.length)}].concat(p)}],generationConfig:{temperature:0.2}});
     // D44: stessi lettori dei listini (Flash → Flash-Lite → Cloudflare), tutte le foto nella stessa richiesta
     let g={};for(const [l] of GEM_LETT){f.bl=l;refreshSheet();let r=await gemCall(body(im),l);
@@ -5737,12 +5761,35 @@ async function vnIaGo(files){const f=S.vnf;if(!f||f.busy)return;const nome=[f.n,
 // D44: fino a VN_FMAX foto della stessa bottiglia (fronte, retro…), lette insieme con «Leggi con l'IA»
 const VN_FMAX=3;
 function vnFoto(nuovo,gal){if(!gemOn())return toast('Per leggere le foto serve l\'IA del ristorante (Gemini): chiedi allo sviluppatore. Intanto scrivi il nome.','warn');
-  pickFile(gal?{accept:'image/*',multiple:true}:{accept:'image/*',capture:'environment'},fs=>{if(nuovo)vnForm(null);vnFotoAdd(fs)})}
-function vnFotoAdd(fs){const f=S.vnf;if(!f)return;f.fotos=f.fotos||[];
-  for(const x of fs){if(f.fotos.length>=VN_FMAX){toast('Bastano '+VN_FMAX+' foto per una bottiglia.','warn');break}f.fotos.push({file:x,url:URL.createObjectURL(x)})}refreshSheet()}
-function vnFotoDel(i){const f=S.vnf,x=f&&f.fotos&&f.fotos.splice(+i,1)[0];if(x)URL.revokeObjectURL(x.url);refreshSheet()}
-function vnFotoVia(f){for(const x of f.fotos||[])URL.revokeObjectURL(x.url);f.fotos=[]}
-function vnFotoH(f){const n=f.fotos.length;
+  S.vnCam=true;if(nuovo)vnBozzaVia();vnBozza(true,!nuovo);
+  pickFile(gal?{accept:'image/*',multiple:true}:{accept:'image/*',capture:'environment'},fs=>{S.vnCam=false;if(nuovo)vnForm(null);vnFotoAdd(fs)})}
+// v96 (D45): ogni foto diventa subito piccola (≤2000 px per l'IA + miniatura): l'originale da 12-48 MP non resta nella pagina
+const VN_PIC=new WeakSet();
+async function vnFotoAdd(fs){const f=S.vnf;if(!f)return;f.fotos=f.fotos||[];f.ld=true;refreshSheet();
+  for(const x of fs){if(f.fotos.length>=VN_FMAX){toast('Bastano '+VN_FMAX+' foto per una bottiglia.','warn');break}
+    try{const r=await fotoPiccola(x,2000,240);VN_PIC.add(r.b);f.fotos.push({file:r.b,url:r.mini})}catch(e){toast('La foto non si apre: prova a rifarla.','warn')}}
+  f.ld=false;if(S.vnf===f){vnBozza(false);vnBozzaFoto(f)}refreshSheet()}
+function vnFotoDel(i){const f=S.vnf;if(f&&f.fotos&&f.fotos.splice(+i,1)[0])vnBozzaFoto(f);refreshSheet()}
+function vnFotoVia(f){f.fotos=[];vnBozzaFoto(f)}
+// v96 (D45): bozza del vino se il telefono chiude l'app (fotocamera aperta o app in secondo piano), come jona_reg della registrazione.
+// Campi in localStorage jona_vn {f,t,cam,u}; foto piccole in IndexedDB (jona-kv, vn_fotos). Chiudere il foglio la cancella.
+function idbKv(k,v){return new Promise(res=>{try{const r=indexedDB.open('jona-kv',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onerror=()=>res(null);
+  r.onsuccess=()=>{const db=r.result;try{const t=db.transaction('kv',v===undefined?'readonly':'readwrite'),s=t.objectStore('kv'),q=v===undefined?s.get(k):v===null?s.delete(k):s.put(v,k);
+    t.oncomplete=()=>{db.close();res(v===undefined?q.result:true)};t.onerror=t.onabort=()=>{db.close();res(null)}}catch(e){db.close();res(null)}}}catch(e){res(null)}})}
+const VN_IDB=()=>(DEMO?'demo:':'')+'vn_fotos';
+function vnBozza(cam,conF){const me=realU();if(!me)return;const f=conF===false?null:S.vnf;if(f&&f.chiusa)return;let c=null;
+  if(f){c={};for(const [k,x] of Object.entries(f))if(!['fotos','busy','bl','rip','chiusa','ld'].includes(k))c[k]=x}
+  ls('jona_vn',{f:c,t:Date.now(),cam:!!cam,u:me.id})}
+function vnBozzaFoto(f){if(f.chiusa)return;const a=(f.fotos||[]).slice();
+  Promise.all(a.map(x=>x.file.arrayBuffer().then(b=>({a:b,m:x.url})))).then(v=>idbKv(VN_IDB(),v.length?v:null)).catch(()=>{})}
+function vnBozzaVia(){ls('jona_vn',null);idbKv(VN_IDB(),null)}
+async function vnRestore(){const d=ls('jona_vn');if(!d)return;if(!(Date.now()-d.t<=1800000)){vnBozzaVia();return}
+  const t0=Date.now();while(S.splash||!allLoaded()||!meU()){if(Date.now()-t0>20000)return;await new Promise(r=>setTimeout(r,300))}
+  const me=realU();if(!me||me.id!==d.u||!funzOn('cantina')||!vnCan(meU())){vnBozzaVia();return}
+  const ft=await idbKv(VN_IDB()),fotos=(Array.isArray(ft)?ft:[]).map(x=>{const b=new File([x.a],'foto.jpg',{type:'image/jpeg'});VN_PIC.add(b);return{file:b,url:x.m}});
+  if(!d.cam&&!fotos.length&&!(d.f&&String(d.f.n||'').trim())){vnBozzaVia();return}
+  vnForm(null);Object.assign(S.vnf,d.f||{});S.vnf.fotos=fotos;S.vnf.rip=d.cam?'cam':'si';vnBozza(false);refreshSheet()}
+function vnFotoH(f){const n=f.fotos.length;if(f.ld&&!n)return`<div class="vn-busy">${ic('clock')} <span>Preparo la foto…</span></div>`;
   return`<div class="vn-fotos"><p class="muted small" style="margin:0 0 8px">${n===1?'Fronte pronto. Se dietro c\'è un\'altra etichetta, fotografa anche il retro: l\'IA legge tutte e due.':n+' foto della stessa bottiglia: l\'IA le legge insieme.'}</p>
   <div class="vn-ft">${f.fotos.map((x,i)=>`<div class="vn-fi"><img src="${x.url}" alt="Foto ${i+1}"><span>${i===0?'Fronte':i===1?'Retro':'Foto '+(i+1)}</span><button type="button" class="vn-fx" data-a="vnFotoDel" data-v="${i}" aria-label="Togli la foto ${i+1}">${ic('x')}</button></div>`).join('')}</div>
   ${n<VN_FMAX?`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} ${n===1?'Fotografa il retro':'Un\'altra foto'}</button><button type="button" class="btn ghost" data-a="vnFotoG">${ic('image')} Galleria</button></div>`:''}
@@ -6263,6 +6310,10 @@ async function boot(){
   applyTheme();document.documentElement.classList.add('intro');setTimeout(()=>document.documentElement.classList.remove('intro'),4100);
   /* chi è già entrato vede l'apertura fino alla fine dell'animazione (4,4 s; un tocco la salta); niente con «riduci movimento» né nelle prove automatiche */
   if(ls('jona_me')&&!animOff()&&!navigator.webdriver){S.splash=true;const end=()=>{if(!S.splash)return;S.splash=false;removeEventListener('click',end,true);render()};addEventListener('click',end,true);setTimeout(end,3800)}
+  // v96 (D45): fotocamera annullata → la bozza non dice più «fotocamera aperta»; app nascosta → bozza del vino aggiornata
+  $('#picker').addEventListener('cancel',()=>{if(S.vnCam){S.vnCam=false;S.vnf?vnBozza(false):vnBozzaVia()}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(S.vnf||S.vnCam)vnBozza(S.vnCam,S.vnf?undefined:false)}
+    else if(S.vnCam)setTimeout(()=>{if(S.vnCam&&pickCb){S.vnCam=false;S.vnf?vnBozza(false):vnBozzaVia()}},2500)});
   $('#picker').addEventListener('change',()=>{const p=$('#picker');const fs=[...(p.files||[])];const cb=pickCb;pickCb=null;if(fs.length&&cb)guard(()=>cb(fs))});
   render();
   const icod=ls('jona_icode');if(icod){ls('jona_icode',null);try{const k=await invRedeem(icod);if(ls('jona_key')!==k){ls('jona_key',k);ls('jona_member',null)}}catch(e){S.joinK=icod;toast(e.message==='scaduto'?'Codice d\'invito scaduto: chiedi allo chef un invito nuovo.':'Non riesco a leggere il codice: controlla la rete e tocca «Collega».','warn')}}
@@ -6272,7 +6323,7 @@ async function boot(){
   try{await seedIfEmpty()}catch(e){toast(errMsg(e),'err')}
   if(S.db.kind==='locale'&&fbCfg())fbPublic().then(a=>{S.fbActive=a;schedule()});
   Object.keys(COLS).forEach(subscribe);
-  regRestore();
+  regRestore();vnRestore();
   setTimeout(()=>{if(!allLoaded()){S.loadTimeout=true;render()}},5000);
 }
 boot();
