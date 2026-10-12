@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 16:51 ora italiana)
+# Ultimo messaggio di Mario (12/10/2026 18:04 ora italiana)
 
-ok
+metti cantina vini e cocktail anche dallo chef ovviamente
