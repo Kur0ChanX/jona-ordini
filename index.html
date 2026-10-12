@@ -994,6 +994,7 @@ button.or-rday{width:100%;text-align:left;font:inherit;color:inherit;border:0;cu
 button.or-pi{cursor:pointer}
 .or-pi.warn{border-left-color:var(--ocra)}
 .or-pi>.ic{width:18px;height:18px;flex:none;color:var(--corallo)}.or-pi.warn>.ic{color:var(--ocra)}
+.or-cp{padding:11px 14px;border-radius:14px;background:var(--lagoon-soft);margin:0 0 12px;font-size:14.5px}.or-cp p{margin:0 0 4px}.or-cp p:last-child{margin:0}.or-cp b .ic,.or-cp b svg{vertical-align:-3px;margin-right:4px}.or-cp.w{border:1px solid color-mix(in srgb,var(--ocra) 35%,var(--line));background:var(--ocra-soft)}.or-cp.w>p:first-child b{color:var(--ocra)}.or-cp .ag-q{margin:6px 0}
 .or-ok{display:flex;align-items:center;gap:8px;padding:11px 14px;border-radius:14px;background:var(--mirto-soft);color:var(--mirto);font-size:14.5px;margin:0 0 12px}
 .or-ok .ic{width:20px;height:20px;flex:none}
 .or-scroll{overflow-x:auto;background:var(--surface);border-radius:18px;box-shadow:var(--lift);margin:0 0 10px;overscroll-behavior-x:contain}
@@ -1223,8 +1224,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=90;
+const APP_VER=91;
 const NEWS=[
+  {v:91,data:'2026-10-12',titolo:'Orari: coperti dell\'agenda e persone in turno',
+    chef:['Negli Orari vedi i coperti dell\'agenda giorno per giorno.','Se in un giorno pieno ci sono poche persone in turno, l\'app ti avvisa: «Sabato 100 coperti a cena: Sala 3 in turno, ne servono 6».','La prima volta scrivi quanti coperti fai in un giorno normale.'],
+    fb:['In «Turni della sala» vedi i coperti dell\'agenda e un avviso se in sala ci sono poche persone per quel giorno.']},
   {v:90,data:'2026-10-12',titolo:'Bar: ogni cocktail il suo disegno',
     tutti:['Ogni cocktail ha il suo disegno: il bicchiere giusto, il colore del drink, ghiaccio, bollicine e guarnizione. Lo vedi nella lista e in grande nella scheda.','Ogni liquore ha la sua bottiglia, con il simbolo del sapore sull\'etichetta. Anche whisky, brandy, grappa e prosecco ora si distinguono.'],
     dev:['v90 (D41): `data/bar-disegni.json` v2 con `b` bicchieri, `pz` pezzi e `k` cocktail → [bicchiere, colore, pezzi], generati da `node tools/bar-disegni.mjs` (colore = media pesata degli ingredienti). `brSvg`, `brCkDis`; nella lista acquerello spento (`.br-ckd`) per non pesare. Corretto: ginger beer/ale prendevano il disegno del gin. Prova `tools/test-bar-disegni.mjs`.']},
@@ -3909,6 +3913,30 @@ async function orConsent(u,errs,prima){
 }
 
 /* pianificatore dei gestori: scheda Staff → Orari */
+/* v91 (D33) coperti dell'agenda nel pianificatore, da oggi in poi: pranzo = eventi con ora prima delle 17, cena = dopo, senza ora = tutto il giorno.
+   Con i coperti di un giorno normale (config/app.copNorm) persone che servono = persone di un giorno normale (mediana dei giorni aperti senza coperti
+   della stessa settimana, per reparto e servizio) × (normale + coperti) / normale, arrotondato in su. Meno persone in turno → avviso a chi fa gli orari. */
+const OR_SRV={p:['a pranzo',720,870],c:['a cena',1170,1320],x:['in agenda']};
+const orMed=a=>{if(!a.length)return 0;a=a.slice().sort((x,y)=>x-y);const m=a.length>>1;return a.length%2?a[m]:(a[m-1]+a[m])/2};
+function orCop(lun,t,ppl){if(!funzOn('agenda'))return null;const me=meU(),tdy=today(),norm=Math.round(Number(cfg().copNorm)||0),cop=[],warn=[];
+  for(let g=0;g<7;g++){const k=today(orDay(lun,g)),c={p:0,c:0,x:0,g,k};
+    for(const e of agDay(k,me)){const n=Math.round(Number(e.cop)||0);if(n>0)c[!e.h?'x':e.h<'17'?'p':'c']+=n}
+    c.tot=c.p+c.c+c.x;cop.push(c)}
+  if(!cop.some(c=>c.tot&&c.k>=tdy))return null;
+  if(norm>0)for(const rep of [...new Set(ppl.map(orRep))].filter(r=>r!=='altro')){const us=ppl.filter(u=>orRep(u)===rep);
+    const cnt=(g,s)=>us.filter(u=>{const v=(t[u.id]||{})[g];return s==='x'?orShifts(v).length>0:orIn(v,OR_SRV[s][1],OR_SRV[s][2])}).length;
+    for(const s of ['p','c','x']){const base=orMed(cop.filter(c=>!c.tot).map(c=>cnt(c.g,s)).filter(Boolean));if(!base)continue;
+      for(const c of cop){if(!c[s]||c.k<tdy)continue;const ha=cnt(c.g,s),serve=Math.ceil(base*(norm+c[s])/norm-1e-9);
+        if(ha<serve)warn.push({g:c.g,rep,s,cop:c[s],ha,serve})}}}
+  warn.sort((a,b)=>a.g-b.g);return{cop,warn,norm}}
+function orCopH(cp,lun){const tdy=today(),gg=c=>OR_GG[c.g]+' '+orDay(lun,c.g).getDate();
+  const l=cp.cop.filter(c=>c.tot&&c.k>=tdy).map(c=>esc(gg(c)+' '+c.tot)).join(' · ');
+  if(!cp.norm)return`<section class="or-cp"><p><b>${ic('calendar')} Coperti in agenda</b> ${l}</p><div class="ag-q"><input class="inp" id="or-cn" data-in="orCn" inputmode="numeric" value="${esc(S.orCn||'')}" placeholder="Coperti in un giorno normale" aria-label="Coperti in un giorno normale"><button type="button" class="btn ghost sm" data-a="orCnSave">Salva</button></div>
+  <p class="muted small">Scrivi quanti coperti fai in un giorno normale: l'app ti avvisa se nei giorni pieni ci sono poche persone in turno.</p></section>`;
+  if(!cp.warn.length)return`<section class="or-cp ok"><p><b>${ic('calendar')} Coperti in agenda</b> ${l}</p><p class="muted small">Persone in turno sufficienti per i coperti.</p></section>`;
+  return`<section class="or-cp w"><p><b>${ic('warn')} Poche persone per i coperti</b></p>${cp.warn.map(x=>{const c=cp.cop[x.g];
+    return`<p class="or-cpw"><b>${esc(gg(c))}</b> · ${x.cop} coperti ${OR_SRV[x.s][0]}: ${esc(REPARTI[x.rep])} ${x.ha} in turno, ne servono ${x.serve}</p>`}).join('')}
+  <p class="muted small">Calcolo: persone di un giorno normale della settimana × coperti (giorno normale ${cp.norm} coperti).</p></section>`}
 function vOrari(){
   const lun=S.orW||(S.orW=orLun()),cur=orLun();const w=orWeek(lun)||{};const t=w.t||{},tp=w.tp||null;
   const me=meU(),sc=orScope(me),ppl=orPeople().filter(u=>orInSc(u,sc)),rsp=orResp(),probs=orProblems(lun).filter(p=>orInSc(p.u,sc)),st=orStato(w,sc);
@@ -3937,7 +3965,7 @@ function vOrari(){
   ${rps.length>1?`<div class="chips or-reps" role="group" aria-label="Reparto">${[['','Tutti']].concat(rps.map(k=>[k,REPARTI[k]])).map(([k,l])=>`<button type="button" class="chip" aria-pressed="${(sc?sc[0]:'')===k}" data-a="orRep" data-v="${k}">${l}</button>`).join('')}</div>`:''}
   <div class="or-st">${st.k?pill(st.k,st.l):`<span class="st">${st.l}</span>`}${w.pub&&st.ch?`<span class="muted small">pubblicata ${ago(w.pub)}</span>`:''}</div>
   <div class="or-acts"><button type="button" class="btn ghost sm" data-a="orCopy">${ic('copy')} Copia settimana prima</button><button type="button" class="btn ghost sm" data-a="orTipi">${ic('clock')} Turni tipo</button>${tbOn()?`<button type="button" class="btn ghost sm" data-a="tbXls">${ic('sheet')} Presenze</button>`:''}${st.k==='ok'||!st.k?'':`<button type="button" class="btn primary sm" data-a="orPub">${ic('send')} ${tp?'Avvisa delle modifiche':'Pubblica'}</button>`}</div>
-  ${cmGmBox(sc)}${lun===cur?orOggi():''}
+  ${cmGmBox(sc)}${lun===cur?orOggi():''}${lun>=cur?(c=>c?orCopH(c,lun):'')(orCop(lun,t,ppl)):''}
   ${probs.length?`<section class="or-pb ${nerr?'':nda?'w':'a'}"><button type="button" class="or-pbh" data-a="orPb" aria-expanded="${!!S.orPb}">${ic('warn')}<b>${nda?nda+' da controllare':'Errori accettati'}</b><span>${[nerr?nerr+(nerr===1?' errore':' errori'):nda?'solo avvisi':'',nacc?nacc+' accettat'+(nacc===1?'o':'i'):''].filter(Boolean).join(' · ')}</span>${ic('chev',S.orPb?'up':'dn')}</button>
   ${S.orPb?`<div class="or-pl">${probs.map(p=>`<button type="button" class="or-pi ${p.ok?'acc':p.k}" data-a="orCell" data-u="${p.u.id}" data-g="${fd(p.u,p.g)}">${avatar(p.u,28)}<span><b>${esc(p.u.nome)}</b> ${esc(p.t)}${p.ok?' <i class="or-acc">accettato</i>':''}</span></button>`).join('')}</div>`:''}</section>`
   :orAny(t)?`<div class="or-ok">${ic('check')} Tutto a posto: riposi, pause e ore controllati.</div>`:''}
@@ -5986,7 +6014,7 @@ rbest:d=>rswapTo(d.r,d.i,d.p),
   notifDel:async()=>{const ns=Object.values(D().notifiche).filter(n=>n.letta);await runPool(ns.map(n=>()=>del('notifiche',n.id)));toast('Notifiche pulite')}
 };
 const IN={
-  agQ:t=>{S.ag.q=t.value},agNt:t=>{S.ag.nt=t.value},sugCn:t=>{if(S.sug)S.sug.cn=t.value},agf:t=>{S.agf[t.dataset.k]=t.value},
+  agQ:t=>{S.ag.q=t.value},agNt:t=>{S.ag.nt=t.value},sugCn:t=>{if(S.sug)S.sug.cn=t.value},orCn:t=>{S.orCn=t.value},agf:t=>{S.agf[t.dataset.k]=t.value},
   sc:t=>{S.sc[t.dataset.k]=t.value},
   q:t=>{S.q=t.value;const r=$('#results');if(r)r.innerHTML=catResults();else render()},
   login:t=>{S.login[t.dataset.k]=t.value},
@@ -6127,6 +6155,7 @@ Object.assign(A,{
   orSave:()=>orSaveCell(false),
   orClear:()=>orSaveCell(true),
   orCopy:()=>orCopy(),
+  orCnSave:async()=>{const n=Math.round(num(S.orCn));if(!(n>0&&n<5000))return toast('Scrivi quanti coperti, es. 60.','warn');await put('config','app',Object.assign({},cfg(),{copNorm:n}));S.orCn='';render();toast('Salvato: giorno normale '+n+' coperti')},
   orTipi:()=>orTipiSheet(),
   orTipoAdd:()=>orTipoAdd(),
   orTipoDel:d=>orTipoDel(+d.i),
