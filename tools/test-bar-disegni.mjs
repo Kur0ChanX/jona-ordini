@@ -45,6 +45,15 @@ const imp=CK.c.map(ckSvg);
 ok(imp.every(Boolean)&&x2(J.k).every(x=>x.slice(2).every(p=>J.pz[pid(p)]&&(!p.includes('@')||/@-?[\d.]+,-?[\d.]+$/.test(p)))),'ogni cocktail ha il suo disegno, pezzi tutti presenti ('+CK.c.length+')');
 ok(new Set(imp).size===CK.c.length,'cocktail: '+new Set(imp).size+' disegni diversi su '+CK.c.length);
 ok(Object.values(J.b).every(x=>x.h&&x.sh&&x.x),'ogni bicchiere ha riflesso, ombra e macchia (D42)');
+{// v95 difetti #101: colori giusti (tinta in gradi) e schiuma senza onda grigia
+ const hue=h=>{const[r,g,b]=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255),M=Math.max(r,g,b),m=Math.min(r,g,b),d=M-m;if(!d)return -1;let H=M===r?(g-b)/d%6:M===g?(b-r)/d+2:(r-g)/d+4;return(H*60+360)%360};
+ const cH=n=>hue(J.k[n][1]),rosso=h=>h>=300||h<20,blu=h=>h>=190&&h<=240,ambra=h=>h>=20&&h<=45;
+ const bad=[['Kir',rosso],['Kir Royal',rosso],['Blue Lagoon',blu],['AMF (Adios)',blu],['Bramble',rosso],['El Diablo',rosso],['Russian Spring Punch',rosso],['Mirto Spritz',rosso],['Stinger',ambra],['Arnold Palmer',ambra],['Oaxaca Old Fashioned',ambra]].filter(([n,f])=>!f(cH(n))).map(([n])=>n+' '+J.k[n][1]);
+ ok(!bad.length,'colori dei cocktail giusti (Kir rosa, Blue Lagoon blu, Stinger ambra…)'+(bad.length?': '+bad.join(', '):''));
+ const onde=Object.entries(J.pz).filter(([k])=>/^fo\|/.test(k)).map(([,v])=>JSON.stringify(v));
+ ok(onde.length&&onde.every(v=>!/--ink2/.test(v)&&/--vetro2/.test(v)),'schiuma: onda color vetro, non grigia ('+onde.length+')');
+ ok(['White Russian','Gin Fizz','Hurricane','Russian Spring Punch','Mai Tai'].every(n=>J.k[n].some(p=>/^it?\|/.test(p))),'ghiaccio come prima anche con i passaggi della v94 (vecchia frase in tools/cocktail-frasi.json)');
+ ok(J.k['White Russian'].some(p=>/^st\|White Russian/.test(p))&&J.k['Espresso Tonic'].some(p=>/^st\|Espresso Tonic/.test(p)),'White Russian con la panna, Espresso Tonic con il caffè sopra');}
 ok(J.k['Negroni'].some(p=>/^g\|aranciaM@/.test(p))&&J.k['Mojito'].some(p=>/^ml\|Highball/.test(p))&&J.k['Margarita'].some(p=>/^r\|Coppa margarita\|m$/.test(p)),'Negroni mezza fetta, Mojito menta pestata, Margarita metà bordo di sale');
 // D42 passo 2 (Mario #97 «meno foto simili e inerenti al cocktail»): somiglianza = stesso bicchiere, differenza di colore (Lab) + 12 per ogni pezzo diverso
 {const lab=h=>{const[r,g,b]=[1,3,5].map(i=>{let x=parseInt(h.slice(i,i+2),16)/255;return x>.04045?((x+.055)/1.055)**2.4:x/12.92});const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116,X=(r*.4124+g*.3576+b*.1805)/.95047,Y=r*.2126+g*.7152+b*.0722,Z=(r*.0193+g*.1192+b*.9505)/1.08883;return[116*f(Y)-16,500*(f(X)-f(Y)),200*(f(Y)-f(Z))]};

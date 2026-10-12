@@ -1,50 +1,49 @@
-# Passaggio di consegne (2026-10-12, fine sessione #105)
+# Passaggio di consegne (2026-10-12, fine sessione #107)
 
-Sessione attuale: #106
+Sessione attuale: #108
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v92 ONLINE** (PR #102, prove verdi 11:16, squash `4dac802`, `main` riunito nel ramo). **v93 committata sul ramo, prove legate VERDI, da pubblicare SUBITO** (Mario #105: «ok poi pubblica direttamente»). `APP_VER`=93, `CACHE` `jona-ordini-v97`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v94 ONLINE, v95 PRONTA** (commit `225dd67` + consegne) e **PR della v95 aperta** dalla #107 subito dopo il push di queste consegne (numero: guardare le PR aperte). `APP_VER` 95, `CACHE` `jona-ordini-v99`.
 
-## ✅ SUBITO (#106)
-1. **v92 unita dalla #105** (squash `4dac802`): fare solo il controllo online. Testo vecchio: PR #102 (https://github.com/Kur0ChanX/jona-ordini/pull/102). Se la #105 l'ha già unita (squash) e riallineata, `main` ha la v92: controllo online `https://jona-ristorante-by-ynoy-corp.pages.dev/` (`APP_VER` 92 o 93). Se è ancora aperta: aspettare `prove` verdi → squash → `git fetch origin main && git merge origin/main` + push.
-2. **Pubblicare la v93 SUBITO, senza chiedere** (Mario #105). Prove legate già verdi in #105: `test-cantina` (53 PASS), `test-news`, `test-campi-16`, `test-giro` 320/390 chiaro/scuro, `test-testbar` (tutte PASS). → nuova PR dal ramo unico → `prove` verdi → squash → controllo online → `git fetch origin main && git merge origin/main` + push. Niente push sul ramo mentre `prove` gira (E39).
-3. **D43 passaggi → v94** (dettagli in «Dettagli da #100», invariati).
-4. Resti dell'elenco #101 dei cocktail (colori 5-8, 13-15, 21 → `COLX`; 9 White Russian, 10 Illegal, 11 Painkiller, 12 Oaxaca fiamma staccata, 15 schiume grigie `wavy` → color vetro, 19 Woo Woo/Cape Codder; sedano della Bloody Maria fuori posto a sinistra) in una versione dopo. Mario (#102): «Fatti aiutare da un agente per fare prima».
-5. Chiedere a Mario a tocco + doppio tocco: «L'aiutante collaudo lo mando anche a RVC e SPA Sensorial?» (non ancora chiesto).
-6. Dopo v92-v94: proposta SOLUZIONE SMART per cocktail «bellissimi» (vedi «Dettagli da #100»). Mario #102: «la nuova schiuma mi piace quello stile».
-7. Mario prova la D44 quando è online: Cantina → **Fotografa una bottiglia** → fronte → **Fotografa il retro** → **Leggi le 2 foto con l'IA** (voce D44 in `docs/DA-FARE.md`).
+## ✅ SUBITO (#108)
+0. 🔴 **BUG iPhone (Mario, 12/10 dopo l'handoff, scritto nella #107 chiusa)**: «correggi nel iphone quando scatta a un vino dopo la foto si riavvia l'applicazione». Cantina → **Fotografa una bottiglia** (v93, D44): dopo lo scatto l'app installata su iPhone ripartisce da capo. Ipotesi da verificare (#107 ha solo guardato il codice, niente prove): `vnFotoAdd` (index.html ~riga 5741) tiene il file originale della fotocamera (12-48 MP) e mostra le miniature con `URL.createObjectURL(file)` a piena risoluzione → iOS decodifica foto enormi e, con la fotocamera aperta sopra l'app installata, chiude la pagina per memoria → al ritorno la ricarica. Rimedi da valutare insieme: (a) rimpicciolire SUBITO ogni foto (es. `shrink(file,1600)` già in index.html ~riga 1172, o `createImageBitmap`) e tenere solo il blob piccolo per miniature e IA; (b) salvare la bozza prima di aprire la fotocamera (come `jona_reg` della registrazione, stesso problema già risolto lì) e riaprire la scheda del vino dopo un riavvio; (c) foto già lette salvate in IndexedDB. Prova nuova (es. in `tools/test-cantina.mjs`: foto grande 4000×3000 → miniatura e invio piccoli; bozza ripresa dopo ricarica). È un bug dell'app in uso: viene PRIMA della v95 se le prove della PR #105 non sono ancora verdi; altrimenti pubblicare la v95 e poi correggere come v96.
+0-bis. **Prove su tutti i dispositivi (regola nuova di Mario, in CLAUDE.md «PROVE SU TUTTI I DISPOSITIVI»)**: oggi esistono solo `test-giro` (Chromium 320/390), `test-giro-safari` (WebKit, solo GitHub) e `test-giro-computer` (1280/1440). Da fare: un giro con la matrice PC, Mac, tablet Android, telefono Android, iPhone, iPad (descrittori `devices` di Playwright, `hasTouch`/`isMobile`) dentro `test-giro` o una prova nuova `test-dispositivi`, in `tools/prova-ci.sh veloce` e `prove.yml` (WebKit già installato lì). La correzione D45 va provata su tutta la matrice. Mario ha detto sì a mandarla anche a RVC e SPA: mandata dalla #107 con `send_message` a RVC #92 e SPA #14 (consegnata).
+1. **Pubblicare la v95**: aspettare il controllo `prove` sulla PR aperta (NON pushare sul ramo mentre gira: E39), poi squash, controllo online (`APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/), poi `git fetch origin main && git merge origin/main` + push. Se `prove` è rosso: capire la causa e correggere. Poi dire a Mario in 2 righe che la v95 è online (le foto prima/dopo le ha già ricevute in #107).
+2. Dopo la v95: difetto 18 rimasto (Americano: fetta d'arancia e scorza di limone sovrapposte sul bordo) e proposta SOLUZIONE SMART per cocktail «bellissimi» (vedi «Idee»: bozza ferma + domanda a tocco con doppio tocco, E19/E38). Mario #102: «la nuova schiuma mi piace quello stile».
+3. Mario (#106): **«pubblica ogni tanto gli aggiornamenti»** = non accumulare: una versione online appena un pezzo è pronto e provato.
+4. Mario prova la D44 (v93) quando può (Cantina → **Fotografa una bottiglia** → fronte → **Fotografa il retro** → **Leggi le 2 foto con l'IA**) e la D43 (Fornitori → Bar → un cocktail → passaggi numerati).
 
-## Fatto in #105 (12/10, ~10:47-11:15 ora italiana)
-- Avvio: scorta più vecchia (ULTIMO-MESSAGGIO 10:43) in conflitto → tenuta la versione di #104; push confermato (`880e7d1`).
-- **PR #102 v92** aperta (prove partite 10:48). Durante la v93 `test-testbar` ha trovato un FAIL della v92: commento `// v92 regola di stile (Mario)` in `index.html` (la prova vieta «Mario» nei testi dell'app, toglie solo i commenti `/* */`). Corretto in `(#101)` con un worktree a parte sopra `origin` (commit `a741e1e`, test-testbar 7 PASS), push → prove ripartite alle 10:58. Poi unito nel lavoro v93 con un merge normale.
-- **v93 D44** applicata dalle bozze (`tools/bozze/d44-modifiche.py`, `d44-prova.py`: gli script restano in `tools/bozze/`), `CACHE` v97, riga v93 in CLAUDE.md, D44 in `docs/DA-FARE.md` → «fatto in #105 (v93)». Il collaudo ha trovato un errore della PROVA (non dell'app): il blocco «Cloudflare non accetta 2 foto» chiama `vnForm(null)` che apre un'altra scheda sopra il Turriga; la prova ne chiudeva una sola → aggiunto un secondo `closeSheet` (commit `24a1f48`).
-- **Barra Test: vista «Bar» in fondo** (Mario #105: «Nel mio test aggiungi Bar alla fine ha lui quella funzione cocktail ecc mauro ha cantina vini anche Maurizio»): `VIEW_AS.bar={ruolo:'staff',reparto:'sala',mansione:'Bartender'}`, pulsante `['bar','Bar']` dopo «Sviluppatore» (solo barra dello sviluppatore, la barra della demo invariata). Scelta di Mario a tocco + conferma: il barista vede **Bar e Cantina Vini**, «e deve avere anche la possibilità di ordinare la sua roba e inviarla a Maurizio» → già così (staff: Catalogo, Carrello, «Invia allo chef» = approvazione del gestore). Prove nuove in `tools/test-testbar.mjs` (ordine gm,fb,staff,dev,bar; barista non gestore con `brOn`/`vnOn`; dentro 320 px; Catalogo/Carrello/I miei ordini; `cadd` → «Invia allo chef»). Nota dev nella NEWS v93, riga v93 in CLAUDE.md.
-- Lezione: un'occhiata a `test-testbar` (controllo del nome) va fatta anche dopo commenti nuovi nel codice.
+## Fatto in #107 (12/10, ~12:15-12:45 ora italiana)
+- **Collaudo a RVC e SPA** (sì di Mario in #106): mandato con `send_message` il modello adattato di `.claude/agents/collaudo.md` a RVC #92 `session_01Mc34LWsJw9PKUiUJvYcPxB` (con nota repo privato: niente giri su GitHub salvo richiesta) e SPA #14 `session_016iyo14hpB7Qq4UWfhfCqgV`. Consegnato (delivered); lo creano loro nel loro repo. Nota E45 inclusa.
+- **v95 difetti dei disegni (#101)** in `tools/bar-disegni.mjs`:
+  - `COLX` nuovi: Kir `#D8687A`, Kir Royal `#C2385A`, Blue Lagoon `#2E8ED6`, AMF (Adios) `#3A9FD8`, White Port Tonic `#F0DC98`, Oaxaca `#C27A2C`, Russian Spring Punch `#B23A5E`, El Diablo `#9C2C4C`, Mirto Spritz `#7C2848`, Bramble `#8C2244`, Espresso Tonic `#E6E0CC`, Woo Woo `#E8607E`, Cape Codder `#A8142C`, Stinger `#C88A3C`, Arnold Palmer `#A8682E`; White Russian `#7A5236`.
+  - `LAY`: White Russian panna `['#F7F2E8',0,.46,.97]` (era 0-.3), Espresso Tonic caffè sopra `['#3A2418',0,.34,.95]` (le bollicine spariscono: strato da 0, voluto).
+  - `wavy` (onda della schiuma) color `--vetro2` invece di `--ink2` grigio (Illegal, Gin/Amaretto/Pisco Sour).
+  - Painkiller: dopo i colori `TIKI`, `COL.Painkiller = viv('#E2A65E')` (crema/arancio).
+  - Fiamma della scorza fiammata attaccata: `flame(.6, -6.2)` (era `flame(9,-9)`, staccata).
+  - Bloody Maria: il sedano oggi è già a posto (destra del lime), niente da fare.
+  - **Bug trovato (E46)**: la v94 ha reso `c[6]` di `data/cocktail.json` una lista di passaggi; il generatore leggeva lì la preparazione e rifacendo i disegni 31 cocktail perdevano/guadagnavano il ghiaccio («shaker senza ghiaccio», «filtra»). Soluzione: `tools/cocktail-frasi.json` (212 vecchie frasi, prese da `81921b5~1:data/cocktail.json`), letto dal generatore; cocktail nuovo senza frase → passaggi uniti. Confronto prima/dopo: cambia solo l'Espresso Tonic (voluto). Scartato: cambiare le regole per leggere i passaggi (rischio di spostare altri disegni).
+  - Peso `bar-disegni.json` compresso 29.192 (< 30.000).
+- `tools/test-bar-disegni.mjs`: 4 controlli nuovi (colori per tinta: Kir/Kir Royal/Bramble/… rossi, Blue Lagoon/AMF blu, Stinger/Arnold Palmer/Oaxaca ambra; schiuma senza `--ink2`; White Russian e Espresso Tonic con strato; ghiaccio in White Russian, Gin Fizz, Hurricane, Russian Spring Punch, Mai Tai). **72 PASS** (anche TZ Roma).
+- Aiutante `collaudo` (ora si carica col nome): test-bar-disegni, test-bar, test-news, test-giro tutte PASS.
+- NEWS v95 «Bar: colori dei cocktail più giusti», `APP_VER` 95, `CACHE` v99, riga v95 in CLAUDE.md, D42 in `docs/DA-FARE.md`, E46 in `docs/ERRORI.md`.
+- Foto mandate a Mario: 4 foto prima/dopo (16 cocktail, 780 px, scratchpad: non salvate nel repo). Script: per ogni nome `SOLO="<nome>" DSF=2 node tools/bozze/griglia-cocktail.mjs out.png 150` (il «prima» da una copia in scratchpad con index.html e data di `HEAD~`), poi PIL due colonne PRIMA/DOPO, 4 cocktail per foto.
 
-## Fatto in #104 (12/10, ~10:43-11:00 ora italiana)
-- Avvio: scorta con un ULTIMO-MESSAGGIO più vecchio (10:26) in conflitto → tenuto quello di #103 (10:45). Push confermato.
-- Messaggio dalla #103 (chiusa): il suo collaudo su `3dda320` era tutto verde.
-- Collaudo su `0c83f7e`: 6/6 PASS (sopra).
-- D44 progettata e scritta in bozza (sopra). Nota: Context7 ha finito la quota mensile gratuita («Monthly quota exceeded»): usare la ricerca web finché non riparte, o chiedere a Mario se vuole una chiave gratis su context7.com/dashboard.
+## Fatto in #106 (12/10, ~11:15-12:05 ora italiana)
+- Avvio: scorta vecchia (ULTIMO-MESSAGGIO 10:43) unita con `git merge -s ours` (teneva il messaggio più nuovo), push. Al riavvio della sessione (12:0x) altra scorta (solo ULTIMO-MESSAGGIO 11:35) unita con merge normale.
+- v92 controllata online. **v93 pubblicata**: PR #103, `prove` verdi (partite 11:18), squash `8353476`, `main` riunito nel ramo, online `APP_VER` 93.
+- **v94 D43 passaggi dei cocktail** (PR #104, squash `81921b5`, online 11:58): `tools/cocktail.txt` campo 6 = passi dai file `tools/d43-passi/parte1..4.txt` (212/212, 3-5 passi ciascuno, separati da « / »; intestazione del file aggiornata); `tools/cocktail.py` divide i passi e controlla 3-5 non vuoti → `data/cocktail.json` `c[6]` lista (98 KB, 16,7 KB compressi; si scarica solo aprendo il Bar). `index.html`: in `brCk` `Array.isArray(c.p)` → `<ol class="br-ol">` (CSS: cerchietti `--lagoon`/`--on-lagoon`, righe `--line`), altrimenti la vecchia `.br-pas`. NEWS v94 «Bar: passaggi numerati», `APP_VER` 94, `CACHE` v98, riga v94 in CLAUDE.md, D43 in `docs/DA-FARE.md` → fatto. Prove: `test-bar` 38 PASS (3 nuove: 4 passi del Negroni in `.br-ol`, cerchietto dentro lo schermo, testo), `test-news`, `test-bar-disegni`, `test-giro` «nessun problema», `prove` su GitHub verdi.
+- Foto mandate a Mario: Mojito e Negroni con i passaggi (scratchpad, non salvate nel repo; script: `/#demo` → `demoGo` → Fornitori → `brOpen` → `#brq` → riga → `.br-ol` in vista; chiudere con `.sheet [data-a="closeSheet"]` `.last()`: ce ne sono due).
+- Mario ha chiesto «quanto tempo resta?» durante le prove: risposto con l'ora di partenza delle prove (11:18) e la durata solita (~15 min + 3 per pubblicare).
 
-## Fatto in #103 (12/10, ~10:30-10:45 ora italiana)
-- Avvio: scorta unita (solo ULTIMO-MESSAGGIO), push confermato. Messaggi della #102 (chiusa) ricevuti: nuovo messaggio di Mario (in «Ultimo messaggio») e prove legate verdi su `3f681d5`.
-- **Regola di stile** (`tools/bar-disegni.mjs`): `joinX` passa ogni parte da `colora`: `d`/`f`/`p` → `c`/`cf`/`cp` = [[colore, forme]] col tono scuro del pezzo (`scuro(w[0][0])`, o `x.k` se dato; parti senza colore = `LEGNO` #8A6440, es. stecchini). `put` per le chiavi `VETRO` rimette `c`/`cf` in `vd`/`vf`. `sw()` ora non fa niente (lo spessore lo decide il CSS). App (`index.html`): `brCol(ps,x,cl,pr)` disegna i gruppi `<g class="br-c" style="stroke:…">`; CSS `.br-c` 1,25 px scheda / 0,8 lista, `.br-c.br-f` 0,75 / 0,5; bicchieri pieni (`op`) con `oc` = contorno nel tono scuro (`.br-o` 2 / 1,2 px), linee fini del bicchiere nello stesso colore; goccioline `.br-dr` color vetro. Colore `*` nei pezzi = colore del drink `k[1]`, `*l` = più chiaro (`cr|<bicchiere>`, `dm|<bicchiere>`, `sf|<bicchiere>`: un pezzo per bicchiere invece che per colore → file più leggero).
-- **Tazza di rame** (Mule): `opaco` #C46E3A, contorno aperto in alto (`o` senza linea sopra), pezzo `rm|` (ombra a destra, luce a sinistra, martellato chiaro, manico pieno, riflessi), `sf|` (apertura ellittica col drink e due cubetti). Per i Mule `fisso` = false → `separa` distanzia i colori del drink (London/Mexican, Moscow/Kentucky/Virgin diversi).
-- **Etichetta con la bottiglia** (`badge` in `m|`) tolta dai bicchieri pieni; i gemelli non la ricevono più (oggi 0 coppie simili, `--simili`).
-- **Cannuccia** `s|`: parte dal liquido (x 34) e passa dentro l'apertura (pendenza ≤ 0,35), nei bicchieri pieni solo sopra il bordo; bianca con una riga rossa. **Ombrellino** sul bordo a sinistra, stecchino dentro il bicchiere.
-- **Agrumi**: `wheel`/`wedge` con albedo bianco tra buccia e polpa, spicchi sottili; `twist(x,y,col,ag)`: riccio per agrume (`TW`: limone lungo con ricciolo, lime corto, arancia larga, pompelmo larga con ricciolo), albedo chiaro dove gira, pori. `SLOT` 14 (Americano).
-- Prova `tools/test-bar-disegni.mjs` (68 PASS): pezzi senza contorno nero, niente `m|`, tazza di rame con `rm|`/`sf|`/`oc`, cannucce poco inclinate e dentro il disegno; somiglianze e «disegni diversi» contano il colore del drink quando c'è `sf|` (`colV`). Le 3 nuove falliscono sul file vecchio (verificato).
-- Foto per Mario `prima-dopo-1..3.png` (12 cocktail: Mule, Piña Colada, Old Fashioned, Gin Tonic, Americano, Mojito, Cosmopolitan, Mint Julep, Mai Tai, Negroni, Tom Collins) mandate; rifatte dallo scratchpad (non salvate nel repo).
-- NEWS v92: riga «Linee sottili del colore di ogni frutto, tazza di rame vera per i Mule, scorze d'agrume arricciate» + nota dev; riga v92 in CLAUDE.md aggiornata. D44 in `docs/DA-FARE.md`.
-- Risposta data a Mario sulla domanda dell'IA: l'app non usa i token di Claude; listini = catena Gemini Flash → Flash-Lite → Cloudflare Llama 4 (`GEM_LETT`); la Cantina oggi solo Gemini Flash → Lite (sarà allineata con la D44).
+## Fatto in #105 (riassunto)
+- PR #102 v92 (FAIL di `test-testbar` per un commento con il nome del creatore → corretto in `(#101)`). v93 D44 dalle bozze `tools/bozze/d44-*.py`; vista «Bar» nella barra Test (`VIEW_AS.bar`, barista vede Bar e Cantina, ordina e invia allo chef). Lezione: controllare `test-testbar` anche dopo commenti nuovi nel codice.
 
-## Dettagli da #100 (D43 e idee)
-- **D43 passaggi** (Mario #100 a tocco + conferma: «Come le foto», cioè **4-5 passi** di una-due righe con i dettagli utili al bancone; bozza `tools/bozze/passaggi-d43.mjs`, foto `docs/img/sessione-100/d43-passaggi-1..3.png` Mojito, Negroni, Margarita). Righe di `tools/d43-passi/parte1..4.txt` = «Nome|passo / passo / …», stesso ordine di `tools/cocktail.txt`.
-  - Mettere i passi nel campo 6 di `tools/cocktail.txt` separati da « / » (scelta tecnica #100); `tools/cocktail.py` li divide in lista → `data/cocktail.json` `c[6]` = array di stringhe (controllo: 3-5 passi, nessun passo vuoto).
-  - App: in `brCk` se `Array.isArray(c.p)` lista numerata (`<ol>` con cerchietti color `--lagoon` come la bozza), altrimenti la frase (vecchio file in cache). Cercare altri usi di `c.p` (la ricerca `k:` non usa p).
-  - Peso: oggi `cocktail.json` 45,7 KB (8,7 KB compressi), diventerà ~+20 KB compressi: va bene (si scarica solo aprendo il Bar).
-  - Prova nuova in `test-bar` (Mojito: 5 passi numerati) + `test-giro`. NEWS v93 («Ogni cocktail ha i passaggi numerati, uno per riga, con i trucchi del bancone»), `APP_VER` 93, `CACHE` +1, riga v93 in CLAUDE.md.
-- **Idea SMART dopo v92/v93** (Mario «non bellissime… mi accontento»): proporre UNA strada più ambiziosa per cocktail «bellissimi», con bozza ferma e domanda a tocco (E19). Spunti: ghiaccio a tanti cerchietti chiari, frutta grande DENTRO il bicchiere (spicchi di lime nel Mojito), contorni delle guarnizioni colorati (non neri), tratto a pennello con spessore che cambia, superficie schiumosa, ciliegina con riflesso.
+## Fatto in #103-#104 (riassunto)
+- #104: D44 progettata in bozza. Context7 aveva finito la quota mensile gratuita: usare la ricerca web o chiedere a Mario una chiave gratis su context7.com/dashboard.
+- #103: regola di stile applicata ai pezzi dei cocktail (`c`/`cf`/`cp` col tono scuro del pezzo, `LEGNO`), tazza di rame dei Mule (`rm|`, `sf|`, `oc`), niente `badge`, cannuccia e ombrellino, agrumi con albedo e `twist`. Dettagli nella riga v92 di CLAUDE.md e nella storia dei commit.
+
+## Idee (da #100)
+- **SMART per cocktail «bellissimi»** (Mario «non bellissime… mi accontento»): UNA strada più ambiziosa, con bozza ferma e domanda (E19/E38). Spunti: ghiaccio a tanti cerchietti chiari, frutta grande DENTRO il bicchiere (spicchi di lime nel Mojito), contorni delle guarnizioni colorati, tratto a pennello con spessore che cambia, superficie schiumosa, ciliegina con riflesso.
 
 ## Fatto in #102 (riassunto)
 - Avvio: scorta (vuota) unita, push confermato.
@@ -73,8 +72,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc` (chiusa), #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
+- Jona #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC attiva: **#92** `session_01Mc34LWsJw9PKUiUJvYcPxB`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
 ## Note tecniche
@@ -94,7 +93,13 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(12/10/2026 ~11:05 ora italiana, #105) «ok poi pubblica direttamente» (= pubblica v92 e poi la v93 senza chiedere).
-Prima (#105, ~10:55): «Nel mio test aggiungi Bar alla fine ha lui quella funzione cocktail ecc mauro ha cantina vini anche Maurizio»; a tocco: «si tutti e 2 e 2 e deve avere anche la possibilità di ordinare la sua roba e inviarla a Maurizio» (fatto).
-Prima (#104, ~10:50): «vai con la D44 dopo la v92»
-Prima (#103, ~10:45): «in coda nell app dammi la possibilità di fare piú foto del vino per prendere anche il retro per caricare scheda del vino, poi domanda: quando lavora l'intelligenza artificiale nell'app lavora con il sistema scansione listini con tutte le ia un'ordine di priorità senza usare i token claude giusto?» (risposta data in #103). Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+(12/10/2026, nella #107 chiusa) «sì, mandala anche a RVC e SPA» → regola dei dispositivi mandata a RVC #92 e SPA #14.
+Prima:
+(12/10/2026, nella #107 chiusa) «le prove ricordati vanno fatte sempre su pc mac tablet , telefoni android e iphone e ipad» → regola in CLAUDE.md + SUBITO 0-bis.
+Prima:
+(12/10/2026, scritto nella #107 già chiusa, dopo l'handoff) «correggi nel iphone quando scatta a un vino dopo la foto si riavvia l'applicazione» → SUBITO 0.
+Prima, in #107 Mario non aveva scritto (sessione partita dal prompt di avvio della #106).
+(12/10/2026 ~12:05 ora italiana, #106) «ok» (risposta alle 2 domande scritte nel testo: collaudo anche a RVC e SPA = sì; sistemare i difetti rimasti nei disegni dei cocktail = sì).
+Prima (#106, 11:35): «ok poi vai con la D43  comunque pubblica ogni tanto gli aggiornamenti» (fatto: v94 online).
+Prima (#106, 11:33): «quanto tempo resta?» (risposto).
+Prima (#105, ~11:05): «ok poi pubblica direttamente» (v92 e v93 pubblicate). Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».

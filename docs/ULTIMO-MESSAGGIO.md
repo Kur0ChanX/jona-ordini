@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~11:05 ora italiana, sessione #105)
+# Ultimo messaggio di Mario (12/10/2026 12:29 ora italiana)
 
-ok poi pubblica direttamente
+sì, mandala anche a RVC e SPA
