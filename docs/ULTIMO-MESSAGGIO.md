@@ -1,7 +1,5 @@
-# Ultimo messaggio di Mario (12/10/2026 ~7:25 ora italiana, sessione #94)
+# Ultimo messaggio di Mario (12/10/2026 07:37 ora italiana)
 
-si
-
-bastano solo 40 immagini di ingredienti?
-
-(poi a tocco: prova cocktail e liquori → «Sì, falla così», confermata)
+git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
+Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #95).
+Poi fai «SUBITO» (v89 online, poi D41 v90 Bar già scelta da Mario) e attendi le istruzioni di Mario.
