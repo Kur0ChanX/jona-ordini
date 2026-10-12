@@ -37,12 +37,27 @@ const generici=tutti.filter(n=>/^(liquore|bottiglia)$/.test(k(n)));
 ok(!generici.length,'ogni liquore ha la sua bottiglia, nessuna bottiglia generica'+(generici.length?': '+generici.join(', '):''));
 const simili=[['Bourbon','Rye whiskey','Scotch whisky','Scotch whisky torbato','Whisky irlandese'],['Calvados','Brandy','Cognac'],['Pisco','Grappa'],['Rum bianco','Cachaça'],['Champagne','Prosecco'],['Fernet','Amaro','Jägermeister'],['Vermouth dry','Lillet blanc'],['Crème de mûre','Mirto'],['Chartreuse verde','Absinthe','Liquore alla mela verde','Liquore al melone'],['Tabasco','Peperoncino rosso'],['Granatina','Succo di melograno']];
 for(const g of simili)ok(new Set(g.map(col)).size===g.length,'disegni diversi: '+g.join(', '));
-const ckSvg=c=>{const x=J.k[c[0]];if(!x||!J.b[x[0]])return null;return JSON.stringify([J.b[x[0]].op||x[1],x[0],x.slice(2).map(p=>J.pz[p])])};
+const pid=p=>p.split('@')[0];
+const ckSvg=c=>{const x=J.k[c[0]];if(!x||!J.b[x[0]])return null;return JSON.stringify([J.b[x[0]].op||x[1],x[0],x.slice(2).map(p=>[J.pz[pid(p)],p.split('@')[1]])])};
 const imp=CK.c.map(ckSvg);
-ok(imp.every(Boolean)&&x2(J.k).every(x=>x.slice(2).every(p=>J.pz[p])),'ogni cocktail ha il suo disegno, pezzi tutti presenti ('+CK.c.length+')');
+ok(imp.every(Boolean)&&x2(J.k).every(x=>x.slice(2).every(p=>J.pz[pid(p)]&&(!p.includes('@')||/@-?[\d.]+,-?[\d.]+$/.test(p)))),'ogni cocktail ha il suo disegno, pezzi tutti presenti ('+CK.c.length+')');
 ok(new Set(imp).size===CK.c.length,'cocktail: '+new Set(imp).size+' disegni diversi su '+CK.c.length);
 ok(Object.values(J.b).every(x=>x.h&&x.sh&&x.x),'ogni bicchiere ha riflesso, ombra e macchia (D42)');
-ok(J.k['Negroni'].some(p=>/^g\|Old fashioned\|aranciaM/.test(p))&&J.k['Mojito'].some(p=>/^ml\|Highball/.test(p))&&J.k['Margarita'].some(p=>/^r\|Coppa margarita\|m$/.test(p)),'Negroni mezza fetta, Mojito menta pestata, Margarita metà bordo di sale');
+ok(J.k['Negroni'].some(p=>/^g\|aranciaM@/.test(p))&&J.k['Mojito'].some(p=>/^ml\|Highball/.test(p))&&J.k['Margarita'].some(p=>/^r\|Coppa margarita\|m$/.test(p)),'Negroni mezza fetta, Mojito menta pestata, Margarita metà bordo di sale');
+// D42 passo 2 (Mario #97 «meno foto simili e inerenti al cocktail»): somiglianza = stesso bicchiere, differenza di colore (Lab) + 12 per ogni pezzo diverso
+{const lab=h=>{const[r,g,b]=[1,3,5].map(i=>{let x=parseInt(h.slice(i,i+2),16)/255;return x>.04045?((x+.055)/1.055)**2.4:x/12.92});const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116,X=(r*.4124+g*.3576+b*.1805)/.95047,Y=r*.2126+g*.7152+b*.0722,Z=(r*.0193+g*.1192+b*.9505)/1.08883;return[116*f(Y)-16,500*(f(X)-f(Y)),200*(f(Y)-f(Z))]};
+ const pz=k=>new Set(k.slice(2).map(p=>pid(p).replace(/\|\d+$/,''))),N=CK.c.map(c=>c[0]),sim=[];
+ for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){const a=J.k[N[i]],b=J.k[N[j]];if(a[0]!==b[0])continue;const A=pz(a),B=pz(b);let n=0;for(const x of A)if(!B.has(x))n++;for(const x of B)if(!A.has(x))n++;
+   const la=lab(J.b[a[0]].op||a[1]),lb=lab(J.b[b[0]].op||b[1]),d=Math.hypot(la[0]-lb[0],la[1]-lb[1],la[2]-lb[2])+12*n;if(d<10)sim.push(N[i]+' ~ '+N[j])}
+ ok(!sim.length,'nessuna coppia di cocktail troppo simile'+(sim.length?': '+sim.join(', '):''));
+ const ha=(n,re)=>J.k[n]&&J.k[n].some(p=>re.test(p));
+ const SEGNI=[['Tequila Sunrise',/^st\|/,'strati'],['B-52',/^st\|/,'strati'],['Black Velvet',/^st\|/,'strati'],['White Russian',/^st\|/,'panna sopra'],['Piña Colada',/^g\|ananasC@/,'ananas e ciliegina'],['Piña Colada',/^u\|/,'ombrellino'],
+  ['Whiskey Sour',/^fo\|/,'schiuma'],['Pisco Sour',/^g\|.*angostura/,'gocce di angostura'],['Horse\'s Neck',/^g\|.*spirale/,'spirale di scorza'],['Manhattan',/^g\|.*ciliegiaF/,'ciliegina sul fondo'],['Jägerbomb',/^jb\|/,'shot dentro'],
+  ['Irish Coffee',/^vp\|/,'vapore'],['Ramos Gin Fizz',/^ft\|/,'schiuma alta'],['Frozen Daiquiri',/^dm\|/,'frullato'],['Espresso Martini',/chicchi/,'chicchi'],['Champagne Cocktail',/^zo\|/,'zolletta'],['Caipirinha',/^ls\|/,'lime nel bicchiere'],
+  ['Bloody Mary',/sedano/,'sedano'],['Oaxaca Old Fashioned',/scorzaaranciaF/,'scorza fiammata'],['Clover Club',/bacche/,'lamponi'],['Sangria',/pezzetti/,'frutta a pezzetti'],["Pimm's Cup",/^cu\|/,'cetriolo dentro'],['Tom Collins',/agrumelimonefC@/,'fetta e ciliegina'],
+  ['Spicy Fifty',/peperoncino/,'peperoncino'],['Appletini',/^g\|mela@/,'fettine di mela'],['Scorpion',/^g\|fiore@/,'gardenia'],['Dry Martini',/oliva/,'oliva'],['Vodka Martini',/scorzalimone/,'scorza (prima scelta)']];
+ const no=SEGNI.filter(([n,re])=>!ha(n,re));ok(!no.length,'cocktail famosi con il loro segno ('+SEGNI.length+')'+(no.length?': manca '+no.map(x=>x[0]+' '+x[2]).join(', '):''));
+ const tk=CK.c.filter(c=>c[3]==='Tiki').map(c=>J.k[c[0]][1]);ok(new Set(tk).size===tk.length&&!J.b.Tiki.op,'tazze tiki di colori diversi');}
 ok(J.k['Negroni'][0]==='Old fashioned'&&J.k['Spritz']&&J.k['Moscow Mule'][0]==='Tazza di rame','bicchieri giusti (Negroni old fashioned, Moscow Mule tazza di rame)');
 // app
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
@@ -73,6 +88,7 @@ async function cocktail(pg,nome){await sh(pg).locator('input#brq').fill(nome);aw
   ok(await big.locator('.br-dr ellipse').count()>=2&&await big.locator('.br-sh').count()===1,'scheda: goccioline e ombra');
   ok(await big.locator('.br-h path').count()>=1&&await big.locator('.br-f').count()===1,'scheda: riflessi e linee fini del vetro');
   ok(await sh(pg).locator('.br-ing.br-carta').count()===1,'Negroni: ingredienti sul foglio di carta');
+  ok(await big.locator('g[transform^="translate("]').count()>=1,'Negroni: mezza fetta d\'arancia spostata sul bordo (@x,y)');
   ok(await sh(pg).locator('.br-ir .br-dis').count()===3,'Negroni: 3 ingredienti, 3 disegni');
   ok(await sh(pg).locator('.br-ir .br-dis .ink').evaluateAll(l=>l.every(g=>g.children.length>0)),'ogni disegno ha le linee a penna');
   ok(await pg.evaluate(()=>document.querySelectorAll('#br-wash').length===1),'filtro acquerello nella pagina una volta sola');

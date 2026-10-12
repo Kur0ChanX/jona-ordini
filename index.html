@@ -5762,14 +5762,16 @@ const brDisK=n=>{const s=String(n||'').toLowerCase();return BR_DIS&&BR_DIS.r.fin
 const brSvg=(w,d,p,cl)=>`<svg class="br-dis${cl?' '+cl:''}" viewBox="0 0 64 64" aria-hidden="true">${w.map(x=>`<g class="wa" transform="translate(1.5 1.5)" fill="${x[0]}">${x[1]}</g>`).join('')}<g class="ink">${d}</g>${p?`<g class="inkp">${p}</g>`:''}</svg>`;
 function brDis(n,alc){if(!BR_DIS)return'';const r=brDisK(n),g=BR_DIS.g[r?r[1]:alc?'liquore':'acqua'];if(!g)return'';
   return brSvg(g.w.map((w,i)=>[i===0&&r&&r[2]||w[0],w[1]]),g.d,g.p)}
-// v92 (D42): cocktail con i dettagli (vetro, riflessi, cubetti con le facce); nella scheda grande (senza cl) anche colore che sfuma, macchia d'acquerello e goccioline
+// v92 (D42): cocktail con i dettagli (vetro, riflessi, cubetti con le facce), strati e schiuma dentro il liquido (q, ritagliati sulla forma del liquido); nella scheda grande (senza cl) anche colore che sfuma, macchia d'acquerello e goccioline
 const brTinta=(h,t,a)=>'#'+[1,3,5].map(i=>Math.round(parseInt(h.slice(i,i+2),16)*(1-a)+t*a).toString(16).padStart(2,'0')).join('');
 let BR_LG=0;
-function brCkDis(c,cl){const k=BR_DIS&&BR_DIS.k[c.n],B=k&&BR_DIS.b[k[0]];if(!B)return'';const ps=k.slice(2).map(x=>BR_DIS.pz[x]).filter(Boolean),big=!cl,col=B.op||k[1];
+const brMove=(p,t)=>{const g=s=>`<g transform="translate(${t.replace(',',' ')})">${s}</g>`,o={};for(const k in p)o[k]=Array.isArray(p[k])?p[k].map(w=>[w[0],g(w[1]),w[2]]):g(p[k]);return o};
+function brCkDis(c,cl){const k=BR_DIS&&BR_DIS.k[c.n],B=k&&BR_DIS.b[k[0]];if(!B)return'';const ps=k.slice(2).map(x=>{const[id,t]=x.split('@'),p=BR_DIS.pz[id];return p&&t?brMove(p,t):p}).filter(Boolean),big=!cl,col=B.op||k[1];
   const wa=(f,s,o)=>`<g class="wa"${o?` style="opacity:${o}"`:''} fill="${f}">${s}</g>`,all=x=>ps.map(p=>p[x]||'').join('');
-  let defs='',fill=col;if(big&&!B.op){const id='br-lg'+(++BR_LG);defs=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${brTinta(col,255,.4)}"/><stop offset="1" stop-color="${brTinta(col,0,.25)}"/></linearGradient></defs>`;fill=`url(#${id})`}
-  return`<svg class="br-dis br-ck${cl?' '+cl:''}" viewBox="0 0 64 64" aria-hidden="true">${defs}${big&&B.x?wa(col,`<path d="${B.x}"/>`,.4):''}${B.sh?`<ellipse class="br-sh" cx="32" cy="${B.sh[0]}" rx="${B.sh[1]}" ry="1.8"/>`:''}`
-    +wa(fill,`<path d="${B.l}"/>`,big?.85:.7)+(B.m?wa(brTinta(col,255,.3),B.m,.8):'')+ps.map(p=>(p.w||[]).map(w=>wa(w[0],w[1],w[2])).join('')).join('')
+  let defs='',fill=col,q='';if(big&&!B.op){const id='br-lg'+(++BR_LG);defs=`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${brTinta(col,255,.4)}"/><stop offset="1" stop-color="${brTinta(col,0,.25)}"/></linearGradient>`;fill=`url(#${id})`}
+  if(ps.some(p=>p.q)){const id='br-lq'+(++BR_LG);defs+=`<clipPath id="${id}"><path d="${B.l}"/></clipPath>`;q=`<g clip-path="url(#${id})">${ps.map(p=>(p.q||[]).map(w=>wa(w[0],w[1],w[2])).join('')).join('')}</g>`}
+  return`<svg class="br-dis br-ck${cl?' '+cl:''}" viewBox="0 0 64 64" aria-hidden="true">${defs?`<defs>${defs}</defs>`:''}${big&&B.x?wa(col,`<path d="${B.x}"/>`,.4):''}${B.sh?`<ellipse class="br-sh" cx="32" cy="${B.sh[0]}" rx="${B.sh[1]}" ry="1.8"/>`:''}`
+    +wa(fill,`<path d="${B.l}"/>`,big?.85:.7)+(B.m?wa(brTinta(col,255,.3),B.m,.8):'')+q+ps.map(p=>(p.w||[]).map(w=>wa(w[0],w[1],w[2])).join('')).join('')
     +`<g class="ink">${B.d+all('d')}</g>${B.f||ps.some(p=>p.f)?`<g class="ink br-f">${(B.f||'')+all('f')}</g>`:''}${ps.some(p=>p.p)?`<g class="inkp">${all('p')}</g>`:''}<g class="br-h">${(B.h||'')+all('h')}</g>`
     +(big&&B.dr?`<g class="br-dr">${B.dr.map(([x,y,r=.9])=>`<ellipse cx="${x}" cy="${y}" rx="${+(r*.8).toFixed(2)}" ry="${r}"/>`).join('')}</g>`:'')+'</svg>'}
 function brCk(){if(BR_CK)return Promise.resolve(BR_CK);
