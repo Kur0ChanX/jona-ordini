@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~11:05 ora italiana, sessione #105)
+# Ultimo messaggio di Mario (12/10/2026 11:33 ora italiana)
 
-ok poi pubblica direttamente
+quanto tempo resta?
