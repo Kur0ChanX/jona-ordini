@@ -1,16 +1,24 @@
-# Passaggio di consegne (2026-10-12, fine sessione #116)
+# Passaggio di consegne (2026-10-12, fine sessione #117)
 
-Sessione attuale: #117
+Sessione attuale: #118
 
-⚠️ La #116 era a profondità 8 (limite): la #117 l'ha aperta Mario a mano (E12), la catena riparte da zero.
+La #117 (aperta a mano da Mario, profondità 0) apre la #118.
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v97 online, v98 in PR #108** (controllato `APP_VER` 97 su https://jona-ristorante-by-ynoy-corp.pages.dev/ alle 17:14). Nel ramo: `APP_VER` 98, `CACHE` `jona-ordini-v102`, PR #108 aperta.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v97 online, v98+v99 in PR #108 con prove ROSSE** (solo `test-chat-tastiera` su iPhone/iPad, errore della prova, non dell'app). Nel ramo: `APP_VER` 99, `CACHE` `jona-ordini-v103`.
 
-## ✅ SUBITO (#117)
-0. **PR #108 = v98 (cannuccia al centro) + v99 (tastiera in chat, D49)**, dal ramo unico. Prove su GitHub partite sul commit `4f7bb2b` (o successivo con le consegne). Iscriviti (`subscribe_pr_activity` 108). Se verdi: squash merge, SUBITO `git fetch origin main && git merge origin/main` + push, controllo `APP_VER` 99 online, avvisare Mario e chiedergli la prova della tastiera (apri chat → tocca **Scrivi un messaggio** → il campo resta sopra la tastiera?). Se rosse: capire e correggere (attenzione a `test-chat-tastiera` su WebKit iPhone/iPad, provato solo su GitHub).
-1. 🔴 **D49 tastiera in chat**: fatta in #116 (vedi sotto), aspetta online + prova di Mario sul telefono Android (app installata a schermo intero). Se non basta sul telefono vero: provare anche `interactive-widget=resizes-content` nel viewport (scartato per ora: cambierebbe tutte le schermate dell'app, la barra in basso salirebbe sopra la tastiera ovunque).
-2. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
-3. Aiutanti: stato «aiutanti sì» con annuncio (regola nuova in CLAUDE.md, da RVC #94).
+## ✅ SUBITO (#118)
+0. 🔴 **Correggere `tools/test-chat-tastiera.mjs`** (prove della PR #108 rosse, run 38294445440 su `bd39060`). FAIL solo iPhone 15 e iPad (WebKit, solo su GitHub): `hTop` 14, poi 7 e 4 = `transform:translateY(14px)` dell'apertura di `.cht` (`.cht.open{transform:none}`, transizione .22 s) non ancora finita. Riga 24: dopo `chOpen('tutti')` c'è `waitForTimeout(400)` fisso. Correzione: `await pg.waitForFunction(()=>getComputedStyle(document.querySelector('.cht')).transform==='none',null,{timeout:5000})` al posto dell'attesa fissa (e prima di ogni misura, per sicurezza). Pixel 7/Galaxy Tab in locale devono restare PASS 10; iPhone/iPad si vedono solo su GitHub. Commento già scritto sulla PR #108 (non scriverne un altro). Poi push e attesa delle prove.
+1. **PR #108 = v98 (cannuccia al centro) + v99 (tastiera in chat, D49)**, dal ramo unico. Iscriviti (`subscribe_pr_activity` 108; la #117 si è disiscritta). Se verdi: squash merge, SUBITO `git fetch origin main && git merge origin/main` + push, controllo `APP_VER` 99 online, avvisare Mario e chiedergli la prova della tastiera (apri chat → tocca **Scrivi un messaggio** → il campo resta sopra la tastiera?). Se rosse: capire e correggere (attenzione a `test-chat-tastiera` su WebKit iPhone/iPad, provato solo su GitHub).
+2. 🔴 **D49 tastiera in chat**: fatta in #116 (vedi sotto), aspetta online + prova di Mario sul telefono Android (app installata a schermo intero). Se non basta sul telefono vero: provare anche `interactive-widget=resizes-content` nel viewport (scartato per ora: cambierebbe tutte le schermate dell'app, la barra in basso salirebbe sopra la tastiera ovunque).
+3. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
+4. Aiutanti: stato «aiutanti sì» con annuncio (regola nuova in CLAUDE.md, da RVC #94).
+
+## Fatto in #117 (12/10, ~20:57-21:25 ora italiana)
+- Avvio: scorta unita (solo ULTIMO-MESSAGGIO «per schermo intero è ancora cosí»), push `bd39060` → le prove della PR #108 sono ripartite (E39). Iscritta alla PR, titolo messo.
+- Foto di Mario `docs/img/sessione-116/chat-tastiera-*.jpg` guardate: campo «Scrivi un messaggio» mezzo sotto la tastiera, intestazione della chat fuori in alto (la pagina è stata spostata dal telefono = caso `vv.offsetTop>0`, già coperto da `chVV`). Sono della versione vecchia.
+- Codice di `chVV` (index.html riga ~4650) riletto: giusto (`top=vv.offsetTop`, `height=vv.height`, classe `kb`).
+- RVC #95 (`session_01FkfToE8frofY9A1By5DgXK`) ha chiesto come funzionano le versioni in Jona (C76): risposto con send_message (`APP_VER`, `NEWS`, `newsFor`, `newsBtn`/`newsSheet`, `jona_news_<id>`, «App da aggiornare», `test-news`).
+- Prove rosse (vedi SUBITO 0), commento sulla PR #108 con la causa. Handoff per l'avviso dell'hook (~140k).
 
 ## Fatto in #116 (12/10, ~20:32-20:55 ora italiana)
 - Avvio: scorta unita (conflitto solo nell'intestazione di ULTIMO-MESSAGGIO, risolto), iscritta alla PR #108. `send_later` e `create_session` negati: profondità 8 (E12).
@@ -78,8 +86,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC attiva: **#94** `session_01GpQTzTBqGoTXC7hcRv6fcx`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
+- Jona #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC attiva: **#95** `session_01FkfToE8frofY9A1By5DgXK`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
 ## Note tecniche
@@ -99,6 +107,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+(12/10/2026 ~20:57 ora italiana, #117, prompt di avvio incollato da Mario) «git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo). Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #117). Poi fai il punto «SUBITO» 0 (PR #108 v98+v99: iscriviti, se verde pubblica).» Ultimo messaggio vero, in attesa: quello qui sotto.
 (12/10/2026 ~20:55 ora italiana, #116, foto `docs/img/sessione-116/chat-tastiera-3-schermo-intero.jpg`: campo ancora mezzo sotto la tastiera) «per schermo intero è ancora cosí» → la v99 NON era ancora online (PR #108 in prova): la foto è della versione vecchia. Dopo l'online chiedergli di riprovare (chiudere e riaprire l'app). Se resta così anche con la v99: il problema è nello schermo intero di Android → strada di riserva `interactive-widget=resizes-content` o `manifest` `display: standalone` solo per… (decidere).
 (12/10/2026 ~20:50 ora italiana, nella #115 chiusa, girato dalla #115, foto `docs/img/sessione-116/chat-tastiera-1.jpg` e `-2.jpg`) «Per ora mi risolvi questo problema della tastiera che va sopra la scrittura.»
 (12/10/2026 ~20:45 ora italiana, nella #115 chiusa, girato dalla #115) «tienila come opzione la faremo più avanti, però tieni l'idea e salvala,la facciamo piú avanti» (su D48 cocktail bellissimi).
