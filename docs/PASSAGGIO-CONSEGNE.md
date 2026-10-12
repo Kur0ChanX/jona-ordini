@@ -8,6 +8,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 
 ## Fatto in #118 (12/10, ~21:23-21:55 ora italiana)
 - `tools/test-chat-tastiera.mjs`: misura solo a chat ferma (`fermo()` = `transform==='none'` e nessuna animazione in corso), commit `1332874`. Prove PR #108 verdi → squash `b670d89`, `main` e scorta uniti nel ramo, push `fd860a7`. **v99 online alle ~21:50** (controllato). Iscrizione alla PR e controllo programmato tolti.
+- Soglia delle consegne portata a **250k** (hook `handoff-check.py` e TRIGGER di CLAUDE.md): regola da RVC #96, confermata da Mario a tocco (doppio tocco) il 13/10 ~01:25. Restano i 20 messaggi e la compressione.
 - Chiesto a Mario di riprovare la tastiera in chat (punto 2 sotto resta aperto finché non risponde).
 
 ## ✅ SUBITO (#118, punti 0-1 FATTI)
