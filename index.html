@@ -5752,7 +5752,7 @@ async function vnIaGo(files){const f=S.vnf;if(!f||f.busy)return;const nome=[f.n,
       // Cloudflare (Llama 4) potrebbe non accettare più foto insieme: riprova con la sola prima foto (il fronte)
       if(l==='cf'&&im.length>1&&!r.txt&&!r.salta)r=await gemCall(body(im.slice(0,1)),l);
       if(r.salta)continue;g=r;if(r.txt||!GEM_RETRY.test(String(r.st)))break;
-      // v96: motivo vero del passaggio al lettore dopo (Mario: «perché Lite?»), nel foglio e nella scatola nera
+      // v96: motivo vero del passaggio al lettore dopo (domanda #108: «perché Lite?»), nel foglio e nella scatola nera
       f.lg.push({l,st:r.st});errLog('Vino: '+gemNome(l)+' non ha letto (errore '+(r.st||'rete')+') '+String(r.msg||'').slice(0,160))}
     if(g.txt)f.lt=f.bl;f.busy=false;f.bl='';
     if(!g.txt){refreshSheet();return toast((g.err||'L\'IA non ha risposto.')+' Riprova.','warn')}
