@@ -14,6 +14,7 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 |----|------|--------|--------|
 | D47 | Cantina vini e Cocktail anche per lo chef (richiesta di Mario #113): oggi la cucina non li vede (`vnCta` escluso per `reparto==="cucina"`, Bar solo `brCan`); i gestori li hanno in Fornitori. Prima una domanda: Maurizio o tutta la cucina, sola lettura o modifica? Poi v98. | Claude, dopo la tua scelta | ora |
 | D46 | Prove su tutti i dispositivi: **fatto in #110**: `tools/test-dispositivi.mjs` (giro di ogni scheda su Pixel 7, Galaxy Tab S4, iPhone 15, iPad, Mac Safari; WebKit solo su GitHub), nelle prove veloci. PC già in `test-giro-computer`. | Claude | fatto |
+| D47 | Cocktail «bellissimi» per tutti i 212 (Mario ha approvato la prova `tools/bozze/cocktail-bellissimi.mjs`, #114/#115): rifare `tools/bar-disegni.mjs` a passi con foto prima/dopo, peso < 30 KB compressi. Più sessioni. |
 | D45 | iPhone, l'app ripartiva dopo la foto di un vino: **corretto in #109, online dal 12/10 16:13 (v96)**: foto rimpicciolita subito (`fotoPiccola`) e bozza del vino ripresa se il telefono chiude l'app. Poi Mario riprova: Cantina → **Fotografa una bottiglia**. | Claude → Mario | ora |
 | D44 | Cantina, fronte e retro del vino: **fatto in #105, online in #106 (v93)**. Poi Mario prova: Cantina → **Fotografa una bottiglia** → fronte, **Fotografa il retro**, **Leggi le 2 foto con l'IA**. | Claude → Mario | ora |
 | D43 | Passaggi dei cocktail numerati (3-5 per ognuno dei 212): **fatto in #106 (v94)**, online dopo le prove. |
