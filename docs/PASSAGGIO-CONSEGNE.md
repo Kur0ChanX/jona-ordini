@@ -8,7 +8,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 
 ## ✅ SUBITO (#116)
 0. **PR #108 v98 (cannuccia al centro)** aperta alle 20:18 dal ramo unico, prove su GitHub in corso. Se verdi: squash merge, SUBITO `git fetch origin main && git merge origin/main` + push, controllo `APP_VER` 98 online, avvisare Mario. Se rosse: capire e correggere. Iscriviti alla PR (`subscribe_pr_activity` 108): la #115 si è tolta e ha cancellato il suo controllo di sicurezza.
-1. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
+1. 🔴 **D49 tastiera in chat** (Mario 12/10 ~20:50, dalla #115): v99 fatta in #116 (`chVV`, prova `tools/test-chat-tastiera.mjs`, PASS Android, WebKit su GitHub), nella stessa PR #108. Dopo l'online: Mario prova sul telefono.
+2. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
 
 ## Fatto in #115 (12/10, ~20:12-20:32 ora italiana)
 - Scorta unita due volte (solo ULTIMO-MESSAGGIO).
@@ -110,6 +111,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+(12/10/2026 ~20:50 ora italiana, nella #115 chiusa, girato dalla #115, foto `docs/img/sessione-116/chat-tastiera-1.jpg` e `-2.jpg`) «Per ora mi risolvi questo problema della tastiera che va sopra la scrittura.»
 (12/10/2026 ~20:45 ora italiana, nella #115 chiusa, girato dalla #115) «tienila come opzione la faremo più avanti, però tieni l'idea e salvala,la facciamo piú avanti» (su D48 cocktail bellissimi).
 (12/10/2026 ~20:40 ora italiana, nella #115 chiusa, girato dalla #115) «Ok, però utilizzerò utilizzando il token per fare tutti i disegni, giusto?» → la #115: sì, token solo mentre si lavora al generatore (stima 2-4 sessioni), non i 212 a mano; dopo, guardarli nell'app non costa token; si risparmia lavorando a passi, foto piccole, prove col collaudo.
 (12/10/2026 ~20:35 ora italiana, nella #115 chiusa, girato dalla #115) «No, sì, allora il prompt è molto chiaro, però tipo, perché prima facevi delle linee, cioè, che facevano, non erano belle, erano proprio minimal. E adesso i disegni sono molto più belli, cioè, che cosa è cambiato? Sembra che è cambiato il motore di disegno. E cosa è cambiato? Cioè, sembra che prima avevi tipo una versione light e adesso la versione avanzata. Cosa hai fatto per disegnare così bene i dettagli e tutto?» → la #115 ha risposto: stesso motore (SVG), prima generatore automatico per 212 con limiti (peso, lista 44 px, pezzi riusati, colori piatti), la prova è a mano su 3 senza limiti; per D48 servono quelle tecniche nel generatore badando al peso.

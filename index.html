@@ -803,6 +803,7 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .cht{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:1fr;background:var(--bg);opacity:0;transform:translateY(14px);transition:opacity .22s ease,transform .22s ease;padding-top:env(safe-area-inset-top,0px)}
 .cht.open{opacity:1;transform:none}
 .cht-l,.cht-c{min-height:0;min-width:0;display:flex;flex-direction:column;height:calc(100dvh - env(safe-area-inset-top,0px))}
+.cht.kb .cht-l,.cht.kb .cht-c{height:100%}.cht.kb .cht-in{padding-bottom:8px}
 .cht-c{display:none}.cht.has-c .cht-l{display:none}.cht.has-c .cht-c{display:flex}
 @media (min-width:760px){.cht{grid-template-columns:minmax(290px,360px) 1fr}.cht-c,.cht.has-c .cht-l{display:flex}.cht-l{border-right:1px solid var(--line)}}
 .cht-h{display:flex;align-items:center;gap:10px;min-height:62px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--line);flex:none}
@@ -1231,8 +1232,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=98;
+const APP_VER=99;
 const NEWS=[
+  {v:99,data:'2026-10-12',titolo:'Chat: la tastiera non copre più il messaggio',
+    tutti:['In chat, quando apri la tastiera, il campo «Scrivi un messaggio» sale sopra la tastiera e vedi gli ultimi messaggi.'],
+    dev:['#116: con l\'app a schermo intero Android non restringe la pagina: la chat segue `visualViewport` (`chVV`, classe `kb`). Prova `tools/test-chat-tastiera.mjs` su Pixel 7, Galaxy Tab, iPhone, iPad.']},
   {v:98,data:'2026-10-12',titolo:'Bar: cannuccia al centro',
     tutti:['Nei disegni di Mojito, Scorpion e Mint Julep la cannuccia esce dal centro del bicchiere.'],
     dev:['#115: in `tools/bar-disegni.mjs` la cannuccia passa per il centro dell\'apertura del bicchiere. Prova in `tools/test-bar-disegni.mjs`.']},
@@ -4642,6 +4646,11 @@ function chOpen(c){
   requestAnimationFrame(()=>CHAT.box&&CHAT.box.classList.add('open'));algCheck();if(isDev(realU())&&chFb())algSpace();chPaint(true);navSync();
 }
 function chClose(){if(!CHAT.box)return;chRecStop(false);if(ALG.pl){ALG.pl.a.pause();ALG.pl=null}const b=CHAT.box;CHAT.box=null;S.chat=null;b.classList.remove('open');setTimeout(()=>b.remove(),250);if(!sheets.length)document.body.classList.remove('noscroll');render()}
+/* tastiera sopra la chat (#116): con l'app a schermo intero Android non restringe la pagina, la tastiera copre il campo. La chat segue la parte visibile (visualViewport) */
+function chVV(){const b=CHAT.box,v=window.visualViewport;if(!b||!v)return;const kb=innerHeight-v.height>60,was=b.classList.contains('kb');
+  if(kb){b.style.top=v.offsetTop+'px';b.style.height=v.height+'px';b.style.bottom='auto';b.classList.add('kb')}else if(was){b.style.top=b.style.height=b.style.bottom='';b.classList.remove('kb')}
+  if(kb&&!was){const m=document.getElementById('ch-m');if(m)m.scrollTop=m.scrollHeight}}
+if(window.visualViewport){visualViewport.addEventListener('resize',chVV);visualViewport.addEventListener('scroll',chVV)}
 const CH_G={tutti:['var(--lagoon)','users'],cucina:['var(--ocra)','pot'],sala:['#5B6FA8','glass'],fb:['#8A5A9E','chart'],resp:['#B5654A','user'],altro:['var(--mirto)','msg']};
 const chAv=(info,size)=>{if(info.u)return avatar(info.u,size);const [c,i]=CH_G[info.g]||CH_G.altro;return`<span class="av cht-gav" style="--s:${size}px;--c:${c}">${ic(i)}</span>`};
 const chTime=t=>new Date(t).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
