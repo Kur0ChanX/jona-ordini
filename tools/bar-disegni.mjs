@@ -333,7 +333,7 @@ const BIC = {
   'Balloon': { o: 'M20 10C10 18 10 32 16 37C22 42 42 42 48 37C54 32 54 18 44 10M32 41V56M21 59Q32 54 43 59Z', liq: 'M12.5 26C12 32 14 35 16 37C22 42 42 42 48 37C50 35 52 32 51.5 26Z', top: 26, rim: [44, 10], ice: [[26, 31], [37, 32]] },
   'Hurricane': { o: 'M22 6C20 16 27 21 27 29C27 37 18 40 19 50Q20 56 32 56Q44 56 45 50C46 40 37 37 37 29C37 21 44 16 42 6M24 60H40M32 56V60', liq: 'M21.5 14C22 19 27 23 27 29C27 37 18 40 19 50Q20 56 32 56Q44 56 45 50C46 40 37 37 37 29C37 23 42 19 42.5 14Z', top: 14, rim: [42, 6], ice: [[29, 44]] },
   'Tiki': { o: 'M18 8H46L44 58Q44 60 42 60H22Q20 60 20 58Z', liq: 'M18 8H46L44 58Q44 60 42 60H22Q20 60 20 58Z', top: 8, rim: [45, 8], extra: L('M24 24Q27 21 30 24M34 24Q37 21 40 24M26 36H38M27 36V42M31 36V42M35 36V42M24 48Q32 52 40 48'), opaco: '#B07A4A' },
-  'Tazza di rame': { o: 'M14 14H44V55Q44 60 39 60H19Q14 60 14 55Z', liq: 'M14 14H44V55Q44 60 39 60H19Q14 60 14 55Z', top: 14, rim: [43, 14], extra: L('M44 22H50Q54 22 54 26V40Q54 44 50 44H44') + [[20, 24], [28, 30], [36, 22], [22, 40], [33, 44], [39, 36], [26, 52]].map(([a, b]) => E(a, b, 1.6, 1)).join(''), opaco: '#C87A4A' },
+  'Tazza di rame': { o: 'M14 14V55Q14 60 19 60H39Q44 60 44 55V14', liq: 'M14 14H44V55Q44 60 39 60H19Q14 60 14 55Z', top: 14, rim: [43, 14], extra: L('M44 22H50Q54 22 54 26V40Q54 44 50 44H44'), opaco: '#C46E3A' },
   'Julep': { o: 'M16 12H48L45 58H19Z', liq: 'M16 12H48L45 58H19Z', top: 12, rim: [46, 12], extra: L('M22 22V30M30 26V36M38 20V28M41 34V42M25 40V48M34 44V52'), opaco: '#C8CFD4' },
   'Irish coffee': { o: 'M18 8C17 24 20 36 32 38C44 36 47 24 46 8M32 38V55M22 59Q32 55 42 59ZM46.5 14H50Q54 14 53 20Q52 28 45 30', liq: 'M17.6 16C18 28 22 36 32 38C42 36 46 28 46.4 16Z', top: 16, rim: [45, 8] },
   'Tazza': { o: 'M12 20H46V48Q46 58 36 58H22Q12 58 12 48ZM46 26H51Q55 26 55 31V36Q55 41 50 41H45M8 60H50', liq: 'M12.3 25H45.7V48Q45.7 57.7 36 57.7H22Q12.3 57.7 12.3 48Z', top: 25, rim: [45, 20] },
@@ -361,12 +361,26 @@ function mix(ing) {
 // pezzi del disegno, salvati una volta sola (PZ) e richiamati per nome da ogni cocktail (K)
 // v92 (D42, scelta di Mario #97 «A lista + B scheda»): w = [colore, forme, opacità?], d = penna, f = penna fine, p = punti, h = riflessi bianchi
 const PZ = {}, K = {};
-const joinX = (...p) => { const o = { w: p.flatMap(x => x.w || []) }, q = p.flatMap(x => x.q || []); if (q.length) o.q = q; for (const k of ['d', 'f', 'p', 'h', 'vd', 'vf']) { const s = p.map(x => x[k] || '').join(''); if (s) o[k] = s; } return o; };
+const LEGNO = '#8A6440';
+// REGOLA DI STILE (Mario #101-#103: «segui le linee del disegno non mettere a caso tratti neri grossi»): i pezzi non hanno più il contorno nero,
+// ma una linea sottile del tono scuro del loro colore (c contorno, cf linee fini, cp puntini: [colore, forme]); il legno degli stecchini è marrone
+const scuro = h => { if (h[0] !== '#') return LEGNO; let [r, g, b] = hex(h).map(x => x / 255); const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let H = 0, Sa = 0, L = (mx + mn) / 2;
+  if (mx !== mn) { const d = mx - mn; Sa = L > .5 ? d / (2 - mx - mn) : d / (mx + mn); H = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; H /= 6; }
+  L = Math.min(L * .5, .34); Sa = Math.min(1, Sa * .9 + .08);
+  const q = L < .5 ? L * (1 + Sa) : L + Sa - L * Sa, pp = 2 * L - q, t = x => { x = (x + 1) % 1; return x < 1 / 6 ? pp + (q - pp) * 6 * x : x < .5 ? q : x < 2 / 3 ? pp + (q - pp) * (2 / 3 - x) * 6 : pp; };
+  return '#' + [t(H + 1 / 3), t(H), t(H - 1 / 3)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('').toUpperCase(); };
+const colora = x => { if (!x.d && !x.f && !x.p) return x; const k = x.k || (x.w && x.w[0] ? scuro(x.w[0][0]) : LEGNO), y = { ...x };
+  for (const [a, b] of [['d', 'c'], ['f', 'cf'], ['p', 'cp']]) if (y[a]) { y[b] = [...(y[b] || []), [k, y[a]]]; delete y[a]; } delete y.k; return y; };
+const unisci = l => { const m = new Map(); for (const [k, v] of l) m.set(k, (m.get(k) || '') + v); return [...m]; };
+const joinX = (...p0) => { const p = p0.map(colora), o = { w: p.flatMap(x => x.w || []) }, q = p.flatMap(x => x.q || []); if (q.length) o.q = q;
+  for (const k of ['h', 'vd', 'vf']) { const s = p.map(x => x[k] || '').join(''); if (s) o[k] = s; }
+  for (const k of ['c', 'cf', 'cp']) { const l = unisci(p.flatMap(x => x[k] || [])); if (l.length) o[k] = l; } return o; };
 // stile C (D42, scelta di Mario #99): linee di ghiaccio e bollicine in vd/vf, l'app le colora come il vetro
 // linee color vetro (D42 stile C): ghiaccio, bollicine; #101: anche cupola dei frullati, schiuma alta e vapore (in nero sembravano archi che stonano)
 const VETRO = /^(i|it|b|dm|ft|vp|r)\|/;
-const put = (key, part) => { if (!PZ[key]) { const p = PZ[key] = joinX(...[].concat(part)); if (VETRO.test(key)) for (const [a, b] of [['d', 'vd'], ['f', 'vf']]) if (p[a]) { p[b] = p[a]; delete p[a]; } } return key; };
-const sw = (w, s) => `<g style="stroke-width:${w}">${s}</g>`;
+const put = (key, part) => { if (!PZ[key]) { const p = PZ[key] = joinX(...[].concat(part)); if (VETRO.test(key)) for (const [a, b] of [['c', 'vd'], ['cf', 'vf']]) if (p[a]) { p[b] = (p[b] || '') + p[a].map(x => x[1]).join(''); delete p[a]; } } return key; };
+// spessore: nell'app lo decide il CSS (.br-c), qui non serve più (file più leggero)
+const sw = (w, s) => s;
 // cubetto di ghiaccio con le facce (davanti, sopra, lato) e un riflesso
 function iceC(x, y, s, a = 0) {
   const t = `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${a})">`, q = n => f1(n * s);
@@ -383,14 +397,14 @@ function wheel(k, cx, cy, r, mezza) {
     const arc = rr => `M${f1(cx - rr)} ${f1(cy)}A${f1(rr)} ${f1(rr)} 0 0 0 ${f1(cx + rr)} ${f1(cy)}Z`;
     const sp = Array.from({ length: 4 }, (_, i) => { const t = rad((i + 1) * 36); return `M${f1(cx)} ${f1(cy)}L${P(cx + r * .8 * Math.cos(t), cy + r * .8 * Math.sin(t))}`; }).join('');
     const g = s => `<g transform="rotate(-18 ${f1(cx)} ${f1(cy)})">${s}</g>`;
-    return { w: [[peel, g(`<path d="${arc(r)}"/>`), .8], [pulp, g(`<path d="${arc(r * .82)}"/>`), .7]], d: sw(1.6, g(`<path d="${arc(r)}"/>`)), f: g(`<path d="${arc(r * .82)}"/><path d="${sp}"/>`) };
+    return { k: scuro(peel), w: [[peel, g(`<path d="${arc(r)}"/>`), .95], ['#FFFBEE', g(`<path d="${arc(r * .88)}"/>`), 1], [pulp, g(`<path d="${arc(r * .78)}"/>`), .95]], d: g(`<path d="${arc(r)}"/>`), f: g(`<path d="${sp}"/>`) };
   }
   const sp = Array.from({ length: n }, (_, i) => { const t = rad(10 + i * 360 / n); return `M${P(cx + r * .18 * Math.cos(t), cy + r * .18 * Math.sin(t))}L${P(cx + r * .76 * Math.cos(t), cy + r * .76 * Math.sin(t))}`; }).join('');
-  return { w: [[peel, C(cx, cy, r), .75], [pulp, C(cx, cy, r * .82), .7]], d: sw(1.6, C(cx, cy, r)), f: C(cx, cy, r * .82) + `<path d="${sp}"/>`, p: C(cx, cy, .6) };
+  return { k: scuro(peel), w: [[peel, C(cx, cy, r), .95], ['#FFFBEE', C(cx, cy, r * .88), 1], [pulp, C(cx, cy, r * .78), .95]], d: C(cx, cy, r), f: `<path d="${sp}"/>`, p: C(cx, cy, .6) };
 }
 // foglia di menta/basilico con le nervature
 const LF = 'M0 0C5-7 15-8 22-1C15 6 5 6 0 0Z', LV = 'M1 0L20-1M6 0L9-4M11-.3L14-4.4M6 .4L9 3.6M11 .2L14 3.8';
-const leafX = (x, y, a, s, c = '#5FAE6E') => { const t = `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${a}) scale(${s})">`; return { w: [[c, `${t}<path d="${LF}"/></g>`, .8]], d: `${t}<path d="${LF}" style="stroke-width:${f1(1.5 / s)}"/></g>`, f: `${t}<path d="${LV}" style="stroke-width:${f1(.8 / s)}"/></g>` }; };
+const leafX = (x, y, a, s, c = '#5FAE6E') => { const t = `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${a}) scale(${s})">`; return { w: [[c, `${t}<path d="${LF}"/></g>`, .8]], d: `${t}<path d="${LF}"/></g>`, f: `${t}<path d="${LV}"/></g>` }; };
 const sprig = (x, y, c) => joinX(leafX(x, y, -70, .55, c), leafX(x, y, -115, .5, c), leafX(x, y - 3, -92, .42, c));
 const bean = (x, y, a) => { const t = `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${a})">`; return { w: [['#4A2C1E', `${t}<ellipse rx="3" ry="2"/></g>`, .95]], d: sw(1.2, `${t}<ellipse rx="3" ry="2"/></g>`), f: `${t}<path d="M-2.4 .3C-1-.8 1 1 2.4-.3"/></g>`, h: `${t}<path d="M-1.8-1.1L.2-1.5" style="stroke-width:.7"/></g>` }; };
 // dettagli dei bicchieri (D42): h riflesso, sh ombra [y, larghezza], f linee fini (spessore del vetro), bot fondo del liquido, dr goccioline (solo scheda)
@@ -406,7 +420,7 @@ const DET = {
   'Balloon': { h: 'M17 18C14 24 14 30 17 35', sh: [59.6, 12], bot: 38, dr: [[44, 30, .9], [36, 36, .8], [22, 33, .8]] },
   'Hurricane': { h: 'M24 10C23.5 15 27 19 28.5 24M22 44Q21.5 50 24 52', sh: [60.6, 10], bot: 53, dr: [[38, 46, .9], [34, 26, .8], [26, 50, .8]] },
   'Tiki': { h: 'M21.5 12L22.8 54', sh: [61, 14] },
-  'Tazza di rame': { h: 'M18 18V52', sh: [61, 18], f: 'M14 17.5H44M41 18V54' },
+  'Tazza di rame': { h: 'M18 20V52', sh: [61, 18] },
   'Julep': { h: 'M20 16L22 52', sh: [59.4, 15], f: 'M17.5 15H46.5' },
   'Irish coffee': { h: 'M20.5 12C20 22 22 30 26 34', sh: [59.6, 11], dr: [[40, 28, .9], [36, 34, .8]] },
   'Tazza': { h: 'M15.5 26V48', sh: [60.6, 21], f: 'M14.5 21.5H43.5' },
@@ -433,7 +447,7 @@ for (const [k, B] of Object.entries(BIC)) {
   o = o.replace(/M32 ([\d.]+)V([\d.]+)/, (_, a, b) => { f += L(`M30.7 ${a}V${+b - .5}M33.3 ${a}V${+b - .5}`); return ''; });
   const rim = !B.opaco && !/^Tazza$|Boccale|Tazza di rame/.test(k) ? E(32, y0, 32 - x0, Math.max(1.2, (32 - x0) * .1)) : '';
   BO[k] = { l: B.liq, d: L(o) + rim + (B.extra || ''), ...(f ? { f } : {}), h: L(D.h), sh: D.sh, x: splash(B.o),
-    ...(!B.opaco && B.top > B.rim[1] ? { m: E(32, B.top, 32 - lx, 1.9) } : {}), ...(D.dr ? { dr: D.dr } : {}), ...(B.opaco && k !== 'Tiki' ? { op: B.opaco } : {}) };
+    ...(!B.opaco && B.top > B.rim[1] ? { m: E(32, B.top, 32 - lx, 1.9) } : {}), ...(D.dr ? { dr: D.dr } : {}), ...(B.opaco && k !== 'Tiki' ? { op: B.opaco, oc: scuro(B.opaco) } : {}) };
 }
 // ── D42 passo 2 (Mario #97: «meno foto simili e inerenti al cocktail»): la guarnizione vera, cosa c'è dentro, colori più distinti
 // geometria: y0 bordo, rx mezza larghezza al bordo, top superficie, sx mezza larghezza della superficie, yb fondo del liquido
@@ -446,7 +460,7 @@ const pa = d => `<path d="${d}"/>`;
 // spicchio d'agrume appoggiato sul bordo (diverso dalla fetta tonda)
 function wedge(k, x, y, a = -25, s = 1) {
   const [peel, pulp] = AGR[k], o = pa('M-7 0Q0-9 7 0Q0 2.4-7 0Z');
-  return { w: [[peel, tg(x, y, a, s, o), .85], [pulp, tg(x, y, a, s, pa('M-5.4-.6Q0-6.6 5.4-.6Q0 1-5.4-.6Z')), .8]], d: sw(1.4, tg(x, y, a, s, o)), f: tg(x, y, a, s, pa('M0 .2L-3-3.4M0 .2L0-4.6M0 .2L3-3.4')) };
+  return { k: scuro(peel), w: [[peel, tg(x, y, a, s, o), .95], ['#FFFBEE', tg(x, y, a, s, pa('M-6.1-.4Q0-7.9 6.1-.4Q0 1.6-6.1-.4Z')), 1], [pulp, tg(x, y, a, s, pa('M-5.2-.8Q0-6.6 5.2-.8Q0 .8-5.2-.8Z')), .95]], d: tg(x, y, a, s, o), f: tg(x, y, a, s, pa('M0-.4L-2.8-3.6M0-.4L0-5M0-.4L2.8-3.6')) };
 }
 const cherry = (x, y, r = 2.6, stem = true) => ({ w: [['#C0283A', C(x, y, r), .95]], d: sw(1.3, C(x, y, r) + (stem ? L(`M${P(x + .4, y - r)}C${P(x + .8, y - r - 3)} ${P(x + 3, y - r - 4.4)} ${P(x + 5, y - r - 5.4)}`) : '')), h: L(`M${P(x - 1.1, y - .9)}L${P(x - .5, y - 1.5)}`) });
 function pine(x, y) {
@@ -469,8 +483,12 @@ function ribbon(segs, w, n = 9) {
   const A = side(1), Bb = side(-1).reverse(), poly = 'M' + [...A, ...Bb].map(p => P(...p)).join('L') + 'Z', mid = 'M' + pts.map(p => P(...p)).join('L');
   return { poly, mid };
 }
-const twist = (x, y, col) => { const { poly, mid } = ribbon([[[x - 9, y + 1], [x - 5, y - 6], [x + 1, y - 7], [x + 3, y - 1]], [[x + 3, y - 1], [x + 4.5, y + 3], [x + 7, y + 4], [x + 6, y + 10]]], 1.8);
-  return { w: [[col, pa(poly), .95]], d: sw(1.3, pa(poly)) }; };
+const TW = { limone: [1.7, 1], lime: [1.3, 0], arancia: [2.4, 0], pompelmo: [2.4, 1] };
+const twist = (x, y, col, ag = 'limone') => { const [w, riccio] = TW[ag] || TW.limone;
+  const a = [[x - 9, y + 1], [x - 5, y - 6], [x + 1, y - 7], [x + 3, y - 1]], b = [[x + 3, y - 1], [x + 4.5, y + 3], [x + 8, y + 3.5], [x + 7.5, y + 8]], c = [[x + 7.5, y + 8], [x + 7, y + 12], [x + 2.6, y + 12], [x + 3.4, y + 8.6]];
+  const r1 = ribbon(riccio ? [a, b, c] : [a, b], w, 6), r2 = ribbon(riccio ? [b, c] : [b], w * .55, 6);
+  const pori = [[x - 5.5, y - 3.2], [x - 2, y - 5.2], [x + 1.4, y - 4.6]].map(([u, v]) => C(u, v, .32)).join('');
+  return { k: scuro(col), w: [[col, pa(r1.poly), 1], ['#FFF6D8', pa(r2.poly), .9]], d: pa(r1.poly), p: pori }; };
 const flame = (x, y) => { const s = tg(x, y, 0, 1, pa('M0 0C-3.4-2.6-2.4-6.4 0-10C.6-7 3.6-5 2.4-1.8C2-.6 1.2 0 0 0Z')); return { w: [['#F29A2E', s, .9], ['#F7D24A', tg(x + .4, y - 1, 0, .5, pa('M0 0C-3.4-2.6-2.4-6.4 0-10C.6-7 3.6-5 2.4-1.8C2-.6 1.2 0 0 0Z')), 1]], f: s }; };
 // spirale lunga di scorza che scende nel bicchiere (Horse's Neck)
 function spiral(g, col) {
@@ -483,8 +501,8 @@ function spiral(g, col) {
 }
 const UMB = ['#E85C8A', '#3FA7D6', '#F2C230', '#7BC86C', '#F08A3C', '#9A6FD0'];
 function umbrella(g, col) {
-  const cx = 13, cy = 3, can = `M${cx - 10} ${cy + 6}Q${cx} ${cy - 6} ${cx + 10} ${cy + 6}Q${cx + 7.5} ${cy + 4.2} ${cx + 5} ${cy + 6.6}Q${cx + 2.5} ${cy + 4.6} ${cx} ${cy + 6.8}Q${cx - 2.5} ${cy + 4.6} ${cx - 5} ${cy + 6.6}Q${cx - 7.5} ${cy + 4.2} ${cx - 10} ${cy + 6}Z`;
-  return { w: [[col, pa(can), .92]], d: sw(1.3, L(can) + L(`M${cx} ${cy - 1}L${f1(cx + 11)} ${f1(g.top + 9)}`)), f: L(`M${cx} ${cy}L${cx - 5} ${cy + 6.6}M${cx} ${cy}V${cy + 6.8}M${cx} ${cy}L${cx + 5} ${cy + 6.6}`) };
+  const cx = Math.round(32 - g.rx + 1), cy = Math.max(0, g.y0 - 6), can = `M${cx - 10} ${cy + 6}Q${cx} ${cy - 6} ${cx + 10} ${cy + 6}Q${cx + 7.5} ${cy + 4.2} ${cx + 5} ${cy + 6.6}Q${cx + 2.5} ${cy + 4.6} ${cx} ${cy + 6.8}Q${cx - 2.5} ${cy + 4.6} ${cx - 5} ${cy + 6.6}Q${cx - 7.5} ${cy + 4.2} ${cx - 10} ${cy + 6}Z`;
+  return joinX({ d: L(`M${cx} ${cy - 1}L${f1(cx + 8)} ${f1(g.top + 10)}`) }, { w: [[col, pa(can), .92]], d: L(can), f: L(`M${cx} ${cy}L${cx - 5} ${cy + 6.6}M${cx} ${cy}V${cy + 6.8}M${cx} ${cy}L${cx + 5} ${cy + 6.6}`) });
 }
 // schiuma (albume, crema del caffè, arancia sbattuta): fascia chiara in cima al liquido
 const wavy = y => `<path d="M0 ${f1(y)}${Array.from({ length: 8 }, (_, i) => `Q${4 + i * 8} ${f1(y + (i % 2 ? 1 : -1))} ${8 + i * 8} ${f1(y)}`).join('')}" style="fill:none;stroke:var(--ink2,#3a302b);stroke-width:.8"/>`;
@@ -570,7 +588,8 @@ function gTipo(p) {
   if (ag) return ['agrume', ag, /spicchio/i.test(p) ? 's' : /mezz/i.test(p) ? 'm' : 'f', /chiodi/i.test(p)];
   return null;
 }
-const SLOT = (g, i) => [g.rimX - i * 11, g.rimY];
+// #103: 14 di distanza (Americano: fetta e scorza non più una sopra l'altra)
+const SLOT = (g, i) => [g.rimX - i * 14, g.rimY];
 function garn(txt, bk, nome) {
   const g = geo(bk), B = BIC[bk], out = [], prima = txt.split(/\s+o\s+/i)[0];
   const T = prima.split(/,\s*|\s+e\s+/i).map(gTipo).filter(Boolean);
@@ -584,7 +603,7 @@ function garn(txt, bk, nome) {
     if (R0) { const [x, y] = rim(); at = '@' + f1(x) + ',' + f1(y); if (k === 'agrumi') rim(); }
     if (k === 'agrume') { key += a + b + (c ? 'c' : ''); p = b === 's' ? wedge(a, 0, 0) : wheel(a, 0, 0, 6.2, b === 'm'); if (b === 'm') key = a === 'arancia' ? 'aranciaM' : a + 'M'; if (c) p = joinX(p, { p: [[-2, -2], [2.4, -1], [0, 2.6]].map(([u, v]) => C(u, v, .8)).join('') });
       if (flag === t) { p = joinX(p, { d: sw(1.1, L('M1-13L-1 3')) }, cherry(.6, -9, 2.4, false)); key += 'C'; } }
-    else if (k === 'scorza') { const col = { limone: '#F2CF3B', lime: '#8DBA3A', arancia: '#F0A23A', pompelmo: '#E8826A' }[a]; key += a + (b ? 'F' : ''); p = b ? joinX(twist(0, 0, col), flame(9, -9)) : twist(0, 0, col); }
+    else if (k === 'scorza') { const col = { limone: '#F2CF3B', lime: '#8DBA3A', arancia: '#F0A23A', pompelmo: '#E8826A' }[a]; key += a + (b ? 'F' : ''); p = b ? joinX(twist(0, 0, col, a), flame(9, -9)) : twist(0, 0, col, a); }
     else if (k === 'ananas') { p = pine(0, 0); if (flag) { p = joinX(p, cherry(-1, -11, 2.4)); key += 'C'; } }
     else if (k === 'fragola') p = strawb(0, 0);
     else if (k === 'mela') p = appleFan(-4, 1);
@@ -652,7 +671,7 @@ function viv(h) {
   return '#' + [t(H + 1 / 3), t(H), t(H - 1 / 3)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
 }
 const COL = {};
-{ const lista = CKS.map(ck => ({ n: ck[0], bk: BIC[ck[3]] ? ck[3] : 'Old fashioned', c: viv(COLX[ck[0]] || mix(ck[4])), fisso: !!COLX[ck[0]] || !!BIC[ck[3]]?.opaco }));
+{ const lista = CKS.map(ck => ({ n: ck[0], bk: BIC[ck[3]] ? ck[3] : 'Old fashioned', c: viv(COLX[ck[0]] || mix(ck[4])), fisso: !!COLX[ck[0]] || !!BIC[ck[3]]?.opaco && ck[3] !== 'Tazza di rame' }));
   separa(lista); for (const x of lista) COL[x.n] = x.c; }
 // le tazze tiki hanno colori diversi (D42): Zombie, Painkiller, Scorpion non sembrano più uguali
 const TIKI = ['#B07A4A', '#6E9A6A', '#C9A46A', '#4F8FA8', '#B85A4A'].map(viv);
@@ -661,9 +680,15 @@ const tinta = (h, t, a) => '#' + hex(h).map(x => Math.round(x * (1 - a) + t * a)
 function cocktail(ck) {
   const [nome, , , bic, ing, gar, prep] = ck; const bk = BIC[bic] ? bic : 'Old fashioned', B = BIC[bk], D = DET[bk], g = geo(bk), col = COL[nome];
   const ks = [], ingT = ing.map(i => i[2]).join(', '), frullato = /frulla/i.test(prep);
+  // tazza di rame (Mario #101: «bicchiere sbagliato»): rame martellato con luce a sinistra, ombra a destra, bordo chiaro, manico pieno
+  // e il drink che si vede dall'apertura (colore diverso per ogni Mule, al posto dell'etichetta con la bottiglia)
+  if (bk === 'Tazza di rame') ks.push(put('rm|' + bk, { w: [['#7E3A1C', pa('M35 15H44V55Q44 60 39 60H35Z'), .4], ['#F7C49C', pa('M17.5 16H22V59H20Q17.5 59 17.5 56Z'), .6],
+    ['#C46E3A', pa('M44 21H50Q55 21 55 26V40Q55 45 50 45H44V41.6H50Q51.6 41.6 51.6 40V26Q51.6 24.4 50 24.4H44Z'), 1],
+    ['#F4B285', [[21, 26], [28, 33], [36, 25], [24, 43], [33, 47], [39, 38], [27, 53], [30, 20]].map(([a, b]) => E(a, b, 1.7, 1.1)).join(''), .8]], h: L('M19.6 20V36M19.6 40V46') }),
+    put('sf|' + bk, { w: [['#E89A66', E(29, 14, 15, 3), 1], ['*', E(29, 14.4, 13.4, 2.2), 1], ['#fff', `<path d="M22 13.6l3-1.2 3 .8-3 1.2zM31 14.6l2.6-1 2.8.7-2.6 1z"/>`, .85]], d: E(29, 14, 15, 3) }));
   if (!B.opaco) {
     // dentro il liquido: crema, strati, frutta, schiuma
-    if (CREMA.test(ingT) && !LAY[nome]) ks.push(put('cr|' + bk + '|' + col, { q: [[col, band(0, 64), .55]] }));
+    if (CREMA.test(ingT) && !LAY[nome]) ks.push(put('cr|' + bk, { q: [['*', band(0, 64), .55]] }));
     if (LAY[nome]) ks.push(put('st|' + nome, { q: LAY[nome].map(([c, a, b, o]) => [c, band(g.top - 2 + (g.yb - g.top + 2) * a, g.top - 2 + (g.yb - g.top + 2) * b + (b === 1 ? 4 : 0)), o]) }));
     if (nome === 'Jägerbomb') ks.push(put('jb|' + bk, shotIn(g)));
     if (/zolletta/i.test(ingT) && bk === 'Flûte') ks.push(put('zo|' + bk, sugarCube(g)));
@@ -690,13 +715,15 @@ function cocktail(ck) {
   if (!B.opaco) {
     if (nome === 'Ramos Gin Fizz') ks.push(put('ft|' + bk, foamTall(g)));
     else if (SCHIUMA[nome] || /albume/i.test(ingT) && !LAY[nome]) { const c = SCHIUMA[nome] || '#FBF6EC'; ks.push(put('fo|' + bk + '|' + c, foam(g, c))); }
-    if (frullato) ks.push(put('dm|' + bk + '|' + col, dome(g, tinta(col, 255, .1))));
+    if (frullato) ks.push(put('dm|' + bk, dome(g, '*l')));
   }
   if (/panna montata/i.test(ingT)) ks.push(put('pm|' + bk, cream(g)));
   if (/^(Tazza|Irish coffee)$/.test(bk) || /cald/i.test(ingT)) ks.push(put('vp|' + bk, steam(g.y0)));
   if (/cannella/i.test(ingT) && /^Tazza$/.test(bk)) ks.push(put('cn|' + bk, cinnamon(g)));
   if (/Tiki|Hurricane/.test(bk) && !/fiore|gardenia/i.test(gar) && /rum|ananas|cocco|passione/i.test(ingT)) ks.push(put('u|' + bk + '|' + UMB[hash(nome) % UMB.length], umbrella(g, UMB[hash(nome) % UMB.length])));
-  else if (/Tiki|Hurricane|Highball|Collins|Tazza di rame|Julep/.test(bk) && /ghiaccio tritato|cannuccia|crushed/i.test(prep + gar)) ks.push(put('s|' + bk, [{ w: [['#E8E2D4', L(`M37 ${B.top + 20}L50 2L52.4 2.8L39.6 ${B.top + 20.6}Z`), .5]], d: sw(1.2, L(`M37 ${B.top + 20}L50 2M39.6 ${B.top + 20.6}L52.4 2.8`)) }]));
+  else if (/Tiki|Hurricane|Highball|Collins|Tazza di rame|Julep/.test(bk) && /ghiaccio tritato|cannuccia|crushed/i.test(prep + gar)) { const xr = 32 + g.rx - 3.5, y1 = B.opaco ? g.y0 + 1 : Math.min(g.yb - 6, B.top + 20), x1 = B.opaco ? f1(xr - .5) : 34, y2 = Math.max(1, g.y0 - 9), x2 = f1(B.opaco ? xr + (g.y0 - y2) * .25 : x1 + (y1 - y2) * Math.min(.35, (xr - x1) / (y1 - g.y0)));
+    const st = `M${x1} ${f1(y1)}L${x2} ${y2}L${f1(x2 + 2.2)} ${y2 + .6}L${x1 + 2.2} ${f1(y1 + .4)}Z`;
+    ks.push(put('s|' + bk, [{ w: [['#F4F0E6', pa(st), .9], ['#D9534F', pa(`M${f1(x2 + (x1 - x2) * .1)} ${f1(y2 + (y1 - y2) * .1)}l2.2 .6l-.4 1.6l-2.2-.6z`), .9]], k: '#9A8F80', d: pa(st) }])); }
   if (/bordo/i.test(gar)) {
     const [x0, y0] = B.o.match(/^M([\d.]+) ([\d.]+)/).slice(1).map(Number), rx = 32 - x0, ry = Math.max(1.2, rx * .1), half = /metà/i.test(gar), n = half ? 7 : 12, zuc = /zucchero/i.test(gar);
     const pts = Array.from({ length: n }, (_, i) => { const x = x0 + 2 + i * (half ? rx - 2 : 2 * rx - 4) / (n - 1); return [x, y0 + ry * Math.sqrt(Math.max(0, 1 - ((x - 32) / rx) ** 2)) + (i % 2) * .5]; });
@@ -705,8 +732,6 @@ function cocktail(ck) {
     ks.push(put('r|' + bk + (half ? '|m' : '') + (zuc ? '|z' : ''), [{ w: [[zuc ? '#F6E7C4' : '#fff', sq, 1]], f: `<g style="stroke-width:.5">${sq}</g>` }]));
   }
   ks.push(...garn(gar, bk, nome));
-  // bicchiere non trasparente (tazza di rame, julep): etichetta con il distillato, se no i Mule sarebbero tutti uguali
-  if (B.opaco && bk !== 'Tiki') { const r = spirito(ing); if (r) ks.push(put('m|' + bk + '|' + r, badge(r, 26, 46, 8.5))); }
   K[nome] = [bk, col, ...ks];
 }
 function spirito(ing) { const al = ing.filter(x => x[3]).sort((a, b) => (+String(b[0]).replace(',', '.') || 0) - (+String(a[0]).replace(',', '.') || 0))[0], r = al && ruleOf(al[2]); return r ? BASE(r[1]) : null; }
@@ -737,7 +762,7 @@ if (process.argv.includes('--simili')) console.log('simili', simili.length, JSON
     const [id, t] = k[i].split('@'); let [x0, y0, x1, y1] = BB[id]; let [x, y] = t.split(',').map(Number);
     // pezzo alto (ananas con ciliegina): invece di farlo scendere nel bicchiere lo si rimpicciolisce sul bordo (copia «~<scala>»)
     let nid = id; if (y0 < 0 && MT - S * y0 - y > 2) { const sc = Math.max(.75, Math.round((y - MT) / (-S * y0) * 20) / 20); if (sc < 1) { nid = id + '~' + sc;
-      if (!PZ[nid]) { const z = v => `<g transform="scale(${sc})">${v}</g>`; PZ[nid] = Object.fromEntries(Object.entries(PZ[id]).map(([q, v]) => [q, Array.isArray(v) ? v.map(w => [w[0], z(w[1]), w[2]]) : z(v)])); }
+      if (!PZ[nid]) { const z = v => `<g transform="scale(${sc})">${v}</g>`; PZ[nid] = Object.fromEntries(Object.entries(PZ[id]).map(([q, v]) => [q, Array.isArray(v) ? v.map(w => w.length > 2 ? [w[0], z(w[1]), w[2]] : [w[0], z(w[1])]) : z(v)])); }
       x0 *= sc; y0 *= sc; x1 *= sc; y1 *= sc; } }
     x = Math.min(Math.max(x, MX - S * x0), 64 - MX - S * x1); y = Math.min(Math.max(y, MT - S * y0), 64 - M - S * y1);
     k[i] = nid + '@' + f1(x) + ',' + f1(y); } }

@@ -38,7 +38,9 @@ ok(!generici.length,'ogni liquore ha la sua bottiglia, nessuna bottiglia generic
 const simili=[['Bourbon','Rye whiskey','Scotch whisky','Scotch whisky torbato','Whisky irlandese'],['Calvados','Brandy','Cognac'],['Pisco','Grappa'],['Rum bianco','Cachaça'],['Champagne','Prosecco'],['Fernet','Amaro','Jägermeister'],['Vermouth dry','Lillet blanc'],['Crème de mûre','Mirto'],['Chartreuse verde','Absinthe','Liquore alla mela verde','Liquore al melone'],['Tabasco','Peperoncino rosso'],['Granatina','Succo di melograno']];
 for(const g of simili)ok(new Set(g.map(col)).size===g.length,'disegni diversi: '+g.join(', '));
 const pid=p=>p.split('@')[0].replace(/~[\d.]+$/,'');
-const ckSvg=c=>{const x=J.k[c[0]];if(!x||!J.b[x[0]])return null;return JSON.stringify([J.b[x[0]].op||x[1],x[0],x.slice(2).map(p=>[J.pz[pid(p)],p.split('@')[1]])])};
+// v92 #103: nella tazza di rame si vede il drink dall'apertura (pezzo sf|): conta anche il suo colore
+const colV=x=>J.b[x[0]].op&&!x.some(p=>/^sf\|/.test(p))?J.b[x[0]].op:x[1];
+const ckSvg=c=>{const x=J.k[c[0]];if(!x||!J.b[x[0]])return null;return JSON.stringify([colV(x),x[0],x.slice(2).map(p=>[J.pz[pid(p)],p.split('@')[1]])])};
 const imp=CK.c.map(ckSvg);
 ok(imp.every(Boolean)&&x2(J.k).every(x=>x.slice(2).every(p=>J.pz[pid(p)]&&(!p.includes('@')||/@-?[\d.]+,-?[\d.]+$/.test(p)))),'ogni cocktail ha il suo disegno, pezzi tutti presenti ('+CK.c.length+')');
 ok(new Set(imp).size===CK.c.length,'cocktail: '+new Set(imp).size+' disegni diversi su '+CK.c.length);
@@ -48,7 +50,7 @@ ok(J.k['Negroni'].some(p=>/^g\|aranciaM@/.test(p))&&J.k['Mojito'].some(p=>/^ml\|
 {const lab=h=>{const[r,g,b]=[1,3,5].map(i=>{let x=parseInt(h.slice(i,i+2),16)/255;return x>.04045?((x+.055)/1.055)**2.4:x/12.92});const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116,X=(r*.4124+g*.3576+b*.1805)/.95047,Y=r*.2126+g*.7152+b*.0722,Z=(r*.0193+g*.1192+b*.9505)/1.08883;return[116*f(Y)-16,500*(f(X)-f(Y)),200*(f(Y)-f(Z))]};
  const pz=k=>new Set(k.slice(2).map(p=>pid(p).replace(/\|\d+$/,''))),N=CK.c.map(c=>c[0]),sim=[];
  for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){const a=J.k[N[i]],b=J.k[N[j]];if(a[0]!==b[0])continue;const A=pz(a),B=pz(b);let n=0;for(const x of A)if(!B.has(x))n++;for(const x of B)if(!A.has(x))n++;
-   const la=lab(J.b[a[0]].op||a[1]),lb=lab(J.b[b[0]].op||b[1]),d=Math.hypot(la[0]-lb[0],la[1]-lb[1],la[2]-lb[2])+12*n;if(d<10)sim.push(N[i]+' ~ '+N[j])}
+   const la=lab(colV(a)),lb=lab(colV(b)),d=Math.hypot(la[0]-lb[0],la[1]-lb[1],la[2]-lb[2])+12*n;if(d<10)sim.push(N[i]+' ~ '+N[j])}
  ok(!sim.length,'nessuna coppia di cocktail troppo simile'+(sim.length?': '+sim.join(', '):''));
  const ha=(n,re)=>J.k[n]&&J.k[n].some(p=>re.test(p));
  const SEGNI=[['Tequila Sunrise',/^st\|/,'strati'],['B-52',/^st\|/,'strati'],['Black Velvet',/^st\|/,'strati'],['White Russian',/^st\|/,'panna sopra'],['Piña Colada',/^g\|ananasC(~[\d.]+)?@/,'ananas e ciliegina'],['Piña Colada',/^u\|/,'ombrellino'],
@@ -58,6 +60,12 @@ ok(J.k['Negroni'].some(p=>/^g\|aranciaM@/.test(p))&&J.k['Mojito'].some(p=>/^ml\|
   ['Spicy Fifty',/peperoncino/,'peperoncino'],['Appletini',/^g\|mela@/,'fettine di mela'],['Scorpion',/^g\|fiore@/,'gardenia'],['Dry Martini',/oliva/,'oliva'],['Vodka Martini',/scorzalimone/,'scorza (prima scelta)']];
  const no=SEGNI.filter(([n,re])=>!ha(n,re));ok(!no.length,'cocktail famosi con il loro segno ('+SEGNI.length+')'+(no.length?': manca '+no.map(x=>x[0]+' '+x[2]).join(', '):''));
  const tk=CK.c.filter(c=>c[3]==='Tiki').map(c=>J.k[c[0]][1]);ok(new Set(tk).size===tk.length&&!J.b.Tiki.op,'tazze tiki di colori diversi');}
+// v92 #103 regola di stile di Mario («non mettere a caso tratti neri grossi»): i pezzi hanno contorni del loro colore, mai neri
+ok(Object.values(J.pz).every(p=>!p.d&&!p.f&&!p.p)&&Object.values(J.pz).every(p=>['c','cf','cp'].every(x=>!p[x]||p[x].every(([k])=>/^#[0-9A-F]{6}$/.test(k)&&k!=='#000000'))),'pezzi senza contorno nero: linee del loro colore');
+ok(!Object.keys(J.pz).some(k=>/^m\|/.test(k)),'niente etichetta con la bottiglia dentro i bicchieri (London Mule)');
+ok(['Moscow Mule','London Mule','Kentucky Mule'].every(n=>J.k[n].some(p=>/^rm\|/.test(p))&&J.k[n].some(p=>/^sf\|/.test(p)))&&J.b['Tazza di rame'].oc,'tazza di rame: rame con luci, drink visibile, contorno ramato');
+{const st=Object.entries(J.pz).filter(([k])=>/^s\|/.test(k)).map(([k,p])=>[k,p.c[0][1].match(/M([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)/).slice(1).map(Number)]),bad=st.filter(([,[x1,y1,x2,y2]])=>y2<0||x2>56||(x2-x1)/(y1-y2)>.36);
+ ok(st.length&&!bad.length,'cannucce dentro il bicchiere, poco inclinate ('+st.length+')'+(bad.length?': '+bad.map(x=>x[0]).join(', '):''))}
 ok(J.k['Negroni'][0]==='Old fashioned'&&J.k['Spritz']&&J.k['Moscow Mule'][0]==='Tazza di rame','bicchieri giusti (Negroni old fashioned, Moscow Mule tazza di rame)');
 // app
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
