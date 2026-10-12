@@ -1,0 +1,77 @@
+// D39 / v89: disegni degli ingredienti del Bar (stile B inchiostro e acquerello) su foglio di carta.
+// Ogni ingrediente dei cocktail e ogni tipo di bottiglia ha un disegno suo; senza file dei disegni il Bar funziona lo stesso.
+import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
+import { readFileSync } from 'fs';
+const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
+const J=JSON.parse(readFileSync(new URL('../data/bar-disegni.json',import.meta.url),'utf8'));
+const CK=JSON.parse(readFileSync(new URL('../data/cocktail.json',import.meta.url),'utf8'));
+const SW=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
+const IDX=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+// dati
+const keys=Object.keys(J.g);
+ok(keys.length>=40,'almeno 40 disegni ('+keys.length+')');
+ok(keys.every(k=>Array.isArray(J.g[k].w)&&J.g[k].w.length&&J.g[k].d),'ogni disegno ha acquerello e linee');
+ok(J.r.every(r=>J.g[r[1]]&&(!r[2]||/^#[0-9A-F]{6}$/i.test(r[2]))),'ogni regola porta a un disegno che esiste, colori validi');
+const RE=J.r.map(r=>[new RegExp(r[0]),r[1]]);
+const base=n=>String(n||'').replace(/\s*\(.*\)$/,'').toLowerCase();
+const trova=n=>RE.find(r=>r[0].test(base(n)));
+const ingr=[...new Set(CK.c.flatMap(c=>c[4].map(x=>x[2])))];
+const senza=ingr.filter(n=>!trova(n));
+ok(!senza.length,'ogni ingrediente dei cocktail ha il suo disegno ('+ingr.length+')'+(senza.length?': manca '+senza.join(', '):''));
+const cats=[...IDX.matchAll(/const BR_CAT=([\s\S]*?\]\]\]);/g)][0];
+const BR_CAT=cats?eval(cats[1]):[];
+const catSenza=BR_CAT.flatMap(x=>x[1]).filter(n=>!trova(n));
+ok(BR_CAT.length&&!catSenza.length,'ogni tipo di bottiglia ha il suo disegno'+(catSenza.length?': manca '+catSenza.join(', '):''));
+const k=n=>(trova(n)||[])[1];
+ok(k('Succo di lime')==='lime'&&k('Gin')==='gin'&&k('Foglie di menta')==='menta'&&k('Ghiaccio')==='ghiaccio'&&k('Campari')==='bottiglia'&&k('Cherry brandy')==='liquore'&&k('Crema di whisky')==='liquore'&&k('Rum scuro')==='rum'&&k('Lemon soda')==='soda'&&k('Acqua di fiori d\'arancio')==='fiore','regole: lime, gin, menta, ghiaccio, Campari, Cherry brandy (liquore, non brandy), Crema di whisky, rum, lemon soda, fiori d\'arancio');
+ok(SW.includes("'./data/bar-disegni.json'"),'sw.js: disegni in FILES (funzionano senza rete)');
+ok(JSON.stringify(J).length<40000,'file dei disegni leggero ('+JSON.stringify(J).length+' byte)');
+// app
+const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
+async function apri(rotto){
+  const ctx=await b.newContext({viewport:{width:390,height:844},serviceWorkers:rotto?'block':'allow'});
+  if(rotto)await ctx.route('**/data/bar-disegni.json',r=>r.fulfill({status:404,body:'no'}));
+  const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
+  await pg.goto('http://localhost:8765/#demo');await pg.click('[data-a="demoGo"]');await pg.waitForTimeout(1200);
+  await pg.click('nav [data-a="tab"][data-v="fornitori"]');await pg.waitForTimeout(300);
+  await pg.click('main [data-a="brOpen"]');await pg.waitForSelector('.sheet [data-a="brC"]');await pg.waitForTimeout(400);
+  return {ctx,pg,errs}}
+const sh=pg=>pg.locator('.sheet').last();
+async function cocktail(pg,nome){await sh(pg).locator('input#brq').fill(nome);await pg.waitForTimeout(300);
+  await sh(pg).locator('[data-a="brC"]').filter({hasText:nome}).first().click();await pg.waitForTimeout(500)}
+{const {ctx,pg,errs}=await apri(false);
+  await cocktail(pg,'Negroni');
+  ok(await sh(pg).locator('.br-ing.br-carta').count()===1,'Negroni: ingredienti sul foglio di carta');
+  ok(await sh(pg).locator('.br-ir .br-dis').count()===3,'Negroni: 3 ingredienti, 3 disegni');
+  ok(await sh(pg).locator('.br-ir .br-dis .ink').evaluateAll(l=>l.every(g=>g.children.length>0)),'ogni disegno ha le linee a penna');
+  ok(await pg.evaluate(()=>document.querySelectorAll('#br-wash').length===1),'filtro acquerello nella pagina una volta sola');
+  const filtro=()=>pg.evaluate(()=>getComputedStyle(document.querySelector('.br-ir .br-dis .wa')).filter);
+  await pg.evaluate(()=>document.documentElement.classList.remove('lite'));
+  ok(/br-wash/.test(await filtro()),'telefono normale: effetto acquerello acceso');
+  await pg.evaluate(()=>document.documentElement.classList.add('lite'));
+  ok(await filtro()==='none','telefono economico (lite): acquerello spento');
+  ok(await sh(pg).locator('.br-ir').first().evaluate(e=>getComputedStyle(e.querySelector('b')).color)==='rgb(42, 36, 32)','testo scuro sulla carta');
+  await pg.evaluate(()=>document.documentElement.dataset.theme='dark');await pg.waitForTimeout(100);
+  ok(await sh(pg).locator('.br-ir').first().evaluate(e=>getComputedStyle(e.querySelector('b')).color)==='rgb(42, 36, 32)','tema scuro: la carta resta chiara con testo scuro');
+  await sh(pg).locator('[data-a="closeSheet"]').click();await pg.waitForTimeout(300);
+  await cocktail(pg,'Mojito');
+  ok(await sh(pg).locator('.br-ir .br-dis').count()===await sh(pg).locator('.br-ir').count(),'Mojito: un disegno per ogni ingrediente');
+  await sh(pg).locator('[data-a="closeSheet"]').click();await pg.waitForTimeout(300);
+  await sh(pg).locator('[data-a="brV"][data-v="inv"]').click();await pg.waitForTimeout(400);
+  const gl=await sh(pg).locator('.br-gl').count();
+  ok(gl>0&&await sh(pg).locator('.br-gl .br-dis').count()===gl,'inventario: ogni gruppo ha il suo disegno ('+gl+')');
+  const ink=await sh(pg).locator('.br-gl .br-dis .ink').first().evaluate(e=>getComputedStyle(e).stroke);
+  ok(ink!=='rgb(42, 36, 32)','tema scuro: disegni dei gruppi chiari (si vedono sullo sfondo scuro)');
+  await sh(pg).locator('[data-a="brV"][data-v="ck"]').click();await pg.waitForTimeout(300);
+  await sh(pg).locator('[data-a="closeSheet"]').click();await pg.waitForTimeout(300);
+  await pg.click('main [data-a="brOpen"]');await pg.waitForTimeout(500);
+  ok(await pg.evaluate(()=>document.querySelectorAll('#br-wash').length===1),'riaperto il Bar: filtro sempre una volta sola');
+  ok(!errs.length,'nessun errore'+(errs.length?': '+errs.join(' | '):''));
+  await ctx.close()}
+{const {ctx,pg,errs}=await apri(true);
+  await cocktail(pg,'Negroni');
+  ok(await sh(pg).locator('.br-ir').count()===3&&await sh(pg).locator('.br-dis').count()===0,'senza file dei disegni: ingredienti mostrati, senza disegni');
+  ok(await sh(pg).locator('.br-carta').count()===0,'senza disegni niente carta (resta la lista di prima)');
+  ok(!errs.length,'nessun errore senza disegni'+(errs.length?': '+errs.join(' | '):''));
+  await ctx.close()}
+await b.close();
