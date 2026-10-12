@@ -1,15 +1,30 @@
-# Passaggio di consegne (2026-10-12, fine sessione #106)
+# Passaggio di consegne (2026-10-12, fine sessione #107)
 
-Sessione attuale: #107
+Sessione attuale: #108
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v94 ONLINE** (controllato 11:58 ora italiana: `APP_VER` 94, `data/cocktail.json` con i passaggi). `CACHE` `jona-ordini-v98`. Nessuna PR aperta.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v94 ONLINE, v95 PRONTA** (commit `225dd67` + consegne) e **PR della v95 aperta** dalla #107 subito dopo il push di queste consegne (numero: guardare le PR aperte). `APP_VER` 95, `CACHE` `jona-ordini-v99`.
 
-## ✅ SUBITO (#107)
-1. **Mario ha risposto «ok» alle 2 domande della #106** (scritte nel testo, E38): (a) «L'aiutante collaudo lo mando anche a RVC e SPA Sensorial?» → **sì**: mandare con `send_message` alle sessioni attive di RVC e SPA (nomi da ricontrollare con `list_sessions`, sotto in «Sessioni») il contenuto di `.claude/agents/collaudo.md` adattato (in RVC repo privato: prove su GitHub al minimo, regola dei 2000 minuti); dire che l'agente si carica solo dalla sessione dopo (E45). (b) «Sistemo i difetti rimasti nei disegni dei cocktail?» → **sì**: voce 2.
-2. **Difetti dei disegni dei cocktail → v95** (elenco #101): colori 5-8, 13-15, 21 → `COLX`; 9 White Russian, 10 Illegal, 11 Painkiller, 12 Oaxaca fiamma staccata, 15 schiume grigie `wavy` → color vetro, 19 Woo Woo/Cape Codder; sedano della Bloody Maria fuori posto a sinistra. Mario (#102): «Fatti aiutare da un agente per fare prima». Generatore `tools/bar-disegni.mjs` → `data/bar-disegni.json`; prova `tools/test-bar-disegni.mjs`; griglia `tools/bozze/griglia-cocktail.mjs`. Regola di stile #101 in CLAUDE.md (riga v92). Foto prima/dopo per Mario (un telefono per foto). Poi pubblicare da solo (prove legate + `test-giro` + `prove` verdi).
+## ✅ SUBITO (#108)
+1. **Pubblicare la v95**: aspettare il controllo `prove` sulla PR aperta (NON pushare sul ramo mentre gira: E39), poi squash, controllo online (`APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/), poi `git fetch origin main && git merge origin/main` + push. Se `prove` è rosso: capire la causa e correggere. Poi dire a Mario in 2 righe che la v95 è online (le foto prima/dopo le ha già ricevute in #107).
+2. Dopo la v95: difetto 18 rimasto (Americano: fetta d'arancia e scorza di limone sovrapposte sul bordo) e proposta SOLUZIONE SMART per cocktail «bellissimi» (vedi «Idee»: bozza ferma + domanda a tocco con doppio tocco, E19/E38). Mario #102: «la nuova schiuma mi piace quello stile».
 3. Mario (#106): **«pubblica ogni tanto gli aggiornamenti»** = non accumulare: una versione online appena un pezzo è pronto e provato.
-4. Dopo la v95: proposta SOLUZIONE SMART per cocktail «bellissimi» (vedi «Idee»). Mario #102: «la nuova schiuma mi piace quello stile».
-5. Mario prova la D44 (v93) quando può: Cantina → **Fotografa una bottiglia** → fronte → **Fotografa il retro** → **Leggi le 2 foto con l'IA** (voce D44 in `docs/DA-FARE.md`). E la D43: Fornitori → Bar → un cocktail → passaggi numerati.
+4. Mario prova la D44 (v93) quando può (Cantina → **Fotografa una bottiglia** → fronte → **Fotografa il retro** → **Leggi le 2 foto con l'IA**) e la D43 (Fornitori → Bar → un cocktail → passaggi numerati).
+
+## Fatto in #107 (12/10, ~12:15-12:45 ora italiana)
+- **Collaudo a RVC e SPA** (sì di Mario in #106): mandato con `send_message` il modello adattato di `.claude/agents/collaudo.md` a RVC #92 `session_01Mc34LWsJw9PKUiUJvYcPxB` (con nota repo privato: niente giri su GitHub salvo richiesta) e SPA #14 `session_016iyo14hpB7Qq4UWfhfCqgV`. Consegnato (delivered); lo creano loro nel loro repo. Nota E45 inclusa.
+- **v95 difetti dei disegni (#101)** in `tools/bar-disegni.mjs`:
+  - `COLX` nuovi: Kir `#D8687A`, Kir Royal `#C2385A`, Blue Lagoon `#2E8ED6`, AMF (Adios) `#3A9FD8`, White Port Tonic `#F0DC98`, Oaxaca `#C27A2C`, Russian Spring Punch `#B23A5E`, El Diablo `#9C2C4C`, Mirto Spritz `#7C2848`, Bramble `#8C2244`, Espresso Tonic `#E6E0CC`, Woo Woo `#E8607E`, Cape Codder `#A8142C`, Stinger `#C88A3C`, Arnold Palmer `#A8682E`; White Russian `#7A5236`.
+  - `LAY`: White Russian panna `['#F7F2E8',0,.46,.97]` (era 0-.3), Espresso Tonic caffè sopra `['#3A2418',0,.34,.95]` (le bollicine spariscono: strato da 0, voluto).
+  - `wavy` (onda della schiuma) color `--vetro2` invece di `--ink2` grigio (Illegal, Gin/Amaretto/Pisco Sour).
+  - Painkiller: dopo i colori `TIKI`, `COL.Painkiller = viv('#E2A65E')` (crema/arancio).
+  - Fiamma della scorza fiammata attaccata: `flame(.6, -6.2)` (era `flame(9,-9)`, staccata).
+  - Bloody Maria: il sedano oggi è già a posto (destra del lime), niente da fare.
+  - **Bug trovato (E46)**: la v94 ha reso `c[6]` di `data/cocktail.json` una lista di passaggi; il generatore leggeva lì la preparazione e rifacendo i disegni 31 cocktail perdevano/guadagnavano il ghiaccio («shaker senza ghiaccio», «filtra»). Soluzione: `tools/cocktail-frasi.json` (212 vecchie frasi, prese da `81921b5~1:data/cocktail.json`), letto dal generatore; cocktail nuovo senza frase → passaggi uniti. Confronto prima/dopo: cambia solo l'Espresso Tonic (voluto). Scartato: cambiare le regole per leggere i passaggi (rischio di spostare altri disegni).
+  - Peso `bar-disegni.json` compresso 29.192 (< 30.000).
+- `tools/test-bar-disegni.mjs`: 4 controlli nuovi (colori per tinta: Kir/Kir Royal/Bramble/… rossi, Blue Lagoon/AMF blu, Stinger/Arnold Palmer/Oaxaca ambra; schiuma senza `--ink2`; White Russian e Espresso Tonic con strato; ghiaccio in White Russian, Gin Fizz, Hurricane, Russian Spring Punch, Mai Tai). **72 PASS** (anche TZ Roma).
+- Aiutante `collaudo` (ora si carica col nome): test-bar-disegni, test-bar, test-news, test-giro tutte PASS.
+- NEWS v95 «Bar: colori dei cocktail più giusti», `APP_VER` 95, `CACHE` v99, riga v95 in CLAUDE.md, D42 in `docs/DA-FARE.md`, E46 in `docs/ERRORI.md`.
+- Foto mandate a Mario: 4 foto prima/dopo (16 cocktail, 780 px, scratchpad: non salvate nel repo). Script: per ogni nome `SOLO="<nome>" DSF=2 node tools/bozze/griglia-cocktail.mjs out.png 150` (il «prima» da una copia in scratchpad con index.html e data di `HEAD~`), poi PIL due colonne PRIMA/DOPO, 4 cocktail per foto.
 
 ## Fatto in #106 (12/10, ~11:15-12:05 ora italiana)
 - Avvio: scorta vecchia (ULTIMO-MESSAGGIO 10:43) unita con `git merge -s ours` (teneva il messaggio più nuovo), push. Al riavvio della sessione (12:0x) altra scorta (solo ULTIMO-MESSAGGIO 11:35) unita con merge normale.
@@ -55,8 +70,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
+- Jona #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC attiva: **#92** `session_01Mc34LWsJw9PKUiUJvYcPxB`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
 ## Note tecniche
@@ -76,6 +91,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
+In #107 Mario non ha scritto (sessione partita dal prompt di avvio della #106). L'ultimo resta quello qui sotto.
 (12/10/2026 ~12:05 ora italiana, #106) «ok» (risposta alle 2 domande scritte nel testo: collaudo anche a RVC e SPA = sì; sistemare i difetti rimasti nei disegni dei cocktail = sì).
 Prima (#106, 11:35): «ok poi vai con la D43  comunque pubblica ogni tanto gli aggiornamenti» (fatto: v94 online).
 Prima (#106, 11:33): «quanto tempo resta?» (risposto).
