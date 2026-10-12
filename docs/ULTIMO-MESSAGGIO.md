@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 ~8:25 ora italiana, sessione #96)
+# Ultimo messaggio di Mario (12/10/2026 ~8:50 ora italiana, sessione #97)
 
-provi degli altri png piú belli per i cocktail  sempre con lo stesso stile degli ingredienti ma con dei disegni con piú dettagli
+A tocco: «Quale stile vuoi per i 212 cocktail?» → «A lista + B scheda (Consigliato)», poi «Sì, confermo lo stile».
