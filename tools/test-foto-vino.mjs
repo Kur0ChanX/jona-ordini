@@ -15,7 +15,7 @@ for(const [nome,mot,dev] of DISP){
   if(mot==='webkit'&&!WK){if(process.env.CI){ok(false,nome+': WebKit non installato su GitHub')}else console.log('SALTATA '+nome+': WebKit non installato su questo computer (gira su GitHub)');continue}
   const b=mot==='webkit'?await webkit.launch():await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
   const {defaultBrowserType,...d}=dev;
-  const ctx=await b.newContext(d);
+  const ctx=await b.newContext({...d,serviceWorkers:'block'}); // WebKit desktop: col service worker attivo il route non vede la richiesta all'IA (400 dal sito vero)
   await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
   const gemReq=[];
   await ctx.route('https://generativelanguage.googleapis.com/**',async r=>{gemReq.push(JSON.parse(r.request().postData()||'{}'));
