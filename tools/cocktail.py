@@ -41,7 +41,9 @@ for n, riga in enumerate((R / 'tools/cocktail.txt').read_text(encoding='utf-8').
             err.append(f'riga {n}: «{base}» sembra alcolico ma non è in BR_CAT')
         I.append([q, u, nm, a] if a else [q, u, nm])
     if fam == 'zero' and any(len(i) > 3 for i in I): err.append(f'riga {n}: analcolico con alcol')
-    out.append([nome, fam, met, bic, I, gu, pas, 1 if iba == 'IBA' else 0])
+    ps = [x.strip() for x in pas.split(' / ')]
+    if not 3 <= len(ps) <= 5 or not all(ps): err.append(f'riga {n}: {len(ps)} passaggi (servono 3-5, nessuno vuoto)')
+    out.append([nome, fam, met, bic, I, gu, ps, 1 if iba == 'IBA' else 0])
 if err: print('\n'.join(err)); sys.exit(1)
 (R / 'data').mkdir(exist_ok=True)
 s = json.dumps({'v': 1, 'c': out}, ensure_ascii=False, separators=(',', ':'))
