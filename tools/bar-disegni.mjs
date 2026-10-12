@@ -729,7 +729,8 @@ function cocktail(ck) {
   if (/^(Tazza|Irish coffee)$/.test(bk) || /cald/i.test(ingT)) ks.push(put('vp|' + bk, steam(g.y0)));
   if (/cannella/i.test(ingT) && /^Tazza$/.test(bk)) ks.push(put('cn|' + bk, cinnamon(g)));
   if (/Tiki|Hurricane/.test(bk) && !/fiore|gardenia/i.test(gar) && /rum|ananas|cocco|passione/i.test(ingT)) ks.push(put('u|' + bk + '|' + UMB[hash(nome) % UMB.length], umbrella(g, UMB[hash(nome) % UMB.length])));
-  else if (/Tiki|Hurricane|Highball|Collins|Tazza di rame|Julep/.test(bk) && /ghiaccio tritato|cannuccia|crushed/i.test(prep + gar)) { const xr = 32 + g.rx - 3.5, y1 = B.opaco ? g.y0 + 1 : Math.min(g.yb - 6, B.top + 20), x1 = B.opaco ? f1(xr - .5) : 34, y2 = Math.max(1, g.y0 - 9), x2 = f1(B.opaco ? xr + (g.y0 - y2) * .25 : x1 + (y1 - y2) * Math.min(.35, (xr - x1) / (y1 - g.y0)));
+  else if (/Tiki|Hurricane|Highball|Collins|Tazza di rame|Julep/.test(bk) && /ghiaccio tritato|cannuccia|crushed/i.test(prep + gar)) { // #115 Mario: la cannuccia passa sempre dal centro dell'apertura (32, g.y0); 1.1 = metà larghezza
+    const y1 = B.opaco ? g.y0 + 1 : Math.min(g.yb - 6, B.top + 20), y2 = Math.max(1, g.y0 - 9), sl = B.opaco ? .25 : Math.min(.3, (g.rx - 4) / (y1 - g.y0)), x1 = f1(30.9 - (y1 - g.y0) * sl), x2 = f1(30.9 + (g.y0 - y2) * sl);
     const st = `M${x1} ${f1(y1)}L${x2} ${y2}L${f1(x2 + 2.2)} ${y2 + .6}L${x1 + 2.2} ${f1(y1 + .4)}Z`;
     ks.push(put('s|' + bk, [{ w: [['#F4F0E6', pa(st), .9], ['#D9534F', pa(`M${f1(x2 + (x1 - x2) * .1)} ${f1(y2 + (y1 - y2) * .1)}l2.2 .6l-.4 1.6l-2.2-.6z`), .9]], k: '#9A8F80', d: pa(st) }])); }
   if (/bordo/i.test(gar)) {

@@ -75,7 +75,10 @@ ok(Object.values(J.pz).every(p=>!p.d&&!p.f&&!p.p)&&Object.values(J.pz).every(p=>
 ok(!Object.keys(J.pz).some(k=>/^m\|/.test(k)),'niente etichetta con la bottiglia dentro i bicchieri (London Mule)');
 ok(['Moscow Mule','London Mule','Kentucky Mule'].every(n=>J.k[n].some(p=>/^rm\|/.test(p))&&J.k[n].some(p=>/^sf\|/.test(p)))&&J.b['Tazza di rame'].oc,'tazza di rame: rame con luci, drink visibile, contorno ramato');
 {const st=Object.entries(J.pz).filter(([k])=>/^s\|/.test(k)).map(([k,p])=>[k,p.c[0][1].match(/M([\d.]+) ([\d.]+)L([\d.]+) ([\d.]+)/).slice(1).map(Number)]),bad=st.filter(([,[x1,y1,x2,y2]])=>y2<0||x2>56||(x2-x1)/(y1-y2)>.36);
- ok(st.length&&!bad.length,'cannucce dentro il bicchiere, poco inclinate ('+st.length+')'+(bad.length?': '+bad.map(x=>x[0]).join(', '):''))}
+ ok(st.length&&!bad.length,'cannucce dentro il bicchiere, poco inclinate ('+st.length+')'+(bad.length?': '+bad.map(x=>x[0]).join(', '):''))
+ // #115 Mario: «la cannuccia sempre centro il cerchio alto del bicchiere» → al bordo il centro della cannuccia è a 32
+ const fc=st.filter(([k,[x1,y1,x2,y2]])=>{const r=+J.b[k.slice(2)].d.match(/M[\d.]+ ([\d.]+)/)[1],x=x1+(x2-x1)*(y1-r)/(y1-y2)+1.1;return Math.abs(x-32)>.6});
+ ok(st.length&&!fc.length,'cannucce dal centro dell\'apertura'+(fc.length?': '+fc.map(x=>x[0]).join(', '):''))}
 ok(J.k['Negroni'][0]==='Old fashioned'&&J.k['Spritz']&&J.k['Moscow Mule'][0]==='Tazza di rame','bicchieri giusti (Negroni old fashioned, Moscow Mule tazza di rame)');
 // app
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});

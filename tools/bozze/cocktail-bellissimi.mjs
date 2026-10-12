@@ -105,7 +105,7 @@ ${bolle([[44, 112, .8], [70, 120, .6], [75, 98, .9], [45, 88, .6], [62, 50, .7],
 <path d="M41.6 127.5H78.4L78.5 132Q78.3 136 74.5 136H45.5Q41.7 136 41.5 132Z" fill="#fff" fill-opacity=".5"/>
 <path d="${body}" fill="url(#${id}vetro)" stroke="#8fb3ba" stroke-width=".9"/>
 ${luce(id, 42, 26, 120, 3.5)}${luce(id, 78, 30, 80, -1.6)}
-<g transform="rotate(16 66 60)"><rect x="64.5" y="2" width="4" height="78" rx="1" fill="#f5f1e8" stroke="#3f7a12" stroke-opacity=".5" stroke-width=".4"/>
+<g transform="rotate(16 60 20)"><rect x="58" y="2" width="4" height="78" rx="1" fill="#f5f1e8" stroke="#3f7a12" stroke-opacity=".5" stroke-width=".4"/>
 ${[0, 1, 2, 3, 4, 5, 6, 7].map(i => `<path d="M64.5 ${6 + i * 9}l4 4v3l-4 -4z" fill="#59a34a" opacity=".85"/>`).join('')}<rect x="65" y="2" width="1" height="78" fill="#fff" opacity=".6"/></g>
 ${ruota(id, 41, 20, 10.5, '#5a9a1e', 'spicL', '#3f7a12')}
 <ellipse cx="60" cy="20" rx="22" ry="2.6" fill="none" stroke="#8fb3ba" stroke-width=".8"/>

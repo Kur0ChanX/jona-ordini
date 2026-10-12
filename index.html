@@ -1231,8 +1231,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=97;
+const APP_VER=98;
 const NEWS=[
+  {v:98,data:'2026-10-12',titolo:'Bar: cannuccia al centro',
+    tutti:['Nei disegni di Mojito, Scorpion e Mint Julep la cannuccia esce dal centro del bicchiere.'],
+    dev:['#115: in `tools/bar-disegni.mjs` la cannuccia passa per il centro dell\'apertura del bicchiere. Prova in `tools/test-bar-disegni.mjs`.']},
   {v:97,data:'2026-10-12',titolo:'Bar: Americano più ordinato',
     tutti:['Nel disegno dell\'Americano la mezza fetta d\'arancia e la scorza di limone non si toccano più.'],
     dev:['Difetto 18 (#101): in `garn` di `tools/bar-disegni.mjs` la scorza dopo una fetta va 10 più a sinistra. Prova in `tools/test-bar-disegni.mjs`.']},
