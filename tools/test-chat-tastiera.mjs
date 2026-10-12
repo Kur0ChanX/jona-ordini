@@ -21,8 +21,10 @@ for(const [br,nome] of DEV){
   await pg.click('[data-a="formset"][data-v="dev"]');
   for(const [k,v] of [['nome','Luca'],['cognome','Rossi'],['username','luca'],['pw','password123'],['pw2','password123']])await pg.fill(`input[data-k="${k}"]`,v);
   await pg.click('[data-a="setupGo"]');await pg.waitForSelector('.testbar');
-  await pg.evaluate(()=>chOpen('tutti'));await pg.waitForSelector('#ch-ta');await pg.waitForTimeout(400);
-  const mis=()=>pg.evaluate(()=>{const i=document.querySelector('.cht-in').getBoundingClientRect(),h=document.querySelector('.cht-c .cht-h').getBoundingClientRect(),v=visualViewport;return{inTop:Math.round(i.top),inBot:Math.round(i.bottom),hTop:Math.round(h.top),vTop:v.offsetTop,vBot:v.offsetTop+v.height,ih:innerHeight}});
+  await pg.evaluate(()=>chOpen('tutti'));await pg.waitForSelector('#ch-ta');
+  // E50: su WebKit in CI la transizione d'apertura di .cht (translateY 14px) può non essere finita dopo un'attesa fissa: si misura solo a chat ferma.
+  const fermo=()=>pg.waitForFunction(()=>getComputedStyle(document.querySelector('.cht')).transform==='none'&&document.getAnimations().every(x=>x.playState!=='running'),null,{timeout:5000});
+  const mis=async()=>{await fermo();return pg.evaluate(()=>{const i=document.querySelector('.cht-in').getBoundingClientRect(),h=document.querySelector('.cht-c .cht-h').getBoundingClientRect(),v=visualViewport;return{inTop:Math.round(i.top),inBot:Math.round(i.bottom),hTop:Math.round(h.top),vTop:v.offsetTop,vBot:v.offsetTop+v.height,ih:innerHeight}})};
   const a=await mis();
   ok(a.inBot<=a.ih+1&&a.inBot>=a.ih-120,nome+': senza tastiera il campo sta in fondo allo schermo '+JSON.stringify(a));
   await pg.evaluate(()=>__kb(Math.round(innerHeight*.42),0));await pg.waitForTimeout(200);
