@@ -20,7 +20,7 @@ for(const [nome,mot,dev] of DISP){
   const gemReq=[];
   await ctx.route('https://generativelanguage.googleapis.com/**',async r=>{gemReq.push(JSON.parse(r.request().postData()||'{}'));
     await r.fulfill({contentType:'application/json',body:JSON.stringify({candidates:[{content:{parts:[{text:'```json\n'+JSON.stringify(GEM)+'\n```'}]}}]})})});
-  const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
+  const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));pg.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,160))});
   const wait=ms=>pg.waitForTimeout(ms),P=nome+': ';
   await pg.goto('http://localhost:8765/index.html');
   await pg.click('[data-a="formset"][data-v="dev"]');
@@ -59,8 +59,8 @@ for(const [nome,mot,dev] of DISP){
   gemReq.length=0;await pg.locator('.sheet [data-a="vnFotoGo"]').first().click();for(let i=0;i<50&&!gemReq.length;i++)await wait(200);
   const im=gemReq.length?gemReq[0].contents[0].parts.filter(p=>p.inline_data):[];
   r=im.length?await pg.evaluate(async({d,esame})=>{const ES=eval(esame),b=await (await fetch('data:image/jpeg;base64,'+d)).blob();return ES(b)},{d:im[0].inline_data.data,esame}):{};
-  ok(im.length===1&&giusta(r,2000),P+'all\'IA arriva la foto ripresa, ≤ 2000 px e dritta ('+r.w+'×'+r.h+')');
-  if(!(im.length===1&&giusta(r,2000)))console.log('  '+P+'richieste '+gemReq.length+', errori '+JSON.stringify(errs.slice(-3))+', scheda: '+(await pg.evaluate(()=>(document.querySelector('.sheet')||{}).textContent||'')).replace(/\s+/g,' ').slice(0,400));
+  {const dg=im.length===1&&giusta(r,2000)?'':' · richieste '+gemReq.length+', errori '+JSON.stringify(errs.slice(-3))+', '+JSON.stringify(await pg.evaluate(()=>{const f=S.vnf||{};return{busy:f.busy,nf:(f.fotos||[]).length,sz:(f.fotos||[]).map(x=>x.file&&x.file.size),lg:f.lg,err:(typeof ERRS!=='undefined'?ERRS:null),sc:((document.querySelector('.sheet')||{}).textContent||'').replace(/\s+/g,' ').slice(0,300)}}));
+  ok(im.length===1&&giusta(r,2000),P+'all\'IA arriva la foto ripresa, ≤ 2000 px e dritta ('+r.w+'×'+r.h+')'+dg)}
   // Chiudi → bozza cancellata
   await pg.locator('.sheet [data-a="closeSheet"]').last().click();await wait(500);
   r=await pg.evaluate(async()=>({l:ls('jona_vn'),f:await idbKv(VN_IDB())}));
