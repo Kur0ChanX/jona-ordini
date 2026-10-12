@@ -5,7 +5,7 @@ Sessione attuale: #113
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v96 nella PR #106** (vedi SUBITO 1). v95 online (controllato: `APP_VER` 95 su https://jona-ristorante-by-ynoy-corp.pages.dev/). Nel ramo: `APP_VER` 96, `CACHE` `jona-ordini-v100`.
 
 ## ✅ SUBITO (#113)
-1. 🔴 **PR #107 (v97, difetto 18 Americano)** aperta dal ramo. Prove partite ~16:45 sul commit `2c666e5`; il push delle consegne le ha fatte ripartire sull'ultimo commit. Se VERDE: squash (titolo «v97: Americano, mezza fetta e scorza non più sovrapposte (difetto 18)»), subito `git fetch origin main && git merge origin/main` nel ramo + push, controllo online `APP_VER` 97 (`curl -sL https://jona-ristorante-by-ynoy-corp.pages.dev/ | grep -o 'APP_VER=[0-9]*'`: serve `-L`). Poi dirlo a Mario.
+1. ✅ v97 ONLINE (#113: PR #107 squash `c7b631e`, 17:14; main unito nel ramo; `APP_VER` 97 controllato online).
 2. Mario proverà la foto del vino sull'iPhone (v96) quando torna in hotel («non sono in hotel ora»). Gli ho detto che va bene anche una bottiglia a casa.
 3. Dopo: proposta SMART cocktail «bellissimi» (vedi «Idee»), con bozza ferma e domanda.
 4. Mario prova D44 (v93) e D43 (passaggi dei cocktail) quando può.
