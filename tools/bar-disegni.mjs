@@ -357,44 +357,127 @@ function mix(ing) {
   if (!t) return '#E8E4D8';
   return '#' + a.map(s => Math.round(((s / t) ** (1 / 2.2)) * 255).toString(16).padStart(2, '0')).join('');
 }
+// pezzi del disegno, salvati una volta sola (PZ) e richiamati per nome da ogni cocktail (K)
+// v92 (D42, scelta di Mario #97 «A lista + B scheda»): w = [colore, forme, opacità?], d = penna, f = penna fine, p = punti, h = riflessi bianchi
+const PZ = {}, K = {};
+const joinX = (...p) => { const o = { w: p.flatMap(x => x.w || []) }; for (const k of ['d', 'f', 'p', 'h']) { const s = p.map(x => x[k] || '').join(''); if (s) o[k] = s; } return o; };
+const put = (key, part) => { if (!PZ[key]) PZ[key] = joinX(...[].concat(part)); return key; };
+const sw = (w, s) => `<g style="stroke-width:${w}">${s}</g>`;
+// cubetto di ghiaccio con le facce (davanti, sopra, lato) e un riflesso
+function iceC(x, y, s, a = 0) {
+  const t = `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${a})">`, q = n => f1(n * s);
+  const top = `M${q(-1)} ${q(-.6)}L${q(-.4)} ${q(-1.3)}L${q(1.2)} ${q(-1.4)}L${q(.7)} ${q(-.8)}Z`, side = `M${q(.7)} ${q(-.8)}L${q(1.2)} ${q(-1.4)}L${q(1.3)} ${q(.3)}L${q(.8)} ${q(1)}Z`;
+  return { w: [['#fff', `${t}<path d="${top}"/></g>`, .55], ['#fff', `${t}<path d="${side}"/></g>`, .25]],
+    f: `${t}<path d="M${q(-1)} ${q(-.6)}L${q(.7)} ${q(-.8)}L${q(.8)} ${q(1)}L${q(-.9)} ${q(1)}Z"/><path d="${top}"/><path d="${side}"/></g>`,
+    h: `${t}<path d="M${q(-.6)} ${q(-.2)}L${q(-.5)} ${q(.5)}"/></g>` };
+}
+// fetta d'agrume intera (buccia, polpa, spicchi) o mezza fetta
+const AGR = { lime: ['#7FA83A', '#C8DE7A', 8], limone: ['#E2BC2C', '#F7E58A', 8], arancia: ['#E8932E', '#F7C266', 9], pompelmo: ['#E0705E', '#F4B0A0', 10] };
+function wheel(k, cx, cy, r, mezza) {
+  const [peel, pulp, n] = AGR[k];
+  if (mezza) {
+    const arc = rr => `M${f1(cx - rr)} ${f1(cy)}A${f1(rr)} ${f1(rr)} 0 0 0 ${f1(cx + rr)} ${f1(cy)}Z`;
+    const sp = Array.from({ length: 4 }, (_, i) => { const t = rad((i + 1) * 36); return `M${f1(cx)} ${f1(cy)}L${P(cx + r * .8 * Math.cos(t), cy + r * .8 * Math.sin(t))}`; }).join('');
+    const g = s => `<g transform="rotate(-18 ${f1(cx)} ${f1(cy)})">${s}</g>`;
+    return { w: [[peel, g(`<path d="${arc(r)}"/>`), .8], [pulp, g(`<path d="${arc(r * .82)}"/>`), .7]], d: sw(1.6, g(`<path d="${arc(r)}"/>`)), f: g(`<path d="${arc(r * .82)}"/><path d="${sp}"/>`) };
+  }
+  const sp = Array.from({ length: n }, (_, i) => { const t = rad(10 + i * 360 / n); return `M${P(cx + r * .18 * Math.cos(t), cy + r * .18 * Math.sin(t))}L${P(cx + r * .76 * Math.cos(t), cy + r * .76 * Math.sin(t))}`; }).join('');
+  return { w: [[peel, C(cx, cy, r), .75], [pulp, C(cx, cy, r * .82), .7]], d: sw(1.6, C(cx, cy, r)), f: C(cx, cy, r * .82) + `<path d="${sp}"/>`, p: C(cx, cy, .6) };
+}
+// foglia di menta/basilico con le nervature
+const LF = 'M0 0C5-7 15-8 22-1C15 6 5 6 0 0Z', LV = 'M1 0L20-1M6 0L9-4M11-.3L14-4.4M6 .4L9 3.6M11 .2L14 3.8';
+const leafX = (x, y, a, s, c = '#5FAE6E') => { const t = `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${a}) scale(${s})">`; return { w: [[c, `${t}<path d="${LF}"/></g>`, .8]], d: `${t}<path d="${LF}" style="stroke-width:${f1(1.5 / s)}"/></g>`, f: `${t}<path d="${LV}" style="stroke-width:${f1(.8 / s)}"/></g>` }; };
+const sprig = (x, y, c) => joinX(leafX(x, y, -70, .55, c), leafX(x, y, -115, .5, c), leafX(x, y - 3, -92, .42, c));
+const bean = (x, y, a) => { const t = `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${a})">`; return { w: [['#4A2C1E', `${t}<ellipse rx="3" ry="2"/></g>`, .95]], d: sw(1.2, `${t}<ellipse rx="3" ry="2"/></g>`), f: `${t}<path d="M-2.4 .3C-1-.8 1 1 2.4-.3"/></g>`, h: `${t}<path d="M-1.8-1.1L.2-1.5" style="stroke-width:.7"/></g>` }; };
 // guarnizioni: parola nella guarnizione → disegno (max 2)
 const GAR = [[/oliv/i, 'oliva'], [/cipollin/i, 'cipolla'], [/ciliegin|amarena/i, 'ciliegia'], [/scorza (lunga )?di limone|scorza di lime/i, 'scorzaL'], [/scorza d'arancia|scorza di pompelmo/i, 'scorzaA'],
-  [/lime/i, 'lime'], [/limone/i, 'limone'], [/pompelmo/i, 'pompelmo'], [/arancia|agrumi/i, 'arancia'], [/menta/i, 'menta'], [/basilico/i, 'menta'], [/ananas/i, 'ananas'], [/fragol/i, 'fragola'], [/lampon|more/i, 'mirtillo'],
+  [/lime/i, 'lime'], [/limone/i, 'limone'], [/pompelmo/i, 'pompelmo'], [/arancia|agrumi/i, 'arancia'], [/menta/i, 'menta'], [/basilico/i, 'basilico'], [/ananas/i, 'ananas'], [/fragol/i, 'fragola'], [/lampon|more/i, 'mirtillo'],
   [/mela/i, 'mela'], [/cetriolo/i, 'cetriolo'], [/peperoncino/i, 'peperoncino'], [/sedano/i, 'sedano'], [/caffè/i, 'chicchi'], [/noce moscata|cacao|cannella/i, 'polvere'], [/panna/i, 'pannaS'], [/cocco/i, 'polvere'], [/frutto della passione/i, 'passione']];
-// pezzi del disegno, salvati una volta sola (PZ) e richiamati per nome da ogni cocktail (K)
-const PZ = {}, K = {};
-const put = (key, part) => { if (!PZ[key]) PZ[key] = clean(join(part)); return key; };
 function garn(txt, B, bk) {
   const out = [], [rx, ry] = B.rim; const seen = new Set();
   for (const [re, k] of GAR) { if (out.length >= 2) break; if (re.test(txt) && !seen.has(k)) { seen.add(k); out.push(k); } }
   return out.map((k, i) => {
-    const x = rx - i * 11, y = ry; let p;
-    if (k === 'scorzaL' || k === 'scorzaA') { const col = k === 'scorzaL' ? '#F2CF3B' : '#F0A23A'; const d = `M${x - 6} ${y - 6}C${x - 2} ${y - 12} ${x + 4} ${y - 2} ${x + 8} ${y - 8}`; p = { w: [[col, `<path d="${d}" style="stroke:${col};stroke-width:4;fill:none"/>`]], d: L(d) }; }
-    else if (k === 'chicchi') p = join(...[[-6, 0], [0, -1], [6, 0]].map(([a, b]) => ({ d: E(32 + a, B.top - 1 + b, 2.2, 1.5) + L(`M${30 + a} ${B.top - 1 + b}H${34 + a}`), w: [['#5A3A2A', E(32 + a, B.top - 1 + b, 2.2, 1.5)]] })));
+    const x = rx - i * 11, y = ry; let p, key = k;
+    if (k === 'scorzaL' || k === 'scorzaA') { const col = k === 'scorzaL' ? '#F2CF3B' : '#F0A23A'; const d = `M${x - 6} ${y - 6}C${x - 2} ${y - 12} ${x + 4} ${y - 2} ${x + 8} ${y - 8}`; p = { w: [[col, `<path d="${d}" style="stroke:${col};stroke-width:4;fill:none"/>`]], d: L(d), f: L(`M${x - 4} ${y - 8.6}C${x - 1} ${y - 11} ${x + 3} ${y - 5} ${x + 6} ${y - 9}`) }; }
+    else if (AGR[k]) { const mz = k === 'arancia' && /mezza|spicchio/i.test(txt); key += mz ? 'M' : ''; p = wheel(k, x, y, 6.2, mz); }
+    else if (k === 'menta' || k === 'basilico') p = sprig(x - 3, y + 1, k === 'menta' ? '#5FAE6E' : '#3F8F4E');
+    else if (k === 'chicchi') p = joinX(bean(26, B.top - .4, -15), bean(32, B.top - 1.2, 5), bean(38, B.top - .4, 20));
     else if (k === 'polvere') p = { p: [[-8, 0], [-3, -1], [2, 0], [7, -1], [-5, 1], [5, 1], [0, 1]].map(([a, b]) => C(32 + a, B.top + b, .7)).join('') };
-    else if (k === 'pannaS') p = { d: L(`M18 ${B.top}Q32 ${B.top - 7} 46 ${B.top}`), w: [['#FBF6EC', L(`M18 ${B.top}Q32 ${B.top - 7} 46 ${B.top}Z`)]] };
-    else if (k === 'sedano') p = { d: L(`M${x - 4} ${y + 14}L${x + 4} ${y - 10}M${x - 1} ${y + 14}L${x + 7} ${y - 9}`) + E(x + 6, y - 12, 4, 2.5, -30), w: [['#9CC25A', E(x + 6, y - 12, 4, 2.5, -30)]] };
-    else if (k === 'cipolla') p = { d: L(`M${x - 8} ${y - 10}L${x + 4} ${y + 10}`) + C(x - 4, y - 3, 2.6) + C(x, y + 3, 2.6), w: [['#EFE9D8', C(x - 4, y - 3, 2.6) + C(x, y + 3, 2.6)]] };
-    else if (k === 'oliva') p = join({ d: L(`M${x - 9} ${y - 12}L${x + 3} ${y + 12}`) }, mini('oliva', x - 2, y + 2, .3));
-    else p = mini(k, x, y, .34);
-    return put(`g|${bk}|${k}|${i}`, p);
+    else if (k === 'pannaS') p = { d: L(`M18 ${B.top}Q32 ${B.top - 7} 46 ${B.top}`), w: [['#FBF6EC', L(`M18 ${B.top}Q32 ${B.top - 7} 46 ${B.top}Z`), .9]], f: L(`M23 ${B.top - 2}Q28 ${B.top - 4.5} 33 ${B.top - 3}`) };
+    else if (k === 'sedano') p = { d: L(`M${x - 4} ${y + 14}L${x + 4} ${y - 10}M${x - 1} ${y + 14}L${x + 7} ${y - 9}`) + E(x + 6, y - 12, 4, 2.5, -30), w: [['#9CC25A', E(x + 6, y - 12, 4, 2.5, -30)]], f: L(`M${x - 2.5} ${y + 12}L${x + 5} ${y - 9}`) };
+    else if (k === 'cipolla') p = { d: L(`M${x - 8} ${y - 10}L${x + 4} ${y + 10}`) + C(x - 4, y - 3, 2.6) + C(x, y + 3, 2.6), w: [['#EFE9D8', C(x - 4, y - 3, 2.6) + C(x, y + 3, 2.6)]], h: L(`M${x - 5.2} ${y - 4}L${x - 4.4} ${y - 4.6}M${x - 1.2} ${y + 2}L${x - .4} ${y + 1.4}`) };
+    else if (k === 'oliva') p = joinX({ d: L(`M${x - 9} ${y - 12}L${x + 3} ${y + 12}`) }, mini('oliva', x - 2, y + 2, .3), { h: L(`M${x - 4} ${y}L${x - 3} ${y - 1}`) });
+    else { p = mini(k, x, y, .34); p.d = p.d.replace(/stroke-width:[\d.]+/, 'stroke-width:3.6'); }
+    return put(`g|${bk}|${key}|${i}`, p);
   });
 }
-const iceCube = (x, y) => ({ d: L(`M${x - 5} ${y - 4}L${x + 4} ${y - 5}L${x + 5} ${y + 4}L${x - 4} ${y + 5}Z`) + L(`M${x - 3} ${y - 2}L${x + 1} ${y - 3}`) });
-// bicchieri per l'app: l = forma del liquido, d = linee (con la superficie del drink), op = colore se il bicchiere non è trasparente
+// dettagli dei bicchieri (D42): h riflesso, sh ombra [y, larghezza], f linee fini (spessore del vetro), bot fondo del liquido, dr goccioline (solo scheda)
+const DET = {
+  'Old fashioned': { h: 'M19.6 28L21.6 51', sh: [59.6, 17], f: 'M16.7 25.5L19.2 54.5H44.8L47.3 25.5', bot: 54, dr: [[23, 47], [42, 50, 1], [40, 38, .8]] },
+  'Highball': { h: 'M23.4 12L24.6 52', sh: [60.4, 13], f: 'M21.6 9.5L23.3 56.4H40.7L42.4 9.5', bot: 56, dr: [[24, 30], [41, 44, 1], [40, 20, .8]] },
+  'Collins': { h: 'M24.6 10L25.4 53', sh: [60.4, 12], f: 'M23.5 7.5L24.3 56.4H39.7L40.5 7.5', bot: 56, dr: [[26, 32], [39, 46, 1], [38, 22, .8]] },
+  'Coppa martini': { h: 'M16 20L26 30.5', sh: [59.6, 11], dr: [[44, 24, .9], [20, 25, .8]] },
+  'Coppetta': { h: 'M14 21C15 27 19 30 23 31.5', sh: [59.6, 11], dr: [[44, 27, .9], [36, 32, .8]] },
+  'Coppa margarita': { h: 'M12 16C14 20 19 22 22 23', sh: [59.6, 11], dr: [[16, 19, .8], [47, 21, .9], [36, 30, .8]] },
+  'Flûte': { h: 'M27 8C26.6 16 27 24 29 29', sh: [58.6, 10], dr: [[36, 16, .8], [35, 26, .7]] },
+  'Calice': { h: 'M21 12C20 20 21 28 25 32', sh: [59.6, 12], dr: [[40, 24, .9], [36, 31, .8]] },
+  'Balloon': { h: 'M17 18C14 24 14 30 17 35', sh: [59.6, 12], bot: 38, dr: [[44, 30, .9], [36, 36, .8], [22, 33, .8]] },
+  'Hurricane': { h: 'M24 10C23.5 15 27 19 28.5 24M22 44Q21.5 50 24 52', sh: [60.6, 10], bot: 53, dr: [[38, 46, .9], [34, 26, .8], [26, 50, .8]] },
+  'Tiki': { h: 'M21.5 12L22.8 54', sh: [61, 14] },
+  'Tazza di rame': { h: 'M18 18V52', sh: [61, 18], f: 'M14 17.5H44M41 18V54' },
+  'Julep': { h: 'M20 16L22 52', sh: [59.4, 15], f: 'M17.5 15H46.5' },
+  'Irish coffee': { h: 'M20.5 12C20 22 22 30 26 34', sh: [59.6, 11], dr: [[40, 28, .9], [36, 34, .8]] },
+  'Tazza': { h: 'M15.5 26V48', sh: [60.6, 21], f: 'M14.5 21.5H43.5' },
+  'Boccale': { h: 'M17.5 20V54', sh: [61, 18], f: 'M16.5 16V56Q16.5 57.6 18 57.6H40Q41.5 57.6 41.5 56V16', dr: [[37, 30, 1], [24, 44, .9], [39, 50, .8]] },
+  'Shot': { h: 'M25 32L26.5 54', sh: [59.4, 9], f: 'M23.4 29.5L25.9 56.2H38.1L40.6 29.5', dr: [[37, 46, .8]] },
+};
+// macchia d'acquerello dietro il bicchiere (solo scheda grande): contorno ondulato intorno al bicchiere
+function splash(o) {
+  const n = o.match(/-?[\d.]+/g).map(Number), xs = n.filter((_, i) => i % 2 === 0), ys = n.filter((_, i) => i % 2);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2 + 4, rx = Math.min(30, (x1 - x0) / 2 + 9), ry = Math.min(30, (y1 - y0) / 2 + 2);
+  const W = [1, .86, 1.04, .9, 1.06, .84, 1, .92];
+  const pt = i => { const t = rad(i * 45 + 20); return [cx + rx * W[i % 8] * Math.cos(t), cy + ry * W[(i + 3) % 8] * Math.sin(t)]; };
+  let d = `M${P(...pt(0))}`;
+  for (let i = 0; i < 8; i++) { const a = pt(i), b = pt(i + 1), t = rad(i * 45 + 42.5), k = 1.12; d += `Q${P(cx + (a[0] - cx + b[0] - cx) / 2 * k + Math.cos(t), cy + (a[1] - cy + b[1] - cy) / 2 * k + Math.sin(t))} ${P(...b)}`; }
+  return d + 'Z';
+}
+// bicchieri per l'app: l = forma del liquido, d = linee, f = linee fini, h = riflessi, m = superficie del drink, sh = ombra, x = macchia, dr = goccioline, op = colore se non trasparente
 const BO = {};
 for (const [k, B] of Object.entries(BIC)) {
-  const lx = +B.liq.match(/^M([\d.]+)/)[1];
-  BO[k] = { l: B.liq, d: L(B.o) + (!B.opaco && B.top > B.rim[1] ? L(`M${lx} ${B.top}H${64 - lx}`) : '') + (B.extra || ''), ...(B.opaco ? { op: B.opaco } : {}) };
+  const lx = +B.liq.match(/^M([\d.]+)/)[1], D = DET[k], [x0, y0] = B.o.match(/^M([\d.]+) ([\d.]+)/).slice(1).map(Number);
+  // gambo: due linee fini invece di una grossa
+  let o = B.o, f = D.f ? L(D.f) : '';
+  o = o.replace(/M32 ([\d.]+)V([\d.]+)/, (_, a, b) => { f += L(`M30.7 ${a}V${+b - .5}M33.3 ${a}V${+b - .5}`); return ''; });
+  const rim = !B.opaco && !/^Tazza$|Boccale|Tazza di rame/.test(k) ? E(32, y0, 32 - x0, Math.max(1.2, (32 - x0) * .1)) : '';
+  BO[k] = { l: B.liq, d: L(o) + rim + (B.extra || ''), ...(f ? { f } : {}), h: L(D.h), sh: D.sh, x: splash(B.o),
+    ...(!B.opaco && B.top > B.rim[1] ? { m: E(32, B.top, 32 - lx, 1.9) } : {}), ...(D.dr ? { dr: D.dr } : {}), ...(B.opaco ? { op: B.opaco } : {}) };
 }
 const BASE = k => /^w_/.test(k) ? 'whisky' : /^br_/.test(k) ? 'brandy' : k;
+const ICE_S = { 'Old fashioned': 5.2, Balloon: 4.4, Hurricane: 4 };
 function cocktail(ck) {
-  const [nome, , , bic, ing, gar, prep] = ck; const bk = BIC[bic] ? bic : 'Old fashioned', B = BIC[bk];
+  const [nome, , , bic, ing, gar, prep] = ck; const bk = BIC[bic] ? bic : 'Old fashioned', B = BIC[bk], D = DET[bk];
   const ks = [];
-  if (/ghiaccio/i.test(prep) && !/filtra|senza ghiaccio/i.test(prep) && B.ice && !B.opaco) ks.push(put('i|' + bk, B.ice.map(([x, y]) => iceCube(x, y))));
-  if ((B.bub || ing.some(i => /soda|tonica|ginger|prosecco|champagne|cola|frizzante|lemon|birra/i.test(i[2]))) && !B.opaco) ks.push(put('b|' + bk, [{ p: [[-4, 10], [3, 16], [-1, 22], [5, 27]].map(([a, b]) => C(32 + a, B.top + b, .9)).join('') }]));
-  if (/Tiki|Hurricane|Highball|Collins|Tazza di rame|Julep/.test(bk) && /ghiaccio tritato|cannuccia|crushed/i.test(prep + gar)) ks.push(put('s|' + bk, [{ d: L(`M38 ${B.top + 20}L50 2`) }]));
-  if (/bordo/i.test(gar)) ks.push(put('r|' + bk, [{ p: Array.from({ length: 9 }, (_, i) => C(B.rim[0] - 30 + i * 3.5 + (bk === 'Coppa margarita' ? -2 : 0), B.rim[1] + (i % 2) * .8, .8)).join('') }]));
+  const tritato = /ghiaccio tritato|crushed/i.test(prep);
+  if (/ghiaccio/i.test(prep) && !/filtra|senza ghiaccio/i.test(prep) && B.ice && !B.opaco) {
+    if (tritato) ks.push(put('it|' + bk, B.ice.flatMap(([x, y], i) => [iceC(x - 3, y - 2, 2.6, i * 23 % 40 - 20), iceC(x + 3, y + 3, 2.5, i * 31 % 50 - 25)])));
+    else ks.push(put('i|' + bk, B.ice.map(([x, y], i) => iceC(x, y, ICE_S[bk] || 3.4, [-8, 10, -15, 20][i % 4]))));
+  }
+  // foglie pestate dentro il bicchiere
+  const pesta = ing.find(i => /foglie di (menta|basilico)/i.test(i[2])) && /pesta/i.test(prep);
+  if (pesta && !B.opaco && D.bot) { const b = D.bot, c = /basilico/i.test(ing.map(i => i[2]).join()) ? '#3F8F4E' : '#4E9A5E';
+    ks.push(put('ml|' + bk + '|' + c, [leafX(25, b - 5, -30, .45, c), leafX(40, b - 8, 200, .42, c), leafX(29, b - 10, 20, .38, '#5FAE6E')])); }
+  if ((B.bub || ing.some(i => /soda|tonica|ginger|prosecco|champagne|cola|frizzante|lemon|birra/i.test(i[2]))) && !B.opaco) {
+    const pts = [[-4, 10, .9], [3, 16, .8], [-1, 22, .7], [5, 27, .8], [-6, 30, .6]].map(([a, b, r]) => [32 + a, B.top + b, r]).filter(([, y]) => !D.bot || y < D.bot - 1);
+    ks.push(put('b|' + bk, [{ w: [['#fff', pts.map(([x, y, r]) => C(x, y, r)).join(''), .5]], f: pts.map(([x, y, r]) => C(x, y, r)).join('') }]));
+  }
+  if (/Tiki|Hurricane|Highball|Collins|Tazza di rame|Julep/.test(bk) && /ghiaccio tritato|cannuccia|crushed/i.test(prep + gar)) ks.push(put('s|' + bk, [{ w: [['#E8E2D4', L(`M37 ${B.top + 20}L50 2L52.4 2.8L39.6 ${B.top + 20.6}Z`), .5]], d: sw(1.2, L(`M37 ${B.top + 20}L50 2M39.6 ${B.top + 20.6}L52.4 2.8`)) }]));
+  if (/bordo/i.test(gar)) {
+    const [x0, y0] = B.o.match(/^M([\d.]+) ([\d.]+)/).slice(1).map(Number), rx = 32 - x0, ry = Math.max(1.2, rx * .1), half = /metà/i.test(gar), n = half ? 7 : 12;
+    const pts = Array.from({ length: n }, (_, i) => { const x = x0 + 2 + i * (half ? rx - 2 : 2 * rx - 4) / (n - 1); return [x, y0 + ry * Math.sqrt(Math.max(0, 1 - ((x - 32) / rx) ** 2)) + (i % 2) * .5]; });
+    const sq = pts.map(([x, y]) => `<rect x="${f1(x - .8)}" y="${f1(y - .8)}" width="1.6" height="1.6" transform="rotate(${Math.round(x * 37 % 90)} ${f1(x)} ${f1(y)})"/>`).join('');
+    ks.push(put('r|' + bk + (half ? '|m' : ''), [{ w: [['#fff', sq, 1]], f: `<g style="stroke-width:.5">${sq}</g>` }]));
+  }
   ks.push(...garn(gar, B, bk));
   // bicchiere non trasparente (tazza di rame, julep): etichetta con il distillato, se no i Mule sarebbero tutti uguali
   if (B.opaco && bk !== 'Tiki') {

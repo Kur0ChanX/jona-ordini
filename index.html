@@ -626,7 +626,7 @@ button.ag-ev{cursor:pointer}.ag-ev .ag-h{flex:none;min-width:44px;font-variant-n
 .br-dis{flex:none;width:44px;height:44px;overflow:visible}.br-dis .wa{opacity:.62;filter:url(#br-wash)}.br-dis .ink{fill:none;stroke:#2a2420;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.br-dis .inkp{fill:#2a2420}
 html.lite .br-dis .wa{filter:none}
 .br-gl{display:flex;align-items:center;gap:8px}.br-gl .br-dis{width:30px;height:30px}.br-gl .br-dis .ink{stroke:var(--ink2)}.br-gl .br-dis .inkp{fill:var(--ink2)}
-.br-ckd .ink,.br-ckbig .ink{stroke:var(--ink2)}.br-ckd .inkp,.br-ckbig .inkp{fill:var(--ink2)}.br-ckd .wa{filter:none}.br-r .br-ckd{margin:-4px 2px -4px -4px}.br-ckbig{display:flex;justify-content:center;margin:2px 0 10px}.br-ckbig .br-dis{width:128px;height:128px}
+.br-ckd .ink,.br-ckbig .ink{stroke:var(--ink2)}.br-ckd .inkp,.br-ckbig .inkp{fill:var(--ink2)}.br-ckd .wa{filter:none}.br-ck .ink.br-f{stroke-width:1.1}.br-ck .br-h{fill:none;stroke:#fff;stroke-width:1.6;stroke-linecap:round;opacity:.85}.br-ck .br-sh{fill:var(--ink2);opacity:.15}.br-ck .br-dr{fill:#fff;fill-opacity:.8;stroke:var(--ink2);stroke-width:.6}.br-r .br-ckd{margin:-4px 2px -4px -4px}.br-ckbig{display:flex;justify-content:center;margin:2px 0 10px}.br-ckbig .br-dis{width:128px;height:128px}
 .br-carta{--carta:#f7f2e8;border:0;border-radius:14px;padding:4px 12px 4px 8px;color:#3a302b;background-color:var(--carta);box-shadow:inset 0 0 36px rgba(120,90,50,.12);
  background-image:radial-gradient(rgba(120,95,60,.07) 1px,transparent 1.2px),radial-gradient(rgba(120,95,60,.05) 1px,transparent 1.2px),linear-gradient(90deg,transparent 60px,rgba(200,80,80,.28) 60px 61.5px,transparent 61.5px);background-size:7px 7px,11px 11px,auto;background-position:0 0,3px 5px,0 0}
 html.lite .br-carta{background-image:linear-gradient(90deg,transparent 60px,rgba(200,80,80,.28) 60px 61.5px,transparent 61.5px);box-shadow:none}
@@ -1224,8 +1224,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=91;
+const APP_VER=92;
 const NEWS=[
+  {v:92,data:'2026-10-12',titolo:'Bar: cocktail disegnati con più dettagli',
+    tutti:['I cocktail del Bar hanno disegni più belli: vetro con i riflessi, cubetti di ghiaccio, menta con le venature, fette di agrumi con gli spicchi.','Aprendo un cocktail lo vedi in grande, come un acquerello: colore che sfuma e goccioline di freddo.'],
+    dev:['D42 «A lista + B scheda»: `tools/bar-disegni.mjs` → `data/bar-disegni.json` (bicchieri con `f` linee fini, `h` riflessi, `m` superficie, `sh` ombra, `x` macchia, `dr` goccioline; pezzi con `f`/`h`); `brCkDis` senza classe = scheda con sfumatura (`brTinta`), macchia e goccioline. Prova `tools/test-bar-disegni.mjs`.']},
   {v:91,data:'2026-10-12',titolo:'Orari: coperti dell\'agenda e persone in turno',
     chef:['Negli Orari vedi i coperti dell\'agenda giorno per giorno.','Se in un giorno pieno ci sono poche persone in turno, l\'app ti avvisa: «Sabato 100 coperti a cena: Sala 3 in turno, ne servono 6».','La prima volta scrivi quanti coperti fai in un giorno normale.'],
     fb:['In «Turni della sala» vedi i coperti dell\'agenda e un avviso se in sala ci sono poche persone per quel giorno.']},
@@ -5759,8 +5762,16 @@ const brDisK=n=>{const s=String(n||'').toLowerCase();return BR_DIS&&BR_DIS.r.fin
 const brSvg=(w,d,p,cl)=>`<svg class="br-dis${cl?' '+cl:''}" viewBox="0 0 64 64" aria-hidden="true">${w.map(x=>`<g class="wa" transform="translate(1.5 1.5)" fill="${x[0]}">${x[1]}</g>`).join('')}<g class="ink">${d}</g>${p?`<g class="inkp">${p}</g>`:''}</svg>`;
 function brDis(n,alc){if(!BR_DIS)return'';const r=brDisK(n),g=BR_DIS.g[r?r[1]:alc?'liquore':'acqua'];if(!g)return'';
   return brSvg(g.w.map((w,i)=>[i===0&&r&&r[2]||w[0],w[1]]),g.d,g.p)}
-function brCkDis(c,cl){const k=BR_DIS&&BR_DIS.k[c.n],B=k&&BR_DIS.b[k[0]];if(!B)return'';const ps=k.slice(2).map(x=>BR_DIS.pz[x]).filter(Boolean);
-  return brSvg([[B.op||k[1],`<path d="${B.l}"/>`]].concat(...ps.map(x=>x.w||[])),B.d+ps.map(x=>x.d||'').join(''),ps.map(x=>x.p||'').join(''),cl)}
+// v92 (D42): cocktail con i dettagli (vetro, riflessi, cubetti con le facce); nella scheda grande (senza cl) anche colore che sfuma, macchia d'acquerello e goccioline
+const brTinta=(h,t,a)=>'#'+[1,3,5].map(i=>Math.round(parseInt(h.slice(i,i+2),16)*(1-a)+t*a).toString(16).padStart(2,'0')).join('');
+let BR_LG=0;
+function brCkDis(c,cl){const k=BR_DIS&&BR_DIS.k[c.n],B=k&&BR_DIS.b[k[0]];if(!B)return'';const ps=k.slice(2).map(x=>BR_DIS.pz[x]).filter(Boolean),big=!cl,col=B.op||k[1];
+  const wa=(f,s,o)=>`<g class="wa"${o?` style="opacity:${o}"`:''} fill="${f}">${s}</g>`,all=x=>ps.map(p=>p[x]||'').join('');
+  let defs='',fill=col;if(big&&!B.op){const id='br-lg'+(++BR_LG);defs=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${brTinta(col,255,.4)}"/><stop offset="1" stop-color="${brTinta(col,0,.25)}"/></linearGradient></defs>`;fill=`url(#${id})`}
+  return`<svg class="br-dis br-ck${cl?' '+cl:''}" viewBox="0 0 64 64" aria-hidden="true">${defs}${big&&B.x?wa(col,`<path d="${B.x}"/>`,.4):''}${B.sh?`<ellipse class="br-sh" cx="32" cy="${B.sh[0]}" rx="${B.sh[1]}" ry="1.8"/>`:''}`
+    +wa(fill,`<path d="${B.l}"/>`,big?.85:.7)+(B.m?wa(brTinta(col,255,.3),B.m,.8):'')+ps.map(p=>(p.w||[]).map(w=>wa(w[0],w[1],w[2])).join('')).join('')
+    +`<g class="ink">${B.d+all('d')}</g>${B.f||ps.some(p=>p.f)?`<g class="ink br-f">${(B.f||'')+all('f')}</g>`:''}${ps.some(p=>p.p)?`<g class="inkp">${all('p')}</g>`:''}<g class="br-h">${(B.h||'')+all('h')}</g>`
+    +(big&&B.dr?`<g class="br-dr">${B.dr.map(([x,y,r=.9])=>`<ellipse cx="${x}" cy="${y}" rx="${+(r*.8).toFixed(2)}" ry="${r}"/>`).join('')}</g>`:'')+'</svg>'}
 function brCk(){if(BR_CK)return Promise.resolve(BR_CK);
   if(!BR_CKP)BR_CKP=fetch('data/cocktail.json').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.json()}).then(j=>{
     BR_CK=j.c.map((c,i)=>({i,n:c[0],f:c[1],m:c[2],g:c[3],ing:c[4],gu:c[5],p:c[6],iba:!!c[7],k:norm(c[0]+' '+c[4].map(x=>x[2]).join(' '))}));return BR_CK}).catch(e=>{BR_CKP=null;throw e});

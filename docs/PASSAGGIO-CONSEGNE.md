@@ -1,13 +1,29 @@
-# Passaggio di consegne (2026-10-12, fine sessione #96)
+# Passaggio di consegne (2026-10-12, fine sessione #97)
 
-Sessione attuale: #97
+Sessione attuale: #98
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). **v91 unita** (PR #101, `630ad48`).
 
-## ✅ SUBITO (#97)
-1. **v91 unita** (PR #101 squash `630ad48`, prove verdi, `main` riunito nel ramo). Controllare online `APP_VER=91` su https://jona-ristorante-by-ynoy-corp.pages.dev/ e dirlo a Mario in 1 riga.
-2. Giro completo a mano su `main` (run `38210644943`): **verde** (8:02-8:30). Il cron del lunedì (5:17) il 12/10 non era partito: se non parte neanche il 19/10, scriverlo in ERRORI.md e cambiare orario.
-3. **Richiesta nuova di Mario (ultimo messaggio)**: disegni dei cocktail più belli e più dettagliati, stesso stile degli ingredienti («inchiostro e acquerello», v89). E19: prima 1 immagine HD con 2-3 bozze di dettaglio (es. Mojito, Negroni, Margarita, Espresso Martini) e domanda a tocco + doppio tocco; poi si costruisce solo la scelta. Oggi: `tools/bar-disegni.mjs` → `data/bar-disegni.json` v2 (`b` bicchieri, `pz` pezzi, `k` cocktail; lista `.br-ckd` senza acquerello, scheda `.br-ckbig` 128 px). Idee di dettaglio: riflessi e spessore del vetro, menisco del liquido, gocce di condensa, cubetti con sfaccettature, foglie con nervature, fetta di agrumi con spicchi, ombra sotto il bicchiere, acquerello anche nella scheda grande. Attenzione al peso (oggi 20 KB compressi) e alla prova `test-bar-disegni` (212 disegni diversi).
+## ✅ SUBITO (#98)
+1. **D42 cocktail più dettagliati: lavoro a metà, NON pubblicato.** Scelta di Mario #97 (tocco + conferma): **«A lista + B scheda»** (lista con i dettagli; scheda grande illustrata). Fatto e committato (commit «D42 in corso»):
+   - `tools/bar-disegni.mjs`: blocco nuovo da `// guarnizioni` a `cocktail()`: `joinX`, `iceC` (cubetti con facce), `wheel` (agrumi con spicchi, mezza fetta d'arancia se «mezza/spicchio»), `leafX`/`sprig` (menta con venature), `bean` (chicchi), `DET` (per ogni bicchiere: `h` riflesso, `sh` ombra, `f` linee fini, `bot` fondo, `dr` goccioline), `splash` (macchia), gambo con 2 linee fini, bordo di sale/zucchero a cristalli (metà se «metà»), menta pestata nel bicchiere (`ml|`), bollicine con contorno, ghiaccio tritato (`it|`). `data/bar-disegni.json` rigenerato (~27,7 KB compressi, limite prova 30 KB).
+   - `index.html`: `brTinta`, `BR_LG`, nuovo `brCkDis` (lista = dettagli; scheda senza `cl` = sfumatura `linearGradient` `br-lg<N>`, macchia, goccioline) e CSS `.br-ck .ink.br-f`, `.br-h`, `.br-sh`, `.br-dr` dopo `.br-ckd .wa{filter:none}`.
+   - `tools/test-bar-disegni.mjs`: 6 controlli nuovi (tutti verdi, 57 PASS).
+   - Già fatti anche: APP_VER 92 + voce NEWS v92, `CACHE` di sw.js v96, riga v92 in CLAUDE.md. **Mancano** (Mario ha interrotto qui): punto 2, poi aggiornare NEWS/CLAUDE.md, `test-news`, `test-giro`, PR e pubblicazione.
+2. **Richiesta nuova di Mario (ultimo messaggio)**: «Cerca di mettere meno foto simili possibili e falle inerenti al cocktail». Oggi molti cocktail si somigliano (stesso bicchiere + stesso colore + stessa fetta di lime/limone sul bordo, es. Gin Lemon/Gin Fizz/Tom Collins, Screwdriver/Harvey Wallbanger, coppette sour tutte con lime+ciliegina). Da fare PRIMA di pubblicare:
+   - guarnizione vera di ogni cocktail (leggere `gu` in `data/cocktail.json`): ombrellino tiki, foglia/fetta d'ananas, cetriolo a nastro, rametto di rosmarino, sedano, stecca di cannella, fragola, more, ciliegina sul fondo, scorza a spirale, chicchi, noce moscata sulla schiuma ecc.;
+   - cosa c'è DENTRO: schiuma bianca dei sour (albume) con gocce di angostura, strati (B-52, Tequila Sunrise sfumata rossa in basso, Black Velvet, Irish coffee panna), crema, foglie/frutti pestati, fette nel bicchiere (Pimm's, Sangria), peperoncino, ecc.;
+   - colori più distinti tra cocktail dello stesso bicchiere;
+   - prova nuova in `test-bar-disegni`: misurare la somiglianza (es. stesso bicchiere + colore vicino + stessi pezzi → max N coppie) e una lista a mano dei cocktail «famosi» col loro segno (Tequila Sunrise strati, Piña Colada ananas, Whiskey Sour schiuma…).
+   - Poi foto HD a Mario (griglia di tutti, `deviceScaleFactor:2`) e domanda a tocco + doppio tocco prima di pubblicare? No: scelta già fatta, pubblicare in automatico se le prove sono verdi (regola PUBBLICA SEMPRE IN AUTOMATICO), mandando la foto.
+3. Testo pronto per NEWS v92: tutti: «I cocktail del Bar hanno disegni più belli: vetro con i riflessi, cubetti di ghiaccio, menta con le venature, fette di agrumi con gli spicchi.» / «Aprendo un cocktail lo vedi in grande, come un acquerello: colore che sfuma e goccioline di freddo.» (+ «ogni cocktail con la sua guarnizione vera» quando fatto il punto 2).
+4. Script foto (scratchpad perso): Playwright demo → Fornitori → `main [data-a="brOpen"]`; griglia di tutti: `await brCk()` poi `brCkDis(c)` dentro `.br-ckbig`, togliere `lite` da `<html>`. Bozze: `tools/bozze/cocktail-d42.mjs`, immagine `docs/img/sessione-97/d42-cocktail-dettagli.png`.
+5. v91 confermata online (APP_VER=91) in #97. Giro completo del lunedì: se il cron non parte neanche il 19/10, scriverlo in ERRORI.md.
+
+## Fatto in #97 (12/10, ~8:40-9:30)
+- Scorta più vecchia unita due volte con `-s ours` (avvio e dopo il riavvio della sessione).
+- Bozze D42 (Oggi / A Più dettagli / B Illustrazione) → Mario: «A lista + B scheda», confermato. DA-FARE D42 aggiunta.
+- Costruzione D42 (punto 1 sopra).
 
 ## Fatto in #96 (12/10, 7:58-8:30 ora italiana)
 - Avvio: scorta vecchia unita con `-s ours` (conteneva solo il prompt di avvio salvato per sbaglio come messaggio di Mario).
@@ -33,7 +49,7 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR` (chiusa), #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #97 `session_012kt4UwsGjC3SCruV9oiyM6` (chiusa), #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -54,5 +70,5 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(12/10/2026 ~8:25 ora italiana, #96) «provi degli altri png piú belli per i cocktail  sempre con lo stesso stile degli ingredienti ma con dei disegni con piú dettagli»
-Prima, a tocco: D33 → «Decide mauro per la sala e maurizio per la cucinacosa fare e quando, lo staff non decide quando non andare ecc», poi «Avviso coperti/persone (Consigliato)» + «Sì, confermo la strada». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+(12/10/2026 ~9:30 ora italiana, #97, interrompendo la pubblicazione) «Cerca di mettere meno foto simili possibili e falle inerenti al cocktail»
+Prima, a tocco: «A lista + B scheda (Consigliato)» + «Sì, confermo lo stile». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».

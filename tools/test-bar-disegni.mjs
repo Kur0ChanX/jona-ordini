@@ -41,6 +41,8 @@ const ckSvg=c=>{const x=J.k[c[0]];if(!x||!J.b[x[0]])return null;return JSON.stri
 const imp=CK.c.map(ckSvg);
 ok(imp.every(Boolean)&&x2(J.k).every(x=>x.slice(2).every(p=>J.pz[p])),'ogni cocktail ha il suo disegno, pezzi tutti presenti ('+CK.c.length+')');
 ok(new Set(imp).size===CK.c.length,'cocktail: '+new Set(imp).size+' disegni diversi su '+CK.c.length);
+ok(Object.values(J.b).every(x=>x.h&&x.sh&&x.x),'ogni bicchiere ha riflesso, ombra e macchia (D42)');
+ok(J.k['Negroni'].some(p=>/^g\|Old fashioned\|aranciaM/.test(p))&&J.k['Mojito'].some(p=>/^ml\|Highball/.test(p))&&J.k['Margarita'].some(p=>/^r\|Coppa margarita\|m$/.test(p)),'Negroni mezza fetta, Mojito menta pestata, Margarita metà bordo di sale');
 ok(J.k['Negroni'][0]==='Old fashioned'&&J.k['Spritz']&&J.k['Moscow Mule'][0]==='Tazza di rame','bicchieri giusti (Negroni old fashioned, Moscow Mule tazza di rame)');
 // app
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
@@ -59,10 +61,17 @@ async function cocktail(pg,nome){await sh(pg).locator('input#brq').fill(nome);aw
   const righe=await sh(pg).locator('[data-a="brC"]').count();
   ok(righe>0&&await sh(pg).locator('[data-a="brC"] .br-ckd').count()===righe,'lista dei cocktail: ogni riga ha il suo disegno ('+righe+')');
   ok(await sh(pg).locator('[data-a="brC"] .br-ckd .wa').first().evaluate(e=>getComputedStyle(e).filter)==='none','lista: acquerello spento (leggera)');
+  ok(await sh(pg).locator('[data-a="brC"] .br-ckd linearGradient, [data-a="brC"] .br-ckd .br-dr').count()===0,'lista: niente sfumatura né goccioline (leggera)');
+  {const nh=await sh(pg).locator('[data-a="brC"] .br-ckd .br-h').count(),nr=await sh(pg).locator('[data-a="brC"] .br-ckd').count();ok(nr>0&&nh===nr,'lista: ogni cocktail con il riflesso del vetro ('+nh+'/'+nr+')')}
   await cocktail(pg,'Negroni');
   ok(await sh(pg).locator('.br-ckbig .br-dis').count()===1,'scheda del Negroni: disegno grande del cocktail in cima');
   const bw=await sh(pg).locator('.br-ckbig .br-dis').boundingBox();
   ok(bw&&bw.width>=120,'disegno grande largo almeno 120 px ('+(bw&&Math.round(bw.width))+')');
+  // v92 (D42, «A lista + B scheda»): scheda illustrata, lista con i dettagli ma leggera
+  const big=sh(pg).locator('.br-ckbig .br-dis');
+  ok(await big.locator('linearGradient').count()===1&&/url\(#br-lg\d+\)/.test(await big.locator('.wa').nth(1).getAttribute('fill')),'scheda: colore del drink che sfuma');
+  ok(await big.locator('.br-dr ellipse').count()>=2&&await big.locator('.br-sh').count()===1,'scheda: goccioline e ombra');
+  ok(await big.locator('.br-h path').count()>=1&&await big.locator('.br-f').count()===1,'scheda: riflessi e linee fini del vetro');
   ok(await sh(pg).locator('.br-ing.br-carta').count()===1,'Negroni: ingredienti sul foglio di carta');
   ok(await sh(pg).locator('.br-ir .br-dis').count()===3,'Negroni: 3 ingredienti, 3 disegni');
   ok(await sh(pg).locator('.br-ir .br-dis .ink').evaluateAll(l=>l.every(g=>g.children.length>0)),'ogni disegno ha le linee a penna');
