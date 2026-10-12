@@ -1,7 +1,8 @@
-// D39 / v89: disegni degli ingredienti del Bar (stile B inchiostro e acquerello) su foglio di carta.
+// D39 / v89 + D41 / v90: disegni degli ingredienti del Bar (stile B inchiostro e acquerello) su foglio di carta.
 // Ogni ingrediente dei cocktail e ogni tipo di bottiglia ha un disegno suo; senza file dei disegni il Bar funziona lo stesso.
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 import { readFileSync } from 'fs';
+import { gzipSync } from 'zlib';
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const J=JSON.parse(readFileSync(new URL('../data/bar-disegni.json',import.meta.url),'utf8'));
 const CK=JSON.parse(readFileSync(new URL('../data/cocktail.json',import.meta.url),'utf8'));
@@ -23,9 +24,24 @@ const BR_CAT=cats?eval(cats[1]):[];
 const catSenza=BR_CAT.flatMap(x=>x[1]).filter(n=>!trova(n));
 ok(BR_CAT.length&&!catSenza.length,'ogni tipo di bottiglia ha il suo disegno'+(catSenza.length?': manca '+catSenza.join(', '):''));
 const k=n=>(trova(n)||[])[1];
-ok(k('Succo di lime')==='lime'&&k('Gin')==='gin'&&k('Foglie di menta')==='menta'&&k('Ghiaccio')==='ghiaccio'&&k('Campari')==='bottiglia'&&k('Cherry brandy')==='liquore'&&k('Crema di whisky')==='liquore'&&k('Rum scuro')==='rum'&&k('Lemon soda')==='soda'&&k('Acqua di fiori d\'arancio')==='fiore','regole: lime, gin, menta, ghiaccio, Campari, Cherry brandy (liquore, non brandy), Crema di whisky, rum, lemon soda, fiori d\'arancio');
+const x2=o=>Object.values(o);
+ok(k('Succo di lime')==='lime'&&k('Gin')==='gin'&&k('Foglie di menta')==='menta'&&k('Ghiaccio')==='ghiaccio'&&k('Campari')==='lq_campari'&&k('Cherry brandy')==='lq_cherry_brandy'&&k('Crema di whisky')==='lq_crema_di_whisky'&&k('Rum scuro')==='rum'&&k('Lemon soda')==='soda'&&k('Acqua di fiori d\'arancio')==='fiore','regole: lime, gin, menta, ghiaccio, Campari, Cherry brandy (liquore, non brandy), Crema di whisky (liquore, non whisky), rum, lemon soda, fiori d\'arancio');
 ok(SW.includes("'./data/bar-disegni.json'"),'sw.js: disegni in FILES (funzionano senza rete)');
-ok(JSON.stringify(J).length<40000,'file dei disegni leggero ('+JSON.stringify(J).length+' byte)');
+const gz=gzipSync(JSON.stringify(J)).length;
+ok(gz<30000,'file dei disegni leggero ('+gz+' byte compressi)');
+// v90 (D41): niente doppioni
+ok(k('Ginger beer')==='soda'&&k('Ginger ale')==='soda','ginger beer e ginger ale non prendono il disegno del gin');
+const col=n=>{const r=trova(n);return r[1]+'|'+(r[2]||'')};
+const tutti=[...new Set([...ingr.map(base),...BR_CAT.flatMap(x=>x[1]).map(base)])];
+const generici=tutti.filter(n=>/^(liquore|bottiglia)$/.test(k(n)));
+ok(!generici.length,'ogni liquore ha la sua bottiglia, nessuna bottiglia generica'+(generici.length?': '+generici.join(', '):''));
+const simili=[['Bourbon','Rye whiskey','Scotch whisky','Scotch whisky torbato','Whisky irlandese'],['Calvados','Brandy','Cognac'],['Pisco','Grappa'],['Rum bianco','Cachaça'],['Champagne','Prosecco'],['Fernet','Amaro','Jägermeister'],['Vermouth dry','Lillet blanc'],['Crème de mûre','Mirto'],['Chartreuse verde','Absinthe','Liquore alla mela verde','Liquore al melone'],['Tabasco','Peperoncino rosso'],['Granatina','Succo di melograno']];
+for(const g of simili)ok(new Set(g.map(col)).size===g.length,'disegni diversi: '+g.join(', '));
+const ckSvg=c=>{const x=J.k[c[0]];if(!x||!J.b[x[0]])return null;return JSON.stringify([J.b[x[0]].op||x[1],x[0],x.slice(2).map(p=>J.pz[p])])};
+const imp=CK.c.map(ckSvg);
+ok(imp.every(Boolean)&&x2(J.k).every(x=>x.slice(2).every(p=>J.pz[p])),'ogni cocktail ha il suo disegno, pezzi tutti presenti ('+CK.c.length+')');
+ok(new Set(imp).size===CK.c.length,'cocktail: '+new Set(imp).size+' disegni diversi su '+CK.c.length);
+ok(J.k['Negroni'][0]==='Old fashioned'&&J.k['Spritz']&&J.k['Moscow Mule'][0]==='Tazza di rame','bicchieri giusti (Negroni old fashioned, Moscow Mule tazza di rame)');
 // app
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 async function apri(rotto){
@@ -40,7 +56,13 @@ const sh=pg=>pg.locator('.sheet').last();
 async function cocktail(pg,nome){await sh(pg).locator('input#brq').fill(nome);await pg.waitForTimeout(300);
   await sh(pg).locator('[data-a="brC"]').filter({hasText:nome}).first().click();await pg.waitForTimeout(500)}
 {const {ctx,pg,errs}=await apri(false);
+  const righe=await sh(pg).locator('[data-a="brC"]').count();
+  ok(righe>0&&await sh(pg).locator('[data-a="brC"] .br-ckd').count()===righe,'lista dei cocktail: ogni riga ha il suo disegno ('+righe+')');
+  ok(await sh(pg).locator('[data-a="brC"] .br-ckd .wa').first().evaluate(e=>getComputedStyle(e).filter)==='none','lista: acquerello spento (leggera)');
   await cocktail(pg,'Negroni');
+  ok(await sh(pg).locator('.br-ckbig .br-dis').count()===1,'scheda del Negroni: disegno grande del cocktail in cima');
+  const bw=await sh(pg).locator('.br-ckbig .br-dis').boundingBox();
+  ok(bw&&bw.width>=120,'disegno grande largo almeno 120 px ('+(bw&&Math.round(bw.width))+')');
   ok(await sh(pg).locator('.br-ing.br-carta').count()===1,'Negroni: ingredienti sul foglio di carta');
   ok(await sh(pg).locator('.br-ir .br-dis').count()===3,'Negroni: 3 ingredienti, 3 disegni');
   ok(await sh(pg).locator('.br-ir .br-dis .ink').evaluateAll(l=>l.every(g=>g.children.length>0)),'ogni disegno ha le linee a penna');
@@ -69,7 +91,9 @@ async function cocktail(pg,nome){await sh(pg).locator('input#brq').fill(nome);aw
   ok(!errs.length,'nessun errore'+(errs.length?': '+errs.join(' | '):''));
   await ctx.close()}
 {const {ctx,pg,errs}=await apri(true);
+  ok(await sh(pg).locator('.br-ckd').count()===0,'senza file dei disegni: lista dei cocktail senza disegni');
   await cocktail(pg,'Negroni');
+  ok(await sh(pg).locator('.br-ckbig').count()===0,'senza file: niente spazio vuoto per il disegno grande');
   ok(await sh(pg).locator('.br-ir').count()===3&&await sh(pg).locator('.br-dis').count()===0,'senza file dei disegni: ingredienti mostrati, senza disegni');
   ok(await sh(pg).locator('.br-carta').count()===0,'senza disegni niente carta (resta la lista di prima)');
   ok(!errs.length,'nessun errore senza disegni'+(errs.length?': '+errs.join(' | '):''));
