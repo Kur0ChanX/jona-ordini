@@ -53,6 +53,7 @@ ok(Object.values(J.b).every(x=>x.h&&x.sh&&x.x),'ogni bicchiere ha riflesso, ombr
  const onde=Object.entries(J.pz).filter(([k])=>/^fo\|/.test(k)).map(([,v])=>JSON.stringify(v));
  ok(onde.length&&onde.every(v=>!/--ink2/.test(v)&&/--vetro2/.test(v)),'schiuma: onda color vetro, non grigia ('+onde.length+')');
  ok(['White Russian','Gin Fizz','Hurricane','Russian Spring Punch','Mai Tai'].every(n=>J.k[n].some(p=>/^it?\|/.test(p))),'ghiaccio come prima anche con i passaggi della v94 (vecchia frase in tools/cocktail-frasi.json)');
+ {const xs=J.k['Americano'].filter(p=>/^g\|(arancia|scorza)/.test(p)).map(p=>+p.split('@')[1].split(',')[0]);ok(xs.length===2&&Math.abs(xs[0]-xs[1])>=22,'Americano: mezza fetta e scorza staccate sul bordo (difetto 18, '+xs.join(' / ')+')')}
  ok(J.k['White Russian'].some(p=>/^st\|White Russian/.test(p))&&J.k['Espresso Tonic'].some(p=>/^st\|Espresso Tonic/.test(p)),'White Russian con la panna, Espresso Tonic con il caffè sopra');}
 ok(J.k['Negroni'].some(p=>/^g\|aranciaM@/.test(p))&&J.k['Mojito'].some(p=>/^ml\|Highball/.test(p))&&J.k['Margarita'].some(p=>/^r\|Coppa margarita\|m$/.test(p)),'Negroni mezza fetta, Mojito menta pestata, Margarita metà bordo di sale');
 // D42 passo 2 (Mario #97 «meno foto simili e inerenti al cocktail»): somiglianza = stesso bicchiere, differenza di colore (Lab) + 12 per ogni pezzo diverso
