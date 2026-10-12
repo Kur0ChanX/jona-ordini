@@ -1,32 +1,32 @@
-# Passaggio di consegne (2026-10-12, fine sessione #94)
+# Passaggio di consegne (2026-10-12, fine sessione #95)
 
-Sessione attuale: #95
+Sessione attuale: #96
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). **v89 unita** (PR #99 squash `910e862`, prove verdi). Alle ~7:40 online c'era ancora v88 (pubblicazione in corso).
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). **v90 unita** (PR #100 squash `7635ca3`, prove verdi, `main` riunito nel ramo `3babb7b`). Alle ~8:15 la pubblicazione su Cloudflare era appena partita.
 
-## ✅ SUBITO (#95)
-1. Controllare che sia online `APP_VER=89` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33: senza index.html). Se sì, dirlo a Mario in 1 riga.
-2. **D41 = v90 Bar** (scelta di Mario a tocco + doppio tocco: «Sì, falla così» / «Sì, confermo la prova»). Costruirla e pubblicarla da sola se le prove sono verdi:
-   - Bozza funzionante in **`tools/bar-prova-v90.mjs`** (scrive `/tmp/bar-prova-liquori.html` e `/tmp/bar-prova-cocktail.html`). Foto mostrate a Mario: `docs/img/sessione-94/liquori-piccola.png`, `cocktail-piccola.png`.
-   - **Liquori**: tabella `LQ` nome → [sagoma, colore, simbolo]. 7 sagome `SAG` (tonda, alta, quadra, monaco, goccia, fiasca, aperitivo) con etichetta tonda; simbolo = disegno esistente rimpicciolito (`mini`) o simboli nuovi `SIMB` (cacao, anice, mandorla, croce, erbe, stella, fumo, spezie, scritta). 40 prodotti (tutti quelli che prima erano «liquore»/«bottiglia»). Da portare in `tools/bar-disegni.mjs`: un disegno per liquore (es. `G['lq_amaretto']`) e regole che puntano lì; le regole vecchie con colore restano solo come riserva.
-   - **Cocktail**: `cocktail(ck)` = bicchiere `BIC` (17 tipi = campo 3 di `cocktail.json`) + colore del drink `mix()` (media pesata per cl in spazio lineare; trasparenti ×0,15, colori forti ×3) + guarnizione `GAR`/`garn()` (max 2, dal campo 5) + ghiaccio (se la preparazione dice ghiaccio) + bollicine + bordo di sale/zucchero. Da fare nell'app: generare il disegno a runtime (bicchieri e simboli dentro `data/bar-disegni.json`, funzione in index.html), mostrarlo nella lista dei cocktail e in cima alla scheda del cocktail.
-   - **Doppioni**: 212 cocktail → 209 disegni. Restano uguali London Mule=Mexican Mule e Moscow/Kentucky/Virgin Mule (tazza di rame opaca): aggiungere un segno del distillato (es. piccolo simbolo o colore del bordo) per renderli diversi. La prova deve controllare 212 disegni diversi.
-   - **Bug v89 trovato**: «ginger beer»/«ginger ale» prendono il disegno del gin (regola `'^gin'`). Correggere con `'^gin(?!ger)'` + controllo nella prova.
-   - Altri doppioni veri tra ingredienti (stesso disegno e colore): whisky (bourbon, rye, scotch, torbato, irlandese), brandy (calvados, brandy, cognac), pisco=grappa, rum bianco=cachaça, champagne=prosecco. Mario ha detto «controlla i doppioni… senza doppioni o provaci»: renderli diversi anche questi (es. simbolo `fumo` per il torbato, mela per il calvados).
-   - Ricordare: `CACHE` in sw.js, `APP_VER=90`, NEWS v90, riga in CLAUDE.md, aggiornare `tools/test-bar-disegni.mjs`, `test-giro`, foto HD a Mario (chiaro e scuro).
-3. Poi D33 (sotto): proposta con immagine e 3 strade.
-4. Guardare il giro delle prove del lunedì (3:17 del 12/10).
+## ✅ SUBITO (#96)
+1. Controllare che sia online `APP_VER=90` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (E33: senza index.html; `curl -s … | grep -o 'APP_VER=[0-9]*'`). Se sì, dirlo a Mario in 1 riga.
+2. **Giro del lunedì mai partito**: il cron di `prove.yml` (`17 3 * * 1` = 5:17 italiane) il 12/10 non è partito (API: `actions/workflows/prove.yml/runs?event=schedule` → total_count 0; il workflow c'è dal 07/10, era il primo lunedì). Lanciare a mano il giro completo su GitHub (workflow «Prove automatiche», workflow_dispatch, modo `tutto`, ramo `main`) con `mcp__github__actions_run_trigger`; gratis, dirlo a Mario in una riga. Se il cron non parte neanche il 19/10: scriverlo in ERRORI.md e valutare un orario diverso (GitHub salta i cron nelle ore cariche; minuto non tondo già usato).
+3. Poi D33 (sotto): proposta con immagine e 3 strade, domanda a tocco + doppio tocco.
 
-## Fatto in #94 (12/10, ~7:15-7:45 ora italiana)
-- Avvio: scorta unita. Conteneva come «ultimo messaggio» l'avviso «This session's worker process was restarted…» (non di Mario) → **E42**: aggiunto ad `AVVISI_DI_SISTEMA` in `.claude/hooks/scorta.py`, prova 3c-quater in `tools/test-scorta.py` (25 controlli ok), ripristinato «vai».
-- Prove PR #99 verdi → squash merge, `main` unito nel ramo.
-- Mario: «bastano solo 40 immagini di ingredienti?» → contati: 143 ingredienti, tutti con disegno (43 disegni, 91 regole); il «liquore» copriva 30 prodotti, «bottiglia» 10, «soda» 10. Fatta la prova liquori+cocktail, mandata in HD, scelta e confermata.
+## Fatto in #95 (12/10, ~7:37-8:15 ora italiana)
+- Avvio: scorta unita (conteneva solo `docs/ULTIMO-MESSAGGIO.md`, l'ultimo messaggio vero di Mario «si / bastano solo 40 immagini di ingredienti?»), push.
+- `APP_VER=89` confermata online.
+- **v90 (D41) fatta e pubblicata** (scelta di Mario #94):
+  - `tools/bar-disegni.mjs` ora genera tutto (la bozza `tools/bar-prova-v90.mjs` è stata tolta: il suo codice è dentro). `data/bar-disegni.json` v2 = `g` (95 disegni: 40 `lq_<nome>` con sagoma `SAG` + simbolo `SIMB`; varianti con etichetta tonda `badge()`: `w_bourbon` botte, `w_rye` spiga, `w_scotch` croce di S. Andrea, `w_torbato` fumo, `w_irl` trifoglio, `br_cognac` uva, `br_calvados` mela, `grappa` (bottiglia alta), `rum_cachaca` lime, `spu_prosecco` uva, `tabasco`, `garofano` nuovo), `r` regole (prima le 40 dei liquori `R0`, poi le vecchie come riserva), `b` 17 bicchieri, `pz` 118 pezzi, `k` 212 cocktail → [bicchiere, colore, pezzi].
+  - Perché pezzi precalcolati e non il codice della bozza nell'app: index.html resta piccolo (solo `brSvg` + `brCkDis`, 4 righe); la logica (colore `mix`, guarnizioni, ghiaccio) gira una volta sul computer. Peso: 170 KB, 20 KB compressi, scaricato solo all'apertura del Bar.
+  - Mule (tazza di rame opaca) distinti con etichetta del distillato principale. 212 cocktail → 212 disegni diversi.
+  - Bug v89 corretto: ginger beer/ale col disegno del gin (`^gin(?!ger)`). Granatina ≠ succo di melograno, basilico = foglia (non fiore), ginger ale più chiaro.
+  - App: disegno a sinistra in ogni riga della lista (`.br-ckd`, acquerello spento per non pesare con 60 righe) e grande (128 px) in cima alla scheda (`.br-ckbig`); tema scuro: linee `var(--ink2)`.
+  - Prova `tools/test-bar-disegni.mjs` (46 controlli: 212 diversi, niente bottiglie generiche, gruppi di prodotti simili diversi, lista e scheda, senza file). Verdi anche `test-bar`, `test-giro`, prove GitHub.
+  - Foto HD mandata a Mario: `docs/img/sessione-95/v90-confronto.png` (lista + Mojito, chiaro e scuro).
+  - CLAUDE.md: riga v90; DA-FARE: tolta D41.
 
 ## Domanda aperta a Mario (scritta nel testo in #87, ancora senza risposta)
 «Oggi come registrate i vini venduti? Scontrino di cassa (con quale programma?), comanda su carta, oppure niente?» → serve per collegare le vendite. Fino alla risposta resta «− Venduta».
 
 ## Prossimi lavori (in ordine, da soli, pubblicare in automatico se le prove sono verdi)
-1. D41 v90 (sopra).
+1. Giro completo a mano (sopra).
 2. D33 (funzioni smart per orari e agenda): proposta con immagine + 3 strade. Domanda a tocco con doppio tocco, ripetendo in chiaro la scelta prima di costruire (E37/E38).
 3. Idee per il Bar (solo se utili): «Cocktail della casa», costo del cocktail dal prezzo delle bottiglie, foto della bottiglia letta dall'IA.
 4. `tools/misura-velocita.mjs` nelle prove di GitHub? Decidere dopo qualche misura.
@@ -42,7 +42,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = lo staff segna i giorni in 
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #94 `session_01KtgXU5jt71weBBriYJGSpK` (chiusa), #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- Jona #95 `session_01QsPmY12GJ337y47Kax1f2a` (chiusa), #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
 - RVC attiva: **#78** `session_012GgQqbq9gDXPmHyQ7VmYMV`. SPA attiva: **#09** `session_011dYniwuL2fEfLGEsTVRWrp` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
@@ -63,7 +63,7 @@ Idee: Ovvia = promemoria del turno via push; Furba = lo staff segna i giorni in 
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-«si
+In #95 Mario non ha scritto nulla (sessione partita dall'handoff, lavoro da solo). L'ultimo resta quello di #94: «si
 
 bastano solo 40 immagini di ingredienti?»
-(12/10/2026 ~7:25 ora italiana, in #94). Poi, a tocco: «controlla i doppioni e se riesci fallo anche per i cooktail nello stesso stile senza doppioni o provaci» / «manda prova cocktail e liquori». Dopo la foto, a tocco: «Sì, falla così (Consigliato)» + «Sì, confermo la prova». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+(12/10/2026 ~7:25 ora italiana). Poi, a tocco: «controlla i doppioni e se riesci fallo anche per i cooktail nello stesso stile senza doppioni o provaci» / «manda prova cocktail e liquori» → «Sì, falla così (Consigliato)» + «Sì, confermo la prova» (fatto: v90). Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
