@@ -87,7 +87,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-Scritti nella #101 (chiusa) e girati alla #102 dalla #101; nella #102 Mario non ha scritto direttamente.
+(12/10/2026 ~10:30 ora italiana, scritto nella #102 dopo la chiusura, girato alla #103 con send_message) «vedo anche moscow mule bicchiere sbagliato e le nei cocktail cannucce fuori tipo in pigna colada  posizione e esempio london mule non sò perché ha disegnato una bottiglia nel bicchiere... e poi le mezze lune gialle forse sono pezzi di limone non sò sono orribili e tutti uguali brutti / segui le linee del disegno non mettere a caso tratti neri grossi perché perde il senso dello stile mantieni coerente la foto / Fatti aiutare da un agente per fare prima / Attenzione ananas ecc linee teoppo grosse e cannucce pigna colada fiori posto la nuova schiuma mi piace quello stile» → novità: aiutanti in parallelo; anche ananas e altre guarnizioni con linee troppo grosse; la panna/cupola piena color vetro della #102 («la nuova schiuma») è lo stile che gli piace.
+Prima, scritti nella #101 (chiusa) e girati alla #102:
 (12/10/2026 ~10:22 ora italiana) «segui le linee del disegno non mettere a caso tratti neri grossi perché perde il senso dello stile mantieni coerente la foto»
 (~10:20) «vedo anche moscow mule bicchiere sbagliato e le nei cocktail cannucce fuori tipo in pigna colada  posizione e esempio london mule non sò perché ha disegnato una bottiglia nel bicchiere... e poi le mezze lune gialle forse sono pezzi di limone non sò sono orribili e tutti uguali brutti»
 (~10:16) «vai» (via libera al punto 0, difetti dei disegni → v92).
