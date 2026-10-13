@@ -140,6 +140,31 @@ ok(w1>0&&w2>0&&w2<=97,'v106: la barra si muove ('+w1+'% → '+w2+'%)');
 await pg.evaluate(async()=>{window._lib();await window._go;gemCall=window._vero});
 ok(await pg.evaluate(()=>{const t=ls('jona_ia_t');return t.lite.length===3&&t.lite[2]>=1&&!S.vnf.busy})&&await pg.locator('.sheet .vn-busy').count()===0,'v106: lettura finita, tempo salvato per la prossima volta, riquadro chiuso');
 await sc('[data-a="closeSheet"]');await wait(300);
+// v107 (idea #126 scelta da Mario): «Rileggila tu più tardi» → l'app riprova da sola, la foto resta, il telefono vibra quando ha letto
+const v107=async(failN)=>pg.evaluate(async n=>{window._n=0;window._vib=[];navigator.vibrate=p=>{window._vib.push(p);return true};
+  gemCall=async()=>(++window._n<=n)?{st:503}:{txt:'{"nome":"Prova Riprova","cantina":"Z","sicuro":true}',lettore:'flash'};
+  await modLoad('cantina');vnForm(null);const c=document.createElement('canvas');c.width=30;c.height=30;const bl=await new Promise(r=>c.toBlob(r,'image/png'));
+  await vnFotoAdd([new File([bl],'f.png',{type:'image/png'})])},failN);
+await pg.evaluate(()=>{window._vero=gemCall;VN_RI_MS=1500;VN_RI_MAX=5});
+await v107(6);await wait(200);await sc('[data-a="vnFotoGo"]');await pg.waitForFunction(()=>S.vnf&&!S.vnf.busy&&window._n>=3);await wait(200);
+t=await txt('.sheet');
+ok(/Rileggila tu più tardi/.test(t)&&await pg.locator('.sheet .vn-fi').count()===1,'v107: lettura non riuscita → «Rileggila tu più tardi», la foto resta');
+await sc('[data-a="vnRiAuto"]');await wait(200);
+ok(/Riprovo da sola tra 0:0[12] · tentativo 1 di 5/.test(await txt('.sheet .vn-ri')),'v107: conto alla rovescia e tentativo 1 di 5 ('+(await txt('.sheet .vn-ri'))+')');
+await pg.waitForFunction(()=>window._n>=6&&!S.vnf.busy,null,{timeout:15000});await wait(200);
+ok(/tentativo 2 di 5/.test(await txt('.sheet .vn-ri'))&&await pg.evaluate(()=>!window._vib.length),'v107: primo tentativo da sola non riuscito → tentativo 2 di 5, niente vibrazione');
+await pg.waitForFunction(()=>S.vnf&&S.vnf.n==='Prova Riprova',null,{timeout:15000});await wait(200);
+ok(await pg.evaluate(()=>window._vib.length===1&&!S.vnf.au&&!S.vnf.ko)&&await pg.locator('.sheet .vn-ri').count()===0&&await pg.locator('.sheet .vn-fi').count()===0,'v107: letto al secondo tentativo da sola → scheda riempita, il telefono vibra, riquadro via');
+await sc('[data-a="closeSheet"]');await wait(300);
+// «Smetti» ferma i tentativi; dopo VN_RI_MAX tentativi si ferma da sola
+await v107(999);await wait(200);await sc('[data-a="vnFotoGo"]');await pg.waitForFunction(()=>S.vnf&&!S.vnf.busy&&window._n>=3);await wait(200);
+await sc('[data-a="vnRiAuto"]');await wait(200);await sc('[data-a="vnRiStop"]');await wait(1900);
+ok(await pg.evaluate(()=>!S.vnf.au&&window._n===3)&&/Rileggila tu più tardi/.test(await txt('.sheet')),'v107: «Smetti» → nessun tentativo in più, torna il pulsante');
+await pg.evaluate(()=>{VN_RI_MS=300;VN_RI_MAX=2});await sc('[data-a="vnRiAuto"]');
+await pg.waitForFunction(()=>!S.vnf.au,null,{timeout:15000});await wait(200);
+ok(await pg.evaluate(()=>window._n===9&&!!S.vnf.ko)&&/neanche dopo 2 tentativi/.test(await txt('body'))&&/Rileggila tu più tardi/.test(await txt('.sheet')),'v107: dopo VN_RI_MAX tentativi si ferma e lo dice ('+(await pg.evaluate(()=>window._n))+' richieste)');
+await pg.evaluate(()=>{gemCall=window._vero;VN_RI_MS=120000;VN_RI_MAX=5});
+await sc('[data-a="closeSheet"]');await wait(300);
 // la prova Cloudflare ha aperto un'altra scheda sopra il Turriga: chiude anche quella
 await sc('[data-a="closeSheet"]');await wait(300);
 // carta: solo in casa, tipo, ricerca

@@ -48,6 +48,7 @@ function vnFormH(){const f=S.vnf,me=meU(),inp=(k,l,ph,x)=>`<label class="lbl" fo
   ta=(k,l,ph)=>`<label class="lbl" for="vnf-${k}">${l}</label><textarea class="inp vn-ta" id="vnf-${k}" data-in="vnf" data-k="${k}" rows="3" placeholder="${esc(ph||'')}">${esc(f[k])}</textarea>`,num_=(k,l,ph)=>`<label><span class="lbl">${l}</span><input class="inp" id="vnf-${k}" inputmode="decimal" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"></label>`;
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica vino':'Nuovo vino'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${f.busy?vnBusyH(f):(f.fotos||[]).length?vnFotoH(f):`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} Foto dell'etichetta</button>${f.rip?`<button type="button" class="btn ghost" data-a="vnFotoG">${ic('image')} Galleria</button>`:''}<button type="button" class="btn ghost" data-a="vnIa">${ic('sparkle')} Completa con l'IA</button></div>`}
+  ${!f.busy&&f.ko?vnRiH(f):''}
   ${f.rip?`<p class="vn-al vn-rip">${ic('warn')} ${f.rip==='cam'?'Il telefono ha chiuso l\'app mentre c\'era la fotocamera. Ho ripreso la scheda: rifai la foto. Se succede ancora: scatta con la Fotocamera del telefono, poi qui tocca «Galleria».':'Il telefono aveva chiuso l\'app: ho ripreso la scheda del vino.'}</p>`:''}
   ${f.ia&&f.lt&&(f.lg||[]).length?`<p class="muted small vn-lt">Letto da ${esc(gemNome(f.lt))}. Prima: ${f.lg.map(x=>esc(gemNome(x.l))+' — '+esc(gemPerche(x.l,x.st))).join('; ')}.</p>`:''}
   ${f.ia?`<p class="vn-al">${ic('warn')} Scritto dall'IA${f.ia==='dubbio'?', che non era sicura del vino':''}: controlla annata, gradi e premi prima di salvare.</p>`:''}
@@ -90,8 +91,8 @@ function vnSecTxt(f,sol){const el=Math.round((Date.now()-(f.t0||Date.now()))/100
 function vnTick(){clearInterval(vnTick.h);vnTick.h=setInterval(()=>{const f=S.vnf;if(!f||!f.busy){clearInterval(vnTick.h);return}
   const sol=f.bl?vnTSolito(f.bl):20,a=(Date.now()-(f.ta||Date.now()))/1000,e=document.getElementById('vn-sec'),b=document.getElementById('vn-bar');
   if(e)e.textContent=vnSecTxt(f,f.bl?sol:0);if(b)b.style.width=(a<sol?a/sol*85:85+12*(1-Math.exp(-(a-sol)/sol))).toFixed(1)+'%'},250)}
-async function vnIaGo(files){const f=S.vnf;if(!f||f.busy)return;const nome=[f.n,f.cant,f.ann].map(x=>String(x||'').trim()).filter(Boolean).join(' ');
-  if(!files&&!nome)return toast('Scrivi prima il nome del vino (e la cantina).','warn');
+async function vnIaGo(files,au){const f=S.vnf;if(!f||f.busy)return false;const nome=[f.n,f.cant,f.ann].map(x=>String(x||'').trim()).filter(Boolean).join(' ');
+  if(!files&&!nome){toast('Scrivi prima il nome del vino (e la cantina).','warn');return false}
   f.busy=true;f.bl='';f.lg=[];f.lt='';f.t0=f.ta=Date.now();refreshSheet();vnTick();try{const im=[];if(files)for(const x of files.slice(0,VN_FMAX))im.push({inline_data:{mime_type:'image/jpeg',data:await b64(VN_PIC.has(x)?x:await shrinkImg(x))}});
     const body=p=>({contents:[{parts:[{text:vnPrompt(files?'':nome,p.length)}].concat(p)}],generationConfig:{temperature:0.2}});
     // D44: stessi lettori dei listini (Flash → Flash-Lite → Cloudflare), tutte le foto nella stessa richiesta
@@ -102,12 +103,31 @@ async function vnIaGo(files){const f=S.vnf;if(!f||f.busy)return;const nome=[f.n,
       // v96: motivo vero del passaggio al lettore dopo (domanda #108: «perché Lite?»), nel foglio e nella scatola nera
       f.lg.push({l,st:r.st,sec:Math.round((Date.now()-f.ta)/1000)});errLog('Vino: '+gemNome(l)+' non ha letto (errore '+(r.st||'rete')+') '+String(r.msg||'').slice(0,160))}
     if(g.txt){f.lt=f.bl;vnTSalva(f.bl,Math.max(1,Math.round((Date.now()-f.ta)/1000)))}f.busy=false;f.bl='';
-    if(!g.txt){refreshSheet();return toast((g.err||'L\'IA non ha risposto.')+' Riprova.','warn')}
-    const r=vnLeggi(g.txt);if(!r){refreshSheet();return toast(files?'Non riconosco il vino nella foto. Riprova con l\'etichetta ben dritta e nitida.':'Non trovo questo vino. Controlla il nome.','warn')}
+    // v107: lettura non riuscita → «Rileggila tu più tardi» (vnRiH); con au (nuovo tentativo da sola) niente avviso a ogni giro
+    if(!g.txt){f.ko={foto:!!files};refreshSheet();if(!au)toast((g.err||'L\'IA non ha risposto.')+' Riprova.','warn');return false}
+    f.ko=null;const r=vnLeggi(g.txt);if(!r){refreshSheet();toast(files?'Non riconosco il vino nella foto. Riprova con l\'etichetta ben dritta e nitida.':'Non trovo questo vino. Controlla il nome.','warn');return false}
     const dop=!f.id&&vnAll().find(v=>norm(v.n)===norm(r.n)&&norm(v.cant||'')===norm(r.cant||'')&&String(v.ann||'')===String(r.ann||''));
-    if(dop){closeSheet();toast('Questo vino è già in cantina.');return vnShow(dop.id)}
-    if(files)vnFotoVia(f);vnUnisci(f,r);refreshSheet()}
-  catch(e){f.busy=false;refreshSheet();toast(e&&e.code==='img'?'La foto non si apre: prova a rifarla.':'Non riesco a contattare l\'IA. Controlla la connessione.','warn')}}
+    if(dop){closeSheet();toast('Questo vino è già in cantina.');vnShow(dop.id);return true}
+    if(files)vnFotoVia(f);vnUnisci(f,r);refreshSheet();return true}
+  catch(e){f.busy=false;f.ko=e&&e.code==='img'?null:{foto:!!files};refreshSheet();if(!au||!f.ko)toast(e&&e.code==='img'?'La foto non si apre: prova a rifarla.':'Non riesco a contattare l\'IA. Controlla la connessione.','warn');return false}}
+// v107 (idea #126 scelta da Mario): se l'IA non legge (Google pieno, niente rete) l'app riprova da sola ogni VN_RI_MS, al massimo VN_RI_MAX volte, finché la scheda è aperta; quando legge il telefono vibra
+let VN_RI_MS=120000,VN_RI_MAX=5;
+function vnRiTra(a){const s=Math.max(0,Math.ceil((a.next-Date.now())/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function vnRiH(f){const a=f.au,pl=(f.fotos||[]).length>1;
+  if(!a)return`<div class="vn-ri"><p class="small">${ic('warn')} L'IA adesso non ha letto (succede quando Google ha troppo lavoro o manca la rete).${f.ko.foto?(pl?' Le foto restano qui.':' La foto resta qui.'):''}</p><button type="button" class="btn primary block" data-a="vnRiAuto">${ic('clock')} ${f.ko.foto?(pl?'Rileggile':'Rileggila'):'Riprova'} tu più tardi</button></div>`;
+  return`<div class="vn-ri" role="status"><p class="small">${ic('clock')} Riprovo da sola tra <b id="vn-ri">${vnRiTra(a)}</b> · tentativo ${a.n+1} di ${VN_RI_MAX}. Tieni aperta questa scheda: quando l'IA ha letto, il telefono vibra.</p><div class="btns"><button type="button" class="btn ghost" data-a="vnRiOra">Riprova adesso</button><button type="button" class="btn ghost" data-a="vnRiStop">Smetti</button></div></div>`}
+function vnRiAuto(){const f=S.vnf;if(!f||!f.ko)return;f.au={n:0,next:Date.now()+VN_RI_MS};refreshSheet();vnRiTick()}
+function vnRiStop(){const f=S.vnf;if(f)f.au=null;clearInterval(vnRiTick.h);refreshSheet()}
+function vnRiOra(){const f=S.vnf;if(f&&f.au&&!f.au.go&&!f.busy)vnRiProva(f)}
+function vnRiTick(){clearInterval(vnRiTick.h);vnRiTick.h=setInterval(()=>{const f=S.vnf;if(!f||!f.au||f.chiusa||!f.ko){if(f)f.au=null;clearInterval(vnRiTick.h);return}
+  const e=document.getElementById('vn-ri');if(e)e.textContent=vnRiTra(f.au);
+  if(!f.busy&&!f.au.go&&Date.now()>=f.au.next&&navigator.onLine!==false)vnRiProva(f)},1000)}
+async function vnRiProva(f){const a=f.au;a.go=true;a.n++;const files=f.ko.foto?(f.fotos||[]).map(x=>x.file):null;
+  if(f.ko.foto&&!files.length){f.au=null;refreshSheet();return}
+  const ok=await vnIaGo(files,true);a.go=false;if(f.au!==a)return;
+  if(ok){f.au=null;try{if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}if(!f.chiusa)toast('Fatto: l\'IA ha letto il vino. Controlla la scheda e salva.');return}
+  if(!f.ko||a.n>=VN_RI_MAX){f.au=null;if(f.ko)toast('L\'IA non ha letto neanche dopo '+a.n+' tentativi. Riprova più tardi.','warn');if(S.vnf===f)refreshSheet();return}
+  a.next=Date.now()+VN_RI_MS;if(S.vnf===f)refreshSheet()}
 // D44: fino a VN_FMAX foto della stessa bottiglia (fronte, retro…), lette insieme con «Leggi con l'IA»
 const VN_FMAX=3;
 function vnFoto(nuovo,gal){if(!gemOn())return toast('Per leggere le foto serve l\'IA del ristorante (Gemini): chiedi allo sviluppatore. Intanto scrivi il nome.','warn');
