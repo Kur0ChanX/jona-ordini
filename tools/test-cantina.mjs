@@ -169,14 +169,21 @@ await sc('[data-a="closeSheet"]');await wait(300);
 await sc('[data-a="closeSheet"]');await wait(300);
 // v108 (D52, strada 2 scelta da Mario #126): «Cerca nel mondo» → l'IA cerca su Google, lista con le annate, tocchi → scheda
 const dopV=await pg.evaluate(()=>{const v=vnAll().find(x=>x.cant);window._b=[];
-  gemCall=async(b,l)=>{const tx=b.contents[0].parts[0].text;window._b.push({l,tools:JSON.stringify(b.tools||null),tx});
+  gemCall=async(b,l)=>{const tx=b.contents[0].parts[0].text;window._b.push({l,tools:JSON.stringify(b.tools||null),tx,gc:JSON.stringify(b.generationConfig||null)});
     return /Cerca sul web/.test(tx)?{txt:'Ecco i vini:\n```json\n'+JSON.stringify({vini:[{nome:'Korem',cantina:'Argiolas',zona:'Sardegna, Italia',denominazione:'Isola dei Nuraghi IGT',tipo:'rosso',annate:[2021,'2020',1800]},{nome:v.n,cantina:v.cant,tipo:'bianco',annate:'2023, 2022'}]})+'\n```',lettore:'flash'}
       :{txt:'{"nome":"Korem","cantina":"Argiolas","gradi":14,"frase":"Rosso sardo morbido.","sicuro":true}',lettore:'flash'}};return v.n});
+// v111 (Mario #130): prima la cantina; se il vino c'è, solo un pulsante piccolo «Non è tra questi?»; se non c'è, pulsante grande «Cerca su internet»
+await pg.fill('#vnq','Tigna');await wait(250);t=await txt('.sheet');
+ok(/Togli «Solo in casa»/.test(t)&&!/non è in cantina/.test(t)&&await pg.locator('.sheet .vn-mb.ghost').count()===1,'v111: vino finito nascosto da «Solo in casa» → niente «non è in cantina», pulsante piccolo');
+await pg.fill('#vnq','Vermen');await wait(250);
+t=await txt('.sheet');ok(await pg.locator('.sheet .vn-mb.ghost').count()===1&&/Non è tra questi\? Cerca su internet/.test(t)&&await pg.locator('.sheet .vn-mb.primary').count()===0,'v111: vino trovato in cantina → lista e piccolo «Non è tra questi? Cerca su internet» ['+dopV+'] '+t.slice(-300));
 await pg.fill('#vnq','korem');await wait(250);
-ok(await pg.locator('.sheet [data-a="vnMondo"]').count()===1&&/Cerca «korem» nel mondo con l'IA/.test(await txt('.sheet')),'v108: scritto un nome → «Cerca nel mondo con l\'IA»');
+t=await txt('.sheet');
+ok(await pg.locator('.sheet .vn-mb.primary[data-a="vnMondo"]').count()===1&&/«korem» non è in cantina\./.test(t)&&!/Solo in casa» per/.test(t)&&/Cerca «korem» su internet/.test(t),'v111: vino non in cantina → «non è in cantina» e pulsante grande «Cerca su internet»');
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
 t=await txt('.sheet');
-ok(await pg.evaluate(()=>window._b.length===1&&window._b[0].l==='f25'&&window._b[0].tools==='[{"google_search":{}}]'&&/«korem»/.test(window._b[0].tx)),'v108/v110: una richiesta a Gemini 2.5 Flash con la ricerca Google');
+ok(await pg.evaluate(()=>window._b.length===1&&window._b[0].l==='l25'&&window._b[0].tools==='[{"google_search":{}}]'&&/«korem»/.test(window._b[0].tx)&&JSON.parse(window._b[0].gc).thinkingConfig.thinkingBudget===0),'v108/v110/v111: una richiesta a Gemini 2.5 Flash-Lite con la ricerca Google, senza ragionamento (thinkingBudget 0)');
+ok(await pg.evaluate(()=>{const a=(ls('jona_ia_t')||{}).mondo;return Array.isArray(a)&&a.length===1&&a[0]>=1}),'v111: tempo della ricerca salvato per il caricamento dopo (jona_ia_t.mondo)');
 ok(/Korem/.test(t)&&/Argiolas · Isola dei Nuraghi IGT/.test(t)&&await pg.locator('.sheet .vn-mo').first().locator('.chip').allInnerTexts().then(x=>x.join()==='2021,2020'),'v108: lista dei vini con cantina, denominazione e annate (anno sbagliato 1800 tolto)');
 ok(/Già in cantina/.test(await pg.locator('.sheet .vn-mo').nth(1).innerText()),'v108: il vino che c\'è già è segnato «Già in cantina» ('+dopV+')');
 await pg.locator('.sheet .vn-mo').first().locator('.chip',{hasText:'2020'}).click();
@@ -186,18 +193,29 @@ await sc('[data-a="closeSheet"]');await wait(300);
 // Google pieno con tutti e due i lettori → errore chiaro e «Riprova»
 await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{window._b.push(l);return{st:503,err:'Gemini non ha risposto.'}}});
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
-ok(await pg.evaluate(()=>window._b.join()==='f25,l25,flash,lite')&&/non ha risposto\. Riprova/.test(await txt('.sheet'))&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v108/v110: Gemini 2.5 e 3 pieni → messaggio e «Riprova» (niente Cloudflare, non cerca sul web) ['+(await pg.evaluate(()=>window._b.join()))+'] '+(await txt('.sheet')));
+ok(await pg.evaluate(()=>window._b.join()==='l25,f25,lite,flash')&&/non ha risposto\. Riprova/.test(await txt('.sheet'))&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v108/v110: Gemini 2.5 e 3 pieni → messaggio e «Riprova» (niente Cloudflare, non cerca sul web) ['+(await pg.evaluate(()=>window._b.join()))+'] '+(await txt('.sheet')));
 await sc('[data-a="closeSheet"]');await wait(300);
 // v109 (#129, foto di Mario): Google nega la ricerca (429) → stessa domanda senza ricerca, avviso giallo; il messaggio non dice due volte «Riprova»
 await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{const t=JSON.stringify(b.tools||null);window._b.push(l+':'+t);
   return t!=='null'?{st:429,msg:'Resource exhausted',err:'Gemini è molto occupato adesso: riprova tra un minuto.'}
     :{txt:JSON.stringify({vini:[{nome:'Korem',cantina:'Argiolas',tipo:'rosso',annate:[2021]}]}),lettore:'flash'}}});
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);t=await txt('.sheet');
-ok(await pg.evaluate(()=>window._b.join()==='f25:[{"google_search":{}}],l25:[{"google_search":{}}],flash:null'&&S.vnM.mem===true)&&/Korem/.test(t)&&/memoria dell'IA/.test(t)&&await pg.locator('.sheet').last().locator('.vn-mo').count()===1,'v109: 429 con la ricerca → senza Google, lista e avviso giallo ['+(await pg.evaluate(()=>window._b.join(' ')))+']');
+ok(await pg.evaluate(()=>window._b.join()==='l25:[{"google_search":{}}],f25:[{"google_search":{}}],lite:null'&&S.vnM.mem===true)&&/Korem/.test(t)&&/memoria dell'IA/.test(t)&&await pg.locator('.sheet').last().locator('.vn-mo').count()===1,'v109: 429 con la ricerca → senza Google, lista e avviso giallo ['+(await pg.evaluate(()=>window._b.join(' ')))+']');
 await sc('[data-a="closeSheet"]');await wait(300);
 await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{window._b.push(l);return{st:429,msg:'Resource exhausted',err:'Gemini è molto occupato adesso: riprova tra un minuto.'}}});
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);t=await txt('.sheet');
-ok(await pg.evaluate(()=>window._b.join()==='f25,l25,flash,lite'&&!S.vnM.mem)&&await pg.locator('.sheet').last().locator('.vn-al').innerText().then(x=>/riprova tra un minuto\.$/.test(x.trim())&&(x.match(/riprova/gi)||[]).length===1)&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v109: tutto pieno → un solo «riprova» nel messaggio e pulsante «Riprova» ['+(await pg.evaluate(()=>window._b.join()))+'] '+t);
+ok(await pg.evaluate(()=>window._b.join()==='l25,f25,lite,flash'&&!S.vnM.mem)&&await pg.locator('.sheet').last().locator('.vn-al').innerText().then(x=>/riprova tra un minuto\.$/.test(x.trim())&&(x.match(/riprova/gi)||[]).length===1)&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v109: tutto pieno → un solo «riprova» nel messaggio e pulsante «Riprova» ['+(await pg.evaluate(()=>window._b.join()))+'] '+t);
+await sc('[data-a="closeSheet"]');await wait(300);
+// v111: calice mentre cerca (il vino sale col tempo, non arriva all'orlo prima della risposta); Google rifiuta thinkingConfig (400) → stessa domanda senza
+await pg.evaluate(()=>{window._b=[];ls('jona_ia_t',{mondo:[2]});window._fine=null;gemCall=(b,l)=>{window._b.push(l+':'+JSON.stringify(b.generationConfig));
+  return JSON.stringify(b.generationConfig).includes('thinking')?Promise.resolve({st:400,err:'x'}):new Promise(r=>{window._fine=()=>r({txt:JSON.stringify({vini:[{nome:'Korem',cantina:'Argiolas',tipo:'rosso',annate:[2021]}]})})})}});
+await sc('[data-a="vnMondo"]');await pg.waitForSelector('.sheet .vn-cal #vn-liv');
+const y0=await pg.evaluate(()=>parseFloat(document.getElementById('vn-liv').style.transform.match(/-?[\d.]+/)[0]));await wait(1600);
+const y1=await pg.evaluate(()=>parseFloat(document.getElementById('vn-liv').style.transform.match(/-?[\d.]+/)[0]));
+ok(await pg.locator('.sheet .vn-cbox').count()===1&&/di solito circa 2 secondi/.test(await txt('.sheet .vn-cbox'))&&y1<y0-5&&y1>8.5,'v111: calice con il vino che sale ('+y0+' → '+y1+', orlo = 8) e tempo solito «circa 2 secondi»');
+ok(await pg.evaluate(()=>window._b.join(' ')==='l25:{"temperature":0.2,"thinkingConfig":{"thinkingBudget":0}} l25:{"temperature":0.2}'),'v111: 400 con thinkingConfig → stessa domanda senza, stesso lettore ['+(await pg.evaluate(()=>window._b.join(' ')))+']');
+await pg.evaluate(()=>window._fine());await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
+ok(await pg.locator('.sheet .vn-cbox').count()===0&&await pg.locator('.sheet').last().locator('.vn-mo').count()===1,'v111: risposta arrivata → calice pieno, poi la lista');
 await sc('[data-a="closeSheet"]');await wait(300);
 // v109: limite del giorno di Google → messaggio chiaro (gemCall con la chiave del telefono e risposta finta)
 t=await pg.evaluate(async()=>{const f=window.fetch,k=ls('jona_gemini_key');ls('jona_gemini_key','prova');
@@ -205,7 +223,7 @@ t=await pg.evaluate(async()=>{const f=window.fetch,k=ls('jona_gemini_key');ls('j
   try{const g=await window._vero({contents:[]},'flash'),h=await window._vero({contents:[]});return g.err+' | '+h.err}finally{window.fetch=f;ls('jona_gemini_key',k||null)}});
 ok(/richieste gratis di oggi/.test(t)&&!/occupato/.test(t),'v109: 429 «PerDay» → «Gemini ha finito le richieste gratis di oggi» ('+t+')');
 await pg.evaluate(()=>{gemCall=window._vero});await pg.fill('#vnq','');await wait(250);
-ok(await pg.locator('.sheet [data-a="vnMondo"]').count()===0,'v108: campo vuoto → niente «Cerca nel mondo»');
+ok(await pg.locator('.sheet [data-a="vnMondo"]').count()===0,'v108: campo vuoto → niente «Cerca su internet»');
 // carta: solo in casa, tipo, ricerca
 t=await txt('.sheet');
 ok(/Vermentino di Gallura 2023/.test(t)&&!/Tignanello/.test(t),'Carta: «Solo in casa» nasconde il Tignanello finito');

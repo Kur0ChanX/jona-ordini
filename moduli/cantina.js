@@ -27,11 +27,13 @@ function vnList(){const V=S.vn,me=meU(),all=vnAll(),can=vnCan(me),ven=vnVenduti(
     ${top?`<span class="lbl">Più venduti questo mese</span><ol class="vn-top">${top}</ol>`:''}
     <span class="lbl">Conta veloce</span><p class="muted small">− quando vendi una bottiglia, + quando arrivano.</p>
     <div>${all.map(v=>`<div class="vn-inv"><div class="row-i"><div class="row-t">${vnTit(v)}</div><div class="row-m">${esc(v.cant||'')}${ven[v.id]?' · '+ven[v.id]+' vendute':''}</div></div><button type="button" class="icon-btn vn-pm" data-a="vnVen" data-v="${v.id}" aria-label="Venduta una bottiglia di ${esc(v.n)}">−</button><b class="vn-n ${!(+v.q)?'vn-zero':v.min>0&&(+v.q||0)<=v.min?'vn-basso':''}">${+v.q||0}</b><button type="button" class="icon-btn vn-pm" data-a="vnCar" data-v="${v.id}" aria-label="Arrivata una bottiglia di ${esc(v.n)}">+</button></div>`).join('')||'<p class="muted">Ancora nessun vino.</p>'}</div>`}
-  const q=norm(V.q),l=all.filter(v=>(!V.tipo||v.tipo===V.tipo)&&(!V.casa||(+v.q||0)>0)&&(!q||norm([v.n,v.cant,v.den,v.vit,v.ann].join(' ')).includes(q)));
+  // v111 (Mario #130: «cerca il vino in locale, se non c'è dentro c'è un tasto cerca su internet»)
+  const qt=String(V.q||'').trim(),mo=can&&!!qt&&gemOn(),q=norm(V.q),cerca=v=>norm([v.n,v.cant,v.den,v.vit,v.ann].join(' ')).includes(q),fuori=!!q&&!all.some(cerca),l=all.filter(v=>(!V.tipo||v.tipo===V.tipo)&&(!V.casa||(+v.q||0)>0)&&(!q||cerca(v)));
   return head+add+`<div class="search rc-cerca">${ic('search')}<input id="vnq" type="search" placeholder="Cerca vino, cantina o vitigno" value="${esc(V.q)}" data-in="vnq" autocomplete="off"></div>
   <div class="chips">${[['','Tutti']].concat(Object.entries(VN_TIPI)).map(([k,t])=>`<button type="button" class="chip" aria-pressed="${V.tipo===k}" data-a="vnTipo" data-v="${k}">${t}</button>`).join('')}<button type="button" class="chip" aria-pressed="${V.casa}" data-a="vnCasa">Solo in casa</button></div>
-  <div>${l.length?l.map(v=>vnRow(v,ven[v.id])).join(''):`<p class="muted">${all.length?'Nessun vino trovato in cantina.'+(V.casa?' Togli «Solo in casa» per vedere anche quelli finiti.':''):can?'La cantina è vuota. Tocca «Fotografa una bottiglia»: l\'IA scrive la scheda del vino, tu controlli e salvi.':'La cantina è vuota: i vini li aggiunge il responsabile.'}</p>`}</div>
-  ${can&&String(V.q).trim()&&gemOn()?`<button type="button" class="btn ghost block vn-mb" data-a="vnMondo">${ic('search')} Cerca «${esc(String(V.q).trim().slice(0,40))}» nel mondo con l'IA</button>`:''}`}
+  <div>${l.length?l.map(v=>vnRow(v,ven[v.id])).join(''):`<p class="muted">${all.length?(fuori?'«'+esc(qt.slice(0,40))+'» non è in cantina.':'Nessun vino trovato in cantina.'+(V.casa?' Togli «Solo in casa» per vedere anche quelli finiti.':'')):can?'La cantina è vuota. Tocca «Fotografa una bottiglia»: l\'IA scrive la scheda del vino, tu controlli e salvi.':'La cantina è vuota: i vini li aggiunge il responsabile.'}</p>`}</div>
+  ${mo?(!fuori?`<button type="button" class="btn ghost block vn-mb" data-a="vnMondo">${ic('search')} Non è tra questi? Cerca su internet</button>`
+    :`<button type="button" class="btn primary block vn-mb" data-a="vnMondo">${ic('search')} Cerca «${esc(qt.slice(0,40))}» su internet</button>`):''}`}
 // v108 (D52, strada 2 «Furba» scelta da Mario #126): «Cerca nel mondo», l'IA cerca su Google (grounding) i vini col nome scritto, lista con le annate, tocchi → scheda scritta dall'IA
 // v109: mem = senza ricerca Google (Google ha negato la ricerca, 429): l'IA risponde da quello che sa
 function vnMondoPrompt(q,mem){return(mem?'Senza cercare sul web, dimmi i vini veri che conosci che corrispondono a: «':'Cerca sul web (ricerca Google) i vini veri che corrispondono a: «')+q+'». Rispondi SOLO con un JSON, senza altro testo né note: {"vini":[{"nome":"nome del vino, senza la cantina","cantina":"","zona":"regione e paese","denominazione":"DOC/DOCG/IGT…","tipo":"rosso|bianco|rosato|bollicine|dolce","annate":[le annate in commercio, numeri, la più recente prima, massimo 6]}]}. Massimo 6 vini, il più probabile per primo. Solo vini che esistono davvero; se non trovi niente: {"vini":[]}.'}
@@ -42,22 +44,38 @@ function vnMondoLeggi(txt){let a;try{a=JSON.parse(String(txt).match(/\{[\s\S]*\}
 async function vnMondo(){const q=String(S.vn&&S.vn.q||'').trim();if(!q)return;if(!gemOn())return toast('L\'IA non è attiva su questo telefono.','warn');
   const nuovo=!S.vnM;S.vnM={q,busy:true,t0:Date.now(),l:[],err:''};const M=S.vnM;
   if(nuovo)openSheet({cls:'tall',live:()=>true,render:vnMondoH,onClose:()=>{if(S.vnM===M)S.vnM=null}});else refreshSheet();
-  clearInterval(vnMondo.h);vnMondo.h=setInterval(()=>{const e=document.getElementById('vn-ms');if(!M.busy||S.vnM!==M){clearInterval(vnMondo.h);return}if(e)e.textContent=Math.round((Date.now()-M.t0)/1000)+' s'},500);
-  const body={contents:[{parts:[{text:vnMondoPrompt(q)}]}],tools:[{google_search:{}}],generationConfig:{temperature:0.2}};
-  // v110 (#129): la ricerca Google gratis c'è solo con Gemini 2.5 (500 al giorno; con Gemini 3 solo a pagamento) → lettori f25, l25
-  let g={};try{for(const l of ['f25','l25']){g=await gemCall(body,l);if(g.txt||!GEM_RETRY.test(String(g.st)))break;errLog('Vino nel mondo: '+gemNome(l)+' non ha cercato (errore '+(g.st||'rete')+(g.msg?': '+String(g.msg).slice(0,160):'')+')')}
+  clearInterval(vnMondo.h);vnMondo.h=setInterval(()=>{if(!M.busy||S.vnM!==M){clearInterval(vnMondo.h);return}const e=document.getElementById('vn-ms'),w=document.getElementById('vn-liv');
+    if(e)e.textContent=Math.round((Date.now()-M.t0)/1000)+' s';if(w)w.style.transform='translateY('+vnCalY(vnCalLiv(M))+'px)'},500);
+  // v111 (Mario #130: «ci ha messo 50 secondi»): Gemini 2.5 Flash ragiona prima di rispondere (thinking acceso) → spento con thinkingBudget 0; Flash-Lite (più veloce) per primo
+  const gc={temperature:0.2,thinkingConfig:{thinkingBudget:0}},body={contents:[{parts:[{text:vnMondoPrompt(q)}]}],tools:[{google_search:{}}],generationConfig:gc};
+  // v110 (#129): la ricerca Google gratis c'è solo con Gemini 2.5 (500 al giorno; con Gemini 3 solo a pagamento) → lettori l25, f25
+  let g={};try{for(const l of ['l25','f25']){g=await gemCall(body,l);
+      // se Google non accetta thinkingConfig (400) la stessa domanda senza, una volta
+      if(!g.txt&&g.st===400&&body.generationConfig.thinkingConfig){body.generationConfig={temperature:0.2};g=await gemCall(body,l)}
+      if(g.txt||!GEM_RETRY.test(String(g.st)))break;errLog('Vino nel mondo: '+gemNome(l)+' non ha cercato (errore '+(g.st||'rete')+(g.msg?': '+String(g.msg).slice(0,160):'')+')')}
     // v109 (#129, foto di Mario «Gemini è molto occupato»): Google non fa la ricerca (limite, occupato) → stessa domanda senza ricerca con Gemini 3
     if(!g.txt&&(GEM_RETRY.test(String(g.st))||g.st===400)){const b2={contents:[{parts:[{text:vnMondoPrompt(q,true)}]}],generationConfig:{temperature:0.2}};
-      for(const l of ['flash','lite']){const r=await gemCall(b2,l);if(r.txt){g=r;M.mem=true;break}errLog('Vino nel mondo senza Google: '+gemNome(l)+' (errore '+(r.st||'rete')+')');if(!GEM_RETRY.test(String(r.st)))break}}
+      for(const l of ['lite','flash']){const r=await gemCall(b2,l);if(r.txt){g=r;M.mem=true;break}errLog('Vino nel mondo senza Google: '+gemNome(l)+' (errore '+(r.st||'rete')+')');if(!GEM_RETRY.test(String(r.st)))break}}
   }catch(e){g={err:'Non riesco a contattare l\'IA. Controlla la connessione.'}}
+  if(S.vnM!==M){M.busy=false;return}
+  // trovato: il calice si riempie fino all'orlo, poi la lista; tempo salvato per il prossimo caricamento (solo ricerca con Google)
+  if(g.txt){if(!M.mem)vnTSalva('mondo',Math.max(1,Math.round((Date.now()-M.t0)/1000)));const w=document.getElementById('vn-liv');
+    if(w){w.style.transition='transform .45s cubic-bezier(.2,.7,.3,1)';w.style.transform='translateY('+vnCalY(1)+'px)';await new Promise(r=>setTimeout(r,480))}}
   M.busy=false;if(S.vnM!==M)return;
   if(!g.txt)M.err=g.err&&/riprova/i.test(g.err)?g.err:(g.err||'L\'IA non ha risposto.')+' Riprova.';
   else{M.l=vnMondoLeggi(g.txt)||[];if(!M.l.length)M.err='Non ho trovato vini con questo nome. Prova a scrivere anche la cantina.'}
   refreshSheet()}
+// v111 (scelta A «Calice» di Mario #130, «fai bene l'animazione… ottimizzata senza appesantire»): il vino sale nel calice sul tempo solito
+// (media delle ultime 5 ricerche riuscite, jona_ia_t.mondo): a quel tempo ~3/4, poi rallenta senza arrivare all'orlo; l'orlo solo a risposta arrivata.
+// Si muovono solo transform (livello ogni 0,5 s con transizione lineare, onda in CSS): niente ridisegni della pagina.
+function vnCalLiv(M){if(!M.busy)return 1;const t=(Date.now()-M.t0)/1000;return .92*(1-Math.exp(-1.6*t/vnTSolito('mondo')))}
+function vnCalY(v){return(42-34*v).toFixed(2)}
+function vnCaliceH(M){const P='M14 6h36c0 22-6 34-18 36C20 40 14 28 14 6z',O='q4-1.4 8 0t8 0'.repeat(8);
+  return`<svg class="vn-cal" viewBox="0 0 64 88" aria-hidden="true"><defs><clipPath id="vn-calk"><path d="${P}"/></clipPath></defs><g clip-path="url(#vn-calk)"><g id="vn-liv" class="vn-liv" style="transform:translateY(${vnCalY(vnCalLiv(M))}px)"><path class="vn-onda2" d="M-32 0${O}V48H-32z"/><path class="vn-onda" d="M-32 1.2${O}V48H-32z"/></g></g><path class="vn-vetro" d="${P}M32 42v30M20 78q12-6 24 0"/><path class="vn-luce" d="M19 10q0 14 4 22"/></svg>`}
 function vnMondoDop(x,y){return vnAll().find(v=>norm(v.n)===norm(x.n)&&norm(v.cant||'')===norm(x.cant||'')&&(!y||String(v.ann||'')===String(y)))}
 function vnMondoH(){const M=S.vnM||{q:'',l:[]};
-  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Cerca nel mondo<div class="sh-s">«${esc(M.q)}»</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${M.busy?`<div class="vn-busy" role="status">${ic('clock')} <span style="flex:1;min-width:0">L'IA cerca su Google i vini con questo nome… <span class="small" id="vn-ms">${Math.round((Date.now()-M.t0)/1000)} s</span><br><span class="muted small">di solito 5-20 secondi</span></span></div>`:''}
+  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Cerca su internet<div class="sh-s">«${esc(M.q)}»</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${M.busy?`<div class="vn-cbox" role="status">${vnCaliceH(M)}<p>L'IA cerca su Google i vini con questo nome… <b id="vn-ms">${Math.round((Date.now()-M.t0)/1000)} s</b></p><p class="muted small">di solito circa ${vnTSolito('mondo')} secondi</p></div>`:''}
   ${M.err?`<p class="vn-al">${ic('warn')} ${esc(M.err)}</p><button type="button" class="btn primary block" data-a="vnMondo">Riprova</button>`:''}
   ${!M.busy&&M.l.length&&M.mem?`<p class="vn-al">${ic('warn')} Google adesso non fa ricerche: elenco dalla memoria dell'IA. Controlla bene nomi e annate.</p>`:''}
   ${!M.busy&&M.l.length?`<p class="muted small vn-hint">Tocca il vino giusto o la sua annata: l'IA scrive la scheda, tu controlli e salvi.</p>`+M.l.map((x,i)=>`<div class="vn-mo"><button type="button" class="prow vn-r" data-a="vnMondoSel" data-v="${i}"><span class="vn-dot vn-${esc(x.tipo||'rosso')}" aria-hidden="true"></span><div class="row-i"><div class="row-t">${esc(x.n)}</div><div class="row-m">${esc([x.cant,x.den||x.zona].filter(Boolean).join(' · '))||'&nbsp;'}</div>${vnMondoDop(x)?'<div class="row-m"><b>Già in cantina</b></div>':''}</div></button>${x.ann.length?`<div class="chips">${x.ann.map(y=>`<button type="button" class="chip" data-a="vnMondoSel" data-v="${i}:${y}">${y}</button>`).join('')}</div>`:''}</div>`).join(''):''}`}
@@ -112,7 +130,7 @@ function vnLeggi(txt){let a;try{const m=String(txt).match(/\{[\s\S]*\}/);a=JSON.
 function vnUnisci(f,r){for(const [k,x] of Object.entries(r)){if(k==='abb'){if(!f.abb.length)f.abb=x.slice();continue}if(k==='ia'){f.ia=x;continue}if(x&&!String(f[k]||'').trim())f[k]=x}
   if(r.tipo&&!f.id&&!f._tipo)f.tipo=r.tipo}
 // v106: caricamento vero (richiesta di Mario #125): secondi che passano, barra sul tempo solito di quel lettore (ultime 5 letture riuscite, jona_ia_t), secondi di ogni tentativo fallito
-const VN_TSOLITO={flash:20,lite:12,cf:30};
+const VN_TSOLITO={flash:20,lite:12,cf:30,mondo:10};
 function vnTSolito(l){const a=((ls('jona_ia_t')||{})[l])||[];return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):VN_TSOLITO[l]||20}
 function vnTSalva(l,sec){const t=ls('jona_ia_t')||{};t[l]=(t[l]||[]).concat(sec).slice(-5);ls('jona_ia_t',t)}
 function vnBusyH(f){const sol=f.bl?vnTSolito(f.bl):0;
