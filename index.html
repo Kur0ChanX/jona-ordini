@@ -1232,8 +1232,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=99;
+const APP_VER=100;
 const NEWS=[
+  {v:100,data:'2026-10-13',titolo:'iPhone: notifiche spiegate meglio',
+    tutti:['Su iPhone e iPad, se apri Jona da Safari, l\'app ora ti spiega come installarla sulla schermata Home: solo così arrivano le notifiche.'],
+    dev:['#119 (iPhone di Maurizio): in Safari il permesso è «denied» e l\'app diceva «Notifiche bloccate» → Impostazioni → Notifiche → Jona Ordini, che non c\'è. `iosWeb()` → scheda «Prima installa Jona sull\'iPhone» (`PUSH_INST`). Prova `tools/test-push-iphone.mjs`.']},
   {v:99,data:'2026-10-12',titolo:'Chat: la tastiera non copre più il messaggio',
     tutti:['In chat, quando apri la tastiera, il campo «Scrivi un messaggio» sale sopra la tastiera e vedi gli ultimi messaggi.'],
     dev:['#116: con l\'app a schermo intero Android non restringe la pagina: la chat segue `visualViewport` (`chVV`, classe `kb`). Prova `tools/test-chat-tastiera.mjs` su Pixel 7, Galaxy Tab, iPhone, iPad.']},
@@ -1869,6 +1872,7 @@ async function pushSync(){
   pushSync.busy=1;try{const sub=await(await navigator.serviceWorker.ready).pushManager.getSubscription();if(sub)await pushSave(sub);else ls('jona_push',null)}catch(e){}finally{pushSync.busy=0}}
 async function pushOn(){
   const fail=m=>{toast(m,'err');pushHelp();return false};
+  if(iosWeb())return fail('Su iPhone le notifiche funzionano solo nell\'app aperta dall\'icona sulla schermata Home.');
   if(!pushOk())return fail(/iPhone|iPad/.test(navigator.userAgent)?'Su iPhone: apri l\'app dall\'icona sulla schermata Home.':'Questo telefono non riesce ad attivare le notifiche.');
   if(!pushFb())return toast('Le notifiche funzionano solo con il database centrale collegato.','err');
   if(await Notification.requestPermission()!=='granted')return fail('Notifiche bloccate: segui la guida per consentirle.');
@@ -1891,11 +1895,18 @@ const PUSH_HELP=[
   ['altro','Altro telefono',['Usa <b>Chrome</b>: apri jona-ristorante-by-ynoy-corp.pages.dev in Chrome, premi i <b>tre puntini</b> in alto → <b>Aggiungi a schermata Home</b> (o <b>Installa app</b>) e apri Jona dalla nuova icona.','Controlla che sul telefono ci sia il <b>Play Store</b>.','Apri <b>Impostazioni</b> → <b>App</b> → <b>Chrome</b>: <b>Notifiche</b> accese e <b>Batteria</b> senza restrizioni.']]];
 const PUSH_DENY={iphone:['Apri <b>Impostazioni</b> del telefono (l\'icona con l\'ingranaggio).','Premi <b>Notifiche</b>.','Scorri e premi <b>Jona Ordini</b>.','Accendi <b>Consenti notifiche</b>.','Chiudi del tutto Jona e riaprila <b>dall\'icona</b> sulla schermata Home.'],
   android:['Tieni premuto il dito sull\'icona di <b>Jona</b> → premi <b>Informazioni app</b> (o la <b>i</b>).','Premi <b>Notifiche</b> e accendi <b>Consenti notifiche</b>.','Non trovi la voce? Apri <b>Chrome</b> → <b>tre puntini</b> in alto a destra → <b>Impostazioni</b> → <b>Impostazioni sito</b> → <b>Notifiche</b>.','Sotto <b>Bloccate</b> premi <b>jona-ristorante-by-ynoy-corp.pages.dev</b> → scegli <b>Consenti</b>.','Chiudi del tutto Jona e riaprila <b>dall\'icona</b>.']};
-const pushDenied=()=>pushOk()&&Notification.permission==='denied';
+/* v100: su iPhone/iPad le notifiche esistono solo nell'app aperta dall'icona della schermata Home; in Safari il permesso risulta «denied» ma non è un blocco */
+const iosDev=()=>/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+const iosWeb=()=>iosDev()&&navigator.standalone!==true&&!(window.matchMedia&&matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches);
+const PUSH_INST=['Guarda la schermata Home: se c\'è già l\'icona di <b>Jona</b>, chiudi Safari e apri Jona <b>da lì</b>. Poi vai al passo 4.','Se l\'icona non c\'è: qui in Safari premi <b>Condividi</b> (il quadrato con la freccia in su; se non lo vedi, premi prima i <b>tre puntini ···</b>).','Scorri e premi <b>Aggiungi alla schermata Home</b>. Se c\'è l\'interruttore <b>Apri come app web</b>, lascialo acceso. Premi <b>Aggiungi</b>.','Apri Jona <b>dalla nuova icona</b> sulla schermata Home e rientra con il tuo profilo.','Tocca <b>la tua foto</b> in alto → <b>Attiva le notifiche</b> → <b>Consenti</b>.'];
+const pushDenied=()=>pushOk()&&!iosWeb()&&Notification.permission==='denied';
 function pushHelp(){
   if(!S.pushBrand)S.pushBrand=/iPhone|iPad/.test(navigator.userAgent)?'iphone':/Xiaomi|Redmi|POCO/i.test(navigator.userAgent)?'xiaomi':/SM-[A-Z]\d|Samsung/i.test(navigator.userAgent)?'samsung':'';
   if(sheets.some(x=>x.ph)){repaint();return}S.pushAll=false;
-  openSheet({cls:'tall',ph:1,render:()=>{const g=PUSH_HELP.find(x=>x[0]===S.pushBrand);if(pushDenied()&&!S.pushAll){const ios=/iPhone|iPad/.test(navigator.userAgent);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche bloccate</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  openSheet({cls:'tall',ph:1,render:()=>{const g=PUSH_HELP.find(x=>x[0]===S.pushBrand);if(iosWeb()&&!S.pushAll)return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Prima installa Jona sull'iPhone</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <p class="ph-inst">Ora Jona è aperta in <b>Safari</b>. Su iPhone e iPad le notifiche arrivano <b>solo</b> all'app aperta dall'icona sulla schermata Home. Per questo in <b>Impostazioni → Notifiche</b> non trovi ancora Jona.</p>
+  <ol class="ph-ol">${PUSH_INST.map(x=>`<li>${x}</li>`).join('')}</ol>
+  <div class="btns col"><button type="button" class="btn ghost block" data-a="pushAll">Ho un altro problema</button></div>`;if(pushDenied()&&!S.pushAll){const ios=/iPhone|iPad/.test(navigator.userAgent);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche bloccate</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <p>Su questo telefono le notifiche di Jona sono <b>bloccate</b> (forse hai premuto <b>Blocca</b> o <b>Non consentire</b> per sbaglio). L'app non può chiedere di nuovo: vanno sbloccate a mano, così.</p>
   <h3 class="ph-t">${ios?'iPhone':'Android'}</h3><ol class="ph-ol">${PUSH_DENY[ios?'iphone':'android'].map(x=>`<li>${x}</li>`).join('')}</ol>
   <div class="btns col"><button type="button" class="btn primary block" data-a="pushOn">${ic('bell')} Riprova ad attivare</button><button type="button" class="btn ghost block" data-a="pushAll">Ho un altro problema</button></div>`}return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Le notifiche non arrivano?</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
@@ -2008,8 +2019,8 @@ function view(){
 }
 /* v35 «App da aggiornare»: c'è una versione nuova (service worker cambiato mentre l'app era aperta) o serve il collegamento
    compatibile (netWatch). Niente riavvio automatico: lo decide la persona */
-function pushAsk(){if(S.upd||S.wallMode||!realU()||!pushOk()||!pushFb()||pushActive()||Number(ls('jona_push_ask')||0)>now())return'';const den=pushDenied();
-  return`<div class="obx push-ask" role="status">${ic('bell')}<div class="obx-i"><b>${den?'Notifiche bloccate':'Attiva le notifiche'}</b><span>${den?'Su questo telefono gli avvisi di Jona sono bloccati. Ti spiego come sbloccarli.':'Così ti arrivano gli avvisi anche con l\'app chiusa. Basta un tocco.'}</span></div><div class="obx-b"><button type="button" class="btn ghost sm" data-a="pushLater">Più tardi</button><button type="button" class="btn primary sm" data-a="${den?'pushHelp':'pushOn'}">${den?'Come fare':'Attiva'}</button></div></div>`}
+function pushAsk(){if(S.upd||S.wallMode||!realU()||!pushOk()||!pushFb()||pushActive()||Number(ls('jona_push_ask')||0)>now())return'';const den=pushDenied(),iw=iosWeb();
+  return`<div class="obx push-ask" role="status">${ic('bell')}<div class="obx-i"><b>${iw?'Installa l\'app per le notifiche':den?'Notifiche bloccate':'Attiva le notifiche'}</b><span>${iw?'Su iPhone gli avvisi arrivano solo all\'app aperta dall\'icona sulla schermata Home. Ti spiego come.':den?'Su questo telefono gli avvisi di Jona sono bloccati. Ti spiego come sbloccarli.':'Così ti arrivano gli avvisi anche con l\'app chiusa. Basta un tocco.'}</span></div><div class="obx-b"><button type="button" class="btn ghost sm" data-a="pushLater">Più tardi</button><button type="button" class="btn primary sm" data-a="${den||iw?'pushHelp':'pushOn'}">${den?'Come fare':'Attiva'}</button></div></div>`}
 function oldUrl(){if(!OLD_URL||DEMO)return'';if(S.me&&!S.oldLog){S.oldLog=1;errLog('Vecchio indirizzo: app aperta da github.io')}
   return`<div class="obx old-url" role="status">${ic('warn')}<div class="obx-i"><b>Installa di nuovo l'app</b><span>Questa icona usa il vecchio indirizzo, che tra poco smetterà di funzionare. Tocca «Apri il nuovo», installa l'app dal browser (Aggiungi a schermata Home) e poi cancella questa icona.</span></div><div class="obx-b"><a class="btn primary sm" href="https://jona-ristorante-by-ynoy-corp.pages.dev/" target="_blank" rel="noopener">Apri il nuovo</a></div></div>`}
 function banner(){if(!S.upd)return'';return`<div class="obx" role="status">${ic('warn')}<div class="obx-i"><b>App da aggiornare</b><span>Hai una versione non aggiornata: potresti avere problemi o funzioni in meno. Ti consigliamo di chiudere e riaprire l'app.</span></div><div class="obx-b"><button type="button" class="btn primary sm" data-a="reload">Aggiorna ora</button></div></div>`}
