@@ -1232,8 +1232,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=102;
+const APP_VER=103;
 const NEWS=[
+  {v:103,data:'2026-10-13',titolo:'Ricette più leggere',
+    chef:['Le Ricette e il costo dei piatti si scaricano solo quando le apri: l\'app parte un po\' più in fretta. Funzionano anche senza rete.'],
+    dev:['D50 passo 3: Ricette in `moduli/ricette.js` (`modLoad(\'ricette\')` al primo `rcOpen` → `rcApri`). In index restano `RC_*`, `rcAll`, `rcU`, `rcFatt`, `rcPct`, `rcPrezzo`, `rcCalc`, `rcSalito`, `rcSnap`, `rcPut`, `rcOn`, `rcCta`, `rcStrip`, `rcVisto` (home e Chiedi a Jona). Prova `test-moduli` anche per le Ricette.']},
   {v:102,data:'2026-10-13',titolo:'Cantina più leggera',
     tutti:['L\'app si apre ancora un po\' più in fretta: la Cantina Vini si scarica solo quando la apri. Funziona anche senza rete.'],
     dev:['D50 passo 2: Cantina in `moduli/cantina.js` (`modLoad(\'cantina\')` al primo `vnOpen` → `vnApri`; all\'avvio `vnRestore` carica il modulo solo se c\'è la bozza `jona_vn` → `vnRipristina`). In index restano `VN_TIPI`, `VN_ABB`, `VN_CAMPI`, `vnAll`, `vnGet`, `vnOn`, `vnCan`, `vnMese`, `vnTit`, `vnSub`, `vnCta`. Prova `test-moduli` senza rete vera (server della prova spento: `setOffline` su WebKit blocca il service worker).']},
@@ -5347,41 +5350,7 @@ const rcCta=me=>{if(!rcOn(me))return'';const n=rcAll().length;return`<button typ
 function rcStrip(me){if(!rcOn(me))return'';const l=rcAll().map(r=>({r,s:rcSalito(r)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);if(!l.length)return'';
   return`<div class="ag-strip ag-nuovo rc-strip">${ic('pot')}<button type="button" class="ag-st-t" data-a="rcOpen"><b>Costo dei piatti salito</b> ${l.slice(0,2).map(x=>esc(x.r.n)+' +'+rcPct(x.s*100)).join(' — ')}${l.length>2?' — +'+(l.length-2):''}</button><button type="button" class="btn primary sm" data-a="rcVisto">Ok, visto</button></div>`}
 async function rcVisto(){for(const r of rcAll())if(rcSalito(r)>0)await rcPut(rcSnap(r));toast('Costi aggiornati')}
-function rcOpen(){if(!funzOn('ricette'))return;S.rc={q:''};usoSegna('ricette');openSheet({cls:'tall',live:()=>true,render:rcList})}
-function rcList(){const all=rcAll(),q=norm(S.rc.q),l=all.filter(r=>!q||norm(r.n).includes(q));
-  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Ricette e costo dei piatti<div class="sh-s">${all.length} ${all.length===1?'ricetta':'ricette'} · prezzi presi dai listini</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  <button type="button" class="btn primary big block" data-a="rcNew">${ic('plus')} Nuova ricetta</button>
-  ${all.length>6?`<div class="search rc-cerca">${ic('search')}<input id="rcq" type="search" placeholder="Cerca un piatto" value="${esc(S.rc.q)}" data-in="rcq" autocomplete="off"></div>`:''}
-  <div class="rc-l">${l.length?l.map(r=>{const c=rcCalc(r),s=rcSalito(r);return`<button type="button" class="prow" data-a="rcEdit" data-v="${r.id}"><div class="row-i"><div class="row-t">${esc(r.n)}</div><div class="row-m">${eur(c.cp)} a porzione${c.fc!=null?` · <span class="${c.fc>RC_ALTO?'rc-alto':''}">food cost ${rcPct(c.fc)}</span>`:''}${s?` <span class="tag urg">costo +${rcPct(s*100)}</span>`:''}${c.manca?` <span class="tag">${c.manca} senza prezzo</span>`:''}</div></div>${ic('chev')}</button>`}).join(''):`<p class="muted">${q?'Nessun piatto trovato.':'Nessuna ricetta. Tocca «Nuova ricetta», scegli gli ingredienti dai listini e l\'app calcola quanto costa il piatto.'}</p>`}</div>`}
-function rcForm(r){const f=r?clone(r):{n:'',por:1,pv:'',ing:[]};const sv=v=>v==null||v===''?'':String(v).replace('.',',');
-  f.por=sv(f.por)||'1';f.pv=sv(f.pv);f.ing=(f.ing||[]).map(g=>Object.assign({},g,{q:sv(g.q)}));S.rcf=f;
-  openSheet({cls:'tall',live:()=>true,render:rcFormH})}
-function rcFormH(){const f=S.rcf,c=rcCalc(f);
-  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica ricetta':'Nuova ricetta'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  <label class="lbl" for="rcf-n">Nome del piatto</label><input class="inp" id="rcf-n" data-in="rcf" data-k="n" value="${esc(f.n)}" placeholder="Es. Spaghetti alle vongole">
-  <div class="ag-2"><label><span class="lbl">Porzioni</span><input class="inp" id="rcf-por" inputmode="decimal" data-in="rcf" data-k="por" value="${esc(f.por)}"></label><label><span class="lbl">Prezzo nel menù €</span><input class="inp" id="rcf-pv" inputmode="decimal" data-in="rcf" data-k="pv" value="${esc(f.pv)}" placeholder="Es. 18"></label></div>
-  <span class="lbl">Ingredienti</span>
-  ${c.righe.map((x,i)=>{const g=x.g,us=rcU(g.pu);return`<div class="rc-ing"><div class="rc-in"><b>${esc(g.nome)}</b><span class="muted small">${x.p?`${eur(x.p.pr)} / ${esc(normUnita(g.pu)||'pz')}${x.p.da==='simile'?' · da '+esc(forn(x.p.f).nome):x.p.da==='vecchio'?' · non più a listino, ultimo prezzo':''}`:'senza prezzo'}</span></div>
-    <div class="rc-q"><input class="inp sm" id="rcq-${i}" inputmode="decimal" data-in="rcfq" data-i="${i}" value="${esc(g.q)}" placeholder="0" aria-label="Quantità di ${esc(g.nome)}">${us.length>1?`<select class="inp sm" id="rcu-${i}" data-ch="rcu" data-i="${i}" aria-label="Unità di ${esc(g.nome)}">${us.map(([u])=>`<option value="${u}" ${g.u===u?'selected':''}>${u}</option>`).join('')}</select>`:`<span class="rc-u">${esc(us[0][0])}</span>`}<span class="rc-c">${x.c!=null?eur(x.c):'—'}</span><button type="button" class="icon-btn" data-a="rcIngDel" data-v="${i}" aria-label="Togli ${esc(g.nome)}">${ic('x')}</button></div></div>`}).join('')||'<p class="muted small">Ancora nessun ingrediente.</p>'}
-  <button type="button" class="btn ghost" data-a="rcPick">${ic('plus')} Aggiungi ingrediente</button>
-  <div class="rc-tot"><div><span>Costo totale</span><b>${eur(c.tot)}</b></div><div><span>Costo a porzione</span><b>${eur(c.cp)}</b></div>${c.fc!=null?`<div class="${c.fc>RC_ALTO?'rc-alto':''}"><span>Food cost</span><b>${rcPct(c.fc)}</b></div>`:''}${c.cons?`<div><span>Prezzo per stare al ${RC_FC}%</span><b>${eur(c.cons)}</b></div>`:''}</div>
-  ${c.manca?`<p class="muted small">${c.manca===1?'1 ingrediente senza quantità o prezzo: non è':c.manca+' ingredienti senza quantità o prezzo: non sono'} nel costo.</p>`:''}
-  <p class="muted small">Food cost: costo a porzione diviso il prezzo del menù senza IVA (10%).</p>
-  <div class="sheet-foot btns" style="margin-top:18px">${f.id?`<button type="button" class="btn ghost danger" data-a="rcDel">${ic('trash')} Elimina</button>`:''}<button type="button" class="btn primary big" data-a="rcSave">${ic('check')} Salva</button></div>`}
-function rcPick(){S.rcpq='';openSheet({cls:'tall',live:()=>true,render:()=>{const q=norm(S.rcpq),toks=q?q.split(' '):[];
-  const l=prods().filter(p=>!toks.length||toks.every(t=>norm(p.nome+' '+(p.codice||'')).includes(t))).sort(byNome).slice(0,80);
-  return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Aggiungi ingrediente<div class="sh-s">Dai listini dei fornitori</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  <div class="search rc-cerca">${ic('search')}<input id="rcpq" type="search" placeholder="Cerca un prodotto" value="${esc(S.rcpq)}" data-in="rcpq" autocomplete="off"></div>
-  <div>${l.length?l.map(p=>`<button type="button" class="prow" data-a="rcAdd" data-v="${p.id}"><div class="row-i"><div class="row-t">${esc(p.nome)}</div><div class="row-m">${esc(forn(p.fornitoreId).nome)}${p.prezzo!=null?' · '+eur(p.prezzo)+(p.unita?' / '+esc(p.unita):''):' · senza prezzo'}</div></div>${ic('plus')}</button>`).join(''):`<p class="muted">Nessun prodotto${q?' trovato':' a listino: caricalo da Fornitori'}.</p>`}</div>`}})}
-function rcAdd(id){const p=D().prodotti[id];if(!p||!S.rcf)return;const pu=normUnita(p.unita)||'pz';
-  S.rcf.ing.push({pid:p.id,nome:p.nome,fid:p.fornitoreId||'',pu,q:'',u:rcU(pu)[0][0],pz:p.prezzo??null});closeSheet();refreshSheet();
-  const i=S.rcf.ing.length-1;setTimeout(()=>{const n=document.getElementById('rcq-'+i);if(n)n.focus()},300)}
-async function rcSave(){const f=S.rcf,me=realU();if(!f||!me)return;const n=f.n.trim();if(!n){toast('Scrivi il nome del piatto','err');return}
-  const r={id:f.id||uid(),n,por:num(f.por)>0?num(f.por):1,pv:num(f.pv)>0?num(f.pv):null,ing:f.ing.map(g=>({pid:g.pid,nome:g.nome,fid:g.fid||'',pu:g.pu,q:num(g.q)>0?num(g.q):null,u:g.u,pz:g.pz??null})),da:f.da||me.id,cr:f.cr||now(),mod:now()};
-  await rcPut(rcSnap(r));closeSheet();toast('Ricetta salvata')}
-async function rcDel(){const f=S.rcf;if(!f||!f.id)return closeSheet();
-  if(!await ask('Eliminare la ricetta?','«'+f.n+'» sparisce dalle ricette.','Elimina',true))return;
-  await upd('config','ricette',{['r.'+f.id]:null});closeSheet();toast('Ricetta eliminata')}
+function rcOpen(){if(!funzOn('ricette'))return;modLoad('ricette').then(()=>rcApri(),()=>toast('Le Ricette non si aprono senza rete. Riprova tra poco.','warn'))}
 
 /* ================= cantina vini (v84, D34) =================
    config/cantina {v:{<id>:vino}}: vino={id,n,cant,ann,gr,tipo,den,vit,storia,palato,naso,colore,abb:[VN_ABB],abbT,prod,serv,frase,parole,pv,pc,q,min,ia,da,cr,mod}.
