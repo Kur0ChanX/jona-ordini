@@ -1232,8 +1232,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=103;
+const APP_VER=104;
 const NEWS=[
+  {v:104,data:'2026-10-13',titolo:'Promemoria del turno',
+    tutti:['Se hai le notifiche attive, 1 ora prima del tuo turno arriva un promemoria con l\'orario, anche con l\'app chiusa. Per i turni spezzati arriva prima di ogni parte.'],
+    chef:['Il promemoria parte solo per i turni pubblicati negli Orari. Si spegne in Impostazioni → Funzioni → «Promemoria del turno».'],
+    dev:['D33: `turPlan`/`turSrv` (in `deadlineTick` per `orPlanner`) mandano al Worker `/turni` {pp: persona → iscrizioni, ev:[{k,at,x,u}]} dei turni `tp` pubblicati (`orPubAt` per reparto) della settimana corrente e dopo, finestra 8 giorni; `turTickSrv` nel cron dei 5 minuti. Funzione `turni` accesa di partenza; spenta → piano vuoto. Impronta in `jona_tupl`. Prova `tools/test-turni.mjs`.']},
   {v:103,data:'2026-10-13',titolo:'Ricette più leggere',
     chef:['Le Ricette e il costo dei piatti si scaricano solo quando le apri: l\'app parte un po\' più in fretta. Funzionano anche senza rete.'],
     dev:['D50 passo 3: Ricette in `moduli/ricette.js` (`modLoad(\'ricette\')` al primo `rcOpen` → `rcApri`). In index restano `RC_*`, `rcAll`, `rcU`, `rcFatt`, `rcPct`, `rcPrezzo`, `rcCalc`, `rcSalito`, `rcSnap`, `rcPut`, `rcOn`, `rcCta`, `rcStrip`, `rcVisto` (home e Chiedi a Jona). Prova `test-moduli` anche per le Ricette.']},
@@ -2479,7 +2483,7 @@ async function promSrv(){if(!pushFb())return false;pushWatch();if(!PUSH.ld)retur
 async function deadlineTick(){
   if(!S.db||!allLoaded())return;const me=meU();if(!me||me.stato!=='attivo')return;
   provaVia().catch(e=>console.warn(e));
-  await agTick(me).catch(e=>console.warn(e));if(agCan(me))agSrv().catch(()=>{});
+  await agTick(me).catch(e=>console.warn(e));if(agCan(me))agSrv().catch(()=>{});if(orPlanner(me))turSrv().catch(()=>{});
   const sp=await scadTick(me);if(!isGM(me))return;
   if(S.tab==='invii'&&!document.hidden)render();
   const td=today(),t0=new Date();t0.setHours(0,0,0,0);const rem=ls('jona_rem')||{};for(const k in rem)if(rem[k]!==td)delete rem[k];
@@ -4892,7 +4896,7 @@ function voiceSheet(){
    config/app.funz {agenda:true}: le funzioni nuove partono spente. Conta d'uso in config/uso_<AAAA-MM> {agenda:{<persona>:giorni}}, al massimo una scrittura al giorno per telefono (jona_uso).
    Agenda: config/agenda_<AAAA-MM> {tipo:'agenda',e:{<id>:ev}}, ricorrenti in config/agenda_ric. ev={t,g:'AAAA-MM-GG',h:'HH:MM'|'',cop,note,vis:'io'|'tutti'|'rep',rep:[],da,cr,mod,r:''|'s'|'m'}.
    Cancellare = e.<id>: null. Per reparto: lo staff vede i suoi, i gestori tutti. «Solo io» è nascosto solo nell'interfaccia (tutti i membri leggono config). */
-const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'cantina',l:'Cantina Vini',d:'Schede dei vini scritte con l\'IA da una foto dell\'etichetta, cosa consigliare al tavolo in base al piatto e inventario delle bottiglie (vendute e in casa).',on:true},{id:'bar',l:'Bar: cocktail e alcolici',d:'Oltre 200 cocktail con dosi, bicchiere e passaggi, e l\'inventario delle bottiglie del bar (intere e quanto resta di quella aperta). Per gestori, responsabili e bartender.',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
+const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'cantina',l:'Cantina Vini',d:'Schede dei vini scritte con l\'IA da una foto dell\'etichetta, cosa consigliare al tavolo in base al piatto e inventario delle bottiglie (vendute e in casa).',on:true},{id:'bar',l:'Bar: cocktail e alcolici',d:'Oltre 200 cocktail con dosi, bicchiere e passaggi, e l\'inventario delle bottiglie del bar (intere e quanto resta di quella aperta). Per gestori, responsabili e bartender.',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'turni',l:'Promemoria del turno',d:'Chi lavora riceve una notifica 1 ora prima di ogni turno pubblicato negli Orari (anche con l\'app chiusa). Per i turni spezzati arriva prima di ogni parte.',on:true},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
 const funzOn=k=>{const f=cfg().funz||{};return k in f?!!f[k]:!!(FUNZ.find(x=>x.id===k)||{}).on};
 async function funzSet(k,on){const f=FUNZ.find(x=>x.id===k);if(!f)return;
   await put('config','app',Object.assign({},cfg(),{funz:Object.assign({},cfg().funz||{},{[k]:!!on})}));toast(f.l+(on?' accesa':' spenta'))}
@@ -4966,6 +4970,24 @@ function agPlan(){const st=D().staff,ps=Object.entries(PUSH.subs).sort((a,b)=>a[
   for(const a of agInst(t-20*60000,t+48*36e5)){const subs=ps.filter(p=>{const u=st[p.u];return !!u&&u.stato==='attivo'&&agSee(a.e,u)}).map(p=>p.sub);
     if(subs.length)ev.push({k:a.id+'|'+a.at,at:a.at,t:a.t,x:agAvTxt(a.m,a.h),subs})}
   return JSON.stringify({ev:ev.slice(0,120)})}
+/* promemoria del turno (v104): chi fa gli orari manda al Worker (/turni) i turni pubblicati dei prossimi 8 giorni;
+   il server avvisa la persona 1 ora prima di ogni parte del turno (spezzato = due avvisi). Funzione spenta → piano vuoto */
+function turPlan(){const st=D().staff,t=now(),pp={},ev=[];
+  if(funzOn('turni')){for(const p of Object.values(PUSH.subs)){const u=st[p&&p.u];if(u&&u.stato==='attivo'&&!orFree(u)&&p.sub)(pp[u.id]=pp[u.id]||[]).push(p.sub)}
+    const cur=orLun();for(const lun of [cur,orShift(cur,1)]){const w=orWeek(lun);if(!w||!w.tp)continue;
+      for(const [id,row] of Object.entries(w.tp)){const u=st[id];if(!u||!pp[id]||!orPubAt(w,[orRep(u)]))continue;
+        for(let g=0;g<7;g++)for(const [a,b] of orShifts((row||{})[g])){const d=orDay(lun,g);d.setHours(0,a-60,0,0);const at=d.getTime();
+          if(at<t-20*60000||at>t+8*864e5)continue;ev.push({k:id+'|'+at,at,x:OR_GGL[g]+' '+orHM(a)+'–'+orHM(b),u:id})}}}
+    for(const id in pp)if(!ev.some(e=>e.u===id))delete pp[id]}
+  ev.sort((a,b)=>a.at-b.at||(a.k<b.k?-1:1));for(const id in pp)pp[id].sort((a,b)=>a.endpoint<b.endpoint?-1:1);
+  return JSON.stringify({pp,ev:ev.slice(0,600)})}
+async function turSrv(){if(!pushFb())return false;pushWatch();if(!PUSH.ld)return false;
+  const body=turPlan(),h=await sha(body),last=ls('jona_tupl')||{};
+  if(last.h===h&&now()-(last.t||0)<6*36e5)return true;
+  if(turSrv.busy||now()<(turSrv.retry||0))return false;
+  turSrv.busy=1;try{const r=await fetch(PUSH_URL+'/turni',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+await algTok()},body});
+    if(!r.ok)throw new Error('turni '+r.status);ls('jona_tupl',{h,t:now()});return true}
+  catch(e){turSrv.retry=now()+15*60000;return false}finally{turSrv.busy=0}}
 async function agSrv(){if(!pushFb()||!funzOn('agenda'))return false;pushWatch();if(!PUSH.ld)return false;
   const body=agPlan(),h=await sha(body),last=ls('jona_agpl')||{};
   if(last.h===h&&now()-(last.t||0)<6*36e5)return true;
