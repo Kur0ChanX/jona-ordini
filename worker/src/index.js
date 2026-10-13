@@ -464,17 +464,24 @@ async function gemini(request, env) {
     if (!LETTORI[l]) return geminiErr("lettore sconosciuto", 400);
     if (l === "cf") return await leggiCf(req, env, Number(env.CF_MS) || CF_MS);
     let r, j;
-    try {
-      r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${LETTORI[l]}:generateContent`, {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_KEY },
-        body,
-        signal: AbortSignal.timeout(tryMs),
-      });
-      const tx = await r.text();
-      try { j = JSON.parse(tx); } catch (e) { j = {}; }
-    } catch (e) {
-      return lettoreErr(l, "Google non ha risposto entro " + Math.round(tryMs / 1000) + " s", 504, "lento");
+    // v106: «sovraccarico» (503) di Google spesso dura pochi secondi: un secondo tentativo dopo 2,5 s prima di passare al lettore dopo
+    for (let t = 0; t < 2; t++) {
+      const resto = tryMs - (Date.now() - start);
+      if (t && resto < 8000) break;
+      try {
+        r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${LETTORI[l]}:generateContent`, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_KEY },
+          body,
+          signal: AbortSignal.timeout(resto),
+        });
+        const tx = await r.text();
+        try { j = JSON.parse(tx); } catch (e) { j = {}; }
+      } catch (e) {
+        return lettoreErr(l, "Google non ha risposto entro " + Math.round(tryMs / 1000) + " s", 504, "lento");
+      }
+      if (r.status !== 503 || t) break;
+      await sleep(Number(env.GEM_503_MS) || 2500);
     }
     if (r.ok) return json(Object.assign(j, { lettore: l }));
     const msg = (j.error && j.error.message) || "errore " + r.status;

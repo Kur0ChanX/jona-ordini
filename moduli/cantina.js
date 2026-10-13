@@ -47,7 +47,7 @@ function vnForm(v){const sv=x=>x==null||x===''?'':String(x).replace('.',',');con
 function vnFormH(){const f=S.vnf,me=meU(),inp=(k,l,ph,x)=>`<label class="lbl" for="vnf-${k}">${l}</label><input class="inp" id="vnf-${k}" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"${x||''}>`,
   ta=(k,l,ph)=>`<label class="lbl" for="vnf-${k}">${l}</label><textarea class="inp vn-ta" id="vnf-${k}" data-in="vnf" data-k="${k}" rows="3" placeholder="${esc(ph||'')}">${esc(f[k])}</textarea>`,num_=(k,l,ph)=>`<label><span class="lbl">${l}</span><input class="inp" id="vnf-${k}" inputmode="decimal" data-in="vnf" data-k="${k}" value="${esc(f[k])}" placeholder="${esc(ph||'')}"></label>`;
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${f.id?'Modifica vino':'Nuovo vino'}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
-  ${f.busy?`<div class="vn-busy">${ic('clock')} <span>L'IA sta ${(f.fotos||[]).length?'leggendo le foto':'scrivendo la scheda del vino'}…${f.bl?` <span class="muted small">(${esc(gemNome(f.bl))})</span>`:''}${(f.lg||[]).map(x=>`<br><span class="muted small">✗ ${esc(gemNome(x.l))}: ${esc(gemPerche(x.l,x.st))}</span>`).join('')}</span></div>`:(f.fotos||[]).length?vnFotoH(f):`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} Foto dell'etichetta</button>${f.rip?`<button type="button" class="btn ghost" data-a="vnFotoG">${ic('image')} Galleria</button>`:''}<button type="button" class="btn ghost" data-a="vnIa">${ic('sparkle')} Completa con l'IA</button></div>`}
+  ${f.busy?vnBusyH(f):(f.fotos||[]).length?vnFotoH(f):`<div class="btns vn-add"><button type="button" class="btn ghost" data-a="vnFotoF">${ic('camera')} Foto dell'etichetta</button>${f.rip?`<button type="button" class="btn ghost" data-a="vnFotoG">${ic('image')} Galleria</button>`:''}<button type="button" class="btn ghost" data-a="vnIa">${ic('sparkle')} Completa con l'IA</button></div>`}
   ${f.rip?`<p class="vn-al vn-rip">${ic('warn')} ${f.rip==='cam'?'Il telefono ha chiuso l\'app mentre c\'era la fotocamera. Ho ripreso la scheda: rifai la foto. Se succede ancora: scatta con la Fotocamera del telefono, poi qui tocca «Galleria».':'Il telefono aveva chiuso l\'app: ho ripreso la scheda del vino.'}</p>`:''}
   ${f.ia&&f.lt&&(f.lg||[]).length?`<p class="muted small vn-lt">Letto da ${esc(gemNome(f.lt))}. Prima: ${f.lg.map(x=>esc(gemNome(x.l))+' — '+esc(gemPerche(x.l,x.st))).join('; ')}.</p>`:''}
   ${f.ia?`<p class="vn-al">${ic('warn')} Scritto dall'IA${f.ia==='dubbio'?', che non era sicura del vino':''}: controlla annata, gradi e premi prima di salvare.</p>`:''}
@@ -77,18 +77,31 @@ function vnLeggi(txt){let a;try{const m=String(txt).match(/\{[\s\S]*\}/);a=JSON.
   return r.n||r.cant?r:null}
 function vnUnisci(f,r){for(const [k,x] of Object.entries(r)){if(k==='abb'){if(!f.abb.length)f.abb=x.slice();continue}if(k==='ia'){f.ia=x;continue}if(x&&!String(f[k]||'').trim())f[k]=x}
   if(r.tipo&&!f.id&&!f._tipo)f.tipo=r.tipo}
+// v106: caricamento vero (richiesta di Mario #125): secondi che passano, barra sul tempo solito di quel lettore (ultime 5 letture riuscite, jona_ia_t), secondi di ogni tentativo fallito
+const VN_TSOLITO={flash:20,lite:12,cf:30};
+function vnTSolito(l){const a=((ls('jona_ia_t')||{})[l])||[];return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):VN_TSOLITO[l]||20}
+function vnTSalva(l,sec){const t=ls('jona_ia_t')||{};t[l]=(t[l]||[]).concat(sec).slice(-5);ls('jona_ia_t',t)}
+function vnBusyH(f){const sol=f.bl?vnTSolito(f.bl):0;
+  return`<div class="vn-busy" role="status">${ic('clock')} <span style="flex:1;min-width:0">L'IA sta ${(f.fotos||[]).length?'leggendo le foto':'scrivendo la scheda del vino'}…${f.bl?` <span class="muted small">(${esc(gemNome(f.bl))})</span>`:''}
+  <span class="vn-bar"><i id="vn-bar"></i></span><span class="small" id="vn-sec">${vnSecTxt(f,sol)}</span>
+  ${(f.lg||[]).map(x=>`<br><span class="muted small">✗ ${esc(gemNome(x.l))}: ${esc(gemPerche(x.l,x.st))} · ${x.sec} s</span>`).join('')}</span></div>`}
+function vnSecTxt(f,sol){const el=Math.round((Date.now()-(f.t0||Date.now()))/1000),a=Math.round((Date.now()-(f.ta||Date.now()))/1000);
+  return el+' s in tutto'+(sol?' · di solito '+(f.bl?gemNome(f.bl).replace(/^Gemini /,''):'')+' ci mette circa '+sol+' s'+(a>sol*1.5?' · sta ancora lavorando, aspetta':''):'')}
+function vnTick(){clearInterval(vnTick.h);vnTick.h=setInterval(()=>{const f=S.vnf;if(!f||!f.busy){clearInterval(vnTick.h);return}
+  const sol=f.bl?vnTSolito(f.bl):20,a=(Date.now()-(f.ta||Date.now()))/1000,e=document.getElementById('vn-sec'),b=document.getElementById('vn-bar');
+  if(e)e.textContent=vnSecTxt(f,f.bl?sol:0);if(b)b.style.width=(a<sol?a/sol*85:85+12*(1-Math.exp(-(a-sol)/sol))).toFixed(1)+'%'},250)}
 async function vnIaGo(files){const f=S.vnf;if(!f||f.busy)return;const nome=[f.n,f.cant,f.ann].map(x=>String(x||'').trim()).filter(Boolean).join(' ');
   if(!files&&!nome)return toast('Scrivi prima il nome del vino (e la cantina).','warn');
-  f.busy=true;f.bl='';f.lg=[];f.lt='';refreshSheet();try{const im=[];if(files)for(const x of files.slice(0,VN_FMAX))im.push({inline_data:{mime_type:'image/jpeg',data:await b64(VN_PIC.has(x)?x:await shrinkImg(x))}});
+  f.busy=true;f.bl='';f.lg=[];f.lt='';f.t0=f.ta=Date.now();refreshSheet();vnTick();try{const im=[];if(files)for(const x of files.slice(0,VN_FMAX))im.push({inline_data:{mime_type:'image/jpeg',data:await b64(VN_PIC.has(x)?x:await shrinkImg(x))}});
     const body=p=>({contents:[{parts:[{text:vnPrompt(files?'':nome,p.length)}].concat(p)}],generationConfig:{temperature:0.2}});
     // D44: stessi lettori dei listini (Flash → Flash-Lite → Cloudflare), tutte le foto nella stessa richiesta
-    let g={};for(const [l] of GEM_LETT){f.bl=l;refreshSheet();let r=await gemCall(body(im),l);
+    let g={};for(const [l] of GEM_LETT){f.bl=l;f.ta=Date.now();refreshSheet();let r=await gemCall(body(im),l);
       // Cloudflare (Llama 4) potrebbe non accettare più foto insieme: riprova con la sola prima foto (il fronte)
       if(l==='cf'&&im.length>1&&!r.txt&&!r.salta)r=await gemCall(body(im.slice(0,1)),l);
       if(r.salta)continue;g=r;if(r.txt||!GEM_RETRY.test(String(r.st)))break;
       // v96: motivo vero del passaggio al lettore dopo (domanda #108: «perché Lite?»), nel foglio e nella scatola nera
-      f.lg.push({l,st:r.st});errLog('Vino: '+gemNome(l)+' non ha letto (errore '+(r.st||'rete')+') '+String(r.msg||'').slice(0,160))}
-    if(g.txt)f.lt=f.bl;f.busy=false;f.bl='';
+      f.lg.push({l,st:r.st,sec:Math.round((Date.now()-f.ta)/1000)});errLog('Vino: '+gemNome(l)+' non ha letto (errore '+(r.st||'rete')+') '+String(r.msg||'').slice(0,160))}
+    if(g.txt){f.lt=f.bl;vnTSalva(f.bl,Math.max(1,Math.round((Date.now()-f.ta)/1000)))}f.busy=false;f.bl='';
     if(!g.txt){refreshSheet();return toast((g.err||'L\'IA non ha risposto.')+' Riprova.','warn')}
     const r=vnLeggi(g.txt);if(!r){refreshSheet();return toast(files?'Non riconosco il vino nella foto. Riprova con l\'etichetta ben dritta e nitida.':'Non trovo questo vino. Controlla il nome.','warn')}
     const dop=!f.id&&vnAll().find(v=>norm(v.n)===norm(r.n)&&norm(v.cant||'')===norm(r.cant||'')&&String(v.ann||'')===String(r.ann||''));
