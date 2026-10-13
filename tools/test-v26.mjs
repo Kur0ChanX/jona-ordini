@@ -5,7 +5,9 @@ const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const mk=async(ua,perm)=>{const ctx=await b.newContext({viewport:{width:320,height:700},serviceWorkers:'block',...(ua?{userAgent:ua}:{})});
   await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
-  if(perm)await ctx.addInitScript(p=>{Object.defineProperty(Notification,'permission',{get:()=>p});Notification.requestPermission=async()=>p},perm);
+  if(perm)await ctx.addInitScript(p=>{Object.defineProperty(Notification,'permission',{get:()=>p});Notification.requestPermission=async()=>p;
+    /* v100: su iPhone il blocco vero c'è solo nell'app aperta dall'icona (in Safari: guida d'installazione, tools/test-push-iphone.mjs) */
+    Object.defineProperty(navigator,'standalone',{configurable:true,get:()=>true})},perm);
   const pg=await ctx.newPage();pg.errs=[];pg.on('pageerror',e=>pg.errs.push(e.message));return pg};
 const pg=await mk();
 await pg.goto('http://localhost:8765/index.html');
