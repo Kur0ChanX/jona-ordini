@@ -651,6 +651,7 @@ html.lite .br-carta{background-image:linear-gradient(90deg,transparent 60px,rgba
 .vn-al{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--sunk);color:var(--ink2);font-size:14px;margin:8px 0}
 .vn-al .ic{flex:none;color:var(--ocra)}
 .vn-busy{display:flex;gap:8px;align-items:center;padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}
+.vn-bar{display:block;height:8px;border-radius:4px;background:var(--line);margin:8px 0 4px;overflow:hidden}.vn-bar i{display:block;height:100%;width:0;border-radius:4px;background:var(--lagoon);background-image:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);background-size:60px 100%;animation:vnScorre 1s linear infinite;transition:width .25s linear}@keyframes vnScorre{from{background-position:-60px 0}to{background-position:200px 0}}
 .vn-fotos{padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}.vn-ft{display:flex;gap:8px;margin:0 0 10px;flex-wrap:wrap}.vn-fi{position:relative;width:84px;text-align:center;font-size:13px}.vn-fi img{width:84px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 0 4px}.vn-fx{position:absolute;top:4px;right:4px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;padding:0}.vn-fx svg{width:16px;height:16px}
 .vn-top{margin:0;padding-left:22px;line-height:1.7}.vn-top b{float:right;margin-left:12px}
 .ag-2>*{min-width:0}.ag-2 .btn{white-space:normal;text-align:center;justify-content:center}
@@ -1232,8 +1233,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=105;
+const APP_VER=106;
 const NEWS=[
+  {v:106,data:'2026-10-13',titolo:'Vini: si vede quanto ci mette l\'IA',
+    chef:['Quando l\'IA legge le foto di un vino ora vedi i secondi che passano, una barra che avanza e quanto ci mette di solito. Così sai che non è bloccata. Se Google risponde «sovraccarico», il server riprova da solo una volta dopo 2 secondi prima di passare al lettore dopo.'],
+    dev:['`vnBusyH`/`vnTick` in `moduli/cantina.js` (contasecondi, barra sul tempo solito delle ultime 5 letture riuscite per lettore in `jona_ia_t`, secondi dei tentativi falliti). Worker: con `lettore` un 503 di Google si riprova una volta dopo 2,5 s (`GEM_503_MS`). Prove in `test-cantina` e `test-gemini-server`.']},
   {v:105,data:'2026-10-13',titolo:'Proponi la settimana (se la vuoi)',
     chef:['Nuova funzione, spenta di partenza: in Impostazioni → Funzioni accendi «Proponi la settimana». Negli Orari compare il pulsante: copia i turni della settimana prima, lascia vuoti ferie, malattia e permessi vecchi e tiene quelli già segnati. I riposi restano i tuoi. Poi correggi e pubblichi. Spenta, i turni si fanno solo a mano come oggi.'],
     dev:['D33: `orProp` (accanto a `orCopy`), funzione `proponi` in `FUNZ` spenta di partenza; pulsante `orProp` solo con `funzOn(\'proponi\')`. F/M/P della settimana prima → vuoti (contati nell\'avviso), F/M/P già in questa settimana restano. Prova `tools/test-orari-proponi.mjs`.']},

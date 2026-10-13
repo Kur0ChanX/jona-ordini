@@ -123,6 +123,22 @@ const cf=await pg.evaluate(async()=>{const vero=gemCall,log=[];
   try{await modLoad('cantina');vnForm(null);const c=document.createElement('canvas');c.width=30;c.height=30;const bl=await new Promise(r=>c.toBlob(r,'image/png'));
     await vnIaGo([new File([bl],'f.png',{type:'image/png'}),new File([bl],'r.png',{type:'image/png'})]);return{log:log.join(),n:S.vnf.n}}finally{gemCall=vero}});
 ok(cf.log==='flash2,lite2,cf2,cf1'&&cf.n==='Prova CF','D44: Cloudflare non accetta 2 foto → riprova col fronte: '+cf.log);
+// v106 (#125, Mario: «un caricamento vero per far vedere che non si è bloccato e quanto ci mette»): secondi, barra, tempo solito, secondi dei tentativi falliti
+await sc('[data-a="closeSheet"]');await wait(300);
+await pg.evaluate(async()=>{ls('jona_ia_t',{lite:[6,8]});window._vero=gemCall;window._lib=null;
+  gemCall=(b,l)=>l==='flash'?new Promise(r=>setTimeout(()=>r({st:503}),1200)):new Promise(r=>{window._lib=()=>r({txt:'{"nome":"Prova Tempo","cantina":"Y","sicuro":true}',lettore:'lite'})});
+  await modLoad('cantina');vnForm(null);const c=document.createElement('canvas');c.width=30;c.height=30;const bl=await new Promise(r=>c.toBlob(r,'image/png'));
+  window._go=vnIaGo([new File([bl],'f.png',{type:'image/png'})])});
+await wait(600);
+const w1=await pg.evaluate(()=>parseFloat(document.getElementById('vn-bar').style.width)||0);
+const s1=await txt('#vn-sec');
+await wait(1900);
+const live=await txt('.sheet .vn-busy'),w2=await pg.evaluate(()=>parseFloat(document.getElementById('vn-bar').style.width)||0);
+ok(/s in tutto/.test(s1)&&/di solito Flash ci mette circa 20 s/.test(s1),'v106: contasecondi e tempo solito di Flash ('+s1+')');
+ok(/✗ Gemini Flash: Google ha risposto «sovraccarico» \(errore 503\) · 1 s/.test(live)&&/di solito Flash-Lite ci mette circa 7 s/.test(live)&&/^[23] s in tutto/.test(await txt('#vn-sec')),'v106: secondi del tentativo fallito e tempo solito di Flash-Lite dalle letture vere ('+live.replace(/\n/g,' / ')+')');
+ok(w1>0&&w2>0&&w2<=97,'v106: la barra si muove ('+w1+'% → '+w2+'%)');
+await pg.evaluate(async()=>{window._lib();await window._go;gemCall=window._vero});
+ok(await pg.evaluate(()=>{const t=ls('jona_ia_t');return t.lite.length===3&&t.lite[2]>=1&&!S.vnf.busy})&&await pg.locator('.sheet .vn-busy').count()===0,'v106: lettura finita, tempo salvato per la prossima volta, riquadro chiuso');
 await sc('[data-a="closeSheet"]');await wait(300);
 // la prova Cloudflare ha aperto un'altra scheda sopra il Turriga: chiude anche quella
 await sc('[data-a="closeSheet"]');await wait(300);
