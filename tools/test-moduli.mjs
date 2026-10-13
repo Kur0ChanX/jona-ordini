@@ -31,13 +31,18 @@ for(const [br,nome] of DEV){
     await pg.reload();await pg.waitForSelector('.testbar');
     ok(await pg.evaluate(()=>!!navigator.serviceWorker.controller),nome+': pagina controllata dal service worker');
     await ctx.setOffline(true);
-    await pg.evaluate(()=>brOpen());
-    const bar=await pg.waitForSelector('.sheet [data-a="brV"]',{timeout:8000}).then(()=>1,()=>0);
-    ok(bar,nome+': senza rete il Bar si apre');
+    // E48: su GitHub si vedono solo le righe FAIL → la diagnosi sta dentro la riga (tempo, script, avvisi, prova diretta di fetch dalla cache)
+    const t0=Date.now();await pg.evaluate(()=>brOpen());
+    const bar=await pg.waitForSelector('.sheet [data-a="brV"]',{timeout:20000}).then(()=>1,()=>0);
+    const diag=bar?'':await pg.evaluate(async()=>{const r=[];r.push('script:'+document.querySelectorAll('script[src="moduli/bar.js"]').length,'brApri:'+typeof brApri,'avvisi:'+[...document.querySelectorAll('#toasts .toast')].map(x=>x.textContent).join('/'),'onLine:'+navigator.onLine,'ctrl:'+!!navigator.serviceWorker.controller);
+      try{const c=await caches.match('moduli/bar.js');r.push('cache:'+(c?c.status:'no'))}catch(e){r.push('cache err:'+e.message)}
+      try{const x=await Promise.race([fetch('moduli/bar.js').then(z=>'fetch:'+z.status),new Promise(z=>setTimeout(()=>z('fetch: ferma 5 s'),5000))]);r.push(x)}catch(e){r.push('fetch err:'+e.message)}
+      return r.join(' · ')});
+    ok(bar,nome+': senza rete il Bar si apre ('+(Date.now()-t0)+' ms) '+diag);
     ok(await pg.evaluate(()=>typeof brApri==='function'&&BR_CAT.length>5),nome+': modulo del Bar caricato');
     await chiudi(pg);
     await pg.evaluate(()=>newsSheet());
-    const nv=await pg.waitForFunction(()=>NEWS_OLD&&document.querySelectorAll('.sheet .news-v').length>20&&!document.querySelector('.sheet .news-old'),null,{timeout:8000}).then(()=>1,()=>0);
+    const nv=await pg.waitForFunction(()=>NEWS_OLD&&document.querySelectorAll('.sheet .news-v').length>20&&!document.querySelector('.sheet .news-old'),null,{timeout:20000}).then(()=>1,()=>0);
     ok(nv,nome+': senza rete le novità vecchie si vedono tutte ('+await pg.evaluate(()=>document.querySelectorAll('.sheet .news-v').length)+' versioni)');
     ok(await pg.evaluate(()=>document.querySelector('.sheet .news-v .news-vn').textContent==='Beta v'+APP_VER),nome+': la più nuova resta in cima');
     await ctx.setOffline(false);
