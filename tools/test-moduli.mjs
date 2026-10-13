@@ -37,10 +37,10 @@ for(const [br,nome] of DEV){
     const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
     const sv=await server();
     await entra(pg,sv.url);
-    ok(await pg.evaluate(()=>typeof brApri==='undefined'&&typeof vnApri==='undefined'&&typeof BR_CAT==='undefined'&&!NEWS_OLD&&NEWS.length<=20),nome+': all\'avvio Bar, Cantina e novità vecchie non caricati');
+    ok(await pg.evaluate(()=>typeof brApri==='undefined'&&typeof vnApri==='undefined'&&typeof rcApri==='undefined'&&typeof BR_CAT==='undefined'&&!NEWS_OLD&&NEWS.length<=20),nome+': all\'avvio Bar, Cantina, Ricette e novità vecchie non caricati');
     const pronto=await pg.evaluate(async()=>{if(!('serviceWorker' in navigator))return 'no sw';await navigator.serviceWorker.ready;
-      for(let i=0;i<100;i++){const a=await caches.match('moduli/bar.js'),n=await caches.match('data/news.json'),v=await caches.match('moduli/cantina.js');if(a&&n&&v)return 'ok';await new Promise(r=>setTimeout(r,100))}return 'file non in cache'});
-    ok(pronto==='ok',nome+': moduli/bar.js, moduli/cantina.js e data/news.json nella cache del service worker ('+pronto+')');
+      for(let i=0;i<100;i++){const a=await caches.match('moduli/bar.js'),n=await caches.match('data/news.json'),v=await caches.match('moduli/cantina.js'),rc=await caches.match('moduli/ricette.js');if(a&&n&&v&&rc)return 'ok';await new Promise(r=>setTimeout(r,100))}return 'file non in cache'});
+    ok(pronto==='ok',nome+': moduli/bar.js, moduli/cantina.js, moduli/ricette.js e data/news.json nella cache del service worker ('+pronto+')');
     await pg.reload();await pg.waitForSelector('.testbar');
     ok(await pg.evaluate(()=>!!navigator.serviceWorker.controller),nome+': pagina controllata dal service worker');
     await sv.spegni();
@@ -58,6 +58,10 @@ for(const [br,nome] of DEV){
     ok(await pg.waitForSelector('.sheet [data-a="vnV"]',{timeout:20000}).then(()=>1,()=>0),nome+': senza rete la Cantina si apre');
     ok(await pg.evaluate(()=>typeof vnApri==='function'&&typeof vnForm==='function'),nome+': modulo della Cantina caricato');
     await chiudi(pg);
+    await pg.evaluate(()=>rcOpen());
+    ok(await pg.waitForSelector('.sheet [data-a="rcNew"]',{timeout:20000}).then(()=>1,()=>0),nome+': senza rete le Ricette si aprono');
+    ok(await pg.evaluate(()=>typeof rcApri==='function'&&typeof rcForm==='function'),nome+': modulo delle Ricette caricato');
+    await chiudi(pg);
     await pg.evaluate(()=>newsSheet());
     const nv=await pg.waitForFunction(()=>NEWS_OLD&&document.querySelectorAll('.sheet .news-v').length>20&&!document.querySelector('.sheet .news-old'),null,{timeout:20000}).then(()=>1,()=>0);
     ok(nv,nome+': senza rete le novità vecchie si vedono tutte ('+await pg.evaluate(()=>document.querySelectorAll('.sheet .news-v').length)+' versioni)');
@@ -71,6 +75,7 @@ for(const [br,nome] of DEV){
     await ctx.route('**/moduli/bar.js',r=>blocca?r.abort():r.continue());
     await ctx.route('**/data/news.json',r=>blocca?r.abort():r.continue());
     await ctx.route('**/moduli/cantina.js',r=>blocca?r.abort():r.continue());
+    await ctx.route('**/moduli/ricette.js',r=>blocca?r.abort():r.continue());
     const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
     await entra(pg);
     await pg.evaluate(()=>brOpen());
@@ -80,6 +85,9 @@ for(const [br,nome] of DEV){
     await pg.evaluate(()=>vnOpen());
     ok(await pg.waitForFunction(()=>[...document.querySelectorAll('#toasts .toast')].some(x=>/Cantina non si apre senza rete/.test(x.textContent)),null,{timeout:8000}).then(()=>1,()=>0),nome+': file della Cantina non arrivato → avviso «La Cantina non si apre senza rete»');
     ok(await pg.evaluate(()=>!document.querySelector('.sheet')&&!document.querySelector('script[src="moduli/cantina.js"]')),nome+': niente scheda vuota della Cantina');
+    await pg.evaluate(()=>rcOpen());
+    ok(await pg.waitForFunction(()=>[...document.querySelectorAll('#toasts .toast')].some(x=>/Ricette non si aprono senza rete/.test(x.textContent)),null,{timeout:8000}).then(()=>1,()=>0),nome+': file delle Ricette non arrivato → avviso «Le Ricette non si aprono senza rete»');
+    ok(await pg.evaluate(()=>!document.querySelector('.sheet')&&!document.querySelector('script[src="moduli/ricette.js"]')),nome+': niente scheda vuota delle Ricette');
     await pg.evaluate(()=>newsSheet());
     const nn=await pg.waitForFunction(()=>/si vedono con la rete/.test((document.querySelector('.sheet .news-old')||{}).textContent||''),null,{timeout:8000}).then(()=>1,()=>0);
     ok(nn,nome+': novità vecchie non arrivate → «Le versioni più vecchie si vedono con la rete»');
@@ -89,6 +97,8 @@ for(const [br,nome] of DEV){
     ok(await pg.waitForSelector('.sheet [data-a="brV"]',{timeout:8000}).then(()=>1,()=>0),nome+': con la rete tornata il Bar si apre');
     await chiudi(pg);await pg.evaluate(()=>vnOpen());
     ok(await pg.waitForSelector('.sheet [data-a="vnV"]',{timeout:8000}).then(()=>1,()=>0),nome+': con la rete tornata la Cantina si apre');
+    await chiudi(pg);await pg.evaluate(()=>rcOpen());
+    ok(await pg.waitForSelector('.sheet [data-a="rcNew"]',{timeout:8000}).then(()=>1,()=>0),nome+': con la rete tornata le Ricette si aprono');
     await chiudi(pg);await pg.evaluate(()=>brOpen());await pg.waitForSelector('.sheet [data-a="brV"]');
     ok(await pg.evaluate(()=>document.querySelectorAll('script[src="moduli/bar.js"]').length===1),nome+': modulo caricato una volta sola');
     ok(!errs.length,nome+': nessun errore '+errs.join(' | '));
