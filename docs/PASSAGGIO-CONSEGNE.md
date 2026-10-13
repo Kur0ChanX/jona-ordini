@@ -6,8 +6,8 @@ Versione lunga delle consegne vecchie (#85-#122): `git show eb9eccd:docs/PASSAGG
 
 ## Stato
 - Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR).
-- **Online: v109** (controllato: `APP_VER=109` sul sito). Ultimo squash su `main`: PR #120 `320ec98` (13/10 22:16).
-- **PR #121 aperta (v110), prove ROSSE** sul commit `08841d3`: giro `38461553398`, job `115517721263` (https://github.com/Kur0ChanX/jona-ordini/actions/runs/38461553398/job/115517721263). Causa NON ancora guardata (handoff partito subito dopo l'avviso). Priorità 1.
+- **Online: v110** (#130, 23:20 circa: `APP_VER=110` sul sito, Worker pubblicato verde). Squash PR #121 `a3986a5`, main unito sul ramo. Causa del rosso: `NEWS` a 21 voci (E55); v90 spostata in `data/news.json`; corretto anche `newsFor` (note `dev:[…]` invisibili dalla v90).
+- Prossimo: aspettare la prova di Mario su «cannonau» (passi 3-4 sotto).
 - Limite: `five_hour` allowed. Commit e push dopo ogni passo.
 
 ## Fatto in #129 (13/10, ~21:41-22:42 ora italiana)
