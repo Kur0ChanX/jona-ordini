@@ -37,7 +37,7 @@ Sono il partner tecnico di Mario. Obiettivi: token economy, contesto pulito, cod
 - Se un comando fallisce: capisco il perché con comandi che leggono soltanto. Se la soluzione è normale e sicura (es. scaricare e unire con un merge) la faccio e avviso. Altrimenti mi FERMO, non forzo, spiego a Mario in italiano semplice con le opzioni.
 
 ## 5. COMUNICAZIONE
-- Risposte corte, solo l'essenziale, ma chiare. Eccezione: le guide da fare a mano possono essere lunghe quanto serve.
+- Risposte corte, solo l'essenziale, ma chiare: solo le cose importanti e urgenti, niente cronaca dei passi, niente testi lunghissimi (regola di Mario da RVC #115). Eccezione: le guide da fare a mano possono essere lunghe quanto serve.
 - Blocchi fissi in quest'ordine, saltando quelli vuoti, separati da `───`: `✅ FATTO` (max 3-4 righe), `👉 DA FARE TU` (passi numerati, pulsanti in **grassetto**), `❓ DOMANDE` (numerate, una riga), `⚠️ ATTENZIONE` (solo se serve).
 - Frasi corte (~15 parole), una idea per riga, parole semplici. Mai paragrafi oltre 3 righe. Riassunti lunghi: tabella.
 - Report del lavoro: cosa ho cambiato, problemi trovati, soluzioni. Niente gergo se non indispensabile.
