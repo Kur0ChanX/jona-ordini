@@ -42,10 +42,10 @@ Versione lunga delle consegne vecchie (#85-#122): `git show eb9eccd:docs/PASSAGG
 - Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva.
 - E38 (aperto): prima di lavori grossi ripetere la scelta in chiaro.
 - Prove in locale: server `python3 -m http.server 8765` in background (si spegne dopo il tempo massimo: riaccenderlo).
-- Impegno: `get_session` non mostra `effort_level`, quindi in `.claude/settings.json` non è scritto.
+- Impegno: `high` (da `effort_level` della #125), scritto in `.claude/settings.json` come `"effortLevel": "high"`.
 
 ## Consumo #125
-`get_session` non dà il campo usage: dato non disponibile. Contesto alla chiusura ~213k.
+cache_read 8.069.362 · cache_write 127.041 · output 22.342 · cost_usd 3,07 (da `set_session_title`, campo usage). Contesto alla chiusura ~213k.
 
 ## Ultimo messaggio di Mario, parola per parola
 (#125, con la foto `docs/foto-mario/2026-10-13-vino-ia-errore-503.jpg`): «Gemini errore 503 oer lettura viti attenzione senza senso non in sovraccarico ha un apo gemini sua non utilizzata da nessuno e mi serve una caricamento vero per far vedere che non si è bloccato e quanto ci mette effettivamente l'ia». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
