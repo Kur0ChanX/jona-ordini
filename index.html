@@ -650,7 +650,7 @@ html.lite .br-carta{background-image:linear-gradient(90deg,transparent 60px,rgba
 .vn-ta{min-height:76px;resize:vertical}
 .vn-al{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--sunk);color:var(--ink2);font-size:14px;margin:8px 0}
 .vn-al .ic{flex:none;color:var(--ocra)}
-.vn-busy{display:flex;gap:8px;align-items:center;padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}.vn-ri{padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}.vn-ri p{margin:0 0 8px}
+.vn-busy{display:flex;gap:8px;align-items:center;padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}.vn-ri{padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}.vn-ri p{margin:0 0 8px}.vn-mb{margin-top:10px}.vn-mo{border-bottom:1px solid var(--line);padding-bottom:6px}.vn-mo .prow{border-bottom:0}.vn-mo .chips{padding:0 0 4px 30px;flex-wrap:wrap;overflow:visible}
 .vn-bar{display:block;height:8px;border-radius:4px;background:var(--line);margin:8px 0 4px;overflow:hidden}.vn-bar i{display:block;height:100%;width:0;border-radius:4px;background:var(--lagoon);background-image:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);background-size:60px 100%;animation:vnScorre 1s linear infinite;transition:width .25s linear}@keyframes vnScorre{from{background-position:-60px 0}to{background-position:200px 0}}
 .vn-fotos{padding:12px;border-radius:12px;background:var(--sunk);margin:0 0 8px}.vn-ft{display:flex;gap:8px;margin:0 0 10px;flex-wrap:wrap}.vn-fi{position:relative;width:84px;text-align:center;font-size:13px}.vn-fi img{width:84px;height:112px;object-fit:cover;border-radius:10px;display:block;margin:0 0 4px}.vn-fx{position:absolute;top:4px;right:4px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;padding:0}.vn-fx svg{width:16px;height:16px}
 .vn-top{margin:0;padding-left:22px;line-height:1.7}.vn-top b{float:right;margin-left:12px}
@@ -1233,8 +1233,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=107;
+const APP_VER=108;
 const NEWS=[
+  {v:108,data:'2026-10-13',titolo:'Vini: cerca nel mondo',
+    chef:['Nella Cantina Vini scrivi un nome nel campo di ricerca. Se il vino non è in cantina, tocca «Cerca nel mondo con l\'IA»: l\'IA cerca su Google e ti mostra fino a 6 vini con le annate. Tocchi quello giusto (o la sua annata) e l\'IA scrive la scheda. Le foto della bottiglia funzionano come prima.'],
+    dev:['`vnMondo`/`vnMondoH`/`vnMondoSel`/`vnMondoLeggi` in `moduli/cantina.js` (lettori flash → lite con `tools:[{google_search:{}}]`, `S.vnM`). Worker `/gemini`: passa `tools` solo se è esattamente la ricerca Google. Prove in `test-cantina` e `test-gemini-server`.']},
   {v:107,data:'2026-10-13',titolo:'Vini: l\'IA riprova da sola',
     chef:['Se l\'IA non riesce a leggere la foto di un vino (Google ha troppo lavoro), tocca «Rileggila tu più tardi»: la foto resta lì e l\'app riprova da sola ogni 2 minuti, fino a 5 volte. Tieni aperta la scheda: quando ha letto, il telefono vibra.'],
     dev:['`vnRiH`/`vnRiAuto`/`vnRiTick`/`vnRiProva` in `moduli/cantina.js`: `f.ko` dopo una lettura non riuscita, `f.au` {n,next} per i tentativi (`VN_RI_MS` 2 min, `VN_RI_MAX` 5), `vnIaGo(files,au)` restituisce vero/falso. Prova in `test-cantina`.']},
@@ -5443,7 +5446,7 @@ const A={
   funzSet:d=>funzSet(d.k,d.v==='1'),agOpen:()=>agOpen(),
   rcOpen:()=>rcOpen(),rcNew:()=>rcForm(null),rcEdit:d=>{const r=((D().config.ricette||{}).r||{})[d.v];if(r)rcForm(r)},rcPick:()=>rcPick(),rcAdd:d=>rcAdd(d.v),rcIngDel:d=>{S.rcf.ing.splice(+d.v,1);refreshSheet()},rcSave:()=>rcSave(),rcDel:()=>rcDel(),rcVisto:()=>rcVisto(),
   vnOpen:()=>vnOpen(),vnV:d=>{S.vn.v=d.v;refreshSheet()},vnTipo:d=>{S.vn.tipo=d.v;refreshSheet()},vnCasa:()=>{S.vn.casa=!S.vn.casa;refreshSheet()},vnAbb:d=>{S.vn.abb=S.vn.abb===d.v?'':d.v;refreshSheet()},
-  vnShow:d=>vnShow(d.v),vnNew:()=>vnForm(null),vnEdit:d=>{const v=vnGet(d.v);if(v)vnForm(v)},vnFoto:()=>vnFoto(true),vnFotoF:()=>vnFoto(false),vnFotoG:()=>vnFoto(false,true),vnFotoDel:d=>vnFotoDel(d.v),vnFotoGo:()=>{const f=S.vnf;if(f&&f.fotos&&f.fotos.length)vnIaGo(f.fotos.map(x=>x.file))},vnIa:()=>vnIaGo(null),vnRiAuto:()=>vnRiAuto(),vnRiOra:()=>vnRiOra(),vnRiStop:()=>vnRiStop(),vnSave:()=>vnSave(),vnDel:()=>vnDel(),
+  vnShow:d=>vnShow(d.v),vnNew:()=>vnForm(null),vnEdit:d=>{const v=vnGet(d.v);if(v)vnForm(v)},vnFoto:()=>vnFoto(true),vnFotoF:()=>vnFoto(false),vnFotoG:()=>vnFoto(false,true),vnFotoDel:d=>vnFotoDel(d.v),vnFotoGo:()=>{const f=S.vnf;if(f&&f.fotos&&f.fotos.length)vnIaGo(f.fotos.map(x=>x.file))},vnIa:()=>vnIaGo(null),vnMondo:()=>vnMondo(),vnMondoSel:d=>vnMondoSel(d.v),vnRiAuto:()=>vnRiAuto(),vnRiOra:()=>vnRiOra(),vnRiStop:()=>vnRiStop(),vnSave:()=>vnSave(),vnDel:()=>vnDel(),
   vnfTipo:d=>{S.vnf.tipo=d.v;S.vnf._tipo=1;refreshSheet()},vnfAbb:d=>{const l=S.vnf.abb,i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},
   vnVen:d=>vnMov(d.v,'ven',1),vnCar:d=>vnMov(d.v,'car',1),vnConta:d=>vnConta(d.v),agV:d=>{S.ag.v=d.v;S.ag.sel='';refreshSheet()},agToday:()=>{S.ag.g=today();S.ag.sel='';refreshSheet()},
   agDayGo:d=>{S.ag.v='oggi';S.ag.g=d.v;S.ag.sel='';refreshSheet();const b=document.querySelector('.sheet.tall');if(b)b.scrollTop=0},

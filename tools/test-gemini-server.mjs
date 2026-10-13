@@ -42,6 +42,11 @@ r=await call(req(GOOD));
 ok(r.s===200&&r.j.candidates[0].content.parts[0].text==='ciao da gemini-flash-latest','member: answer from Gemini');
 ok(calls[0].key==='CHIAVE-SEGRETA'&&!('extra' in calls[0].body)&&calls[0].body.generationConfig.temperature===0,'server key used, only Gemini fields forwarded');
 ok(r.h.get('access-control-allow-origin')==='*','CORS on the answer');
+// v108 (D52): la ricerca Google passa, altri strumenti no
+calls.length=0;r=await call(req(GOOD,{contents:[{parts:[{text:'cerca'}]}],tools:[{google_search:{}}]}));
+ok(r.s===200&&JSON.stringify(calls[0].body.tools)==='[{"google_search":{}}]','v108: google_search forwarded to Gemini');
+calls.length=0;r=await call(req(GOOD,{contents:[{parts:[{text:'x'}]}],tools:[{code_execution:{}}]}));
+ok(r.s===200&&!('tools' in calls[0].body),'v108: other tools are not forwarded');
 const fs1=fsCalls;await call(req(GOOD));ok(fsCalls===fs1,'membership remembered (no second Firestore read)');
 calls.length=0;plan=['429','ok'];let t=Date.now();r=await call(req(GOOD));
 ok(r.s===200&&calls.length===2&&calls[1].m==='gemini-flash-latest'&&calls[1].t-calls[0].t>=950,'429: waits retryDelay (1 s) and retries the same model ('+(calls[1]&&calls[1].t-calls[0].t)+' ms)');
