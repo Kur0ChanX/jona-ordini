@@ -52,5 +52,20 @@
   },
   "enabledMcpjsonServers": [
     "context7"
-  ]
+  ],
+  "permissions": {
+    "deny": [
+      "Bash(git push -f*)",
+      "Bash(git push --force*)",
+      "Bash(git push * -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(rm -rf*)",
+      "Bash(rm -fr*)",
+      "Bash(kill *)",
+      "Bash(pkill *)",
+      "Bash(killall *)"
+    ]
+  }
 }

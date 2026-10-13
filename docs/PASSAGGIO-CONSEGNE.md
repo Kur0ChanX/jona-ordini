@@ -1,8 +1,8 @@
-# Passaggio di consegne (2026-10-13, fine sessione #121)
+# Passaggio di consegne (2026-10-13, fine sessione #122)
 
-Sessione attuale: #122
+Sessione attuale: #123
 
-La #121 (aperta dalla #120, profondità 4) apre la #122.
+La #122 (aperta dalla #121, profondità 5) apre la #123.
 
 Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v102** (controllato 14:55: `APP_VER=102` su https://jona-ristorante-by-ynoy-corp.pages.dev/ — la pagina `index.html` risponde 308 verso `/`, usare `curl -sL .../`). Ramo = main + merge (`fa9fe4b`). Nessuna PR aperta, nessuna iscrizione, nessun controllo programmato.
 
@@ -15,10 +15,12 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 ## Fatto in #122 (13/10, ~14:56-15:27 ora italiana)
 - Scorta unita (niente di nuovo). **v103 D50 passo 3: Ricette in `moduli/ricette.js`** (7 KB, ~3 KB compressi; `rcOpen` → `modLoad('ricette')` → `rcApri`, avviso «Le Ricette non si aprono senza rete»). `sw.js` CACHE v107 + FILES, APP_VER 103, NEWS v103 (`chef`), riga v103 in CLAUDE.md, D50 in DA-FARE. `test-moduli` con le Ricette (75 PASS), ricette 36, news 94, testbar 13 PASS; GitHub verde → PR #112 squash `0ffaaf3`, **v103 online 15:26** (anche `moduli/ricette.js` 200). Main unito nel ramo (`074c6ab`).
 - D50 a questo punto: Bar, Cantina, Ricette, novità vecchie fatti; Agenda NO (intrecciata con la home).
+- **Regole da RVC #107** (send_message da `session_01DuagRMT8Hn5tWvB896Bv8e`, approvate da Mario in RVC #106): (1) CLAUDE.md riscritto SENZA STORIA (8.180 → ~6.200 parole; la parte «Jona Ordini/Struttura» è rimasta com'era, cambiate le regole generali e «Regole di lavoro»), copia intera di prima in `docs/STORIA-REGOLE.md`, riga in cima; (2) `docs/ERRORI.md` a lezioni per argomento (E1-E52, ~1.200 parole, fatto da un aiutante sonnet), tabella completa in `docs/ERRORI-STORIA.md`; (4) punto (b) della scheda che sparisce: domanda sempre scritta anche con scelte numerate (sezione 6 di CLAUDE.md); (3) Mario ha scelto a tocco «Sì, bloccali» + «Sì, confermo il blocco» → `permissions.deny` in `.claude/settings.json` (git push -f/--force, reset --hard, clean -f, rm -rf/-fr, kill, pkill, killall; vale da questa sessione nuova) e riga in CLAUDE.md sezione 4. Commit `a56d6cc` + commit delle consegne. Risposta mandata a RVC #107.
+- Punto 5 di RVC (solo informazione): Mario incollerà Preferenze personali nuove (ramo unico, icone, domande con scelte numerate, stesso motore e impegno). Jona usa già il ramo unico: niente da proporre.
 
-## ✅ PROSSIMI PASSI (#122, aggiornati, continuare da sola)
+## ✅ PROSSIMI PASSI (#123, continuare da sola)
 0. All'avvio: `get_session` (motore Opus?), server locale `python3 -m http.server 8765`.
-1. **D50 passo 3: Ricette in `moduli/ricette.js`** (stesso metodo della Cantina). Da spostare: `rcOpen`…`rcDel` (index.html ~righe 5350-5384: `rcOpen`, `rcList`, `rcForm`, `rcFormH`, `rcPick`, `rcAdd`, `rcSave`, `rcDel`; controllare anche chi chiama `rcForm`/`rcPick` fuori). Restano in index: `RC_*`, `rcAll`, `rcU`, `rcFatt`, `rcPct`, `rcPrezzo`, `rcCalc`, `rcSalito`, `rcSnap`, `rcPut`, `rcOn`, `rcCta`, `rcStrip`, `rcVisto` (usati da home e da `jonaRc`). `rcOpen` → `modLoad('ricette').then(()=>rcApri())`. `sw.js` FILES + CACHE v107, APP_VER 103, NEWS, CLAUDE.md, `test-moduli` (Ricette: avvio non caricate, offline, avviso), `tools/test-ricette.mjs` con `modLoad` se chiama funzioni dirette. Guadagno piccolo (~4 KB compressi): se pesa poco, valutare con `node tools/misura-velocita.mjs` prima/dopo e dirlo a Mario.
+1. ~~D50 passo 3~~ FATTO in #122 (v103). Controllare che i `deny` di `.claude/settings.json` non blocchino comandi normali (es. `git push -u origin …` deve andare). Poi: idee del Bar / D44 / D43 solo se utili, oppure aspettare Mario. Vecchia nota: **Ricette in `moduli/ricette.js`** (stesso metodo della Cantina). Da spostare: `rcOpen`…`rcDel` (index.html ~righe 5350-5384: `rcOpen`, `rcList`, `rcForm`, `rcFormH`, `rcPick`, `rcAdd`, `rcSave`, `rcDel`; controllare anche chi chiama `rcForm`/`rcPick` fuori). Restano in index: `RC_*`, `rcAll`, `rcU`, `rcFatt`, `rcPct`, `rcPrezzo`, `rcCalc`, `rcSalito`, `rcSnap`, `rcPut`, `rcOn`, `rcCta`, `rcStrip`, `rcVisto` (usati da home e da `jonaRc`). `rcOpen` → `modLoad('ricette').then(()=>rcApri())`. `sw.js` FILES + CACHE v107, APP_VER 103, NEWS, CLAUDE.md, `test-moduli` (Ricette: avvio non caricate, offline, avviso), `tools/test-ricette.mjs` con `modLoad` se chiama funzioni dirette. Guadagno piccolo (~4 KB compressi): se pesa poco, valutare con `node tools/misura-velocita.mjs` prima/dopo e dirlo a Mario.
 2. Agenda NO (intrecciata con la home, vedi D50 in DA-FARE).
 3. Se Mario risponde su Maurizio (notifiche iPhone, v100): aiutarlo. Domanda aperta: «A che passo è arrivato Maurizio?».
 4. Restano: foto del vino su iPhone (v96) da provare da Mario, D44, D43. D48 rimandata. Aiutanti: «aiutanti sì» con annuncio.
@@ -31,33 +33,10 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 | #119 | 6.643.470 | 244.374 | 20.405 | 3,24 | ~188-225k |
 | #120 | 11.730.738 | 170.252 | 37.304 | 4,46 | ~227k |
 | #121 | 8.467.655 | 146.652 | 21.485 | 3,30 | ~180k |
+| #122 | 4.989.156 | 137.494 | 10.760 | 2,31 | ~235k |
 
-## Fatto in #117 (12/10, ~20:57-21:25 ora italiana)
-- Avvio: scorta unita (solo ULTIMO-MESSAGGIO «per schermo intero è ancora cosí»), push `bd39060` → le prove della PR #108 sono ripartite (E39). Iscritta alla PR, titolo messo.
-- Foto di Mario `docs/img/sessione-116/chat-tastiera-*.jpg` guardate: campo «Scrivi un messaggio» mezzo sotto la tastiera, intestazione della chat fuori in alto (la pagina è stata spostata dal telefono = caso `vv.offsetTop>0`, già coperto da `chVV`). Sono della versione vecchia.
-- Codice di `chVV` (index.html riga ~4650) riletto: giusto (`top=vv.offsetTop`, `height=vv.height`, classe `kb`).
-- RVC #95 (`session_01FkfToE8frofY9A1By5DgXK`) ha chiesto come funzionano le versioni in Jona (C76): risposto con send_message (`APP_VER`, `NEWS`, `newsFor`, `newsBtn`/`newsSheet`, `jona_news_<id>`, «App da aggiornare», `test-news`).
-- Prove rosse (vedi SUBITO 0), commento sulla PR #108 con la causa. Handoff per l'avviso dell'hook (~140k).
-
-## Fatto in #116 (12/10, ~20:32-20:55 ora italiana)
-- Avvio: scorta unita (conflitto solo nell'intestazione di ULTIMO-MESSAGGIO, risolto), iscritta alla PR #108. `send_later` e `create_session` negati: profondità 8 (E12).
-- Messaggi di Mario girati dalla #115 (chiusa) salvati sotto. D48 «cocktail bellissimi» RIMANDATA da Mario (in Idee e in DA-FARE, in fondo).
-- **v99 D49** (Mario: «mi risolvi questo problema della tastiera che va sopra la scrittura», foto `docs/img/sessione-116/chat-tastiera-1.jpg` e `-2.jpg`: Android, app installata, tema scuro, chat con Mauro Loi, barra di scrittura sotto la tastiera). Causa: con `display: fullscreen` (e in generale `resizes-visual`) Android non accorcia la pagina, `.cht` usa `100dvh`. Correzione in `index.html`: `chVV()` dopo `chClose` su `visualViewport` resize/scroll: se `innerHeight − vv.height > 60` → `CHAT.box.style.top=vv.offsetTop`, `height=vv.height`, `bottom:auto`, classe `kb`, scorre `#ch-m` in fondo quando si apre; tastiera chiusa → stili tolti. CSS `.cht.kb .cht-l,.cht.kb .cht-c{height:100%}.cht.kb .cht-in{padding-bottom:8px}`. Su iPhone se `innerHeight` si accorcia insieme alla tastiera non cambia niente (come prima). Scelta di non usare `interactive-widget` (vedi SUBITO 1).
-- Prova nuova `tools/test-chat-tastiera.mjs` (visualViewport finto con `__kb(k,offset)`; Pixel 7 e Galaxy Tab S4 PASS 10, iPhone 15 e iPad SALTATA in locale; sul codice vecchio 4 FAIL), aggiunta a `VELOCI` in `tools/prova-ci.sh`. test-news e test-testbar PASS. NEWS v99, `APP_VER` 99, `CACHE` `jona-ordini-v103`, riga v99 in CLAUDE.md, D49 in DA-FARE. Titolo PR #108 aggiornato.
-- Regole nuove da RVC #94 (approvate da Mario per tutti i progetti) scritte in CLAUDE.md: MOTORE IN SILENZIO, INTERRUTTORE DEGLI AIUTANTI.
-- Handoff per l'avviso dell'hook (~155k).
-
-## Fatto in #115 (12/10, ~20:12-20:32 ora italiana)
-- Scorta unita due volte (solo ULTIMO-MESSAGGIO).
-- v98: in `tools/bar-disegni.mjs` la cannuccia (`s|`: Mojito Highball, Scorpion Tiki, Mint Julep) passa per il centro dell'apertura (32, `g.y0`); pendenza `min(.3,(rx-4)/(y1-y0))`, opachi .25; `x1/x2` = 30.9 ± … (1.1 = metà larghezza). Prova nuova in `tools/test-bar-disegni.mjs` «cannucce dal centro dell'apertura» (FAIL sul vecchio JSON, controllato). NEWS v98, `APP_VER` 98, `CACHE` v102, riga v98 in CLAUDE.md. Foto `docs/img/sessione-115/cannuccia-prima-dopo.png` mandata. Prove locali: test-bar-disegni 74, test-bar 38, test-news 94, test-testbar 13 PASS. Commit `6749eb8`, PR #108.
-- Bozza: Mojito di `tools/bozze/cocktail-bellissimi.mjs` con `rotate(16 60 20)` e rect x=58 (centro dell'ellisse 60,20). Foto prova rifatta e mandata in 2 pezzi (le foto «oggi» si fanno con un overlay `.br-ckbig` sulla pagina demo dopo `brOpen`, `brCkDis({n})`).
-- Handoff per l'avviso dell'hook (~141k).
-
-## Fatto in #114 (12/10, ~18:05-18:20 ora italiana)
-- Avvio: scorta unita (due volte, solo ULTIMO-MESSAGGIO), push. Titolo sessione messo.
-- Richiesta «cantina e cocktail allo chef»: chiesto chi è lo chef; Mario «scusa visto ora che si trova in fornitori» → niente da fare (chiusa).
-- Prova «cocktail bellissimi» (Mario «si»): bozza `tools/bozze/cocktail-bellissimi.mjs`, foto `docs/img/sessione-114/cocktail-prova-1di2.png` e `-2di2.png` mandate (oggi a sinistra, prova a destra). Pezzi: `ruota` (agrume con albedo e vescicole), `foglia` (menta con venature), `cubo` (ghiaccio trasparente col colore del drink, parametro `k` per drink scuri), `bolle`, `gocce`, `luce` (riflesso a pennello pieno), acquerello con feTurbulence. Avvertito Mario: per tutti i 212 serve rifare il generatore, lavoro di più sessioni; nella lista (44 px) i dettagli si vedono poco.
-- Handoff per l'avviso dell'hook (contesto ~150k).
+## Fatto in #115-#117 (riassunto)
+- v98 cannuccia al centro, v99 tastiera in chat (D49): dettagli nelle righe v98-v99 di CLAUDE.md e nei commit. Regole MOTORE IN SILENZIO e INTERRUTTORE DEGLI AIUTANTI da RVC #94. D48 «cocktail bellissimi» rimandata (vedi Idee).
 
 ## Fatto in #113 (12/10, ~16:49-17:16 ora italiana)
 - Avvio: scorta unita due volte (solo ULTIMO-MESSAGGIO: «non sono in hotel ora», poi «ok»).
@@ -105,8 +84,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #121 `session_019Pcx9R4JATNsWQQowh8UR6` (chiusa), #120 `session_0163UBBPpxTPFrpKzmTJf8q6` (chiusa), #119 `session_01VzprLAnmjTUe4pZMSH5J5o` (chiusa), #118 `session_01AfBcMxPZTDeEmgsGBGSHXS` (chiusa), #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC: ultima vista attiva #102 `session_01HQxtExvET3RJtVvyibVrgQ` (prima #101 `session_012uieedTtFyqonpGfgZ3yBR`); messaggi arrivati prima da #96 `session_01HcU3X6qjywWKKKXoz3cba6` e #97 `session_01Eob4hXJkfiHDSKwWDhugj2` (la più alta è l'attiva; ricontrollare con `list_sessions`). SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
+- Jona #122 `session_012bxjmAc6J4rsMJxnn7fxaf` (chiusa), #121 `session_019Pcx9R4JATNsWQQowh8UR6` (chiusa), #120 `session_0163UBBPpxTPFrpKzmTJf8q6` (chiusa), #119 `session_01VzprLAnmjTUe4pZMSH5J5o` (chiusa), #118 `session_01AfBcMxPZTDeEmgsGBGSHXS` (chiusa), #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC: attiva #107 `session_01DuagRMT8Hn5tWvB896Bv8e`; prima #102 `session_01HQxtExvET3RJtVvyibVrgQ` (prima #101 `session_012uieedTtFyqonpGfgZ3yBR`); messaggi arrivati prima da #96 `session_01HcU3X6qjywWKKKXoz3cba6` e #97 `session_01Eob4hXJkfiHDSKwWDhugj2` (la più alta è l'attiva; ricontrollare con `list_sessions`). SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
 ## Note tecniche
@@ -126,6 +105,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(13/10/2026 ~11:56 ora italiana, #119; in #120 e #121 nessun messaggio nuovo di Mario) «Ok però prima risolviami le notifiche nell'iphone di Maurizio che non trova l'app per abilitarle risolvi subito e pubblica poi il resto fatti aiutare per risolvere le notifiche»
+(#122, ~16:30 ora italiana, risposta a tocco alla domanda «Blocco anche nelle impostazioni i comandi pericolosi…?»: «Sì, bloccali (Consigliato)» + «Sì, confermo il blocco». Domanda ancora aperta: «Maurizio è riuscito ad attivare le notifiche sull'iPhone? Se no, a che passo si è fermato?». Messaggio scritto prima, 13/10/2026 ~11:56, #119) «Ok però prima risolviami le notifiche nell'iphone di Maurizio che non trova l'app per abilitarle risolvi subito e pubblica poi il resto fatti aiutare per risolvere le notifiche»
 Prima (#119): «avvia plan mode : Consigli? senza appesantire» → scelta a tocco «3 Geniale (Consigliata)», «Sì, confermo il lavoro».
 Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
