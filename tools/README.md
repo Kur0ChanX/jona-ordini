@@ -63,3 +63,8 @@ Le prove Firebase impostano `localStorage.jona_fb_emu` e una configurazione fint
 - `node tools/test-falsi-ok.mjs` (con l'emulatore, S1/v48): scritture bloccate con la rete accesa → dopo 8 s «1 modifica non arrivata · Riprova», poi la modifica arriva davvero al server.
 - `node tools/test-errori.mjs` (con l'emulatore, S3/v49): scatola nera, errori mandati a `/errori` (finto), striscia e elenco per lo sviluppatore. `node tools/test-errori-server.mjs`: `/errori` del Worker con D1 finto.
 - `node tools/test-richieste-gestite.mjs` (D9/v50): scheda Richieste «Da approvare»/«Gestite», gestite per giorno con ora e chi ha deciso, filtri, 320/390 px.
+
+## Note pratiche (spostate dalle consegne in #123)
+- Foto per Mario (gli script si perdono con lo scratchpad, si rifanno in 2 minuti): Playwright `createRequire('/opt/node22/lib/node_modules/')`, `deviceScaleFactor:2`: `/#demo` → `[data-a="demoGo"]` → `nav [data-a="tab"][data-v="fornitori"]` → `main [data-a="brOpen"]` / `main [data-a="vnOpen"]`; schede Cantina `.sheet [data-a="vnV"]`, Bar `[data-a="brV"][data-v="inv"]`; riga Negroni = `getByText('Gin · Campari · Vermouth rosso')`. Tema scuro: `document.documentElement.dataset.theme='dark'`.
+- Il server locale 8765 si spegne quando il contenitore riparte: riaccenderlo (`nohup python3 -m http.server 8765 &`) prima delle prove (altrimenti tutto «Error»).
+- Esito delle prove di un commit: `curl https://api.github.com/repos/Kur0ChanX/jona-ordini/commits/<sha>/check-runs`; log con `mcp__github__get_job_logs`. La pagina online `index.html` risponde 308 verso `/`: usare `curl -sL https://jona-ristorante-by-ynoy-corp.pages.dev/`.
