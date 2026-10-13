@@ -1,0 +1,126 @@
+# REGOLE NEW CLAUDE V3 — fix per tutti i progetti (Jona, SPA Sensorial, EdilCannas) — da RVC #119, 13/10/2026
+
+**Per chi lo riceve (una sessione Claude Code di un altro progetto):** Mario ha chiesto queste correzioni (parti 1–5) per TUTTI i progetti. Applicale tu, una alla volta, con il tuo stile di lavoro. Se hai già applicato una versione precedente (V1 o V2), fai solo quello che manca: prima controlla con `grep`. Non toccare altro. Alla fine fai la parte 6.
+
+**Per Mario:** mandalo come file allegato (questo .txt) o incollalo intero. Mai passarlo da Google Docs o PDF: trasformano `$…$` in simboli matematici e tolgono gli spazi, e lo script della parte 4 si rompe (successo con la V2).
+
+## 1. Regole da aggiungere al tuo `CLAUDE.md` (copia queste righe, adattando il nome del progetto)
+- Domande: se la scheda a tocco sparisce o Mario scrive senza averle risposto, la ripropongo SUBITO, in 3 righe con le scelte numerate, prima di ogni altra cosa (costa quasi niente).
+- Foto per Mario: mai pagine intere o catturate da scroll (il visualizzatore le riduce e il testo non si legge). Una foto per schermata (telefono 390×844, `deviceScaleFactor: 2`, `fullPage: false`: la schermata intera, 780×1688, si legge bene, provato in RVC #118), oppure, per le pagine lunghe, pezzi alti al massimo ~1100 px a larghezza piena con `tools/taglia-foto.py`. Al massimo 4 pezzi per messaggio, numerati «1 di 4», nella stessa chiamata dello strumento dei file. Alla prima foto vera chiedo a Mario: «si leggono bene?».
+- Controlli GitHub solo quando servono: niente push di codice mentre un giro di prove corre (lo annulla e ricomincia: minuti buttati); più modifiche in un solo push; l'esito lo leggo UNA volta, quando arriva l'evento (o dopo ≥15 min dal push), mai in ciclo; niente sveglie sotto i 50 minuti; push di soli documenti ok.
+- Token: leggo poco (prima `grep`, poi solo le righe utili), uscite lunghe in un file, consegne snelle (~1.000 parole, tetto massimo 1.750), regole di rado usate in una skill letta solo quando servono (es. le fasi del passaggio di consegne).
+- Titoli delle sessioni (il testo non si colora davvero: il pallino lo fa vedere): attiva `🟢 <icona> ▶ ATTIVA · #<NN> · …`, chiusa `🔴 <icona> ✓ CHIUSA · #<NN> · …`. Aggiorna anche le regole del passaggio di consegne, l'hook di soglia (se c'è) e il testo dei prompt di avvio.
+
+## 2. Taglia-foto: crea `tools/taglia-foto.py` con questo contenuto (serve Pillow: `python3 -c "import PIL"`)
+```python
+#!/usr/bin/env python3
+"""Taglia una foto lunga in pezzi leggibili sul telefono (C90, Mario #116).
+
+Perché: il visualizzatore riduce una foto alta (es. 780×6400) per farla entrare nello schermo, e il testo diventa
+illeggibile. Pezzi alti al massimo ~1100 px a larghezza piena restano chiari.
+
+Uso: python3 -I tools/taglia-foto.py <foto.png> [cartella-uscita] [altezza-massima]
+Scrive <nome>-1di3.png, <nome>-2di3.png… e stampa i percorsi (uno per riga). Taglia negli spazi vuoti
+(le righe più uniformi vicino al punto di taglio), mai in mezzo al testo. Non cancella niente.
+"""
+import sys
+from pathlib import Path
+
+from PIL import Image
+
+ALTEZZA = 1100   # px massimi per pezzo (foto a 2x di un telefono: poco più di mezza schermata alta)
+FINESTRA = 0.2   # il taglio si cerca entro il 20% dell'altezza prima del punto ideale
+
+def riga_vuota(img, y):
+    """Più basso = riga più uniforme (spazio vuoto). Misura la differenza tra il pixel più chiaro e più scuro."""
+    riga = img.crop((0, y, img.width, y + 1)).convert('L')
+    lo, hi = riga.getextrema()
+    return hi - lo
+
+def punti_di_taglio(img, massimo):
+    tagli = [0]
+    while img.height - tagli[-1] > massimo:
+        ideale = tagli[-1] + massimo
+        minimo = tagli[-1] + int(massimo * (1 - FINESTRA))
+        migliore = min(range(minimo, ideale + 1), key=lambda y: (riga_vuota(img, y), -y))
+        tagli.append(migliore)
+    tagli.append(img.height)
+    return tagli
+
+def main():
+    if len(sys.argv) < 2:
+        print(__doc__)
+        return 1
+    foto = Path(sys.argv[1])
+    uscita = Path(sys.argv[2]) if len(sys.argv) > 2 else foto.parent
+    massimo = int(sys.argv[3]) if len(sys.argv) > 3 else ALTEZZA
+    uscita.mkdir(parents=True, exist_ok=True)
+    img = Image.open(foto).convert('RGB')
+    if img.height <= massimo * 1.15:
+        print(foto)  # già abbastanza bassa: niente da tagliare
+        return 0
+    tagli = punti_di_taglio(img, massimo)
+    n = len(tagli) - 1
+    for i in range(n):
+        pezzo = img.crop((0, tagli[i], img.width, tagli[i + 1]))
+        p = uscita / f'{foto.stem}-{i + 1}di{n}.png'
+        pezzo.save(p)
+        print(p)
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())
+```
+Uso: `python3 -I tools/taglia-foto.py <foto.png> <cartella-uscita>` → stampa i percorsi dei pezzi.
+Aggiorna la tua skill/regola delle foto e l'eventuale agente «fotografo» perché la usino (altezza massima ~1100 px, mai `fullPage` per Mario).
+
+## 3. Minuti GitHub: prove solo a PR pronta (Mario, RVC #118; solo se il progetto ha prove su GitHub)
+- Nel workflow: `pull_request:` con `types: [opened, synchronize, reopened, ready_for_review]`; togli `push: branches: [main]` (dopo l'unione il giro sarebbe doppio); nel job `if: github.event_name != 'pull_request' || github.event.pull_request.draft == false`.
+- La PR resta in **bozza** (draft) mentre lavori: in bozza le prove su GitHub non partono (zero minuti). Prima di ogni push, giro completo in locale.
+- Quando la versione è pronta da unire (e Mario l'ha chiesto): `update_pull_request` con `draft: false` → parte UN giro; esito letto una volta all'evento.
+- Regola da aggiungere al `CLAUDE.md` e alla skill/procedura di unione.
+- Il giro automatico del lunedì (`schedule`) resta: non dipende dalla bozza.
+
+## 4. Prove su GitHub saltate per i soli documenti (solo se il progetto ha un file `.github/workflows/*.yml` con prove)
+Ok di Mario già dato in RVC; qui chiedigli un tocco se il tuo controllo di sicurezza blocca la modifica. Aggiungi come PRIMO passo del job questo (cambia `prove.yml` col nome del tuo file, e le cartelle «solo documenti» se diverse) e aggiungi `if: steps.doc.outputs.salta != 'true'` a ogni passo successivo tranne l'eventuale caricamento del rapporto con `if: failure()`:
+```yaml
+      # C87 (ok di Mario, #117): se rispetto all'ultimo push sono cambiati SOLO documenti (docs/, archivio/, .claude/,
+      # file .md in cima) e l'ultimo giro sul commit di prima era VERDE, il giro non si rifà: il lavoro si chiude subito, verde.
+      # In ogni altro caso (codice toccato, giro di prima rosso o mancante, qualsiasi dubbio) gira tutto.
+      - name: Solo documenti? Riuso l'esito del giro di prima
+        id: doc
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PRIMA: ${{ github.event.before }}
+          DOPO: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          salta=false
+          if [ -n "$PRIMA" ] && [ -n "${PRIMA//0/}" ] && [ "$GITHUB_EVENT_NAME" != "schedule" ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            file=$(gh api "repos/$REPO/compare/$PRIMA...$DOPO" --jq '[.files[].filename] | join(" ")' 2>/dev/null || echo "")
+            solo_doc=false
+            if [ -n "$file" ]; then
+              solo_doc=true
+              for f in $file; do
+                case "$f" in docs/*|archivio/*|.claude/*) ;; */*) solo_doc=false ;; *.md) ;; *) solo_doc=false ;; esac
+              done
+            fi
+            if [ "$solo_doc" = true ]; then
+              esito=$(gh api "repos/$REPO/actions/workflows/prove.yml/runs?head_sha=$PRIMA&status=completed&per_page=5" --jq '.workflow_runs[0].conclusion // ""' 2>/dev/null || echo "")
+              echo "Solo documenti. Esito del giro sul commit di prima: '$esito'"
+              if [ "$esito" = "success" ]; then salta=true; fi
+            fi
+          fi
+          echo "salta=$salta" >> "$GITHUB_OUTPUT"
+          if [ "$salta" = true ]; then echo "::notice::Solo documenti dopo un giro verde: prove non rifatte (C87)."; fi
+```
+Serve anche il permesso di leggere i giri: nel job aggiungi `permissions:` con `contents: read` e `actions: read` (senza, la lettura fallisce con «Resource not accessible by integration» e il giro gira sempre intero: provato in RVC #118).
+Insieme alla parte 3 non c'è conflitto: in bozza non gira niente; questo passo serve quando la PR è pronta e arriva un push di soli documenti. All'evento «pronta» (`ready_for_review`) non c'è un commit di prima, quindi gira tutto: è giusto.
+Regola di sicurezza: se cambia codice, o il giro prima non era verde, o c'è qualsiasi dubbio → il giro gira intero. Mai saltare in modo semplice.
+
+## 5. Preferenze di claude.ai
+Il testo aggiornato (v8) è nel repo RVC, `docs/PREFERENZE-CLAUDE.md`: lo incolla Mario nei 3 account. Non serve che tu lo tocchi. Se nelle preferenze che ricevi manca la frase «La PR resta in bozza (draft) mentre lavori…» nella riga «GitHub:», dillo a Mario in 1 riga: quell'account ha ancora la v7.
+
+## 6. Controllo finale e conferma a Mario
+- Cerca con `grep` nel tuo `CLAUDE.md`, nelle regole e nelle skill vecchi valori in conflitto: foto «~1700 px» (ora ~1100), consegne «2.000/2.500 parole» (ora ~1.000, tetto 1.750), giro di prove a ogni push (ora solo a PR pronta). Correggili.
+- Commit e push (con `git fetch` prima), poi conferma a Mario in 1 riga: «Fix V3: 1 ✓ · 2 ✓ · 3 ✓/non serve · 4 ✓/non serve · 6 ✓».

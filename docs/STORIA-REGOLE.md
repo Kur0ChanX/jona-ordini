@@ -205,3 +205,5 @@ IndexedDB `jona-outbox` (store `q`): push non partite, lette sia da `index.html`
 - CONTEXT7 (Mario, 11/10/2026, «Solo Context7», anche RVC e SPA): MCP in `.mcp.json` (manuali aggiornati delle librerie, gratis, legge solo documenti pubblici). Per Firebase, Cloudflare Workers/D1, Gemini, Playwright usarlo prima della ricerca web: meno errori da API vecchie e meno token.
 - Interfaccia dello staff a prova di principiante: parole semplici, pulsanti grandi.
 - Pubblicazione: PR dal ramo unico → squash merge → controllo online → riallineamento senza force: `git fetch origin main && git merge origin/main` sul ramo, poi `git push` normale.
+- CONSEGNE CORTE (Mario, 13/10/2026 #128, a tocco con conferma, dopo il file «Regole New Claude V3» di RVC #119; prima «attendi per ora»): consegne ~1.000 parole, tetto 1.750 (prima 2.500). Regola 🔒 §3 cambiata col suo consenso esplicito.
+- PR IN BOZZA (Mario, 13/10/2026 #128, «Solo la bozza», regola minuti da RVC #118): in bozza niente prove su GitHub; niente giro locale completo prima di ogni push e niente attesa del suo ok per unire (Jona è pubblico, minuti gratis).

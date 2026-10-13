@@ -188,6 +188,22 @@ await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{window._b.push(l);retur
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
 ok(await pg.evaluate(()=>window._b.join()==='flash,lite')&&/non ha risposto\. Riprova/.test(await txt('.sheet'))&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v108: Flash e Flash-Lite pieni → messaggio e «Riprova» (niente Cloudflare, non cerca sul web) ['+(await pg.evaluate(()=>window._b.join()))+'] '+(await txt('.sheet')));
 await sc('[data-a="closeSheet"]');await wait(300);
+// v109 (#129, foto di Mario): Google nega la ricerca (429) → stessa domanda senza ricerca, avviso giallo; il messaggio non dice due volte «Riprova»
+await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{const t=JSON.stringify(b.tools||null);window._b.push(l+':'+t);
+  return t!=='null'?{st:429,msg:'Resource exhausted',err:'Gemini è molto occupato adesso: riprova tra un minuto.'}
+    :{txt:JSON.stringify({vini:[{nome:'Korem',cantina:'Argiolas',tipo:'rosso',annate:[2021]}]}),lettore:'flash'}}});
+await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);t=await txt('.sheet');
+ok(await pg.evaluate(()=>window._b.join()==='flash:[{"google_search":{}}],lite:[{"google_search":{}}],flash:null'&&S.vnM.mem===true)&&/Korem/.test(t)&&/memoria dell'IA/.test(t)&&await pg.locator('.sheet').last().locator('.vn-mo').count()===1,'v109: 429 con la ricerca → senza Google, lista e avviso giallo ['+(await pg.evaluate(()=>window._b.join(' ')))+']');
+await sc('[data-a="closeSheet"]');await wait(300);
+await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{window._b.push(l);return{st:429,msg:'Resource exhausted',err:'Gemini è molto occupato adesso: riprova tra un minuto.'}}});
+await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);t=await txt('.sheet');
+ok(await pg.evaluate(()=>window._b.join()==='flash,lite,flash,lite'&&!S.vnM.mem)&&await pg.locator('.sheet').last().locator('.vn-al').innerText().then(x=>/riprova tra un minuto\.$/.test(x.trim())&&(x.match(/riprova/gi)||[]).length===1)&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v109: tutto pieno → un solo «riprova» nel messaggio e pulsante «Riprova» ['+(await pg.evaluate(()=>window._b.join()))+'] '+t);
+await sc('[data-a="closeSheet"]');await wait(300);
+// v109: limite del giorno di Google → messaggio chiaro (gemCall con la chiave del telefono e risposta finta)
+t=await pg.evaluate(async()=>{const f=window.fetch,k=ls('jona_gemini_key');ls('jona_gemini_key','prova');
+  window.fetch=async()=>new Response(JSON.stringify({error:{message:'Quota exceeded for metric: generate_content_free_tier_requests, limit: 20, quota id: GenerateRequestsPerDayPerProjectPerModel-FreeTier'}}),{status:429});
+  try{const g=await window._vero({contents:[]},'flash'),h=await window._vero({contents:[]});return g.err+' | '+h.err}finally{window.fetch=f;ls('jona_gemini_key',k||null)}});
+ok(/richieste gratis di oggi/.test(t)&&!/occupato/.test(t),'v109: 429 «PerDay» → «Gemini ha finito le richieste gratis di oggi» ('+t+')');
 await pg.evaluate(()=>{gemCall=window._vero});await pg.fill('#vnq','');await wait(250);
 ok(await pg.locator('.sheet [data-a="vnMondo"]').count()===0,'v108: campo vuoto → niente «Cerca nel mondo»');
 // carta: solo in casa, tipo, ricerca
