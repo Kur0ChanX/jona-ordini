@@ -456,7 +456,9 @@ async function gemini(request, env) {
   let req;
   try { req = JSON.parse(raw); } catch (e) { return geminiErr("richiesta non valida", 400); }
   if (!req || !Array.isArray(req.contents)) return geminiErr("richiesta non valida", 400);
-  const body = JSON.stringify({ contents: req.contents, system_instruction: req.system_instruction, generationConfig: req.generationConfig });
+  // v108 (D52 «Cerca nel mondo»): passa a Google solo la ricerca Google (grounding), nessun altro strumento
+  const tools = JSON.stringify(req.tools) === '[{"google_search":{}}]' ? [{ google_search: {} }] : undefined;
+  const body = JSON.stringify({ contents: req.contents, system_instruction: req.system_instruction, generationConfig: req.generationConfig, tools });
   const start = Date.now();
   const budget = Number(env.GEM_BUDGET) || GEM_BUDGET, tryMs = Number(env.GEM_TRY_MS) || GEM_TRY_MS;
   if (req.lettore !== undefined) {

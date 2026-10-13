@@ -140,8 +140,56 @@ ok(w1>0&&w2>0&&w2<=97,'v106: la barra si muove ('+w1+'% → '+w2+'%)');
 await pg.evaluate(async()=>{window._lib();await window._go;gemCall=window._vero});
 ok(await pg.evaluate(()=>{const t=ls('jona_ia_t');return t.lite.length===3&&t.lite[2]>=1&&!S.vnf.busy})&&await pg.locator('.sheet .vn-busy').count()===0,'v106: lettura finita, tempo salvato per la prossima volta, riquadro chiuso');
 await sc('[data-a="closeSheet"]');await wait(300);
+// v107 (idea #126 scelta da Mario): «Rileggila tu più tardi» → l'app riprova da sola, la foto resta, il telefono vibra quando ha letto
+const v107=async(failN)=>pg.evaluate(async n=>{window._n=0;window._vib=[];navigator.vibrate=p=>{window._vib.push(p);return true};
+  gemCall=async()=>(++window._n<=n)?{st:503}:{txt:'{"nome":"Prova Riprova","cantina":"Z","sicuro":true}',lettore:'flash'};
+  await modLoad('cantina');vnForm(null);const c=document.createElement('canvas');c.width=30;c.height=30;const bl=await new Promise(r=>c.toBlob(r,'image/png'));
+  await vnFotoAdd([new File([bl],'f.png',{type:'image/png'})])},failN);
+await pg.evaluate(()=>{window._vero=gemCall;VN_RI_MS=1500;VN_RI_MAX=5});
+await v107(6);await wait(200);await sc('[data-a="vnFotoGo"]');await pg.waitForFunction(()=>S.vnf&&!S.vnf.busy&&window._n>=3);await wait(200);
+t=await txt('.sheet');
+ok(/Rileggila tu più tardi/.test(t)&&await pg.locator('.sheet .vn-fi').count()===1,'v107: lettura non riuscita → «Rileggila tu più tardi», la foto resta');
+await sc('[data-a="vnRiAuto"]');await wait(200);
+ok(/Riprovo da sola tra 0:0[12] · tentativo 1 di 5/.test(await txt('.sheet .vn-ri')),'v107: conto alla rovescia e tentativo 1 di 5 ('+(await txt('.sheet .vn-ri'))+')');
+await pg.waitForFunction(()=>window._n>=6&&!S.vnf.busy,null,{timeout:15000});await wait(200);
+ok(/tentativo 2 di 5/.test(await txt('.sheet .vn-ri'))&&await pg.evaluate(()=>!window._vib.length),'v107: primo tentativo da sola non riuscito → tentativo 2 di 5, niente vibrazione');
+await pg.waitForFunction(()=>S.vnf&&S.vnf.n==='Prova Riprova',null,{timeout:15000});await wait(200);
+ok(await pg.evaluate(()=>window._vib.length===1&&!S.vnf.au&&!S.vnf.ko)&&await pg.locator('.sheet .vn-ri').count()===0&&await pg.locator('.sheet .vn-fi').count()===0,'v107: letto al secondo tentativo da sola → scheda riempita, il telefono vibra, riquadro via');
+await sc('[data-a="closeSheet"]');await wait(300);
+// «Smetti» ferma i tentativi; dopo VN_RI_MAX tentativi si ferma da sola
+await v107(999);await wait(200);await sc('[data-a="vnFotoGo"]');await pg.waitForFunction(()=>S.vnf&&!S.vnf.busy&&window._n>=3);await wait(200);
+await sc('[data-a="vnRiAuto"]');await wait(200);await sc('[data-a="vnRiStop"]');await wait(1900);
+ok(await pg.evaluate(()=>!S.vnf.au&&window._n===3)&&/Rileggila tu più tardi/.test(await txt('.sheet')),'v107: «Smetti» → nessun tentativo in più, torna il pulsante');
+await pg.evaluate(()=>{VN_RI_MS=300;VN_RI_MAX=2});await sc('[data-a="vnRiAuto"]');
+await pg.waitForFunction(()=>!S.vnf.au,null,{timeout:15000});await wait(200);
+ok(await pg.evaluate(()=>window._n===9&&!!S.vnf.ko)&&/neanche dopo 2 tentativi/.test(await txt('body'))&&/Rileggila tu più tardi/.test(await txt('.sheet')),'v107: dopo VN_RI_MAX tentativi si ferma e lo dice ('+(await pg.evaluate(()=>window._n))+' richieste)');
+await pg.evaluate(()=>{gemCall=window._vero;VN_RI_MS=120000;VN_RI_MAX=5});
+await sc('[data-a="closeSheet"]');await wait(300);
 // la prova Cloudflare ha aperto un'altra scheda sopra il Turriga: chiude anche quella
 await sc('[data-a="closeSheet"]');await wait(300);
+// v108 (D52, strada 2 scelta da Mario #126): «Cerca nel mondo» → l'IA cerca su Google, lista con le annate, tocchi → scheda
+const dopV=await pg.evaluate(()=>{const v=vnAll().find(x=>x.cant);window._b=[];
+  gemCall=async(b,l)=>{const tx=b.contents[0].parts[0].text;window._b.push({l,tools:JSON.stringify(b.tools||null),tx});
+    return /Cerca sul web/.test(tx)?{txt:'Ecco i vini:\n```json\n'+JSON.stringify({vini:[{nome:'Korem',cantina:'Argiolas',zona:'Sardegna, Italia',denominazione:'Isola dei Nuraghi IGT',tipo:'rosso',annate:[2021,'2020',1800]},{nome:v.n,cantina:v.cant,tipo:'bianco',annate:'2023, 2022'}]})+'\n```',lettore:'flash'}
+      :{txt:'{"nome":"Korem","cantina":"Argiolas","gradi":14,"frase":"Rosso sardo morbido.","sicuro":true}',lettore:'flash'}};return v.n});
+await pg.fill('#vnq','korem');await wait(250);
+ok(await pg.locator('.sheet [data-a="vnMondo"]').count()===1&&/Cerca «korem» nel mondo con l'IA/.test(await txt('.sheet')),'v108: scritto un nome → «Cerca nel mondo con l\'IA»');
+await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
+t=await txt('.sheet');
+ok(await pg.evaluate(()=>window._b.length===1&&window._b[0].l==='flash'&&window._b[0].tools==='[{"google_search":{}}]'&&/«korem»/.test(window._b[0].tx)),'v108: una richiesta a Flash con la ricerca Google');
+ok(/Korem/.test(t)&&/Argiolas · Isola dei Nuraghi IGT/.test(t)&&await pg.locator('.sheet .vn-mo').first().locator('.chip').allInnerTexts().then(x=>x.join()==='2021,2020'),'v108: lista dei vini con cantina, denominazione e annate (anno sbagliato 1800 tolto)');
+ok(/Già in cantina/.test(await pg.locator('.sheet .vn-mo').nth(1).innerText()),'v108: il vino che c\'è già è segnato «Già in cantina» ('+dopV+')');
+await pg.locator('.sheet .vn-mo').first().locator('.chip',{hasText:'2020'}).click();
+await pg.waitForFunction(()=>S.vnf&&!S.vnf.busy&&window._b.length===2);await wait(300);
+ok(await pg.inputValue('#vnf-n')==='Korem'&&await pg.inputValue('#vnf-cant')==='Argiolas'&&await pg.inputValue('#vnf-ann')==='2020'&&await pg.evaluate(()=>S.vnf.frase==='Rosso sardo morbido.'&&window._b[1].tools==='null'&&!S.vnM),'v108: toccata l\'annata 2020 → scheda con nome, cantina e annata, poi l\'IA la completa');
+await sc('[data-a="closeSheet"]');await wait(300);
+// Google pieno con tutti e due i lettori → errore chiaro e «Riprova»
+await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{window._b.push(l);return{st:503,err:'Gemini non ha risposto.'}}});
+await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
+ok(await pg.evaluate(()=>window._b.join()==='flash,lite')&&/non ha risposto\. Riprova/.test(await txt('.sheet'))&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v108: Flash e Flash-Lite pieni → messaggio e «Riprova» (niente Cloudflare, non cerca sul web) ['+(await pg.evaluate(()=>window._b.join()))+'] '+(await txt('.sheet')));
+await sc('[data-a="closeSheet"]');await wait(300);
+await pg.evaluate(()=>{gemCall=window._vero});await pg.fill('#vnq','');await wait(250);
+ok(await pg.locator('.sheet [data-a="vnMondo"]').count()===0,'v108: campo vuoto → niente «Cerca nel mondo»');
 // carta: solo in casa, tipo, ricerca
 t=await txt('.sheet');
 ok(/Vermentino di Gallura 2023/.test(t)&&!/Tignanello/.test(t),'Carta: «Solo in casa» nasconde il Tignanello finito');
