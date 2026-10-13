@@ -68,6 +68,9 @@ ok(typeof AbortSignal.timeout==='function','AbortSignal.timeout exists');
 const reqL=(l,extra={})=>req(GOOD,{contents:[{parts:[{text:'leggi'},{inline_data:{mime_type:'image/jpeg',data:'QUJD'}}]}],generationConfig:{temperature:0},lettore:l,...extra});
 calls.length=0;plan=['ok'];r=await call(reqL('lite'));
 ok(r.s===200&&r.j.lettore==='lite'&&calls.length===1&&calls[0].m==='gemini-flash-lite-latest'&&!('lettore' in calls[0].body),'lettore lite: only Flash-Lite, answer says lettore:lite');
+// v110 (#129): la ricerca Google gratis c'è solo con Gemini 2.5 → lettori f25 e l25
+for(const [l,m] of [['f25','gemini-2.5-flash'],['l25','gemini-2.5-flash-lite']]){calls.length=0;plan=['ok'];r=await call(reqL(l,{tools:[{google_search:{}}]}));
+  ok(r.s===200&&r.j.lettore===l&&calls.length===1&&calls[0].m===m&&JSON.stringify(calls[0].body.tools)==='[{"google_search":{}}]','v110 lettore '+l+': '+m+' with Google search');}
 calls.length=0;plan=['429'];r=await call(reqL('flash'));
 ok(r.s===429&&calls.length===1&&r.j.error.motivo==='limite'&&r.j.error.lettore==='flash'&&r.j.error.codice===429,'lettore flash busy: no retry, no other model, motivo limite ('+calls.length+' call)');
 // v106 (#125): un 503 di Google spesso passa in pochi secondi: il server riprova una volta lo stesso lettore

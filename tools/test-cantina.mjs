@@ -176,7 +176,7 @@ await pg.fill('#vnq','korem');await wait(250);
 ok(await pg.locator('.sheet [data-a="vnMondo"]').count()===1&&/Cerca «korem» nel mondo con l'IA/.test(await txt('.sheet')),'v108: scritto un nome → «Cerca nel mondo con l\'IA»');
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
 t=await txt('.sheet');
-ok(await pg.evaluate(()=>window._b.length===1&&window._b[0].l==='flash'&&window._b[0].tools==='[{"google_search":{}}]'&&/«korem»/.test(window._b[0].tx)),'v108: una richiesta a Flash con la ricerca Google');
+ok(await pg.evaluate(()=>window._b.length===1&&window._b[0].l==='f25'&&window._b[0].tools==='[{"google_search":{}}]'&&/«korem»/.test(window._b[0].tx)),'v108/v110: una richiesta a Gemini 2.5 Flash con la ricerca Google');
 ok(/Korem/.test(t)&&/Argiolas · Isola dei Nuraghi IGT/.test(t)&&await pg.locator('.sheet .vn-mo').first().locator('.chip').allInnerTexts().then(x=>x.join()==='2021,2020'),'v108: lista dei vini con cantina, denominazione e annate (anno sbagliato 1800 tolto)');
 ok(/Già in cantina/.test(await pg.locator('.sheet .vn-mo').nth(1).innerText()),'v108: il vino che c\'è già è segnato «Già in cantina» ('+dopV+')');
 await pg.locator('.sheet .vn-mo').first().locator('.chip',{hasText:'2020'}).click();
@@ -186,18 +186,18 @@ await sc('[data-a="closeSheet"]');await wait(300);
 // Google pieno con tutti e due i lettori → errore chiaro e «Riprova»
 await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{window._b.push(l);return{st:503,err:'Gemini non ha risposto.'}}});
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
-ok(await pg.evaluate(()=>window._b.join()==='flash,lite')&&/non ha risposto\. Riprova/.test(await txt('.sheet'))&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v108: Flash e Flash-Lite pieni → messaggio e «Riprova» (niente Cloudflare, non cerca sul web) ['+(await pg.evaluate(()=>window._b.join()))+'] '+(await txt('.sheet')));
+ok(await pg.evaluate(()=>window._b.join()==='f25,l25,flash,lite')&&/non ha risposto\. Riprova/.test(await txt('.sheet'))&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v108/v110: Gemini 2.5 e 3 pieni → messaggio e «Riprova» (niente Cloudflare, non cerca sul web) ['+(await pg.evaluate(()=>window._b.join()))+'] '+(await txt('.sheet')));
 await sc('[data-a="closeSheet"]');await wait(300);
 // v109 (#129, foto di Mario): Google nega la ricerca (429) → stessa domanda senza ricerca, avviso giallo; il messaggio non dice due volte «Riprova»
 await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{const t=JSON.stringify(b.tools||null);window._b.push(l+':'+t);
   return t!=='null'?{st:429,msg:'Resource exhausted',err:'Gemini è molto occupato adesso: riprova tra un minuto.'}
     :{txt:JSON.stringify({vini:[{nome:'Korem',cantina:'Argiolas',tipo:'rosso',annate:[2021]}]}),lettore:'flash'}}});
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);t=await txt('.sheet');
-ok(await pg.evaluate(()=>window._b.join()==='flash:[{"google_search":{}}],lite:[{"google_search":{}}],flash:null'&&S.vnM.mem===true)&&/Korem/.test(t)&&/memoria dell'IA/.test(t)&&await pg.locator('.sheet').last().locator('.vn-mo').count()===1,'v109: 429 con la ricerca → senza Google, lista e avviso giallo ['+(await pg.evaluate(()=>window._b.join(' ')))+']');
+ok(await pg.evaluate(()=>window._b.join()==='f25:[{"google_search":{}}],l25:[{"google_search":{}}],flash:null'&&S.vnM.mem===true)&&/Korem/.test(t)&&/memoria dell'IA/.test(t)&&await pg.locator('.sheet').last().locator('.vn-mo').count()===1,'v109: 429 con la ricerca → senza Google, lista e avviso giallo ['+(await pg.evaluate(()=>window._b.join(' ')))+']');
 await sc('[data-a="closeSheet"]');await wait(300);
 await pg.evaluate(()=>{window._b=[];gemCall=async(b,l)=>{window._b.push(l);return{st:429,msg:'Resource exhausted',err:'Gemini è molto occupato adesso: riprova tra un minuto.'}}});
 await sc('[data-a="vnMondo"]');await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);t=await txt('.sheet');
-ok(await pg.evaluate(()=>window._b.join()==='flash,lite,flash,lite'&&!S.vnM.mem)&&await pg.locator('.sheet').last().locator('.vn-al').innerText().then(x=>/riprova tra un minuto\.$/.test(x.trim())&&(x.match(/riprova/gi)||[]).length===1)&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v109: tutto pieno → un solo «riprova» nel messaggio e pulsante «Riprova» ['+(await pg.evaluate(()=>window._b.join()))+'] '+t);
+ok(await pg.evaluate(()=>window._b.join()==='f25,l25,flash,lite'&&!S.vnM.mem)&&await pg.locator('.sheet').last().locator('.vn-al').innerText().then(x=>/riprova tra un minuto\.$/.test(x.trim())&&(x.match(/riprova/gi)||[]).length===1)&&await pg.locator('.sheet').last().locator('[data-a="vnMondo"]').count()===1,'v109: tutto pieno → un solo «riprova» nel messaggio e pulsante «Riprova» ['+(await pg.evaluate(()=>window._b.join()))+'] '+t);
 await sc('[data-a="closeSheet"]');await wait(300);
 // v109: limite del giorno di Google → messaggio chiaro (gemCall con la chiave del telefono e risposta finta)
 t=await pg.evaluate(async()=>{const f=window.fetch,k=ls('jona_gemini_key');ls('jona_gemini_key','prova');

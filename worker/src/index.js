@@ -147,7 +147,8 @@ const GEM_BUDGET = 85000;   // tempo massimo di una richiesta: Cloudflare la chi
 const GEM_TRY_MS = 45000;   // un modello che non risponde entro questo tempo lascia il posto al successivo (Lite, più veloce)
 const GEM_MAX_BODY = 20 * 1024 * 1024;
 // v68: lettori delle foto, nell'ordine in cui li prova l'app (il più preciso per primo); cf = ripiego gratis fuori da Google
-const LETTORI = { flash: "gemini-flash-latest", lite: "gemini-flash-lite-latest", cf: "@cf/meta/llama-4-scout-17b-16e-instruct" };
+// v110: f25/l25 = Gemini 2.5, l'unico con la ricerca Google (grounding) nel piano gratis (500 al giorno, Flash e Flash-Lite insieme)
+const LETTORI = { flash: "gemini-flash-latest", lite: "gemini-flash-lite-latest", f25: "gemini-2.5-flash", l25: "gemini-2.5-flash-lite", cf: "@cf/meta/llama-4-scout-17b-16e-instruct" };
 const CF_MS = 80000;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const geminiErr = (message, status) => json({ error: { message } }, status);

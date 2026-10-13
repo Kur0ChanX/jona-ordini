@@ -90,6 +90,8 @@ ok(h4.join()==='AGGIUNTE,CORREZIONI'||h4.join()==='Aggiunte,Correzioni','v3 head
 const all4=new Set((await pg.locator('.sheet .news-dev h4').evaluateAll(es=>es.map(e=>e.textContent))));
 ok(['Aggiunte','Correzioni','Problemi risolti'].every(x=>all4.has(x)),'dev sees the three headings: '+[...all4].join(', '));
 ok(await vSec(2).locator('.news-dev h4').evaluateAll(es=>es.map(e=>e.textContent).join())==='Aggiunte','v2 only "Aggiunte"');
+// v110: le novità recenti hanno dev:[…] (elenco semplice) e prima non si vedevano: ora finiscono sotto «Aggiunte».
+ok(await vSec(V).locator('.news-dev li').count()>0,'dev: v'+V+' (dev come elenco) mostra la parte tecnica');
 ok(await pg.locator('.sheet .news-dev code').count()>20,'dev: code names rendered');
 await pg.screenshot({path:OUT+'sheet-dev.png'});
 await pg.locator('.sheet').evaluate(e=>e.scrollTop=e.scrollHeight);await wait(100);
