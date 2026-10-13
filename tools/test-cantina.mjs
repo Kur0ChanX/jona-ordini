@@ -79,21 +79,21 @@ await sc('[data-a="closeSheet"]');await wait(300);
 // secondo vino dalla foto (bianco, pesce), poi doppione
 gemOut={nome:'Vermentino di Gallura',cantina:'Cantina Prova',annata:'2023',gradi:'13,5',tipo:'Bianco',abbinamenti:['pesce','crudi'],frase:'Fresco e sapido.',parole:'Fresco · Sapido · Fiori',sicuro:false};
 await pg.evaluate(async()=>{const c=document.createElement('canvas');c.width=40;c.height=60;c.getContext('2d').fillRect(0,0,20,20);const bl=await new Promise(r=>c.toBlob(r,'image/png'));
-  vnForm(null);await vnIaGo([new File([bl],'e.png',{type:'image/png'})])});await wait(500);
+  await modLoad('cantina');vnForm(null);await vnIaGo([new File([bl],'e.png',{type:'image/png'})])});await wait(500);
 const pf=gemReq[gemReq.length-1].contents[0].parts;
 ok(pf.length===2&&pf[1].inline_data&&/foto dell'etichetta/.test(pf[0].text),'foto: IA chiamata con l\'immagine dell\'etichetta');
 ok(await pg.inputValue('#vnf-gr')==='13,5'&&/che non era sicura del vino/.test(await txt('.sheet')),'foto: gradi «13,5» e avviso «non era sicura»');
 await pg.fill('#vnf-q','6');await sc('[data-a="vnSave"]');await wait(600);
 ok(await pg.evaluate(()=>{const v=vnAll().find(x=>x.n==='Vermentino di Gallura');return v&&v.tipo==='bianco'&&v.ia==='dubbio'&&v.q===6}),'salvato come bianco, scheda «dubbio»');
 await sc('[data-a="closeSheet"]');await wait(300);
-await pg.evaluate(async()=>{const c=document.createElement('canvas');c.width=40;c.height=60;const bl=await new Promise(r=>c.toBlob(r,'image/png'));vnForm(null);await vnIaGo([new File([bl],'e.png',{type:'image/png'})])});await wait(600);
+await pg.evaluate(async()=>{const c=document.createElement('canvas');c.width=40;c.height=60;const bl=await new Promise(r=>c.toBlob(r,'image/png'));await modLoad('cantina');vnForm(null);await vnIaGo([new File([bl],'e.png',{type:'image/png'})])});await wait(600);
 ok(/Questo vino è già in cantina/.test(await txt('body'))&&/Vermentino di Gallura 2023/.test(await txt('.sheet')),'stesso vino fotografato di nuovo: apre quello già in cantina');
 await sc('[data-a="closeSheet"]');await wait(300);
 // D44: fronte e retro della stessa bottiglia, letti insieme
 const png=async(pg,w)=>pg.evaluate(async w=>{const c=document.createElement('canvas');c.width=w;c.height=60;c.getContext('2d').fillRect(0,0,10,10);const u=await new Promise(r=>c.toBlob(b=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)},'image/png'));return u.split(',')[1]},w);
 const fimg=async(n,w)=>({name:n,mimeType:'image/png',buffer:Buffer.from(await png(pg,w),'base64')});
 gemOut={nome:'Turriga',cantina:'Argiolas',annata:'2019',gradi:14.5,tipo:'rosso',denominazione:'Isola dei Nuraghi IGT',vitigni:'85% Cannonau, Carignano, Bovale',frase:'Il grande rosso sardo.',parole:'Potente · Mirto · Spezie',sicuro:true};
-await pg.evaluate(()=>vnForm(null));await wait(300);
+await pg.evaluate(async()=>{await modLoad('cantina');vnForm(null)});await wait(300);
 let fc=(await Promise.all([pg.waitForEvent('filechooser'),sc('[data-a="vnFotoF"]')]))[0];
 ok(await pg.evaluate(()=>{const p=document.querySelector('#picker');return p.getAttribute('capture')==='environment'&&!p.multiple}),'foto: apre la fotocamera');
 await fc.setFiles([await fimg('fronte.png',40)]);await wait(400);
@@ -120,7 +120,7 @@ ok(/Letto da Gemini Flash-Lite\. Prima: Gemini Flash — Google ha risposto «so
 // Cloudflare con più foto che non risponde: riprova con il solo fronte
 const cf=await pg.evaluate(async()=>{const vero=gemCall,log=[];
   gemCall=async(b,l)=>{const n=b.contents[0].parts.length-1;log.push(l+n);return l==='cf'?(n>1?{st:400,msg:'troppe immagini'}:{txt:'{"nome":"Prova CF","cantina":"X","sicuro":true}',lettore:'cf'}):{st:503}};
-  try{vnForm(null);const c=document.createElement('canvas');c.width=30;c.height=30;const bl=await new Promise(r=>c.toBlob(r,'image/png'));
+  try{await modLoad('cantina');vnForm(null);const c=document.createElement('canvas');c.width=30;c.height=30;const bl=await new Promise(r=>c.toBlob(r,'image/png'));
     await vnIaGo([new File([bl],'f.png',{type:'image/png'}),new File([bl],'r.png',{type:'image/png'})]);return{log:log.join(),n:S.vnf.n}}finally{gemCall=vero}});
 ok(cf.log==='flash2,lite2,cf2,cf1'&&cf.n==='Prova CF','D44: Cloudflare non accetta 2 foto → riprova col fronte: '+cf.log);
 await sc('[data-a="closeSheet"]');await wait(300);
