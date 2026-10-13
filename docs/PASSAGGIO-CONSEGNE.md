@@ -1,31 +1,45 @@
-# Passaggio di consegne (2026-10-13, fine sessione #119)
+# Passaggio di consegne (2026-10-13, fine sessione #120)
 
-Sessione attuale: #120
+Sessione attuale: #121
 
-La #119 (aperta dalla #118, profondità 2) apre la #120.
+La #120 (aperta dalla #119, profondità 3) apre la #121.
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v100 online** (PR #109, squash `2713ae3`, online ~12:30 controllato), `main` unito nel ramo. Niente PR aperta. Nel ramo: `APP_VER` 100, `CACHE` `jona-ordini-v104`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Online: **v100**. Nel ramo: **v101** (`APP_VER` 101, `CACHE` `jona-ordini-v105`), **PR #110 aperta** (https://github.com/Kur0ChanX/jona-ordini/pull/110), sessione iscritta alla PR (la nuova deve iscriversi di nuovo con `subscribe_pr_activity`).
 
-## Fatto in #119 (13/10, ~8:22-12:35 ora italiana)
-- Avvio: scorta unita due volte (solo ULTIMO-MESSAGGIO), push.
-- Mario: «avvia plan mode : Consigli? senza appesantire». Piano con 3 strade (Ovvia promemoria del turno via push D33; Furba costo del cocktail da `config/bar.pc`; **Geniale** Bar/Cantina/Ricette in file a parte caricati solo all'apertura). Mario ha scelto **3 Geniale** a tocco con doppio tocco. Piano in `/root/.claude/plans/parallel-bouncing-crayon.md` (perso col contenitore: riassunto qui sotto in «Prossimi passi»).
-- **v100 URGENTE (Mario: «prima risolviami le notifiche nell'iphone di Maurizio che non trova l'app per abilitarle risolvi subito e pubblica»)**. Foto `docs/img/sessione-119/maurizio-notifiche-safari.jpg`: Maurizio apriva Jona in Safari; il permesso risultava «denied» e la guida «Notifiche bloccate» mandava in Impostazioni → Notifiche → Jona Ordini, che non esiste senza app installata. Correzione: `iosDev`/`iosWeb()`, `PUSH_INST`, `pushDenied` falso in Safari iOS, `pushHelp` scheda «Prima installa Jona sull'iPhone», `pushOn` non chiede il permesso, `pushAsk` «Installa l'app per le notifiche». Prova nuova `tools/test-push-iphone.mjs` (in VELOCI di `tools/prova-ci.sh`); `tools/test-v26.mjs` aggiornata (caso iPhone «bloccate» = app dall'icona, `navigator.standalone` finto). E51 in ERRORI, riga v100 in CLAUDE.md. Prove locali verdi (push-iphone, v26, news, testbar, giro); GitHub `prove` verde (PC, Mac, Android, tablet, iPhone, iPad).
-- Dato a Mario i passi per Maurizio (Safari → Condividi/··· → Aggiungi alla schermata Home → Apri come app web → Aggiungi → apri dall'icona → foto → Attiva le notifiche → Consenti). In attesa della risposta («a che passo è arrivato»).
-- Regola da RVC #101 (messaggio di `session_012uieedTtFyqonpGfgZ3yBR`) scritta in CLAUDE.md, handoff punti 6-7: la nuova sessione parte da sola dai Prossimi passi, motore Opus, stesso impegno. In #119 `get_session` NON mostra `effort_level`: non scritto `effortLevel` in `.claude/settings.json` (da verificare alla prossima apertura, come in RVC).
-- Aiutante `ottimizza` lanciato per misurare Bar/Cantina/Ricette/Agenda: risultato perso con l'handoff, da rifare.
+## Fatto in #120 (13/10, ~12:30-13:40 ora italiana)
+- Avvio: scorta unita (solo ULTIMO-MESSAGGIO), motore Opus ok, `effort_level` non visibile in `get_session`.
+- **v101 D50 «app più leggera»** (strada 3 Geniale di Mario #119), dettagli nella riga v101 di CLAUDE.md:
+  - Bar in `moduli/bar.js` (19 KB, 7,5 KB compressi): `modLoad(n)` in index.html (script globale, una volta, su errore si può riprovare), `brOpen` → `modLoad('bar')` → `brApri`; in index restano `isBar`, `brCan`, `brOn`, `brAll`, `brGet`, `brTot`, `brMese`, `brCta`, azioni `br*` in `A`. Avviso «Il Bar non si apre senza rete. Riprova tra poco.».
+  - Novità dalla v89 in giù in `data/news.json` (le novità erano 85 KB / 32 KB compressi: la parte più pesante, idea mia oltre al piano); in `NEWS` restano v90-v101. `newsOld()`, `newsList()`, `newsSheet` le scarica e ridisegna; senza rete `.news-old` «Le versioni più vecchie si vedono con la rete».
+  - `sw.js` FILES + `./moduli/bar.js`, `./data/news.json`; deploy `cp -r lib media data moduli sito/`.
+  - Misura (`node tools/misura-velocita.mjs`): index.html 912 → 796 KB (297 → 263 KB compresso), prima schermata sul telefono lento 4525 ms (OLTRE il tetto 4500) → 3253 ms, blocco più lungo 699 → 196 ms.
+  - Prove aggiornate: `test-news`, `test-bar` (+ controllo «Bar non caricato all'avvio», poi `modLoad('bar')`), `test-bar-disegni` (legge anche `moduli/bar.js`), `test-testbar`, `test-v27/28/29/30` (usano `await newsOld(); newsList()`). Prova nuova `tools/test-moduli.mjs` (in VELOCI di `prova-ci.sh`). Locale: tutte verdi + `test-giro` verde.
+- Misura dell'aiutante `ottimizza` arrivata da #119 → ordine dei prossimi moduli in DA-FARE D50 (Cantina, Ricette; Agenda NO).
+- Regola nuova da RVC #102 (`session_01HQxtExvET3RJtVvyibVrgQ`) «SCHEDA DELLE DOMANDE CHE SPARISCE» scritta in CLAUDE.md (approvata da Mario per tutti).
 
-## ✅ PROSSIMI PASSI (#120, continuare da sola)
-0. All'avvio: `get_session` (motore Opus? `effort_level`?) come dice CLAUDE.md punto 7.
-1. Se Mario risponde su Maurizio: aiutarlo coi passi (se l'icona c'è già: aprire da lì). Se le notifiche non arrivano ancora con l'app installata → guida «bloccate» vera.
-2. **Strada 3 Geniale (scelta di Mario)**: misura con l'agente `ottimizza` + `node tools/misura-velocita.mjs` quanti KB pesano Bar (`br*`), Cantina (`vn*`), Ricette (`rc*`), Agenda (`ag*`) dentro `index.html` (910 KB, 304 KB compresso) e i punti di contatto all'avvio (`rcStrip`, `agStrip`, `vnRestore`…). Poi un modulo per volta (Bar per primo, ha già `data/cocktail.json` e `data/bar-disegni.json` scaricati all'apertura) in `moduli/<nome>.js` caricato al primo `brOpen`; nell'app resta solo l'ingresso. File in `FILES` di `sw.js` e nel passo «Prepara i file» di `.github/workflows/cloudflare-pages.yml`. Prove: `test-bar`, `test-bar-disegni`, `test-testbar`, `test-giro`, `test-dispositivi`, `test-leggera`, prova nuova senza rete (Bar si apre dal service worker). Versione nuova: `APP_VER`, `NEWS`, `CACHE`.
-3. Misura del consumo: riga di #120 nella tabella sotto all'handoff.
-4. Restano: Mario proverà foto del vino su iPhone (v96), D44 (v93), D43. D48 rimandata. Aiutanti: «aiutanti sì» con annuncio.
+## 🔴 PR #110 ROSSA: `test-moduli` solo su WebKit (Desktop Safari e iPhone 15; iPad PASSA)
+Diagnosi dentro la riga FAIL (commit `cd3b3af`): «senza rete il Bar si apre (20011 ms) script:0 · brApri:undefined · avvisi: · onLine:false · ctrl:true · cache:200 · fetch err:Load failed»; anche «novità vecchie (12 versioni)» = `data/news.json` non arrivato.
+Cioè: pagina controllata dal service worker, file presente nella cache (`caches.match` 200), ma `fetch('moduli/bar.js')` dalla pagina dà «Load failed» → il service worker non risponde dalla cache con `ctx.setOffline(true)` su WebKit di Playwright (lo script è stato tolto da `onerror`; l'avviso era già sparito dopo 20 s).
+Da capire PRIMA di toccare l'app (non pubblicare finché non è chiaro):
+1. Controllo: nella stessa prova su WebKit, offline, `fetch('index.html')` / `pg.reload()` funzionano? Se falliscono anche loro = limite dell'emulazione offline di Playwright WebKit (il service worker non viene usato offline) → la parte «senza rete col service worker» si verifica su WebKit con un altro modo (es. `fetch` dalla cache con `caches.match` già provato, o route che fa fallire la rete verso il server ma lascia il service worker), scritto nella prova con il motivo, NON spenta. Se `index.html` offline invece va → problema vero nel `fetch` di `sw.js` per i file nuovi: guardare `sw.js` righe 18-28 (`caches.match(req)` con richiesta di tipo script, `ignoreSearch`/`ignoreVary`?).
+2. Perché iPad passa e iPhone no? (tempo? stesso WebKit). Utile come indizio.
+3. Prima di ogni push: E39 (ogni push fa ripartire le prove della PR, ~25 min).
+Dopo il verde: squash, `git fetch origin main && git merge origin/main`, push, controllo online (`APP_VER` 101 su https://jona-ristorante-by-ynoy-corp.pages.dev/), poi dire a Mario su quali dispositivi è stata provata.
+
+## ✅ PROSSIMI PASSI (#121, continuare da sola)
+0. All'avvio: `get_session` (motore Opus?), `subscribe_pr_activity` PR #110, server locale `python3 -m http.server 8765` (si spegne quando il contenitore riparte).
+1. 🔴 PR #110 come sopra.
+2. Se Mario risponde su Maurizio (notifiche iPhone, v100): aiutarlo; se con l'app installata le notifiche non arrivano → guida «bloccate» vera. Domanda aperta: «A che passo è arrivato Maurizio?».
+3. Dopo la v101 online: modulo Cantina (DA-FARE D50), poi Ricette.
+4. Restano: Mario proverà foto del vino su iPhone (v96), D44, D43. D48 rimandata. Aiutanti: «aiutanti sì» con annuncio.
+5. Misura del consumo: riga #120 sotto (fatta), #121 alla sua chiusura (ultima delle 3).
 
 ## Consumo (misura per 3 sessioni, regola RVC #97)
 | Sessione | cache_read | cache_write | output | cost_usd | contesto alla chiusura |
 |---|---|---|---|---|---|
 | #118 | 4.914.969 | 222.117 | 10.822 | 2,98 | ~187-221k |
 | #119 | 6.643.470 | 244.374 | 20.405 | 3,24 | ~188-225k |
+| #120 | 11.730.738 | 170.252 | 37.304 | 4,46 | ~227k |
 
 ## Fatto in #117 (12/10, ~20:57-21:25 ora italiana)
 - Avvio: scorta unita (solo ULTIMO-MESSAGGIO «per schermo intero è ancora cosí»), push `bd39060` → le prove della PR #108 sono ripartite (E39). Iscritta alla PR, titolo messo.
@@ -100,8 +114,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #119 `session_01VzprLAnmjTUe4pZMSH5J5o` (chiusa), #118 `session_01AfBcMxPZTDeEmgsGBGSHXS` (chiusa), #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC: ultima vista attiva #101 `session_012uieedTtFyqonpGfgZ3yBR`; messaggi arrivati prima da #96 `session_01HcU3X6qjywWKKKXoz3cba6` e #97 `session_01Eob4hXJkfiHDSKwWDhugj2` (la più alta è l'attiva; ricontrollare con `list_sessions`). SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
+- Jona #120 `session_0163UBBPpxTPFrpKzmTJf8q6` (chiusa), #119 `session_01VzprLAnmjTUe4pZMSH5J5o` (chiusa), #118 `session_01AfBcMxPZTDeEmgsGBGSHXS` (chiusa), #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC: ultima vista attiva #102 `session_01HQxtExvET3RJtVvyibVrgQ` (prima #101 `session_012uieedTtFyqonpGfgZ3yBR`); messaggi arrivati prima da #96 `session_01HcU3X6qjywWKKKXoz3cba6` e #97 `session_01Eob4hXJkfiHDSKwWDhugj2` (la più alta è l'attiva; ricontrollare con `list_sessions`). SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
 ## Note tecniche
@@ -121,6 +135,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(13/10/2026 ~11:56 ora italiana, #119, con la foto dell'iPhone di Maurizio) «Ok però prima risolviami le notifiche nell'iphone di Maurizio che non trova l'app per abilitarle risolvi subito e pubblica poi il resto fatti aiutare per risolvere le notifiche»
+(13/10/2026 ~11:56 ora italiana, #119; in #120 nessun messaggio nuovo di Mario) «Ok però prima risolviami le notifiche nell'iphone di Maurizio che non trova l'app per abilitarle risolvi subito e pubblica poi il resto fatti aiutare per risolvere le notifiche»
 Prima (#119): «avvia plan mode : Consigli? senza appesantire» → scelta a tocco «3 Geniale (Consigliata)», «Sì, confermo il lavoro».
 Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
