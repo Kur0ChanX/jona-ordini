@@ -15,6 +15,8 @@
 // Dalla v35 il piano porta anche le scadenze per lo staff («Richieste allo chef entro le…», con le iscrizioni dello staff scelto)
 // e le iscrizioni dei gestori («gest») per /richiesta: un telefono in attesa avvisa i gestori che chiede di entrare.
 // /agenda (v58): chi scrive in agenda manda gli avvisi dei prossimi 2 giorni con le iscrizioni di chi li riceve; il cron li manda una volta sola (chiavi «ag» e «agfatto» in «prom»).
+// /turni (v104): chi fa gli orari manda i turni pubblicati dei prossimi 8 giorni {pp: persona → iscrizioni, ev: [{k, at, x, u}]};
+// il cron manda «Tra un'ora inizi il turno» una volta sola (chiavi «tu» e «tufatto» in «prom»).
 // /inviti con {fisso:true}: codice del «QR da cucina» che non scade (il vecchio, se indicato, viene cancellato).
 // /invito/<codice>: al massimo INV_ERR codici sbagliati all'ora per indirizzo IP.
 
@@ -310,6 +312,42 @@ async function agTickSrv(env, t = Date.now()) {
     await send(env, { titolo: x.t, testo: x.x, tag: "ag_" + x.k, subs: x.subs });
   }
   if (cambiato) await promPut(db, "agfatto", fatto);
+}
+// turni (v104): un promemoria per ogni parte del turno, 1 ora prima (l'ora «at» la calcola il telefono)
+async function turSalva(request, env) {
+  if (!(await membro(request, env))) return json({ errore: "Telefono non collegato al ristorante" }, 403);
+  const db = await promDb(env);
+  if (!db) return json({ errore: "promemoria non attivi sul server" }, 503);
+  const b = await request.json().catch(() => null);
+  if (!b || !Array.isArray(b.ev) || !b.pp || typeof b.pp !== "object") return json({ errore: "richiesta non valida" }, 400);
+  const pp = {};
+  for (const [u, l] of Object.entries(b.pp).slice(0, 80)) {
+    const subs = (Array.isArray(l) ? l : []).filter(validSub).slice(0, 5);
+    if (subs.length) pp[String(u).slice(0, 64)] = subs;
+  }
+  const ev = b.ev.slice(0, 600).map(x => ({
+    k: String(x && x.k || "").slice(0, 80),
+    at: Number.isFinite(x && x.at) ? Math.round(x.at) : 0,
+    x: String(x && x.x || "").slice(0, 80),
+    u: String(x && x.u || "").slice(0, 64),
+  })).filter(x => x.k && x.at > 0 && x.x && pp[x.u]);
+  await promPut(db, "tu", { pp, ev, agg: Date.now() });
+  return json({ ok: true, turni: ev.length, persone: Object.keys(pp).length });
+}
+async function turTickSrv(env, t = Date.now()) {
+  const db = await promDb(env);
+  if (!db) return;
+  const tu = await promGet(db, "tu");
+  if (!tu || !Array.isArray(tu.ev)) return;
+  const fatto = await promGet(db, "tufatto") || {};
+  let cambiato = false;
+  for (const k in fatto) if (fatto[k] < t - 2 * 864e5) { delete fatto[k]; cambiato = true; }
+  for (const x of tu.ev) {
+    if (x.at > t || x.at < t - 20 * 60000 || fatto[x.k] || !tu.pp[x.u]) continue;
+    fatto[x.k] = t; cambiato = true;
+    await send(env, { titolo: "Tra un'ora inizi il turno", testo: x.x, tag: "tu_" + x.k, subs: tu.pp[x.u] });
+  }
+  if (cambiato) await promPut(db, "tufatto", fatto);
 }
 const promHm = m => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
 async function promTick(env, t = Date.now()) {
@@ -714,7 +752,7 @@ async function ponte(request, env, url) {
 
 export default {
   async scheduled(event, env, ctx) {
-    if (event && event.cron === PROM_CRON) return ctx.waitUntil(promTick(env).then(() => agTickSrv(env)));
+    if (event && event.cron === PROM_CRON) return ctx.waitUntil(promTick(env).catch(() => {}).then(() => agTickSrv(env)).catch(() => {}).then(() => turTickSrv(env)));
     ctx.waitUntil(algPulizia(env));
     ctx.waitUntil(invDb(env).then(db => db && db.prepare("DELETE FROM inviti WHERE scade < ?").bind(Date.now()).run()));
     ctx.waitUntil(errDb(env).then(db => db && db.prepare("DELETE FROM err WHERE t < ?").bind(Date.now() - ERR_GIORNI * 864e5).run()));
@@ -732,6 +770,7 @@ export default {
       if (url.pathname === "/richiesta" && request.method === "POST") return await richiesta(request, env);
       if (url.pathname === "/promemoria" && request.method === "POST") return await promSalva(request, env);
       if (url.pathname === "/agenda" && request.method === "POST") return await agSalva(request, env);
+      if (url.pathname === "/turni" && request.method === "POST") return await turSalva(request, env);
       if (url.pathname.startsWith("/allegati")) {
         const uid = await membro(request, env);
         if (!uid) return algErr("Telefono non collegato al ristorante", 403);
