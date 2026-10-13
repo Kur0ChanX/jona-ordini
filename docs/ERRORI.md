@@ -48,6 +48,7 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 - **E14** Aggiungendo un indirizzo al Worker aggiornare tutti i Worker finti (`grep -l jona-notifiche tools/*.mjs`) (#124: dimenticato `/turni` → 2 prove Firebase rosse) e dopo una versione che tocca il Worker lanciare il giro `tutto` su GitHub.
 - **E26** Prova rossa legata all'ora: rilanciare in locale; se fallisce sempre cercare un'ora fissa nei dati di prova (togliere l'ora limite agli altri fornitori di prova).
 - **E33** Controlli: check `prove` senza badare alle maiuscole, indirizzo `https://jona-ristorante-by-ynoy-corp.pages.dev/` senza index.html; prima di un'attesa lunga provare il comando una volta.
+- **E54** Mai `list_workflow_runs` (stampa il messaggio intero dello squash, migliaia di token): stato con `get_check_runs` o `list_workflow_jobs`; squash merge sempre con `commit_message` corto.
 - **E49** «App chiusa con la fotocamera aperta» = pagina nuova (`nuova()`), non reload; prima di dire «bloccato» guardare il passo del lavoro (`list_workflow_jobs`).
 
 ## Immagini, animazioni e disegni
