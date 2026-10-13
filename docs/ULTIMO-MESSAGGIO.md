@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (13/10/2026 18:20 ora italiana)
+# Ultimo messaggio di Mario (13/10/2026 19:42 ora italiana)
 
-Gemini errore 503 oer lettura viti attenzione senza senso non in sovraccarico ha un apo gemini sua non utilizzata da nessuno e mi serve una caricamento vero per far vedere che non si è bloccato e quanto ci mette effettivamente l'ia
+si può mettere un altra ricerca in vini ad esempio una vini in casa che ti cerca i tuoi e un altra che ti va a un catalogo super completo aggiornato mese per mese con tutti i nuovi vini annate ecc ci clicchi e interviene l'ia per trovare il vino cosí anche meglio se è fattibile e smart e teniamo anche le foto però
