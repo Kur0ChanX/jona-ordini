@@ -54,7 +54,7 @@ jobs:
         run: |
           mkdir -p sito
           cp index.html sw.js manifest.webmanifest firebase-config.js _headers *.png sito/
-          cp -r lib media data sito/
+          cp -r lib media data moduli sito/
           ls -la sito
 
       - name: Pubblica

@@ -22,7 +22,7 @@ await pg.click('[data-a="setupGo"]');
 await pg.waitForSelector('.testbar');await wait(300);
 const id=await pg.evaluate(()=>realU().id);
 // conteggi attesi calcolati dai dati di NEWS (niente numeri scritti a mano)
-const RAW=await pg.evaluate(()=>NEWS.map(n=>({v:n.v,data:n.data,t:(n.tutti||[]).length,c:(n.chef||[]).length,d:Object.values(n.dev||{}).some(a=>a&&a.length)})));
+const RAW=await pg.evaluate(async()=>(await newsOld(),newsList()).map(n=>({v:n.v,data:n.data,t:(n.tutti||[]).length,c:(n.chef||[]).length,d:Object.values(n.dev||{}).some(a=>a&&a.length)})));
 const V=RAW[0].v,LV={staff:0,gm:1,dev:2};
 const exp=r=>RAW.filter(n=>n.t||(LV[r]>=1&&n.c)||(LV[r]>=2&&n.d)).map(n=>n.v);
 const after=(r,s)=>exp(r).filter(v=>v>s).length;
@@ -31,7 +31,7 @@ const MESI=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','ag
 const day=s=>{const [y,m,d]=s.split('-').map(Number);return d+' '+MESI[m-1]+' '+y};
 const vSec=v=>pg.locator('.sheet .news-v').filter({has:pg.locator('.news-vn',{hasText:new RegExp('^Beta v'+v+'$')})});
 ok(await pg.evaluate(()=>APP_VER)===V,'APP_VER = NEWS[0].v ('+V+')');
-ok(await pg.evaluate(()=>NEWS.every((n,i,a)=>!i||a[i-1].v>n.v)),'NEWS sorted newest first');
+ok(await pg.evaluate(()=>newsList().every((n,i,a)=>!i||a[i-1].v>n.v)),'NEWS sorted newest first');
 // new profile -> counter 1 in every view
 ok(await cnt()===1,'dev new profile counter 1: '+await cnt());
 ok(await pg.evaluate(id=>localStorage.getItem('jona_news_'+id),id)===String(V-1),'baseline stored as APP_VER-1');
