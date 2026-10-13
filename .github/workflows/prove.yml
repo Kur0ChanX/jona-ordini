@@ -18,19 +18,55 @@ jobs:
   prove:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
     env:
       TZ: Europe/Rome
       PLAYWRIGHT_BROWSERS_PATH: /opt/pw-browsers
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # C87 (da RVC #117, ok di Mario, Jona #128): se rispetto all'ultimo push sono cambiati SOLO documenti (docs/,
+      # .claude/, file .md in cima) e l'ultimo giro sul commit di prima era VERDE, il giro non si rifà: il lavoro si chiude
+      # subito, verde. In ogni altro caso (codice toccato, giro di prima rosso o mancante, qualsiasi dubbio) gira tutto.
+      - name: Solo documenti? Riuso l'esito del giro di prima
+        id: doc
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PRIMA: ${{ github.event.before }}
+          DOPO: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          salta=false
+          if [ -n "$PRIMA" ] && [ -n "${PRIMA//0/}" ] && [ "$GITHUB_EVENT_NAME" != "schedule" ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            file=$(gh api "repos/$REPO/compare/$PRIMA...$DOPO" --jq '[.files[].filename] | join(" ")' 2>/dev/null || echo "")
+            solo_doc=false
+            if [ -n "$file" ]; then
+              solo_doc=true
+              for f in $file; do
+                case "$f" in docs/*|archivio/*|.claude/*) ;; */*) solo_doc=false ;; *.md) ;; *) solo_doc=false ;; esac
+              done
+            fi
+            if [ "$solo_doc" = true ]; then
+              esito=$(gh api "repos/$REPO/actions/workflows/prove.yml/runs?head_sha=$PRIMA&status=completed&per_page=5" --jq '.workflow_runs[0].conclusion // ""' 2>/dev/null || echo "")
+              echo "Solo documenti. Esito del giro sul commit di prima: '$esito'"
+              if [ "$esito" = "success" ]; then salta=true; fi
+            fi
+          fi
+          echo "salta=$salta" >> "$GITHUB_OUTPUT"
+          if [ "$salta" = true ]; then echo "::notice::Solo documenti dopo un giro verde: prove non rifatte (C87)."; fi
+      - if: steps.doc.outputs.salta != 'true'
+        uses: actions/checkout@v4
+      - if: steps.doc.outputs.salta != 'true'
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - uses: actions/setup-java@v4
+      - if: steps.doc.outputs.salta != 'true'
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
       - name: Playwright e Chromium negli stessi percorsi del computer di lavoro
+        if: steps.doc.outputs.salta != 'true'
         run: |
           sudo mkdir -p /opt/node22/lib/node_modules /opt/pw-browsers /opt/pw-npm
           sudo chown -R "$USER" /opt/node22 /opt/pw-browsers /opt/pw-npm
@@ -41,9 +77,10 @@ jobs:
           /opt/pw-browsers/chromium --version
           sudo apt-get install -y ffmpeg >/dev/null
       - name: Prove
+        if: steps.doc.outputs.salta != 'true'
         run: bash tools/prova-ci.sh "${{ github.event_name == 'schedule' && 'tutto' || inputs.modo || 'veloce' }}" /tmp/jona-prove
       - name: Registri delle prove
-        if: always()
+        if: always() && steps.doc.outputs.salta != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: registri-prove
