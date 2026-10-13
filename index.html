@@ -1295,12 +1295,9 @@ const NEWS=[
     dev:['D42 «A lista + B scheda»: `tools/bar-disegni.mjs` → `data/bar-disegni.json` (bicchieri con `f` linee fini, `h` riflessi, `m` superficie, `sh` ombra, `x` macchia, `dr` goccioline; pezzi con `f`/`h`); `brCkDis` senza classe = scheda con sfumatura (`brTinta`), macchia e goccioline. Stile C (#99): linee di ghiaccio e bollicine in `vd`/`vf` → gruppo `.br-v` color vetro (`--vetro`), tratto `vector-effect:non-scaling-stroke`, colori `viv()`, guarnizioni del bordo ×1,35 (`brMove`). #101-#102: cupola dei frullati, panna (`cream`), vapore, sale del bordo e bollicine dei calici con linee color vetro; spirale a nastro (`ribbon`); menta pestata senza contorno. #103 (regola di stile di Mario): `joinX`/`colora` trasformano `d`/`f`/`p` dei pezzi in `c`/`cf`/`cp` [[colore, forme]] col tono scuro del pezzo (`scuro`), disegnati da `brCol` (`.br-c` sottile); bicchieri pieni con `oc` (`.br-o`); colore `*`/`*l` = drink (`k[1]`); tazza di rame `rm|`+`sf|`, niente etichetta `m|`. Prova `tools/test-bar-disegni.mjs`.']},
   {v:91,data:'2026-10-12',titolo:'Orari: coperti dell\'agenda e persone in turno',
     chef:['Negli Orari vedi i coperti dell\'agenda giorno per giorno.','Se in un giorno pieno ci sono poche persone in turno, l\'app ti avvisa: «Sabato 100 coperti a cena: Sala 3 in turno, ne servono 6».','La prima volta scrivi quanti coperti fai in un giorno normale.'],
-    fb:['In «Turni della sala» vedi i coperti dell\'agenda e un avviso se in sala ci sono poche persone per quel giorno.']},
-  {v:90,data:'2026-10-12',titolo:'Bar: ogni cocktail il suo disegno',
-    tutti:['Ogni cocktail ha il suo disegno: il bicchiere giusto, il colore del drink, ghiaccio, bollicine e guarnizione. Lo vedi nella lista e in grande nella scheda.','Ogni liquore ha la sua bottiglia, con il simbolo del sapore sull\'etichetta. Anche whisky, brandy, grappa e prosecco ora si distinguono.'],
-    dev:['v90 (D41): `data/bar-disegni.json` v2 con `b` bicchieri, `pz` pezzi e `k` cocktail → [bicchiere, colore, pezzi], generati da `node tools/bar-disegni.mjs` (colore = media pesata degli ingredienti). `brSvg`, `brCkDis`; nella lista acquerello spento (`.br-ckd`) per non pesare. Corretto: ginger beer/ale prendevano il disegno del gin. Prova `tools/test-bar-disegni.mjs`.']}
+    fb:['In «Turni della sala» vedi i coperti dell\'agenda e un avviso se in sala ci sono poche persone per quel giorno.']}
 ];
-/* Le novità dalla v89 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
+/* Le novità dalla v90 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
 /* ================= constants ================= */
 const REPARTI={cucina:'Cucina',sala:'Sala',fb:'F&B Manager',resp:'Responsabile',altro:'Altro'};
@@ -4450,7 +4447,7 @@ const NEWS_DEV=[['aggiunte','Aggiunte'],['correzioni','Correzioni'],['risolti','
 let NEWS_OLD=null,NEWS_OP=null;
 function newsOld(){return NEWS_OP||(NEWS_OP=fetch('data/news.json').then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.json()}).then(j=>NEWS_OLD=j).catch(e=>{NEWS_OP=null;throw e}))}
 const newsList=()=>NEWS_OLD?NEWS.concat(NEWS_OLD):NEWS;
-function newsFor(me){const lv=isDev(me)?2:isGM(me)?1:0;return newsList().map(n=>{const it=(n.tutti||[]).concat(lv>=1&&n.chef||[],!lv&&me&&OR_PLAN[me.reparto]&&n.fb||[]);const d=lv>=2&&n.dev||{};return{v:n.v,data:n.data,titolo:n.titolo,it,tech:NEWS_DEV.filter(([k])=>d[k]&&d[k].length).map(([k,l])=>[l,d[k]])}}).filter(n=>n.it.length||n.tech.length)}
+function newsFor(me){const lv=isDev(me)?2:isGM(me)?1:0;return newsList().map(n=>{const it=(n.tutti||[]).concat(lv>=1&&n.chef||[],!lv&&me&&OR_PLAN[me.reparto]&&n.fb||[]);const d0=lv>=2&&n.dev||{},d=Array.isArray(d0)?{aggiunte:d0}:d0;return{v:n.v,data:n.data,titolo:n.titolo,it,tech:NEWS_DEV.filter(([k])=>d[k]&&d[k].length).map(([k,l])=>[l,d[k]])}}).filter(n=>n.it.length||n.tech.length)}
 function newsSeen(){const u=realU();if(!u)return APP_VER;const k='jona_news_'+u.id;const v=ls(k);if(typeof v==='number')return v;ls(k,APP_VER-1);return APP_VER-1}
 const newsCount=me=>{const s=newsSeen();return newsFor(me).filter(n=>n.v>s).length};
 const newsBtn=me=>{const n=newsCount(me);return`<button type="button" class="news-btn" data-a="news" aria-label="Novità${n?', '+n+' da vedere':''}">${ic('sparkle')}<span class="news-l">Novità</span>${n?`<span class="news-n">${n>9?'9+':n}</span>`:''}</button>`};
