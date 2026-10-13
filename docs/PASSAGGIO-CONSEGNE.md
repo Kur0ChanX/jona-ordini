@@ -15,7 +15,7 @@ Versione lunga di prima (fatti delle sessioni #85-#122): `git show eb9eccd:docs/
 
 ## ✅ PROSSIMI PASSI
 1. ~~Guardia~~ FATTA in #123.
-2. Domanda aperta: «Maurizio è riuscito ad attivare le notifiche sull'iPhone? Se no, a che passo si è fermato?» (v100, E51).
+2. ~~Notifiche iPhone di Maurizio~~ CHIUSA: Mario a tocco «Sì, funzionano» + «Sì, confermo la risposta» (#123).
 3. Restano da provare da Mario: foto del vino su iPhone (v96), D44, D43. D50: Agenda NO (intrecciata con la home).
 
 ## Riferimenti
@@ -27,4 +27,4 @@ Versione lunga di prima (fatti delle sessioni #85-#122): `git show eb9eccd:docs/
 - Rischi: ponte con l'hotel vero solo quando RVC avrà D5 e `PONTE_KEY`; URL del Drive mai in file pubblici.
 
 ## Ultimo messaggio di Mario, parola per parola
-(#122, ~16:30) risposta a tocco «Sì, bloccali (Consigliato)» + «Sì, confermo il blocco». Prima (#119, ~11:56): «Ok però prima risolviami le notifiche nell'iphone di Maurizio che non trova l'app per abilitarle risolvi subito e pubblica poi il resto fatti aiutare per risolvere le notifiche». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+(#123) risposte a tocco: guardia «Sì, mettila (Consigliato)» + «Sì, confermo la scelta»; notifiche di Maurizio «Sì, funzionano» + «Sì, confermo la risposta». Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
