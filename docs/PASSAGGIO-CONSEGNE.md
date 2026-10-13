@@ -29,7 +29,7 @@ Versione lunga delle consegne vecchie (#85-#122): `git show eb9eccd:docs/PASSAGG
 ## Riferimenti
 - Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`.
 - Sessioni Jona: #128 `session_016n58ZsVbDPafmfh4Rpp1QH` (chiusa), #127 `session_01ESm6VyarK1aRqd5R44MzBo`.
-- RVC attiva: #118 `session_01GB5eMCr6YKKHPgyPkZ34yu` (in #128 già c'era RVC #119 che ha scritto il V3: ricontrollare con `list_sessions` limit 4). SPA: #14 `session_016iyo14hpB7Qq4UWfhfCqgV`.
+- RVC attiva: #119 `session_01JRdmqsRmgnHzvjRXEnk13X` (controllato in #129). SPA: #14 `session_016iyo14hpB7Qq4UWfhfCqgV`.
 - Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva.
 - Prove in locale: server `python3 -m http.server 8765` in background.
 - Impegno: `high` (`.claude/settings.json` `"effortLevel": "high"`; `get_session` non mostra `effort_level`).
