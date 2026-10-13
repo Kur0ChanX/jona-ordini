@@ -2,14 +2,26 @@
 // Controlla: (1) all'avvio non sono caricati; (2) con il service worker si aprono anche senza rete; (3) senza file l'app avvisa e poi riprova.
 // Gira su PC, telefono e tablet Android, Mac, iPhone e iPad (WebKit solo su GitHub: in locale SALTATA).
 import { chromium, webkit, devices } from '/opt/node22/lib/node_modules/playwright/index.mjs';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
+import { createServer } from 'http';
+import { join, extname, dirname } from 'path';
+import { fileURLToPath } from 'url';
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 let wk='';try{wk=webkit.executablePath()}catch(e){}
 const WK=!!wk&&existsSync(wk);
 const DEV=[['chromium','Desktop Chrome'],['chromium','Pixel 7'],['chromium','Galaxy Tab S4'],['webkit','Desktop Safari'],['webkit','iPhone 15'],['webkit','iPad (gen 7)']];
 const URL0='http://localhost:8765/index.html';
-async function entra(pg){
-  await pg.goto(URL0);
+// Senza rete «vera» (#121): ctx.setOffline su WebKit di Playwright blocca anche il service worker («Load failed» con il file nella cache),
+// mentre su iPhone vero il service worker risponde dalla cache. Qui la prova accende un suo server e lo spegne: la rete manca davvero, su tutti i dispositivi.
+const ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
+const MIME={'.html':'text/html','.js':'application/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.mp4':'video/mp4','.css':'text/css'};
+function server(){const socks=new Set();const sv=createServer((q,r)=>{let f=join(ROOT,decodeURIComponent(new URL(q.url,'http://x').pathname));if(f.endsWith('/'))f+='index.html';
+  if(!f.startsWith(ROOT)||!existsSync(f)){r.writeHead(404);r.end();return}
+  try{const b=readFileSync(f);r.writeHead(200,{'content-type':MIME[extname(f)]||'application/octet-stream','cache-control':'no-store'});r.end(b)}catch(e){r.writeHead(404);r.end()}});
+  sv.on('connection',c=>{socks.add(c);c.on('close',()=>socks.delete(c))});
+  return new Promise(ok=>sv.listen(0,'127.0.0.1',()=>ok({url:'http://127.0.0.1:'+sv.address().port+'/index.html',spegni:()=>new Promise(z=>{sv.close(()=>z());for(const c of socks)c.destroy()})})))}
+async function entra(pg,u=URL0){
+  await pg.goto(u);
   await pg.click('[data-a="formset"][data-v="dev"]');
   for(const [k,v] of [['nome','Luca'],['cognome','Rossi'],['username','luca'],['pw','password123'],['pw2','password123']])await pg.fill(`input[data-k="${k}"]`,v);
   await pg.click('[data-a="setupGo"]');await pg.waitForSelector('.testbar');
@@ -23,14 +35,15 @@ for(const [br,nome] of DEV){
   {const ctx=await b.newContext({...d,deviceScaleFactor:1});
     await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
     const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(e.message));
-    await entra(pg);
+    const sv=await server();
+    await entra(pg,sv.url);
     ok(await pg.evaluate(()=>typeof brApri==='undefined'&&typeof BR_CAT==='undefined'&&!NEWS_OLD&&NEWS.length<=20),nome+': all\'avvio Bar e novità vecchie non caricati');
     const pronto=await pg.evaluate(async()=>{if(!('serviceWorker' in navigator))return 'no sw';await navigator.serviceWorker.ready;
       for(let i=0;i<100;i++){const a=await caches.match('moduli/bar.js'),n=await caches.match('data/news.json');if(a&&n)return 'ok';await new Promise(r=>setTimeout(r,100))}return 'file non in cache'});
     ok(pronto==='ok',nome+': moduli/bar.js e data/news.json nella cache del service worker ('+pronto+')');
     await pg.reload();await pg.waitForSelector('.testbar');
     ok(await pg.evaluate(()=>!!navigator.serviceWorker.controller),nome+': pagina controllata dal service worker');
-    await ctx.setOffline(true);
+    await sv.spegni();
     // E48: su GitHub si vedono solo le righe FAIL → la diagnosi sta dentro la riga (tempo, script, avvisi, prova diretta di fetch dalla cache)
     const t0=Date.now();await pg.evaluate(()=>brOpen());
     const bar=await pg.waitForSelector('.sheet [data-a="brV"]',{timeout:20000}).then(()=>1,()=>0);
@@ -45,7 +58,6 @@ for(const [br,nome] of DEV){
     const nv=await pg.waitForFunction(()=>NEWS_OLD&&document.querySelectorAll('.sheet .news-v').length>20&&!document.querySelector('.sheet .news-old'),null,{timeout:20000}).then(()=>1,()=>0);
     ok(nv,nome+': senza rete le novità vecchie si vedono tutte ('+await pg.evaluate(()=>document.querySelectorAll('.sheet .news-v').length)+' versioni)');
     ok(await pg.evaluate(()=>document.querySelector('.sheet .news-v .news-vn').textContent==='Beta v'+APP_VER),nome+': la più nuova resta in cima');
-    await ctx.setOffline(false);
     ok(!errs.length,nome+': nessun errore '+errs.join(' | '));
     await ctx.close()}
   // 3: senza service worker e file che non arrivano → avviso, poi riprova e va
