@@ -1,27 +1,31 @@
-# Passaggio di consegne (2026-10-13, fine sessione #118)
+# Passaggio di consegne (2026-10-13, fine sessione #119)
 
-Sessione attuale: #119
+Sessione attuale: #120
 
-La #118 (aperta dalla #117, profondità 1) apre la #119.
+La #119 (aperta dalla #118, profondità 2) apre la #120.
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v99 online** (PR #108 unita), niente PR aperta. Nel ramo: `APP_VER` 99, `CACHE` `jona-ordini-v103`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v100 online** (PR #109, squash `2713ae3`, online ~12:30 controllato), `main` unito nel ramo. Niente PR aperta. Nel ramo: `APP_VER` 100, `CACHE` `jona-ordini-v104`.
 
-## Fatto in #118 (12/10, ~21:23-21:55 ora italiana)
-- `tools/test-chat-tastiera.mjs`: misura solo a chat ferma (`fermo()` = `transform==='none'` e nessuna animazione in corso), commit `1332874`. Prove PR #108 verdi → squash `b670d89`, `main` e scorta uniti nel ramo, push `fd860a7`. **v99 online alle ~21:50** (controllato). Iscrizione alla PR e controllo programmato tolti.
-- Soglia poi portata a **200k** (RVC #97, confermata da Mario a tocco ~01:35): in più per 3 sessioni annotare il consumo (vedi TRIGGER in CLAUDE.md). Prima: soglia portata a 250k (hook `handoff-check.py` e TRIGGER di CLAUDE.md): regola da RVC #96, confermata da Mario a tocco (doppio tocco) il 13/10 ~01:25. Restano i 20 messaggi e la compressione.
-- Chiesto a Mario di riprovare la tastiera in chat (punto 2 sotto resta aperto finché non risponde).
+## Fatto in #119 (13/10, ~8:22-12:35 ora italiana)
+- Avvio: scorta unita due volte (solo ULTIMO-MESSAGGIO), push.
+- Mario: «avvia plan mode : Consigli? senza appesantire». Piano con 3 strade (Ovvia promemoria del turno via push D33; Furba costo del cocktail da `config/bar.pc`; **Geniale** Bar/Cantina/Ricette in file a parte caricati solo all'apertura). Mario ha scelto **3 Geniale** a tocco con doppio tocco. Piano in `/root/.claude/plans/parallel-bouncing-crayon.md` (perso col contenitore: riassunto qui sotto in «Prossimi passi»).
+- **v100 URGENTE (Mario: «prima risolviami le notifiche nell'iphone di Maurizio che non trova l'app per abilitarle risolvi subito e pubblica»)**. Foto `docs/img/sessione-119/maurizio-notifiche-safari.jpg`: Maurizio apriva Jona in Safari; il permesso risultava «denied» e la guida «Notifiche bloccate» mandava in Impostazioni → Notifiche → Jona Ordini, che non esiste senza app installata. Correzione: `iosDev`/`iosWeb()`, `PUSH_INST`, `pushDenied` falso in Safari iOS, `pushHelp` scheda «Prima installa Jona sull'iPhone», `pushOn` non chiede il permesso, `pushAsk` «Installa l'app per le notifiche». Prova nuova `tools/test-push-iphone.mjs` (in VELOCI di `tools/prova-ci.sh`); `tools/test-v26.mjs` aggiornata (caso iPhone «bloccate» = app dall'icona, `navigator.standalone` finto). E51 in ERRORI, riga v100 in CLAUDE.md. Prove locali verdi (push-iphone, v26, news, testbar, giro); GitHub `prove` verde (PC, Mac, Android, tablet, iPhone, iPad).
+- Dato a Mario i passi per Maurizio (Safari → Condividi/··· → Aggiungi alla schermata Home → Apri come app web → Aggiungi → apri dall'icona → foto → Attiva le notifiche → Consenti). In attesa della risposta («a che passo è arrivato»).
+- Regola da RVC #101 (messaggio di `session_012uieedTtFyqonpGfgZ3yBR`) scritta in CLAUDE.md, handoff punti 6-7: la nuova sessione parte da sola dai Prossimi passi, motore Opus, stesso impegno. In #119 `get_session` NON mostra `effort_level`: non scritto `effortLevel` in `.claude/settings.json` (da verificare alla prossima apertura, come in RVC).
+- Aiutante `ottimizza` lanciato per misurare Bar/Cantina/Ricette/Agenda: risultato perso con l'handoff, da rifare.
 
-## ✅ SUBITO (#119)
-0. Niente di bloccante. **D49 tastiera in chat CHIUSA**: Mario 13/10 ~8:20 «tastiera sembra bene» (v99 sul telefono vero). Tolta da DA-FARE.
-1. Misura del consumo (3 sessioni, #118-#120): sezione «Consumo» qui sotto, aggiungere la riga della sessione che chiude.
-2. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
-3. Prossimi lavori: vedi «Prossimi lavori» e `docs/DA-FARE.md`. D48 cocktail bellissimi resta rimandata da Mario.
-4. Aiutanti: «aiutanti sì» con annuncio.
+## ✅ PROSSIMI PASSI (#120, continuare da sola)
+0. All'avvio: `get_session` (motore Opus? `effort_level`?) come dice CLAUDE.md punto 7.
+1. Se Mario risponde su Maurizio: aiutarlo coi passi (se l'icona c'è già: aprire da lì). Se le notifiche non arrivano ancora con l'app installata → guida «bloccate» vera.
+2. **Strada 3 Geniale (scelta di Mario)**: misura con l'agente `ottimizza` + `node tools/misura-velocita.mjs` quanti KB pesano Bar (`br*`), Cantina (`vn*`), Ricette (`rc*`), Agenda (`ag*`) dentro `index.html` (910 KB, 304 KB compresso) e i punti di contatto all'avvio (`rcStrip`, `agStrip`, `vnRestore`…). Poi un modulo per volta (Bar per primo, ha già `data/cocktail.json` e `data/bar-disegni.json` scaricati all'apertura) in `moduli/<nome>.js` caricato al primo `brOpen`; nell'app resta solo l'ingresso. File in `FILES` di `sw.js` e nel passo «Prepara i file» di `.github/workflows/cloudflare-pages.yml`. Prove: `test-bar`, `test-bar-disegni`, `test-testbar`, `test-giro`, `test-dispositivi`, `test-leggera`, prova nuova senza rete (Bar si apre dal service worker). Versione nuova: `APP_VER`, `NEWS`, `CACHE`.
+3. Misura del consumo: riga di #120 nella tabella sotto all'handoff.
+4. Restano: Mario proverà foto del vino su iPhone (v96), D44 (v93), D43. D48 rimandata. Aiutanti: «aiutanti sì» con annuncio.
 
 ## Consumo (misura per 3 sessioni, regola RVC #97)
 | Sessione | cache_read | cache_write | output | cost_usd | contesto alla chiusura |
 |---|---|---|---|---|---|
 | #118 | 4.914.969 | 222.117 | 10.822 | 2,98 | ~187-221k |
+| #119 | 6.643.470 | 244.374 | 20.405 | 3,24 | ~188-225k |
 
 ## Fatto in #117 (12/10, ~20:57-21:25 ora italiana)
 - Avvio: scorta unita (solo ULTIMO-MESSAGGIO «per schermo intero è ancora cosí»), push `bd39060` → le prove della PR #108 sono ripartite (E39). Iscritta alla PR, titolo messo.
@@ -96,8 +100,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #118 `session_01AfBcMxPZTDeEmgsGBGSHXS` (chiusa), #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC: messaggi arrivati da #96 `session_01HcU3X6qjywWKKKXoz3cba6` e #97 `session_01Eob4hXJkfiHDSKwWDhugj2` (la più alta è l'attiva; ricontrollare con `list_sessions`). SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
+- Jona #119 `session_01VzprLAnmjTUe4pZMSH5J5o` (chiusa), #118 `session_01AfBcMxPZTDeEmgsGBGSHXS` (chiusa), #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC: ultima vista attiva #101 `session_012uieedTtFyqonpGfgZ3yBR`; messaggi arrivati prima da #96 `session_01HcU3X6qjywWKKKXoz3cba6` e #97 `session_01Eob4hXJkfiHDSKwWDhugj2` (la più alta è l'attiva; ricontrollare con `list_sessions`). SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
 ## Note tecniche
@@ -117,6 +121,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(13/10/2026 ~8:20 ora italiana, #118) «tastiera sembra bene» (dopo la prova della v99 in chat).
-(13/10/2026 ~1:25 e ~1:35, #118, a tocco con doppio tocco) soglia consegne 250k poi 200k + misura del consumo: confermate.
-Messaggi più vecchi: nella storia di questo file. Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
+(13/10/2026 ~11:56 ora italiana, #119, con la foto dell'iPhone di Maurizio) «Ok però prima risolviami le notifiche nell'iphone di Maurizio che non trova l'app per abilitarle risolvi subito e pubblica poi il resto fatti aiutare per risolvere le notifiche»
+Prima (#119): «avvia plan mode : Consigli? senza appesantire» → scelta a tocco «3 Geniale (Consigliata)», «Sì, confermo il lavoro».
+Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
