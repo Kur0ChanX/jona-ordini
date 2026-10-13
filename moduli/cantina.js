@@ -44,9 +44,10 @@ async function vnMondo(){const q=String(S.vn&&S.vn.q||'').trim();if(!q)return;if
   if(nuovo)openSheet({cls:'tall',live:()=>true,render:vnMondoH,onClose:()=>{if(S.vnM===M)S.vnM=null}});else refreshSheet();
   clearInterval(vnMondo.h);vnMondo.h=setInterval(()=>{const e=document.getElementById('vn-ms');if(!M.busy||S.vnM!==M){clearInterval(vnMondo.h);return}if(e)e.textContent=Math.round((Date.now()-M.t0)/1000)+' s'},500);
   const body={contents:[{parts:[{text:vnMondoPrompt(q)}]}],tools:[{google_search:{}}],generationConfig:{temperature:0.2}};
-  let g={};try{for(const l of ['flash','lite']){g=await gemCall(body,l);if(g.txt||!GEM_RETRY.test(String(g.st)))break;errLog('Vino nel mondo: '+gemNome(l)+' non ha cercato (errore '+(g.st||'rete')+(g.msg?': '+String(g.msg).slice(0,160):'')+')')}
-    // v109 (#129, foto di Mario «Gemini è molto occupato»): 429 su Flash e Flash-Lite = Google nega la ricerca (limite) → stessa domanda senza ricerca
-    if(!g.txt&&g.st===429){const b2={contents:[{parts:[{text:vnMondoPrompt(q,true)}]}],generationConfig:{temperature:0.2}};
+  // v110 (#129): la ricerca Google gratis c'è solo con Gemini 2.5 (500 al giorno; con Gemini 3 solo a pagamento) → lettori f25, l25
+  let g={};try{for(const l of ['f25','l25']){g=await gemCall(body,l);if(g.txt||!GEM_RETRY.test(String(g.st)))break;errLog('Vino nel mondo: '+gemNome(l)+' non ha cercato (errore '+(g.st||'rete')+(g.msg?': '+String(g.msg).slice(0,160):'')+')')}
+    // v109 (#129, foto di Mario «Gemini è molto occupato»): Google non fa la ricerca (limite, occupato) → stessa domanda senza ricerca con Gemini 3
+    if(!g.txt&&(GEM_RETRY.test(String(g.st))||g.st===400)){const b2={contents:[{parts:[{text:vnMondoPrompt(q,true)}]}],generationConfig:{temperature:0.2}};
       for(const l of ['flash','lite']){const r=await gemCall(b2,l);if(r.txt){g=r;M.mem=true;break}errLog('Vino nel mondo senza Google: '+gemNome(l)+' (errore '+(r.st||'rete')+')');if(!GEM_RETRY.test(String(r.st)))break}}
   }catch(e){g={err:'Non riesco a contattare l\'IA. Controlla la connessione.'}}
   M.busy=false;if(S.vnM!==M)return;

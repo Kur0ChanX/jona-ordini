@@ -1233,8 +1233,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=109;
+const APP_VER=110;
 const NEWS=[
+  {v:110,data:'2026-10-13',titolo:'Vini: la ricerca su Google torna gratis',
+    chef:['«Cerca nel mondo» ora usa il Gemini che può cercare su Google senza pagare (fino a 500 ricerche al giorno per tutto il ristorante). Se un giorno finiscono, l\'app ti mostra lo stesso i vini che l\'IA conosce.'],
+    dev:['Ricerca con lettori `f25`/`l25` (Gemini 2.5 Flash e Flash-Lite: grounding gratis 500 RPD; con Gemini 3 solo a pagamento), poi Gemini 3 senza ricerca. Worker `LETTORI` con `f25`/`l25`, `GEM_DIR` e `gemNome`. Prove in `test-cantina` e `test-gemini-server`.']},
   {v:109,data:'2026-10-13',titolo:'Vini: cerca nel mondo anche senza Google',
     chef:['Se Google non fa la ricerca (troppe ricerche), «Cerca nel mondo» ti mostra lo stesso i vini che l\'IA conosce, con un avviso giallo: controlla bene nomi e annate. Se l\'IA ha finito le richieste gratis del giorno, te lo dice chiaro: riprova domani mattina.'],
     dev:['`vnMondo`: dopo 429 su flash e lite rifà la domanda senza `google_search` (`vnMondoPrompt(q,true)`, `S.vnM.mem`, avviso `.vn-al`); scatola nera con il messaggio vero di Google. `gemCall`: 429 «per day» → messaggio «richieste gratis di oggi». Prova in `test-cantina`.']},
@@ -3087,9 +3090,9 @@ const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(S
 // v68: per ogni foto l'app prova i lettori in ordine (Flash, Flash-Lite, Cloudflare) e mostra dal vivo chi legge e, se passa
 // al successivo, il motivo preso SOLO dal codice vero della risposta (503 sovraccarico, 429 limite, 504/524 nessuna risposta in tempo).
 const GEM_RETRY=/^(429|500|502|503|504|524|404)$/;
-const GEM_DIR={flash:'gemini-flash-latest',lite:'gemini-flash-lite-latest'};
+const GEM_DIR={flash:'gemini-flash-latest',lite:'gemini-flash-lite-latest',f25:'gemini-2.5-flash',l25:'gemini-2.5-flash-lite'};
 const GEM_LETT=[['flash','Gemini Flash','il più preciso'],['lite','Gemini Flash-Lite','riserva veloce di Google'],['cf','Cloudflare Llama 4','riserva gratis fuori da Google']];
-const gemNome=l=>(GEM_LETT.find(x=>x[0]===l)||[0,'Gemini'])[1];
+const gemNome=l=>({f25:'Gemini 2.5 Flash',l25:'Gemini 2.5 Flash-Lite'})[l]||(GEM_LETT.find(x=>x[0]===l)||[0,'Gemini'])[1];
 function gemPerche(l,st){const chi=l==='cf'?'Cloudflare':'Google';
   return st===503?chi+' ha risposto «sovraccarico» (errore 503)':st===429?chi+' ha risposto «limite di richieste raggiunto» (errore 429)'
     :st===504||st===524?'nessuna risposta in tempo (errore '+st+'): l\'app passa avanti per non farti aspettare'
