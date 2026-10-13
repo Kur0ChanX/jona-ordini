@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # Protocollo di handoff di CLAUDE.md. Scatta con >= 20 messaggi nella sessione o con il contesto oltre SOGLIA_TOKENS
-# (70% di 200k: soglia fissa per risparmiare token, qualunque sia la finestra del modello) e lo ripete a OGNI messaggio.
+# (200k: scelta di Mario da RVC #97, confermata in Jona #118 il 13/10/2026: costo minimo con le consegne, sotto i 224k provati) e lo ripete a OGNI messaggio.
 # Con l'argomento «compact» (hook SessionStart dopo una compressione) rimette l'obbligo nel contesto nuovo:
 # la compressione cancella gli avvisi precedenti.
 import json, os, sys
 
 MAX_PROMPTS = 20
-SOGLIA = 70
-SOGLIA_TOKENS = int(os.environ.get("JONA_CTX_SOGLIA", "140000"))
+SOGLIA_TOKENS = int(os.environ.get("JONA_CTX_SOGLIA", "200000"))
 AZIONE = ("Prima di qualsiasi altro lavoro: rispondi in breve al messaggio, poi aggiorna docs/PASSAGGIO-CONSEGNE.md "
           "(max 2500 parole, senza riassumere troppo: decisioni col perché, fatti nuovi, file ricevuti, richieste dell'utente ancora da fare, il suo ultimo messaggio parola per parola), verifica le condizioni e, se sono tutte vere, "
           "apri da solo la nuova sessione (titolo «▶ ATTIVA · …», prompt di massimo 3 righe) e rinomina questa in «✓ CHIUSA · …». "
@@ -31,7 +30,7 @@ except Exception:
 
 def esci(why):
     print(json.dumps({
-        "systemMessage": f"Regola {SOGLIA}%: {why}. Claude deve fare il passaggio di consegne.",
+        "systemMessage": f"Regola soglia {SOGLIA_TOKENS // 1000}k: {why}. Claude deve fare il passaggio di consegne.",
         "hookSpecificOutput": {"hookEventName": evento,
                                "additionalContext": f"PROTOCOLLO DI HANDOFF (CLAUDE.md) OBBLIGATORIO: {why}. {AZIONE}"}
     }))
