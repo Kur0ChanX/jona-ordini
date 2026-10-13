@@ -1,22 +1,27 @@
-# Passaggio di consegne (2026-10-12, fine sessione #117)
+# Passaggio di consegne (2026-10-13, fine sessione #118)
 
-Sessione attuale: #118
+Sessione attuale: #119
 
-La #117 (aperta a mano da Mario, profondità 0) apre la #118.
+La #118 (aperta dalla #117, profondità 1) apre la #119.
 
-Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v97 online, v98+v99 in PR #108 con prove ROSSE** (solo `test-chat-tastiera` su iPhone/iPad, errore della prova, non dell'app). Nel ramo: `APP_VER` 99, `CACHE` `jona-ordini-v103`.
+Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per le PR). Stato all'handoff: **v99 online** (PR #108 unita), niente PR aperta. Nel ramo: `APP_VER` 99, `CACHE` `jona-ordini-v103`.
 
 ## Fatto in #118 (12/10, ~21:23-21:55 ora italiana)
 - `tools/test-chat-tastiera.mjs`: misura solo a chat ferma (`fermo()` = `transform==='none'` e nessuna animazione in corso), commit `1332874`. Prove PR #108 verdi → squash `b670d89`, `main` e scorta uniti nel ramo, push `fd860a7`. **v99 online alle ~21:50** (controllato). Iscrizione alla PR e controllo programmato tolti.
 - Soglia poi portata a **200k** (RVC #97, confermata da Mario a tocco ~01:35): in più per 3 sessioni annotare il consumo (vedi TRIGGER in CLAUDE.md). Prima: soglia portata a 250k (hook `handoff-check.py` e TRIGGER di CLAUDE.md): regola da RVC #96, confermata da Mario a tocco (doppio tocco) il 13/10 ~01:25. Restano i 20 messaggi e la compressione.
 - Chiesto a Mario di riprovare la tastiera in chat (punto 2 sotto resta aperto finché non risponde).
 
-## ✅ SUBITO (#118, punti 0-1 FATTI)
-0. 🔴 **Correggere `tools/test-chat-tastiera.mjs`** (prove della PR #108 rosse, run 38294445440 su `bd39060`). FAIL solo iPhone 15 e iPad (WebKit, solo su GitHub): `hTop` 14, poi 7 e 4 = `transform:translateY(14px)` dell'apertura di `.cht` (`.cht.open{transform:none}`, transizione .22 s) non ancora finita. Riga 24: dopo `chOpen('tutti')` c'è `waitForTimeout(400)` fisso. Correzione: `await pg.waitForFunction(()=>getComputedStyle(document.querySelector('.cht')).transform==='none',null,{timeout:5000})` al posto dell'attesa fissa (e prima di ogni misura, per sicurezza). Pixel 7/Galaxy Tab in locale devono restare PASS 10; iPhone/iPad si vedono solo su GitHub. Commento già scritto sulla PR #108 (non scriverne un altro). Poi push e attesa delle prove.
-1. **PR #108 = v98 (cannuccia al centro) + v99 (tastiera in chat, D49)**, dal ramo unico. Iscriviti (`subscribe_pr_activity` 108; la #117 si è disiscritta). Se verdi: squash merge, SUBITO `git fetch origin main && git merge origin/main` + push, controllo `APP_VER` 99 online, avvisare Mario e chiedergli la prova della tastiera (apri chat → tocca **Scrivi un messaggio** → il campo resta sopra la tastiera?). Se rosse: capire e correggere (attenzione a `test-chat-tastiera` su WebKit iPhone/iPad, provato solo su GitHub).
-2. 🔴 **D49 tastiera in chat**: fatta in #116 (vedi sotto), aspetta online + prova di Mario sul telefono Android (app installata a schermo intero). Se non basta sul telefono vero: provare anche `interactive-widget=resizes-content` nel viewport (scartato per ora: cambierebbe tutte le schermate dell'app, la barra in basso salirebbe sopra la tastiera ovunque).
-3. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
-4. Aiutanti: stato «aiutanti sì» con annuncio (regola nuova in CLAUDE.md, da RVC #94).
+## ✅ SUBITO (#119)
+0. Niente di bloccante. **D49 tastiera in chat CHIUSA**: Mario 13/10 ~8:20 «tastiera sembra bene» (v99 sul telefono vero). Tolta da DA-FARE.
+1. Misura del consumo (3 sessioni, #118-#120): sezione «Consumo» qui sotto, aggiungere la riga della sessione che chiude.
+2. Mario proverà la foto del vino sull'iPhone (v96), D44 (v93) e D43 quando può.
+3. Prossimi lavori: vedi «Prossimi lavori» e `docs/DA-FARE.md`. D48 cocktail bellissimi resta rimandata da Mario.
+4. Aiutanti: «aiutanti sì» con annuncio.
+
+## Consumo (misura per 3 sessioni, regola RVC #97)
+| Sessione | cache_read | cache_write | output | cost_usd | contesto alla chiusura |
+|---|---|---|---|---|---|
+| #118 | 4.914.969 | 222.117 | 10.822 | 2,98 | ~187-221k |
 
 ## Fatto in #117 (12/10, ~20:57-21:25 ora italiana)
 - Avvio: scorta unita (solo ULTIMO-MESSAGGIO «per schermo intero è ancora cosí»), push `bd39060` → le prove della PR #108 sono ripartite (E39). Iscritta alla PR, titolo messo.
@@ -91,8 +96,8 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 - M34: 2FA di Kur0ChanX entro il 24/11/2026.
 
 ## Sessioni
-- Jona #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
-- RVC attiva: **#95** `session_01FkfToE8frofY9A1By5DgXK`. SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
+- Jona #118 `session_01AfBcMxPZTDeEmgsGBGSHXS` (chiusa), #117 `session_013BeB8J6Uc3jK39wSM9YbFB` (chiusa), #116 `session_01A2a8HzRNtt6PUug97SBJy9` (chiusa), #115 `session_01BHdALVpytDytxMRjAAHmzY` (chiusa), #114 `session_01Uzvha9HgPqw6pyPumPMSSw` (chiusa), #113 `session_01Rs2wW3qtEsVmaZtPkUz1Ei` (chiusa), #112 `session_01BE2ryA88ArUAZd9NyaGvrx` (chiusa), #111 `session_014JToN22uoTmG4osX9ScPhz` (chiusa), #110 `session_01QbaaAWWe28daKawzaaSb87` (chiusa), #109 `session_01N97sLf9HZ1a5TGP2TnTRsD` (chiusa), #108 `session_019f4wJG2gdxbuqrEvomUcYx` (chiusa), #107 `session_018zMHKEtsWAECS8Kf4wLjhw` (chiusa), #106 `session_019NMEenGwfWR4T8nH4n1bTV` (chiusa), #105 (chiusa, id nelle consegne di #105 nella storia), #104 `session_01EJmeBxR3qSz8gs4Zxtxwdc`, #103 `session_01PQwMNp8FBcD6HAGnbTtBEB`, #102 `session_01X1y9TToVXuFHrms1cxvCyw`, #101 `session_0141yTsGHB7Ns7NrFjZ7sn5j`, #100 `session_012UpbnoEghY7djrbt8t3jBq`, #99 `session_01EJWztt4yYAtG2FhL7ryBnw`, #98 `session_01PgAxZzTSbFoVtpzVYVdnxK`, #97 `session_012kt4UwsGjC3SCruV9oiyM6`, #96 `session_01Sj7TpaG8q6Ffu7CiJ6mgWR`, #95 `session_01QsPmY12GJ337y47Kax1f2a`, #94 `session_01KtgXU5jt71weBBriYJGSpK`, #93 `session_01Q2KYN7TKMEbWP23X6HfPYB`, #92 `session_01XEe2wGYr9SNdFKhqLniFbG`, #91 `session_01DWN2LgoPJUedg9xmjS3opj` (chiuse). Se Mario scrive in una sessione chiusa, rimandarlo alla attiva.
+- RVC: messaggi arrivati da #96 `session_01HcU3X6qjywWKKKXoz3cba6` e #97 `session_01Eob4hXJkfiHDSKwWDhugj2` (la più alta è l'attiva; ricontrollare con `list_sessions`). SPA attiva: **#14** `session_016iyo14hpB7Qq4UWfhfCqgV` (nomi da ricontrollare con `list_sessions` prima di mandare messaggi).
 - Ponte con l'hotel: RVC dice che **D5 non è fatto**. M42 5stelle: si aspettano le risposte della reception (in RVC).
 
 ## Note tecniche
@@ -112,16 +117,6 @@ Ramo di lavoro: **`claude/jona-ramo-definitivo`** (unico e permanente, ANCHE per
 Risposte a tocco arrivate senza che Mario toccasse (#85). Finché non è chiaro: domande scritte nel testo, risposta a parole.
 
 ## Ultimo messaggio di Mario, parola per parola
-(12/10/2026 ~20:57 ora italiana, #117, prompt di avvio incollato da Mario) «git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo). Leggi CLAUDE.md, docs/ERRORI.md e docs/PASSAGGIO-CONSEGNE.md (sessione #117). Poi fai il punto «SUBITO» 0 (PR #108 v98+v99: iscriviti, se verde pubblica).» Ultimo messaggio vero, in attesa: quello qui sotto.
-(12/10/2026 ~20:55 ora italiana, #116, foto `docs/img/sessione-116/chat-tastiera-3-schermo-intero.jpg`: campo ancora mezzo sotto la tastiera) «per schermo intero è ancora cosí» → la v99 NON era ancora online (PR #108 in prova): la foto è della versione vecchia. Dopo l'online chiedergli di riprovare (chiudere e riaprire l'app). Se resta così anche con la v99: il problema è nello schermo intero di Android → strada di riserva `interactive-widget=resizes-content` o `manifest` `display: standalone` solo per… (decidere).
-(12/10/2026 ~20:50 ora italiana, nella #115 chiusa, girato dalla #115, foto `docs/img/sessione-116/chat-tastiera-1.jpg` e `-2.jpg`) «Per ora mi risolvi questo problema della tastiera che va sopra la scrittura.»
-(12/10/2026 ~20:45 ora italiana, nella #115 chiusa, girato dalla #115) «tienila come opzione la faremo più avanti, però tieni l'idea e salvala,la facciamo piú avanti» (su D48 cocktail bellissimi).
-(12/10/2026 ~20:40 ora italiana, nella #115 chiusa, girato dalla #115) «Ok, però utilizzerò utilizzando il token per fare tutti i disegni, giusto?» → la #115: sì, token solo mentre si lavora al generatore (stima 2-4 sessioni), non i 212 a mano; dopo, guardarli nell'app non costa token; si risparmia lavorando a passi, foto piccole, prove col collaudo.
-(12/10/2026 ~20:35 ora italiana, nella #115 chiusa, girato dalla #115) «No, sì, allora il prompt è molto chiaro, però tipo, perché prima facevi delle linee, cioè, che facevano, non erano belle, erano proprio minimal. E adesso i disegni sono molto più belli, cioè, che cosa è cambiato? Sembra che è cambiato il motore di disegno. E cosa è cambiato? Cioè, sembra che prima avevi tipo una versione light e adesso la versione avanzata. Cosa hai fatto per disegnare così bene i dettagli e tutto?» → la #115 ha risposto: stesso motore (SVG), prima generatore automatico per 212 con limiti (peso, lista 44 px, pezzi riusati, colori piatti), la prova è a mano su 3 senza limiti; per D48 servono quelle tecniche nel generatore badando al peso.
-(12/10/2026 ~20:20 ora italiana, nella #114 chiusa, girato dalla #114) «si è quello che volevo dimmi come hai fatto questo stile che salvo il prompt di questi disegni bellissimi che sistema hai cambiato per disegnare cosí?»
-(12/10/2026 ~18:20 ora italiana, #114) «la cannuccia sempre centro il cerchio alto del bicchiere» (dopo le foto della prova dei cocktail).
-(12/10/2026 ~18:15, #114) «si» (alla prova dei cocktail più belli). (~18:10) «scusa visto ora che si trova in fornitori».
-(12/10/2026 ~17:16 ora italiana, #113) «metti cantina vini e cocktail anche dallo chef ovviamente»
-(12/10/2026 ~16:51, #113) «ok» (dopo: controllo di sicurezza alle 17:41).
-(12/10/2026 ~16:30, #112) «non sono in hotel ora» (risposta a: prova la foto del vino sull'iPhone).
+(13/10/2026 ~8:20 ora italiana, #118) «tastiera sembra bene» (dopo la prova della v99 in chat).
+(13/10/2026 ~1:25 e ~1:35, #118, a tocco con doppio tocco) soglia consegne 250k poi 200k + misura del consumo: confermate.
 Messaggi più vecchi: nella storia di questo file. Regola sempre valida: «Vai avanti da solo chiedimi solo scelte importanti».
