@@ -7,7 +7,7 @@ const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const J=JSON.parse(readFileSync(new URL('../data/bar-disegni.json',import.meta.url),'utf8'));
 const CK=JSON.parse(readFileSync(new URL('../data/cocktail.json',import.meta.url),'utf8'));
 const SW=readFileSync(new URL('../sw.js',import.meta.url),'utf8');
-const IDX=readFileSync(new URL('../index.html',import.meta.url),'utf8');
+const IDX=readFileSync(new URL('../index.html',import.meta.url),'utf8')+readFileSync(new URL('../moduli/bar.js',import.meta.url),'utf8'); // v101: il Bar sta in moduli/bar.js
 // dati
 const keys=Object.keys(J.g);
 ok(keys.length>=40,'almeno 40 disegni ('+keys.length+')');

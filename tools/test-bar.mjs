@@ -25,6 +25,8 @@ for(const [k,v] of [['nome','Luca'],['cognome','Rossi'],['username','luca'],['pw
 await pg.click('[data-a="setupGo"]');
 await pg.waitForSelector('.testbar');await wait(300);
 const SRC=readFileSync(new URL('./cocktail.txt',import.meta.url),'utf8');
+ok(await pg.evaluate(()=>typeof BR_CAT==='undefined'&&typeof brApri==='undefined'&&typeof brCta==='function'),'v101: Bar non caricato all\'avvio (solo l\'ingresso)');
+await pg.evaluate(()=>modLoad('bar'));
 ok(await pg.evaluate(()=>BR_CAT.flatMap(x=>x[1]).length===new Set(BR_CAT.flatMap(x=>x[1])).size),'BR_CAT senza doppioni');
 // D35 ruoli
 ok(await pg.evaluate(()=>['Chef de rang','Commis di sala','Bartender','Barback','Chef de partie','Runner'].every(m=>MANSIONI.includes(m))&&MANSIONI.includes('Altro')),'mansioni nuove: Chef de rang, Commis di sala, Bartender, Barback, Chef de partie, Runner');

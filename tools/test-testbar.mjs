@@ -24,7 +24,7 @@ ok(on.length===1&&on[0].v==='gm','solo «Admin Chef» premuto: '+JSON.stringify(
 const lag=await pg.evaluate(()=>{const d=document.createElement('i');d.style.color='var(--lagoon)';document.body.appendChild(d);const c=getComputedStyle(d).color;d.remove();return c});
 ok(on.length===1&&on[0].bg===lag,'il pulsante attivo è colorato (laguna): '+on[0]?.bg+' '+lag);
 // testi: il nome del creatore non compare in ciò che vede chi usa l'app (solo note tecniche per lo sviluppatore)
-const dev=await pg.evaluate(()=>NEWS.flatMap(n=>Object.values(n.dev||{}).flat()));
+const dev=await pg.evaluate(async()=>(await newsOld(),newsList()).flatMap(n=>Object.values(n.dev||{}).flat()));
 let src=readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/\\'/g,"'");
 for(const t of dev)src=src.split(t).join('');
 src=src.replace(/\/\*[\s\S]*?\*\//g,'').replace(/referente:'Mario'/g,'');
