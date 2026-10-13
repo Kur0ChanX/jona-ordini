@@ -45,7 +45,7 @@ async function vnMondo(){const q=String(S.vn&&S.vn.q||'').trim();if(!q)return;if
   const nuovo=!S.vnM;S.vnM={q,busy:true,t0:Date.now(),l:[],err:''};const M=S.vnM;
   if(nuovo)openSheet({cls:'tall',live:()=>true,render:vnMondoH,onClose:()=>{if(S.vnM===M)S.vnM=null}});else refreshSheet();
   clearInterval(vnMondo.h);vnMondo.h=setInterval(()=>{if(!M.busy||S.vnM!==M){clearInterval(vnMondo.h);return}const e=document.getElementById('vn-ms'),w=document.getElementById('vn-liv');
-    if(e)e.textContent=Math.round((Date.now()-M.t0)/1000)+' s';if(w)w.style.transform='translateY('+vnCalY(vnCalLiv(M))+'px)'},500);
+    if(e)e.textContent=Math.round((Date.now()-M.t0)/1000)+' s';if(w)vnCalSet(vnCalLiv(M))},500);
   // v111 (Mario #130: «ci ha messo 50 secondi»): Gemini 2.5 Flash ragiona prima di rispondere (thinking acceso) → spento con thinkingBudget 0; Flash-Lite (più veloce) per primo
   const gc={temperature:0.2,thinkingConfig:{thinkingBudget:0}},body={contents:[{parts:[{text:vnMondoPrompt(q)}]}],tools:[{google_search:{}}],generationConfig:gc};
   // v110 (#129): la ricerca Google gratis c'è solo con Gemini 2.5 (500 al giorno; con Gemini 3 solo a pagamento) → lettori l25, f25
@@ -59,8 +59,8 @@ async function vnMondo(){const q=String(S.vn&&S.vn.q||'').trim();if(!q)return;if
   }catch(e){g={err:'Non riesco a contattare l\'IA. Controlla la connessione.'}}
   if(S.vnM!==M){M.busy=false;return}
   // trovato: il calice si riempie fino all'orlo, poi la lista; tempo salvato per il prossimo caricamento (solo ricerca con Google)
-  if(g.txt){if(!M.mem)vnTSalva('mondo',Math.max(1,Math.round((Date.now()-M.t0)/1000)));const w=document.getElementById('vn-liv');
-    if(w){w.style.transition='transform .45s cubic-bezier(.2,.7,.3,1)';w.style.transform='translateY('+vnCalY(1)+'px)';await new Promise(r=>setTimeout(r,480))}}
+  if(g.txt){if(!M.mem)vnTSalva('mondo',Math.max(1,Math.round((Date.now()-M.t0)/1000)));
+    if(vnCalSet(1,'.45s cubic-bezier(.2,.7,.3,1)'))await new Promise(r=>setTimeout(r,480))}
   M.busy=false;if(S.vnM!==M)return;
   if(!g.txt)M.err=g.err&&/riprova/i.test(g.err)?g.err:(g.err||'L\'IA non ha risposto.')+' Riprova.';
   else{M.l=vnMondoLeggi(g.txt)||[];if(!M.l.length)M.err='Non ho trovato vini con questo nome. Prova a scrivere anche la cantina.'}
@@ -69,9 +69,20 @@ async function vnMondo(){const q=String(S.vn&&S.vn.q||'').trim();if(!q)return;if
 // (media delle ultime 5 ricerche riuscite, jona_ia_t.mondo): a quel tempo ~3/4, poi rallenta senza arrivare all'orlo; l'orlo solo a risposta arrivata.
 // Si muovono solo transform (livello ogni 0,5 s con transizione lineare, onda in CSS): niente ridisegni della pagina.
 function vnCalLiv(M){if(!M.busy)return 1;const t=(Date.now()-M.t0)/1000;return .92*(1-Math.exp(-1.6*t/vnTSolito('mondo')))}
-function vnCalY(v){return(42-34*v).toFixed(2)}
-function vnCaliceH(M){const P='M14 6h36c0 22-6 34-18 36C20 40 14 28 14 6z',O='q4-1.4 8 0t8 0'.repeat(8);
-  return`<svg class="vn-cal" viewBox="0 0 64 88" aria-hidden="true"><defs><clipPath id="vn-calk"><path d="${P}"/></clipPath></defs><g clip-path="url(#vn-calk)"><g id="vn-liv" class="vn-liv" style="transform:translateY(${vnCalY(vnCalLiv(M))}px)"><path class="vn-onda2" d="M-32 0${O}V48H-32z"/><path class="vn-onda" d="M-32 1.2${O}V48H-32z"/></g></g><path class="vn-vetro" d="${P}M32 42v30M20 78q12-6 24 0"/><path class="vn-luce" d="M19 10q0 14 4 22"/></svg>`}
+// v112 (Mario #131: «fai un calice bello da vino rosso disegnalo tu», stile B acquerello dei cocktail): calice Borgogna 120×200, il vino sale (translateY) e la superficie si allarga con la pancia (scaleX da VN_CALW)
+const VN_CALW=[29.7,31.4,33.1,34.6,36.1,37.4,38.4,39.1,39.6,39.9,40,39.8,39.1,37.9,36,33.5,30.1,25.4,18.5,0];// mezza larghezza della coppa ogni 4 da y 52 a 128
+function vnCalY(v){return 128-54*Math.max(0,Math.min(1,v))}
+function vnCalSx(y){const i=Math.max(0,Math.min(18.999,(y-52)/4)),k=i|0;return Math.max(.05,(VN_CALW[k]+(VN_CALW[k+1]-VN_CALW[k])*(i-k))/40)}
+function vnCalSet(v,tr){const w=document.getElementById('vn-liv'),u=document.getElementById('vn-sup');if(!w)return false;const y=vnCalY(v);
+  if(tr){w.style.transition=u.style.transition='transform '+tr}w.style.transform='translateY('+y.toFixed(2)+'px)';u.style.transform='scaleX('+vnCalSx(y).toFixed(3)+')';return true}
+function vnCaliceH(M){const y=vnCalY(vnCalLiv(M)),K='M37 30C31.1 57.9 20 66 20 92C20 114.3 40 128 60 128';
+  return`<div class="vn-cal" aria-hidden="true"><svg class="vn-calw" viewBox="0 0 120 200"><defs><filter id="vn-wash" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="9"/><feGaussianBlur stdDeviation="1.2"/></filter></defs><g filter="url(#vn-wash)"><ellipse cx="66" cy="82" rx="54" ry="51" fill="#e7aab4" opacity=".42"/><ellipse cx="50" cy="104" rx="36" ry="33" fill="#d98a98" opacity=".25"/><ellipse cx="60" cy="189" rx="38" ry="4.5" fill="#3a2f2a" opacity=".13"/></g></svg>
+  <svg viewBox="0 0 120 200"><defs><clipPath id="vn-supk"><ellipse rx="33" ry="6.5"/></clipPath><clipPath id="vn-calk"><path d="${K}C80 128 100 114.3 100 92C100 66 89 57.9 83 30Z"/></clipPath><radialGradient id="vn-vino" cx=".42" cy=".2" r=".7"><stop offset="0" stop-color="#a92a42"/><stop offset=".5" stop-color="#7f1729"/><stop offset="1" stop-color="#4c0816"/></radialGradient><linearGradient id="vn-sup-c"><stop offset="0" stop-color="#8a1f33"/><stop offset=".45" stop-color="#c4475e"/><stop offset="1" stop-color="#7a1a2c"/></linearGradient><linearGradient id="vn-vt"><stop offset="0" stop-color="#dfe7ea" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#dfe7ea" stop-opacity=".45"/></linearGradient></defs>
+  <path d="${K}C80 128 100 114.3 100 92C100 66 89 57.9 83 30Z" fill="url(#vn-vt)"/>
+  <g clip-path="url(#vn-calk)"><g id="vn-liv" class="vn-liv" style="transform:translateY(${y.toFixed(2)}px)"><rect y="0" width="120" height="76" fill="url(#vn-vino)"/><path d="M84 8Q90 30 72 64" stroke="#2e0410" stroke-width="7" fill="none" opacity=".12"/>
+    <g transform="translate(60 0)"><g id="vn-sup" class="vn-sup" style="transform:scaleX(${vnCalSx(y).toFixed(3)})"><ellipse rx="39.4" ry="8" fill="url(#vn-sup-c)" stroke="#5a0b1b" stroke-width=".5"/><g clip-path="url(#vn-supk)"><path class="vn-onda" d="M-54 1.5q4-1.4 8 0t8 0 8 0 8 0 8 0 8 0 8 0 8 0 8 0 8 0 8 0 8 0" stroke="#e58a9c" stroke-width=".8" fill="none" opacity=".75"/></g></g></g></g></g>
+  <g class="vn-luce"><path d="M40 38C25 68 23 92 26 106" stroke-width="2.6"/><path d="M29 112q2 6 5 9M95 74q1.5 8 0 16" stroke-width="1.4" opacity=".8"/><path d="M59.7 144V176" stroke-width=".8"/></g>
+  <g class="vn-ink"><path d="M37 30A23 3.9 0 0 1 83 30M30 188A30 4.2 0 0 1 90 188" stroke-width=".6" opacity=".5"/><path d="${K}M83 30C89 57.9 100 66 100 92C100 114.3 80 128 60 128M37 30A23 3.9 0 0 0 83 30M30 188A30 4.2 0 0 0 90 188" stroke-width="1.35"/><path d="M56.8 129C58.6 134 58.7 137 58.6 142V178C58.4 183 52 186 30 188M63.2 129C61.4 134 61.3 137 61.4 142V178C61.6 183 68 186 90 188" stroke-width="1.2"/></g></svg></div>`}
 function vnMondoDop(x,y){return vnAll().find(v=>norm(v.n)===norm(x.n)&&norm(v.cant||'')===norm(x.cant||'')&&(!y||String(v.ann||'')===String(y)))}
 function vnMondoH(){const M=S.vnM||{q:'',l:[]};
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Cerca su internet<div class="sh-s">«${esc(M.q)}»</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
