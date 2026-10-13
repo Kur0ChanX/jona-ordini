@@ -11,10 +11,10 @@ Versione lunga di prima (fatti delle sessioni #85-#122): `git show eb9eccd:docs/
 
 ## Fatto in #123 (13/10, dalle ~16:30 ora italiana)
 - Avvio: scorta unita (niente di nuovo). Motore Opus ok. Il `git push -u` va ancora con i `deny` di `.claude/settings.json`.
-- Secondo giro di regole da RVC #107 (arrivato tramite #122): **A** regole a richiesta: `.claude/rules/struttura.md` (Struttura + Chiavi tolte da CLAUDE.md, + lezioni E20 E24 E27 E35 E46 E47) e `.claude/rules/prove.md` (E8 E18 E22 E36 E41 E48 E50 E52); regola in CLAUDE.md sezione 8; «A OGNI versione» ora scrive la riga in `struttura.md`. **B** consegne snelle (regola in CLAUDE.md sezione 8; queste consegne rifatte corte). **D** lezione E53 (grep -o su righe lunghe). **C** guardia (`.claude/hooks/guardia.py` + `tools/test-guardia.py`): ASPETTA l'ok di Mario a tocco (testo dei due file nel messaggio di #122 in questa sessione; se perso, chiederlo a RVC con send_message).
+- Secondo giro di regole da RVC #107 (arrivato tramite #122): **A** regole a richiesta: `.claude/rules/struttura.md` (Struttura + Chiavi tolte da CLAUDE.md, + lezioni E20 E24 E27 E35 E46 E47) e `.claude/rules/prove.md` (E8 E18 E22 E36 E41 E48 E50 E52); regola in CLAUDE.md sezione 8; «A OGNI versione» ora scrive la riga in `struttura.md`. **B** consegne snelle (regola in CLAUDE.md sezione 8; queste consegne rifatte corte). **D** lezione E53 (grep -o su righe lunghe). **C** guardia: Mario «Sì, mettila» + «Sì, confermo la scelta» (a tocco) → `.claude/hooks/guardia.py` (copia di RVC + prove Jona node/bash in PROVE), hook PreToolUse in `.claude/settings.json`, `tools/test-guardia.py` 41/41 verdi (non in `prova-ci.sh`: gira solo in locale), riga GUARDIA in CLAUDE.md sezione 4. Attiva da subito: blocca anche un commit nello stesso comando di un testo che cita le prove → comandi separati.
 
 ## ✅ PROSSIMI PASSI
-1. Domanda a Mario sulla guardia (C). Se sì: file identici a RVC, add_repo che passa = `Kur0ChanX/jona-ordini`, valutare `node tools/test-` in PROVE, riga GUARDIA in CLAUDE.md sezione 4.
+1. ~~Guardia~~ FATTA in #123.
 2. Domanda aperta: «Maurizio è riuscito ad attivare le notifiche sull'iPhone? Se no, a che passo si è fermato?» (v100, E51).
 3. Restano da provare da Mario: foto del vino su iPhone (v96), D44, D43. D50: Agenda NO (intrecciata con la home).
 

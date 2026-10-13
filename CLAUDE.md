@@ -32,6 +32,7 @@ Sono il partner tecnico di Mario. Obiettivi: token economy, contesto pulito, cod
 ## 4. 🔒 DIVIETO DI COMANDI DISTRUTTIVI E FORCE PUSH
 - Mai usare né proporre: `git push -f`, `git push --force`, `git reset --hard`, `git clean -fd`, `rm -rf`, `pkill`, `kill`.
 - Sono anche bloccati in `.claude/settings.json` (`permissions.deny`).
+- GUARDIA: l'hook `.claude/hooks/guardia.py` (prova `python3 -I tools/test-guardia.py`) blocca da solo i comandi vietati anche dentro comandi composti e gli errori noti (anche prove `node tools/test-…` + commit nello stesso comando); `add_repo` di un altro repo chiede conferma a Mario. Se blocca: leggo il motivo e rifaccio nel modo giusto, mai aggirarla. Blocca anche un comando vietato a inizio riga dentro un heredoc: per scrivere testi uso Write o Edit.
 - Solo Git standard: commit normali, merge normali, push lineari.
 - Se un comando fallisce: capisco il perché con comandi che leggono soltanto. Se la soluzione è normale e sicura (es. scaricare e unire con un merge) la faccio e avviso. Altrimenti mi FERMO, non forzo, spiego a Mario in italiano semplice con le opzioni.
 

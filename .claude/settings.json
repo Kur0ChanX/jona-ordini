@@ -48,6 +48,18 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|mcp__claude-code-remote__add_repo|mcp__claude-code-remote__list_sessions",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guardia.py\" 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "enabledMcpjsonServers": [
