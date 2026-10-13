@@ -1233,8 +1233,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=108;
+const APP_VER=109;
 const NEWS=[
+  {v:109,data:'2026-10-13',titolo:'Vini: cerca nel mondo anche senza Google',
+    chef:['Se Google non fa la ricerca (troppe ricerche), «Cerca nel mondo» ti mostra lo stesso i vini che l\'IA conosce, con un avviso giallo: controlla bene nomi e annate. Se l\'IA ha finito le richieste gratis del giorno, te lo dice chiaro: riprova domani mattina.'],
+    dev:['`vnMondo`: dopo 429 su flash e lite rifà la domanda senza `google_search` (`vnMondoPrompt(q,true)`, `S.vnM.mem`, avviso `.vn-al`); scatola nera con il messaggio vero di Google. `gemCall`: 429 «per day» → messaggio «richieste gratis di oggi». Prova in `test-cantina`.']},
   {v:108,data:'2026-10-13',titolo:'Vini: cerca nel mondo',
     chef:['Nella Cantina Vini scrivi un nome nel campo di ricerca. Se il vino non è in cantina, tocca «Cerca nel mondo con l\'IA»: l\'IA cerca su Google e ti mostra fino a 6 vini con le annate. Tocchi quello giusto (o la sua annata) e l\'IA scrive la scheda. Le foto della bottiglia funzionano come prima.'],
     dev:['`vnMondo`/`vnMondoH`/`vnMondoSel`/`vnMondoLeggi` in `moduli/cantina.js` (lettori flash → lite con `tools:[{google_search:{}}]`, `S.vnM`). Worker `/gemini`: passa `tools` solo se è esattamente la ricerca Google. Prove in `test-cantina` e `test-gemini-server`.']},
@@ -3039,7 +3042,7 @@ async function gemCall(body,lettore){const k=gemKey();let last='',st=0,srv=false
     else return{err:'Prima inserisci la chiave Gemini.'}}
   catch(e){return{err:'Non riesco a contattare Gemini: controlla la connessione.'}}
   return{st,msg:last,err:srv&&st===403?'Questo telefono non è collegato al ristorante: rientra con la chiave.'
-    :st===429?'Gemini è molto occupato adesso: riprova tra un minuto.'
+    :st===429?(/per.?day|PerDay|daily/i.test(last)?'Gemini ha finito le richieste gratis di oggi: riprova domani mattina.':'Gemini è molto occupato adesso: riprova tra un minuto.')
     :st===504||st===524||st===502?'Gemini ci ha messo troppo a rispondere.'
     :/key|API_KEY|permission/i.test(last)?(srv?'La chiave Gemini del ristorante non funziona: avvisa lo sviluppatore.':'La chiave Gemini non è valida: controllala.')
     :'Gemini non ha risposto'+(last?' ('+last+')':'')+'.'}}

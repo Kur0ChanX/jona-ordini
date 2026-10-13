@@ -33,7 +33,8 @@ function vnList(){const V=S.vn,me=meU(),all=vnAll(),can=vnCan(me),ven=vnVenduti(
   <div>${l.length?l.map(v=>vnRow(v,ven[v.id])).join(''):`<p class="muted">${all.length?'Nessun vino trovato in cantina.'+(V.casa?' Togli «Solo in casa» per vedere anche quelli finiti.':''):can?'La cantina è vuota. Tocca «Fotografa una bottiglia»: l\'IA scrive la scheda del vino, tu controlli e salvi.':'La cantina è vuota: i vini li aggiunge il responsabile.'}</p>`}</div>
   ${can&&String(V.q).trim()&&gemOn()?`<button type="button" class="btn ghost block vn-mb" data-a="vnMondo">${ic('search')} Cerca «${esc(String(V.q).trim().slice(0,40))}» nel mondo con l'IA</button>`:''}`}
 // v108 (D52, strada 2 «Furba» scelta da Mario #126): «Cerca nel mondo», l'IA cerca su Google (grounding) i vini col nome scritto, lista con le annate, tocchi → scheda scritta dall'IA
-function vnMondoPrompt(q){return'Cerca sul web (ricerca Google) i vini veri che corrispondono a: «'+q+'». Rispondi SOLO con un JSON, senza altro testo né note: {"vini":[{"nome":"nome del vino, senza la cantina","cantina":"","zona":"regione e paese","denominazione":"DOC/DOCG/IGT…","tipo":"rosso|bianco|rosato|bollicine|dolce","annate":[le annate in commercio, numeri, la più recente prima, massimo 6]}]}. Massimo 6 vini, il più probabile per primo. Solo vini che esistono davvero; se non trovi niente: {"vini":[]}.'}
+// v109: mem = senza ricerca Google (Google ha negato la ricerca, 429): l'IA risponde da quello che sa
+function vnMondoPrompt(q,mem){return(mem?'Senza cercare sul web, dimmi i vini veri che conosci che corrispondono a: «':'Cerca sul web (ricerca Google) i vini veri che corrispondono a: «')+q+'». Rispondi SOLO con un JSON, senza altro testo né note: {"vini":[{"nome":"nome del vino, senza la cantina","cantina":"","zona":"regione e paese","denominazione":"DOC/DOCG/IGT…","tipo":"rosso|bianco|rosato|bollicine|dolce","annate":[le annate in commercio, numeri, la più recente prima, massimo 6]}]}. Massimo 6 vini, il più probabile per primo. Solo vini che esistono davvero; se non trovi niente: {"vini":[]}.'}
 function vnMondoLeggi(txt){let a;try{a=JSON.parse(String(txt).match(/\{[\s\S]*\}/)[0])}catch(e){return null}
   const s=(x,n)=>String(x==null?'':x).trim().slice(0,n),an=new Date().getFullYear()+1;
   return((a&&a.vini)||[]).filter(x=>x&&s(x.nome,120)).slice(0,6).map(x=>({n:s(x.nome,120),cant:s(x.cantina,120),zona:s(x.zona,80),den:s(x.denominazione,80),tipo:VN_TIPI[x.tipo]?x.tipo:'',
@@ -43,9 +44,13 @@ async function vnMondo(){const q=String(S.vn&&S.vn.q||'').trim();if(!q)return;if
   if(nuovo)openSheet({cls:'tall',live:()=>true,render:vnMondoH,onClose:()=>{if(S.vnM===M)S.vnM=null}});else refreshSheet();
   clearInterval(vnMondo.h);vnMondo.h=setInterval(()=>{const e=document.getElementById('vn-ms');if(!M.busy||S.vnM!==M){clearInterval(vnMondo.h);return}if(e)e.textContent=Math.round((Date.now()-M.t0)/1000)+' s'},500);
   const body={contents:[{parts:[{text:vnMondoPrompt(q)}]}],tools:[{google_search:{}}],generationConfig:{temperature:0.2}};
-  let g={};try{for(const l of ['flash','lite']){g=await gemCall(body,l);if(g.txt||!GEM_RETRY.test(String(g.st)))break;errLog('Vino nel mondo: '+gemNome(l)+' non ha cercato (errore '+(g.st||'rete')+')')}}catch(e){g={err:'Non riesco a contattare l\'IA. Controlla la connessione.'}}
+  let g={};try{for(const l of ['flash','lite']){g=await gemCall(body,l);if(g.txt||!GEM_RETRY.test(String(g.st)))break;errLog('Vino nel mondo: '+gemNome(l)+' non ha cercato (errore '+(g.st||'rete')+(g.msg?': '+String(g.msg).slice(0,160):'')+')')}
+    // v109 (#129, foto di Mario «Gemini è molto occupato»): 429 su Flash e Flash-Lite = Google nega la ricerca (limite) → stessa domanda senza ricerca
+    if(!g.txt&&g.st===429){const b2={contents:[{parts:[{text:vnMondoPrompt(q,true)}]}],generationConfig:{temperature:0.2}};
+      for(const l of ['flash','lite']){const r=await gemCall(b2,l);if(r.txt){g=r;M.mem=true;break}errLog('Vino nel mondo senza Google: '+gemNome(l)+' (errore '+(r.st||'rete')+')');if(!GEM_RETRY.test(String(r.st)))break}}
+  }catch(e){g={err:'Non riesco a contattare l\'IA. Controlla la connessione.'}}
   M.busy=false;if(S.vnM!==M)return;
-  if(!g.txt)M.err=(g.err||'L\'IA non ha risposto.')+' Riprova.';
+  if(!g.txt)M.err=g.err&&/riprova/i.test(g.err)?g.err:(g.err||'L\'IA non ha risposto.')+' Riprova.';
   else{M.l=vnMondoLeggi(g.txt)||[];if(!M.l.length)M.err='Non ho trovato vini con questo nome. Prova a scrivere anche la cantina.'}
   refreshSheet()}
 function vnMondoDop(x,y){return vnAll().find(v=>norm(v.n)===norm(x.n)&&norm(v.cant||'')===norm(x.cant||'')&&(!y||String(v.ann||'')===String(y)))}
@@ -53,6 +58,7 @@ function vnMondoH(){const M=S.vnM||{q:'',l:[]};
   return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Cerca nel mondo<div class="sh-s">«${esc(M.q)}»</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${M.busy?`<div class="vn-busy" role="status">${ic('clock')} <span style="flex:1;min-width:0">L'IA cerca su Google i vini con questo nome… <span class="small" id="vn-ms">${Math.round((Date.now()-M.t0)/1000)} s</span><br><span class="muted small">di solito 5-20 secondi</span></span></div>`:''}
   ${M.err?`<p class="vn-al">${ic('warn')} ${esc(M.err)}</p><button type="button" class="btn primary block" data-a="vnMondo">Riprova</button>`:''}
+  ${!M.busy&&M.l.length&&M.mem?`<p class="vn-al">${ic('warn')} Google adesso non fa ricerche: elenco dalla memoria dell'IA. Controlla bene nomi e annate.</p>`:''}
   ${!M.busy&&M.l.length?`<p class="muted small vn-hint">Tocca il vino giusto o la sua annata: l'IA scrive la scheda, tu controlli e salvi.</p>`+M.l.map((x,i)=>`<div class="vn-mo"><button type="button" class="prow vn-r" data-a="vnMondoSel" data-v="${i}"><span class="vn-dot vn-${esc(x.tipo||'rosso')}" aria-hidden="true"></span><div class="row-i"><div class="row-t">${esc(x.n)}</div><div class="row-m">${esc([x.cant,x.den||x.zona].filter(Boolean).join(' · '))||'&nbsp;'}</div>${vnMondoDop(x)?'<div class="row-m"><b>Già in cantina</b></div>':''}</div></button>${x.ann.length?`<div class="chips">${x.ann.map(y=>`<button type="button" class="chip" data-a="vnMondoSel" data-v="${i}:${y}">${y}</button>`).join('')}</div>`:''}</div>`).join(''):''}`}
 function vnMondoSel(v){const M=S.vnM,[i,y]=String(v).split(':'),x=M&&M.l[+i];if(!x)return;const d=vnMondoDop(x,y);closeSheet();
   if(d){toast('Questo vino è già in cantina.');return vnShow(d.id)}
