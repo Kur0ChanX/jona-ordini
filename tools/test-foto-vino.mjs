@@ -45,7 +45,7 @@ for(const [nome,mot,dev] of DISP){
   r=await prova('ignora');ok(giusta(r,2000),P+'createImageBitmap che ignora le opzioni → foto giusta lo stesso ('+r.w+'×'+r.h+')');
   r=await prova('coricata');ok(r.h>r.w&&Math.max(r.w,r.h)<=2000&&r.su[0]>180&&r.giu[2]>180,P+'createImageBitmap che non gira la foto → girata a mano ('+r.w+'×'+r.h+')');
   // foglio del vino: foto dalla fotocamera → miniatura piccola, niente originale tenuto, all'IA ≤ 2000 px
-  await pg.evaluate(()=>{vnForm(null)});await wait(300);
+  await pg.evaluate(async()=>{await modLoad('cantina');vnForm(null)});await wait(300);
   await pg.fill('.sheet input[data-k="n"]','Barolo');
   let fc=(await Promise.all([pg.waitForEvent('filechooser'),pg.locator('.sheet [data-a="vnFotoF"]').first().click()]))[0];
   await fc.setFiles(FOTO);await pg.waitForSelector('.sheet .vn-fi img',{timeout:15000});
@@ -67,7 +67,7 @@ for(const [nome,mot,dev] of DISP){
   r=await pg.evaluate(async()=>({l:ls('jona_vn'),f:await idbKv(VN_IDB())}));
   ok(r.l==null&&r.f==null,P+'Chiudi: bozza cancellata (localStorage e IndexedDB)');
   // fotocamera aperta e app chiusa dal telefono (ricarica senza foto) → nota «fotocamera» e «Galleria»
-  await pg.evaluate(()=>{vnForm(null)});await wait(300);await pg.fill('.sheet input[data-k="n"]','Brunello');
+  await pg.evaluate(async()=>{await modLoad('cantina');vnForm(null)});await wait(300);await pg.fill('.sheet input[data-k="n"]','Brunello');
   await Promise.all([pg.waitForEvent('filechooser'),pg.locator('.sheet [data-a="vnFotoF"]').first().click()]);await wait(200);
   // app chiusa dal telefono con la fotocamera aperta = pagina chiusa e app riaperta in una pagina nuova
   // (WebKit desktop: ricaricare con la finestra dei file aperta fa cadere la pagina, «Page crashed»)
