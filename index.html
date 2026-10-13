@@ -1232,8 +1232,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=104;
+const APP_VER=105;
 const NEWS=[
+  {v:105,data:'2026-10-13',titolo:'Proponi la settimana (se la vuoi)',
+    chef:['Nuova funzione, spenta di partenza: in Impostazioni → Funzioni accendi «Proponi la settimana». Negli Orari compare il pulsante: copia i turni della settimana prima, lascia vuoti ferie, malattia e permessi vecchi e tiene quelli già segnati. I riposi restano i tuoi. Poi correggi e pubblichi. Spenta, i turni si fanno solo a mano come oggi.'],
+    dev:['D33: `orProp` (accanto a `orCopy`), funzione `proponi` in `FUNZ` spenta di partenza; pulsante `orProp` solo con `funzOn(\'proponi\')`. F/M/P della settimana prima → vuoti (contati nell\'avviso), F/M/P già in questa settimana restano. Prova `tools/test-orari-proponi.mjs`.']},
   {v:104,data:'2026-10-13',titolo:'Promemoria del turno',
     tutti:['Se hai le notifiche attive, 1 ora prima del tuo turno arriva un promemoria con l\'orario, anche con l\'app chiusa. Per i turni spezzati arriva prima di ogni parte.'],
     chef:['Il promemoria parte solo per i turni pubblicati negli Orari. Si spegne in Impostazioni → Funzioni → «Promemoria del turno».'],
@@ -3735,7 +3738,7 @@ function vOrari(){
   <button type="button" class="icon-btn" data-a="orW" data-v="1" aria-label="Settimana dopo">${ic('chev')}</button></div>
   ${rps.length>1?`<div class="chips or-reps" role="group" aria-label="Reparto">${[['','Tutti']].concat(rps.map(k=>[k,REPARTI[k]])).map(([k,l])=>`<button type="button" class="chip" aria-pressed="${(sc?sc[0]:'')===k}" data-a="orRep" data-v="${k}">${l}</button>`).join('')}</div>`:''}
   <div class="or-st">${st.k?pill(st.k,st.l):`<span class="st">${st.l}</span>`}${w.pub&&st.ch?`<span class="muted small">pubblicata ${ago(w.pub)}</span>`:''}</div>
-  <div class="or-acts"><button type="button" class="btn ghost sm" data-a="orCopy">${ic('copy')} Copia settimana prima</button><button type="button" class="btn ghost sm" data-a="orTipi">${ic('clock')} Turni tipo</button>${tbOn()?`<button type="button" class="btn ghost sm" data-a="tbXls">${ic('sheet')} Presenze</button>`:''}${st.k==='ok'||!st.k?'':`<button type="button" class="btn primary sm" data-a="orPub">${ic('send')} ${tp?'Avvisa delle modifiche':'Pubblica'}</button>`}</div>
+  <div class="or-acts"><button type="button" class="btn ghost sm" data-a="orCopy">${ic('copy')} Copia settimana prima</button>${funzOn('proponi')?`<button type="button" class="btn ghost sm" data-a="orProp">${ic('sparkle')} Proponi la settimana</button>`:''}<button type="button" class="btn ghost sm" data-a="orTipi">${ic('clock')} Turni tipo</button>${tbOn()?`<button type="button" class="btn ghost sm" data-a="tbXls">${ic('sheet')} Presenze</button>`:''}${st.k==='ok'||!st.k?'':`<button type="button" class="btn primary sm" data-a="orPub">${ic('send')} ${tp?'Avvisa delle modifiche':'Pubblica'}</button>`}</div>
   ${cmGmBox(sc)}${lun===cur?orOggi():''}${lun>=cur?(c=>c?orCopH(c,lun):'')(orCop(lun,t,ppl)):''}
   ${probs.length?`<section class="or-pb ${nerr?'':nda?'w':'a'}"><button type="button" class="or-pbh" data-a="orPb" aria-expanded="${!!S.orPb}">${ic('warn')}<b>${nda?nda+' da controllare':'Errori accettati'}</b><span>${[nerr?nerr+(nerr===1?' errore':' errori'):nda?'solo avvisi':'',nacc?nacc+' accettat'+(nacc===1?'o':'i'):''].filter(Boolean).join(' · ')}</span>${ic('chev',S.orPb?'up':'dn')}</button>
   ${S.orPb?`<div class="or-pl">${probs.map(p=>`<button type="button" class="or-pi ${p.ok?'acc':p.k}" data-a="orCell" data-u="${p.u.id}" data-g="${fd(p.u,p.g)}">${avatar(p.u,28)}<span><b>${esc(p.u.nome)}</b> ${esc(p.t)}${p.ok?' <i class="or-acc">accettato</i>':''}</span></button>`).join('')}</div>`:''}</section>`
@@ -3796,6 +3799,21 @@ async function orCopy(){
   for(const [id,r] of Object.entries(p.t))if(D().staff[id]&&inS(id)&&orHas(r))t[id]=clone(r);
   if(w)await upd('config','orari_'+lun,{t,mod:now()});else await put('config','orari_'+lun,{tipo:'orari',lun,t,mod:now()});
   toast('Copiati i turni della settimana prima: controlla e pubblica');
+}
+// «Proponi la settimana» (funzione «proponi», spenta di partenza): copia la settimana prima, ma lascia vuoti ferie/malattia/permesso
+// della settimana prima e tiene le assenze già messe in questa settimana. I riposi restano quelli decisi dal responsabile.
+async function orProp(){
+  const sc=orScope(),inS=id=>orInSc(D().staff[id],sc);if(!orPlanner(meU())||!funzOn('proponi'))return;
+  const lun=S.orW||orLun(),p=orWeek(orShift(lun,-1));if(!p||!Object.entries(p.t||{}).some(([id,r])=>inS(id)&&orHas(r)))return toast('La settimana prima è vuota: niente da proporre.','warn');
+  const w=orWeek(lun),wt=(w&&w.t)||{},ass=v=>v==='F'||v==='M'||v==='P';
+  if(Object.entries(wt).some(([id,r])=>inS(id)&&Object.values(r||{}).some(v=>v&&!ass(v)))&&!await ask('Sostituire gli orari di questa settimana?','I turni già messi vengono sostituiti dalla proposta. Ferie, malattia e permessi già segnati restano.','Proponi',true))return;
+  const t={};let vuoti=0;for(const [id,r] of Object.entries(wt))if(!inS(id))t[id]=r;
+  for(const [id,r] of Object.entries(p.t)){if(!D().staff[id]||!inS(id)||!orHas(r))continue;const o={},mia=wt[id]||{};
+    for(let g=0;g<7;g++){const v=r[g],m=mia[g];if(ass(m))o[g]=m;else if(ass(v))vuoti++;else if(v)o[g]=v}
+    if(orHas(o))t[id]=o}
+  for(const [id,r] of Object.entries(wt))if(inS(id)&&!t[id]){const o={};for(const g in r||{})if(ass(r[g]))o[g]=r[g];if(orHas(o))t[id]=o}
+  if(w)await upd('config','orari_'+lun,{t,mod:now()});else await put('config','orari_'+lun,{tipo:'orari',lun,t,mod:now()});
+  toast(vuoti?'Proposta pronta. '+vuoti+(vuoti===1?' giorno di ferie/malattia/permesso della settimana prima lasciato vuoto':' giorni di ferie/malattia/permesso della settimana prima lasciati vuoti')+': decidi tu, poi pubblica':'Proposta pronta: controlla e pubblica');
 }
 function orTipiSheet(){
   S.orN={n:'',a1:'',b1:'',a2:'',b2:''};
@@ -4896,7 +4914,7 @@ function voiceSheet(){
    config/app.funz {agenda:true}: le funzioni nuove partono spente. Conta d'uso in config/uso_<AAAA-MM> {agenda:{<persona>:giorni}}, al massimo una scrittura al giorno per telefono (jona_uso).
    Agenda: config/agenda_<AAAA-MM> {tipo:'agenda',e:{<id>:ev}}, ricorrenti in config/agenda_ric. ev={t,g:'AAAA-MM-GG',h:'HH:MM'|'',cop,note,vis:'io'|'tutti'|'rep',rep:[],da,cr,mod,r:''|'s'|'m'}.
    Cancellare = e.<id>: null. Per reparto: lo staff vede i suoi, i gestori tutti. «Solo io» è nascosto solo nell'interfaccia (tutti i membri leggono config). */
-const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'cantina',l:'Cantina Vini',d:'Schede dei vini scritte con l\'IA da una foto dell\'etichetta, cosa consigliare al tavolo in base al piatto e inventario delle bottiglie (vendute e in casa).',on:true},{id:'bar',l:'Bar: cocktail e alcolici',d:'Oltre 200 cocktail con dosi, bicchiere e passaggi, e l\'inventario delle bottiglie del bar (intere e quanto resta di quella aperta). Per gestori, responsabili e bartender.',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'turni',l:'Promemoria del turno',d:'Chi lavora riceve una notifica 1 ora prima di ogni turno pubblicato negli Orari (anche con l\'app chiusa). Per i turni spezzati arriva prima di ogni parte.',on:true},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
+const FUNZ=[{id:'ricette',l:'Ricette e costo dei piatti',d:'Ricette con gli ingredienti presi dai listini: l\'app calcola quanto costa ogni piatto e il food cost, e avvisa quando un prezzo lo fa salire. Solo per i gestori.',on:true},{id:'cantina',l:'Cantina Vini',d:'Schede dei vini scritte con l\'IA da una foto dell\'etichetta, cosa consigliare al tavolo in base al piatto e inventario delle bottiglie (vendute e in casa).',on:true},{id:'bar',l:'Bar: cocktail e alcolici',d:'Oltre 200 cocktail con dosi, bicchiere e passaggi, e l\'inventario delle bottiglie del bar (intere e quanto resta di quella aperta). Per gestori, responsabili e bartender.',on:true},{id:'agenda',l:'Agenda',d:'Eventi, gruppi e cose da ricordare. Chi ha un evento oggi vede la striscia «Oggi in hotel».'},{id:'turni',l:'Promemoria del turno',d:'Chi lavora riceve una notifica 1 ora prima di ogni turno pubblicato negli Orari (anche con l\'app chiusa). Per i turni spezzati arriva prima di ogni parte.',on:true},{id:'proponi',l:'Proponi la settimana',d:'Negli Orari compare il pulsante «Proponi la settimana»: copia i turni della settimana prima, lascia vuoti ferie, malattia e permessi vecchi e tiene quelli già segnati. Poi correggi e pubblichi. Spenta: i turni si fanno solo a mano.'},{id:'hotel',l:'Hotel',d:'Collegamento con l\'app dell\'hotel: camere e ospiti di oggi, vassoi da ritirare, guasti, richieste ed eventi. Accendila quando l\'app dell\'hotel è in uso.'}];
 const funzOn=k=>{const f=cfg().funz||{};return k in f?!!f[k]:!!(FUNZ.find(x=>x.id===k)||{}).on};
 async function funzSet(k,on){const f=FUNZ.find(x=>x.id===k);if(!f)return;
   await put('config','app',Object.assign({},cfg(),{funz:Object.assign({},cfg().funz||{},{[k]:!!on})}));toast(f.l+(on?' accesa':' spenta'))}
@@ -5732,6 +5750,7 @@ Object.assign(A,{
   orSave:()=>orSaveCell(false),
   orClear:()=>orSaveCell(true),
   orCopy:()=>orCopy(),
+  orProp:()=>orProp(),
   orCnSave:async()=>{const n=Math.round(num(S.orCn));if(!(n>0&&n<5000))return toast('Scrivi quanti coperti, es. 60.','warn');await put('config','app',Object.assign({},cfg(),{copNorm:n}));S.orCn='';render();toast('Salvato: giorno normale '+n+' coperti')},
   orTipi:()=>orTipiSheet(),
   orTipoAdd:()=>orTipoAdd(),
