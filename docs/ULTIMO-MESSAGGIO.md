@@ -1,3 +1,4 @@
-# Ultimo messaggio di Mario (13/10/2026 21:51 ora italiana)
+# Ultimo messaggio di Mario (14/10/2026 00:01 ora italiana)
 
-cerca una soluzione
+falla a mano
+Ricordatinche ci ha messo quasi un minutonper trovare i vini cannonau
