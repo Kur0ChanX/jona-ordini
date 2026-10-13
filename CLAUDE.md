@@ -91,7 +91,7 @@ Struttura del codice, versioni (v16-v103) e chiavi in localStorage: `.claude/rul
 - Niente nome del creatore (Mario Miscera, `mario-miscera`, `kur0chanx`) in link, inviti e testi che vedono gli utenti. Il nome di chi invita (utente dell'app) va bene. Stessa regola in RVC.
 - A OGNI versione: cambia `CACHE` in `sw.js`, aggiungi la voce in `NEWS`, aumenta `APP_VER`, scrivi la riga della versione in `.claude/rules/struttura.md`.
 - Interfaccia dello staff a prova di principiante: parole semplici, pulsanti grandi.
-- Pubblicazione: PR dal ramo unico → prove verdi → squash merge → controllo online → `git fetch origin main && git merge origin/main` sul ramo e `git push` normale. Ogni versione pronta va online da sola appena le prove sono verdi, senza chiedere; chiedo solo se qualcosa fallisce.
+- Pubblicazione: PR dal ramo unico aperta in BOZZA (draft: in bozza le prove su GitHub non partono, scelta di Mario #128) → quando la versione è pronta `update_pull_request` con `draft: false` (parte UN giro) → prove verdi → squash merge → controllo online → `git fetch origin main && git merge origin/main` sul ramo e `git push` normale. Ogni versione pronta va online da sola appena le prove sono verdi, senza chiedere; chiedo solo se qualcosa fallisce.
 - Prove: `tools/README.md` (server locale, Playwright con Chromium `/opt/pw-browsers/chromium`, emulatore Firebase con `localStorage.jona_fb_emu`).
   - Stabilità (l'app serve a un hotel): ogni bug corretto riceve una prova che l'avrebbe trovato. Una prova fallita non si salta né si spegne: si capisce la causa.
   - Sul computer di lavoro solo le prove legate alla modifica (la nuova + quelle della stessa schermata) e `tools/test-giro.mjs` se cambia l'aspetto. Niente prove rifatte due volte: il resto lo fa GitHub.

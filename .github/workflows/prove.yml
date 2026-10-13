@@ -4,6 +4,7 @@ name: Prove automatiche
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   schedule:
     - cron: '17 3 * * 1'
   workflow_dispatch:
@@ -16,6 +17,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   prove:
+    # PR in bozza (draft) = niente prove (scelta di Mario #128, regola da RVC #118): partono quando la PR è pronta.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     permissions:
