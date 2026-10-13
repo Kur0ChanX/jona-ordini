@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (12/10/2026 20:52 ora italiana)
+# Ultimo messaggio di Mario (13/10/2026 08:21 ora italiana)
 
-per schermo intero è ancora cosí
+tastiera sembra bene
