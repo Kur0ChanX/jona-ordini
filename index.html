@@ -2946,7 +2946,7 @@ async function codaFlush(){
       if(!gemOn()){it.err='Questo telefono non ha Gemini: la bolla la legge un altro telefono del ristorante.';continue}
       const lk=await codaLock(it);if(lk==='fatta'){await codaVia(it);continue}if(!lk)continue;
       await codaLeggi(it)}}
-  finally{CODA.busy=false;refreshSheet()}}
+  finally{CODA.busy=false;refreshSheet();codaRaccogli()}}// riguarda il cloud: una voce «fatta» da un altro telefono mentre questa era occupata esce subito dalla coda
 async function codaLeggi(it){it.busy=true;it.t0=now();it.n=(it.n||0)+1;it.err='';refreshSheet();let g=null;
   try{const body={contents:[{parts:[{text:geminiPrompt()},{inline_data:{mime_type:'image/jpeg',data:it.foto}}]}],generationConfig:{temperature:0}};
     for(const [l] of GEM_LETT){g=await gemCall(body,l);if(g.salta){g=null;continue}if(g.txt||!GEM_RETRY.test(String(g.st)))break}
