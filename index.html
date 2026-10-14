@@ -959,6 +959,7 @@ html.staff-ui .cartbar .btn>span{text-wrap:balance}
 .f-logo{display:flex;align-items:center;gap:14px;padding:12px;margin:4px 0 2px;border-radius:16px;background:var(--sunk)}
 .f-logo b{display:block;font-weight:500}.f-logo>div>span{display:block;font-size:13px;color:var(--muted);margin:1px 0 8px}.f-logo .btns{justify-content:flex-start}
 /* ---------- ordine suggerito ---------- */
+.coda-ris{display:flex;align-items:center;gap:6px;margin:0 0 14px}.coda-ris .sug-cta{flex:1;min-width:0;margin:0}
 .sug-cta{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;margin:0 0 14px;border-radius:18px;background:linear-gradient(120deg,var(--lagoon-soft),var(--surface) 70%);box-shadow:var(--lift);cursor:pointer}
 .sug-cta:focus-visible{outline:2px solid var(--lagoon);outline-offset:2px}
 .sug-cta>.ic:first-child{width:28px;height:28px;flex:none;color:var(--ocra)}
@@ -1234,8 +1235,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=114;
+const APP_VER=115;
 const NEWS=[
+  {v:115,data:'2026-10-14',titolo:'Foto dei listini: scatta e basta',
+    chef:['In Importa listino le foto vanno in coda come le bolle: puoi chiudere l\'app, le foto non si perdono e la lettura riparte da sola finché non va, anche da un altro telefono del ristorante.','A lettura finita arriva un avviso con prezzi aumentati, righe con i conti che non tornano e prodotti nuovi; in Fornitori trovi «Listino letto» che apre «Controlla e salva».'],
+    dev:['D54 (c): voci `tipo:\'listino\'` nella coda (una per foto, gruppo `grp`), testo letto nel documento `coda/<grp>_<i>`; gruppo completo → risultato `coda/<grp>` (`tipo:\'ris\'`, creato una volta sola con `runTransaction`), avviso `listino` ai gestori (`codaRisAvviso`: `rvUps`, `rigaNonTorna`, senza fornitore, prodotti nuovi, foto illeggibili); `codaRisCta` in Fornitori → `codaRisApri` → `impRun(\'txt\')` con `S.rev.grp`, tolto al salvataggio. `gemGo` → `codaListino`; `gemRun` resta per la prova `test-fatture`. Prova `tools/test-coda.mjs` (listino: 2 foto, due telefoni) e `test-bolla`.']},
   {v:114,data:'2026-10-14',titolo:'Bolla di consegna: scatta e basta',
     chef:['All\'arrivo della merce lo staff fotografa la bolla e può chiudere l\'app: la foto resta salvata nel telefono e si legge da sola, anche senza rete (appena torna) e anche da un altro telefono del ristorante.','A lettura finita ricevi un avviso con prezzi diversi, prodotti mancanti e prodotti in più rispetto all\'ordine.'],
     staff:['Nel Controllo merce basta fotografare la bolla: non serve più toccare «Confronta». Puoi chiudere l\'app, la foto non si perde e la lettura riparte da sola finché non va.'],
@@ -1295,9 +1299,6 @@ const NEWS=[
   {v:96,data:'2026-10-12',titolo:'iPhone: la foto del vino non fa più ripartire l\'app',
     tutti:['Cantina Vini: dopo la foto della bottiglia l\'app su iPhone non riparte più da sola. La foto viene subito rimpicciolita.','Se il telefono chiude lo stesso l\'app, la scheda del vino riparte da dove eri (nome e foto già fatte).','Se l\'IA passa a un lettore di riserva, la scheda dice il motivo vero.'],
     dev:['D45: `fotoPiccola(file,max,mini)` (EXIF da `jpgInfo`, `createImageBitmap` con `resizeWidth`, giro a mano se resta coricata, tela svuotata), usata anche da `shrinkImg`. Vino: solo foto piccole + miniatura (`VN_PIC`), bozza `jona_vn` + IndexedDB `jona-kv` (`vnBozza`, `vnRestore`). Prova `tools/test-foto-vino.mjs` su PC, Android, tablet, Mac, iPhone, iPad.']},
-  {v:95,data:'2026-10-12',titolo:'Bar: colori dei cocktail più giusti',
-    tutti:['I disegni dei cocktail hanno colori più fedeli: Kir rosa, Blue Lagoon blu, Bramble e El Diablo rosso-viola, Arnold Palmer color tè.','White Russian con la panna ben visibile, Espresso Tonic con il caffè sopra, schiume più pulite.'],
-    dev:['Difetti #101 (5-15, 19, 21): `COLX` e `LAY` in `tools/bar-disegni.mjs`, onda della schiuma `wavy` color vetro, Painkiller crema/arancio, fiamma della scorza attaccata (Oaxaca). Prova `tools/test-bar-disegni.mjs`.']},
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -2915,7 +2916,7 @@ function bolRiga(o,rz,i){const B=rz.bolla;if(!B)return'';const b=B.righe.find(x=
 function idbKv(k,v){return new Promise(res=>{try{const r=indexedDB.open('jona-kv',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onerror=()=>res(null);
   r.onsuccess=()=>{const db=r.result;try{const t=db.transaction('kv',v===undefined?'readonly':'readwrite'),s=t.objectStore('kv'),q=v===undefined?s.get(k):v===null?s.delete(k):s.put(v,k);
     t.oncomplete=()=>{db.close();res(v===undefined?q.result:true)};t.onerror=t.onabort=()=>{db.close();res(null)}}catch(e){db.close();res(null)}}}catch(e){res(null)}})}
-const CODA={list:[],busy:false,on:false,cloud:[]};
+const CODA={list:[],busy:false,on:false,cloud:[],ris:{},gb:false};
 let CODA_T={testa:20000,lock:150000,ri:120000,riMax:5,poi:600000,maxB:900000,vecchie:7*864e5};
 const CODA_K=()=>(DEMO?'demo:':'')+'coda_q';
 const codaDev=()=>{let d=ls('jona_dev');if(!d){d=uid();ls('jona_dev',d)}return d};
@@ -2949,19 +2950,22 @@ async function codaFlush(){
 async function codaLeggi(it){it.busy=true;it.t0=now();it.n=(it.n||0)+1;it.err='';refreshSheet();let g=null;
   try{const body={contents:[{parts:[{text:geminiPrompt()},{inline_data:{mime_type:'image/jpeg',data:it.foto}}]}],generationConfig:{temperature:0}};
     for(const [l] of GEM_LETT){g=await gemCall(body,l);if(g.salta){g=null;continue}if(g.txt||!GEM_RETRY.test(String(g.st)))break}
-    if(!g||!g.txt)throw{msg:(g&&g.err)||'Gemini non è riuscito a leggere la bolla.'};
+    if(!g||!g.txt)throw{msg:(g&&g.err)||'Gemini non è riuscito a leggere la foto.'};
     const rows=(mapRows(parseTable(g.txt))||[]).map(r=>({nome:pulisciNome(r.nome),codice:r.codice,unita:normUnita(r.unita),q:r.q,prezzo:r.prezzo,imp:r.imp})).filter(r=>r.nome);
     if(!rows.length){it.vuote=(it.vuote||0)+1;if(it.vuote<2)throw{msg:'Sulla foto non trovo righe di prodotti.',foto:true};
       await codaIlleggibile(it)}
-    else await codaApplica(it,rows,g.lettore||'');
-    it.st='fatta';it.err='';codaFine(it);await codaVia(it);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return true}
+    else if(it.tipo==='listino')await codaRisPezzo(it,g.txt,g.lettore||'');else await codaApplica(it,rows,g.lettore||'');
+    it.st='fatta';it.err='';codaFine(it);await codaVia(it);if(it.grp)codaGruppo(it.grp);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return true}
   catch(e){const m=(e&&e.msg)||'Non riesco a contattare Gemini.';it.err=m;it.st='errore';it.next=now()+(e&&e.foto?CODA_T.poi:it.n<=CODA_T.riMax?CODA_T.ri:CODA_T.poi);
     await codaSalva();if(codaCloud())codaCol().doc(it.id).update({st:'errore',err:m,n:it.n,vuote:it.vuote||0,at:0}).catch(()=>{});
     errLog('Bolla in coda: '+m+' (tentativo '+it.n+')');return false}
   finally{it.busy=false;refreshSheet()}}
-function codaFine(it){if(!codaCloud())return;codaCol().doc(it.id).update({st:'fatta',fatto:now(),lk:codaDev(),err:'',n:it.n||0,foto:firebase.firestore.FieldValue.delete()}).catch(()=>{})}
+function codaFine(it){if(!codaCloud())return;codaCol().doc(it.id).update(Object.assign({st:'fatta',fatto:now(),lk:codaDev(),err:'',n:it.n||0,foto:firebase.firestore.FieldValue.delete()},it.grp?{txt:it.txt||'',l:it.l||'',ko:!!it.ko}:{})).catch(()=>{})}
 // due letture senza righe = foto non leggibile: lo sanno chi ha scattato e i gestori, la voce esce dalla coda
-async function codaIlleggibile(it){const o=D().ordini[it.oid];const f=o?forn(o.fornitoreId).nome:'';
+async function codaIlleggibile(it){
+  if(it.tipo==='listino'){const f=it.fid&&D().fornitori[it.fid]?D().fornitori[it.fid].nome:'';await codaRisPezzo(it,'','',true);
+    if(it.da)await notify(it.da,'Listino'+(f?' '+f:'')+': foto '+(it.idx+1)+' non leggibile','Non trovo righe di prodotti nella foto '+(it.idx+1)+' di '+it.tot+'. Rifalla più vicina e dritta da Importa listino.','listino',it.grp);return}
+  const o=D().ordini[it.oid];const f=o?forn(o.fornitoreId).nome:'';
   if(it.da)await notify(it.da,'Bolla '+f+': foto non leggibile','Non trovo righe di prodotti nella foto. Rifalla più vicina e dritta dal Controllo merce.','bolla',it.oid);
   await notify('gm','Bolla '+f+': foto non leggibile','La foto di '+(it.daNome||'staff')+' non si legge: serve una foto nuova.','bolla',it.oid)}
 // risultato nell'ordine + avviso ai gestori con prezzi diversi, mancanze e prodotti in più (D54: «discrepanze prezzi mancanze e anomalie con l'invio a Maurizio»)
@@ -2994,17 +2998,78 @@ function codaTick(){const e=document.getElementById('coda-sec');if(!e)return;con
 function codaRaccogli(){const me=codaDev();let nuove=false;
   for(const x of CODA.cloud){const loc=CODA.list.find(y=>y.id===x.id);
     if(x.st==='fatta'){if(loc&&!loc.busy)codaVia(loc);if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
-    if(loc||!x.foto||!x.oid)continue;
+    if(loc||!x.foto||!(x.oid||x.grp))continue;
     if(x.st==='lettura'&&x.lk!==me&&now()-(x.at||0)<CODA_T.lock)continue;
     if(now()-(x.creato||0)<CODA_T.testa)continue;
     CODA.list.push(Object.assign({},x,{next:0,busy:false}));nuove=true}
-  if(nuove){codaSalva();schedule()}}
+  if(nuove){codaSalva();schedule()}codaGruppi()}
 function codaWatch(){if(CODA.on||!codaCloud())return;CODA.on=true;
-  codaCol().onSnapshot(q=>{CODA.cloud=q.docs.map(d=>Object.assign({id:d.id},d.data()));codaRaccogli();codaFlush()},()=>{CODA.on=false})}
-async function codaAvvio(){try{const l=await idbKv(CODA_K());if(Array.isArray(l))for(const x of l)if(x&&x.id&&!CODA.list.some(y=>y.id===x.id))CODA.list.push(Object.assign(x,{busy:false,next:0}))}catch(e){}
+  codaCol().onSnapshot(q=>{CODA.cloud=q.docs.map(d=>Object.assign({id:d.id},d.data()));codaRaccogli();codaFlush();codaRisArrivo();schedule()},()=>{CODA.on=false})}
+async function codaAvvio(){try{const r=await idbKv(codaRisK());if(r&&typeof r==='object')CODA.ris=r}catch(e){}
+  try{const l=await idbKv(CODA_K());if(Array.isArray(l))for(const x of l)if(x&&x.id&&!CODA.list.some(y=>y.id===x.id))CODA.list.push(Object.assign(x,{busy:false,next:0}))}catch(e){}
   setInterval(()=>{codaRaccogli();codaFlush()},60000);setInterval(codaTick,1000);codaFlush();schedule()}
 addEventListener('online',()=>codaFlush());
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)codaFlush()});
+// ===== v115 (D54 c): foto dei listini in coda come le bolle. Una voce per foto (stesso gruppo grp); i testi letti si uniscono
+// in un solo risultato coda/<grp> (tipo 'ris'), creato una volta sola; avviso ai gestori con le discrepanze; «Controlla e salva» da Fornitori.
+const codaRisK=()=>(DEMO?'demo:':'')+'coda_ris';
+function codaRisSalva(){return idbKv(codaRisK(),Object.keys(CODA.ris).length?CODA.ris:null)}
+async function codaListino(){const I=S.imp;if(!I||!I.photos.length||I.busy)return;const me=realU();if(!me)return;I.busy=true;I.err='';refreshSheet();
+  try{const grp=uid(),tot=I.photos.length,t=now();
+    for(let i=0;i<tot;i++){const f=await codaFoto(I.photos[i]);
+      await codaAdd({id:grp+'_'+i,tipo:'listino',grp,idx:i,tot,fid:I.fid||'',foto:f.b64,creato:t,da:me.id,daNome:fullName(me),st:'coda',n:0})}
+    I.grp=grp;I.photos=[]}
+  catch(e){I.err='Non riesco a salvare le foto: riprova.'}
+  I.busy=false;refreshSheet()}
+// pezzo letto (ko = foto senza righe): nel telefono e, con codaFine, nel documento della voce sul cloud
+async function codaRisPezzo(it,txt,l,ko){it.txt=txt||'';it.l=l||'';it.ko=!!ko;
+  const g=CODA.ris[it.grp]||(CODA.ris[it.grp]={grp:it.grp,fid:it.fid||'',tot:it.tot,da:it.da||'',daNome:it.daNome||'',creato:it.creato||now(),p:{}});
+  g.p[it.idx]={txt:it.txt,l:it.l,ko:it.ko};await codaRisSalva()}
+function codaPezzi(grp){const g=CODA.ris[grp],p=Object.assign({},(g&&g.p)||{});let info=g;
+  for(const x of CODA.cloud){if(x.grp!==grp||x.st!=='fatta'||x.tipo!=='listino')continue;if(p[x.idx]===undefined)p[x.idx]={txt:x.txt||'',l:x.l||'',ko:!!x.ko};if(!info)info={grp,fid:x.fid||'',tot:x.tot,da:x.da||'',daNome:x.daNome||'',creato:x.creato||now()}}
+  return{info,p}}
+function codaGruppi(){const s=new Set();for(const r of Object.values(CODA.ris))if(r.tipo!=='ris')s.add(r.grp);for(const x of CODA.cloud)if(x.grp&&x.st==='fatta')s.add(x.grp);for(const g of s)codaGruppo(g)}
+async function codaGruppo(grp){if(CODA.gb)return;const {info,p}=codaPezzi(grp);if(!info||!info.tot)return;
+  if((CODA.ris[grp]&&CODA.ris[grp].tipo==='ris')||CODA.cloud.some(x=>x.id===grp&&x.tipo==='ris'))return;
+  const idx=[];for(let i=0;i<info.tot;i++){if(!p[i])return;idx.push(i)}
+  CODA.gb=true;
+  try{const ko=idx.filter(i=>p[i].ko),txt=gemJoin(idx.filter(i=>!p[i].ko).map(i=>p[i].txt)),lett=idx.map(i=>({l:p[i].l||'',ko:!!p[i].ko}));
+    const R={tipo:'ris',grp,fid:info.fid,tot:info.tot,txt,lett,ko,creato:info.creato,da:info.da,daNome:info.daNome,letto:now()};
+    let mio=true;
+    if(codaCloud()){const ref=codaCol().doc(grp);
+      try{mio=await fbInit().fs.runTransaction(async t=>{const s=await t.get(ref);if(s.exists)return false;t.set(ref,R);return true})}catch(e){return}
+      if(mio)for(const i of idx)codaCol().doc(grp+'_'+i).delete().catch(()=>{});
+      if(!CODA.cloud.some(x=>x.id===grp))CODA.cloud.push(Object.assign({id:grp},R))}
+    CODA.ris[grp]=R;await codaRisSalva();
+    if(mio)await codaRisAvviso(R);
+    codaRisArrivo();schedule()}
+  finally{CODA.gb=false}}
+// avviso ai gestori (D54: «discrepanze prezzi mancanze e anomalie con l'invio a Maurizio»)
+async function codaRisAvviso(R){const rows=impRighe(mapRows(parseTable(R.txt))||[],'txt',R.fid),f=R.fid&&D().fornitori[R.fid]?D().fornitori[R.fid].nome:'';
+  const ups=rvUps(rows),miss=rows.filter(r=>!r.fid).length,chk=rows.filter(r=>rigaNonTorna({q:r.q,imp:r.imp,prezzo:num(r.prezzo)})).length,nuovi=rows.filter(r=>r.fid&&!r.spesa&&!matchProd(prods().filter(p=>p.fornitoreId===r.fid),r)).length;
+  const p=[];if(ups.length)p.push((ups.length===1?'1 prezzo aumentato':ups.length+' prezzi aumentati')+': '+ups.slice(0,3).map(u=>u.nome+' '+pctS(u.pc)).join(', ')+(ups.length>3?'…':''));
+  if(chk)p.push(chk===1?'1 riga con i conti che non tornano':chk+' righe con i conti che non tornano');
+  if(miss)p.push(miss===1?'1 riga senza fornitore':miss+' righe senza fornitore');
+  if(nuovi)p.push(nuovi===1?'1 prodotto nuovo':nuovi+' prodotti nuovi');
+  if(R.ko.length)p.push(R.ko.length===1?'la foto '+(R.ko[0]+1)+' non si legge':R.ko.length+' foto non si leggono');
+  await notify('gm','Listino'+(f?' '+f:'')+': '+(rows.length?rows.length+(rows.length===1?' riga letta':' righe lette'):'niente da leggere')+(ups.length?', '+(ups.length===1?'1 prezzo aumentato':ups.length+' prezzi aumentati'):''),
+    (p.length?p.join('; ')+'.':'Nessuna discrepanza.')+' Foto di '+(R.daNome||'staff')+'. Apri Fornitori → «Controlla e salva».','listino',R.grp)}
+// risultati da controllare (cloud + telefono), striscia in Fornitori, apertura di «Controlla e salva», rimozione dopo il salvataggio
+function codaRisList(){const m={};for(const r of Object.values(CODA.ris))if(r.tipo==='ris')m[r.grp]=r;for(const x of CODA.cloud)if(x.tipo==='ris')m[x.id]=Object.assign({grp:x.id},x);
+  return Object.values(m).sort((a,b)=>(b.letto||0)-(a.letto||0))}
+const codaRisCta=me=>{if(!isMgr(me))return'';return codaRisList().map(r=>{const f=r.fid&&D().fornitori[r.fid];const n=(mapRows(parseTable(r.txt||''))||[]).length;
+  return`<div class="coda-ris"><button type="button" class="sug-cta" data-a="codaRis" data-id="${r.grp}">${ic('sheet')}<div><b>Listino${f?' '+esc(f.nome):''} letto</b><span>${n?n+(n===1?' riga':' righe')+' da controllare e salvare':'nelle foto non ho trovato righe'} · foto di ${esc(r.daNome||'staff')}, ${ago(r.letto||r.creato)}</span></div>${ic('chev')}</button><button type="button" class="icon-btn" data-a="codaRisVia" data-id="${r.grp}" aria-label="Togli">${ic('x')}</button></div>`}).join('')};
+function codaRisApri(grp){const r=codaRisList().find(x=>x.grp===grp);if(!r)return;impSheet(r.fid);const I=S.imp;I.txt=r.txt||'';I.gnote=(r.lett||[]).filter(x=>!x.ko).map(x=>({l:x.l,log:[]}));
+  if(!I.txt.trim()){I.stage='paste';I.err='Nelle foto non ho trovato righe di prodotti.';refreshSheet();return}
+  const prima=S.rev;impRun('txt');if(S.rev&&S.rev!==prima)S.rev.grp=grp}
+function codaRisVia(grp){delete CODA.ris[grp];CODA.cloud=CODA.cloud.filter(x=>x.id!==grp);codaRisSalva();if(codaCloud())codaCol().doc(grp).delete().catch(()=>{});schedule()}
+// il foglio «Importa listino» aperto su questo gruppo: appena il risultato c'è, il gestore passa a «Controlla e salva»
+function codaRisArrivo(){const I=S.imp;if(!I||!I.grp||!isMgr(realU()))return;if(!codaRisList().some(x=>x.grp===I.grp))return;const g=I.grp;I.grp='';closeSheet();codaRisApri(g)}
+function codaListStatoH(I){const vs=CODA.list.filter(x=>x.grp===I.grp).sort((a,b)=>a.idx-b.idx);
+  if(!vs.length)return`<div class="vn-ri" role="status" id="coda-stato"><p class="small">${ic('clock')} Foto salvate: le sta leggendo un altro telefono del ristorante. Ti avviso quando il listino è pronto: puoi chiudere questa finestra.</p></div><div class="btns" style="margin-top:10px"><button type="button" class="btn ghost" data-a="closeSheet">Chiudi</button></div>`;
+  const b=vs.find(x=>x.busy),off=navigator.onLine===false,e=vs.find(x=>x.err&&x.next>now());
+  return`<div class="${b?'banner':'vn-ri'}" role="status" id="coda-stato"><div class="small">${b?'⏳ Sto leggendo la foto '+(b.idx+1)+' di '+b.tot+'… <b id="coda-sec">'+Math.round((now()-b.t0)/1000)+' s</b>.':off?ic('clock')+' Foto salvate. Manca la rete: le leggo appena torna, anche da un altro telefono.':e?esc(e.err)+' Riprovo tra <b id="coda-sec">'+codaTra(e)+'</b> (tentativo '+e.n+').':ic('clock')+' Foto salvate: le leggo tra poco.'} Puoi chiudere l'app: le foto non si perdono e ti avviso quando il listino è pronto.</div></div>
+  <div class="btns" style="margin-top:10px">${!b&&!off&&e?`<button type="button" class="btn ghost sm" data-a="codaOraG" data-id="${I.grp}">Riprova adesso</button>`:''}<button type="button" class="btn ghost" data-a="closeSheet">Chiudi</button></div>`}
 </script>
 <script>
 /* ================= fornitori ================= */
@@ -3012,7 +3077,7 @@ function vFornitori(){
   const fs=Object.values(D().fornitori).sort(byNome);const cnt={};for(const p of prods())cnt[p.fornitoreId]=(cnt[p.fornitoreId]||0)+1;
   return`<div class="vhead"><div><h1 class="vt">Fornitori</h1><p class="vsub">${fs.length} fornitori, ${prods().length} prodotti a listino</p></div><button type="button" class="btn ghost" data-a="fnew">${ic('plus')} Nuovo</button></div>
   <button type="button" class="sug-cta" data-a="imp" data-f="">${ic('upload')}<div><b>Importa listini</b><span>Excel, CSV, fattura XML, tabella preparata con Gemini o foto</span></div>${ic('chev')}</button>
-  ${rcCta(meU())}${vnCta(meU())}${brCta(meU())}
+  ${codaRisCta(meU())}${rcCta(meU())}${vnCta(meU())}${brCta(meU())}
   ${fs.length?`<div class="fgrid">${fs.map(f=>{const m=METODI[f.metodo],n=cnt[f.id]||0;return`<button type="button" class="fcard" data-a="fopen" data-f="${f.id}" style="--c:${fcolor(f.id)}" aria-label="${esc(f.nome)}">
     <span class="fc-top">${f.logo?`<img src="${esc(f.logo)}" alt="">`:`<b>${esc(f.nome.charAt(0))}</b>`}</span>
     <span class="fc-b"><span class="fc-n">${esc(f.nome)}</span><span class="fc-m">${m?ic(m.i)+esc(m.l):'Invio da definire'}</span>
@@ -3153,7 +3218,7 @@ async function gemCall1(body,lettore,sig){const k=gemKey();let last='',st=0,srv=
     :st===504||st===524||st===502?'Gemini ci ha messo troppo a rispondere.'
     :/key|API_KEY|permission/i.test(last)?(srv?'La chiave Gemini del ristorante non funziona: avvisa lo sviluppatore.':'La chiave Gemini non è valida: controllala.')
     :'Gemini non ha risposto'+(last?' ('+last+')':'')+'.'}}
-function fotoStage(I){const k=gemKey(),srv=!k&&gemOn(),n=I.photos.length;
+function fotoStage(I){if(I.grp)return codaListStatoH(I);const k=gemKey(),srv=!k&&gemOn(),n=I.photos.length;
   return(I.err?`<div class="err">${esc(I.err)}</div>`:'')+`<p class="muted" style="margin-top:0">${n?n+(n===1?' foto pronta':' foto pronte'):'Nessuna foto'}. Puoi aggiungerne altre se il listino ha più pagine.</p>
   ${n?`<div class="chips">${I.photos.map((p,i)=>`<button type="button" class="chip" data-a="gemDel" data-v="${i}">${esc(p.name.slice(0,22))} ${ic('x')}</button>`).join('')}</div>`:''}
   <div class="btns" style="justify-content:flex-start;margin:10px 0 18px"><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="cam">${ic('camera')} Scatta</button><button type="button" class="btn ghost sm" data-a="gemFoto" data-k="gal">${ic('image')} Galleria</button></div>
@@ -3302,6 +3367,9 @@ const isSpesa=n=>/^(spese?|consegna|trasporto|contributo|contributi|cauzione|imb
 const rigaNonTorna=it=>it.q>0&&it.imp>0&&it.prezzo>0&&Math.abs(it.q*it.prezzo-it.imp)>Math.max(.06,it.imp*.015);
 function guessSupplier(name){const n=norm(name);if(!n)return'';const fs=Object.values(D().fornitori);
   return(fs.find(f=>norm(f.nome)===n)||fs.find(f=>n.includes(norm(f.nome))||norm(f.nome).includes(n))||fs.find(f=>norm(f.nome).split(' ').some(w=>w.length>3&&n.includes(w)))||{}).id||''}
+function impRighe(items,kind,def){return items.map(it=>{const fid=guessSupplier(it.fornitore)||def;const f=fid?forn(fid):null;const nome=(kind==='txt'?pulisciNome(it.nome):it.nome)||it.nome,spesa=isSpesa(nome);
+  return{fid,nome:nome.slice(0,160),codice:String(it.codice||'').slice(0,40),unita:normUnita(it.unita).slice(0,20),prezzo:it.prezzo,
+    categoria:CATS.includes(it.categoria)?it.categoria:((f&&f.categoria)||'Altro'),catF:CATS.includes(it.categoria),fnome:it.fornitore,sel:!!fid&&!spesa,spesa,q:it.q,imp:it.imp}})}
 async function impRun(kind,files){
   const I=S.imp;if(!I)return;I.err='';
   try{
@@ -3318,10 +3386,7 @@ async function impRun(kind,files){
       fonte=fl.name}
     else if(kind==='txt'){items=mapRows(parseTable(I.txt));fonte=I.gnote?(I.gnote.length===1?'foto letta':I.gnote.length+' foto lette'):'Tabella incollata'}
     if(!items||!items.length){I.stage=kind==='txt'?'paste':'pick';I.err='Non trovo le colonne. Serve almeno una riga di intestazione con "nome" e una tra "prezzo", "codice" o "unita".';refreshSheet();return}
-    const def=I.fid;
-    const rows=items.map(it=>{const fid=guessSupplier(it.fornitore)||def;const f=fid?forn(fid):null;const nome=(kind==='txt'?pulisciNome(it.nome):it.nome)||it.nome,spesa=isSpesa(nome);
-      return{fid,nome:nome.slice(0,160),codice:String(it.codice||'').slice(0,40),unita:normUnita(it.unita).slice(0,20),prezzo:it.prezzo,
-        categoria:CATS.includes(it.categoria)?it.categoria:((f&&f.categoria)||'Altro'),catF:CATS.includes(it.categoria),fnome:it.fornitore,sel:!!fid&&!spesa,spesa,q:it.q,imp:it.imp}});
+    const rows=impRighe(items,kind,I.fid);
     rvDup(rows).forEach((d,i)=>{if(d)rows[i].sel=false});
     S.rev={fonte,items:rows,lett:kind==='txt'?I.gnote||null:null};I.gnote=null;closeSheet();reviewSheet();
   }catch(e){I.stage='pick';I.err=errMsg(e);refreshSheet()}
@@ -3376,7 +3441,7 @@ async function reviewSave(){
   const tasks=plan.map(({it,m})=>()=>{
     const d={fornitoreId:it.fid,nome:String(it.nome).trim(),codice:String(it.codice||'').trim(),unita:String(it.unita||'').trim(),prezzo:num(it.prezzo),categoria:it.categoria||'Altro',aggiornato:now(),caricatoDa:S.me};
     if(m){if(m.prezzo!=null&&m.prezzo!==d.prezzo)d.prezzoPrec=m.prezzo;return upd('prodotti',m.id,d)}return put('prodotti',uid(),d)});
-  await runPool(tasks,4);S.rev=null;closeSheet();toast(sel.length+' prodotti salvati nel listino');
+  await runPool(tasks,4);if(R.grp)codaRisVia(R.grp);S.rev=null;closeSheet();toast(sel.length+' prodotti salvati nel listino');
   if(ups.length){
     const fs=[...new Set(ups.map(u=>u.fnome))];
     await notify('gm',`Prezzi aumentati: ${ups.length===1?'1 prodotto':ups.length+' prodotti'}`,(fs.length===1?fs[0]+': ':'')+ups.slice(0,4).map(u=>u.nome+' '+pctS(u.pc)).join(', ')+(ups.length>4?'…':''),'prezzi',R.fonte||'');
@@ -4572,7 +4637,7 @@ function newsSheet(){
 }
 function notifSheet(){
   const me=meU();const unread=myNotifs(me).filter(n=>!n.letta);
-  const NI={bolla:'box',agenda:'calendar',richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',promemoria:'bell',prezzi:'warn',urgente:'warn',orari:'calendar',cambio:'users'};
+  const NI={bolla:'box',listino:'sheet',agenda:'calendar',richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',promemoria:'bell',prezzi:'warn',urgente:'warn',orari:'calendar',cambio:'users'};
   openSheet({live:()=>true,render:()=>{const ns=myNotifs(me).slice(0,80);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${ns.length?ns.map(n=>`<div class="notif ${unread.some(x=>x.id===n.id)?'unread':''}">${ic(NI[n.tipo]||'bell')}<div><div class="nt">${esc(n.titolo)}</div>${n.testo?`<div class="nx">${esc(n.testo)}</div>`:''}<div class="nx small">${ago(n.creato)}</div></div></div>`).join(''):'<p class="muted">Nessuna notifica.</p>'}`}});
   runPool(unread.map(n=>()=>upd('notifiche',n.id,{letta:true})),4).catch(()=>{});
@@ -5692,7 +5757,7 @@ rbest:d=>rswapTo(d.r,d.i,d.p),
   copyPrompt:()=>copyText(geminiPrompt()),
   gemFoto:d=>{if(!S.imp.photos)S.imp.photos=[];pickFile({accept:'image/*',capture:d.k==='cam'?'environment':'',multiple:d.k!=='cam'},gemAdd)},
   gemDel:d=>{S.imp.photos.splice(+d.v,1);refreshSheet()},
-  gemGo:()=>gemRun(),
+  gemGo:()=>codaListino(),codaRis:d=>codaRisApri(d.id),codaRisVia:d=>codaRisVia(d.id),codaOraG:d=>{for(const x of CODA.list)if(x.grp===d.id&&!x.busy)x.next=0;codaFlush()},
   gemShare:()=>gemShare(),
   gemKey:async()=>{const v=prompt('Chiave Gemini (lascia vuoto per toglierla). La trovi gratis su aistudio.google.com/apikey',gemKey());if(v===null)return;ls('jona_gemini_key',v.trim()||null);toast(v.trim()?'Gemini collegato su questo telefono':'Chiave tolta');refreshSheet()},
   tplDl:()=>saveBlob('modello_listino_jona.csv',new Blob(['\ufeff'+TEMPLATE_HEAD+'\nMetro;M100;Zucchero semolato 1 kg;pz;1,20;Secco e dispensa\n'],{type:'text/csv'})),

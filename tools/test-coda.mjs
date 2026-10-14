@@ -11,7 +11,7 @@ const BOLLA=['fornitore;codice;nome;unita;prezzo;categoria;quantita;importo',
   'Fornitore di prova 1;PROVA-01;POMODORO CILIEGINO;kg;3,50;Verdura;5;17,50',
   'Fornitore di prova 1;PROVA-02;ZUCCHINE;kg;2,10;Verdura;3;6,30',
   'Fornitore di prova 1;;LIMONI;kg;2,80;Verdura;2;5,60'].join('\n');
-const gem={A:'ok',B:'503'};const letture=[];
+const gem={A:'ok',B:'503'};const letture=[];const risp=[];
 const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,height:800},serviceWorkers:'block'});
   await c.addInitScript(([cfg])=>{localStorage.setItem('jona_fb_emu',JSON.stringify('127.0.0.1'));if(cfg&&!localStorage.getItem('jona_fb'))localStorage.setItem('jona_fb',JSON.stringify(cfg))},[cfg]);
   await c.route('https://jona-notifiche.jona-ristorante-by-ynoy-corp.workers.dev/**',async r=>{const u=r.request().url();
@@ -20,12 +20,12 @@ const mk=async(cfg,name)=>{const c=await b.newContext({viewport:{width:400,heigh
     if(u.endsWith('/errori'))return r.fulfill({json:{ok:true,e:[]}});
     if(u.endsWith('/gemini')){const body=JSON.parse(r.request().postData()||'{}');letture.push({da:name,l:body.lettore,foto:!!(body.contents||[]).some(c=>(c.parts||[]).some(p=>p.inline_data))});
       if(gem[name]!=='ok')return r.fulfill({status:Number(gem[name]),json:{error:{message:'overloaded'}}});
-      return r.fulfill({json:{lettore:body.lettore,candidates:[{content:{parts:[{text:BOLLA}]}}]}})}
+      return r.fulfill({json:{lettore:body.lettore,candidates:[{content:{parts:[{text:risp.length?risp.shift():BOLLA}]}}]}})}
     r.fulfill({json:{ok:true}})});
   const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));return [c,p]};
 const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-const fino=async(pg,f,ms=15000)=>{const t=Date.now();while(Date.now()-t<ms){if(await pg.evaluate(f))return true;await wait(250)}return false};
+const fino=async(pg,f,ms=15000,arg)=>{const t=Date.now();while(Date.now()-t<ms){if(await pg.evaluate(f,arg))return true;await wait(250)}return false};
 const [,A]=await mk(CFG,'A');
 await A.goto('http://localhost:8765/index.html');await A.waitForTimeout(3000);
 await A.click('[data-a="formset"][data-v="dev"]');
@@ -98,9 +98,50 @@ await A.waitForTimeout(2500);
 ok(await A.evaluate(()=>!CODA.list.some(x=>x.id==='lk1')&&!D().ordini.test_o3.bolla),'lucchetto fresco di un altro telefono: A non la tocca');
 await A.evaluate(()=>fbInit().fs.collection('coda').doc('lk1').update({at:now()-CODA_T.lock-1000}));
 await A.evaluate(()=>{codaRaccogli();return codaFlush()});
-ok(await fino(A,()=>!!D().ordini.test_o3.bolla,15000)&&await A.evaluate(()=>!CODA.list.length),'lucchetto scaduto: A la legge e la toglie dalla coda');
+ok(await fino(A,()=>!!D().ordini.test_o3.bolla,25000)&&await fino(A,()=>!CODA.list.length,5000),'lucchetto scaduto: A la legge e la toglie dalla coda');
 const lk=await A.evaluate(async()=>(await fbInit().fs.collection('coda').doc('lk1').get()).data());
 ok(lk.st==='fatta'&&lk.lk!=='altro-telefono'&&!lk.foto,'cloud: «fatta» con il lucchetto di A, foto tolta '+JSON.stringify({st:lk.st,lk:lk.lk}));
+// ---------- 4. v115: foto dei listini in coda (D54 c) ----------
+const pz=await A.evaluate(()=>D().prodotti.test_p1.prezzo);
+const L1=['fornitore;codice;nome;unita;prezzo;categoria','Fornitore di prova 1;PROVA-01;POMODORO CILIEGINO;kg;'+String(Math.round(pz*120)/100).replace('.',',')+';Verdura','Fornitore di prova 1;PROVA-02;ZUCCHINE;kg;2,10;Verdura'].join('\n');
+const L2=['fornitore;codice;nome;unita;prezzo;categoria','Fornitore di prova 1;NUOVO-9;CAROTE;kg;1,30;Verdura'].join('\n');
+risp.push(L1,L2);
+const fotoList=(pg,fid,n)=>pg.evaluate(async([fid,n])=>{impSheet(fid);const fs=[];for(let i=0;i<n;i++){const c=document.createElement('canvas');c.width=60;c.height=80;c.getContext('2d').fillRect(0,0,10+i*5,20);
+  fs.push(new File([await new Promise(r=>c.toBlob(r,'image/jpeg'))],'listino'+i+'.jpg',{type:'image/jpeg'}))}await gemAdd(fs);await codaListino();return S.imp.grp},[fid,n]);
+const g1=await fotoList(A,'test_f1',2);
+ok(!!g1&&await A.evaluate(g=>CODA.list.filter(x=>x.grp===g&&x.tipo==='listino').length===2||!!CODA.ris[g],g1),'A: 2 foto del listino in coda (gruppo '+String(g1).slice(0,6)+'…)');
+ok(await fino(A,g=>!!(S.rev&&S.rev.grp===g),25000,g1),'A (gestore): a lettura finita si apre da solo «Controlla e salva» con il risultato della coda');
+const rv=await A.evaluate(()=>({n:S.rev.items.length,nomi:S.rev.items.map(i=>i.nome).join('|'),lett:(S.rev.lett||[]).map(x=>x.l).join()}));
+ok(rv.n===3&&/POMODORO.*ZUCCHINE.*CAROTE/i.test(rv.nomi)&&rv.lett==='f25,f25','controllo: 3 righe dalle 2 foto unite, lettori f25,f25 '+JSON.stringify(rv));
+await fino(A,()=>Object.values(D().notifiche).some(n=>n.tipo==='listino'),10000);
+const nl=await A.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='listino')[0]);
+ok(nl&&nl.a==='gm'&&/Listino Fornitore di prova 1: 3 righe lette, 1 prezzo aumentato/.test(nl.titolo)&&/1 prezzo aumentato: Pomodoro Ciliegino \+20%/i.test(nl.testo)&&/1 prodotto nuovo/.test(nl.testo)&&/Foto di Mario Test/.test(nl.testo),'avviso ai gestori: 3 righe, Pomodoro +20%, 1 prodotto nuovo, foto di Mario '+JSON.stringify(nl&&[nl.titolo,nl.testo]));
+const cr=await A.evaluate(async()=>{const s=await fbInit().fs.collection('coda').get();return s.docs.map(d=>({id:d.id,tipo:d.data().tipo,st:d.data().st,foto:!!d.data().foto}))});
+ok(cr.filter(x=>x.tipo==='ris').length===1&&!cr.some(x=>x.tipo==='listino'),'cloud: un solo risultato «ris», voci delle foto tolte '+JSON.stringify(cr.filter(x=>x.tipo!=='bolla')));
+ok(await fino(A,()=>!!document.querySelector('.sheet-wrap:last-child [data-a="rvok"]')),'foglio «Controlla e salva» aperto');
+await A.click(sh+'[data-a="rvok"]');await A.waitForTimeout(2000);
+await A.evaluate(()=>{if(sheets.length)closeSheet(true)});// foglio «Prezzi aumentati» dopo il salvataggio
+ok(await fino(A,([g,pz])=>!CODA.ris[g]&&!CODA.cloud.some(x=>x.id===g)&&Math.abs(D().prodotti.test_p1.prezzo-Math.round(pz*120)/100)<0.001,10000,[g1,pz]),'salvato: prezzo del pomodoro aggiornato, risultato tolto dal telefono e dal cloud');
+ok(await fino(A,async()=>(await fbInit().fs.collection('coda').get()).docs.every(d=>d.data().tipo!=='ris'),10000),'cloud: documento del risultato cancellato');
+// 4b. il Gemini di A non risponde: legge B (staff), A vede il risultato arrivare nel foglio aperto
+gem.A='503';risp.push(L2);const n0=letture.length;
+const g2=await fotoList(A,'test_f1',1);
+ok(await fino(A,g=>{const it=CODA.list.find(x=>x.grp===g);return!!it&&it.st==='errore'&&!it.busy},20000,g2),'A: Gemini non risponde, la foto resta in coda');
+ok(/Riprovo tra/.test(await A.innerText(sh+'#coda-stato')),'A: «Riprovo tra…» nel foglio del listino');
+ok(await fino(B,g=>CODA.list.some(x=>x.grp===g&&x.st==='errore'),20000,g2),'B prende la foto dal cloud, ma anche il suo Gemini è spento: resta in coda');
+gem.B='ok';await B.evaluate(()=>{for(const x of CODA.list)x.next=0;return codaFlush()});
+ok(await fino(A,g=>!!(S.rev&&S.rev.grp===g),30000,g2),'Gemini di B tornato: B legge la foto, su A si apre «Controlla e salva» da solo');
+ok(letture.slice(n0).some(x=>x.da==='A'&&x.foto)&&letture.slice(n0).some(x=>x.da==='B'&&x.foto),'A ha provato, B ha letto');
+ok(await A.evaluate(()=>S.rev.items.length===1&&/CAROTE/i.test(S.rev.items[0].nome)),'controllo: 1 riga (Carote) letta da B');
+ok(await B.evaluate(()=>CODA.list.length===0)&&!(await B.$('[data-a="codaRis"]')),'B (staff): coda vuota, nessuna striscia «Listino letto»');
+const nl2=await A.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='listino').length);
+ok(nl2===2,'un solo avviso nuovo ai gestori (risultato creato una volta sola) '+nl2);
+await A.evaluate(()=>closeSheet());await A.waitForTimeout(600);
+ok(await A.evaluate(()=>!document.querySelector('.sheet-wrap')),'A: chiuso «Controlla e salva», nessun foglio rimasto sotto');
+ok(await A.evaluate(()=>{S.tab='fornitori';render();return!!document.querySelector('[data-a="codaRis"]')}),'A: striscia «Listino letto» in Fornitori finché non salva');
+await A.click('[data-a="codaRisVia"]');
+ok(await fino(A,()=>!document.querySelector('[data-a="codaRis"]')&&!codaRisList().length,8000),'«Togli»: la striscia sparisce');
+gem.A='ok';gem.B='503';
 ok(A.errs.length===0&&B.errs.length===0,'nessun errore di pagina '+JSON.stringify([A.errs,B.errs]));
 await b.close();
 console.log(process.exitCode?'SOME FAIL':'ALL PASS');
