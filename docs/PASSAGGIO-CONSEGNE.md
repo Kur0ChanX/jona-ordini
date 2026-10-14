@@ -7,7 +7,7 @@ Versione lunga delle consegne vecchie (#85-#122): `git show eb9eccd:docs/PASSAGG
 ## Stato
 - Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR), già allineato a `main` dopo la v116.
 - **v115 online** (PR #124 unita 19:59 ora italiana, squash `5989d7a`, controllato `APP_VER=115` sul sito).
-- **v116 unita** (PR #125, squash `a4d96b2`, 20:42 ora italiana). Alla chiusura il sito diceva ancora `APP_VER=115` (Cloudflare stava pubblicando). **Prima cosa**: controllare una volta `APP_VER=116` su https://jona-ristorante-by-ynoy-corp.pages.dev/ (se non c'è dopo 15 minuti dall'unione: guardare il workflow `cloudflare-pages.yml`).
+- **v116 online** (PR #125, squash `a4d96b2`, unita 20:42; `APP_VER=116` controllato sul sito alle ~20:46 ora italiana).
 - Nessuna PR aperta, nessuna sveglia attiva di questa sessione. Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva.
 - Motore `claude-opus-5-5`, `effortLevel` `medium` in `.claude/settings.json` (`get_session` non dà `effort_level`).
 - Emulatore Firebase e server 8765 vanno riaccesi nella sessione nuova se servono (`tools/README.md`).
@@ -24,7 +24,7 @@ Versione lunga delle consegne vecchie (#85-#122): `git show eb9eccd:docs/PASSAGG
 - Mario non ha ancora provato bolla e listino veri sulla v115.
 
 ## ✅ PROSSIMI PASSI (#138, continuare da sola)
-1. Controllo una volta `APP_VER=116` online (vedi Stato). Poi segnare D55 «online» in `docs/DA-FARE.md`.
+1. Segnare D55 «online 14/10 20:46» in `docs/DA-FARE.md` (v116 già controllata online).
 2. Ricordare a Mario (già chiesto in #137, in attesa): fotografare una bolla vera e una foto di listino con la v115/v116, dirmi se si legge bene e quanti secondi.
 3. **D54 (d) letture sicure** (Mario: «che non sbagli a leggere dati sbagliati fuori riga o falsi o diversi o saltarli»): righe lette < 80% dell'ordine o troppi `rigaNonTorna` → seconda lettura con l'altro lettore e confronto; righe diverse → «da controllare a mano». Prova con foto vere di Mario (E22). Sarà v117. Prima un piano in 3 punti; domanda a Mario solo se serve un gusto.
 4. M44: quando Mario dice i secondi di «cannonau» (v112).
