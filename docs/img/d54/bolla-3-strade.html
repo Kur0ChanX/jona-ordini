@@ -1,0 +1,40 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8">
+<style>
+body{margin:0;padding-bottom:14px;width:390px;background:#f6f1e8;font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#222}
+h1{font-size:17px;margin:12px 14px 4px;text-align:center}
+.sub{font-size:11.5px;text-align:center;color:#555;margin:0 14px 8px}
+.card{margin:8px 10px;border-radius:12px;padding:10px 12px;background:#fff;box-shadow:0 1px 3px #0002;border-left:6px solid #999}
+.c1{border-left-color:#8a8a8a}.c2{border-left-color:#d08a1f}.c3{border-left-color:#2a8a4a}
+.t{font-weight:700;font-size:14.5px;margin-bottom:4px}
+.flow{display:flex;align-items:center;gap:4px;font-size:11px;margin:6px 0;flex-wrap:wrap}
+.b{background:#eee;border-radius:7px;padding:4px 6px;white-space:nowrap}
+.b.ok{background:#d9f2e1}.b.ko{background:#fbe0e0}.b.w{background:#fff0cc}
+.ar{color:#888}
+ul{margin:4px 0 0 16px;padding:0;font-size:11.5px;line-height:1.35}
+.pro{color:#1f6f3a}.con{color:#a33}
+.rec{margin:6px 10px 12px;background:#2a8a4a;color:#fff;border-radius:10px;padding:8px 12px;font-size:12.5px;font-weight:600;text-align:center}
+</style></head><body>
+<h1>Bolla di consegna · 3 strade</h1>
+<div class="sub">Foto fatta dal cameriere → letta dall'IA → anomalie a Maurizio</div>
+
+<div class="card c1"><div class="t">1 · Ovvia — tutto nel telefono</div>
+<div class="flow"><span class="b">📷 foto</span><span class="ar">→</span><span class="b ok">salvata nel telefono</span><span class="ar">→</span><span class="b w">l'IA legge (telefono)</span><span class="ar">→</span><span class="b">riprova ogni 2 min</span></div>
+<ul><li class="pro">Semplice: riusa Cantina (bozza + «rileggila tu»)</li>
+<li class="con">iPhone: con l'app chiusa NON riprova nulla</li>
+<li class="con">Android: in background solo a tratti</li></ul></div>
+
+<div class="card c2"><div class="t">2 · Furba — il server legge</div>
+<div class="flow"><span class="b">📷 foto</span><span class="ar">→</span><span class="b ok">invio al server (3 s)</span><span class="ar">→</span><span class="b w">il server legge con l'IA</span><span class="ar">→</span><span class="b">risultato nell'app</span></div>
+<ul><li class="pro">Il telefono può chiudersi subito</li>
+<li class="con">Serve un deposito nuovo sul server (foto + stato)</li>
+<li class="con">Più codice e più cose che si possono rompere</li></ul></div>
+
+<div class="card c3"><div class="t">3 · Geniale — legge chi è acceso</div>
+<div class="flow"><span class="b">📷 foto</span><span class="ar">→</span><span class="b ok">salvata nel telefono<br>+ in coda sul cloud (2 s)</span><span class="ar">→</span><span class="b w">la legge il primo<br>dispositivo aperto<br>(tablet cucina, Maurizio…)</span><span class="ar">→</span><span class="b ok">risultato a tutti</span></div>
+<ul><li class="pro">Foto mai persa: telefono + cloud</li>
+<li class="pro">Riprova finché va, anche con il telefono del cameriere chiuso</li>
+<li class="pro">Niente server nuovo: usa il cloud che c'è già</li>
+<li class="con">Se nessun dispositivo è aperto, legge al primo che si apre</li></ul></div>
+
+<div class="rec">Consiglio: 3 Geniale (+ in tutte: IA 2.5 Flash senza «ragionamento», più tempo per le foto)</div>
+</body></html>

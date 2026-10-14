@@ -163,7 +163,7 @@ function vnLeggi(txt){let a;try{const m=String(txt).match(/\{[\s\S]*\}/);a=JSON.
 function vnUnisci(f,r){for(const [k,x] of Object.entries(r)){if(k==='abb'){if(!f.abb.length)f.abb=x.slice();continue}if(k==='ia'){f.ia=x;continue}if(x&&!String(f[k]||'').trim())f[k]=x}
   if(r.tipo&&!f.id&&!f._tipo)f.tipo=r.tipo}
 // v106: caricamento vero (richiesta di Mario #125): secondi che passano, barra sul tempo solito di quel lettore (ultime 5 letture riuscite, jona_ia_t), secondi di ogni tentativo fallito
-const VN_TSOLITO={flash:20,lite:12,cf:30,mondo:10};
+const VN_TSOLITO={f25:15,l25:10,flash:20,lite:12,cf:30,mondo:10};
 function vnTSolito(l){const a=((ls('jona_ia_t')||{})[l])||[];return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):VN_TSOLITO[l]||20}
 function vnTSalva(l,sec){const t=ls('jona_ia_t')||{};t[l]=(t[l]||[]).concat(sec).slice(-5);ls('jona_ia_t',t)}
 function vnBusyH(f){const sol=f.bl?vnTSolito(f.bl):0;
@@ -227,9 +227,7 @@ function vnFotoDel(i){const f=S.vnf;if(f&&f.fotos&&f.fotos.splice(+i,1)[0])vnBoz
 function vnFotoVia(f){f.fotos=[];vnBozzaFoto(f)}
 // v96 (D45): bozza del vino se il telefono chiude l'app (fotocamera aperta o app in secondo piano), come jona_reg della registrazione.
 // Campi in localStorage jona_vn {f,t,cam,u}; foto piccole in IndexedDB (jona-kv, vn_fotos). Chiudere il foglio la cancella.
-function idbKv(k,v){return new Promise(res=>{try{const r=indexedDB.open('jona-kv',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onerror=()=>res(null);
-  r.onsuccess=()=>{const db=r.result;try{const t=db.transaction('kv',v===undefined?'readonly':'readwrite'),s=t.objectStore('kv'),q=v===undefined?s.get(k):v===null?s.delete(k):s.put(v,k);
-    t.oncomplete=()=>{db.close();res(v===undefined?q.result:true)};t.onerror=t.onabort=()=>{db.close();res(null)}}catch(e){db.close();res(null)}}}catch(e){res(null)}})}
+// idbKv (IndexedDB jona-kv) sta in index.html dalla v114 (la usa anche la coda delle bolle)
 const VN_IDB=()=>(DEMO?'demo:':'')+'vn_fotos';
 function vnBozza(cam,conF){const me=realU();if(!me)return;const f=conF===false?null:S.vnf;if(f&&f.chiusa)return;let c=null;
   if(f){c={};for(const [k,x] of Object.entries(f))if(!['fotos','busy','bl','rip','chiusa','ld','lg','lt'].includes(k))c[k]=x}

@@ -51,6 +51,7 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 - **E33** Controlli: check `prove` senza badare alle maiuscole, indirizzo `https://jona-ristorante-by-ynoy-corp.pages.dev/` senza index.html; prima di un'attesa lunga provare il comando una volta.
 - **E54** Mai `list_workflow_runs` (stampa il messaggio intero dello squash, migliaia di token): stato con `get_check_runs` (il numero del giro è nel suo `html_url`, `/runs/<id>/`); squash merge sempre con `commit_message` corto.
 - **E49** «App chiusa con la fotocamera aperta» = pagina nuova (`nuova()`), non reload; prima di dire «bloccato» guardare il passo del lavoro (`list_workflow_jobs`).
+- **E57** Prova che fallisce a caso con tempi lunghi: prima di alzare le attese, 5 giri sul codice originale + messaggi di diagnosi (in `test-coda` era un difetto vero: risultato ricreato da un telefono in ritardo). Niente «Mario» neanche nei commenti di `index.html` (`test-testbar`).
 
 ## Immagini, animazioni e disegni
 - **E16** Difetto segnalato in un'immagine: segnare le zone sullo screenshot di Mario e fargliele scegliere prima di correggere; poi prima/dopo sullo stesso punto.

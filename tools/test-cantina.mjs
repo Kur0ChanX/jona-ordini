@@ -109,24 +109,24 @@ await fc.setFiles([await fimg('a.png',44),await fimg('b.png',46)]);await wait(40
 ok(await pg.locator('.sheet .vn-fi').count()===3&&/Bastano 3 foto/.test(await txt('body'))&&await pg.locator('.sheet [data-a="vnFotoF"]').count()===0,'D44: massimo 3 foto, poi niente più pulsanti per aggiungerne');
 await sc('[data-a="vnFotoDel"][data-v="2"]');await wait(300);
 ok(await pg.locator('.sheet .vn-fi').count()===2,'D44: la X toglie una foto');
-gemFail='gemini-flash-latest';
+gemFail='gemini-2.5-flash';
 await sc('[data-a="vnFotoGo"]');await wait(900);gemFail='';
 const lastP=gemReq[gemReq.length-1].contents[0].parts;
 ok(lastP.length===3&&lastP[1].inline_data&&lastP[2].inline_data&&/2 foto della stessa bottiglia/.test(lastP[0].text),'D44: le 2 foto vanno all\'IA nella stessa richiesta');
-ok(gemUrl.slice(-2).map(u=>u.includes('/gemini-flash-latest:')?'flash':u.includes('/gemini-flash-lite-latest:')?'lite':'?').join()==='flash,lite','D44: Flash sovraccarico → legge Flash-Lite (stessi lettori dei listini)');
+ok(gemUrl.slice(-2).map(u=>u.includes('/gemini-2.5-flash:')?'f25':u.includes('/gemini-2.5-flash-lite:')?'l25':'?').join()==='f25,l25','D44: Flash sovraccarico → legge Flash-Lite (stessi lettori dei listini)');
 ok(await pg.inputValue('#vnf-n')==='Turriga'&&await pg.inputValue('#vnf-den')==='Isola dei Nuraghi IGT'&&await pg.locator('.sheet .vn-fi').count()===0,'D44: scheda riempita, riquadro delle foto chiuso');
 // v96: il motivo vero del passaggio a Flash-Lite si vede nel foglio e va nella scatola nera (Mario: «perché Lite?»)
-ok(/Letto da Gemini Flash-Lite\. Prima: Gemini Flash — Google ha risposto «sovraccarico» \(errore 503\)/.test(await txt('.sheet'))&&await pg.evaluate(()=>Object.keys(ERR.seen).some(k=>/Vino: Gemini Flash non ha letto \(errore 503\)/.test(k))),'v96: «Letto da Gemini Flash-Lite» con il motivo vero (503) nel foglio e nella scatola nera');
+ok(/Letto da Gemini 2\.5 Flash-Lite\. Prima: Gemini 2\.5 Flash — Google ha risposto «sovraccarico» \(errore 503\)/.test(await txt('.sheet'))&&await pg.evaluate(()=>Object.keys(ERR.seen).some(k=>/Vino: Gemini 2\.5 Flash non ha letto \(errore 503\)/.test(k))),'v96: «Letto da Gemini Flash-Lite» con il motivo vero (503) nel foglio e nella scatola nera');
 // Cloudflare con più foto che non risponde: riprova con il solo fronte
 const cf=await pg.evaluate(async()=>{const vero=gemCall,log=[];
   gemCall=async(b,l)=>{const n=b.contents[0].parts.length-1;log.push(l+n);return l==='cf'?(n>1?{st:400,msg:'troppe immagini'}:{txt:'{"nome":"Prova CF","cantina":"X","sicuro":true}',lettore:'cf'}):{st:503}};
   try{await modLoad('cantina');vnForm(null);const c=document.createElement('canvas');c.width=30;c.height=30;const bl=await new Promise(r=>c.toBlob(r,'image/png'));
     await vnIaGo([new File([bl],'f.png',{type:'image/png'}),new File([bl],'r.png',{type:'image/png'})]);return{log:log.join(),n:S.vnf.n}}finally{gemCall=vero}});
-ok(cf.log==='flash2,lite2,cf2,cf1'&&cf.n==='Prova CF','D44: Cloudflare non accetta 2 foto → riprova col fronte: '+cf.log);
+ok(cf.log==='f252,l252,cf2,cf1'&&cf.n==='Prova CF','D44: Cloudflare non accetta 2 foto → riprova col fronte: '+cf.log);
 // v106 (#125, Mario: «un caricamento vero per far vedere che non si è bloccato e quanto ci mette»): secondi, barra, tempo solito, secondi dei tentativi falliti
 await sc('[data-a="closeSheet"]');await wait(300);
-await pg.evaluate(async()=>{ls('jona_ia_t',{lite:[6,8]});window._vero=gemCall;window._lib=null;
-  gemCall=(b,l)=>l==='flash'?new Promise(r=>setTimeout(()=>r({st:503}),1200)):new Promise(r=>{window._lib=()=>r({txt:'{"nome":"Prova Tempo","cantina":"Y","sicuro":true}',lettore:'lite'})});
+await pg.evaluate(async()=>{ls('jona_ia_t',{l25:[6,8]});window._vero=gemCall;window._lib=null;
+  gemCall=(b,l)=>l==='f25'?new Promise(r=>setTimeout(()=>r({st:503}),1200)):new Promise(r=>{window._lib=()=>r({txt:'{"nome":"Prova Tempo","cantina":"Y","sicuro":true}',lettore:'l25'})});
   await modLoad('cantina');vnForm(null);const c=document.createElement('canvas');c.width=30;c.height=30;const bl=await new Promise(r=>c.toBlob(r,'image/png'));
   window._go=vnIaGo([new File([bl],'f.png',{type:'image/png'})])});
 await wait(600);
@@ -134,11 +134,11 @@ const w1=await pg.evaluate(()=>parseFloat(document.getElementById('vn-bar').styl
 const s1=await txt('#vn-sec');
 await wait(1900);
 const live=await txt('.sheet .vn-busy'),w2=await pg.evaluate(()=>parseFloat(document.getElementById('vn-bar').style.width)||0);
-ok(/s in tutto/.test(s1)&&/di solito Flash ci mette circa 20 s/.test(s1),'v106: contasecondi e tempo solito di Flash ('+s1+')');
-ok(/✗ Gemini Flash: Google ha risposto «sovraccarico» \(errore 503\) · 1 s/.test(live)&&/di solito Flash-Lite ci mette circa 7 s/.test(live)&&/^[23] s in tutto/.test(await txt('#vn-sec')),'v106: secondi del tentativo fallito e tempo solito di Flash-Lite dalle letture vere ('+live.replace(/\n/g,' / ')+')');
+ok(/s in tutto/.test(s1)&&/di solito 2\.5 Flash ci mette circa 15 s/.test(s1),'v106: contasecondi e tempo solito di Flash ('+s1+')');
+ok(/✗ Gemini 2\.5 Flash: Google ha risposto «sovraccarico» \(errore 503\) · 1 s/.test(live)&&/di solito 2\.5 Flash-Lite ci mette circa 7 s/.test(live)&&/^[23] s in tutto/.test(await txt('#vn-sec')),'v106: secondi del tentativo fallito e tempo solito di Flash-Lite dalle letture vere ('+live.replace(/\n/g,' / ')+')');
 ok(w1>0&&w2>0&&w2<=97,'v106: la barra si muove ('+w1+'% → '+w2+'%)');
 await pg.evaluate(async()=>{window._lib();await window._go;gemCall=window._vero});
-ok(await pg.evaluate(()=>{const t=ls('jona_ia_t');return t.lite.length===3&&t.lite[2]>=1&&!S.vnf.busy})&&await pg.locator('.sheet .vn-busy').count()===0,'v106: lettura finita, tempo salvato per la prossima volta, riquadro chiuso');
+ok(await pg.evaluate(()=>{const t=ls('jona_ia_t');return t.l25.length===3&&t.l25[2]>=1&&!S.vnf.busy})&&await pg.locator('.sheet .vn-busy').count()===0,'v106: lettura finita, tempo salvato per la prossima volta, riquadro chiuso');
 await sc('[data-a="closeSheet"]');await wait(300);
 // v107 (idea #126 scelta da Mario): «Rileggila tu più tardi» → l'app riprova da sola, la foto resta, il telefono vibra quando ha letto
 const v107=async(failN)=>pg.evaluate(async n=>{window._n=0;window._vib=[];navigator.vibrate=p=>{window._vib.push(p);return true};
