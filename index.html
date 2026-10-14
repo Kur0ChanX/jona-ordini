@@ -1234,8 +1234,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=112;
+const APP_VER=113;
 const NEWS=[
+  {v:113,data:'2026-10-14',titolo:'Foto di bolle, listini e vini: lettori più veloci',
+    chef:['Le foto di bolle, listini, fatture ed etichette dei vini ora le legge Gemini 2.5 Flash senza «ragionare», con Flash-Lite di riserva: meno attese e meno blocchi dopo 45 secondi.','Se una lettura va oltre 30 secondi resta una riga nella scatola nera: così vediamo i tempi veri.'],
+    dev:['`GEM_LETT` = `f25` → `l25` → `cf` (prima `flash`/`lite` = Gemini 3, ragiona di partenza); `gemCall` aggiunge a `f25` `thinkingConfig.thinkingBudget:0` (400 → senza), `gemLenta` scrive «Lettura lenta» oltre `GEM_LENTA` 30 s. Worker: con `inline_data` il lettore ha `GEM_FOTO_MS` 70 s (testo: `GEM_TRY_MS` 45 s), sempre sotto `GEM_BUDGET` 85 s. v93 spostata in `data/news.json` (E55). Prove in `test-bolla`, `test-gemini-server`, `test-cantina`.']},
   {v:112,data:'2026-10-14',titolo:'Vini: ricerca più veloce e calice disegnato a mano',
     chef:['«Cerca su internet» è più veloce: due IA cercano insieme e vince la prima che risponde. Se Google è lento, dopo pochi secondi ti mostra i vini che l\'IA conosce.','Mentre cerca vedi un calice da rosso disegnato a mano: il vino scende dall\'alto, oscilla e sale fino all\'orlo quando arrivano i vini.'],
     dev:['`vnMondoCerca`: gara `l25`+`f25` con la ricerca Google (prima uno dopo l\'altro, fino a 45 s del Worker per un lettore fermo), chi perde riceve lo stop (`gemCall(body,lettore,sig)`, AbortSignal); senza Google (`lite`, poi `flash`) dopo `VN_MONDO.mem` 15 s o se Google fallisce, usata solo dopo `VN_MONDO.max` 22 s; stop a 50 s; «Vino nel mondo lenta» nella scatola nera. Calice a mano (`tools/calice-mano.mjs` → `VN_CAL`, `VN_CALW`): getto `.vn-getto`, cerchi, oscillazione `.vn-slosh`, acquerello fermo `.vn-calw` (spento con `lite`), tempo solito al massimo 22 s (`vnMondoT`). v92 spostata in `data/news.json` (E55). Prove in `test-cantina`.']},
@@ -1294,9 +1297,6 @@ const NEWS=[
   {v:94,data:'2026-10-12',titolo:'Bar: passaggi numerati',
     tutti:['Ogni cocktail ha i passaggi numerati, uno per riga, con i trucchi del bancone.'],
     dev:['D43: `tools/cocktail.txt` campo 6 = passi separati da « / » (3-5, controllo in `tools/cocktail.py`), `data/cocktail.json` `c[6]` lista; `brCk` li mostra in `.br-ol` (il vecchio file con la frase va ancora). Prova in `tools/test-bar.mjs`.']},
-  {v:93,data:'2026-10-12',titolo:'Cantina: fronte e retro della bottiglia',
-    tutti:['Fotografando un vino ora puoi aggiungere anche il retro dell\'etichetta (fino a 3 foto): l\'IA le legge insieme e la scheda viene più precisa.','Ogni foto si può togliere prima di leggere; c\'è anche «Galleria» per le foto già fatte.'],
-    dev:['D44: `vnFotoAdd`/`vnFotoH` (riquadro con le miniature, `VN_FMAX` 3, «Leggi con l\'IA» `vnFotoGo`), `vnIaGo` usa i lettori `GEM_LETT` come i listini (tutte le foto in una richiesta; Cloudflare riprova con la sola prima foto), lettore dal vivo nel riquadro «L\'IA sta…». Prova in `tools/test-cantina.mjs`.','Barra Test: vista «Bar» in fondo (`VIEW_AS.bar`, staff di sala con mansione Bartender) per provare ciò che vede il barista (prova `tools/test-testbar.mjs`).']},
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -3032,7 +3032,14 @@ function gemSrvOk(){if(gemSrv.ok!==null)return Promise.resolve(gemSrv.ok);if(!pu
 const gemOn=()=>!!gemKey()||(!!gemSrv.ok&&pushFb());
 const gemTxt=j=>((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n').trim();
 // v112: sig = AbortSignal facoltativo (la gara della ricerca vini ferma il lettore che perde)
-async function gemCall(body,lettore,sig){const k=gemKey();let last='',st=0,srv=false;
+// v113 (Mario #132: «non usare gemini 3», «flash dopo 45 secondi si blocca»): le foto le leggono Gemini 2.5 Flash (f25) e Flash-Lite (l25), non più «flash»/«lite» (oggi = Gemini 3, ragiona di partenza → lento).
+// A f25 si spegne il ragionamento (thinkingBudget 0, come vnMondo); se Google risponde 400 la stessa richiesta senza. Una lettura riuscita oltre GEM_LENTA s va nella scatola nera.
+const GEM_LENTA=30;
+async function gemCall(body,lettore,sig){const t0=Date.now(),gc=body.generationConfig||{};
+  if(lettore==='f25'&&!gc.thinkingConfig){const r=await gemCall1(Object.assign({},body,{generationConfig:Object.assign({},gc,{thinkingConfig:{thinkingBudget:0}})}),lettore,sig);if(r.st!==400)return gemLenta(r,lettore,t0)}
+  return gemLenta(await gemCall1(body,lettore,sig),lettore,t0)}
+function gemLenta(r,lettore,t0){const s=Math.round((Date.now()-t0)/1000);if(r.txt&&lettore&&s>GEM_LENTA)errLog('Lettura lenta: '+gemNome(lettore)+' '+s+' s');return r}
+async function gemCall1(body,lettore,sig){const k=gemKey();let last='',st=0,srv=false;
   try{if(k&&lettore){if(!GEM_DIR[lettore])return{st:0,salta:true};const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEM_DIR[lettore]+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body),signal:sig});
       const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j),lettore};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status}
     else if(k){for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body),signal:sig});
@@ -3090,8 +3097,8 @@ const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(S
 // al successivo, il motivo preso SOLO dal codice vero della risposta (503 sovraccarico, 429 limite, 504/524 nessuna risposta in tempo).
 const GEM_RETRY=/^(429|500|502|503|504|524|404)$/;
 const GEM_DIR={flash:'gemini-flash-latest',lite:'gemini-flash-lite-latest',f25:'gemini-2.5-flash',l25:'gemini-2.5-flash-lite'};
-const GEM_LETT=[['flash','Gemini Flash','il più preciso'],['lite','Gemini Flash-Lite','riserva veloce di Google'],['cf','Cloudflare Llama 4','riserva gratis fuori da Google']];
-const gemNome=l=>({f25:'Gemini 2.5 Flash',l25:'Gemini 2.5 Flash-Lite'})[l]||(GEM_LETT.find(x=>x[0]===l)||[0,'Gemini'])[1];
+const GEM_LETT=[['f25','Gemini 2.5 Flash','il più preciso'],['l25','Gemini 2.5 Flash-Lite','riserva veloce di Google'],['cf','Cloudflare Llama 4','riserva gratis fuori da Google']];
+const gemNome=l=>({f25:'Gemini 2.5 Flash',l25:'Gemini 2.5 Flash-Lite',flash:'Gemini Flash',lite:'Gemini Flash-Lite'})[l]||(GEM_LETT.find(x=>x[0]===l)||[0,'Gemini'])[1];
 function gemPerche(l,st){const chi=l==='cf'?'Cloudflare':'Google';
   return st===503?chi+' ha risposto «sovraccarico» (errore 503)':st===429?chi+' ha risposto «limite di richieste raggiunto» (errore 429)'
     :st===504||st===524?'nessuna risposta in tempo (errore '+st+'): l\'app passa avanti per non farti aspettare'

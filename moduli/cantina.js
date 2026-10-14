@@ -163,7 +163,7 @@ function vnLeggi(txt){let a;try{const m=String(txt).match(/\{[\s\S]*\}/);a=JSON.
 function vnUnisci(f,r){for(const [k,x] of Object.entries(r)){if(k==='abb'){if(!f.abb.length)f.abb=x.slice();continue}if(k==='ia'){f.ia=x;continue}if(x&&!String(f[k]||'').trim())f[k]=x}
   if(r.tipo&&!f.id&&!f._tipo)f.tipo=r.tipo}
 // v106: caricamento vero (richiesta di Mario #125): secondi che passano, barra sul tempo solito di quel lettore (ultime 5 letture riuscite, jona_ia_t), secondi di ogni tentativo fallito
-const VN_TSOLITO={flash:20,lite:12,cf:30,mondo:10};
+const VN_TSOLITO={f25:15,l25:10,flash:20,lite:12,cf:30,mondo:10};
 function vnTSolito(l){const a=((ls('jona_ia_t')||{})[l])||[];return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):VN_TSOLITO[l]||20}
 function vnTSalva(l,sec){const t=ls('jona_ia_t')||{};t[l]=(t[l]||[]).concat(sec).slice(-5);ls('jona_ia_t',t)}
 function vnBusyH(f){const sol=f.bl?vnTSolito(f.bl):0;

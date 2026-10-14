@@ -145,6 +145,7 @@ const GEM_MODELS = ["gemini-flash-latest", "gemini-flash-lite-latest", "gemini-2
 const GEM_MAX_WAIT = 25000;
 const GEM_BUDGET = 85000;   // tempo massimo di una richiesta: Cloudflare la chiude a 100 s con l'errore 524
 const GEM_TRY_MS = 45000;   // un modello che non risponde entro questo tempo lascia il posto al successivo (Lite, più veloce)
+const GEM_FOTO_MS = 70000;  // v113 (Mario #132: «flash dopo 45 secondi si blocca»): con una foto (bolla, listino, etichetta) il lettore ha più tempo, sempre sotto GEM_BUDGET
 const GEM_MAX_BODY = 20 * 1024 * 1024;
 // v68: lettori delle foto, nell'ordine in cui li prova l'app (il più preciso per primo); cf = ripiego gratis fuori da Google
 // v110: f25/l25 = Gemini 2.5, l'unico con la ricerca Google (grounding) nel piano gratis (500 al giorno, Flash e Flash-Lite insieme)
@@ -466,10 +467,12 @@ async function gemini(request, env) {
     const l = String(req.lettore);
     if (!LETTORI[l]) return geminiErr("lettore sconosciuto", 400);
     if (l === "cf") return await leggiCf(req, env, Number(env.CF_MS) || CF_MS);
+    const conFoto = req.contents.some(c => c && Array.isArray(c.parts) && c.parts.some(p => p && p.inline_data));
+    const tMs = conFoto ? Math.min(Number(env.GEM_FOTO_MS) || GEM_FOTO_MS, budget) : tryMs;
     let r, j;
     // v106: «sovraccarico» (503) di Google spesso dura pochi secondi: un secondo tentativo dopo 2,5 s prima di passare al lettore dopo
     for (let t = 0; t < 2; t++) {
-      const resto = tryMs - (Date.now() - start);
+      const resto = tMs - (Date.now() - start);
       if (t && resto < 8000) break;
       try {
         r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${LETTORI[l]}:generateContent`, {
@@ -481,7 +484,7 @@ async function gemini(request, env) {
         const tx = await r.text();
         try { j = JSON.parse(tx); } catch (e) { j = {}; }
       } catch (e) {
-        return lettoreErr(l, "Google non ha risposto entro " + Math.round(tryMs / 1000) + " s", 504, "lento");
+        return lettoreErr(l, "Google non ha risposto entro " + Math.round(tMs / 1000) + " s", 504, "lento");
       }
       if (r.status !== 503 || t) break;
       await sleep(Number(env.GEM_503_MS) || 2500);

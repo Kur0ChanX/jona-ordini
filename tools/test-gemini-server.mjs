@@ -58,7 +58,7 @@ calls.length=0;plan=['404','ok'];r=await call(req(GOOD));ok(r.s===200&&calls[1].
 calls.length=0;plan=['400'];r=await call(req(GOOD));ok(r.s===400&&calls.length===1&&/API key/.test(r.j.error.message),'other errors passed through without retry');
 r=await call(req(GOOD,{nope:1}));ok(r.s===400,'request without contents: 400');
 // v65: Gemini troppo lento (errore 524 di Cloudflare a 100 s): tempo massimo per modello e per richiesta
-const envT={...env,GEM_TRY_MS:'400',GEM_BUDGET:'3700'};
+const envT={...env,GEM_TRY_MS:'400',GEM_FOTO_MS:'400',GEM_BUDGET:'3700'};
 calls.length=0;plan=['slow','ok'];t=Date.now();r=await call(req(GOOD),envT);
 ok(r.s===200&&calls.map(c=>c.m).join()==='gemini-flash-latest,gemini-flash-lite-latest'&&Date.now()-t<2000,'slow model: gives up after GEM_TRY_MS and answers with the Lite model ('+(Date.now()-t)+' ms)');
 calls.length=0;plan=['slow','slow','slow'];t=Date.now();r=await call(req(GOOD),envT);
@@ -82,6 +82,14 @@ ok(r.s===503&&r.j.error.motivo==='sovraccarico'&&calls.length===2,'v106 lettore 
 calls.length=0;plan=['slow'];t=Date.now();r=await call(reqL('flash'),envT);
 ok(r.s===504&&r.j.error.motivo==='lento'&&Date.now()-t<1500,'lettore flash slow: 504 lento after GEM_TRY_MS');
 r=await call(reqL('pro'));ok(r.s===400,'unknown lettore: 400');
+// v113 (Mario #132): con una foto il lettore ha GEM_FOTO_MS (più di GEM_TRY_MS), col solo testo resta GEM_TRY_MS
+const envF={...envT,GEM_FOTO_MS:'900'};let dt;
+calls.length=0;plan=['slow'];t=Date.now();r=await call(reqL('f25'),envF);dt=Date.now()-t;
+ok(r.s===504&&r.j.error.motivo==='lento'&&dt>=850&&dt<1600&&/entro 1 s/.test(r.j.error.message)&&calls[0].m==='gemini-2.5-flash','v113 lettore f25 with photo, slow: gives up after GEM_FOTO_MS not GEM_TRY_MS ('+dt+' ms)');
+calls.length=0;plan=['slow'];t=Date.now();r=await call(req(GOOD,{contents:[{parts:[{text:'solo testo'}]}],generationConfig:{temperature:0},lettore:'f25'}),envF);dt=Date.now()-t;
+ok(r.s===504&&r.j.error.motivo==='lento'&&dt<800,'v113 lettore f25 text only: still GEM_TRY_MS ('+dt+' ms)');
+calls.length=0;plan=['slow'];t=Date.now();r=await call(reqL('f25'),{...envF,GEM_BUDGET:'500'});dt=Date.now()-t;
+ok(r.s===504&&dt<800,'v113 GEM_FOTO_MS never above GEM_BUDGET ('+dt+' ms)');
 calls.length=0;r=await call(reqL('cf'));ok(r.s===502&&r.j.error.motivo==='manca'&&calls.length===0,'lettore cf without the AI binding: 502 manca, Google not called');
 const aiCalls=[];let aiPlan='ok';
 const envAI={...env,CF_MS:'400',AI:{run:async(m,inp)=>{aiCalls.push({m,inp});if(aiPlan==='3040')throw new Error('3040: Capacity temporarily exceeded, please try again.');
@@ -149,26 +157,26 @@ await pg.evaluate(()=>gemRun());
 let ir=await pg.evaluate(()=>window._ir);
 ok(srv.parts.join()==='2,2','two photos: two requests with one photo each ('+srv.parts.join()+')');
 ok(ir.length===1&&ir[0][1]==='fornitore;codice;nome;unita;prezzo;categoria\nDAC;1;Prodotto 1;kg;1,50;Carne\nDAC;2;Prodotto 2;kg;2,50;Carne','tables joined: one header, no code fences');
-ok(srv.lett.join()==='flash,flash','v68: each photo asks Gemini Flash first ('+srv.lett.join()+')');
+ok(srv.lett.join()==='f25,f25','v68/v113: each photo asks Gemini 2.5 Flash first ('+srv.lett.join()+')');
 srv.parts=[];srv.lett=[];srv.seq=['ok','524','503','429'];
 await pg.evaluate(()=>{window._ir=[];S.imp.gres=null;S.imp.busy=false});await pg.evaluate(()=>gemRun());
 let st=await pg.evaluate(()=>({err:S.imp.err,busy:S.imp.busy,ir:window._ir.length}));
-ok(srv.parts.length===4&&srv.lett.join()==='flash,flash,lite,cf'&&st.ir===0&&!st.busy,'v68: photo 2 fails on all three readers, in order ('+srv.lett.join()+')');
-ok(/^Foto 2 di 2: nessun lettore è riuscito/.test(st.err)&&/Gemini Flash: nessuna risposta in tempo \(errore 524\)/.test(st.err)&&/Gemini Flash-Lite: Google ha risposto «sovraccarico» \(errore 503\)/.test(st.err)&&/Cloudflare Llama 4: Cloudflare ha risposto «limite di richieste raggiunto» \(errore 429\)/.test(st.err)&&/già lette restano/.test(st.err),'v68: the error lists each reader with the real code ('+st.err+')');
+ok(srv.parts.length===4&&srv.lett.join()==='f25,f25,l25,cf'&&st.ir===0&&!st.busy,'v68: photo 2 fails on all three readers, in order ('+srv.lett.join()+')');
+ok(/^Foto 2 di 2: nessun lettore è riuscito/.test(st.err)&&/Gemini 2\.5 Flash: nessuna risposta in tempo \(errore 524\)/.test(st.err)&&/Gemini 2\.5 Flash-Lite: Google ha risposto «sovraccarico» \(errore 503\)/.test(st.err)&&/Cloudflare Llama 4: Cloudflare ha risposto «limite di richieste raggiunto» \(errore 429\)/.test(st.err)&&/già lette restano/.test(st.err),'v68: the error lists each reader with the real code ('+st.err+')');
 srv.parts=[];srv.seq=['ok'];await pg.evaluate(()=>gemRun());
 ir=await pg.evaluate(()=>window._ir);
 ok(srv.parts.length===1&&ir.length===1&&/Prodotto 3/.test(ir[0][1])&&/Prodotto 4/.test(ir[0][1]),'second tap reads only the missing photo and keeps the first ('+srv.parts.length+' request)');
 srv.parts=[];srv.seq=['503','ok'];await pg.evaluate(()=>{window._ir=[];S.imp.gres=null;S.imp.photos=S.imp.photos.slice(0,1)});await pg.evaluate(()=>gemRun());
 ok(srv.parts.length===2&&(await pg.evaluate(()=>window._ir.length))===1,'one photo, 503 then ok: automatic second try');
 const lett=await pg.evaluate(()=>S.rev&&S.rev.lett||S.imp.gnote);
-ok(lett&&lett.length===1&&lett[0].l==='lite'&&lett[0].log[0].l==='flash'&&lett[0].log[0].st===503,'v68: note says Flash-Lite read it after Flash answered 503 ('+JSON.stringify(lett)+')');
+ok(lett&&lett.length===1&&lett[0].l==='l25'&&lett[0].log[0].l==='f25'&&lett[0].log[0].st===503,'v68: note says Flash-Lite read it after Flash answered 503 ('+JSON.stringify(lett)+')');
 // banner dal vivo: chi legge e contasecondi, poi motivo vero del passaggio
 srv.parts=[];srv.lett=[];srv.seq=['503','hold'];
 await pg.evaluate(()=>{window._ir=[];S.imp.gres=null;S.imp.busy=false;window.refreshSheet=()=>{const I=S.imp;let d=document.getElementById('gl');if(!d){d=document.createElement('div');d.id='gl';document.body.appendChild(d)}d.innerHTML=I&&I.busy?fotoStage(I):''}});
 const run=pg.evaluate(()=>gemRun());
-await pg.waitForFunction(()=>S.imp.glive&&S.imp.glive.l==='lite');await pg.waitForTimeout(2300);
+await pg.waitForFunction(()=>S.imp.glive&&S.imp.glive.l==='l25');await pg.waitForTimeout(2300);
 const live=await pg.locator('#gl #gem-live').innerText();
-ok(/✗ Gemini Flash: Google ha risposto «sovraccarico» \(errore 503\)/.test(live)&&/Legge Gemini Flash-Lite \(riserva veloce di Google\)/.test(live),'v68: live banner shows the real reason and who is reading now ('+live.replace(/\n/g,' / ')+')');
+ok(/✗ Gemini 2\.5 Flash: Google ha risposto «sovraccarico» \(errore 503\)/.test(live)&&/Legge Gemini 2\.5 Flash-Lite \(riserva veloce di Google\)/.test(live),'v68: live banner shows the real reason and who is reading now ('+live.replace(/\n/g,' / ')+')');
 ok(Number(await pg.locator('#gem-sec').innerText())>=2,'v68: the seconds counter moves while reading');
 srv.release();await run;
 ok(await pg.evaluate(()=>!S.imp.busy&&!S.imp.glive&&window._ir.length===1),'v68: reading done, live state cleared');

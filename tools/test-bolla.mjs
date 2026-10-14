@@ -5,7 +5,7 @@ const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 const ctx=await b.newContext({viewport:{width:390,height:800},deviceScaleFactor:1});
 await ctx.route('**/firebase-config.js',r=>r.fulfill({contentType:'application/javascript',body:'self.JONA_FIREBASE=null'}));
 // Gemini finto: risponde con la tabella della bolla (o con un errore 503 se GUASTO)
-let GUASTO=false,chiamate=0;
+let GUASTO=false,chiamate=0,NO_TB=false;const corpi=[];
 const BOLLA=['fornitore;codice;nome;unita;prezzo;categoria;quantita;importo',
   'Prova;40;MOZZARELLA FIOR DI LATTE BUSTA;kg;11,00;Latticini;5;55,00',
   'Prova;;Pomodori ciliegino rossi;pz;2,00;Frutta e verdura;2;4,00',
@@ -13,6 +13,9 @@ const BOLLA=['fornitore;codice;nome;unita;prezzo;categoria;quantita;importo',
   'Prova;;Burrata pugliese;pz;3,00;Latticini;1;3,00',
   'Prova;;Spese di trasporto;;5,00;Altro;1;5,00'].join('\n');
 await ctx.route('https://generativelanguage.googleapis.com/**',r=>{chiamate++;
+  const bo=JSON.parse(r.request().postData()||'{}'),tb=((bo.generationConfig||{}).thinkingConfig||{}).thinkingBudget;
+  corpi.push({m:(r.request().url().match(/models\/([^:]+):/)||[])[1],tb});
+  if(NO_TB&&tb===0)return r.fulfill({status:400,contentType:'application/json',body:JSON.stringify({error:{message:'thinking not supported'}})});
   if(GUASTO)return r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:{message:'overloaded'}})});
   r.fulfill({contentType:'application/json',body:JSON.stringify({candidates:[{content:{parts:[{text:BOLLA}]}}]})})});
 const pg=await ctx.newPage();
@@ -87,6 +90,20 @@ const m=await pg.evaluate(()=>{const r=bolMatch([{nome:'Farina 00 Caputo',codice
   [{nome:'FARINA INTEGRALE BIO',codice:''},{nome:'Farina 00 Caputo pizzeria',codice:''}]);return[...r.ri]});
 ok(JSON.stringify(m.sort())===JSON.stringify([[0,1],[1,0]]),'abbinamento: ogni riga della bolla una volta sola '+JSON.stringify(m));
 ok(chiamate>=2,'Gemini chiamato');
+// v113 (Mario #132): la bolla la legge Gemini 2.5 Flash senza ragionamento; se Google rifiuta (400) la stessa richiesta senza thinkingConfig
+ok(corpi[0].m==='gemini-2.5-flash'&&corpi[0].tb===0,'v113: primo lettore gemini-2.5-flash con thinkingBudget 0 '+JSON.stringify(corpi[0]));
+ok(corpi.every(c=>/^gemini-2\.5-flash(-lite)?$/.test(c.m)&&(c.m==='gemini-2.5-flash-lite'||c.tb===0)),'v113: tutte le letture della bolla con Gemini 2.5 (f25 senza ragionamento, poi l25; niente Gemini 3) '+JSON.stringify(corpi.map(c=>c.m+':'+c.tb)));
+corpi.length=0;NO_TB=true;
+await pg.evaluate(()=>closeSheet());await wait(200);
+const oid2=await pg.evaluate(async()=>{const fid=Object.keys(D().fornitori)[0];const id='ord_bolla2';
+  await put('ordini',id,{fornitoreId:fid,stato:'inviato',inviato:now()-3600e3,creato:now()-7200e3,aggiornato:now(),richieste:[],
+    items:[{key:'k1',nome:'Mozzarella fior di latte',codice:'040',unita:'kg',prezzo:10,qta:5,da:[]}]});return id});
+await pg.evaluate(id=>receiveSheet(id),oid2);await wait(300);
+await pg.evaluate(async id=>{const c=document.createElement('canvas');c.width=60;c.height=80;c.getContext('2d').fillRect(0,0,20,20);
+  const bl=await new Promise(r=>c.toBlob(r,'image/jpeg'));await setBolla(id,[new File([bl],'bolla.jpg',{type:'image/jpeg'})])},oid2);await wait(300);
+await pg.click('[data-a="bolLeggi"]');await pg.waitForSelector('#bol-esito');
+ok(corpi.length===2&&corpi[0].tb===0&&corpi[1].tb===undefined&&corpi[1].m==='gemini-2.5-flash'&&await pg.evaluate(id=>rcvState(id).lines[0].st==='ok',oid2),'v113: Google rifiuta thinkingBudget (400) → stessa richiesta a f25 senza thinkingConfig, bolla letta '+JSON.stringify(corpi));
+await pg.evaluate(()=>closeSheet());await wait(200);
 ok(errs.length===0,'no pageerror '+JSON.stringify(errs));
 await b.close();
 console.log(process.exitCode?'SOME FAIL':'ALL PASS');
