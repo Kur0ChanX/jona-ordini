@@ -89,7 +89,7 @@ ok(o2.prezziDiversi===1&&!o2.bolla,'ordine già controllato: prezziDiversi 1, ni
 await fino(A,()=>Object.values(D().notifiche).some(n=>n.tipo==='bolla'&&n.rif==='test_o2'),20000);
 const n2=await A.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='bolla'&&n.rif==='test_o2')[0]);
 ok(n2&&/Foto di Luca Prova\.$/.test(n2.testo),'avviso: «Foto di Luca Prova.» senza «ancora da controllare» '+JSON.stringify(n2&&n2.testo));
-ok(await fino(B,()=>CODA.list.length===0,30000),'B: coda vuota dopo la lettura di A');
+ok(await fino(B,()=>CODA.list.length===0,30000),'B: coda vuota dopo la lettura di A '+await B.evaluate(()=>JSON.stringify(CODA.list.map(x=>({st:x.st,n:x.n,busy:x.busy,err:x.err}))))+' cloud '+await B.evaluate(()=>JSON.stringify(CODA.cloud.map(x=>({st:x.st,lk:x.lk,oid:x.oid})))));
 
 // ---------- 3. lucchetto di un altro telefono: rispettato finché non scade ----------
 await mkOrd('test_o3');await A.waitForTimeout(1200);

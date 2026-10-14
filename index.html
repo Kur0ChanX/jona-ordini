@@ -2976,9 +2976,13 @@ async function codaLeggi(it){it.busy=true;it.t0=now();it.n=(it.n||0)+1;it.err=''
     else if(it.tipo==='listino')await codaRisPezzo(it,txt,lett);else await codaApplica(it,rows,lett,alt);
     it.st='fatta';it.err='';CODA.fatte[it.id]=now();codaFine(it);await codaVia(it);if(it.grp)codaGruppo(it.grp);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return true}
   catch(e){const m=(e&&e.msg)||'Non riesco a contattare Gemini.';it.err=m;it.st='errore';it.next=now()+(e&&e.foto?CODA_T.poi:it.n<=CODA_T.riMax?CODA_T.ri:CODA_T.poi);
-    await codaSalva();if(codaCloud())codaCol().doc(it.id).update({st:'errore',err:m,n:it.n,vuote:it.vuote||0,at:0}).catch(()=>{});
+    await codaSalva();if(codaCloud()&&await codaErrCloud(it,m)==='fatta')await codaVia(it);
     errLog('Bolla in coda: '+m+' (tentativo '+it.n+')');return false}
   finally{it.busy=false;refreshSheet()}}
+// v117: l'errore va sul cloud solo se nel frattempo un altro telefono non l'ha già letta («fatta» non si sovrascrive)
+async function codaErrCloud(it,m){const ref=codaCol().doc(it.id),d={st:'errore',err:m,n:it.n,vuote:it.vuote||0,at:0};
+  try{return await fbInit().fs.runTransaction(async t=>{const s=await t.get(ref);if(s.exists&&s.data().st==='fatta')return'fatta';if(s.exists)t.update(ref,d);return''})}
+  catch(e){ref.update(d).catch(()=>{});return''}}
 function codaFine(it){if(!codaCloud())return;codaCol().doc(it.id).update(Object.assign({st:'fatta',fatto:now(),lk:codaDev(),err:'',n:it.n||0,foto:firebase.firestore.FieldValue.delete()},it.grp?{txt:it.txt||'',l:it.l||'',ko:!!it.ko}:{})).catch(()=>{})}
 // due letture senza righe = foto non leggibile: lo sanno chi ha scattato e i gestori, la voce esce dalla coda
 async function codaIlleggibile(it){
