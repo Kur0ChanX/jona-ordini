@@ -1,4 +1,5 @@
-# Ultimo messaggio di Mario (14/10/2026 00:01 ora italiana)
+# Ultimo messaggio di Mario (14/10/2026 07:28 ora italiana)
 
-falla a mano
-Ricordatinche ci ha messo quasi un minutonper trovare i vini cannonau
+no scegli tu 
+come ti permetti 
+non scegli tu
