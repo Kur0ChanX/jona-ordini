@@ -1236,9 +1236,9 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
 const APP_VER=112;
 const NEWS=[
-  {v:112,data:'2026-10-14',titolo:'Vini: il calice disegnato a mano',
-    chef:['Mentre l\'IA cerca un vino su internet ora vedi un calice da rosso disegnato a mano, con l\'acquerello dietro: il vino sale piano e la superficie si allarga con la pancia del bicchiere.'],
-    dev:['`vnCaliceH`: calice Borgogna 120×200 (scelta di Mario #131, stile B acquerello dei cocktail), acquerello `#vn-wash` in un SVG fermo a parte (`.vn-calw`, spento con `lite`), vino `#vn-liv` translateY + superficie `#vn-sup` scaleX da `VN_CALW`/`vnCalSx`, `vnCalSet(v,tr)`. v92 spostata in `data/news.json` (E55). Prova in `test-cantina`.']},
+  {v:112,data:'2026-10-14',titolo:'Vini: ricerca più veloce e calice disegnato a mano',
+    chef:['«Cerca su internet» è più veloce: due IA cercano insieme e vince la prima che risponde. Se Google è lento, dopo pochi secondi ti mostra i vini che l\'IA conosce.','Mentre cerca vedi un calice da rosso disegnato a mano: il vino scende dall\'alto, oscilla e sale fino all\'orlo quando arrivano i vini.'],
+    dev:['`vnMondoCerca`: gara `l25`+`f25` con la ricerca Google (prima uno dopo l\'altro, fino a 45 s del Worker per un lettore fermo), chi perde riceve lo stop (`gemCall(body,lettore,sig)`, AbortSignal); senza Google (`lite`, poi `flash`) dopo `VN_MONDO.mem` 15 s o se Google fallisce, usata solo dopo `VN_MONDO.max` 22 s; stop a 50 s; «Vino nel mondo lenta» nella scatola nera. Calice a mano (`tools/calice-mano.mjs` → `VN_CAL`, `VN_CALW`): getto `.vn-getto`, cerchi, oscillazione `.vn-slosh`, acquerello fermo `.vn-calw` (spento con `lite`), tempo solito al massimo 22 s (`vnMondoT`). v92 spostata in `data/news.json` (E55). Prove in `test-cantina`.']},
   {v:111,data:'2026-10-13',titolo:'Vini: prima la cantina, poi internet',
     chef:['Nella Carta scrivi il nome del vino: se è in cantina lo vedi subito. Se non c\'è, tocca «Cerca su internet».','Mentre l\'IA cerca su Google, un calice si riempie di vino: quando è pieno, ecco i vini. La ricerca ora è molto più veloce.'],
     dev:['`vnMondo`: lettori `l25` poi `f25` con `thinkingConfig.thinkingBudget:0` (Gemini 2.5 Flash ragiona di partenza: ~50 s), 400 → stessa domanda senza `thinkingConfig`; senza Google `lite` poi `flash`. Calice `vnCaliceH`/`vnCalLiv`/`vnCalY` (livello sul tempo solito `jona_ia_t.mondo`, solo `transform`), Carta: «non è in cantina» + `vn-mb primary`, con risultati «Non è tra questi?». v91 spostata in `data/news.json` (E55). Prove in `test-cantina`.']},
@@ -3031,13 +3031,14 @@ function gemSrvOk(){if(gemSrv.ok!==null)return Promise.resolve(gemSrv.ok);if(!pu
   return gemSrv.p||(gemSrv.p=fetch(PUSH_URL+'/salute').then(r=>r.json()).then(j=>{gemSrv.ok=!!j.gemini;if(gemSrv.ok)refreshSheet();return gemSrv.ok}).catch(()=>false).finally(()=>{gemSrv.p=null}))}
 const gemOn=()=>!!gemKey()||(!!gemSrv.ok&&pushFb());
 const gemTxt=j=>((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n').trim();
-async function gemCall(body,lettore){const k=gemKey();let last='',st=0,srv=false;
-  try{if(k&&lettore){if(!GEM_DIR[lettore])return{st:0,salta:true};const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEM_DIR[lettore]+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body)});
+// v112: sig = AbortSignal facoltativo (la gara della ricerca vini ferma il lettore che perde)
+async function gemCall(body,lettore,sig){const k=gemKey();let last='',st=0,srv=false;
+  try{if(k&&lettore){if(!GEM_DIR[lettore])return{st:0,salta:true};const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEM_DIR[lettore]+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body),signal:sig});
       const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j),lettore};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status}
-    else if(k){for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body)});
+    else if(k){for(const m of GEM_MODELS){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body),signal:sig});
         const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j)};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status;if(r.status!==404)break}}
     else if(await gemSrvOk()){srv=true;let tok='';try{tok=await fbInit().auth.currentUser.getIdToken()}catch(e){}
-      const r=await fetch(PUSH_URL+'/gemini',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(lettore?Object.assign({},body,{lettore}):body)});
+      const r=await fetch(PUSH_URL+'/gemini',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(lettore?Object.assign({},body,{lettore}):body),signal:sig});
       // lettore = quello che il server dice di aver usato davvero (un server vecchio non lo dice: allora resta «Gemini» generico)
       const j=await r.json().catch(()=>({}));if(r.ok)return{txt:gemTxt(j),lettore:j.lettore||''};last=(j.error&&j.error.message)||('errore '+r.status);st=r.status}
     else return{err:'Prima inserisci la chiave Gemini.'}}
