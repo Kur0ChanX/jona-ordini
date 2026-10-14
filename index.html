@@ -1234,8 +1234,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=113;
+const APP_VER=114;
 const NEWS=[
+  {v:114,data:'2026-10-14',titolo:'Bolla di consegna: scatta e basta',
+    chef:['All\'arrivo della merce lo staff fotografa la bolla e può chiudere l\'app: la foto resta salvata nel telefono e si legge da sola, anche senza rete (appena torna) e anche da un altro telefono del ristorante.','A lettura finita ricevi un avviso con prezzi diversi, prodotti mancanti e prodotti in più rispetto all\'ordine.'],
+    staff:['Nel Controllo merce basta fotografare la bolla: non serve più toccare «Confronta». Puoi chiudere l\'app, la foto non si perde e la lettura riparte da sola finché non va.'],
+    dev:['D54 strada 3: coda delle letture `CODA` (IndexedDB `jona-kv` chiave `coda_q` + collezione Firestore `coda` con la foto sotto 900 KB in base64), `codaAdd`/`codaFlush`/`codaLeggi`/`codaApplica` (lucchetto `st`/`at`/`lk` con `runTransaction`, scade dopo `CODA_T.lock`), ritentativi `CODA_T.ri` × `riMax` poi ogni `CODA_T.poi`, `codaWatch` su ogni dispositivo aperto (vantaggio `CODA_T.testa` a chi ha scattato). Risultato nell\'ordine (`bolla` o `ricezione.bolla`), `bolInR` lo mette nel foglio del controllo, avviso `tipo` «bolla» ai gestori. `idbKv` spostata in index.html. Regole Firestore: collezione `coda`. Prove `test-bolla` e `test-coda` (emulatore).']},
   {v:113,data:'2026-10-14',titolo:'Foto di bolle, listini e vini: lettori più veloci',
     chef:['Le foto di bolle, listini, fatture ed etichette dei vini ora le legge Gemini 2.5 Flash senza «ragionare», con Flash-Lite di riserva: meno attese e meno blocchi dopo 45 secondi.','Se una lettura va oltre 30 secondi resta una riga nella scatola nera: così vediamo i tempi veri.'],
     dev:['`GEM_LETT` = `f25` → `l25` → `cf` (prima `flash`/`lite` = Gemini 3, ragiona di partenza); `gemCall` aggiunge a `f25` `thinkingConfig.thinkingBudget:0` (400 → senza), `gemLenta` scrive «Lettura lenta» oltre `GEM_LENTA` 30 s. Worker: con `inline_data` il lettore ha `GEM_FOTO_MS` 70 s (testo: `GEM_TRY_MS` 45 s), sempre sotto `GEM_BUDGET` 85 s. v93 spostata in `data/news.json` (E55). Prove in `test-bolla`, `test-gemini-server`, `test-cantina`.']},
@@ -1294,9 +1298,6 @@ const NEWS=[
   {v:95,data:'2026-10-12',titolo:'Bar: colori dei cocktail più giusti',
     tutti:['I disegni dei cocktail hanno colori più fedeli: Kir rosa, Blue Lagoon blu, Bramble e El Diablo rosso-viola, Arnold Palmer color tè.','White Russian con la panna ben visibile, Espresso Tonic con il caffè sopra, schiume più pulite.'],
     dev:['Difetti #101 (5-15, 19, 21): `COLX` e `LAY` in `tools/bar-disegni.mjs`, onda della schiuma `wavy` color vetro, Painkiller crema/arancio, fiamma della scorza attaccata (Oaxaca). Prova `tools/test-bar-disegni.mjs`.']},
-  {v:94,data:'2026-10-12',titolo:'Bar: passaggi numerati',
-    tutti:['Ogni cocktail ha i passaggi numerati, uno per riga, con i trucchi del bancone.'],
-    dev:['D43: `tools/cocktail.txt` campo 6 = passi separati da « / » (3-5, controllo in `tools/cocktail.py`), `data/cocktail.json` `c[6]` lista; `brCk` li mostra in `.br-ol` (il vecchio file con la frase va ancora). Prova in `tools/test-bar.mjs`.']},
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -1559,7 +1560,8 @@ function subscribe(name){
     const first=!S.loaded[name];const m={};
     snap.docs.forEach(d=>{m[d.id]=Object.assign({id:d.id},d.data())});
     if(name==='notifiche'&&!first)onNewNotifs(snap);
-    if(S.db.kind==='firebase'){pushWatch();gemSrvOk()}
+    if(S.db.kind==='firebase'){pushWatch();gemSrvOk();codaWatch()}
+    if(name==='ordini'&&!first)codaFlush();
     S.data[name]=m;S.loaded[name]=true;
     if(name==='prodotti')rebuildIndex();
     schedule();
@@ -2809,21 +2811,21 @@ const SEM={'':['no','da controllare',''],ok:['ok',"c'è",'check'],ko:['ko','manc
 const SEM_NEXT={'':'ok',ok:'ko',ko:'meno',meno:'ok'};
 const rcvDiff=L=>L.st==='ko'||(L.st==='meno'&&L.arr!==L.qta);
 const consegnaTxt=c=>c?fdate(new Date(c+'T12:00').getTime()):'';
-function rcvState(oid){if(!S.rcv[oid]){const o=D().ordini[oid];S.rcv[oid]={lines:(o?o.items:[]).map(l=>({qta:l.qta,arr:l.qta,st:''})),note:'',foto:''}}return S.rcv[oid]}
+function rcvState(oid){if(!S.rcv[oid]){const o=D().ordini[oid];S.rcv[oid]={lines:(o?o.items:[]).map(l=>({qta:l.qta,arr:l.qta,st:''})),note:'',foto:'',cid:''}}return S.rcv[oid]}
 function vArrivi(){
   const all=Object.values(D().ordini);
   const pend=all.filter(o=>o.stato==='inviato'&&!o.ricevuto).sort((a,b)=>String(a.consegna||'9').localeCompare(String(b.consegna||'9'))||(a.inviato-b.inviato));
   const done=all.filter(o=>o.ricevuto).sort((a,b)=>b.ricevuto-a.ricevuto).slice(0,20);
   const fd=o=>`${fDot(o.fornitoreId)}`;
   return`<h1 class="vt">Arrivi</h1><p class="vsub">${pend.length?(pend.length===1?'Una consegna':pend.length+' consegne')+' da controllare':'Nessuna consegna in attesa'}</p>
-  ${pend.length?`<div class="panel">${pend.map(o=>`<button type="button" class="row link" data-a="rcvOpen" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${o.items.length} ${o.items.length===1?'articolo':'articoli'}, ordinato ${ago(o.inviato)}${o.consegna?', consegna '+consegnaTxt(o.consegna):''}</div></div><span class="btn primary sm">Controlla</span></button>`).join('')}</div>`
+  ${pend.length?`<div class="panel">${pend.map(o=>`<button type="button" class="row link" data-a="rcvOpen" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${o.items.length} ${o.items.length===1?'articolo':'articoli'}, ordinato ${ago(o.inviato)}${o.consegna?', consegna '+consegnaTxt(o.consegna):''}</div></div>${o.bolla?pill('ok','bolla letta'):CODA.list.some(x=>x.oid===o.id)?pill('wait','bolla in coda'):''}<span class="btn primary sm">Controlla</span></button>`).join('')}</div>`
   :empty('box','Niente in arrivo','Quando Maurizio invia un ordine a un fornitore, compare qui per il controllo della merce.')}
   ${done.length?`<h2 class="sec">Controllati di recente</h2><div class="panel">${done.map(o=>`<button type="button" class="row link" data-a="rcvView" data-o="${o.id}">${fd(o)}<div class="row-i"><div class="row-t">${esc(forn(o.fornitoreId).nome)}</div><div class="row-m">${esc(o.ricevutoNome||'')} ${ago(o.ricevuto)}</div></div>${o.prezziDiversi&&showPrices()?pill('ko',o.prezziDiversi===1?'1 prezzo diverso':o.prezziDiversi+' prezzi diversi'):''}${o.differenze?pill('wait',o.differenze===1?'1 differenza':o.differenze+' differenze'):o.nonControllati?pill('wait',o.nonControllati+' non controllati'):pill('ok','tutto ok')}</button>`).join('')}</div>`:''}`;
 }
 function receiveSheet(oid){
-  openSheet({cls:'tall',render:()=>{const o=D().ordini[oid];if(!o)return'<p class="muted">Ordine non trovato.</p>';const f=forn(o.fornitoreId);
+  openSheet({cls:'tall',live:()=>{const o=D().ordini[oid],R=S.rcv[oid];return!!(o&&o.bolla&&R&&!o.ricevuto&&R.bolVia!==o.bolla.cid&&(!R.bol||R.bol.cid!==o.bolla.cid))},render:()=>{const o=D().ordini[oid];if(!o)return'<p class="muted">Ordine non trovato.</p>';const f=forn(o.fornitoreId);
     if(o.ricevuto)return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${esc(f.nome)}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div><p>Questa consegna è già stata controllata da ${esc(o.ricevutoNome||'')}.</p>`;
-    const R=rcvState(oid);const nd=R.lines.filter(rcvDiff).length;const tot=R.lines.length;const fatti=R.lines.filter(l=>l.st).length;
+    const R=rcvState(oid);if(o.bolla)bolInR(R,o);const nd=R.lines.filter(rcvDiff).length;const tot=R.lines.length;const fatti=R.lines.filter(l=>l.st).length;
     return`<div class="grab"></div><div class="sh-h">${fDot(f.id,'lg')}<div class="sh-t">Controllo merce<div class="sh-s">${esc(f.nome)}, ordinato ${ago(o.inviato)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
     <p class="muted" style="margin-top:0">Se è tutto giusto basta un tocco.</p>
     <button type="button" class="btn primary block big" data-a="rcvAll" data-o="${oid}" ${nd?'disabled':''}>${ic('check')} È arrivato tutto</button>
@@ -2834,15 +2836,19 @@ function receiveSheet(oid){
       ${L.st==='meno'?`<div class="sem-q"><span>Quanti ne sono arrivati?</span>${stepper('rq2',oid+'-'+i,L.arr,`data-o="${oid}" data-i="${i}"`)}<span>${esc(l.unita||'')}</span></div>`:''}</div>`}).join('')}</div>
     <label class="lbl" for="rcv-note">Note</label><textarea class="inp" id="rcv-note" rows="2" placeholder="Es. pomodori troppo maturi" data-in="rcvnote" data-o="${oid}">${esc(R.note)}</textarea>
     <span class="lbl">Foto della bolla (facoltativa)</span>
-    ${R.foto?`<div class="bolla"><img src="${R.foto}" alt="Foto della bolla"><button type="button" class="btn ghost sm danger" data-a="bollaDel" data-o="${oid}">${ic('trash')} Togli</button></div>
-    ${R.bolErr?`<div class="err">${esc(R.bolErr)}</div>`:''}
-    ${R.bolBusy?`<div class="banner" role="status"><div>⏳ Gemini sta leggendo la bolla…</div></div>`:R.bol?`<div class="bol-ok" id="bol-esito">${ic('check')} Bolla letta: ${R.bol.auto===1?'1 prodotto segnato':R.bol.auto+' prodotti segnati'} da solo. Controlla e correggi se serve.${R.lines.some(x=>x.bno)?`<br><b class="bol-r ko">${R.lines.filter(x=>x.bno).length} non sulla bolla</b>: tocca tu se ci sono.`:''}${R.bol.extra.length?`<br><b class="bol-r ko">Sulla bolla ma non ordinati:</b> ${esc(R.bol.extra.join(', '))}`:''}</div>`
-      :gemOn()?`<button type="button" class="btn primary block" data-a="bolLeggi" data-o="${oid}">${ic('sparkle')} Confronta la bolla con l'ordine</button>`:''}`:`<div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="bollaCam" data-o="${oid}">${ic('camera')} Fotocamera</button><button type="button" class="btn ghost sm" data-a="bollaLib" data-o="${oid}">${ic('image')} Galleria</button></div>`}
+    ${R.foto?`<div class="bolla"><img src="${R.foto}" alt="Foto della bolla"><button type="button" class="btn ghost sm danger" data-a="bollaDel" data-o="${oid}">${ic('trash')} Togli</button></div>`:''}
+    ${R.bolErr?`<div class="err">${esc(R.bolErr)}</div>`:''}${codaStatoH(oid)}
+    ${R.bol?`<div class="bol-ok" id="bol-esito">${ic('check')} Bolla letta${R.bol.lett?' da '+esc(gemNome(R.bol.lett)):''}${R.bol.daNome&&R.bol.da!==(realU()||{}).id?' (foto di '+esc(R.bol.daNome)+')':''}: ${R.bol.auto===1?'1 prodotto segnato':R.bol.auto+' prodotti segnati'} da solo. Controlla e correggi se serve.${R.lines.some(x=>x.bno)?`<br><b class="bol-r ko">${R.lines.filter(x=>x.bno).length} non sulla bolla</b>: tocca tu se ci sono.`:''}${R.bol.extra.length?`<br><b class="bol-r ko">Sulla bolla ma non ordinati:</b> ${esc(R.bol.extra.join(', '))}`:''}</div>`:''}
+    ${R.foto||R.bol||R.cid?'':`<div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="bollaCam" data-o="${oid}">${ic('camera')} Fotocamera</button><button type="button" class="btn ghost sm" data-a="bollaLib" data-o="${oid}">${ic('image')} Galleria</button></div>${gemOn()?`<p class="muted small" style="margin-top:6px">Scatta e basta: la bolla si legge da sola, anche se chiudi l'app.</p>`:''}`}
     <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Più tardi</button><button type="button" class="btn wrapt ${nd?'dark':'primary'}" data-a="rcvGo" data-o="${oid}" ${fatti?'':'disabled'}>${ic('send')} ${nd?'Invia con '+(nd===1?'1 differenza':nd+' differenze'):'Invia controllo'}</button></div>`}});
 }
-async function setBolla(oid,fs){
-  const img=await loadImg(fs[0]);const sc=Math.min(1,1400/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-  const R=rcvState(oid);R.foto=c.toDataURL('image/jpeg',.6);R.bol=null;R.bolErr='';R.bolImg=null;try{R.bolImg=await shrinkImg(fs[0])}catch(e){}gemSrvOk();refreshSheet();
+async function setBolla(oid,fs){const R=rcvState(oid),o=D().ordini[oid];if(!o)return;
+  R.bolErr='';if(R.cid)codaTogli(R.cid);R.cid='';R.bol=null;R.bolImg=null;R.lines.forEach(L=>{delete L.bq;delete L.bno});if(o.bolla)R.bolVia=o.bolla.cid;
+  let p=null;try{p=await codaFoto(fs[0])}catch(e){R.bolErr='La foto non si apre: prova a rifarla.';refreshSheet();return}
+  R.foto=p.mini;
+  // v114 (D54 strada 3): la foto va subito in coda e si legge da sola (anche da un altro telefono); niente più tocco su «Confronta»
+  if(gemOn()||gemSrv.ok===null){const me=realU();const it={id:uid(),tipo:'bolla',oid,fid:o.fornitoreId||'',foto:p.b64,creato:now(),da:me?me.id:'',daNome:me?fullName(me):'',st:'attesa',n:0,next:0};R.cid=it.id;codaAdd(it)}
+  gemSrvOk();refreshSheet();
 }
 /* v77 (D25): la foto della bolla letta da Gemini e confrontata con l'ordine. Si leggono le righe con lo stesso testo dei listini
    (geminiPrompt: nome, codice, quantità, prezzo), si abbinano alle righe dell'ordine (codice uguale, altrimenti parole del nome)
@@ -2858,21 +2864,13 @@ function bolMatch(items,rows){
   return{ri,extra:rows.filter((r,j)=>!usate.has(j)&&!isSpesa(r.nome))}}
 // prezzo diverso: solo con la stessa unità (o senza unità sulla bolla) e almeno 1% di differenza
 const bolPrezzoDiv=(l,r)=>r&&r.prezzo>0&&l.prezzo>0&&(!r.unita||normUnita(r.unita)===normUnita(l.unita||''))&&Math.abs(r.prezzo-l.prezzo)/l.prezzo>=.01;
-async function bolLeggi(oid){const R=rcvState(oid),o=D().ordini[oid];if(!o||!R.foto||R.bolBusy)return;
-  R.bolBusy=true;R.bolErr='';refreshSheet();
-  try{const data=R.bolImg?await b64(R.bolImg):R.foto.split(',')[1];
-    const body={contents:[{parts:[{text:geminiPrompt()},{inline_data:{mime_type:'image/jpeg',data}}]}],generationConfig:{temperature:0}};
-    let g=null;for(const [l] of GEM_LETT){g=await gemCall(body,l);if(g.salta){g=null;continue}if(g.txt||!GEM_RETRY.test(String(g.st)))break}
-    if(!g||!g.txt){R.bolErr=(g&&g.err)||'Gemini non è riuscito a leggere la bolla. Riprova tra un minuto o controlla a mano.';return}
-    const rows=(mapRows(parseTable(g.txt))||[]).map(r=>({nome:pulisciNome(r.nome),codice:r.codice,unita:normUnita(r.unita),q:r.q,prezzo:r.prezzo})).filter(r=>r.nome);
-    if(!rows.length){R.bolErr='Sulla foto non trovo righe di prodotti: rifai la foto più vicina e dritta.';return}
-    const {ri,extra}=bolMatch(o.items,rows);let n=0;
-    o.items.forEach((l,i)=>{const L=R.lines[i];const r=ri.has(i)?rows[ri.get(i)]:null;L.bq=r?r.q:undefined;L.bno=!r;
-      if(L.st||!r||r.q==null)return;n++;
-      if(r.q<=0)L.st='ko';else if(r.q<l.qta*.95){L.st='meno';L.arr=r3(r.q)}else L.st='ok'});
-    R.bol={lett:g.lettore||'',righe:rows.map((r,j)=>({nome:r.nome,codice:r.codice||'',unita:r.unita||'',q:r.q,prezzo:r.prezzo,i:[...ri].find(x=>x[1]===j)?.[0]??-1})),extra:extra.map(r=>r.nome),auto:n};
-  }catch(e){R.bolErr='Non riesco a contattare Gemini. Controlla la connessione.'}
-  finally{R.bolBusy=false;refreshSheet()}}
+// v114: la lettura passa dalla coda (codaLeggi); bolLeggi resta per chi la chiama a mano e rilancia subito la voce in coda di quell'ordine
+async function bolLeggi(oid){const R=rcvState(oid);const it=CODA.list.find(x=>x.oid===oid&&x.tipo==='bolla');if(!it||it.busy)return;it.next=0;R.bolErr='';await codaFlush()}
+// la lettura arrivata (campo «bolla» dell'ordine, scritta da qualsiasi telefono) entra nel foglio del controllo: precompila solo le righe non toccate
+function bolInR(R,o){const B=o.bolla;if(!B||!B.righe||R.bolVia===B.cid||(R.bol&&R.bol.cid===B.cid))return;let n=0;
+  o.items.forEach((l,i)=>{const L=R.lines[i];if(!L)return;const r=B.righe.find(x=>x.i===i);L.bq=r?r.q:undefined;L.bno=!r;
+    if(L.st||!r||r.q==null)return;n++;if(r.q<=0)L.st='ko';else if(r.q<l.qta*.95){L.st='meno';L.arr=r3(r.q)}else L.st='ok'});
+  R.bol=Object.assign({},B,{auto:n});R.bolErr='';if(R.cid===B.cid)R.cid=''}
 const rcvDiffTxt=d=>d.nome+': '+(d.motivo==='mancante'?'manca':'arrivati '+fq(d.arr)+' su '+fq(d.qta));
 async function confirmReceipt(oid,all){
   const o=D().ordini[oid];if(!o||o.ricevuto)return;const R=rcvState(oid);const me=meU();const f=forn(o.fornitoreId);
@@ -2881,8 +2879,8 @@ async function confirmReceipt(oid,all){
   const righe=o.items.map((l,i)=>{const L=all?{st:'ok'}:R.lines[i];
     const arr=L.st==='ko'?0:L.st==='meno'?L.arr:l.qta;const motivo=!L.st?'nonctrl':L.st==='ko'?'mancante':arr!==l.qta?'quantita':'';
     return{nome:l.nome,codice:l.codice||'',unita:l.unita||'',qta:l.qta,arr,motivo,key:l.key||'',da:[...new Set((l.da||[]).map(x=>firstName(x.n||'')).filter(Boolean))]}});
-  const diffs=righe.filter(r=>r.motivo&&r.motivo!=='nonctrl');const bp=!all&&R.bol?o.items.filter((l,i)=>{const b=R.bol.righe.find(x=>x.i===i);return bolPrezzoDiv(l,b)}).length:0;const nc=righe.length-righe.filter(r=>r.motivo!=='nonctrl').length;
-  await upd('ordini',oid,Object.assign({ricevuto:now(),ricevutoDa:me.id,ricevutoNome:fullName(me),ricezione:Object.assign({righe,note:all?'':R.note.trim(),foto:all?'':R.foto},!all&&R.bol?{bolla:R.bol}:{}),differenze:diffs.length,nonControllati:nc},bp?{prezziDiversi:bp}:{}));
+  const diffs=righe.filter(r=>r.motivo&&r.motivo!=='nonctrl');const BL=(!all&&R.bol)||o.bolla||null;const bp=BL?o.items.filter((l,i)=>{const b=BL.righe.find(x=>x.i===i);return bolPrezzoDiv(l,b)}).length:0;const nc=righe.length-righe.filter(r=>r.motivo!=='nonctrl').length;
+  await upd('ordini',oid,Object.assign({ricevuto:now(),ricevutoDa:me.id,ricevutoNome:fullName(me),ricezione:Object.assign({righe,note:all?'':R.note.trim(),foto:all?'':R.foto},BL?{bolla:BL}:{}),differenze:diffs.length,nonControllati:nc},bp?{prezziDiversi:bp}:{}));
   for(const rid of o.richieste||[]){const r=D().richieste[rid];if(r)await upd('richieste',rid,{arrivati:Object.assign({},r.arrivati||{},{[o.fornitoreId]:now()})})}
   await notify('gm',diffs.length?`Consegna ${f.nome}: ${diffs.length===1?'1 differenza':diffs.length+' differenze'}`:`Consegna ${f.nome} arrivata`,
     (diffs.length?diffs.slice(0,5).map(d=>rcvDiffTxt(d)+(d.da.length?' (chiesto da '+d.da.join(', ')+')':'')).join('; ')+(diffs.length>5?'; …e altri '+(diffs.length-5):'')+'. Controllata da '+me.nome:'Controllata da '+me.nome+(nc?'':', tutto ok'))+(nc?(diffs.length?'; ':', ')+nc+' non controllati':'')+(bp?'. Sulla bolla '+(bp===1?'1 prezzo diverso':bp+' prezzi diversi')+' dall\'ordine':''),'arrivo',oid);
@@ -2907,6 +2905,106 @@ function bolRiga(o,rz,i){const B=rz.bolla;if(!B)return'';const b=B.righe.find(x=
   if(!b)return'<br><span class="bol-r ko">Non era sulla bolla</span>';
   const pr=showPrices()&&b.prezzo>0?(bolPrezzoDiv(l,b)?` · <span class="bol-r ko">prezzo bolla ${eur(b.prezzo)}, ordine ${eur(l.prezzo)}</span>`:` · prezzo bolla ${eur(b.prezzo)}`):'';
   return`<br><span class="bol-r">Sulla bolla: ${b.q!=null?fq(b.q)+' '+esc(l.unita||b.unita||''):'quantità non letta'}</span>${pr}`}
+/* ================= coda delle letture (D54 strada 3 «Geniale», v114) =================
+   La foto della bolla si salva SUBITO nel telefono (IndexedDB «jona-kv», chiave coda_q) e, con Firebase, nella collezione «coda»
+   (foto ridotta sotto CODA_T.maxB in base64). La legge il primo dispositivo aperto del ristorante che ha Gemini: prende la voce
+   con un lucchetto (st «lettura», at, lk = telefono; scade dopo CODA_T.lock), chiama i lettori GEM_LETT, mette il risultato
+   nell'ordine (campo «bolla», o ricezione.bolla se già controllato) e avvisa i gestori. Se non riesce riprova da sola
+   (CODA_T.ri × riMax, poi ogni CODA_T.poi) finché non va: senza rete riparte quando torna, all'apertura e in primo piano.
+   Chi ha scattato ha CODA_T.testa di vantaggio; gli altri telefoni vedono la voce con codaWatch. Niente si perde mai. */
+function idbKv(k,v){return new Promise(res=>{try{const r=indexedDB.open('jona-kv',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onerror=()=>res(null);
+  r.onsuccess=()=>{const db=r.result;try{const t=db.transaction('kv',v===undefined?'readonly':'readwrite'),s=t.objectStore('kv'),q=v===undefined?s.get(k):v===null?s.delete(k):s.put(v,k);
+    t.oncomplete=()=>{db.close();res(v===undefined?q.result:true)};t.onerror=t.onabort=()=>{db.close();res(null)}}catch(e){db.close();res(null)}}}catch(e){res(null)}})}
+const CODA={list:[],busy:false,on:false,cloud:[]};
+let CODA_T={testa:20000,lock:150000,ri:120000,riMax:5,poi:600000,maxB:900000,vecchie:7*864e5};
+const CODA_K=()=>(DEMO?'demo:':'')+'coda_q';
+const codaDev=()=>{let d=ls('jona_dev');if(!d){d=uid();ls('jona_dev',d)}return d};
+const codaCol=()=>fbInit().fs.collection('coda');
+const codaCloud=()=>!DEMO&&pushFb();
+const codaDoc=it=>{const d={};for(const [k,v] of Object.entries(it))if(!['next','busy','t0','err0'].includes(k)&&v!==undefined)d[k]=v;return d};
+function codaSalva(){return idbKv(CODA_K(),CODA.list.length?CODA.list.map(codaDoc):null)}
+// foto per la coda: lato lungo 1600 px, più piccola finché il base64 sta sotto CODA_T.maxB (limite del documento Firestore); mini = anteprima per il foglio e la ricezione
+async function codaFoto(file){let max=1600,r,b;for(;;){r=await fotoPiccola(file,max,1200);b=await b64(r.b);if(b.length<=CODA_T.maxB||max<=800)break;max=Math.round(max*.75)}return{b64:b,mini:r.mini}}
+async function codaAdd(it){CODA.list.push(it);await codaSalva();
+  if(codaCloud()){const lo=navigator.onLine!==false&&gemOn();codaCol().doc(it.id).set(Object.assign(codaDoc(it),lo?{st:'lettura',at:now(),lk:codaDev()}:{})).catch(()=>{})}
+  codaFlush()}
+async function codaVia(it){CODA.list=CODA.list.filter(x=>x.id!==it.id);await codaSalva();const R=it.oid&&S.rcv[it.oid];if(R&&R.cid===it.id)R.cid='';refreshSheet();schedule()}
+function codaTogli(id){const it=CODA.list.find(x=>x.id===id);if(it)codaVia(it);if(codaCloud())codaCol().doc(id).delete().catch(()=>{})}
+// lucchetto sul cloud: true = leggo io, false = la sta leggendo un altro telefono, 'fatta' = già letta, null = server non raggiungibile
+async function codaLock(it){if(!codaCloud())return true;const me=codaDev(),ref=codaCol().doc(it.id);
+  try{return await fbInit().fs.runTransaction(async t=>{const s=await t.get(ref);
+    if(!s.exists){t.set(ref,Object.assign(codaDoc(it),{st:'lettura',at:now(),lk:me}));return true}
+    const d=s.data();if(d.st==='fatta')return'fatta';
+    if(d.st==='lettura'&&d.lk!==me&&now()-(d.at||0)<CODA_T.lock)return false;
+    t.update(ref,{st:'lettura',at:now(),lk:me,n:(d.n||0)+1});return true})}
+  catch(e){return null}}
+async function codaFlush(){
+  if(CODA.busy||!CODA.list.length||navigator.onLine===false||!realU()||!allLoaded())return;CODA.busy=true;
+  try{if(codaCloud())await gemSrvOk();
+    for(const it of CODA.list.slice()){if(!CODA.list.includes(it)||it.busy||it.next>now()||navigator.onLine===false)continue;
+      if(!gemOn()){it.err='Questo telefono non ha Gemini: la bolla la legge un altro telefono del ristorante.';continue}
+      const lk=await codaLock(it);if(lk==='fatta'){await codaVia(it);continue}if(!lk)continue;
+      await codaLeggi(it)}}
+  finally{CODA.busy=false;refreshSheet()}}
+async function codaLeggi(it){it.busy=true;it.t0=now();it.n=(it.n||0)+1;it.err='';refreshSheet();let g=null;
+  try{const body={contents:[{parts:[{text:geminiPrompt()},{inline_data:{mime_type:'image/jpeg',data:it.foto}}]}],generationConfig:{temperature:0}};
+    for(const [l] of GEM_LETT){g=await gemCall(body,l);if(g.salta){g=null;continue}if(g.txt||!GEM_RETRY.test(String(g.st)))break}
+    if(!g||!g.txt)throw{msg:(g&&g.err)||'Gemini non è riuscito a leggere la bolla.'};
+    const rows=(mapRows(parseTable(g.txt))||[]).map(r=>({nome:pulisciNome(r.nome),codice:r.codice,unita:normUnita(r.unita),q:r.q,prezzo:r.prezzo,imp:r.imp})).filter(r=>r.nome);
+    if(!rows.length){it.vuote=(it.vuote||0)+1;if(it.vuote<2)throw{msg:'Sulla foto non trovo righe di prodotti.',foto:true};
+      await codaIlleggibile(it)}
+    else await codaApplica(it,rows,g.lettore||'');
+    it.st='fatta';it.err='';codaFine(it);await codaVia(it);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return true}
+  catch(e){const m=(e&&e.msg)||'Non riesco a contattare Gemini.';it.err=m;it.st='errore';it.next=now()+(e&&e.foto?CODA_T.poi:it.n<=CODA_T.riMax?CODA_T.ri:CODA_T.poi);
+    await codaSalva();if(codaCloud())codaCol().doc(it.id).update({st:'errore',err:m,n:it.n,vuote:it.vuote||0,at:0}).catch(()=>{});
+    errLog('Bolla in coda: '+m+' (tentativo '+it.n+')');return false}
+  finally{it.busy=false;refreshSheet()}}
+function codaFine(it){if(!codaCloud())return;codaCol().doc(it.id).update({st:'fatta',fatto:now(),lk:codaDev(),err:'',n:it.n||0,foto:firebase.firestore.FieldValue.delete()}).catch(()=>{})}
+// due letture senza righe = foto non leggibile: lo sanno chi ha scattato e i gestori, la voce esce dalla coda
+async function codaIlleggibile(it){const o=D().ordini[it.oid];const f=o?forn(o.fornitoreId).nome:'';
+  if(it.da)await notify(it.da,'Bolla '+f+': foto non leggibile','Non trovo righe di prodotti nella foto. Rifalla più vicina e dritta dal Controllo merce.','bolla',it.oid);
+  await notify('gm','Bolla '+f+': foto non leggibile','La foto di '+(it.daNome||'staff')+' non si legge: serve una foto nuova.','bolla',it.oid)}
+// risultato nell'ordine + avviso ai gestori con prezzi diversi, mancanze e prodotti in più (D54: «discrepanze prezzi mancanze e anomalie con l'invio a Maurizio»)
+async function codaApplica(it,rows,lett){const o=D().ordini[it.oid];if(!o)return;const me=realU();
+  const {ri,extra}=bolMatch(o.items||[],rows);
+  const righe=rows.map((r,j)=>({nome:r.nome,codice:r.codice||'',unita:r.unita||'',q:r.q,prezzo:r.prezzo,i:[...ri].find(x=>x[1]===j)?.[0]??-1}));
+  const bol={lett,righe,extra:extra.map(r=>r.nome),cid:it.id,letto:now(),da:it.da||'',daNome:it.daNome||'',lettoDa:me?me.id:''};
+  const its=o.items||[],bd=i=>righe.find(x=>x.i===i);
+  const pd=its.filter((l,i)=>bolPrezzoDiv(l,bd(i))),nb=its.filter((l,i)=>!bd(i)),meno=its.filter((l,i)=>{const b=bd(i);return b&&b.q!=null&&b.q<l.qta*.95}),dub=righe.filter(r=>rigaNonTorna({q:r.q,imp:rows[righe.indexOf(r)].imp,prezzo:r.prezzo}));
+  if(o.ricevuto)await upd('ordini',o.id,Object.assign({'ricezione.bolla':bol},pd.length?{prezziDiversi:pd.length}:{}));
+  else await upd('ordini',o.id,{bolla:bol});
+  if(S.rcv[o.id])bolInR(S.rcv[o.id],Object.assign({},o,{bolla:bol}));
+  const nomi=a=>a.slice(0,3).map(l=>l.nome).join(', ')+(a.length>3?'…':'');const p=[];
+  if(pd.length)p.push((pd.length===1?'1 prezzo diverso':pd.length+' prezzi diversi')+' dall\'ordine: '+nomi(pd));
+  if(nb.length)p.push((nb.length===1?'1 prodotto ordinato non è sulla bolla':nb.length+' prodotti ordinati non sono sulla bolla')+': '+nomi(nb));
+  if(meno.length)p.push((meno.length===1?'1 prodotto in quantità minore':meno.length+' prodotti in quantità minore')+': '+nomi(meno));
+  if(extra.length)p.push((extra.length===1?'1 prodotto sulla bolla non ordinato':extra.length+' prodotti sulla bolla non ordinati')+': '+nomi(extra));
+  if(dub.length)p.push((dub.length===1?'1 riga con i conti che non tornano':dub.length+' righe con i conti che non tornano')+': '+nomi(dub));
+  const f=forn(o.fornitoreId);
+  await notify('gm','Bolla '+f.nome+(p.length?': '+(p.length===1?'1 cosa da vedere':p.length+' cose da vedere'):' letta, tutto corrisponde'),
+    (p.length?p.join('; ')+'.':'Prezzi, quantità e prodotti uguali all\'ordine.')+' Foto di '+(it.daNome||'staff')+(o.ricevuto?'.':'; la consegna è ancora da controllare.'),'bolla',o.id)}
+// stato della voce di quest'ordine nel foglio del controllo
+const codaTra=it=>{const s=Math.max(0,Math.ceil((it.next-now())/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function codaStatoH(oid){const it=CODA.list.find(x=>x.oid===oid&&x.tipo==='bolla');if(!it)return'';
+  if(it.busy)return`<div class="banner" role="status" id="coda-stato"><div>⏳ Sto leggendo la bolla… <b id="coda-sec">${Math.round((now()-it.t0)/1000)} s</b>. Puoi chiudere l'app: ti avviso quando è letta.</div></div>`;
+  const off=navigator.onLine===false;
+  return`<div class="vn-ri" role="status" id="coda-stato"><p class="small">${ic('clock')} ${off?'Bolla salvata. Manca la rete: la leggo appena torna, anche da un altro telefono del ristorante.':it.err?esc(it.err)+' Riprovo tra <b id="coda-sec">'+codaTra(it)+'</b> (tentativo '+it.n+').':'Bolla salvata: la leggo tra poco.'} Puoi chiudere l'app: la foto non si perde.</p>${off?'':`<div class="btns"><button type="button" class="btn ghost sm" data-a="codaOra" data-id="${it.id}">Riprova adesso</button></div>`}</div>`}
+function codaTick(){const e=document.getElementById('coda-sec');if(!e)return;const it=CODA.list.find(x=>x.busy)||CODA.list.find(x=>x.next>now());if(!it)return;e.textContent=it.busy?Math.round((now()-it.t0)/1000)+' s':codaTra(it)}
+// altri telefoni: le voci sul cloud non ancora lette entrano nella lista locale (dopo il vantaggio di chi ha scattato); le «fatta» escono
+function codaRaccogli(){const me=codaDev();let nuove=false;
+  for(const x of CODA.cloud){const loc=CODA.list.find(y=>y.id===x.id);
+    if(x.st==='fatta'){if(loc&&!loc.busy)codaVia(loc);if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
+    if(loc||!x.foto||!x.oid)continue;
+    if(x.st==='lettura'&&x.lk!==me&&now()-(x.at||0)<CODA_T.lock)continue;
+    if(now()-(x.creato||0)<CODA_T.testa)continue;
+    CODA.list.push(Object.assign({},x,{next:0,busy:false}));nuove=true}
+  if(nuove){codaSalva();schedule()}}
+function codaWatch(){if(CODA.on||!codaCloud())return;CODA.on=true;
+  codaCol().onSnapshot(q=>{CODA.cloud=q.docs.map(d=>Object.assign({id:d.id},d.data()));codaRaccogli();codaFlush()},()=>{CODA.on=false})}
+async function codaAvvio(){try{const l=await idbKv(CODA_K());if(Array.isArray(l))for(const x of l)if(x&&x.id&&!CODA.list.some(y=>y.id===x.id))CODA.list.push(Object.assign(x,{busy:false,next:0}))}catch(e){}
+  setInterval(()=>{codaRaccogli();codaFlush()},60000);setInterval(codaTick,1000);codaFlush();schedule()}
+addEventListener('online',()=>codaFlush());
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)codaFlush()});
 </script>
 <script>
 /* ================= fornitori ================= */
@@ -4474,7 +4572,7 @@ function newsSheet(){
 }
 function notifSheet(){
   const me=meU();const unread=myNotifs(me).filter(n=>!n.letta);
-  const NI={agenda:'calendar',richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',promemoria:'bell',prezzi:'warn',urgente:'warn',orari:'calendar',cambio:'users'};
+  const NI={bolla:'box',agenda:'calendar',richiesta:'inbox',approvata:'check',rifiutata:'x',ordinato:'truck',staff:'user',arrivo:'box',scadenza:'clock',promemoria:'bell',prezzi:'warn',urgente:'warn',orari:'calendar',cambio:'users'};
   openSheet({live:()=>true,render:()=>{const ns=myNotifs(me).slice(0,80);return`<div class="grab"></div><div class="sh-h"><div class="sh-t">Notifiche</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${ns.length?ns.map(n=>`<div class="notif ${unread.some(x=>x.id===n.id)?'unread':''}">${ic(NI[n.tipo]||'bell')}<div><div class="nt">${esc(n.titolo)}</div>${n.testo?`<div class="nx">${esc(n.testo)}</div>`:''}<div class="nx small">${ago(n.creato)}</div></div></div>`).join(''):'<p class="muted">Nessuna notifica.</p>'}`}});
   runPool(unread.map(n=>()=>upd('notifiche',n.id,{letta:true})),4).catch(()=>{});
@@ -5575,8 +5673,9 @@ rbest:d=>rswapTo(d.r,d.i,d.p),
   rst:d=>{const L=rcvState(d.o).lines[+d.i];L.st=SEM_NEXT[L.st||''];if(L.st==='meno')L.arr=L.qta>1?r3(L.qta-1):r3(L.qta/2);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}refreshSheet()},
   bollaCam:d=>pickFile({accept:'image/*',capture:'environment'},fs=>setBolla(d.o,fs)),
   bollaLib:d=>pickFile({accept:'image/*'},fs=>setBolla(d.o,fs)),
-  bollaDel:d=>{const R=rcvState(d.o);R.foto='';R.bol=null;R.bolErr='';R.bolImg=null;R.lines.forEach(L=>{delete L.bq;delete L.bno});refreshSheet()},
+  bollaDel:d=>{const R=rcvState(d.o),o=D().ordini[d.o];if(R.cid)codaTogli(R.cid);R.cid='';if(o&&o.bolla)R.bolVia=o.bolla.cid;R.foto='';R.bol=null;R.bolErr='';R.bolImg=null;R.lines.forEach(L=>{delete L.bq;delete L.bno});refreshSheet()},
   bolLeggi:d=>bolLeggi(d.o),
+  codaOra:d=>{const it=CODA.list.find(x=>x.id===d.id);if(it&&!it.busy){it.next=0;codaFlush()}},
   fnew:()=>newSupSheet(),
   fopen:d=>supSheet(d.f,d.t),
   suptab:d=>{S.supTab=d.v;if(d.v==='contatti'){S.fe=clone(D().fornitori[S.supFid]||{});delete S.fe.id}refreshSheet()},
@@ -5846,7 +5945,7 @@ async function boot(){
   try{await seedIfEmpty()}catch(e){toast(errMsg(e),'err')}
   if(S.db.kind==='locale'&&fbCfg())fbPublic().then(a=>{S.fbActive=a;schedule()});
   Object.keys(COLS).forEach(subscribe);
-  regRestore();vnRestore();
+  regRestore();vnRestore();codaAvvio();
   setTimeout(()=>{if(!allLoaded()){S.loadTimeout=true;render()}},5000);
 }
 boot();

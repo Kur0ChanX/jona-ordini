@@ -227,9 +227,7 @@ function vnFotoDel(i){const f=S.vnf;if(f&&f.fotos&&f.fotos.splice(+i,1)[0])vnBoz
 function vnFotoVia(f){f.fotos=[];vnBozzaFoto(f)}
 // v96 (D45): bozza del vino se il telefono chiude l'app (fotocamera aperta o app in secondo piano), come jona_reg della registrazione.
 // Campi in localStorage jona_vn {f,t,cam,u}; foto piccole in IndexedDB (jona-kv, vn_fotos). Chiudere il foglio la cancella.
-function idbKv(k,v){return new Promise(res=>{try{const r=indexedDB.open('jona-kv',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onerror=()=>res(null);
-  r.onsuccess=()=>{const db=r.result;try{const t=db.transaction('kv',v===undefined?'readonly':'readwrite'),s=t.objectStore('kv'),q=v===undefined?s.get(k):v===null?s.delete(k):s.put(v,k);
-    t.oncomplete=()=>{db.close();res(v===undefined?q.result:true)};t.onerror=t.onabort=()=>{db.close();res(null)}}catch(e){db.close();res(null)}}}catch(e){res(null)}})}
+// idbKv (IndexedDB jona-kv) sta in index.html dalla v114 (la usa anche la coda delle bolle)
 const VN_IDB=()=>(DEMO?'demo:':'')+'vn_fotos';
 function vnBozza(cam,conF){const me=realU();if(!me)return;const f=conF===false?null:S.vnf;if(f&&f.chiusa)return;let c=null;
   if(f){c={};for(const [k,x] of Object.entries(f))if(!['fotos','busy','bl','rip','chiusa','ld','lg','lt'].includes(k))c[k]=x}
