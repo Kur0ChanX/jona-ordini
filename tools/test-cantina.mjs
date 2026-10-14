@@ -212,10 +212,11 @@ await pg.evaluate(()=>{window._b=[];ls('jona_ia_t',{mondo:[2]});window._fine=nul
 await sc('[data-a="vnMondo"]');await pg.waitForSelector('.sheet .vn-cal #vn-liv');
 const y0=await pg.evaluate(()=>parseFloat(document.getElementById('vn-liv').style.transform.match(/-?[\d.]+/)[0]));await wait(1600);
 const y1=await pg.evaluate(()=>parseFloat(document.getElementById('vn-liv').style.transform.match(/-?[\d.]+/)[0]));
-ok(await pg.locator('.sheet .vn-cbox').count()===1&&/di solito circa 2 secondi/.test(await txt('.sheet .vn-cbox'))&&y1<y0-5&&y1>74.5,'v111: calice con il vino che sale ('+y0+' → '+y1+', pieno = 74) e tempo solito «circa 2 secondi»');
-// v112: calice Borgogna disegnato a mano (acquerello dietro in un disegno a parte, fermo); la superficie del vino segue la pancia del calice
-const sx=await pg.evaluate(()=>{const u=document.getElementById('vn-sup'),k=parseFloat(u.style.transform.match(/[\d.]+/)[0]);return{k,ok:Math.abs(k-vnCalSx(vnCalY(.5)))<.2&&vnCalSx(128)<.06&&vnCalSx(92)===1,w:!!document.querySelector('.vn-cal svg.vn-calw filter'),n:document.querySelectorAll('.vn-cal svg').length}});
+ok(await pg.locator('.sheet .vn-cbox').count()===1&&/di solito circa 2 secondi/.test(await txt('.sheet .vn-cbox'))&&y1<y0-5&&y1>70.5,'v111: calice con il vino che sale ('+y0+' → '+y1+', pieno = 70) e tempo solito «circa 2 secondi»');
+// v112: calice da rosso disegnato a mano (acquerello dietro in un disegno a parte, fermo); la superficie del vino segue la pancia del calice
+const sx=await pg.evaluate(()=>{const u=document.getElementById('vn-sup'),k=parseFloat(u.style.transform.match(/[\d.]+/)[0]);return{k,ok:Math.abs(k-vnCalSx(vnCalY(.5)))<.2&&vnCalSx(116)<.06&&vnCalSx(80)===1,w:!!document.querySelector('.vn-cal svg.vn-calw filter'),n:document.querySelectorAll('.vn-cal svg').length}});
 ok(sx.ok&&sx.w&&sx.n===2&&sx.k>.7&&sx.k<=1,'v112: superficie del vino larga come la pancia ('+JSON.stringify(sx)+')');
+ok(await pg.evaluate(()=>!!document.querySelector('.vn-cal .vn-getto')&&getComputedStyle(document.querySelector('.vn-slosh')).animationName==='vnSlosh'),'v112: vino versato dall\'alto e che oscilla');
 ok(await pg.evaluate(()=>window._b.join(' ')==='l25:{"temperature":0.2,"thinkingConfig":{"thinkingBudget":0}} l25:{"temperature":0.2}'),'v111: 400 con thinkingConfig → stessa domanda senza, stesso lettore ['+(await pg.evaluate(()=>window._b.join(' ')))+']');
 await pg.evaluate(()=>window._fine());await pg.waitForFunction(()=>S.vnM&&!S.vnM.busy);await wait(250);
 ok(await pg.locator('.sheet .vn-cbox').count()===0&&await pg.locator('.sheet').last().locator('.vn-mo').count()===1,'v111: risposta arrivata → calice pieno, poi la lista');
