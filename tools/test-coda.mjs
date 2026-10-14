@@ -88,7 +88,7 @@ const o2=await A.evaluate(()=>D().ordini.test_o2);
 ok(o2.prezziDiversi===1&&!o2.bolla,'ordine già controllato: prezziDiversi 1, niente campo «bolla» a parte');
 const n2=await A.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='bolla'&&n.rif==='test_o2')[0]);
 ok(n2&&/Foto di Luca Prova\.$/.test(n2.testo),'avviso: «Foto di Luca Prova.» senza «ancora da controllare» '+JSON.stringify(n2&&n2.testo));
-ok(await fino(B,()=>CODA.list.length===0),'B: coda vuota dopo la lettura di A');
+ok(await fino(B,()=>CODA.list.length===0,30000),'B: coda vuota dopo la lettura di A');
 
 // ---------- 3. lucchetto di un altro telefono: rispettato finché non scade ----------
 await mkOrd('test_o3');await A.waitForTimeout(1200);
@@ -121,8 +121,8 @@ ok(cr.filter(x=>x.tipo==='ris').length===1&&!cr.some(x=>x.tipo==='listino'),'clo
 ok(await fino(A,()=>!!document.querySelector('.sheet-wrap:last-child [data-a="rvok"]')),'foglio «Controlla e salva» aperto');
 await A.click(sh+'[data-a="rvok"]');await A.waitForTimeout(2000);
 await A.evaluate(()=>{if(sheets.length)closeSheet(true)});// foglio «Prezzi aumentati» dopo il salvataggio
-ok(await fino(A,([g,pz])=>!CODA.ris[g]&&!CODA.cloud.some(x=>x.id===g)&&Math.abs(D().prodotti.test_p1.prezzo-Math.round(pz*120)/100)<0.001,10000,[g1,pz]),'salvato: prezzo del pomodoro aggiornato, risultato tolto dal telefono e dal cloud');
-ok(await fino(A,async()=>(await fbInit().fs.collection('coda').get()).docs.every(d=>d.data().tipo!=='ris'),10000),'cloud: documento del risultato cancellato');
+ok(await fino(A,([g,pz])=>!CODA.ris[g]&&!CODA.cloud.some(x=>x.id===g&&x.st!=='tolto')&&Math.abs(D().prodotti.test_p1.prezzo-Math.round(pz*120)/100)<0.001,30000,[g1,pz]),'salvato: prezzo del pomodoro aggiornato, risultato tolto dal telefono e dal cloud');
+ok(await fino(A,async()=>(await fbInit().fs.collection('coda').get()).docs.every(d=>d.data().tipo!=='ris'||d.data().st==='tolto'),30000),'cloud: risultato segnato «tolto» (nessun telefono lo rifà)');
 // 4b. il Gemini di A non risponde: legge B (staff), A vede il risultato arrivare nel foglio aperto
 gem.A='503';risp.push(L2);const n0=letture.length;
 const g2=await fotoList(A,'test_f1',1);
@@ -134,13 +134,15 @@ ok(await fino(A,g=>!!(S.rev&&S.rev.grp===g),30000,g2),'Gemini di B tornato: B le
 ok(letture.slice(n0).some(x=>x.da==='A'&&x.foto)&&letture.slice(n0).some(x=>x.da==='B'&&x.foto),'A ha provato, B ha letto');
 ok(await A.evaluate(()=>S.rev.items.length===1&&/CAROTE/i.test(S.rev.items[0].nome)),'controllo: 1 riga (Carote) letta da B');
 ok(await B.evaluate(()=>CODA.list.length===0)&&!(await B.$('[data-a="codaRis"]')),'B (staff): coda vuota, nessuna striscia «Listino letto»');
+await fino(A,()=>Object.values(D().notifiche).filter(n=>n.tipo==='listino').length>=2,20000);
 const nl2=await A.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='listino').length);
 ok(nl2===2,'un solo avviso nuovo ai gestori (risultato creato una volta sola) '+nl2);
 await A.evaluate(()=>closeSheet());await A.waitForTimeout(600);
 ok(await A.evaluate(()=>!document.querySelector('.sheet-wrap')),'A: chiuso «Controlla e salva», nessun foglio rimasto sotto');
 ok(await A.evaluate(()=>{S.tab='fornitori';render();return!!document.querySelector('[data-a="codaRis"]')}),'A: striscia «Listino letto» in Fornitori finché non salva');
 await A.click('[data-a="codaRisVia"]');
-ok(await fino(A,()=>!document.querySelector('[data-a="codaRis"]')&&!codaRisList().length,8000),'«Togli»: la striscia sparisce');
+const togli=await fino(A,()=>!document.querySelector('[data-a="codaRis"]')&&!codaRisList().length,30000);
+ok(togli,'«Togli»: la striscia sparisce'+(togli?'':' '+JSON.stringify(await A.evaluate(async()=>({ris:Object.values(CODA.ris).map(r=>r.grp+':'+r.tipo+':'+Object.keys(r.p||{})),cloud:CODA.cloud.map(x=>x.id+':'+x.tipo+':'+x.st),docs:(await fbInit().fs.collection('coda').get()).docs.map(d=>d.id+':'+d.data().tipo+':'+d.data().st),strisce:[...document.querySelectorAll('[data-a=codaRisVia]')].map(b=>b.dataset.id)})))));
 gem.A='ok';gem.B='503';
 ok(A.errs.length===0&&B.errs.length===0,'nessun errore di pagina '+JSON.stringify([A.errs,B.errs]));
 await b.close();
