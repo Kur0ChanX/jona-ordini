@@ -2998,6 +2998,7 @@ function codaTick(){const e=document.getElementById('coda-sec');if(!e)return;con
 function codaRaccogli(){const me=codaDev();let nuove=false;
   for(const x of CODA.cloud){const loc=CODA.list.find(y=>y.id===x.id);
     if(x.st==='fatta'){if(loc&&!loc.busy)codaVia(loc);if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
+    if(x.tipo==='ris'&&x.st==='tolto'){if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
     if(loc||!x.foto||!(x.oid||x.grp))continue;
     if(x.st==='lettura'&&x.lk!==me&&now()-(x.at||0)<CODA_T.lock)continue;
     if(now()-(x.creato||0)<CODA_T.testa)continue;
@@ -3028,7 +3029,9 @@ async function codaRisPezzo(it,txt,l,ko){it.txt=txt||'';it.l=l||'';it.ko=!!ko;
 function codaPezzi(grp){const g=CODA.ris[grp],p=Object.assign({},(g&&g.p)||{});let info=g;
   for(const x of CODA.cloud){if(x.grp!==grp||x.st!=='fatta'||x.tipo!=='listino')continue;if(p[x.idx]===undefined)p[x.idx]={txt:x.txt||'',l:x.l||'',ko:!!x.ko};if(!info)info={grp,fid:x.fid||'',tot:x.tot,da:x.da||'',daNome:x.daNome||'',creato:x.creato||now()}}
   return{info,p}}
-function codaGruppi(){const s=new Set();for(const r of Object.values(CODA.ris))if(r.tipo!=='ris')s.add(r.grp);for(const x of CODA.cloud)if(x.grp&&x.st==='fatta')s.add(x.grp);for(const g of s)codaGruppo(g)}
+function codaGruppi(){let ripulito=false;for(const g of Object.keys(CODA.ris)){const r=CODA.ris[g];// pezzi letti da questo telefono: se il risultato del gruppo è già sul cloud i pezzi non servono più (senza, dopo «Togli» un altro telefono lo rifarebbe)
+    if(r.tipo!=='ris'&&CODA.cloud.some(x=>x.id===g&&x.tipo==='ris')){delete CODA.ris[g];ripulito=true}}
+  if(ripulito)codaRisSalva();const s=new Set();for(const r of Object.values(CODA.ris))if(r.tipo!=='ris')s.add(r.grp);for(const x of CODA.cloud)if(x.grp&&x.st==='fatta')s.add(x.grp);for(const g of s)codaGruppo(g)}
 async function codaGruppo(grp){if(CODA.gb)return;const {info,p}=codaPezzi(grp);if(!info||!info.tot)return;
   if((CODA.ris[grp]&&CODA.ris[grp].tipo==='ris')||CODA.cloud.some(x=>x.id===grp&&x.tipo==='ris'))return;
   const idx=[];for(let i=0;i<info.tot;i++){if(!p[i])return;idx.push(i)}
@@ -3039,8 +3042,9 @@ async function codaGruppo(grp){if(CODA.gb)return;const {info,p}=codaPezzi(grp);i
     if(codaCloud()){const ref=codaCol().doc(grp);
       try{mio=await fbInit().fs.runTransaction(async t=>{const s=await t.get(ref);if(s.exists)return false;t.set(ref,R);return true})}catch(e){return}
       if(mio)for(const i of idx)codaCol().doc(grp+'_'+i).delete().catch(()=>{});
-      if(!CODA.cloud.some(x=>x.id===grp))CODA.cloud.push(Object.assign({id:grp},R))}
-    CODA.ris[grp]=R;await codaRisSalva();
+      if(mio&&!CODA.cloud.some(x=>x.id===grp))CODA.cloud.push(Object.assign({id:grp},R))}
+    // se il risultato l'ha fatto un altro telefono arriva dal cloud: rimetterlo qui da questo telefono lo farebbe tornare dopo «Togli»
+    if(mio){CODA.ris[grp]=R;await codaRisSalva()}
     if(mio)await codaRisAvviso(R);
     codaRisArrivo();schedule()}
   finally{CODA.gb=false}}
@@ -3055,14 +3059,15 @@ async function codaRisAvviso(R){const rows=impRighe(mapRows(parseTable(R.txt))||
   await notify('gm','Listino'+(f?' '+f:'')+': '+(rows.length?rows.length+(rows.length===1?' riga letta':' righe lette'):'niente da leggere')+(ups.length?', '+(ups.length===1?'1 prezzo aumentato':ups.length+' prezzi aumentati'):''),
     (p.length?p.join('; ')+'.':'Nessuna discrepanza.')+' Foto di '+(R.daNome||'staff')+'. Apri Fornitori → «Controlla e salva».','listino',R.grp)}
 // risultati da controllare (cloud + telefono), striscia in Fornitori, apertura di «Controlla e salva», rimozione dopo il salvataggio
-function codaRisList(){const m={};for(const r of Object.values(CODA.ris))if(r.tipo==='ris')m[r.grp]=r;for(const x of CODA.cloud)if(x.tipo==='ris')m[x.id]=Object.assign({grp:x.id},x);
+function codaRisList(){const m={};for(const r of Object.values(CODA.ris))if(r.tipo==='ris')m[r.grp]=r;for(const x of CODA.cloud)if(x.tipo==='ris'&&x.st!=='tolto')m[x.id]=Object.assign({grp:x.id},x);
   return Object.values(m).sort((a,b)=>(b.letto||0)-(a.letto||0))}
 const codaRisCta=me=>{if(!isMgr(me))return'';return codaRisList().map(r=>{const f=r.fid&&D().fornitori[r.fid];const n=(mapRows(parseTable(r.txt||''))||[]).length;
   return`<div class="coda-ris"><button type="button" class="sug-cta" data-a="codaRis" data-id="${r.grp}">${ic('sheet')}<div><b>Listino${f?' '+esc(f.nome):''} letto</b><span>${n?n+(n===1?' riga':' righe')+' da controllare e salvare':'nelle foto non ho trovato righe'} · foto di ${esc(r.daNome||'staff')}, ${ago(r.letto||r.creato)}</span></div>${ic('chev')}</button><button type="button" class="icon-btn" data-a="codaRisVia" data-id="${r.grp}" aria-label="Togli">${ic('x')}</button></div>`}).join('')};
 function codaRisApri(grp){const r=codaRisList().find(x=>x.grp===grp);if(!r)return;impSheet(r.fid);const I=S.imp;I.txt=r.txt||'';I.gnote=(r.lett||[]).filter(x=>!x.ko).map(x=>({l:x.l,log:[]}));
   if(!I.txt.trim()){I.stage='paste';I.err='Nelle foto non ho trovato righe di prodotti.';refreshSheet();return}
   const prima=S.rev;impRun('txt');if(S.rev&&S.rev!==prima)S.rev.grp=grp}
-function codaRisVia(grp){delete CODA.ris[grp];CODA.cloud=CODA.cloud.filter(x=>x.id!==grp);codaRisSalva();if(codaCloud())codaCol().doc(grp).delete().catch(()=>{});schedule()}
+// «tolto» e non cancellato: un telefono in ritardo (pezzi vecchi) non può rifare il risultato; sparisce da solo dopo CODA_T.vecchie
+function codaRisVia(grp){delete CODA.ris[grp];const c=CODA.cloud.find(x=>x.id===grp);if(c){c.st='tolto';c.fatto=now()}codaRisSalva();if(codaCloud())codaCol().doc(grp).set({st:'tolto',fatto:now(),txt:'',lett:[],ko:[]},{merge:true}).catch(()=>{});schedule()}
 // il foglio «Importa listino» aperto su questo gruppo: appena il risultato c'è, il gestore passa a «Controlla e salva»
 function codaRisArrivo(){const I=S.imp;if(!I||!I.grp||!isMgr(realU()))return;if(!codaRisList().some(x=>x.grp===I.grp))return;const g=I.grp;I.grp='';closeSheet();codaRisApri(g)}
 function codaListStatoH(I){const vs=CODA.list.filter(x=>x.grp===I.grp).sort((a,b)=>a.idx-b.idx);
@@ -3195,7 +3200,7 @@ function gemSrvOk(){if(gemSrv.ok!==null)return Promise.resolve(gemSrv.ok);if(!pu
 const gemOn=()=>!!gemKey()||(!!gemSrv.ok&&pushFb());
 const gemTxt=j=>((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.text||'').join('\n').trim();
 // v112: sig = AbortSignal facoltativo (la gara della ricerca vini ferma il lettore che perde)
-// v113 (Mario #132: «non usare gemini 3», «flash dopo 45 secondi si blocca»): le foto le leggono Gemini 2.5 Flash (f25) e Flash-Lite (l25), non più «flash»/«lite» (oggi = Gemini 3, ragiona di partenza → lento).
+// v113 (richiesta: «non usare gemini 3», «flash dopo 45 secondi si blocca»): le foto le leggono Gemini 2.5 Flash (f25) e Flash-Lite (l25), non più «flash»/«lite» (oggi = Gemini 3, ragiona di partenza → lento).
 // A f25 si spegne il ragionamento (thinkingBudget 0, come vnMondo); se Google risponde 400 la stessa richiesta senza. Una lettura riuscita oltre GEM_LENTA s va nella scatola nera.
 const GEM_LENTA=30;
 async function gemCall(body,lettore,sig){const t0=Date.now(),gc=body.generationConfig||{};
