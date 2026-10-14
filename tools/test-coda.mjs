@@ -86,6 +86,7 @@ await cb.setOffline(false);await B.waitForTimeout(500);
 ok(await fino(A,()=>{const o=D().ordini.test_o2;return!!(o&&o.ricezione&&o.ricezione.bolla&&o.ricezione.bolla.righe)},25000),'rete tornata: la foto parte da B, A la legge e la mette in ricezione.bolla (ordine già controllato)');
 const o2=await A.evaluate(()=>D().ordini.test_o2);
 ok(o2.prezziDiversi===1&&!o2.bolla,'ordine già controllato: prezziDiversi 1, niente campo «bolla» a parte');
+await fino(A,()=>Object.values(D().notifiche).some(n=>n.tipo==='bolla'&&n.rif==='test_o2'),20000);
 const n2=await A.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='bolla'&&n.rif==='test_o2')[0]);
 ok(n2&&/Foto di Luca Prova\.$/.test(n2.testo),'avviso: «Foto di Luca Prova.» senza «ancora da controllare» '+JSON.stringify(n2&&n2.testo));
 ok(await fino(B,()=>CODA.list.length===0,30000),'B: coda vuota dopo la lettura di A');
