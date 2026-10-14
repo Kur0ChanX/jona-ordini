@@ -39,6 +39,7 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 - **E6** Regole di Firebase: nelle istruzioni dire «menù a sinistra → icona **Firestore** → scheda **Regole**» (il link diretto porta alla home).
 - **E51** Nelle guide per iPhone chiedere prima «la apri dall'icona o da Safari?» (le notifiche esistono solo nell'app dalla Home).
 - **E21** Prima di dare colpa all'aggiornamento controllare la vista della barra Test: le Novità dipendono dal ruolo.
+- **E56** Se Mario boccia tutte le bozze e dice «fallo tu», NON scegliere una bozza bocciata: disegnare una cosa nuova e mostrargliela prima di metterla nell'app.
 
 ## Leggere i file
 - **E53** File con righe lunghissime (tabelle, index.html): `grep -n -o '.\{0,80\}parola.\{0,80\}'`, mai `grep` semplice (una riga sola = migliaia di token).
