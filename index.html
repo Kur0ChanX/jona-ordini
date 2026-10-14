@@ -1235,8 +1235,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=115;
+const APP_VER=116;
 const NEWS=[
+  {v:116,data:'2026-10-14',titolo:'Foto delle bolle: pulizia da sola',
+    chef:['La foto della bolla dentro il controllo merce resta 30 giorni, poi si toglie da sola: l\'app resta veloce e lo spazio non si riempie. Prodotti, quantità, prezzi e note del controllo restano per sempre.'],
+    dev:['D55: `fotoPulisci` (telefono di un gestore, una volta al giorno, dal giro di 60 s della coda): `S.db.range(\'ordini\',\'ricevuto\',da,fino)` con `fino` = ora − `FOTO_GG` (30 giorni) e `da` = ultimo `fino` (`jona_fotopul`), poi `ricezione.foto` → \'\'. Prova `tools/test-foto-pulizia.mjs`.']},
   {v:115,data:'2026-10-14',titolo:'Foto dei listini: scatta e basta',
     chef:['In Importa listino le foto vanno in coda come le bolle: puoi chiudere l\'app, le foto non si perdono e la lettura riparte da sola finché non va, anche da un altro telefono del ristorante.','A lettura finita arriva un avviso con prezzi aumentati, righe con i conti che non tornano e prodotti nuovi; in Fornitori trovi «Listino letto» che apre «Controlla e salva».'],
     dev:['D54 (c): voci `tipo:\'listino\'` nella coda (una per foto, gruppo `grp`), testo letto nel documento `coda/<grp>_<i>`; gruppo completo → risultato `coda/<grp>` (`tipo:\'ris\'`, creato una volta sola con `runTransaction`), avviso `listino` ai gestori (`codaRisAvviso`: `rvUps`, `rigaNonTorna`, senza fornitore, prodotti nuovi, foto illeggibili); `codaRisCta` in Fornitori → `codaRisApri` → `impRun(\'txt\')` con `S.rev.grp`, tolto al salvataggio. `gemGo` → `codaListino`; `gemRun` resta per la prova `test-fatture`. Prova `tools/test-coda.mjs` (listino: 2 foto, due telefoni) e `test-bolla`.']},
@@ -1295,10 +1298,7 @@ const NEWS=[
     dev:['#115: in `tools/bar-disegni.mjs` la cannuccia passa per il centro dell\'apertura del bicchiere. Prova in `tools/test-bar-disegni.mjs`.']},
   {v:97,data:'2026-10-12',titolo:'Bar: Americano più ordinato',
     tutti:['Nel disegno dell\'Americano la mezza fetta d\'arancia e la scorza di limone non si toccano più.'],
-    dev:['Difetto 18 (#101): in `garn` di `tools/bar-disegni.mjs` la scorza dopo una fetta va 10 più a sinistra. Prova in `tools/test-bar-disegni.mjs`.']},
-  {v:96,data:'2026-10-12',titolo:'iPhone: la foto del vino non fa più ripartire l\'app',
-    tutti:['Cantina Vini: dopo la foto della bottiglia l\'app su iPhone non riparte più da sola. La foto viene subito rimpicciolita.','Se il telefono chiude lo stesso l\'app, la scheda del vino riparte da dove eri (nome e foto già fatte).','Se l\'IA passa a un lettore di riserva, la scheda dice il motivo vero.'],
-    dev:['D45: `fotoPiccola(file,max,mini)` (EXIF da `jpgInfo`, `createImageBitmap` con `resizeWidth`, giro a mano se resta coricata, tela svuotata), usata anche da `shrinkImg`. Vino: solo foto piccole + miniatura (`VN_PIC`), bozza `jona_vn` + IndexedDB `jona-kv` (`vnBozza`, `vnRestore`). Prova `tools/test-foto-vino.mjs` su PC, Android, tablet, Mac, iPhone, iPad.']},
+    dev:['Difetto 18 (#101): in `garn` di `tools/bar-disegni.mjs` la scorza dopo una fetta va 10 più a sinistra. Prova in `tools/test-bar-disegni.mjs`.']}
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -3008,7 +3008,15 @@ function codaWatch(){if(CODA.on||!codaCloud())return;CODA.on=true;
   codaCol().onSnapshot(q=>{CODA.cloud=q.docs.map(d=>Object.assign({id:d.id},d.data()));codaRaccogli();codaFlush();codaRisArrivo();schedule()},()=>{CODA.on=false})}
 async function codaAvvio(){try{const r=await idbKv(codaRisK());if(r&&typeof r==='object')CODA.ris=r}catch(e){}
   try{const l=await idbKv(CODA_K());if(Array.isArray(l))for(const x of l)if(x&&x.id&&!CODA.list.some(y=>y.id===x.id))CODA.list.push(Object.assign(x,{busy:false,next:0}))}catch(e){}
-  setInterval(()=>{codaRaccogli();codaFlush()},60000);setInterval(codaTick,1000);codaFlush();schedule()}
+  setInterval(()=>{codaRaccogli();codaFlush();fotoPulisci()},60000);setTimeout(fotoPulisci,15000);setInterval(codaTick,1000);codaFlush();schedule()}
+// v116 (D55): la foto della bolla nel controllo merce (`ricezione.foto`, ~200 KB) si toglie dopo 30 giorni; lo fa un gestore una volta al giorno, solo sugli ordini non ancora puliti (segno in jona_fotopul)
+const FOTO_GG=30;let fotoBusy=false;
+async function fotoPulisci(){const u=realU();if(fotoBusy||!u||!isMgr(u)||!S.db||!S.db.range)return;
+  const oggi=new Date().toDateString(),st=ls('jona_fotopul')||{};if(st.g===oggi)return;
+  fotoBusy=true;const fino=now()-FOTO_GG*864e5;
+  try{const l=await S.db.range('ordini','ricevuto',st.f||1,fino);
+    for(const o of l)if(o.ricezione&&o.ricezione.foto)await upd('ordini',o.id,{'ricezione.foto':''});
+    ls('jona_fotopul',{g:oggi,f:fino})}catch(e){}finally{fotoBusy=false}}
 addEventListener('online',()=>codaFlush());
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)codaFlush()});
 // ===== v115 (D54 c): foto dei listini in coda come le bolle. Una voce per foto (stesso gruppo grp); i testi letti si uniscono
