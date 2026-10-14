@@ -53,13 +53,13 @@ ok(await fino(B,()=>{const it=CODA.list[0];return it&&it.st==='errore'&&!it.busy
 ok(/Riprovo tra/.test(await B.innerText(sh+'#coda-stato'))&&letture.filter(x=>x.da==='B'&&x.foto).length>=2,'B: «Riprovo tra…» nel foglio; ha provato più lettori con la foto');
 ok(await fino(A,()=>{const o=D().ordini.test_o1;return!!(o&&o.bolla&&o.bolla.righe)},20000),'A ha preso la bolla dal cloud e l\'ha letta: «bolla» nell\'ordine');
 const ob=await A.evaluate(()=>D().ordini.test_o1.bolla);
-ok(ob.righe.length===3&&ob.lett==='f25'&&ob.da==='test_u1'&&ob.daNome==='Luca Prova'&&ob.lettoDa===await A.evaluate(()=>realU().id)&&ob.extra.join()==='LIMONI','bolla: 3 righe, lettore f25, foto di Luca, letta da mario, Limoni in più '+JSON.stringify({l:ob.lett,da:ob.da,n:ob.daNome,x:ob.extra}));
-ok(letture.filter(x=>x.da==='A'&&x.foto).length===1,'A ha chiamato Gemini una volta sola con la foto');
+ok(ob.righe.length===3&&ob.lett==='f25'&&ob.lett2==='l25'&&!(ob.dc||[]).length&&ob.da==='test_u1'&&ob.daNome==='Luca Prova'&&ob.lettoDa===await A.evaluate(()=>realU().id)&&ob.extra.join()==='LIMONI','bolla: 3 righe, lettore f25, foto di Luca, letta da mario, Limoni in più '+JSON.stringify({l:ob.lett,da:ob.da,n:ob.daNome,x:ob.extra}));
+ok(letture.filter(x=>x.da==='A'&&x.foto).map(x=>x.l).join()==='f25,l25','A ha letto con Flash e, 2 prodotti su 3 (sotto l\'80%), ricontrollato con Flash-Lite (v117) '+JSON.stringify(letture.filter(x=>x.da==='A')));
 const na=await A.evaluate(()=>Object.values(D().notifiche).filter(n=>n.tipo==='bolla')[0]);
 ok(na&&na.a==='gm'&&/3 cose da vedere/.test(na.titolo)&&/1 prezzo diverso.*Pomodoro/.test(na.testo)&&/non è sulla bolla: Basilico/.test(na.testo)&&/non ordinato: LIMONI/.test(na.testo)&&/Foto di Luca Prova; la consegna è ancora da controllare/.test(na.testo),'avviso ai gestori: prezzo diverso, Basilico mancante, Limoni in più, foto di Luca '+JSON.stringify(na&&na.testo));
 ok(await fino(B,()=>CODA.list.length===0&&!!document.querySelector('#bol-esito')),'B: la voce esce dalla sua coda e il foglio aperto mostra «Bolla letta»');
 const tb=await B.innerText(sh+'#bol-esito');
-ok(/Bolla letta da Gemini 2.5 Flash: 2 prodotti segnati/.test(tb)&&/1 non sulla bolla/.test(tb)&&/LIMONI/.test(tb)&&!/foto di/.test(tb),'B: «letta da Gemini 2.5 Flash: 2 prodotti segnati», 1 non sulla bolla, Limoni in più, senza «foto di» (è la sua) '+tb.replace(/\s+/g,' ').slice(0,120));
+ok(/Bolla letta da Gemini 2.5 Flash e ricontrollata da Gemini 2.5 Flash-Lite: 2 prodotti segnati/.test(tb)&&/1 non sulla bolla/.test(tb)&&/LIMONI/.test(tb)&&!/foto di/.test(tb),'B: «letta da Gemini 2.5 Flash: 2 prodotti segnati», 1 non sulla bolla, Limoni in più, senza «foto di» (è la sua) '+tb.replace(/\s+/g,' ').slice(0,120));
 ok(await B.evaluate(()=>{const L=rcvState('test_o1').lines;return L[0].st==='ok'&&L[1].st==='ok'&&L[2].st===''&&L[2].bno===true}),'B: pomodoro e zucchine «c\'è», basilico da toccare e segnato «non sulla bolla»');
 ok(!(await B.$(sh+'#coda-stato')),'B: niente più stato della coda');
 const cd=await A.evaluate(async()=>{const s=await fbInit().fs.collection('coda').get();return s.docs.map(d=>d.data())});

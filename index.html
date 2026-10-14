@@ -1235,8 +1235,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=116;
+const APP_VER=117;
 const NEWS=[
+  {v:117,data:'2026-10-14',titolo:'Bolla: doppio controllo quando la lettura è dubbia',
+    chef:['Se la bolla letta ha pochi prodotti dell\'ordine o righe con i conti che non tornano, l\'app la fa rileggere da un secondo lettore e tiene la lettura migliore.','Le righe dove le due letture sono diverse non si segnano da sole: nel controllo merce trovi «Da controllare a mano» e l\'avviso te le elenca. Così l\'app non sbaglia, non inventa e non salta prodotti.','Lo stesso doppio controllo vale per le foto dei listini con conti che non tornano.'],
+    dev:['D54 (d): `letDubbia` (bolla con meno dell\'80% dei prodotti dell\'ordine abbinati, o ≥2 / >20% righe `rigaNonTorna`) → `codaSeconda` con il lettore successivo di `GEM_LETT`; `letPunti` sceglie la migliore; `bolla.lett2` e `bolla.dc` (indici delle righe dell\'ordine diverse tra le due letture, `letNumDiv` >1%) → `bolInR` non le precompila (`L.bdc`), avviso «da controllare a mano». `CODA.fatte`: una voce appena letta non torna in coda per uno snapshot del cloud in ritardo. Prova `tools/test-letture-sicure.mjs`.']},
   {v:116,data:'2026-10-14',titolo:'Foto delle bolle: pulizia da sola',
     chef:['La foto della bolla dentro il controllo merce resta 30 giorni, poi si toglie da sola: l\'app resta veloce e lo spazio non si riempie. Prodotti, quantità, prezzi e note del controllo restano per sempre.'],
     dev:['D55: `fotoPulisci` (telefono di un gestore, una volta al giorno, dal giro di 60 s della coda): `S.db.range(\'ordini\',\'ricevuto\',da,fino)` con `fino` = ora − `FOTO_GG` (30 giorni) e `da` = ultimo `fino` (`jona_fotopul`), poi `ricezione.foto` → \'\'. Prova `tools/test-foto-pulizia.mjs`.']},
@@ -1296,9 +1299,6 @@ const NEWS=[
   {v:98,data:'2026-10-12',titolo:'Bar: cannuccia al centro',
     tutti:['Nei disegni di Mojito, Scorpion e Mint Julep la cannuccia esce dal centro del bicchiere.'],
     dev:['#115: in `tools/bar-disegni.mjs` la cannuccia passa per il centro dell\'apertura del bicchiere. Prova in `tools/test-bar-disegni.mjs`.']},
-  {v:97,data:'2026-10-12',titolo:'Bar: Americano più ordinato',
-    tutti:['Nel disegno dell\'Americano la mezza fetta d\'arancia e la scorza di limone non si toccano più.'],
-    dev:['Difetto 18 (#101): in `garn` di `tools/bar-disegni.mjs` la scorza dopo una fetta va 10 più a sinistra. Prova in `tools/test-bar-disegni.mjs`.']}
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -2833,18 +2833,18 @@ function receiveSheet(oid){
     <h2 class="sec">Oppure tocca ogni prodotto</h2>
     <div class="sem-leg"><span style="--k:var(--mirto)"><i></i>1 tocco: c'è</span><span style="--k:var(--corallo)"><i></i>2 tocchi: manca</span><span style="--k:var(--ocra)"><i></i>3 tocchi: ne è arrivato meno</span></div>
     <div class="sem-top"><div class="sem-bar" aria-hidden="true"><i style="width:${tot?Math.round(fatti*100/tot):0}%"></i></div><span class="sem-cnt" id="sem-cnt">${fatti} di ${tot}</span></div>
-    <div>${o.items.map((l,i)=>{const L=R.lines[i];const [k,t,icn]=SEM[L.st||''];return`<div class="sem s-${k}"><button type="button" class="sem-b" id="sem-${oid}-${i}" data-a="rst" data-o="${oid}" data-i="${i}" aria-label="${esc(l.nome)}: ${t}. Tocca per cambiare"><span class="sem-d">${icn?ic(icn):''}</span><span class="sem-i"><span class="sem-n">${esc(l.nome)}</span><span class="sem-m">ordinati ${fq(l.qta)} ${esc(l.unita||'')}${l.codice?', cod. '+esc(l.codice):''}</span>${R.bol?(L.bno?'<span class="bol-r ko">Non è sulla bolla</span>':L.bq!=null?`<span class="bol-r${Math.abs(L.bq-l.qta)>l.qta*.05?' ko':''}">Sulla bolla: ${fq(L.bq)} ${esc(l.unita||'')}</span>`:''):''}</span><span class="sem-l">${t}</span></button>
+    <div>${o.items.map((l,i)=>{const L=R.lines[i];const [k,t,icn]=SEM[L.st||''];return`<div class="sem s-${k}"><button type="button" class="sem-b" id="sem-${oid}-${i}" data-a="rst" data-o="${oid}" data-i="${i}" aria-label="${esc(l.nome)}: ${t}. Tocca per cambiare"><span class="sem-d">${icn?ic(icn):''}</span><span class="sem-i"><span class="sem-n">${esc(l.nome)}</span><span class="sem-m">ordinati ${fq(l.qta)} ${esc(l.unita||'')}${l.codice?', cod. '+esc(l.codice):''}</span>${R.bol?(L.bdc?'<span class="bol-r ko">Da controllare a mano: le due letture sono diverse</span>':L.bno?'<span class="bol-r ko">Non è sulla bolla</span>':L.bq!=null?`<span class="bol-r${Math.abs(L.bq-l.qta)>l.qta*.05?' ko':''}">Sulla bolla: ${fq(L.bq)} ${esc(l.unita||'')}</span>`:''):''}</span><span class="sem-l">${t}</span></button>
       ${L.st==='meno'?`<div class="sem-q"><span>Quanti ne sono arrivati?</span>${stepper('rq2',oid+'-'+i,L.arr,`data-o="${oid}" data-i="${i}"`)}<span>${esc(l.unita||'')}</span></div>`:''}</div>`}).join('')}</div>
     <label class="lbl" for="rcv-note">Note</label><textarea class="inp" id="rcv-note" rows="2" placeholder="Es. pomodori troppo maturi" data-in="rcvnote" data-o="${oid}">${esc(R.note)}</textarea>
     <span class="lbl">Foto della bolla (facoltativa)</span>
     ${R.foto?`<div class="bolla"><img src="${R.foto}" alt="Foto della bolla"><button type="button" class="btn ghost sm danger" data-a="bollaDel" data-o="${oid}">${ic('trash')} Togli</button></div>`:''}
     ${R.bolErr?`<div class="err">${esc(R.bolErr)}</div>`:''}${codaStatoH(oid)}
-    ${R.bol?`<div class="bol-ok" id="bol-esito">${ic('check')} Bolla letta${R.bol.lett?' da '+esc(gemNome(R.bol.lett)):''}${R.bol.daNome&&R.bol.da!==(realU()||{}).id?' (foto di '+esc(R.bol.daNome)+')':''}: ${R.bol.auto===1?'1 prodotto segnato':R.bol.auto+' prodotti segnati'} da solo. Controlla e correggi se serve.${R.lines.some(x=>x.bno)?`<br><b class="bol-r ko">${R.lines.filter(x=>x.bno).length} non sulla bolla</b>: tocca tu se ci sono.`:''}${R.bol.extra.length?`<br><b class="bol-r ko">Sulla bolla ma non ordinati:</b> ${esc(R.bol.extra.join(', '))}`:''}</div>`:''}
+    ${R.bol?`<div class="bol-ok" id="bol-esito">${ic('check')} Bolla letta${R.bol.lett?' da '+esc(gemNome(R.bol.lett)):''}${R.bol.lett2?' e ricontrollata da '+esc(gemNome(R.bol.lett2)):''}${R.bol.daNome&&R.bol.da!==(realU()||{}).id?' (foto di '+esc(R.bol.daNome)+')':''}: ${R.bol.auto===1?'1 prodotto segnato':R.bol.auto+' prodotti segnati'} da solo. Controlla e correggi se serve.${R.lines.some(x=>x.bdc)?`<br><b class="bol-r ko">${R.lines.filter(x=>x.bdc).length} da controllare a mano</b>: le due letture sono diverse.`:''}${R.lines.some(x=>x.bno)?`<br><b class="bol-r ko">${R.lines.filter(x=>x.bno).length} non sulla bolla</b>: tocca tu se ci sono.`:''}${R.bol.extra.length?`<br><b class="bol-r ko">Sulla bolla ma non ordinati:</b> ${esc(R.bol.extra.join(', '))}`:''}</div>`:''}
     ${R.foto||R.bol||R.cid?'':`<div class="btns" style="justify-content:flex-start"><button type="button" class="btn ghost sm" data-a="bollaCam" data-o="${oid}">${ic('camera')} Fotocamera</button><button type="button" class="btn ghost sm" data-a="bollaLib" data-o="${oid}">${ic('image')} Galleria</button></div>${gemOn()?`<p class="muted small" style="margin-top:6px">Scatta e basta: la bolla si legge da sola, anche se chiudi l'app.</p>`:''}`}
     <div class="sheet-foot"><button type="button" class="btn ghost" data-a="closeSheet">Più tardi</button><button type="button" class="btn wrapt ${nd?'dark':'primary'}" data-a="rcvGo" data-o="${oid}" ${fatti?'':'disabled'}>${ic('send')} ${nd?'Invia con '+(nd===1?'1 differenza':nd+' differenze'):'Invia controllo'}</button></div>`}});
 }
 async function setBolla(oid,fs){const R=rcvState(oid),o=D().ordini[oid];if(!o)return;
-  R.bolErr='';if(R.cid)codaTogli(R.cid);R.cid='';R.bol=null;R.bolImg=null;R.lines.forEach(L=>{delete L.bq;delete L.bno});if(o.bolla)R.bolVia=o.bolla.cid;
+  R.bolErr='';if(R.cid)codaTogli(R.cid);R.cid='';R.bol=null;R.bolImg=null;R.lines.forEach(L=>{delete L.bq;delete L.bno;delete L.bdc});if(o.bolla)R.bolVia=o.bolla.cid;
   let p=null;try{p=await codaFoto(fs[0])}catch(e){R.bolErr='La foto non si apre: prova a rifarla.';refreshSheet();return}
   R.foto=p.mini;
   // v114 (D54 strada 3): la foto va subito in coda e si legge da sola (anche da un altro telefono); niente più tocco su «Confronta»
@@ -2869,8 +2869,8 @@ const bolPrezzoDiv=(l,r)=>r&&r.prezzo>0&&l.prezzo>0&&(!r.unita||normUnita(r.unit
 async function bolLeggi(oid){const R=rcvState(oid);const it=CODA.list.find(x=>x.oid===oid&&x.tipo==='bolla');if(!it||it.busy)return;it.next=0;R.bolErr='';await codaFlush()}
 // la lettura arrivata (campo «bolla» dell'ordine, scritta da qualsiasi telefono) entra nel foglio del controllo: precompila solo le righe non toccate
 function bolInR(R,o){const B=o.bolla;if(!B||!B.righe||R.bolVia===B.cid||(R.bol&&R.bol.cid===B.cid))return;let n=0;
-  o.items.forEach((l,i)=>{const L=R.lines[i];if(!L)return;const r=B.righe.find(x=>x.i===i);L.bq=r?r.q:undefined;L.bno=!r;
-    if(L.st||!r||r.q==null)return;n++;if(r.q<=0)L.st='ko';else if(r.q<l.qta*.95){L.st='meno';L.arr=r3(r.q)}else L.st='ok'});
+  o.items.forEach((l,i)=>{const L=R.lines[i];if(!L)return;const r=B.righe.find(x=>x.i===i);L.bdc=(B.dc||[]).includes(i);L.bq=r&&!L.bdc?r.q:undefined;L.bno=!r&&!L.bdc;
+    if(L.st||L.bdc||!r||r.q==null)return;n++;if(r.q<=0)L.st='ko';else if(r.q<l.qta*.95){L.st='meno';L.arr=r3(r.q)}else L.st='ok'});
   R.bol=Object.assign({},B,{auto:n});R.bolErr='';if(R.cid===B.cid)R.cid=''}
 const rcvDiffTxt=d=>d.nome+': '+(d.motivo==='mancante'?'manca':'arrivati '+fq(d.arr)+' su '+fq(d.qta));
 async function confirmReceipt(oid,all){
@@ -2903,6 +2903,7 @@ function receiptView(oid){
 }
 // riga della bolla nel controllo già inviato: quantità per tutti, prezzo solo per il gestore (rosso se diverso dall'ordine)
 function bolRiga(o,rz,i){const B=rz.bolla;if(!B)return'';const b=B.righe.find(x=>x.i===i),l=(o.items||[])[i]||{};
+  if((B.dc||[]).includes(i))return'<br><span class="bol-r ko">Bolla da controllare a mano: le due letture erano diverse</span>';
   if(!b)return'<br><span class="bol-r ko">Non era sulla bolla</span>';
   const pr=showPrices()&&b.prezzo>0?(bolPrezzoDiv(l,b)?` · <span class="bol-r ko">prezzo bolla ${eur(b.prezzo)}, ordine ${eur(l.prezzo)}</span>`:` · prezzo bolla ${eur(b.prezzo)}`):'';
   return`<br><span class="bol-r">Sulla bolla: ${b.q!=null?fq(b.q)+' '+esc(l.unita||b.unita||''):'quantità non letta'}</span>${pr}`}
@@ -2916,13 +2917,13 @@ function bolRiga(o,rz,i){const B=rz.bolla;if(!B)return'';const b=B.righe.find(x=
 function idbKv(k,v){return new Promise(res=>{try{const r=indexedDB.open('jona-kv',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onerror=()=>res(null);
   r.onsuccess=()=>{const db=r.result;try{const t=db.transaction('kv',v===undefined?'readonly':'readwrite'),s=t.objectStore('kv'),q=v===undefined?s.get(k):v===null?s.delete(k):s.put(v,k);
     t.oncomplete=()=>{db.close();res(v===undefined?q.result:true)};t.onerror=t.onabort=()=>{db.close();res(null)}}catch(e){db.close();res(null)}}}catch(e){res(null)}})}
-const CODA={list:[],busy:false,on:false,cloud:[],ris:{},gb:false};
+const CODA={list:[],busy:false,on:false,cloud:[],ris:{},gb:false,fatte:{}};
 let CODA_T={testa:20000,lock:150000,ri:120000,riMax:5,poi:600000,maxB:900000,vecchie:7*864e5};
 const CODA_K=()=>(DEMO?'demo:':'')+'coda_q';
 const codaDev=()=>{let d=ls('jona_dev');if(!d){d=uid();ls('jona_dev',d)}return d};
 const codaCol=()=>fbInit().fs.collection('coda');
 const codaCloud=()=>!DEMO&&pushFb();
-const codaDoc=it=>{const d={};for(const [k,v] of Object.entries(it))if(!['next','busy','t0','err0'].includes(k)&&v!==undefined)d[k]=v;return d};
+const codaDoc=it=>{const d={};for(const [k,v] of Object.entries(it))if(!['next','busy','t0','err0','bis'].includes(k)&&v!==undefined)d[k]=v;return d};
 function codaSalva(){return idbKv(CODA_K(),CODA.list.length?CODA.list.map(codaDoc):null)}
 // foto per la coda: lato lungo 1600 px, più piccola finché il base64 sta sotto CODA_T.maxB (limite del documento Firestore); mini = anteprima per il foglio e la ricezione
 async function codaFoto(file){let max=1600,r,b;for(;;){r=await fotoPiccola(file,max,1200);b=await b64(r.b);if(b.length<=CODA_T.maxB||max<=800)break;max=Math.round(max*.75)}return{b64:b,mini:r.mini}}
@@ -2947,15 +2948,33 @@ async function codaFlush(){
       const lk=await codaLock(it);if(lk==='fatta'){await codaVia(it);continue}if(!lk)continue;
       await codaLeggi(it)}}
   finally{CODA.busy=false;refreshSheet();codaRaccogli()}}// riguarda il cloud: una voce «fatta» da un altro telefono mentre questa era occupata esce subito dalla coda
+// v117 (D54 d, letture sicure): lettura dubbia (bolla con meno dell'80% dei prodotti dell'ordine, o righe con i conti che non tornano)
+// → seconda lettura con un altro lettore; si tiene la migliore e le righe diverse tra le due letture vanno «da controllare a mano»
+const LET2={min:.8,dub:.2};
+const codaRighe=txt=>(mapRows(parseTable(txt))||[]).map(r=>({nome:pulisciNome(r.nome),codice:r.codice,unita:normUnita(r.unita),q:r.q,prezzo:r.prezzo,imp:r.imp})).filter(r=>r.nome);
+const letStorte=rows=>rows.filter(r=>rigaNonTorna(r)).length;
+const letOrd=it=>it.tipo==='bolla'&&D().ordini[it.oid]?D().ordini[it.oid].items||[]:null;
+function letDubbia(it,rows){const k=letStorte(rows);if(k>=2||k>rows.length*LET2.dub)return true;
+  const its=letOrd(it);return!!(its&&its.length&&bolMatch(its,rows).ri.size<its.length*LET2.min)}
+function letPunti(it,rows){const its=letOrd(it);return(its?bolMatch(its,rows).ri.size*2:rows.length)-letStorte(rows)*2}
+async function codaSeconda(it,body,l1){it.bis=true;refreshSheet();if(codaCloud())codaCol().doc(it.id).update({at:now()}).catch(()=>{});
+  try{for(const [l] of GEM_LETT){if(l===l1)continue;const g=await gemCall(body,l);if(g.salta||!g.txt)continue;
+      const rows=codaRighe(g.txt);if(rows.length)return{txt:g.txt,rows,lett:g.lettore||l}}
+    errLog('Seconda lettura non riuscita: tengo la prima ('+gemNome(l1)+')');return null}
+  finally{it.bis=false}}
+// due numeri diversi tra le letture (oltre l'1%); un numero letto da una sola delle due conta come diverso
+const letNumDiv=(a,b)=>(a==null)!==(b==null)||(a!=null&&Math.abs(a-b)>Math.max(.01,Math.abs(a)*.01));
 async function codaLeggi(it){it.busy=true;it.t0=now();it.n=(it.n||0)+1;it.err='';refreshSheet();let g=null;
   try{const body={contents:[{parts:[{text:geminiPrompt()},{inline_data:{mime_type:'image/jpeg',data:it.foto}}]}],generationConfig:{temperature:0}};
     for(const [l] of GEM_LETT){g=await gemCall(body,l);if(g.salta){g=null;continue}if(g.txt||!GEM_RETRY.test(String(g.st)))break}
     if(!g||!g.txt)throw{msg:(g&&g.err)||'Gemini non è riuscito a leggere la foto.'};
-    const rows=(mapRows(parseTable(g.txt))||[]).map(r=>({nome:pulisciNome(r.nome),codice:r.codice,unita:normUnita(r.unita),q:r.q,prezzo:r.prezzo,imp:r.imp})).filter(r=>r.nome);
+    let rows=codaRighe(g.txt),txt=g.txt,lett=g.lettore||'',alt=null;
+    if(rows.length&&letDubbia(it,rows)){const s=await codaSeconda(it,body,lett);
+      if(s){if(letPunti(it,s.rows)>letPunti(it,rows)){alt={rows,lett};rows=s.rows;txt=s.txt;lett=s.lett}else alt=s}}
     if(!rows.length){it.vuote=(it.vuote||0)+1;if(it.vuote<2)throw{msg:'Sulla foto non trovo righe di prodotti.',foto:true};
       await codaIlleggibile(it)}
-    else if(it.tipo==='listino')await codaRisPezzo(it,g.txt,g.lettore||'');else await codaApplica(it,rows,g.lettore||'');
-    it.st='fatta';it.err='';codaFine(it);await codaVia(it);if(it.grp)codaGruppo(it.grp);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return true}
+    else if(it.tipo==='listino')await codaRisPezzo(it,txt,lett);else await codaApplica(it,rows,lett,alt);
+    it.st='fatta';it.err='';CODA.fatte[it.id]=now();codaFine(it);await codaVia(it);if(it.grp)codaGruppo(it.grp);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return true}
   catch(e){const m=(e&&e.msg)||'Non riesco a contattare Gemini.';it.err=m;it.st='errore';it.next=now()+(e&&e.foto?CODA_T.poi:it.n<=CODA_T.riMax?CODA_T.ri:CODA_T.poi);
     await codaSalva();if(codaCloud())codaCol().doc(it.id).update({st:'errore',err:m,n:it.n,vuote:it.vuote||0,at:0}).catch(()=>{});
     errLog('Bolla in coda: '+m+' (tentativo '+it.n+')');return false}
@@ -2969,12 +2988,15 @@ async function codaIlleggibile(it){
   if(it.da)await notify(it.da,'Bolla '+f+': foto non leggibile','Non trovo righe di prodotti nella foto. Rifalla più vicina e dritta dal Controllo merce.','bolla',it.oid);
   await notify('gm','Bolla '+f+': foto non leggibile','La foto di '+(it.daNome||'staff')+' non si legge: serve una foto nuova.','bolla',it.oid)}
 // risultato nell'ordine + avviso ai gestori con prezzi diversi, mancanze e prodotti in più (D54: «discrepanze prezzi mancanze e anomalie con l'invio a Maurizio»)
-async function codaApplica(it,rows,lett){const o=D().ordini[it.oid];if(!o)return;const me=realU();
+async function codaApplica(it,rows,lett,alt){const o=D().ordini[it.oid];if(!o)return;const me=realU();
   const {ri,extra}=bolMatch(o.items||[],rows);
   const righe=rows.map((r,j)=>({nome:r.nome,codice:r.codice||'',unita:r.unita||'',q:r.q,prezzo:r.prezzo,i:[...ri].find(x=>x[1]===j)?.[0]??-1}));
   const bol={lett,righe,extra:extra.map(r=>r.nome),cid:it.id,letto:now(),da:it.da||'',daNome:it.daNome||'',lettoDa:me?me.id:''};
   const its=o.items||[],bd=i=>righe.find(x=>x.i===i);
-  const pd=its.filter((l,i)=>bolPrezzoDiv(l,bd(i))),nb=its.filter((l,i)=>!bd(i)),meno=its.filter((l,i)=>{const b=bd(i);return b&&b.q!=null&&b.q<l.qta*.95}),dub=righe.filter(r=>rigaNonTorna({q:r.q,imp:rows[righe.indexOf(r)].imp,prezzo:r.prezzo}));
+  if(alt){const r2=bolMatch(its,alt.rows).ri;bol.lett2=alt.lett;
+    bol.dc=its.map((l,i)=>i).filter(i=>{const a=bd(i),b=r2.has(i)?alt.rows[r2.get(i)]:null;return!a!==!b||(a&&(letNumDiv(a.q,b.q)||(a.prezzo>0&&b.prezzo>0&&letNumDiv(a.prezzo,b.prezzo))))})}
+  const dc=bol.dc||[],dci=its.filter((l,i)=>dc.includes(i)),fuori=(l,i)=>!dc.includes(i);
+  const pd=its.filter((l,i)=>fuori(l,i)&&bolPrezzoDiv(l,bd(i))),nb=its.filter((l,i)=>fuori(l,i)&&!bd(i)),meno=its.filter((l,i)=>{const b=bd(i);return fuori(l,i)&&b&&b.q!=null&&b.q<l.qta*.95}),dub=righe.filter(r=>rigaNonTorna({q:r.q,imp:rows[righe.indexOf(r)].imp,prezzo:r.prezzo}));
   if(o.ricevuto)await upd('ordini',o.id,Object.assign({'ricezione.bolla':bol},pd.length?{prezziDiversi:pd.length}:{}));
   else await upd('ordini',o.id,{bolla:bol});
   if(S.rcv[o.id])bolInR(S.rcv[o.id],Object.assign({},o,{bolla:bol}));
@@ -2984,13 +3006,14 @@ async function codaApplica(it,rows,lett){const o=D().ordini[it.oid];if(!o)return
   if(meno.length)p.push((meno.length===1?'1 prodotto in quantità minore':meno.length+' prodotti in quantità minore')+': '+nomi(meno));
   if(extra.length)p.push((extra.length===1?'1 prodotto sulla bolla non ordinato':extra.length+' prodotti sulla bolla non ordinati')+': '+nomi(extra));
   if(dub.length)p.push((dub.length===1?'1 riga con i conti che non tornano':dub.length+' righe con i conti che non tornano')+': '+nomi(dub));
+  if(dci.length)p.push((dci.length===1?'1 prodotto da controllare a mano':dci.length+' prodotti da controllare a mano')+' (due letture diverse): '+nomi(dci));
   const f=forn(o.fornitoreId);
   await notify('gm','Bolla '+f.nome+(p.length?': '+(p.length===1?'1 cosa da vedere':p.length+' cose da vedere'):' letta, tutto corrisponde'),
     (p.length?p.join('; ')+'.':'Prezzi, quantità e prodotti uguali all\'ordine.')+' Foto di '+(it.daNome||'staff')+(o.ricevuto?'.':'; la consegna è ancora da controllare.'),'bolla',o.id)}
 // stato della voce di quest'ordine nel foglio del controllo
 const codaTra=it=>{const s=Math.max(0,Math.ceil((it.next-now())/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 function codaStatoH(oid){const it=CODA.list.find(x=>x.oid===oid&&x.tipo==='bolla');if(!it)return'';
-  if(it.busy)return`<div class="banner" role="status" id="coda-stato"><div>⏳ Sto leggendo la bolla… <b id="coda-sec">${Math.round((now()-it.t0)/1000)} s</b>. Puoi chiudere l'app: ti avviso quando è letta.</div></div>`;
+  if(it.busy)return`<div class="banner" role="status" id="coda-stato"><div>⏳ ${it.bis?'Ricontrollo la bolla con un secondo lettore…':'Sto leggendo la bolla…'} <b id="coda-sec">${Math.round((now()-it.t0)/1000)} s</b>. Puoi chiudere l'app: ti avviso quando è letta.</div></div>`;
   const off=navigator.onLine===false;
   return`<div class="vn-ri" role="status" id="coda-stato"><p class="small">${ic('clock')} ${off?'Bolla salvata. Manca la rete: la leggo appena torna, anche da un altro telefono del ristorante.':it.err?esc(it.err)+' Riprovo tra <b id="coda-sec">'+codaTra(it)+'</b> (tentativo '+it.n+').':'Bolla salvata: la leggo tra poco.'} Puoi chiudere l'app: la foto non si perde.</p>${off?'':`<div class="btns"><button type="button" class="btn ghost sm" data-a="codaOra" data-id="${it.id}">Riprova adesso</button></div>`}</div>`}
 function codaTick(){const e=document.getElementById('coda-sec');if(!e)return;const it=CODA.list.find(x=>x.busy)||CODA.list.find(x=>x.next>now());if(!it)return;e.textContent=it.busy?Math.round((now()-it.t0)/1000)+' s':codaTra(it)}
@@ -2999,7 +3022,7 @@ function codaRaccogli(){const me=codaDev();let nuove=false;
   for(const x of CODA.cloud){const loc=CODA.list.find(y=>y.id===x.id);
     if(x.st==='fatta'){if(loc&&!loc.busy)codaVia(loc);if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
     if(x.tipo==='ris'&&x.st==='tolto'){if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
-    if(loc||!x.foto||!(x.oid||x.grp))continue;
+    if(loc||!x.foto||!(x.oid||x.grp)||CODA.fatte[x.id])continue;// v117: letta qui, il cloud in ritardo (ancora «lettura») non la rimette in coda
     if(x.st==='lettura'&&x.lk!==me&&now()-(x.at||0)<CODA_T.lock)continue;
     if(now()-(x.creato||0)<CODA_T.testa)continue;
     CODA.list.push(Object.assign({},x,{next:0,busy:false}));nuove=true}
@@ -5751,7 +5774,7 @@ rbest:d=>rswapTo(d.r,d.i,d.p),
   rst:d=>{const L=rcvState(d.o).lines[+d.i];L.st=SEM_NEXT[L.st||''];if(L.st==='meno')L.arr=L.qta>1?r3(L.qta-1):r3(L.qta/2);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}refreshSheet()},
   bollaCam:d=>pickFile({accept:'image/*',capture:'environment'},fs=>setBolla(d.o,fs)),
   bollaLib:d=>pickFile({accept:'image/*'},fs=>setBolla(d.o,fs)),
-  bollaDel:d=>{const R=rcvState(d.o),o=D().ordini[d.o];if(R.cid)codaTogli(R.cid);R.cid='';if(o&&o.bolla)R.bolVia=o.bolla.cid;R.foto='';R.bol=null;R.bolErr='';R.bolImg=null;R.lines.forEach(L=>{delete L.bq;delete L.bno});refreshSheet()},
+  bollaDel:d=>{const R=rcvState(d.o),o=D().ordini[d.o];if(R.cid)codaTogli(R.cid);R.cid='';if(o&&o.bolla)R.bolVia=o.bolla.cid;R.foto='';R.bol=null;R.bolErr='';R.bolImg=null;R.lines.forEach(L=>{delete L.bq;delete L.bno;delete L.bdc});refreshSheet()},
   bolLeggi:d=>bolLeggi(d.o),
   codaOra:d=>{const it=CODA.list.find(x=>x.id===d.id);if(it&&!it.busy){it.next=0;codaFlush()}},
   fnew:()=>newSupSheet(),
