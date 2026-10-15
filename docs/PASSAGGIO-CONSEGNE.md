@@ -1,49 +1,55 @@
-# Passaggio di consegne (2026-10-15, fine sessione #138)
+# Passaggio di consegne (2026-10-16, fine sessione #139)
 
-Sessione attuale: #139
+Sessione attuale: #140
 
-Versione lunga delle consegne vecchie (#85-#122): `git show eb9eccd:docs/PASSAGGIO-CONSEGNE.md`. Consegne della #137: `git show 7b83c8b~3:docs/PASSAGGIO-CONSEGNE.md` (stesso file prima di questa riscrittura).
+Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lunga vecchia (#85-#122): `git show eb9eccd:docs/PASSAGGIO-CONSEGNE.md`.
 
 ## Stato
-- Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR), allineato a `main` dopo la v117.
-- **v116 online** (14/10 20:46 ora italiana). **v117 online** (PR #126, squash `78b082c`, unita 14/10 ~21:28; `APP_VER=117` controllato sul sito alle 21:29).
-- Nessuna PR aperta, nessuna sveglia attiva. Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva.
-- Motore: Mario ha cambiato a mano il motore di questa sessione in `claude-sonnet-5-5` (comando `/model`) a fine #138; anche RVC #152 gira su Sonnet 5.5. La nuova sessione parte con lo stesso motore della #138 (Sonnet 5.5). `effortLevel` `medium` in `.claude/settings.json` (`get_session` non dà `effort_level`).
-- Emulatore Firebase (`npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`) e server 8765 vanno riaccesi se servono (`tools/README.md`). Svuotare l'emulatore prima di ogni prova (`curl -X DELETE` come in README).
+- Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR).
+- **v117 online** (dal 14/10). **v118 + v119 nella PR #127** (https://github.com/Kur0ChanX/jona-ordini/pull/127), già pronta (non bozza).
+  - Il primo giro di `prove` (solo v118) è partito alle 00:00 del 16/10 ora italiana. All'handoff ho fatto il push della v119 sulla stessa PR: il giro riparte con v118+v119 insieme (un solo giro per due versioni).
+  - Prove locali tutte verdi: `test-gemini-sost`, `test-coda-vino` (PC, Pixel 7, Galaxy Tab; Apple solo su GitHub), `test-coda` (51 controlli, emulatore, parte 5 nuova), `test-bolla`, `test-cantina`, `test-letture-sicure`, `test-foto-vino`, `test-moduli`, `test-news`, `test-testbar`.
+- Motore: Mario ha messo `/model claude-opus-5-5` durante la #139 → la #140 parte su Opus 5.5. `effortLevel` `medium` in `.claude/settings.json` (`get_session` non dà `effort_level`).
+- Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva. Nessuna sveglia.
+- Emulatore Firebase e server 8765 vanno riaccesi se servono (`tools/README.md`).
 
-## Fatto in #138 (14/10, 20:44 → 15/10, 09:30 ora italiana)
-- **D54 (d) letture sicure = v117** (Mario #134: «che non sbagli a leggere dati sbagliati fuori riga o falsi o diversi o saltarli»). In `index.html` vicino a `codaLeggi`:
-  - `letDubbia`: ≥2 righe o >20% con `rigaNonTorna`, oppure bolla con meno dell'80% (`LET2.min`) dei prodotti dell'ordine abbinati da `bolMatch` → `codaSeconda` prova gli altri lettori di `GEM_LETT`; `letPunti` tiene la lettura migliore (a pari punti la prima). Banner «Ricontrollo la bolla con un secondo lettore…» (`it.bis`).
-  - `codaApplica(it,rows,lett,alt)` scrive `bolla.lett2` e `bolla.dc` (righe dell'ordine con presenza/quantità/prezzo diversi tra le due letture, soglia 1%, `letNumDiv`). `bolInR` non le precompila (`L.bdc`): «Da controllare a mano: le due letture sono diverse»; escono da prezzi diversi/non sulla bolla/meno e vanno nell'avviso ai gestori «N prodotti da controllare a mano (due letture diverse)». `bolRiga` lo dice anche dopo l'invio.
-  - Listini: stesso controllo solo per conti che non tornano (non c'è un ordine); `codaRisPezzo` riceve il testo della lettura migliore.
-  - Seconda lettura fallita → resta la prima, riga «Seconda lettura non riuscita» nella scatola nera.
-  - Due difetti VECCHI chiusi trovati con `test-coda`: (1) `CODA.fatte` — uno snapshot del cloud in ritardo (voce ancora «lettura» col proprio lucchetto) rimetteva in coda la bolla appena letta → seconda lettura doppia; (2) `codaErrCloud` — un telefono che fallisce scriveva «errore» sopra una voce già «fatta» da un altro telefono (transazione: se è fatta la toglie dalla sua coda). Dopo il secondo `test-coda` ha fatto 4 giri su 4 verdi in locale.
-  - Prova nuova `tools/test-letture-sicure.mjs` (nelle `VELOCI` di `tools/prova-ci.sh`): lettura buona, 2 su 4, conti che non tornano, secondo lettore guasto, letture uguali, listino. `test-coda` aggiornata (2 su 3 prodotti → f25 + l25, «ricontrollata da»).
-  - NEWS v117 aggiunta; v97 spostata in cima a `data/news.json` (E55, max 20 voci). `sw.js` CACHE `jona-ordini-v121`. Riga v117 in `.claude/rules/struttura.md`. D54 in `docs/DA-FARE.md` segnato «v117 online 14/10».
-  - Prove: `prove` su GitHub verde (giro sul commit `40733c8`, ~24 min, tutti i dispositivi del giro veloce); in locale verdi `test-letture-sicure`, `test-coda` (4 giri), `test-bolla`, `test-moduli`, `test-news`, `test-testbar`, `test-foto-pulizia`.
-- D55 (v116) segnato «online 14/10 20:46» in `docs/DA-FARE.md`.
-- Scorta di #137 controllata: diff vuoto, niente da unire.
+## Fatto in #139 (15/10 07:27 → 16/10 00:15 ora italiana)
+- Unita la scorta di #138 (diff solo `docs/ULTIMO-MESSAGGIO.md`).
+- **Fatto nuovo (D56)**: scatola nera di Mario 14/10 14:08: «Vino nel mondo: Gemini 2.5 Flash non ha cercato (errore 404: This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash…)». Ricerca web: Google limita i modelli 2.5 a chi li usava già (note di rilascio https://ai.google.dev/gemini-api/docs/changelog); per le chiavi nuove indica 3.8 Flash / 3.5 Flash-Lite. Su Vertex il 2.5 chiude il 20/10/2026. Altra riga di Mario: «Vino: Gemini Flash non ha letto (errore 503) … high demand» = sovraccarico normale, la catena dei lettori c'è già.
+- **Scelta di Mario sull'ordine dei lettori**: «voglio il flash normale in primis ne il pro nel il lite… mettili in ordine di performance se lite è meglio di cloudflare lascia prima lite». Deciso: **Flash → Flash-Lite → Cloudflare Llama**, Pro mai (Lite legge foto e numeri meglio di Llama). È l'ordine che c'era (`GEM_LETT` f25 → l25 → cf): cambia solo il ripiego sul 404.
+- Mario ha l'account Gemini **gratuito**; gli ho detto che la chiave non va cambiata (cambia solo il modello nel codice).
+- **v118 (D56)** in `index.html` vicino a `gemCall`: 404 con «model/available» su `f25`/`l25` → `gemSegnaMorto` (`jona_gem404` via `ls()`, 7 giorni `GEM_SOST_GG`) + riga «Google ha spento … per questa chiave: passo a …» nella scatola nera → `gemSostCall` con `GEM_SOST` {f25:'flash', l25:'lite'} (`gemini-flash-latest`/`-lite-latest`), `thinkingConfig:{thinkingLevel:'minimal'}`, 400 → senza. `gemCall0` = vecchio comportamento (f25 con `thinkingBudget:0`). Vale anche passando dal Worker (il messaggio di Google arriva in `lettoreErr`): Worker invariato. Prova nuova `tools/test-gemini-sost.mjs` (nelle `VELOCI`). NEWS v118, v98 spostata in `data/news.json`, `sw.js` CACHE v122.
+- **v119 (D57)**, Mario: «si va bene se è la miglior soluzione intelligente» (domanda: «Metto anche i vini nella stessa coda di bolle e listini?»). Lettura del vino non riuscita con foto → `vnRiH` mostra **«Leggila da sola: puoi chiudere l'app»** (`vnCoda`; resta sotto «Rileggila tu più tardi» v107) → voce `tipo:'vino'` in coda (`foto`, `fx`, `vid`, `da`), `codaVino` in index.html legge, `CODA.vini` + IndexedDB `coda_vini`, cloud `txt`, avviso «Vino letto: …» a chi ha scattato; Cantina: striscia `vnRisH` «Vino letto dalla foto · Controlla e salva · ✕». Dettagli completi nella riga v119 di `.claude/rules/struttura.md`. Prove `tools/test-coda-vino.mjs` (6 dispositivi, nelle `VELOCI`) e `test-coda` parte 5. NEWS v119, v99 spostata in `data/news.json`, `sw.js` CACHE v123.
+- Lezione rivista: in `index.html` niente «Mario» neanche nei commenti (E57, `test-testbar` l'ha trovato di nuovo).
+- `docs/DA-FARE.md`: D56 e D57 in cima alla tabella.
+
+## Domande fatte a Mario e risposte
+- «Hai provato una bolla vera dal Controllo merce con la v117?»: **ancora senza risposta** (ha mandato invece le righe della scatola nera).
+- Bolle/listini/vini con schermo spento: spiegato che nessuna app web lavora a schermo spento; bolle e listini ripartono alla riapertura o col ritorno della rete e un altro telefono li legge dal cloud; ora anche i vini (v119).
 
 ## Rischi / cose note
-- `test-bolla` è caduta 1 volta su 6 al PRIMO giro (poi sempre verde): non capita su GitHub finora. Se ricapita, guardare «Gemini guasto: Riprovo tra…» (banner «Sto leggendo… 0 s» ancora visibile = la prova guardava troppo presto).
-- `test-coda` parte 4b («Gemini di B tornato… Controlla e salva», «1 riga Carote») cadeva ogni tanto anche col codice VECCHIO; con la v117 non è più caduta in 4 giri, ma resta da tenere d'occhio.
-- Nessun test con foto vere di Mario ancora (E22): Mario non ha provato bolla e listino veri sulla v115/v116/v117.
+- Gemini 3 (`gemini-flash-latest`) ragiona di partenza: `thinkingLevel:'minimal'` non provato contro Google vero. Se Google lo rifiuta (400) l'app rifà senza. Controllare nella scatola nera «Lettura lenta» o righe «Google ha spento…» dopo la v118.
+- «Vino nel mondo» con Gemini 3 + ricerca Google: nel piano gratis forse «Not available» → ripiega su «senza Google» (annate meno certe). Mario è sul piano gratuito: nessun costo.
+- `test-bolla` (1 volta su 6 al primo giro) e `test-coda` 4b da tenere d'occhio (vedi #138).
+- Nessuna prova con foto vere di Mario (E22).
 
-## ✅ PROSSIMI PASSI (#139, continuare da sola)
-1. Chiedere a Mario (già chiesto in #138, senza risposta): fotografare una bolla vera dal Controllo merce con la v117, dirmi se si legge bene e in quanti secondi; stessa cosa per una foto di listino.
-2. M44: quando Mario dice i secondi di «cannonau» (v112).
-3. Lunedì 19/10: controllare una volta il giro `tutto` delle 3:17 (una sola occhiata, mai in ciclo).
-4. Se Mario non chiede altro: idea nuova per l'uso del momento nel ristorante (CLAUDE.md §7), dopo aver controllato che non esista già. Prima leggere `docs/DA-FARE.md` (voci 🔴 in cima).
+## ✅ PROSSIMI PASSI (#140, continuare da sola)
+1. `subscribe_pr_activity` sulla PR #127 (questa sessione era iscritta; la nuova no). Guardare l'esito di `prove` UNA volta quando arriva l'evento (o ≥15 min dal push delle 00:15), con `get_check_runs` (E54).
+2. Verde → squash merge di #127 (`commit_message` corto, titolo «v118+v119: Gemini nuovo da solo, vini in coda») → controllo online `APP_VER=119` su https://jona-ristorante-by-ynoy-corp.pages.dev/ → `git fetch origin main && git merge origin/main` sul ramo e push. Segnare D56/D57 «online» in `docs/DA-FARE.md`. Rosso → capire la causa e correggere.
+3. Dire a Mario che v118+v119 sono online, su quali dispositivi sono provate (6, Apple su GitHub), e cosa provare: Cantina → foto di una bottiglia; se Google è pieno → «Leggila da sola».
+4. Richiedere a Mario (una domanda, numerata): bolla vera dal Controllo merce con la v117+ (si legge bene? quanti secondi?) e una foto di listino. M44: secondi di «cannonau».
+5. Lunedì 19/10: una sola occhiata al giro `tutto` delle 3:17.
 
 ## Riferimenti
-- Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`, `model` = lo stesso della sessione che chiude (ora `claude-sonnet-5-5`).
-- Sessioni Jona: #138 `session_01FXo5VVU5Fi6r9mSCckpcfm` (chiusa, depth 4 su 8), #137 `session_01MR84DW6YWy6XyCNtNUHozp`.
+- Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`, `model` `claude-opus-5-5`.
+- Sessioni Jona: #139 `session_015F5SwkFDmtb4p6jQoM51GW` (chiusa, depth 5 su 8), #138 `session_01FXo5VVU5Fi6r9mSCckpcfm`.
 - RVC attiva: #152 `session_01T88fifKchYVHw7GcUe8HVK`. SPA: #19 chiusa `session_01X8MjDTxctEEGuQGiLbPm2T`. EdilCannas Fornitori #15 `session_01B67cFRJxX2F4gzrDKbognj`.
-- Server locale `python3 -m http.server 8765`. Playwright: import da `/opt/node22/lib/node_modules/playwright/index.mjs`. Nelle prove locali `firebase-config.js` si sostituisce con `self.JONA_FIREBASE=null` (`ctx.route`); profilo con `formset dev` + `setupGo` (come `test-bolla`); `S` non è su `window` (`typeof S`).
-- Confronto col codice vecchio: `git worktree add --detach <cartella> HEAD` + server su un'altra porta (nella #138 rimasta una worktree in `scratchpad/orig`, nello scratchpad della sessione chiusa: non serve più).
+- Server locale `python3 -m http.server 8765`; Playwright da `/opt/node22/lib/node_modules/playwright/index.mjs`; `ls()` salva in JSON con prefisso demo (usare `ls('jona_gemini_key','x')`, non `localStorage.setItem`).
+- Context7 ha finito la quota mensile (15/10): per i documenti di Google usare la ricerca web.
 
-## Consumo #138
-cache_read 12.707.681 · cache_write 163.265 · output 38.341 · cost_usd 4,62 (da `get_session`, campo usage, 15/10 09:26).
+## Consumo #139
+cache_read 7.941.282 · cache_write 244.977 · output 26.549 · cost_usd 3,41 (da `get_session`, campo usage, 16/10 00:10).
 
 ## Ultimo messaggio di Mario, parola per parola
-«no» (risposta alla domanda «Ti serve ancora l'aiuto per far "disegnare meglio" l'altro progetto?»; la domanda originale di Mario, 14/10 19:30, era: «per un altro progetto come faccio a dirgli di disegnare meglio mi fà vettoriali basic senza dettagli»). Poco prima Mario ha dato il comando `/model claude-sonnet-5-5`.
+«si va bene se è la miglior soluzione intelligente
+Per le chiavi nuove al loro posto di gemini devo aggiungerle? ho l'account gratuito»
