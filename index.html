@@ -1235,8 +1235,14 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=117;
+const APP_VER=119;
 const NEWS=[
+  {v:119,data:'2026-10-15',titolo:'Vini: la foto si legge da sola, anche ad app chiusa',
+    chef:['Se l\'IA non legge la foto di un vino (Google pieno o niente rete), tocca «Leggila da sola: puoi chiudere l\'app». La foto resta salvata e si legge appena possibile, anche da un altro telefono del ristorante.','Quando è letta ti arriva l\'avviso «Vino letto». In Cantina Vini trovi «Controlla e salva»: la scheda è già piena, la controlli e salvi.'],
+    dev:['D57: voce `tipo:"vino"` nella coda di bolle e listini (`foto` + `fx`, `codaFoto(file,maxB)` con maxB diviso per le foto), `codaVino` (stessi lettori di `vnIaGo`), risultato in `CODA.vini` (IndexedDB `coda_vini`) e sul cloud (`txt`), `codaKo` comune. Cantina: `vnCoda`, `vnRisH`/`vnRisList`/`vnRisApri`/`vnRisVia`, `vnSave` toglie il risultato. Prove `tools/test-coda-vino.mjs` (6 dispositivi) e `test-coda` parte 5.']},
+  {v:118,data:'2026-10-15',titolo:'Lettura con l\'IA: passa da sola al Gemini nuovo',
+    chef:['Google ha spento il vecchio Gemini 2.5 per le chiavi nuove. Se lo trova spento, l\'app passa da sola al Gemini Flash nuovo, poi a Flash-Lite e infine a Cloudflare.','Vale per bolle, listini ed etichette dei vini. Non devi fare niente.'],
+    dev:['D56: `gemCall` → 404 «model/available» su `f25`/`l25` → `gemSostCall` con `flash`/`lite` (`GEM_SOST`), `thinkingLevel:minimal` (400 → senza `thinkingConfig`); 404 ricordato 7 giorni in `jona_gem404`; riga «Google ha spento…» nella scatola nera. Prova `tools/test-gemini-sost.mjs`.']},
   {v:117,data:'2026-10-14',titolo:'Bolla: doppio controllo quando la lettura è dubbia',
     chef:['Se la bolla letta ha pochi prodotti dell\'ordine o righe con i conti che non tornano, l\'app la fa rileggere da un secondo lettore e tiene la lettura migliore.','Le righe dove le due letture sono diverse non si segnano da sole: nel controllo merce trovi «Da controllare a mano» e l\'avviso te le elenca. Così l\'app non sbaglia, non inventa e non salta prodotti.','Lo stesso doppio controllo vale per le foto dei listini con conti che non tornano.'],
     dev:['D54 (d): `letDubbia` (bolla con meno dell\'80% dei prodotti dell\'ordine abbinati, o ≥2 / >20% righe `rigaNonTorna`) → `codaSeconda` con il lettore successivo di `GEM_LETT`; `letPunti` sceglie la migliore; `bolla.lett2` e `bolla.dc` (indici delle righe dell\'ordine diverse tra le due letture, `letNumDiv` >1%) → `bolInR` non le precompila (`L.bdc`), avviso «da controllare a mano». `CODA.fatte`: una voce appena letta non torna in coda per uno snapshot del cloud in ritardo. Prova `tools/test-letture-sicure.mjs`.']},
@@ -1292,13 +1298,7 @@ const NEWS=[
     dev:['Strada 3 «Geniale» (#119-#120): Bar in `moduli/bar.js` (`modLoad(\'bar\')` al primo `brOpen` → `brApri`; in index restano `isBar`, `brCan`, `brOn`, `brAll`, `brGet`, `brTot`, `brMese`, `brCta`). Novità dalla v89 in giù in `data/news.json` (`newsOld`, `newsList`, caricate da `newsSheet`). Tutti e due in `FILES` di sw.js (si aprono anche senza rete). index.html −98 KB.']},
   {v:100,data:'2026-10-13',titolo:'iPhone: notifiche spiegate meglio',
     tutti:['Su iPhone e iPad, se apri Jona da Safari, l\'app ora ti spiega come installarla sulla schermata Home: solo così arrivano le notifiche.'],
-    dev:['#119 (iPhone di Maurizio): in Safari il permesso è «denied» e l\'app diceva «Notifiche bloccate» → Impostazioni → Notifiche → Jona Ordini, che non c\'è. `iosWeb()` → scheda «Prima installa Jona sull\'iPhone» (`PUSH_INST`). Prova `tools/test-push-iphone.mjs`.']},
-  {v:99,data:'2026-10-12',titolo:'Chat: la tastiera non copre più il messaggio',
-    tutti:['In chat, quando apri la tastiera, il campo «Scrivi un messaggio» sale sopra la tastiera e vedi gli ultimi messaggi.'],
-    dev:['#116: con l\'app a schermo intero Android non restringe la pagina: la chat segue `visualViewport` (`chVV`, classe `kb`). Prova `tools/test-chat-tastiera.mjs` su Pixel 7, Galaxy Tab, iPhone, iPad.']},
-  {v:98,data:'2026-10-12',titolo:'Bar: cannuccia al centro',
-    tutti:['Nei disegni di Mojito, Scorpion e Mint Julep la cannuccia esce dal centro del bicchiere.'],
-    dev:['#115: in `tools/bar-disegni.mjs` la cannuccia passa per il centro dell\'apertura del bicchiere. Prova in `tools/test-bar-disegni.mjs`.']},
+    dev:['#119 (iPhone di Maurizio): in Safari il permesso è «denied» e l\'app diceva «Notifiche bloccate» → Impostazioni → Notifiche → Jona Ordini, che non c\'è. `iosWeb()` → scheda «Prima installa Jona sull\'iPhone» (`PUSH_INST`). Prova `tools/test-push-iphone.mjs`.']}
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -2917,7 +2917,7 @@ function bolRiga(o,rz,i){const B=rz.bolla;if(!B)return'';const b=B.righe.find(x=
 function idbKv(k,v){return new Promise(res=>{try{const r=indexedDB.open('jona-kv',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onerror=()=>res(null);
   r.onsuccess=()=>{const db=r.result;try{const t=db.transaction('kv',v===undefined?'readonly':'readwrite'),s=t.objectStore('kv'),q=v===undefined?s.get(k):v===null?s.delete(k):s.put(v,k);
     t.oncomplete=()=>{db.close();res(v===undefined?q.result:true)};t.onerror=t.onabort=()=>{db.close();res(null)}}catch(e){db.close();res(null)}}}catch(e){res(null)}})}
-const CODA={list:[],busy:false,on:false,cloud:[],ris:{},gb:false,fatte:{}};
+const CODA={list:[],busy:false,on:false,cloud:[],ris:{},gb:false,fatte:{},vini:{}};
 let CODA_T={testa:20000,lock:150000,ri:120000,riMax:5,poi:600000,maxB:900000,vecchie:7*864e5};
 const CODA_K=()=>(DEMO?'demo:':'')+'coda_q';
 const codaDev=()=>{let d=ls('jona_dev');if(!d){d=uid();ls('jona_dev',d)}return d};
@@ -2926,7 +2926,7 @@ const codaCloud=()=>!DEMO&&pushFb();
 const codaDoc=it=>{const d={};for(const [k,v] of Object.entries(it))if(!['next','busy','t0','err0','bis'].includes(k)&&v!==undefined)d[k]=v;return d};
 function codaSalva(){return idbKv(CODA_K(),CODA.list.length?CODA.list.map(codaDoc):null)}
 // foto per la coda: lato lungo 1600 px, più piccola finché il base64 sta sotto CODA_T.maxB (limite del documento Firestore); mini = anteprima per il foglio e la ricezione
-async function codaFoto(file){let max=1600,r,b;for(;;){r=await fotoPiccola(file,max,1200);b=await b64(r.b);if(b.length<=CODA_T.maxB||max<=800)break;max=Math.round(max*.75)}return{b64:b,mini:r.mini}}
+async function codaFoto(file,maxB){const mb=maxB||CODA_T.maxB;let max=1600,r,b;for(;;){r=await fotoPiccola(file,max,1200);b=await b64(r.b);if(b.length<=mb||max<=600)break;max=Math.round(max*.75)}return{b64:b,mini:r.mini}}
 async function codaAdd(it){CODA.list.push(it);await codaSalva();
   if(codaCloud()){const lo=navigator.onLine!==false&&gemOn();codaCol().doc(it.id).set(Object.assign(codaDoc(it),lo?{st:'lettura',at:now(),lk:codaDev()}:{})).catch(()=>{})}
   codaFlush()}
@@ -2946,7 +2946,7 @@ async function codaFlush(){
     for(const it of CODA.list.slice()){if(!CODA.list.includes(it)||it.busy||it.next>now()||navigator.onLine===false)continue;
       if(!gemOn()){it.err='Questo telefono non ha Gemini: la bolla la legge un altro telefono del ristorante.';continue}
       const lk=await codaLock(it);if(lk==='fatta'){await codaVia(it);continue}if(!lk)continue;
-      await codaLeggi(it)}}
+      await(it.tipo==='vino'?codaVino(it):codaLeggi(it))}}
   finally{CODA.busy=false;refreshSheet();codaRaccogli()}}// riguarda il cloud: una voce «fatta» da un altro telefono mentre questa era occupata esce subito dalla coda
 // v117 (D54 d, letture sicure): lettura dubbia (bolla con meno dell'80% dei prodotti dell'ordine, o righe con i conti che non tornano)
 // → seconda lettura con un altro lettore; si tiene la migliore e le righe diverse tra le due letture vanno «da controllare a mano»
@@ -2975,15 +2975,37 @@ async function codaLeggi(it){it.busy=true;it.t0=now();it.n=(it.n||0)+1;it.err=''
       await codaIlleggibile(it)}
     else if(it.tipo==='listino')await codaRisPezzo(it,txt,lett);else await codaApplica(it,rows,lett,alt);
     it.st='fatta';it.err='';CODA.fatte[it.id]=now();codaFine(it);await codaVia(it);if(it.grp)codaGruppo(it.grp);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return true}
-  catch(e){const m=(e&&e.msg)||'Non riesco a contattare Gemini.';it.err=m;it.st='errore';it.next=now()+(e&&e.foto?CODA_T.poi:it.n<=CODA_T.riMax?CODA_T.ri:CODA_T.poi);
-    await codaSalva();if(codaCloud()&&await codaErrCloud(it,m)==='fatta')await codaVia(it);
-    errLog('Bolla in coda: '+m+' (tentativo '+it.n+')');return false}
+  catch(e){return codaKo(it,e,'Bolla in coda')}
+  finally{it.busy=false;refreshSheet()}}
+async function codaKo(it,e,cosa){const m=(e&&e.msg)||'Non riesco a contattare Gemini.';it.err=m;it.st='errore';it.next=now()+(e&&e.foto?CODA_T.poi:it.n<=CODA_T.riMax?CODA_T.ri:CODA_T.poi);
+  await codaSalva();if(codaCloud()&&await codaErrCloud(it,m)==='fatta')await codaVia(it);
+  errLog(cosa+': '+m+' (tentativo '+it.n+')');return false}
+// v119 (D57, #139): foto del vino in coda come bolle e listini: letta da sola anche ad app chiusa o da un altro telefono.
+// Stessi lettori di vnIaGo (Cloudflare con la sola prima foto se rifiuta più foto); il testo letto va in CODA.vini e sul cloud (txt),
+// chi ha scattato riceve l'avviso e in Cantina trova «Controlla e salva» (vnRisH in moduli/cantina.js).
+const codaViniK=()=>(DEMO?'demo:':'')+'coda_vini';
+function codaViniSalva(){return idbKv(codaViniK(),Object.keys(CODA.vini).length?CODA.vini:null)}
+async function codaVino(it){it.busy=true;it.t0=now();it.n=(it.n||0)+1;it.err='';refreshSheet();
+  try{await modLoad('cantina');const im=[it.foto].concat(it.fx||[]).map(d=>({inline_data:{mime_type:'image/jpeg',data:d}}));
+    const body=p=>({contents:[{parts:[{text:vnPrompt('',p.length)}].concat(p)}],generationConfig:{temperature:0.2}});
+    let g=null;for(const [l] of GEM_LETT){let r=await gemCall(body(im),l);if(l==='cf'&&im.length>1&&!r.txt&&!r.salta)r=await gemCall(body(im.slice(0,1)),l);
+      if(r.salta)continue;g=Object.assign(r,{l:r.lettore||l});if(r.txt||!GEM_RETRY.test(String(r.st)))break;
+      errLog('Vino in coda: '+gemNome(l)+' non ha letto (errore '+(r.st||'rete')+') '+String(r.msg||'').slice(0,160))}
+    if(!g||!g.txt)throw{msg:(g&&g.err)||'L\'IA non è riuscita a leggere la foto.'};
+    const v=vnLeggi(g.txt);
+    if(!v){it.vuote=(it.vuote||0)+1;if(it.vuote<2)throw{msg:'Non riconosco il vino nella foto.',foto:true};
+      it.txt='';it.ko=true;if(it.da)await notify(it.da,'Vino: foto non leggibile','Non riconosco il vino nella foto. Rifalla con l\'etichetta dritta e nitida da Cantina Vini.','vino',it.id)}
+    else{it.txt=g.txt;it.l=g.l;CODA.vini[it.id]={txt:g.txt,l:g.l,vid:it.vid||'',da:it.da||'',daNome:it.daNome||'',letto:now()};await codaViniSalva();
+      if(it.da)await notify(it.da,'Vino letto: '+v.n+(v.ann?' '+v.ann:''),'Apri Cantina Vini e tocca «Controlla e salva».','vino',it.id)}
+    it.st='fatta';it.err='';CODA.fatte[it.id]=now();codaFine(it);await codaVia(it);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}return true}
+  catch(e){return codaKo(it,e,'Vino in coda')}
   finally{it.busy=false;refreshSheet()}}
 // v117: l'errore va sul cloud solo se nel frattempo un altro telefono non l'ha già letta («fatta» non si sovrascrive)
 async function codaErrCloud(it,m){const ref=codaCol().doc(it.id),d={st:'errore',err:m,n:it.n,vuote:it.vuote||0,at:0};
   try{return await fbInit().fs.runTransaction(async t=>{const s=await t.get(ref);if(s.exists&&s.data().st==='fatta')return'fatta';if(s.exists)t.update(ref,d);return''})}
   catch(e){ref.update(d).catch(()=>{});return''}}
-function codaFine(it){if(!codaCloud())return;codaCol().doc(it.id).update(Object.assign({st:'fatta',fatto:now(),lk:codaDev(),err:'',n:it.n||0,foto:firebase.firestore.FieldValue.delete()},it.grp?{txt:it.txt||'',l:it.l||'',ko:!!it.ko}:{})).catch(()=>{})}
+function codaFine(it){if(!codaCloud())return;const del=firebase.firestore.FieldValue.delete();
+  codaCol().doc(it.id).update(Object.assign({st:'fatta',fatto:now(),lk:codaDev(),err:'',n:it.n||0,foto:del},it.grp||it.tipo==='vino'?{txt:it.txt||'',l:it.l||'',ko:!!it.ko}:{},it.tipo==='vino'?{fx:del}:{})).catch(()=>{})}
 // due letture senza righe = foto non leggibile: lo sanno chi ha scattato e i gestori, la voce esce dalla coda
 async function codaIlleggibile(it){
   if(it.tipo==='listino'){const f=it.fid&&D().fornitori[it.fid]?D().fornitori[it.fid].nome:'';await codaRisPezzo(it,'','',true);
@@ -3025,8 +3047,8 @@ function codaTick(){const e=document.getElementById('coda-sec');if(!e)return;con
 function codaRaccogli(){const me=codaDev();let nuove=false;
   for(const x of CODA.cloud){const loc=CODA.list.find(y=>y.id===x.id);
     if(x.st==='fatta'){if(loc&&!loc.busy)codaVia(loc);if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
-    if(x.tipo==='ris'&&x.st==='tolto'){if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
-    if(loc||!x.foto||!(x.oid||x.grp)||CODA.fatte[x.id])continue;// v117: letta qui, il cloud in ritardo (ancora «lettura») non la rimette in coda
+    if((x.tipo==='ris'||x.tipo==='vino')&&x.st==='tolto'){if(x.fatto&&now()-x.fatto>CODA_T.vecchie)codaCol().doc(x.id).delete().catch(()=>{});continue}
+    if(loc||!x.foto||!(x.oid||x.grp||x.tipo==='vino')||CODA.fatte[x.id])continue;// v117: letta qui, il cloud in ritardo (ancora «lettura») non la rimette in coda
     if(x.st==='lettura'&&x.lk!==me&&now()-(x.at||0)<CODA_T.lock)continue;
     if(now()-(x.creato||0)<CODA_T.testa)continue;
     CODA.list.push(Object.assign({},x,{next:0,busy:false}));nuove=true}
@@ -3034,6 +3056,7 @@ function codaRaccogli(){const me=codaDev();let nuove=false;
 function codaWatch(){if(CODA.on||!codaCloud())return;CODA.on=true;
   codaCol().onSnapshot(q=>{CODA.cloud=q.docs.map(d=>Object.assign({id:d.id},d.data()));codaRaccogli();codaFlush();codaRisArrivo();schedule()},()=>{CODA.on=false})}
 async function codaAvvio(){try{const r=await idbKv(codaRisK());if(r&&typeof r==='object')CODA.ris=r}catch(e){}
+  try{const r=await idbKv(codaViniK());if(r&&typeof r==='object')CODA.vini=r}catch(e){}
   try{const l=await idbKv(CODA_K());if(Array.isArray(l))for(const x of l)if(x&&x.id&&!CODA.list.some(y=>y.id===x.id))CODA.list.push(Object.assign(x,{busy:false,next:0}))}catch(e){}
   setInterval(()=>{codaRaccogli();codaFlush();fotoPulisci()},60000);setTimeout(fotoPulisci,15000);setInterval(codaTick,1000);codaFlush();schedule()}
 // v116 (D55): la foto della bolla nel controllo merce (`ricezione.foto`, ~200 KB) si toglie dopo 30 giorni; lo fa un gestore una volta al giorno, solo sugli ordini non ancora puliti (segno in jona_fotopul)
@@ -3238,9 +3261,26 @@ const gemTxt=j=>((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.t
 // v113 (richiesta: «non usare gemini 3», «flash dopo 45 secondi si blocca»): le foto le leggono Gemini 2.5 Flash (f25) e Flash-Lite (l25), non più «flash»/«lite» (oggi = Gemini 3, ragiona di partenza → lento).
 // A f25 si spegne il ragionamento (thinkingBudget 0, come vnMondo); se Google risponde 400 la stessa richiesta senza. Una lettura riuscita oltre GEM_LENTA s va nella scatola nera.
 const GEM_LENTA=30;
-async function gemCall(body,lettore,sig){const t0=Date.now(),gc=body.generationConfig||{};
-  if(lettore==='f25'&&!gc.thinkingConfig){const r=await gemCall1(Object.assign({},body,{generationConfig:Object.assign({},gc,{thinkingConfig:{thinkingBudget:0}})}),lettore,sig);if(r.st!==400)return gemLenta(r,lettore,t0)}
-  return gemLenta(await gemCall1(body,lettore,sig),lettore,t0)}
+// v118 (D56): Google ha spento Gemini 2.5 per le chiavi nuove (404 «no longer available to new users»): f25/l25 → Flash/Flash-Lite nuovi.
+// Il 404 resta ricordato GEM_SOST_GG giorni (jona_gem404), così le letture dopo non perdono un giro; poi si riprova il 2.5.
+const GEM_SOST={f25:'flash',l25:'lite'},GEM_SOST_GG=7;
+function gemMorti(){const m=ls('jona_gem404');return m&&typeof m==='object'?m:{}}
+function gemMorto(l){const t=gemMorti()[l];return!!t&&Date.now()-t<GEM_SOST_GG*864e5}
+function gemSegnaMorto(l){const m=gemMorti();m[l]=Date.now();ls('jona_gem404',m)}
+async function gemCall(body,lettore,sig){const t0=Date.now(),n=GEM_SOST[lettore];
+  if(n&&gemMorto(lettore))return gemLenta(await gemSostCall(body,n,sig),n,t0);
+  const r=await gemCall0(body,lettore,sig);
+  if(n&&r.st===404&&/model|available/i.test(r.msg||'')&&!(sig&&sig.aborted)){gemSegnaMorto(lettore);
+    errLog('Google ha spento '+gemNome(lettore)+' per questa chiave: passo a '+gemNome(n));return gemLenta(await gemSostCall(body,n,sig),n,t0)}
+  return gemLenta(r,lettore,t0)}
+async function gemCall0(body,lettore,sig){const gc=body.generationConfig||{};
+  if(lettore==='f25'&&!gc.thinkingConfig){const r=await gemCall1(Object.assign({},body,{generationConfig:Object.assign({},gc,{thinkingConfig:{thinkingBudget:0}})}),lettore,sig);if(r.st!==400)return r}
+  return gemCall1(body,lettore,sig)}
+// Gemini 3 ragiona di partenza (lento): thinkingLevel «minimal» al posto di thinkingBudget 0; 400 → stessa richiesta senza thinkingConfig
+async function gemSostCall(body,n,sig){const gc=Object.assign({},body.generationConfig||{}),fin=r=>r.txt?Object.assign(r,{lettore:r.lettore||n}):r;
+  const r=await gemCall1(Object.assign({},body,{generationConfig:Object.assign({},gc,{thinkingConfig:{thinkingLevel:'minimal'}})}),n,sig);
+  if(r.st!==400||(sig&&sig.aborted))return fin(r);
+  delete gc.thinkingConfig;return fin(await gemCall1(Object.assign({},body,{generationConfig:gc}),n,sig))}
 function gemLenta(r,lettore,t0){const s=Math.round((Date.now()-t0)/1000);if(r.txt&&lettore&&s>GEM_LENTA)errLog('Lettura lenta: '+gemNome(lettore)+' '+s+' s');return r}
 async function gemCall1(body,lettore,sig){const k=gemKey();let last='',st=0,srv=false;
   try{if(k&&lettore){if(!GEM_DIR[lettore])return{st:0,salta:true};const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEM_DIR[lettore]+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body),signal:sig});
@@ -5661,7 +5701,7 @@ const A={
   funzSet:d=>funzSet(d.k,d.v==='1'),agOpen:()=>agOpen(),
   rcOpen:()=>rcOpen(),rcNew:()=>rcForm(null),rcEdit:d=>{const r=((D().config.ricette||{}).r||{})[d.v];if(r)rcForm(r)},rcPick:()=>rcPick(),rcAdd:d=>rcAdd(d.v),rcIngDel:d=>{S.rcf.ing.splice(+d.v,1);refreshSheet()},rcSave:()=>rcSave(),rcDel:()=>rcDel(),rcVisto:()=>rcVisto(),
   vnOpen:()=>vnOpen(),vnV:d=>{S.vn.v=d.v;refreshSheet()},vnTipo:d=>{S.vn.tipo=d.v;refreshSheet()},vnCasa:()=>{S.vn.casa=!S.vn.casa;refreshSheet()},vnAbb:d=>{S.vn.abb=S.vn.abb===d.v?'':d.v;refreshSheet()},
-  vnShow:d=>vnShow(d.v),vnNew:()=>vnForm(null),vnEdit:d=>{const v=vnGet(d.v);if(v)vnForm(v)},vnFoto:()=>vnFoto(true),vnFotoF:()=>vnFoto(false),vnFotoG:()=>vnFoto(false,true),vnFotoDel:d=>vnFotoDel(d.v),vnFotoGo:()=>{const f=S.vnf;if(f&&f.fotos&&f.fotos.length)vnIaGo(f.fotos.map(x=>x.file))},vnIa:()=>vnIaGo(null),vnMondo:()=>vnMondo(),vnMondoSel:d=>vnMondoSel(d.v),vnRiAuto:()=>vnRiAuto(),vnRiOra:()=>vnRiOra(),vnRiStop:()=>vnRiStop(),vnSave:()=>vnSave(),vnDel:()=>vnDel(),
+  vnShow:d=>vnShow(d.v),vnNew:()=>vnForm(null),vnEdit:d=>{const v=vnGet(d.v);if(v)vnForm(v)},vnFoto:()=>vnFoto(true),vnFotoF:()=>vnFoto(false),vnFotoG:()=>vnFoto(false,true),vnFotoDel:d=>vnFotoDel(d.v),vnFotoGo:()=>{const f=S.vnf;if(f&&f.fotos&&f.fotos.length)vnIaGo(f.fotos.map(x=>x.file))},vnIa:()=>vnIaGo(null),vnMondo:()=>vnMondo(),vnMondoSel:d=>vnMondoSel(d.v),vnRiAuto:()=>vnRiAuto(),vnCoda:()=>vnCoda(),vnRisApri:d=>vnRisApri(d.v),vnRisVia:d=>vnRisVia(d.v),vnRiOra:()=>vnRiOra(),vnRiStop:()=>vnRiStop(),vnSave:()=>vnSave(),vnDel:()=>vnDel(),
   vnfTipo:d=>{S.vnf.tipo=d.v;S.vnf._tipo=1;refreshSheet()},vnfAbb:d=>{const l=S.vnf.abb,i=l.indexOf(d.v);if(i<0)l.push(d.v);else l.splice(i,1);refreshSheet()},
   vnVen:d=>vnMov(d.v,'ven',1),vnCar:d=>vnMov(d.v,'car',1),vnConta:d=>vnConta(d.v),agV:d=>{S.ag.v=d.v;S.ag.sel='';refreshSheet()},agToday:()=>{S.ag.g=today();S.ag.sel='';refreshSheet()},
   agDayGo:d=>{S.ag.v='oggi';S.ag.g=d.v;S.ag.sel='';refreshSheet();const b=document.querySelector('.sheet.tall');if(b)b.scrollTop=0},

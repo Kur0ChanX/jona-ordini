@@ -1,44 +1,55 @@
-# Passaggio di consegne (2026-10-14, fine sessione #137)
+# Passaggio di consegne (2026-10-16, fine sessione #139)
 
-Sessione attuale: #138
+Sessione attuale: #140
 
-Versione lunga delle consegne vecchie (#85-#122): `git show eb9eccd:docs/PASSAGGIO-CONSEGNE.md`. Consegne della #136: `git show 70f48f7:docs/PASSAGGIO-CONSEGNE.md`.
+Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lunga vecchia (#85-#122): `git show eb9eccd:docs/PASSAGGIO-CONSEGNE.md`.
 
 ## Stato
-- Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR), già allineato a `main` dopo la v116.
-- **v115 online** (PR #124 unita 19:59 ora italiana, squash `5989d7a`, controllato `APP_VER=115` sul sito).
-- **v116 online** (PR #125, squash `a4d96b2`, unita 20:42; `APP_VER=116` controllato sul sito alle ~20:46 ora italiana).
-- Nessuna PR aperta, nessuna sveglia attiva di questa sessione. Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva.
-- Motore `claude-opus-5-5`, `effortLevel` `medium` in `.claude/settings.json` (`get_session` non dà `effort_level`).
-- Emulatore Firebase e server 8765 vanno riaccesi nella sessione nuova se servono (`tools/README.md`).
+- Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR).
+- **v117 online** (dal 14/10). **v118 + v119 nella PR #127** (https://github.com/Kur0ChanX/jona-ordini/pull/127), già pronta (non bozza).
+  - Il primo giro di `prove` (solo v118) è partito alle 00:00 del 16/10 ora italiana. All'handoff ho fatto il push della v119 sulla stessa PR: il giro riparte con v118+v119 insieme (un solo giro per due versioni).
+  - Prove locali tutte verdi: `test-gemini-sost`, `test-coda-vino` (PC, Pixel 7, Galaxy Tab; Apple solo su GitHub), `test-coda` (51 controlli, emulatore, parte 5 nuova), `test-bolla`, `test-cantina`, `test-letture-sicure`, `test-foto-vino`, `test-moduli`, `test-news`, `test-testbar`.
+- Motore: Mario ha messo `/model claude-opus-5-5` durante la #139 → la #140 parte su Opus 5.5. `effortLevel` `medium` in `.claude/settings.json` (`get_session` non dà `effort_level`).
+- Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva. Nessuna sveglia.
+- Emulatore Firebase e server 8765 vanno riaccesi se servono (`tools/README.md`).
 
-## Fatto in #137 (14/10, 19:31 → 20:45 ora italiana)
-- Prove della PR #124 verdi (giro sul commit `b0ac9e8`) → squash, v115 online, `main` unito nel ramo, scorta unita (solo `docs/ULTIMO-MESSAGGIO.md`).
-- **Lezione E57** scritta in `docs/ERRORI.md` (sezione Prove) e `docs/ERRORI-STORIA.md`: prova che fallisce a caso → 5 giri sul codice originale + diagnosi prima di alzare le attese; niente «Mario» neanche nei commenti di `index.html` (`test-testbar`). Riga v115 di `.claude/rules/struttura.md` completata col segno `st:'tolto'`.
-- **D55 → v116** (pulizia delle foto delle bolle). Domanda a Mario. Prima risposta (a mano): «consigliami tu cosa mi serve tenerle? e 60 giorni può essere tanto e poi perché tenerle ha un motivo?». Spiegato il motivo: contestazioni col fornitore e controllo della fattura del mese. Seconda domanda (15/30/60 giorni): «se non occupano troppo del nostro spazio va bene 30».
-  - Fatto trovato: `ricezione.foto` è la miniatura di 1200 px (JPEG 0,7, ~200 KB in base64) salvata DENTRO il documento dell'ordine. Ogni telefono scarica gli ultimi 300 ordini (`COLS.ordini` limit 300) → fino a ~60 MB. Quindi la pulizia serve anche alla velocità, non solo allo spazio.
-  - Codice (`index.html`, vicino a `codaAvvio`): `FOTO_GG=30`, `fotoPulisci()` solo `isMgr`, una volta al giorno (`jona_fotopul` {g giorno, f limite}), `S.db.range('ordini','ricevuto',da,fino)` con `da` = limite dell'ultimo giro (legge solo gli ordini nuovi da pulire, pochi documenti al giorno), poi `upd('ordini',id,{'ricezione.foto':''})`. Parte 15 s dopo l'avvio e nel giro di 60 s della coda. Righe, note e `bolla` restano.
-  - Scartate: «tieni l'ultima per fornitore» (perdi le foto delle contestazioni) e «foto nel Worker/D1» (troppo lavoro per ora). Possibile seguito: spostare la foto fuori dall'ordine (Worker come gli allegati della chat) se l'app resta pesante.
-  - NEWS v116 aggiunta; v96 spostata in cima a `data/news.json` (E55: max 20 voci). `sw.js` CACHE `jona-ordini-v120`. Riga v116 + chiave `jona_fotopul` in `.claude/rules/struttura.md`. D55 in `docs/DA-FARE.md` (tabella in cima).
-  - Prova nuova `tools/test-foto-pulizia.mjs` (aggiunta a `VELOCI` in `tools/prova-ci.sh`): staff non tocca niente, 40 giorni tolta, 29 e 2 giorni restano, una volta al giorno, giorno dopo solo dal segno in poi. Verdi in locale anche `test-moduli`, `test-news`, `test-bolla`, `test-testbar`; su GitHub `prove` verde (tutti i dispositivi del giro veloce).
-- Mario non ha ancora provato bolla e listino veri sulla v115.
+## Fatto in #139 (15/10 07:27 → 16/10 00:15 ora italiana)
+- Unita la scorta di #138 (diff solo `docs/ULTIMO-MESSAGGIO.md`).
+- **Fatto nuovo (D56)**: scatola nera di Mario 14/10 14:08: «Vino nel mondo: Gemini 2.5 Flash non ha cercato (errore 404: This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash…)». Ricerca web: Google limita i modelli 2.5 a chi li usava già (note di rilascio https://ai.google.dev/gemini-api/docs/changelog); per le chiavi nuove indica 3.8 Flash / 3.5 Flash-Lite. Su Vertex il 2.5 chiude il 20/10/2026. Altra riga di Mario: «Vino: Gemini Flash non ha letto (errore 503) … high demand» = sovraccarico normale, la catena dei lettori c'è già.
+- **Scelta di Mario sull'ordine dei lettori**: «voglio il flash normale in primis ne il pro nel il lite… mettili in ordine di performance se lite è meglio di cloudflare lascia prima lite». Deciso: **Flash → Flash-Lite → Cloudflare Llama**, Pro mai (Lite legge foto e numeri meglio di Llama). È l'ordine che c'era (`GEM_LETT` f25 → l25 → cf): cambia solo il ripiego sul 404.
+- Mario ha l'account Gemini **gratuito**; gli ho detto che la chiave non va cambiata (cambia solo il modello nel codice).
+- **v118 (D56)** in `index.html` vicino a `gemCall`: 404 con «model/available» su `f25`/`l25` → `gemSegnaMorto` (`jona_gem404` via `ls()`, 7 giorni `GEM_SOST_GG`) + riga «Google ha spento … per questa chiave: passo a …» nella scatola nera → `gemSostCall` con `GEM_SOST` {f25:'flash', l25:'lite'} (`gemini-flash-latest`/`-lite-latest`), `thinkingConfig:{thinkingLevel:'minimal'}`, 400 → senza. `gemCall0` = vecchio comportamento (f25 con `thinkingBudget:0`). Vale anche passando dal Worker (il messaggio di Google arriva in `lettoreErr`): Worker invariato. Prova nuova `tools/test-gemini-sost.mjs` (nelle `VELOCI`). NEWS v118, v98 spostata in `data/news.json`, `sw.js` CACHE v122.
+- **v119 (D57)**, Mario: «si va bene se è la miglior soluzione intelligente» (domanda: «Metto anche i vini nella stessa coda di bolle e listini?»). Lettura del vino non riuscita con foto → `vnRiH` mostra **«Leggila da sola: puoi chiudere l'app»** (`vnCoda`; resta sotto «Rileggila tu più tardi» v107) → voce `tipo:'vino'` in coda (`foto`, `fx`, `vid`, `da`), `codaVino` in index.html legge, `CODA.vini` + IndexedDB `coda_vini`, cloud `txt`, avviso «Vino letto: …» a chi ha scattato; Cantina: striscia `vnRisH` «Vino letto dalla foto · Controlla e salva · ✕». Dettagli completi nella riga v119 di `.claude/rules/struttura.md`. Prove `tools/test-coda-vino.mjs` (6 dispositivi, nelle `VELOCI`) e `test-coda` parte 5. NEWS v119, v99 spostata in `data/news.json`, `sw.js` CACHE v123.
+- Lezione rivista: in `index.html` niente «Mario» neanche nei commenti (E57, `test-testbar` l'ha trovato di nuovo).
+- `docs/DA-FARE.md`: D56 e D57 in cima alla tabella.
 
-## ✅ PROSSIMI PASSI (#138, continuare da sola)
-1. Segnare D55 «online 14/10 20:46» in `docs/DA-FARE.md` (v116 già controllata online).
-2. Ricordare a Mario (già chiesto in #137, in attesa): fotografare una bolla vera e una foto di listino con la v115/v116, dirmi se si legge bene e quanti secondi.
-3. **D54 (d) letture sicure** (Mario: «che non sbagli a leggere dati sbagliati fuori riga o falsi o diversi o saltarli»): righe lette < 80% dell'ordine o troppi `rigaNonTorna` → seconda lettura con l'altro lettore e confronto; righe diverse → «da controllare a mano». Prova con foto vere di Mario (E22). Sarà v117. Prima un piano in 3 punti; domanda a Mario solo se serve un gusto.
-4. M44: quando Mario dice i secondi di «cannonau» (v112).
-5. Lunedì 19/10: controllare una volta il giro `tutto` delle 3:17.
+## Domande fatte a Mario e risposte
+- «Hai provato una bolla vera dal Controllo merce con la v117?»: **ancora senza risposta** (ha mandato invece le righe della scatola nera).
+- Bolle/listini/vini con schermo spento: spiegato che nessuna app web lavora a schermo spento; bolle e listini ripartono alla riapertura o col ritorno della rete e un altro telefono li legge dal cloud; ora anche i vini (v119).
+
+## Rischi / cose note
+- Gemini 3 (`gemini-flash-latest`) ragiona di partenza: `thinkingLevel:'minimal'` non provato contro Google vero. Se Google lo rifiuta (400) l'app rifà senza. Controllare nella scatola nera «Lettura lenta» o righe «Google ha spento…» dopo la v118.
+- «Vino nel mondo» con Gemini 3 + ricerca Google: nel piano gratis forse «Not available» → ripiega su «senza Google» (annate meno certe). Mario è sul piano gratuito: nessun costo.
+- `test-bolla` (1 volta su 6 al primo giro) e `test-coda` 4b da tenere d'occhio (vedi #138).
+- Nessuna prova con foto vere di Mario (E22).
+
+## ✅ PROSSIMI PASSI (#140, continuare da sola)
+1. `subscribe_pr_activity` sulla PR #127 (questa sessione era iscritta; la nuova no). Guardare l'esito di `prove` UNA volta quando arriva l'evento (o ≥15 min dal push delle 00:15), con `get_check_runs` (E54).
+2. Verde → squash merge di #127 (`commit_message` corto, titolo «v118+v119: Gemini nuovo da solo, vini in coda») → controllo online `APP_VER=119` su https://jona-ristorante-by-ynoy-corp.pages.dev/ → `git fetch origin main && git merge origin/main` sul ramo e push. Segnare D56/D57 «online» in `docs/DA-FARE.md`. Rosso → capire la causa e correggere.
+3. Dire a Mario che v118+v119 sono online, su quali dispositivi sono provate (6, Apple su GitHub), e cosa provare: Cantina → foto di una bottiglia; se Google è pieno → «Leggila da sola».
+4. Richiedere a Mario (una domanda, numerata): bolla vera dal Controllo merce con la v117+ (si legge bene? quanti secondi?) e una foto di listino. M44: secondi di «cannonau».
+5. Lunedì 19/10: una sola occhiata al giro `tutto` delle 3:17.
 
 ## Riferimenti
 - Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`, `model` `claude-opus-5-5`.
-- Sessioni Jona: #137 `session_01MR84DW6YWy6XyCNtNUHozp` (chiusa, depth 3), #136 `session_01QVGvVgjREzxgz8wssjrW5s`.
-- RVC attiva: #146 `session_01CrJcNRSfSAvyyKUhNEaD4z`. SPA: #19 chiusa `session_01X8MjDTxctEEGuQGiLbPm2T`. EdilCannas Fornitori #15 `session_01B67cFRJxX2F4gzrDKbognj`.
-- Server locale `python3 -m http.server 8765`; emulatore `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`. Playwright: import da `/opt/node22/lib/node_modules/playwright/index.mjs`. Nelle prove locali: `firebase-config.js` va sostituito con `self.JONA_FIREBASE=null` (`ctx.route`) e il profilo si crea con `formset dev` + `setupGo` (come `test-bolla`); `S` non è su `window` (`typeof S`).
+- Sessioni Jona: #139 `session_015F5SwkFDmtb4p6jQoM51GW` (chiusa, depth 5 su 8), #138 `session_01FXo5VVU5Fi6r9mSCckpcfm`.
+- RVC attiva: #152 `session_01T88fifKchYVHw7GcUe8HVK`. SPA: #19 chiusa `session_01X8MjDTxctEEGuQGiLbPm2T`. EdilCannas Fornitori #15 `session_01B67cFRJxX2F4gzrDKbognj`.
+- Server locale `python3 -m http.server 8765`; Playwright da `/opt/node22/lib/node_modules/playwright/index.mjs`; `ls()` salva in JSON con prefisso demo (usare `ls('jona_gemini_key','x')`, non `localStorage.setItem`).
+- Context7 ha finito la quota mensile (15/10): per i documenti di Google usare la ricerca web.
 
-## Consumo #137
-cache_read 10.541.229 · cache_write 146.523 · output 22.887 · cost_usd 3,74 (da `get_session`, campo usage, alle 20:43).
+## Consumo #139
+cache_read 7.941.282 · cache_write 244.977 · output 26.549 · cost_usd 3,41 (da `get_session`, campo usage, 16/10 00:10).
 
 ## Ultimo messaggio di Mario, parola per parola
-(20:1x, risposta a tocco) «se non occupano troppo del nostro spazio va bene 30»
-Prima: «consigliami tu cosa mi serve tenerle? e 60 giorni può essere tanto e poi perché tenerle ha un motivo?»
+«si va bene se è la miglior soluzione intelligente
+Per le chiavi nuove al loro posto di gemini devo aggiungerle? ho l'account gratuito»

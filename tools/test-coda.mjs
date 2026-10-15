@@ -145,6 +145,18 @@ await A.click('[data-a="codaRisVia"]');
 const togli=await fino(A,()=>!document.querySelector('[data-a="codaRis"]')&&!codaRisList().length,30000);
 ok(togli,'«Togli»: la striscia sparisce'+(togli?'':' '+JSON.stringify(await A.evaluate(async()=>({ris:Object.values(CODA.ris).map(r=>r.grp+':'+r.tipo+':'+Object.keys(r.p||{})),cloud:CODA.cloud.map(x=>x.id+':'+x.tipo+':'+x.st),docs:(await fbInit().fs.collection('coda').get()).docs.map(d=>d.id+':'+d.data().tipo+':'+d.data().st),strisce:[...document.querySelectorAll('[data-a=codaRisVia]')].map(b=>b.dataset.id)})))));
 gem.A='ok';gem.B='503';
+// ---------- 5. v119 (D57): foto del vino in coda. B la salva (il suo Gemini non risponde), A la legge dal cloud, B trova «Controlla e salva» ----------
+risp.push(JSON.stringify({nome:'Turriga',cantina:'Argiolas',annata:'2019',tipo:'rosso',sicuro:true}));
+await B.evaluate(async()=>{await modLoad('cantina');const c=document.createElement('canvas');c.width=40;c.height=60;c.getContext('2d').fillRect(5,5,20,40);
+  const bl=await new Promise(r=>c.toBlob(r,'image/jpeg'));const f=await codaFoto(bl,Math.floor(CODA_T.maxB/2));
+  await codaAdd({id:'vntest1',tipo:'vino',foto:f.b64,fx:[f.b64],vid:'',creato:now(),da:realU().id,daNome:fullName(realU()),st:'coda',n:0})});
+ok(await fino(A,()=>!!CODA.cloud.find(x=>x.id==='vntest1'&&x.st==='fatta'&&x.txt),30000),'vino: B non legge, A lo prende dal cloud e lo legge (voce «fatta» con il testo)');
+const cv=await A.evaluate(async()=>(await fbInit().fs.collection('coda').doc('vntest1').get()).data());
+ok(!cv.foto&&!cv.fx&&/Turriga/.test(cv.txt)&&cv.da==='test_u1','cloud: foto tolte, testo letto, chi ha scattato '+JSON.stringify({foto:!!cv.foto,fx:!!cv.fx,da:cv.da}));
+ok(await fino(B,()=>Object.values(D().notifiche).some(n=>n.tipo==='vino'&&n.a===realU().id&&/Vino letto: Turriga 2019/.test(n.titolo)),20000),'B riceve l\'avviso «Vino letto: Turriga 2019»');
+ok(await fino(B,async()=>{await modLoad('cantina');return vnRisList().some(x=>x.id==='vntest1')&&!CODA.list.length},20000),'B: «Controlla e salva» in Cantina, la sua coda è vuota');
+await B.evaluate(()=>vnRisVia('vntest1'));
+ok(await fino(A,async()=>{await modLoad('cantina');return!vnRisList().some(x=>x.id==='vntest1')},20000),'«Togli» su B: sparisce anche su A (copia del telefono di A ignorata)');
 ok(A.errs.length===0&&B.errs.length===0,'nessun errore di pagina '+JSON.stringify([A.errs,B.errs]));
 await b.close();
 console.log(process.exitCode?'SOME FAIL':'ALL PASS');
