@@ -1,3 +1,5 @@
-# Ultimo messaggio di Mario (14/10/2026 19:30 ora italiana)
+# Ultimo messaggio di Mario (15/10/2026 23:49 ora italiana)
 
-per un altro progetto come faccio a dirgli di disegnare meglio mi fà vettoriali basic senza dettagli
+mettili in ordine di performance  se litenè meglio di cloudflare lascia prima lite
+
+e poi c'è sempre la regola background che anche a schemo spento del cell o senza rete carica aplena può perché salva la foro e riprova in vini e listini e ritiro del formitore?
