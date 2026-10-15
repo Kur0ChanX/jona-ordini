@@ -15,7 +15,7 @@ function vnRow(v,ven){const me=meU(),q=+v.q||0,basso=v.min>0&&q<=v.min;
 function vnList(){const V=S.vn,me=meU(),all=vnAll(),can=vnCan(me),ven=vnVenduti();
   const head=`<div class="grab"></div><div class="sh-h"><div class="sh-t">Cantina Vini<div class="sh-s">${all.length} ${all.length===1?'vino':'vini'} · ${all.reduce((s,v)=>s+(+v.q||0),0)} bottiglie in casa</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   <div class="seg wide vn-seg">${[['carta','Carta'],['consiglia','Consiglia'],['inv','Inventario']].map(([k,l])=>`<button type="button" aria-pressed="${V.v===k}" data-a="vnV" data-v="${k}">${l}</button>`).join('')}</div>`;
-  const add=can?`<div class="btns vn-add"><button type="button" class="btn primary big" data-a="vnFoto">${ic('camera')} Fotografa una bottiglia</button><button type="button" class="btn ghost" data-a="vnNew">${ic('plus')} Scrivi il nome</button></div>`:'';
+  const add=vnRisH()+(can?`<div class="btns vn-add"><button type="button" class="btn primary big" data-a="vnFoto">${ic('camera')} Fotografa una bottiglia</button><button type="button" class="btn ghost" data-a="vnNew">${ic('plus')} Scrivi il nome</button></div>`:'');
   if(V.v==='consiglia'){const l=V.abb?all.filter(v=>(v.abb||[]).includes(V.abb)&&(+v.q||0)>0).sort((a,b)=>(ven[b.id]||0)-(ven[a.id]||0)||String(a.n).localeCompare(String(b.n),'it')):[];
     return head+`<p class="muted small vn-hint">Cosa mangia il cliente? Ti mostro i vini in casa che ci stanno bene, con la frase da dire.</p>
     <div class="vn-abb">${VN_ABB.map(([k,l])=>`<button type="button" class="chip" aria-pressed="${V.abb===k}" data-a="vnAbb" data-v="${k}">${l}</button>`).join('')}</div>
@@ -198,7 +198,7 @@ async function vnIaGo(files,au){const f=S.vnf;if(!f||f.busy)return false;const n
 let VN_RI_MS=120000,VN_RI_MAX=5;
 function vnRiTra(a){const s=Math.max(0,Math.ceil((a.next-Date.now())/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 function vnRiH(f){const a=f.au,pl=(f.fotos||[]).length>1;
-  if(!a)return`<div class="vn-ri"><p class="small">${ic('warn')} L'IA adesso non ha letto (succede quando Google ha troppo lavoro o manca la rete).${f.ko.foto?(pl?' Le foto restano qui.':' La foto resta qui.'):''}</p><button type="button" class="btn primary block" data-a="vnRiAuto">${ic('clock')} ${f.ko.foto?(pl?'Rileggile':'Rileggila'):'Riprova'} tu più tardi</button></div>`;
+  if(!a)return`<div class="vn-ri"><p class="small">${ic('warn')} L'IA adesso non ha letto (succede quando Google ha troppo lavoro o manca la rete).${f.ko.foto?(pl?' Le foto restano qui.':' La foto resta qui.'):''}</p>${f.ko.foto&&(f.fotos||[]).length?`<button type="button" class="btn primary block" data-a="vnCoda">${ic('clock')} ${pl?'Leggile':'Leggila'} da sola: puoi chiudere l'app</button>`:''}<button type="button" class="btn ${f.ko.foto&&(f.fotos||[]).length?'ghost':'primary'} block" data-a="vnRiAuto">${ic('clock')} ${f.ko.foto?(pl?'Rileggile':'Rileggila'):'Riprova'} tu più tardi</button></div>`;
   return`<div class="vn-ri" role="status"><p class="small">${ic('clock')} Riprovo da sola tra <b id="vn-ri">${vnRiTra(a)}</b> · tentativo ${a.n+1} di ${VN_RI_MAX}. Tieni aperta questa scheda: quando l'IA ha letto, il telefono vibra.</p><div class="btns"><button type="button" class="btn ghost" data-a="vnRiOra">Riprova adesso</button><button type="button" class="btn ghost" data-a="vnRiStop">Smetti</button></div></div>`}
 function vnRiAuto(){const f=S.vnf;if(!f||!f.ko)return;f.au={n:0,next:Date.now()+VN_RI_MS};refreshSheet();vnRiTick()}
 function vnRiStop(){const f=S.vnf;if(f)f.au=null;clearInterval(vnRiTick.h);refreshSheet()}
@@ -212,6 +212,30 @@ async function vnRiProva(f){const a=f.au;a.go=true;a.n++;const files=f.ko.foto?(
   if(ok){f.au=null;try{if(navigator.vibrate)navigator.vibrate([200,100,200])}catch(e){}if(!f.chiusa)toast('Fatto: l\'IA ha letto il vino. Controlla la scheda e salva.');return}
   if(!f.ko||a.n>=VN_RI_MAX){f.au=null;if(f.ko)toast('L\'IA non ha letto neanche dopo '+a.n+' tentativi. Riprova più tardi.','warn');if(S.vnf===f)refreshSheet();return}
   a.next=Date.now()+VN_RI_MS;if(S.vnf===f)refreshSheet()}
+// v119 (D57, Mario #139 «sì va bene se è la miglior soluzione intelligente»): le foto vanno nella coda di bolle e listini
+// (codaVino in index.html): salvate, lette da sole anche ad app chiusa o da un altro telefono; il risultato torna qui con «Controlla e salva»
+let vnCodaBusy=false;
+async function vnCoda(){const f=S.vnf,me=realU();if(!f||!me||f.busy||vnCodaBusy)return;const fs=(f.fotos||[]).map(x=>x.file);if(!fs.length)return;
+  vnCodaBusy=true;try{const mb=Math.floor(CODA_T.maxB/fs.length),b=[];for(const x of fs)b.push((await codaFoto(x,mb)).b64);
+    await codaAdd({id:'vn'+uid(),tipo:'vino',foto:b[0],fx:b.slice(1),vid:f.id||'',creato:now(),da:me.id,daNome:fullName(me),st:'coda',n:0});
+    f.au=null;f.ko=null;vnFotoVia(f);closeSheet();toast('Foto salvata: la leggo da sola, anche con l\'app chiusa. Ti avviso quando è pronta.')}
+  catch(e){toast('Non riesco a salvare la foto: riprova.','warn')}finally{vnCodaBusy=false}}
+// vini letti dalla coda (cloud «fatta» con il testo + copia del telefono), visibili a chi ha scattato e a chi modifica la cantina
+function vnRisList(){const me=meU();if(!me)return[];const m={};
+  for(const x of CODA.cloud)if(x.tipo==='vino'&&x.st==='fatta'&&x.txt)m[x.id]={id:x.id,txt:x.txt,l:x.l||'',vid:x.vid||'',da:x.da||'',daNome:x.daNome||'',letto:x.fatto||0};
+  const via=new Set(CODA.cloud.filter(x=>x.tipo==='vino'&&x.st==='tolto').map(x=>x.id));
+  for(const [id,x] of Object.entries(CODA.vini))if(!m[id]&&!via.has(id))m[id]=Object.assign({id},x);
+  return Object.values(m).filter(x=>x.da===me.id||vnCan(me)).sort((a,b)=>(b.letto||0)-(a.letto||0))}
+function vnRisH(){const me=meU();if(!me)return'';
+  const att=CODA.list.filter(x=>x.tipo==='vino'&&(x.da===me.id||vnCan(me))),ris=vnRisList();if(!att.length&&!ris.length)return'';
+  return`<div class="vn-ris">${att.map(x=>`<p class="vn-al small" role="status">${ic('clock')} ${x.busy?'Sto leggendo la foto di un vino…':navigator.onLine===false?'Foto di un vino salvata: la leggo appena torna la rete.':x.err?esc(x.err)+' Riprovo da sola.':'Foto di un vino salvata: la leggo tra poco.'}</p>`).join('')}
+  ${ris.map(x=>{const v=vnLeggi(x.txt)||{};return`<div class="banner vn-rb" role="status"><div>${ic('sparkle')} Vino letto dalla foto: <b>${v.n?vnTit(v):'vino'}</b>${x.daNome?` · foto di ${esc(x.daNome)}`:''}</div><div class="btns"><button type="button" class="btn primary sm" data-a="vnRisApri" data-v="${esc(x.id)}">Controlla e salva</button><button type="button" class="btn ghost sm" data-a="vnRisVia" data-v="${esc(x.id)}" aria-label="Togli">${ic('x')}</button></div></div>`}).join('')}</div>`}
+function vnRisApri(id){const x=vnRisList().find(y=>y.id===id);if(!x)return;const r=vnLeggi(x.txt);if(!r){vnRisVia(id);return}
+  const base=x.vid&&vnGet(x.vid);
+  if(!base){const dop=vnAll().find(v=>norm(v.n)===norm(r.n)&&norm(v.cant||'')===norm(r.cant||'')&&String(v.ann||'')===String(r.ann||''));
+    if(dop){vnRisVia(id);toast('Questo vino è già in cantina.');vnShow(dop.id);return}}
+  vnForm(base||null);const f=S.vnf;vnUnisci(f,r);f.lt=x.l;f.ris=id;refreshSheet()}
+function vnRisVia(id){if(CODA.vini[id]){delete CODA.vini[id];codaViniSalva()}if(codaCloud())codaCol().doc(id).update({st:'tolto'}).catch(()=>{});refreshSheet()}
 // D44: fino a VN_FMAX foto della stessa bottiglia (fronte, retro…), lette insieme con «Leggi con l'IA»
 const VN_FMAX=3;
 function vnFoto(nuovo,gal){if(!gemOn())return toast('Per leggere le foto serve l\'IA del ristorante (Gemini): chiedi allo sviluppatore. Intanto scrivi il nome.','warn');
@@ -251,7 +275,7 @@ async function vnSave(){const f=S.vnf,me=realU();if(!f||!me)return;const n=f.n.t
   const v={id:f.id||uid(),n,cant:f.cant.trim(),ann:String(f.ann||'').trim(),gr:nn(f.gr),tipo:VN_TIPI[f.tipo]?f.tipo:'rosso',den:f.den.trim(),vit:f.vit.trim(),abb:f.abb.slice(),pv:nn(f.pv),pc:isMgr(meU())?nn(f.pc):(old&&old.pc)||null,
     q:Math.max(0,Math.round(num(f.q)||0)),min:Math.max(0,Math.round(num(f.min)||0)),ia:f.ia||'',da:f.da||me.id,cr:f.cr||now(),mod:now()};
   for(const [k] of VN_CAMPI)v[k]=String(f[k]||'').trim();v.frase=String(f.frase||'').trim();v.parole=String(f.parole||'').trim();
-  await vnPut(v);closeSheet();toast('Vino salvato');if(!f.id)vnShow(v.id)}
+  await vnPut(v);if(f.ris)vnRisVia(f.ris);closeSheet();toast('Vino salvato');if(!f.id)vnShow(v.id)}
 async function vnDel(){const f=S.vnf;if(!f||!f.id)return closeSheet();
   if(!await ask('Eliminare il vino?','«'+f.n+'» sparisce dalla cantina.','Elimina',true))return;
   await upd('config','cantina',{['v.'+f.id]:null});closeSheet();closeSheet();toast('Vino eliminato')}
