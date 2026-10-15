@@ -1235,8 +1235,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=117;
+const APP_VER=118;
 const NEWS=[
+  {v:118,data:'2026-10-15',titolo:'Lettura con l\'IA: passa da sola al Gemini nuovo',
+    chef:['Google ha spento il vecchio Gemini 2.5 per le chiavi nuove. Se lo trova spento, l\'app passa da sola al Gemini Flash nuovo, poi a Flash-Lite e infine a Cloudflare.','Vale per bolle, listini ed etichette dei vini. Non devi fare niente.'],
+    dev:['D56: `gemCall` → 404 «model/available» su `f25`/`l25` → `gemSostCall` con `flash`/`lite` (`GEM_SOST`), `thinkingLevel:minimal` (400 → senza `thinkingConfig`); 404 ricordato 7 giorni in `jona_gem404`; riga «Google ha spento…» nella scatola nera. Prova `tools/test-gemini-sost.mjs`.']},
   {v:117,data:'2026-10-14',titolo:'Bolla: doppio controllo quando la lettura è dubbia',
     chef:['Se la bolla letta ha pochi prodotti dell\'ordine o righe con i conti che non tornano, l\'app la fa rileggere da un secondo lettore e tiene la lettura migliore.','Le righe dove le due letture sono diverse non si segnano da sole: nel controllo merce trovi «Da controllare a mano» e l\'avviso te le elenca. Così l\'app non sbaglia, non inventa e non salta prodotti.','Lo stesso doppio controllo vale per le foto dei listini con conti che non tornano.'],
     dev:['D54 (d): `letDubbia` (bolla con meno dell\'80% dei prodotti dell\'ordine abbinati, o ≥2 / >20% righe `rigaNonTorna`) → `codaSeconda` con il lettore successivo di `GEM_LETT`; `letPunti` sceglie la migliore; `bolla.lett2` e `bolla.dc` (indici delle righe dell\'ordine diverse tra le due letture, `letNumDiv` >1%) → `bolInR` non le precompila (`L.bdc`), avviso «da controllare a mano». `CODA.fatte`: una voce appena letta non torna in coda per uno snapshot del cloud in ritardo. Prova `tools/test-letture-sicure.mjs`.']},
@@ -1295,10 +1298,7 @@ const NEWS=[
     dev:['#119 (iPhone di Maurizio): in Safari il permesso è «denied» e l\'app diceva «Notifiche bloccate» → Impostazioni → Notifiche → Jona Ordini, che non c\'è. `iosWeb()` → scheda «Prima installa Jona sull\'iPhone» (`PUSH_INST`). Prova `tools/test-push-iphone.mjs`.']},
   {v:99,data:'2026-10-12',titolo:'Chat: la tastiera non copre più il messaggio',
     tutti:['In chat, quando apri la tastiera, il campo «Scrivi un messaggio» sale sopra la tastiera e vedi gli ultimi messaggi.'],
-    dev:['#116: con l\'app a schermo intero Android non restringe la pagina: la chat segue `visualViewport` (`chVV`, classe `kb`). Prova `tools/test-chat-tastiera.mjs` su Pixel 7, Galaxy Tab, iPhone, iPad.']},
-  {v:98,data:'2026-10-12',titolo:'Bar: cannuccia al centro',
-    tutti:['Nei disegni di Mojito, Scorpion e Mint Julep la cannuccia esce dal centro del bicchiere.'],
-    dev:['#115: in `tools/bar-disegni.mjs` la cannuccia passa per il centro dell\'apertura del bicchiere. Prova in `tools/test-bar-disegni.mjs`.']},
+    dev:['#116: con l\'app a schermo intero Android non restringe la pagina: la chat segue `visualViewport` (`chVV`, classe `kb`). Prova `tools/test-chat-tastiera.mjs` su Pixel 7, Galaxy Tab, iPhone, iPad.']}
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -3238,9 +3238,26 @@ const gemTxt=j=>((((j.candidates||[])[0]||{}).content||{}).parts||[]).map(x=>x.t
 // v113 (richiesta: «non usare gemini 3», «flash dopo 45 secondi si blocca»): le foto le leggono Gemini 2.5 Flash (f25) e Flash-Lite (l25), non più «flash»/«lite» (oggi = Gemini 3, ragiona di partenza → lento).
 // A f25 si spegne il ragionamento (thinkingBudget 0, come vnMondo); se Google risponde 400 la stessa richiesta senza. Una lettura riuscita oltre GEM_LENTA s va nella scatola nera.
 const GEM_LENTA=30;
-async function gemCall(body,lettore,sig){const t0=Date.now(),gc=body.generationConfig||{};
-  if(lettore==='f25'&&!gc.thinkingConfig){const r=await gemCall1(Object.assign({},body,{generationConfig:Object.assign({},gc,{thinkingConfig:{thinkingBudget:0}})}),lettore,sig);if(r.st!==400)return gemLenta(r,lettore,t0)}
-  return gemLenta(await gemCall1(body,lettore,sig),lettore,t0)}
+// v118 (D56): Google ha spento Gemini 2.5 per le chiavi nuove (404 «no longer available to new users»): f25/l25 → Flash/Flash-Lite nuovi.
+// Il 404 resta ricordato GEM_SOST_GG giorni (jona_gem404), così le letture dopo non perdono un giro; poi si riprova il 2.5.
+const GEM_SOST={f25:'flash',l25:'lite'},GEM_SOST_GG=7;
+function gemMorti(){const m=ls('jona_gem404');return m&&typeof m==='object'?m:{}}
+function gemMorto(l){const t=gemMorti()[l];return!!t&&Date.now()-t<GEM_SOST_GG*864e5}
+function gemSegnaMorto(l){const m=gemMorti();m[l]=Date.now();ls('jona_gem404',m)}
+async function gemCall(body,lettore,sig){const t0=Date.now(),n=GEM_SOST[lettore];
+  if(n&&gemMorto(lettore))return gemLenta(await gemSostCall(body,n,sig),n,t0);
+  const r=await gemCall0(body,lettore,sig);
+  if(n&&r.st===404&&/model|available/i.test(r.msg||'')&&!(sig&&sig.aborted)){gemSegnaMorto(lettore);
+    errLog('Google ha spento '+gemNome(lettore)+' per questa chiave: passo a '+gemNome(n));return gemLenta(await gemSostCall(body,n,sig),n,t0)}
+  return gemLenta(r,lettore,t0)}
+async function gemCall0(body,lettore,sig){const gc=body.generationConfig||{};
+  if(lettore==='f25'&&!gc.thinkingConfig){const r=await gemCall1(Object.assign({},body,{generationConfig:Object.assign({},gc,{thinkingConfig:{thinkingBudget:0}})}),lettore,sig);if(r.st!==400)return r}
+  return gemCall1(body,lettore,sig)}
+// Gemini 3 ragiona di partenza (lento): thinkingLevel «minimal» al posto di thinkingBudget 0; 400 → stessa richiesta senza thinkingConfig
+async function gemSostCall(body,n,sig){const gc=Object.assign({},body.generationConfig||{}),fin=r=>r.txt?Object.assign(r,{lettore:r.lettore||n}):r;
+  const r=await gemCall1(Object.assign({},body,{generationConfig:Object.assign({},gc,{thinkingConfig:{thinkingLevel:'minimal'}})}),n,sig);
+  if(r.st!==400||(sig&&sig.aborted))return fin(r);
+  delete gc.thinkingConfig;return fin(await gemCall1(Object.assign({},body,{generationConfig:gc}),n,sig))}
 function gemLenta(r,lettore,t0){const s=Math.round((Date.now()-t0)/1000);if(r.txt&&lettore&&s>GEM_LENTA)errLog('Lettura lenta: '+gemNome(lettore)+' '+s+' s');return r}
 async function gemCall1(body,lettore,sig){const k=gemKey();let last='',st=0,srv=false;
   try{if(k&&lettore){if(!GEM_DIR[lettore])return{st:0,salta:true};const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEM_DIR[lettore]+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body:JSON.stringify(body),signal:sig});
