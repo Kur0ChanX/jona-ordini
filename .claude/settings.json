@@ -60,6 +60,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|Bash|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/scorta.py\" tool 2>/dev/null || true",
+            "timeout": 60
+          }
+        ]
+      }
     ]
   },
   "enabledMcpjsonServers": [
