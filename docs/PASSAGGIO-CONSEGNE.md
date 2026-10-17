@@ -5,6 +5,7 @@ Sessione attuale: #140
 Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lunga vecchia (#85-#122): `git show eb9eccd:docs/PASSAGGIO-CONSEGNE.md`.
 
 ## Stato
+- **#140 (17/10, account Max)**: v118+v119 online (PR #127 unita il 16/10, `APP_VER=119` controllato online il 17/10). Passi 1-3 fatti. Messaggi di Mario del 16-17/10 senza contesto nel repo: «1» (07:39), «si» (00:57), «99%» (01:50, la sessione dell'altro account si è fermata al limite).
 - Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR).
 - **v117 online** (dal 14/10). **v118 + v119 nella PR #127** (https://github.com/Kur0ChanX/jona-ordini/pull/127), già pronta (non bozza).
   - Il primo giro di `prove` (solo v118) è partito alle 00:00 del 16/10 ora italiana. All'handoff ho fatto il push della v119 sulla stessa PR: il giro riparte con v118+v119 insieme (un solo giro per due versioni).
