@@ -2,7 +2,7 @@
 
 1. Apri https://claude.ai/code nell'altro account.
 2. Scegli il repo **Kur0ChanX/jona-ordini** e il ramo **claude/jona-ramo-definitivo**.
-3. Incolla questo testo:
+3. Incolla questo testo (fa tutto da sola: scarica il ramo, legge le consegne, continua il lavoro):
 
 ```
 Repo Kur0ChanX/jona-ordini, ramo claude/jona-ramo-definitivo. Sessione #141.
