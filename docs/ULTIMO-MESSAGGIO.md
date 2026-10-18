@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (17/10/2026 01:50 ora italiana)
+# Ultimo messaggio di Mario (18/10/2026 18:28 ora italiana)
 
-99%
+mettilo nel md non puoi?
