@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (17/10/2026 01:50 ora italiana)
+# Ultimo messaggio di Mario (18/10/2026 18:30 ora italiana)
 
-99%
+e una volta usato cancelli qll che non serve
