@@ -1,11 +1,11 @@
 # Passaggio di consegne (2026-10-16, fine sessione #139)
 
-Sessione attuale: #140
+Sessione attuale: #140 (cambio account 18/10: Mario «97%», la prossima è #141)
 
 Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lunga vecchia (#85-#122): `git show eb9eccd:docs/PASSAGGIO-CONSEGNE.md`.
 
 ## Stato
-- **#140 (17/10, account Max)**: v118+v119 online (PR #127 unita il 16/10, `APP_VER=119` controllato online il 17/10). Passi 1-3 fatti. Messaggi di Mario del 16-17/10 senza contesto nel repo: «1» (07:39), «si» (00:57), «99%» (01:50, la sessione dell'altro account si è fermata al limite).
+- **#140 (17/10, account Max)**: v118+v119 online (PR #127 unita il 16/10, `APP_VER=119` controllato online il 17/10). Passi 1-3 fatti. Unita `e8ae0e3` dalla sessione madre (scorta anche a metà risposta, `test-scorta` 31/31). Domanda aperta a Mario: a cosa rispondevano «1» e «si» (1 = vado avanti, consigliato). Sessioni RVC #C123 e SPA #22 sull'account Max ferme: Fable 5.1 chiede crediti. Messaggi di Mario del 16-17/10 senza contesto nel repo: «1» (07:39), «si» (00:57), «99%» (01:50, la sessione dell'altro account si è fermata al limite).
 - Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR).
 - **v117 online** (dal 14/10). **v118 + v119 nella PR #127** (https://github.com/Kur0ChanX/jona-ordini/pull/127), già pronta (non bozza).
   - Il primo giro di `prove` (solo v118) è partito alle 00:00 del 16/10 ora italiana. All'handoff ho fatto il push della v119 sulla stessa PR: il giro riparte con v118+v119 insieme (un solo giro per due versioni).
@@ -52,5 +52,4 @@ Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lun
 cache_read 7.941.282 · cache_write 244.977 · output 26.549 · cost_usd 3,41 (da `get_session`, campo usage, 16/10 00:10).
 
 ## Ultimo messaggio di Mario, parola per parola
-«si va bene se è la miglior soluzione intelligente
-Per le chiavi nuove al loro posto di gemini devo aggiungerle? ho l'account gratuito»
+«97%» (18/10, limite settimanale dell'account Max → cambio account)
