@@ -35,6 +35,7 @@ Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lun
 - Nessuna prova con foto vere di Mario (E22).
 
 ## ✅ PROSSIMI PASSI (#140, continuare da sola)
+0. (#141) Togliere `docs/PROMPT-PROSSIMO-ACCOUNT.md` con `git rm` (serviva solo per il cambio account, Mario: «una volta usato cancelli qll che non serve»), commit e push.
 1. `subscribe_pr_activity` sulla PR #127 (questa sessione era iscritta; la nuova no). Guardare l'esito di `prove` UNA volta quando arriva l'evento (o ≥15 min dal push delle 00:15), con `get_check_runs` (E54).
 2. Verde → squash merge di #127 (`commit_message` corto, titolo «v118+v119: Gemini nuovo da solo, vini in coda») → controllo online `APP_VER=119` su https://jona-ristorante-by-ynoy-corp.pages.dev/ → `git fetch origin main && git merge origin/main` sul ramo e push. Segnare D56/D57 «online» in `docs/DA-FARE.md`. Rosso → capire la causa e correggere.
 3. Dire a Mario che v118+v119 sono online, su quali dispositivi sono provate (6, Apple su GitHub), e cosa provare: Cantina → foto di una bottiglia; se Google è pieno → «Leggila da sola».
