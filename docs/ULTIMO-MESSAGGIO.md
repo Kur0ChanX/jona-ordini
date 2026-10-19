@@ -1,4 +1,5 @@
-# Ultimo messaggio di Mario (15/10/2026 23:55 ora italiana)
+# Ultimo messaggio di Mario (18/10/2026 19:16 ora italiana)
 
-si va bene se è la miglior soluzione intelligente
-Per le chiavi nuove al loro posto di gemini devo aggiungerle? ho l'account gratuito
+Repo Kur0ChanX/jona-ordini, ramo claude/jona-ramo-definitivo. Sessione #141 (cambio account).
+git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo (se «HEAD detached», prima git checkout claude/jona-ramo-definitivo).
+Leggi CLAUDE.md, docs/ERRORI.md, docs/PASSAGGIO-CONSEGNE.md e continua da sola dai «Prossimi passi». Come primo passo togli docs/PROMPT-PROSSIMO-ACCOUNT.md con git rm, commit e push.

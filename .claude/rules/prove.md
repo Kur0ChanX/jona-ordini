@@ -12,3 +12,4 @@ Per LANCIARE le prove valgono le lezioni rimaste in `docs/ERRORI.md` (sezione «
 - **E50** Le prove che misurano posizioni aspettano la fine delle animazioni (`waitForFunction`, `document.getAnimations()`), mai un tempo fisso.
 - **E52** Per provare «senza rete» con il service worker: server proprio da spegnere (`server()`/`spegni()` in `tools/test-moduli.mjs`), non `setOffline`.
 - **E36** Come E26: la prova conta solo le notifiche che interessano e chiama `deadlineTick()` apposta; riprodurre con orario spostato nello scratchpad.
+- **E58** Aspettare lo STATO giusto (testo), non un pulsante che c'è in più stati: in `test-bolla` «Riprova adesso» c'è già in «la leggo tra poco» (giro del lunedì 19/10 rosso).

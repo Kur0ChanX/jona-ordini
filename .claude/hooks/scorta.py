@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # Scorta automatica (D27, autorizzata da Mario il 10/10/2026): se i token finiscono di colpo, su GitHub c'è già tutto.
 #   scorta.py msg  (UserPromptSubmit): salva l'ultimo messaggio di Mario in .git/scorta-msg.md (fuori dal progetto).
+#                  Poi fa subito anche la scorta: un «salva» scritto quando il limite è finito arriva comunque su GitHub.
+#   scorta.py tool (PostToolUse di Edit/Write/Bash): scorta anche a metà risposta, al massimo ogni 2 minuti
+#                  (Mario 17/10: se il limite arriva a metà lavoro, la scorta di fine risposta non parte mai).
 #   scorta.py stop (Stop): fotografa il lavoro (anche non salvato) con l'ultimo messaggio in docs/ULTIMO-MESSAGGIO.md
 #                  e lo manda su GitHub nel ramo scorta/<ramo>, senza toccare il ramo di lavoro né l'indice vero.
 # Ogni scorta contiene HEAD e la scorta prima: il push è sempre in avanti, mai forzato. Niente cambiato = niente push.
 # Per riprendere: git fetch origin scorta/<ramo> && git merge origin/scorta/<ramo> (avvio-check.py lo segnala).
-import datetime, json, os, subprocess, sys, re
+import datetime, json, os, subprocess, sys, re, time
 
 CWD = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
 FILE_MSG = "docs/ULTIMO-MESSAGGIO.md"
@@ -101,6 +104,21 @@ def scorta(gitdir, push=True):
                          start_new_session=True)
 
 
+PAUSA_TOOL = 120  # secondi minimi tra due scorte a metà risposta
+
+
+def tocca_al_tool(gitdir):
+    segno = os.path.join(gitdir, "scorta-ora")
+    try:
+        if time.time() - os.path.getmtime(segno) < PAUSA_TOOL:
+            return False
+    except OSError:
+        pass
+    with open(segno, "w") as f:
+        f.write("")
+    return True
+
+
 def main():
     try:
         dati = json.load(sys.stdin)
@@ -111,7 +129,9 @@ def main():
         return
     if "msg" in sys.argv[1:]:
         salva_msg(dati, gitdir)
-    elif "stop" in sys.argv[1:]:
+    if "tool" in sys.argv[1:] and not tocca_al_tool(gitdir):
+        return
+    if {"msg", "tool", "stop"} & set(sys.argv[1:]):
         scorta(gitdir, push=os.environ.get("JONA_SCORTA_NOPUSH") != "1")
 
 

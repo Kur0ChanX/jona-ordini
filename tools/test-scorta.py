@@ -152,6 +152,31 @@ with tempfile.TemporaryDirectory() as tmp:
     s3 = remoto_scorta(repo)
     controlla("ecco il link" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "prompt di avvio ignorato")
 
+    # 3y. Mario 17/10: «salva» scritto col limite finito → la scorta parte già col messaggio, senza aspettare la fine risposta
+    open(os.path.join(repo, "a.txt"), "w").write("sei\n")
+    hook(repo, "msg", {"prompt": "salva 99%"})
+    s4 = remoto_scorta(repo)
+    controlla(s4 != s3 and git(repo, "show", f"{s4}:a.txt") == "sei", "il messaggio fa subito la scorta del lavoro")
+    controlla("salva 99%" in git(repo, "show", f"{s4}:docs/ULTIMO-MESSAGGIO.md"), "messaggio nella scorta subito")
+
+    # 3z. scorta a metà risposta (dopo uno strumento), al massimo ogni 2 minuti
+    gitdir = git(repo, "rev-parse", "--absolute-git-dir")
+    segno = os.path.join(gitdir, "scorta-ora")
+    if os.path.exists(segno):
+        os.remove(segno)
+    open(os.path.join(repo, "a.txt"), "w").write("sette\n")
+    hook(repo, "tool")
+    s5 = remoto_scorta(repo)
+    controlla(s5 != s4 and git(repo, "show", f"{s5}:a.txt") == "sette", "scorta dopo uno strumento")
+    open(os.path.join(repo, "a.txt"), "w").write("otto\n")
+    hook(repo, "tool")
+    time.sleep(1)
+    controlla(remoto_scorta(repo) == s5, "seconda scorta entro 2 minuti saltata")
+    os.utime(segno, (time.time() - 200, time.time() - 200))
+    hook(repo, "tool")
+    s3 = remoto_scorta(repo)
+    controlla(s3 != s5 and git(repo, "show", f"{s3}:a.txt") == "otto", "dopo 2 minuti la scorta riparte")
+
     # 4. sessione nuova da un altro clone: avvio-check segnala la scorta e il merge è in avanti
     altro = os.path.join(tmp, "altro")
     sh("git", "clone", "-q", "-b", "claude/prova-1", nudo, altro, cwd=tmp)
