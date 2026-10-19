@@ -43,7 +43,8 @@ ok(!(await pg.$('[data-a="bolLeggi"]'))&&!(await pg.$('[data-a="codaOra"]'))&&/S
 // v114 (D54 strada 3): la foto va subito in coda e si legge da sola. Con Gemini guasto resta in coda con il conto alla rovescia
 const foto=async id=>pg.evaluate(async id=>{const c=document.createElement('canvas');c.width=60;c.height=80;c.getContext('2d').fillRect(0,0,20,20);
   const bl=await new Promise(r=>c.toBlob(r,'image/jpeg'));await setBolla(id,[new File([bl],'bolla.jpg',{type:'image/jpeg'})])},id);
-GUASTO=true;await foto(oid);await pg.waitForSelector('#coda-stato [data-a="codaOra"]');
+// il pulsante «Riprova adesso» c'è già in «la leggo tra poco»: si aspetta il testo dell'errore (giro del 19/10 rosso)
+GUASTO=true;await foto(oid);await pg.waitForFunction(()=>/Riprovo tra/.test(document.querySelector('#coda-stato')?.textContent||''),null,{timeout:15000});
 const st1=await pg.textContent('#coda-stato');
 ok(/Riprovo tra \d+:\d\d \(tentativo 1\)/.test(st1)&&/chiudere l'app/.test(st1),'Gemini guasto: «Riprovo tra m:ss (tentativo 1)… Puoi chiudere l\'app» '+st1.trim().slice(0,90));
 ok(await pg.evaluate(id=>rcvState(id).lines.filter(l=>l.st).length===0&&CODA.list.length===1&&CODA.list[0].oid===id&&!/^data:/.test(CODA.list[0].foto)&&CODA.list[0].st==='errore',oid),'Gemini guasto: nessun prodotto segnato, voce in coda con la foto in base64 e stato «errore»');
