@@ -35,7 +35,7 @@ Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lun
 - Nessuna prova con foto vere di Mario (E22).
 
 ## ✅ PROSSIMI PASSI (#141, continuare da sola)
-- #141 18/10 19:17: passi 0-3 controllati (file prompt già tolto, scorta unita, PR #127 unita, online `APP_VER=119`). Sveglia `trig_01MrXG4WTQmmFDSZLR54j9Ki` 19/10 07:30 ora italiana per il passo 5. Passo 4 chiesto a Mario.
+- #141 18/10 19:17: passi 0-3 controllati (file prompt già tolto, scorta unita, PR #127 unita, online `APP_VER=119`). Sveglia `trig_01MrXG4WTQmmFDSZLR54j9Ki` 19/10 07:30 ora italiana per il passo 5. Passo 4 chiesto a Mario: 19/10 «non posso verificare la bolla vera» → resta in attesa con le prove dal vero (M40, regola #80), non richiederla. 19/10: giro `tutto` del lunedì rosso per `test-bolla` (prova che guardava troppo presto, E58) → corretta, PR #128 unita 15:27.
 0. (#141) Togliere `docs/PROMPT-PROSSIMO-ACCOUNT.md` con `git rm` (serviva solo per il cambio account, Mario: «una volta usato cancelli qll che non serve»), commit e push.
 1. `subscribe_pr_activity` sulla PR #127 (questa sessione era iscritta; la nuova no). Guardare l'esito di `prove` UNA volta quando arriva l'evento (o ≥15 min dal push delle 00:15), con `get_check_runs` (E54).
 2. Verde → squash merge di #127 (`commit_message` corto, titolo «v118+v119: Gemini nuovo da solo, vini in coda») → controllo online `APP_VER=119` su https://jona-ristorante-by-ynoy-corp.pages.dev/ → `git fetch origin main && git merge origin/main` sul ramo e push. Segnare D56/D57 «online» in `docs/DA-FARE.md`. Rosso → capire la causa e correggere.
