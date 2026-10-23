@@ -42,4 +42,4 @@ Sessione attuale: #142 (account Max, ambiente `env_01PHQTdrmzBJ65UoCn8yQSqE`, Op
 cache_read 209.696 · cache_write 3.856 · output 1.859 · cost_usd 0,11 (da `get_session`, campo usage: sembra solo l'ultimo turno). Limite settimanale in avviso (`seven_day` «allowed_warning»).
 
 ## Ultimo messaggio di Mario, parola per parola
-«ok kit»
+«ok kit». Poi, a tocco con conferma: «Sì, apri la nuova» alla domanda «Apro la chat nuova lo stesso, e lei parte da quelle 2 prove?».
