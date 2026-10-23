@@ -61,7 +61,7 @@ ALTRI = [
     ("mcp__claude-code-remote__list_sessions", {"limit": 20}, "deny"),
     ("mcp__claude-code-remote__list_sessions", {}, "deny"),
     ("mcp__claude-code-remote__add_repo", {"owner": "Kur0ChanX", "repo": "jona-ordini"}, "passa"),
-    ("mcp__claude-code-remote__add_repo", {"owner": "Kur0ChanX", "repo": "jona-ordini", "access": "read"}, "ask"),
+    ("mcp__claude-code-remote__add_repo", {"owner": "RVC-Operation-by-YNOY-CORP", "repo": "RVC", "access": "read"}, "ask"),
     ("Read", {"file_path": "/x"}, "passa"),
     # E132: lo squash senza messaggio incolla i «[skip ci]» delle consegne e main non pubblica
     ("mcp__github__merge_pull_request", {"pullNumber": 60, "merge_method": "squash"}, "deny"),
