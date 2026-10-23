@@ -1,0 +1,8 @@
+# Zone del codice di Jona (le usano controlla-js.py e cancello-fatto.py). Fuori: lib/ (librerie di altri), data/, media/.
+index.html
+sw.js
+firebase-config.js
+moduli/
+worker/
+tools/
+firebase/
