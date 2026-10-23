@@ -30,11 +30,9 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 - **E43** Anche il prompt di avvio dell'handoff (`git fetch origin claude/`) va saltato (prova 3c-quinquies).
 
 ## Comunicazione con Mario e domande
-- **E2** Una domanda per volta, con le scelte pronte da toccare.
+- **E2, E29, E37** Superate dal kit 27.3 (scelta di Mario #143): domande SCRITTE con scelte numerate, niente strumento a tocco (vedi `docs/kit-progetto/REGOLE.md`, «Domande a Mario»).
 - **E3** Per scelte e confronti mandare un'immagine (prima/dopo).
-- **E29** Domande a tocco sempre con il doppio tocco («Confermi?») nella stessa chiamata.
 - **E30** Se la risposta scritta a mano contiene una domanda o «roba così» non è una scelta: rispondere e rifare la domanda a tocco.
-- **E37** Ogni domanda a Mario SEMPRE con lo strumento delle domande + doppio tocco, mai solo nel testo.
 - **E38** (aperto, causa non chiara: tocco fantasma o risposta automatica) Prima di lavori grossi dopo una risposta a tocco ripetere la scelta in chiaro; se Mario dice di non aver toccato, fermare subito le sessioni aperte (interrupt).
 - **E6** Regole di Firebase: nelle istruzioni dire «menù a sinistra → icona **Firestore** → scheda **Regole**» (il link diretto porta alla home).
 - **E51** Nelle guide per iPhone chiedere prima «la apri dall'icona o da Safari?» (le notifiche esistono solo nell'app dalla Home).
