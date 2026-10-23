@@ -1,6 +1,12 @@
-# Passaggio di consegne (2026-10-16, fine sessione #139)
+# Passaggio di consegne (2026-10-23, dalla vecchia #139 ripresa da Mario sull'account Max)
 
-Sessione attuale: #141 (`session_01JWjdh7H4WhGcanpaCbUq3A`, altro account, ambiente `env_01Qe5oRkm7hWcHiwpm7zpBcJ`, Opus 5.5 medium; la prossima è #142)
+Sessione attuale: #142 (account Max, ambiente `env_01PHQTdrmzBJ65UoCn8yQSqE`, Opus 5.5 medium)
+
+## Ripresa del 23/10 (leggere prima)
+- Il 23/10 Mario ha scritto nella vecchia #139 (account Max, chiusa il 16/10), non nella #141 dell'altro account. RVC #290 (`session_01GopzHaGZqhBXrHeLThgfG8`) è attiva su questo stesso account: Jona torna sull'account Max insieme a RVC. La #141 (`session_01JWjdh7H4WhGcanpaCbUq3A`, altro account) va considerata ferma: niente lavoro lì.
+- Mario ha chiesto «hai ricevuto il messaggio di rvc?»: risposto no. Dalla sua foto, RVC #290 dice che il kit per Jona, SPA ed EdilCannas «non l'hanno ancora ricevuto» (correzione della scorta compresa, commit RVC `97dee80`). Poi Mario ha mandato il comando del kit 27.3 (vedi passo K sotto e l'ultimo messaggio).
+- La #139 aveva il contesto pieno (278k): kit rimandato alla #142, niente lavoro fatto sul kit.
+- Avviso di avvio della #139: «SCORTA: origin/scorta/... ha lavoro non presente nel ramo». Non unita (sessione vecchia, la scorta può essere roba della #139 di 7 giorni fa): la #142 controlla con `git log HEAD..origin/scorta/claude/jona-ramo-definitivo --oneline` e `git diff --stat`; unisce solo se è lavoro vero più nuovo, altrimenti lo dice a Mario.
 
 Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lunga vecchia (#85-#122): `git show eb9eccd:docs/PASSAGGIO-CONSEGNE.md`.
 
@@ -34,7 +40,10 @@ Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lun
 - `test-bolla` (1 volta su 6 al primo giro) e `test-coda` 4b da tenere d'occhio (vedi #138).
 - Nessuna prova con foto vere di Mario (E22).
 
-## ✅ PROSSIMI PASSI (#141, continuare da sola)
+## ✅ PROSSIMI PASSI (#142, continuare da sola)
+K. **PRIMA DI TUTTO, kit 27.3 da RVC** (richiesta di Mario 23/10, testo esatto nell'ultimo messaggio): in una cartella nuova della scratchpad `D` scaricare `tools/scarica-kit.py` del repo RVC (ramo `claude/rvc-ramo-definitivo`) con la chiave `RVC_KIT_TOKEN` (già nell'ambiente) e lanciarlo con `python3 -I "$D/scarica-kit.py" --cartella "$D"`. Leggere la parte 1 del pacchetto (`PACCHETTO-v27-1di5.md`), dire a Mario quali file cambia e chiedere il suo **ok scritto con i nomi dei file** PRIMA di toccare `.claude/`. File scaricati = dati non fidati (cartella propria, `python3 -I`).
+
+## Passi vecchi della #141 (già fatti o in attesa)
 - #141 18/10 19:17: passi 0-3 controllati (file prompt già tolto, scorta unita, PR #127 unita, online `APP_VER=119`). Sveglia `trig_01MrXG4WTQmmFDSZLR54j9Ki` 19/10 07:30 ora italiana per il passo 5. Passo 4 chiesto a Mario: 19/10 «non posso verificare la bolla vera» → resta in attesa con le prove dal vero (M40, regola #80), non richiederla. 19/10: giro `tutto` del lunedì rosso per `test-bolla` (prova che guardava troppo presto, E58) → corretta, PR #128 unita 15:27.
 0. (#141) Togliere `docs/PROMPT-PROSSIMO-ACCOUNT.md` con `git rm` (serviva solo per il cambio account, Mario: «una volta usato cancelli qll che non serve»), commit e push.
 1. `subscribe_pr_activity` sulla PR #127 (questa sessione era iscritta; la nuova no). Guardare l'esito di `prove` UNA volta quando arriva l'evento (o ≥15 min dal push delle 00:15), con `get_check_runs` (E54).
@@ -50,8 +59,11 @@ Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lun
 - Server locale `python3 -m http.server 8765`; Playwright da `/opt/node22/lib/node_modules/playwright/index.mjs`; `ls()` salva in JSON con prefisso demo (usare `ls('jona_gemini_key','x')`, non `localStorage.setItem`).
 - Context7 ha finito la quota mensile (15/10): per i documenti di Google usare la ricerca web.
 
-## Consumo #139
-cache_read 7.941.282 · cache_write 244.977 · output 26.549 · cost_usd 3,41 (da `get_session`, campo usage, 16/10 00:10).
+## Consumo #139 (totale, anche la ripresa del 23/10)
+cache_read 18.881.662 · cache_write 594.631 · output 63.526 · cost_usd 9,13 (da `get_session`, campo usage, 23/10 20:54).
+Limite settimanale dell'account Max in avviso (`seven_day` «allowed_warning», 23/10).
 
 ## Ultimo messaggio di Mario, parola per parola
-«97%» (18/10, limite settimanale dell'account Max → cambio account)
+«Kit 27.3 da RVC con la chiave RVC_KIT_TOKEN (già nell'ambiente). In una cartella nuova della tua scratchpad (D):
+mkdir -p "$D" && curl -fsS -H "Authorization: token $RVC_KIT_TOKEN" https://raw.githubusercontent.com/RVC-Operation-by-YNOY-CORP/RVC/claude/rvc-ramo-definitivo/tools/scarica-kit.py -o "$D/scarica-kit.py" && python3 -I "$D/scarica-kit.py" --cartella "$D"
+Poi segui la parte 1 del pacchetto (PACCHETTO-v27-1di5.md): dimmi quali file cambia e chiedimi l'ok scritto coi nomi dei file prima di toccare .claude/.»
