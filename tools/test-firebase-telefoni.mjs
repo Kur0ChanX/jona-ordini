@@ -67,7 +67,9 @@ await C.fill('.sheet input[data-k="nome"]','Luca');await C.fill('.sheet input[da
 await C.click('.sheet [data-a="phSend"]');await C.waitForTimeout(2000);
 ok(/Hai già un profilo/.test(await txt(C)),'C: richiesta «ho già un profilo»');
 await A.waitForTimeout(500);ok(/ha già un profilo/.test(await txt(A)),'A: vede «ha già un profilo»');
-await A.click('[data-a="phOk"]');await C.waitForTimeout(4000);
+await A.click('[data-a="phOk"]');await A.waitForTimeout(400);
+ok(/Di chi è questo telefono/.test(await txt(A,'.sheet'))&&await A.inputValue('#ph-sel')==='','A (v121): «Approva» chiede di chi è; «Luca Rossi» non somiglia a «Luca Prova»: niente scelto da solo');
+await A.click('.sheet [data-a="phPlain"]');await C.waitForTimeout(4000);
 ok(await C.locator('[data-a="doLogin"]').count()===1,'C: dopo l\'approvazione vede l\'accesso');
 await C.fill('input[data-k="u"]','test1');await C.fill('input[data-k="p"]','prova123');await C.click('[data-a="doLogin"]');await C.waitForTimeout(2500);
 ok(await C.evaluate(()=>meU()&&meU().id==='test_u1'),'C: entra con il suo profilo');
