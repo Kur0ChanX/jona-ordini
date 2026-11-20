@@ -30,7 +30,7 @@ Sessione chiusa: #145 (Opus 5.5; ambiente `env_01PHQTdrmzBJ65UoCn8yQSqE`; impegn
 2. v121: con l'ok di Mario alle foto, PR pronta, «prove» verde, squash. Senza risposta: aspettare, intanto il punto 3.
 3. Rifare le domande aperte (sopra). Poi D59 secondo la scelta: con il consiglio = pezzo 2b (robot) + pezzo 3 con `autocomplete` per il gestore delle password, poi la passkey.
 4. Pezzo 4 di `docs/RIENTRO.md`; aggiornare il kit di Jona (installato 27.3 con Preferenze v27; Mario ha le Preferenze v38) e, a fine giornata, il testo di `docs/kit-progetto/PREFERENZE-CHAT.txt` se più vecchio delle sue.
-5. Controllare che RVC abbia messo «nessuno resta fuori» nel kit (messaggio mandato alla sessione RVC «Codice 38»).
+5. RVC ha risposto (20/11): il kit RVC è già al **47** e ha la regola «Nessuno resta mai fuori» (REGOLE.md riga 29); la sessione RVC «Accessi 6» aggiunge memoria protetta, 2 strade di rientro e la prova del telefono svuotato. Jona ha il kit 27.3: aggiornarlo (punto 4) porta anche questa regola.
 
 ## Sessione #145 in breve
 - Unita la scorta della #144 (solo l'ultimo messaggio «va bene»), poi un'altra scorta vuota (in locale).
