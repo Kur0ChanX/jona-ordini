@@ -9,9 +9,13 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 **🔴 = blocca il lavoro nuovo** (regola di Mario: prima si chiudono queste, poi si va avanti; le rifiniture estetiche non bloccano).
 
 ## 0. Aspetta Mario
+<<<<<<< HEAD
 - 20/11 · 🟡 Principale 146 · attivare «Email/password» in Firebase (salvagente)
 - 20/11 · 🟡 Principale 146 · come rientri stasera: 1 Maurizio · 2 da solo da Firebase
 - 20/11 · 🟢 Principale 147 · ok al kit 48 (1 Sì · 2 No)
+=======
+- 20/11 · 🟡 Principale 146 · attivare «Email/password» in Firebase (salvagente); Mario rientra da solo da Firebase (scelta 2, guida della 147)
+>>>>>>> origin/claude/jona-ramo-definitivo
 
 ## Riassunto: cosa manca, in ordine
 
