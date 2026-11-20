@@ -10,3 +10,8 @@ Domanda 2, va bene, mettila online. Domanda 3, vai di tuo consiglio, basta che f
 
 ## 2026-11-20 20:49 · 01WTjqUuMXap
 Questo messaggio va bene, comunicalo in tutto l'account. Mi sono ricordato che la memoria del telefono che mi si è cancellata, se tu stai provando a indagare il motivo, te lo dico io. Probabilmente la colpa è la mia, però non è proprio una colpa, nel senso che io sono entrato, volevo cancellare la cronologia. Mi diceva un giorno, io ho messo tutto quello che c'era e ho cancellato anche dati. Mi ricordo che c'è su Chrome, c'era scritto dati, cronologia, tranne forse accessi non ho toccato, e probabilmente sono stato io, però nel senso non me ne do una colpa, io l'ho toccato su Chrome, quindi diciamo che le colpe sono 50-50, 50 mie e 50 tue. Tu dovevi salvarlo in modo in sicurezza e io non sapevo che cancellando la cronologia e dati da Chrome, io volevo cancellare solo la cronologia ma ho lasciato flaggato anche il resto, mi andasse a cancellare queste cose. Anche immaginati se un cliente, un collega cancella la cronologia, non li si deve cancellare tutto, memoria e quant'altro. Cioè, le app devono avere una base stabile, non pendente a una cronologia, dati volatili così. Mi confermi che in tutto l'account state ragionando per risolvere questo problema definitivamente?
+
+## 2026-11-20 20:55 · 01WTjqUuMXap
+Ok, mi confermi che per i prossimi progetti non succederà mai più questo problema? Anche per i prossimi progetti si salva in quel modo, salvagente, per evitare che cancellando la cronologia e i dati dal telefono posso loggare tranquillamente?
+
+firebase ovviamente che figura ci faccio se no il creatore che rimane chiuso fuori dall'app che chiede aiuto agli utenti... dai cerca di capirmi, per questo non deve ricapitare mai più
