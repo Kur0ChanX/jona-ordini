@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Prova di .claude/hooks/kit-check.py (C250): versione del kit, import di REGOLE.md, tetti, Preferenze, su un progetto finto.
 # Uso: python3 -I tools/test-kit-check.py
-import functools, http.server, json, os, shutil, subprocess, sys, tempfile, threading
+import functools, http.server, json, os, shutil, subprocess, sys, tempfile, threading, time
 
 QUI = os.path.dirname(os.path.abspath(__file__))
 HOOK = os.path.join(QUI, "..", ".claude", "hooks", "kit-check.py")
@@ -72,6 +72,20 @@ try:
     controlla(codice == 0 and d["hookSpecificOutput"]["hookEventName"] == "SessionStart"
               and d["hookSpecificOutput"]["additionalContext"] == u, "uscita JSON dell'hook SessionStart", uscita)
 
+    # C469 fase 2 (rapporto 14 voce 6): riavvio (segno fresco di avvio-check.py) → muto se il kit è a posto
+    os.makedirs(os.path.join(cartella, ".git"), exist_ok=True)
+    marca = os.path.join(cartella, ".git", "avvio-riavvio")
+    open(marca, "w").close()
+    controlla(riga(cartella) == "", "riavvio, kit a posto: muto", riga(cartella))
+    os.utime(marca, (time.time() - 3600, time.time() - 3600))
+    controlla(riga(cartella) == u, "segno di riavvio vecchio: avviso intero", riga(cartella))
+    open(marca, "w").close()
+    scrivi(cartella, "docs/kit-progetto/REGOLE.md", "# Regole di lavoro · kit 22.9 · 22/10/2026\n")
+    r_ = riga(cartella)
+    controlla(r_.startswith("ATTENZIONE kit: REGOLE.md") and "Preferenze v23." not in r_, "riavvio: solo l'ATTENZIONE", r_)
+    os.remove(marca)
+    progetto_buono(cartella)
+
     scrivi(cartella, "docs/kit-progetto/REGOLE.md", "# Regole di lavoro · kit 22.2 · 22/10/2026\n")
     u = riga(cartella)
     controlla("ATTENZIONE kit: REGOLE.md è «kit 22.2»" in u, "REGOLE.md di un'altra versione: avviso", u)
@@ -97,9 +111,9 @@ try:
     controlla("manca docs/kit-progetto/PREFERENZE-CHAT.txt" in riga(cartella), "manca il testo della chat: avviso")
 
     progetto_buono(cartella)
-    scrivi(cartella, "docs/kit-progetto/REGOLE.md", "# Regole di lavoro · kit 23.0 · 23/10/2026\n" + "- regola\n" * 1500)
+    scrivi(cartella, "docs/kit-progetto/REGOLE.md", "# Regole di lavoro · kit 23.0 · 23/10/2026\n" + "- regola\n" * 1600)
     u = riga(cartella)
-    controlla("REGOLE.md ha ~" in u and "(tetto 6000)" in u, "REGOLE.md oltre 6.000 token: avviso", u)
+    controlla("REGOLE.md ha ~" in u and "(tetto 6475)" in u, "REGOLE.md oltre 6.475 token: avviso", u)
 
     progetto_buono(cartella)
     scrivi(cartella, "CLAUDE.md", "# Progetto\n@docs/kit-progetto/REGOLE.md\n" + "riga\n" * 450)
@@ -136,10 +150,23 @@ try:
         shutil.copy(os.path.join(QUI, "scarica-kit.py"), os.path.join(cartella, "tools", "scarica-kit.py"))
         controlla("KIT NUOVO" not in riga(cartella) and "Kit della fonte" not in riga(cartella), "senza chiave: zitto", riga(cartella))
         u = riga(cartella, RVC_KIT_URL=url, RVC_KIT_TOKEN="segreto")
-        controlla("KIT NUOVO nella fonte del kit: «kit 24.1 · 24/10/2026 · Preferenze v24» (qui kit 23.0)" in u and "scarica-kit.py --cartella" in u
+        controlla("KIT NUOVO nella fonte del kit: «kit 24.1 · 24/10/2026 · Preferenze v24» (qui Kit 23)" in u and "scarica-kit.py --cartella" in u
                   and "segreto" not in u, "kit più nuovo nella fonte: avviso con i passi, chiave mai a schermo", u)
         scrivi(fonte, "docs/kit-progetto/VERSIONE", "kit 23.0 · 23/10/2026 · Preferenze v23\n")
         controlla("KIT NUOVO" not in riga(cartella, RVC_KIT_URL=url), "stesso kit: niente avviso", riga(cartella, RVC_KIT_URL=url))
+        # Kit 39 (Mario 18/11 «va bene 2 cifre»): «Kit N» intero; la forma vecchia «kit N.M» si legge ancora
+        scrivi(fonte, "docs/kit-progetto/VERSIONE", "Kit 24 · 24/10/2026 · Preferenze v23\n")
+        u = riga(cartella, RVC_KIT_URL=url, RVC_KIT_TOKEN="segreto")
+        controlla("KIT NUOVO nella fonte del kit: «Kit 24 · 24/10/2026 · Preferenze v23» (qui Kit 23)" in u, "Kit 24 nuovo contro kit 23.0", u)
+        scrivi(cartella, "docs/kit-progetto/VERSIONE", "Kit 24 · 24/10/2026 · Preferenze v23\n")
+        scrivi(cartella, "docs/kit-progetto/REGOLE.md", "# Regole di lavoro · Kit 24 · 24/10/2026\n\n- una regola\n")
+        u = riga(cartella, RVC_KIT_URL=url, RVC_KIT_TOKEN="segreto")
+        controlla("ATTENZIONE" not in u and "KIT NUOVO" not in u and "Kit 24 (24/10/2026)" in u, "Kit 24 qui e nella fonte: zitto", u)
+        scrivi(fonte, "docs/kit-progetto/VERSIONE", "Kit 25 · 25/10/2026 · Preferenze v23\n")
+        u = riga(cartella, RVC_KIT_URL=url, RVC_KIT_TOKEN="segreto")
+        controlla("«Kit 25 · 25/10/2026 · Preferenze v23» (qui Kit 24)" in u, "Kit 25 nuovo contro Kit 24", u)
+        scrivi(fonte, "docs/kit-progetto/VERSIONE", "kit 23.54 · 23/10/2026 · Preferenze v23\n")
+        controlla("KIT NUOVO" not in riga(cartella, RVC_KIT_URL=url, RVC_KIT_TOKEN="segreto"), "kit 23.54 vecchio contro Kit 24", "")
         scrivi(fonte, "docs/kit-progetto/VERSIONE", "kit 22.9 · 22/10/2026 · Preferenze v22\n")
         controlla("KIT NUOVO" not in riga(cartella, RVC_KIT_URL=url), "kit più vecchio nella fonte: niente avviso", riga(cartella, RVC_KIT_URL=url))
         server.shutdown()

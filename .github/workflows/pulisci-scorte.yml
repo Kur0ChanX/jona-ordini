@@ -1,0 +1,89 @@
+# Pulizia dei rami di scorta (C352, Mario 30/10 «consigliato»; giornaliera dal C469 A2). Le scorte automatiche (scorta-…)
+# crescono di ~20 rami al giorno e non si cancellano mai da sole. Ogni notte tools/pulisci-scorte.py --unite toglie SOLO
+# quelle già tutte nel ramo di lavoro (niente si perde): le più vecchie di 30 giorni e quelle di sessioni chiuse (C450,
+# legge docs/CHI-FA-COSA.md); quelle con lavoro non nel ramo restano e vengono elencate nel riassunto del giro. Eccezione scritta alla regola 🔒 «nessun ramo si cancella» (REGOLE.md, kit 29.3).
+# ~1 minuto al giorno (stima). A mano: «Run workflow» (con «prova a secco» non cancella niente, dice solo cosa toglierebbe).
+name: Pulisci le scorte
+
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+    inputs:
+      prova:
+        description: 'Prova a secco (non cancella niente)'
+        type: boolean
+        default: false
+      unite:
+        description: 'C450: anche le scorte recenti di sessioni chiuse già tutte nel ramo (--unite; legge docs/CHI-FA-COSA.md)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pulisci-scorte
+  cancel-in-progress: false
+
+jobs:
+  pulisci:
+    runs-on: ${{ vars.PROVE_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            tools/pulisci-scorte.py
+            .claude/ramo-di-lavoro.txt
+            .claude/hooks/scorta.py
+            docs/CHI-FA-COSA.md
+            tools/archivio-messaggi.py
+            archivio/messaggi-mario
+            archivio/messaggi-tolti.txt
+            archivio/consumo
+
+      # Strumenti e docs/CHI-FA-COSA.md del ramo di lavoro, non quelli di main (vecchi fino alla versione dopo).
+      - name: Passa al ramo di lavoro
+        run: |
+          RAMO=$(cat .claude/ramo-di-lavoro.txt)
+          git checkout -q -B lavoro "origin/$RAMO"
+          echo "RAMO=$RAMO" >> "$GITHUB_ENV"
+
+      # C469 L4 (Mario 10/11 «sì»): un messaggio di Mario scritto a una sessione già chiusa resta solo nella sua scorta.
+      # Ogni notte tools/archivio-messaggi.py lo copia nell'archivio del ramo (archivio/messaggi-mario/), senza doppi;
+      # le voci tolte apposta (archivio/messaggi-tolti.txt) non tornano. Push rifiutato (una chat ha spinto intanto):
+      # rifà da capo sul ramo nuovo, fino a 6 volte (13/11: 3 tentativi rifiutati, il ramo riceve molti push).
+      # Risparmio 25 (14/11): insieme, i totali dei token (archivio/consumo/) rimasti solo nelle scorte chiuse
+      # (pulisci-scorte.py --consumo, la versione più avanti): erano l'unico «lavoro» di ~9 scorte tenute su 10.
+      - name: Messaggi di Mario e consumo rimasti solo nelle scorte → archivio del ramo
+        if: ${{ inputs.prova != true }}
+        env:
+          CLAUDE_PROJECT_DIR: ${{ github.workspace }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for giro in 1 2 3 4 5 6; do
+            [ "$giro" = 1 ] || { sleep $((5 + RANDOM % 20)); git fetch -q origin "+refs/heads/$RAMO:refs/remotes/origin/$RAMO"; git checkout -q -B lavoro "origin/$RAMO"; }
+            python3 -I tools/archivio-messaggi.py --scrivi | tee -a "$GITHUB_STEP_SUMMARY"
+            { python3 -I tools/pulisci-scorte.py --consumo || echo "⚠️ Consumo delle scorte non raccolto (i messaggi sì)."; } | tee -a "$GITHUB_STEP_SUMMARY"
+            git add archivio/messaggi-mario
+            if [ -d archivio/consumo ]; then git add archivio/consumo; fi
+            if git diff --cached --quiet; then echo "Archivio già completo." >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
+            git commit -q -m "Archivio dei messaggi di Mario e consumo rimasti solo nelle scorte (giro notturno, C469 L4)"
+            if git push -q origin "HEAD:$RAMO"; then echo "Archivio aggiornato nel ramo $RAMO." >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
+          done
+          echo "⚠️ Archivio NON aggiornato: push rifiutato 6 volte." >> "$GITHUB_STEP_SUMMARY"; exit 1
+
+      - name: Pulisci le scorte vecchie già nel ramo
+        if: ${{ !cancelled() }}
+        env:
+          CLAUDE_PROJECT_DIR: ${{ github.workspace }}
+        run: |
+          UNITE=""; if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.unite }}" = "true" ]; then UNITE="--unite"; fi
+          if [ "${{ inputs.prova }}" = "true" ]; then
+            python3 -I tools/pulisci-scorte.py $UNITE --elenco | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            python3 -I tools/pulisci-scorte.py $UNITE --elenco --cancella | tee -a "$GITHUB_STEP_SUMMARY"
+          fi

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Taglia una foto lunga in pezzi leggibili sul telefono (C90 di RVC, Mario #116; in Jona da #128).
+"""Taglia una foto lunga in pezzi leggibili sul telefono (C90, Mario #116).
 
 Perché: il visualizzatore riduce una foto alta (es. 780×6400) per farla entrare nello schermo, e il testo diventa
 illeggibile. Pezzi alti al massimo ~1100 px a larghezza piena restano chiari.

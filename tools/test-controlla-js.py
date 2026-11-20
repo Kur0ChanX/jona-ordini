@@ -82,6 +82,24 @@ try:
     finally:
         shutil.rmtree(fuori)
 
+    # ESLint (#296): solo se il progetto ha eslint e eslint.config.js; senza, il nome sbagliato passa (come prima).
+    sbagliato = "export const c = nonDefinito + 1;\n"
+    codice, err = hook(cartella, scrivi(cartella, "app/src/ui/nome.js", sbagliato))
+    controlla(codice == 0, "senza ESLint: solo la sintassi")
+    moduli = os.path.join(QUI, "..", "node_modules")
+    if os.path.isfile(os.path.join(moduli, ".bin", "eslint")):
+        os.symlink(os.path.realpath(moduli), os.path.join(cartella, "node_modules"))
+        scrivi(cartella, "eslint.config.js", "export default [{ files: ['**/*.js'], rules: { 'no-undef': 'error' } }];\n")
+        codice, err = hook(cartella, "app/src/ui/nome.js")
+        controlla(codice == 2 and "nonDefinito" in err and "app/src/ui/nome.js" in err, "ESLint: nome non definito = uscita 2 col messaggio")
+        codice, err = hook(cartella, "app/src/ui/buono.js")
+        controlla(codice == 0 and err == "", "ESLint: file giusto = silenzio")
+        scrivi(cartella, "eslint.config.js", "export default [ rotto\n")
+        codice, err = hook(cartella, "app/src/ui/nome.js")
+        controlla(codice == 0, "ESLint con la configurazione rotta: non blocca")
+    else:
+        print("(ESLint non installato: controlli di ESLint saltati; npm ci)")
+
     env = dict(os.environ, CLAUDE_PROJECT_DIR=cartella)
     r = subprocess.run([sys.executable, "-I", HOOK], input="non è json", capture_output=True, text=True, env=env)
     controlla(r.returncode == 0, "entrata rotta: silenzio")

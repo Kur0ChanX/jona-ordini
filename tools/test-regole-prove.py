@@ -27,10 +27,10 @@ def conversazione(nome, letture):
     return p
 
 
-def lancia(comando, sessione="s1", conv=None, progetto=os.path.join(QUI, "..")):
-    env = dict(os.environ, REGOLE_PROVE_STATO=stato, CLAUDE_PROJECT_DIR=progetto)
-    dati = json.dumps({"session_id": sessione, "transcript_path": conv or "", "tool_name": "Bash",
-                       "tool_input": {"command": comando}})
+def lancia(comando, sessione="s1", conv=None, progetto=None, strumento="Bash", ingresso=None):
+    env = dict(os.environ, REGOLE_PROVE_STATO=stato, CLAUDE_PROJECT_DIR=progetto or con_prove, REGOLE_PROVE_LUCCHETTO=lucchetto)
+    dati = json.dumps({"session_id": sessione, "transcript_path": conv or "", "tool_name": strumento,
+                       "tool_input": ingresso or {"command": comando}})
     r = subprocess.run([sys.executable, "-I", HOOK], input=dati, capture_output=True, text=True, timeout=30, env=env)
     uscita = json.loads(r.stdout).get("hookSpecificOutput", {}) if r.stdout.strip() else {}
     fermo = uscita.get("permissionDecision") == "deny"
@@ -38,8 +38,14 @@ def lancia(comando, sessione="s1", conv=None, progetto=os.path.join(QUI, "..")):
 
 
 radice = tempfile.mkdtemp(prefix="prova-regole-prove-")
+lucchetto = os.path.join(radice, "prove.lock")
 stato = os.path.join(radice, "stato")
 os.makedirs(stato)
+# Progetto finto col modulo «app con prove» (la regola c'è): la prova non dipende dal progetto vero (kit 38.18)
+con_prove = os.path.join(radice, "progetto-con-prove")
+os.makedirs(os.path.join(con_prove, ".claude", "rules"))
+with open(os.path.join(con_prove, ".claude", "rules", "prove.md"), "w", encoding="utf-8") as f:
+    f.write("regola delle prove\n")
 try:
     vuota = conversazione("vuota", [("Read", "/home/user/RVC/app/src/main.js")])
     c, e = lancia("git status", conv=vuota)
@@ -78,6 +84,26 @@ try:
     r = subprocess.run([sys.executable, "-I", HOOK], input="non è json", capture_output=True, text=True, timeout=30,
                        env=dict(os.environ, REGOLE_PROVE_STATO=stato))
     controlla(r.returncode == 0 and r.stderr == "", "entrata illeggibile: silenzio", r.stderr)
+
+    # E485: prove in corso (lucchetto preso da un altro processo) → niente cambi alle regole né merge.
+    import fcntl
+    regole = 'python3 - <<X\ns=open("firestore.rules").read(); open("firestore.rules","w").write(s)\nX'
+    c, e = lancia(regole, sessione="s9", conv=letta)
+    controlla(c == 0, "lucchetto libero: cambio delle regole passa", e)
+    tieni = open(lucchetto, "w")
+    fcntl.flock(tieni, fcntl.LOCK_EX)
+    c, e = lancia(regole, sessione="s9", conv=letta)
+    controlla(c == 2 and "E485" in e, "prove in corso: Bash che scrive le regole fermo", e)
+    c, e = lancia("grep -n paccoAvviso firestore.rules", sessione="s9", conv=letta)
+    controlla(c == 0, "prove in corso: leggere le regole passa", e)
+    c, e = lancia("git merge origin/x", sessione="s9", conv=letta)
+    controlla(c == 2 and "E485" in e, "prove in corso: git merge fermo", e)
+    c, e = lancia("", sessione="s9", conv=letta, strumento="Edit", ingresso={"file_path": "/home/user/RVC/firestore.rules"})
+    controlla(c == 2 and "E485" in e, "prove in corso: Edit delle regole fermo", e)
+    c, e = lancia("", sessione="s9", conv=letta, strumento="Write", ingresso={"file_path": "/home/user/RVC/app/src/main.js"})
+    controlla(c == 0, "prove in corso: Write di un altro file passa", e)
+    fcntl.flock(tieni, fcntl.LOCK_UN)
+    tieni.close()
 finally:
     shutil.rmtree(radice, ignore_errors=True)
 

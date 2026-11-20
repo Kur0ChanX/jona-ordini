@@ -1,0 +1,10 @@
+# Driver di unione (li registra avvio-check.py a ogni avvio): file della scorta, registri e archivio dei
+# messaggi di Mario, impostazioni chiave per chiave. Uguali a ATTRIBUTI di .claude/hooks/avvio-check.py.
+docs/ULTIMO-MESSAGGIO.md merge=scorta
+docs/ULTIMO-MESSAGGIO-PARALLELA.md merge=scorta
+docs/ULTIMA-RISPOSTA.md merge=scorta
+docs/ULTIMA-RISPOSTA-PARALLELA.md merge=scorta
+docs/MESSAGGI-MARIO.md merge=registro
+docs/MESSAGGI-MARIO-PARALLELA.md merge=registro
+archivio/messaggi-mario/*.md merge=archivio
+.claude/settings.json merge=impostazioni

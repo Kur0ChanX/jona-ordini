@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # Prova dell'hook .claude/hooks/domande-chiare.py (C233, E145): domande a Mario chiare e col contesto.
 # Uso: python3 -I tools/test-domande-chiare.py
-import json, os, subprocess, sys
+import json, os, subprocess, sys, tempfile, time
 
 QUI = os.path.dirname(os.path.abspath(__file__))
 HOOK = os.path.join(QUI, "..", ".claude", "hooks", "domande-chiare.py")
 ok_n = 0
+TMP = tempfile.mkdtemp()
+subprocess.run(["git", "init", "-q", TMP], check=True)
+GITDIR = os.path.join(TMP, ".git")
+STATO = os.path.join(GITDIR, "domande-ultime.json")
 
 
 def controlla(cond, nome, extra=""):
@@ -16,10 +20,13 @@ def controlla(cond, nome, extra=""):
     ok_n += 1
 
 
-def stop(messaggio, attivo=False, grezzo=None):
+def stop(messaggio, attivo=False, grezzo=None, tieni=False):
+    if not tieni and os.path.exists(STATO):
+        os.remove(STATO)  # ogni controllo parte senza domande di prima, salvo quelli della domanda ripetuta
     dati = grezzo if grezzo is not None else json.dumps({"session_id": "prova", "stop_hook_active": attivo,
                                                          "last_assistant_message": messaggio})
-    r = subprocess.run([sys.executable, "-I", HOOK], input=dati, capture_output=True, text=True, timeout=30)
+    r = subprocess.run([sys.executable, "-I", HOOK], input=dati, capture_output=True, text=True, timeout=30,
+                       env=dict(os.environ, CLAUDE_PROJECT_DIR=TMP))
     return r.returncode, r.stderr
 
 
@@ -71,4 +78,138 @@ for grezzo, nome in (("non json", "ingresso non JSON"), (json.dumps({"session_id
     c, err = stop(None, grezzo=grezzo)
     controlla(c == 0 and not err, nome, f"{c} {err}")
 
+# Domanda ripetuta senza un messaggio di Mario in mezzo (Mario 27/10 «non rifarmi le stesse domande in loop»).
+def mario_scrive():
+    open(os.path.join(GITDIR, "scorta-msg.md"), "w").write("messaggio\n")
+    t = time.time() + len(os.listdir(GITDIR))
+    os.utime(os.path.join(GITDIR, "scorta-msg.md"), (t, t))
+
+
+mario_scrive()
+c, err = stop(BUONA)
+controlla(c == 0, "prima volta: passa", err)
+c, err = stop(BUONA.replace("Consiglio la 2", "Io consiglio la 2"), tieni=True)
+controlla(c == 2 and "ripetuta" in err, "stessa domanda (riscritta) senza Mario in mezzo: blocca", f"{c} {err}")
+c, err = stop("✅ FATTO\n- Aspetto la tua risposta.", tieni=True)
+controlla(c == 0 and not err, "senza la domanda: passa", f"{c} {err}")
+c, err = stop("❓ DOMANDE\n📌 Di cosa parliamo: il colore del tasto Salva nella scheda camere.\n1 · Verde · 2 · Blu",
+              tieni=True)
+controlla(c == 0 and not err, "domanda diversa: passa", f"{c} {err}")
+c, err = stop(BUONA, tieni=True)
+controlla(c == 0, "torna la prima ma l'ultima mostrata era un'altra: passa", err)
+mario_scrive()
+c, err = stop(BUONA, tieni=True)
+controlla(c == 0 and not err, "Mario ha scritto d'altro: la domanda si può rifare una volta", f"{c} {err}")
+c, err = stop(BUONA.replace("📌", ""), tieni=True)
+controlla(c == 2 and "ripetuta" in err, "ripetuta e anche senza contesto: vale la ripetuta", f"{c} {err}")
+c, err = stop(BUONA.replace("📌 Di cosa parliamo: la striscia", "La striscia"), tieni=False)
+c, err = stop(BUONA, attivo=True, tieni=True)
+controlla(c == 0 and not err, "riscritta dopo il blocco del contesto: passa (secondo giro)", f"{c} {err}")
+c, err = stop(BUONA, tieni=True)
+controlla(c == 2 and "ripetuta" in err, "dopo la riscrittura è segnata: rifarla di nuovo blocca", f"{c} {err}")
+
+# Foto e video (E240, E247; Mario 1/11 «mandami un video se mi devi mostrare qualcosa animata»).
+def turno(*voci):
+    """Scrive un transcript finto: voci = ("mario", testo) | ("sistema", testo) | ("file", [percorsi])."""
+    righe = []
+    for tipo, x in voci:
+        if tipo == "file":
+            righe.append({"type": "assistant", "message": {"content": [
+                {"type": "tool_use", "name": "SendUserFile", "input": {"files": x}}]}})
+        else:
+            righe.append({"type": "user", "isMeta": tipo == "sistema", "message": {"content": x}})
+    nome = os.path.join(TMP, "turno.jsonl")
+    with open(nome, "w") as f:
+        f.write("\n".join(json.dumps(r) for r in righe) + "\n")
+    return nome
+
+
+def stop_media(messaggio, voci, attivo=False, sessione="session_scorte", remoto=""):
+    if os.path.exists(STATO):
+        os.remove(STATO)
+    dati = json.dumps({"session_id": sessione, "stop_hook_active": attivo, "last_assistant_message": messaggio,
+                       "transcript_path": turno(*voci)})
+    r = subprocess.run([sys.executable, "-I", HOOK], input=dati, capture_output=True, text=True, timeout=30,
+                       env=dict(os.environ, CLAUDE_PROJECT_DIR=TMP, CLAUDE_CODE_REMOTE_SESSION_ID=remoto))
+    return r.returncode, r.stderr
+
+
+MOSSA = "❓ DOMANDE\n📌 Di cosa parliamo: lo sblocco con l'impronta, con l'onda verde.\n1 · Va bene · 2 · Cambi"
+c, err = stop_media(MOSSA, [("mario", "mandami un video")])
+controlla(c == 2 and "E247" in err and "video" in err, "cosa che si muove senza video nel turno: blocca", f"{c} {err}")
+c, err = stop_media(MOSSA, [("mario", "ok"), ("file", ["archivio/C359/sblocco.mp4"])])
+controlla(c == 0 and not err, "video mandato nel turno: passa", f"{c} {err}")
+c, err = stop_media(MOSSA, [("file", ["archivio/C359/sblocco.mp4"]), ("mario", "e il video?")])
+controlla(c == 2 and "E247" in err, "video mandato in un turno di prima: blocca", f"{c} {err}")
+c, err = stop_media(MOSSA, [("mario", "ok"), ("file", ["archivio/x.png"]), ("sistema", "Stop hook feedback")])
+controlla(c == 2 and "video" in err, "solo una foto (e un messaggio del sistema dopo): blocca", f"{c} {err}")
+c, err = stop_media(MOSSA, [("mario", "ok")], attivo=True)
+controlla(c == 0 and not err, "secondo giro: mai due volte", f"{c} {err}")
+c, err = stop_media(BUONA, [("mario", "ok")])
+controlla(c == 0 and not err, "domanda su una cosa ferma senza video: passa", f"{c} {err}")
+os.makedirs(os.path.join(TMP, "docs"), exist_ok=True)
+os.makedirs(os.path.join(TMP, "archivio", "c1"), exist_ok=True)
+open(os.path.join(TMP, "archivio", "c1", "colori.png"), "w").write("x")
+open(os.path.join(TMP, "docs", "DA-FARE.md"), "w").write(
+    "# Da fare\n## 0. Aspetta Mario\n- 01/11 · 💛 Scorte 70 · colori del tasto (foto `archivio/c1/colori.png`): 1 · 2.\n"
+    "- 01/11 · 💛 Scorte 70 · foto `archivio/c1/manca.png` che non c'è.\n"
+    "- 01/11 · 🟡 Principale 471 · foto `archivio/c1/colori2.png` (dell'altra catena).\n\n## 1. Altro\n")
+open(os.path.join(TMP, "archivio", "c1", "colori2.png"), "w").write("x")
+open(os.path.join(TMP, "docs", "CHI-FA-COSA.md"), "w").write(
+    "## Catene\n| Catena | Forma | Segni | Numero | Sessione | Chiusa il |\n|---|---|---|---|---|---|\n"
+    "| Principale | cerchi | 🟢 | 471 | `session_princ` | — |\n| Scorte | cuori | 💚 | 71 | `session_scorte` | — |\n")
+RICORDO = "✅ FATTO\n- Avvio.\n───\n⏳ Aspettano te\n- Scorte 70: colori del tasto.\n- Principale 471: altro."
+c, err = stop_media(RICORDO, [("mario", "[AVVIO]")])
+controlla(c == 2 and "archivio/c1/colori.png" in err and "manca.png" not in err and "colori2" not in err,
+          "promemoria: la foto vera della propria catena va rimandata (il file che non c'è e l'altra catena no)",
+          f"{c} {err}")
+c, err = stop_media(RICORDO, [("mario", "[AVVIO]"), ("file", ["/home/x/archivio/c1/colori.png"])])
+controlla(c == 0 and not err, "foto rimandata (percorso intero): passa", f"{c} {err}")
+c, err = stop_media("✅ FATTO\n- Principale 471 ha finito.", [("mario", "ok")])
+controlla(c == 0 and not err, "riga senza foto vera: passa", f"{c} {err}")
+# C469 fase 2 (rapporto 14 voce 1): in cloud l'ingresso ha l'id locale; la catena si trova con l'id dell'ambiente
+# (cse_<id> → session_<id> della tabella).
+c, err = stop_media(RICORDO, [("mario", "[AVVIO]")], sessione="c9c6a68f-locale", remoto="cse_scorte")
+controlla(c == 2 and "archivio/c1/colori.png" in err, "cloud: catena dall'id dell'ambiente, foto da rimandare", f"{c} {err}")
+c, err = stop_media(RICORDO, [("mario", "[AVVIO]")], sessione="c9c6a68f-locale", remoto="cse_altra")
+controlla(c == 0 and not err, "cloud: sessione fuori dalla tabella = niente catena, passa", f"{c} {err}")
+# Rodato dal vivo (09/11, Risparmio 10): righe «Catena N → M» (dopo un handoff) e la riga corta «⚠️ Aspettano te».
+open(os.path.join(TMP, "archivio", "c1", "logo.png"), "w").write("x")
+with open(os.path.join(TMP, "docs", "DA-FARE.md"), "w") as f:
+    f.write("# Da fare\n## 0. Aspetta Mario\n- 09/11 · 💛 Scorte 70 → 71 · colori del logo (`archivio/c1/logo.png`): 1 · 2.\n\n## 1. Altro\n")
+c, err = stop_media("❓ DOMANDE\n📌 Di cosa parliamo: colori del logo (Scorte 71).\n1 · Va bene · 2 · No", [("mario", "?")])
+controlla(c == 2 and "archivio/c1/logo.png" in err, "riga «Scorte 70 → 71» richiesta di nuovo col numero nuovo: foto da rimandare", f"{c} {err}")
+c, err = stop_media("✅ FATTO\n- Avvio.\n───\n⚠️ Aspettano te: 1 · colori del logo (Scorte 70 → 71)", [("mario", "[AVVIO]")])
+controlla(c == 0 and not err, "solo la riga corta «⚠️ Aspettano te» in fondo: passa (la foto va con la domanda intera)", f"{c} {err}")
+# Rodato dal vivo (10/11, Risparmio 10 → 11): blocco «❓» seguito SENZA «───» dalla riga corta che nomina un video:
+# la riga corta non fa parte del blocco (niente «manda un video», niente sigle, niente foto da rimandare).
+FERMA_E_CORTA = ("❓ DOMANDE\n📌 Di cosa parliamo: la regola dei file vecchi, il controllo è pronto.\n"
+                 "1 · Accendi (consiglio) · 2 · Resta spento\n⚠️ Aspettano te: 1 · video del logo C464 (Principale 471)")
+c, err = stop_media(FERMA_E_CORTA, [("mario", "?")])
+controlla(c == 0 and not err, "domanda ferma + riga corta che dice «video» senza «───»: passa", f"{c} {err}")
+# kit 38.27 (Mario 11/11): il promemoria è un blocco, prima la propria catena poi le altre, una riga «- …» per catena.
+BLOCCO = ("✅ FATTO\n- Avvio.\n───\n⚠️ Aspettano te: 2\n- Mia catena: Scorte 70 → 71 · colori del logo, va bene o no\n"
+          "- Altre: Principale 471 · video del logo C464")
+c, err = stop_media(BLOCCO, [("mario", "[AVVIO]")])
+controlla(c == 0 and not err, "blocco «⚠️ Aspettano te» con le righe «- …» delle catene: passa (niente foto, niente video)", f"{c} {err}")
+c, err = stop_media(BLOCCO + "\n\nPoi: colori del logo (Scorte 71) da rifare.", [("mario", "[AVVIO]")])
+controlla(c == 2 and "archivio/c1/logo.png" in err, "il blocco finisce alla riga vuota: la catena nominata DOPO chiede ancora la foto", f"{c} {err}")
+
+# kit 37.2 (Pronti in Tavola, Mario «regola per tutti i progetti»): «👉 DA FARE TU» parte da «A cosa serve»
+SENZA = "✅ FATTO\n- ok\n───\n👉 DA FARE TU\n1. Apri la pagina\n2. Tocca Salva\n───\n⚠️ ATTENZIONE\n- niente"
+CON = SENZA.replace("👉 DA FARE TU\n", "👉 DA FARE TU\nA cosa serve: così l'app vede la chiave.\n")
+c, err = stop(SENZA)
+controlla(c == 2 and "A cosa serve" in err, "«👉 DA FARE TU» senza «A cosa serve»: blocca una volta", f"{c} {err}")
+c, err = stop(SENZA, attivo=True)
+controlla(c == 0 and not err, "«👉 DA FARE TU» al secondo giro: passa", f"{c} {err}")
+c, err = stop(CON)
+controlla(c == 0 and not err, "«👉 DA FARE TU» con «A cosa serve»: passa", f"{c} {err}")
+c, err = stop("✅ FATTO\n- ok\n───\n👉 DA FARE TU\n1. passo\n───\nA cosa serve: in un altro blocco")
+controlla(c == 2, "«A cosa serve» fuori dal blocco non conta", f"{c} {err}")
+
+# Blocco falso (Risparmio 25, dati veri del 12/11 14:38): il promemoria di una domanda già fatta non è una domanda nuova
+passa("✅ FATTO\n- Avvio.\n───\n❓ Resta la DOMANDA 1 del messaggio di prima: correzione del controllo delle promesse.",
+      "promemoria di una domanda già fatta")
+blocca("❓ DOMANDA 1\nVuoi il tasto verde nella scheda camere?", "domanda nuova senza contesto né scelte", "📌")
+blocca("❓ Resta la DOMANDA 1: il tasto.\n1 · Verde · 2 · Blu", "promemoria con le scelte = domanda vera", "📌")
 print(f"OK domande-chiare: {ok_n} controlli")

@@ -17,11 +17,12 @@ description: Regole delle due chat sullo stesso ramo (chi fa cosa, chat principa
 
 ## La chat parallela
 - Serve per un lavoro grande in una zona separata, che non tocca i file della principale.
-- Prompt di avvio: «[AVVIO] Sei la chat parallela P<NN> di <progetto> (ramo <ramo>)» + fetch e merge del ramo + file da leggere (`CLAUDE.md`, `docs/ERRORI.md`, le sue consegne `docs/CONSEGNE-PARALLELA-<lavoro>.md`).
-- Con quella frase la scorta si segna «parallela»: ramo `scorta-parallela/<ramo>`, messaggio di Mario in `docs/ULTIMO-MESSAGGIO-PARALLELA.md`. Aperta a mano senza la frase: primo comando `python3 -I .claude/hooks/scorta.py ruolo parallela`.
+- Catena nuova: nome di una parola, che non cambia mai, e prima forma libera della tabella «## Catene» di `docs/CHI-FA-COSA.md` (riserva: libri 📗 📒 📕 📓); numero da 1; fissi per tutta la catena anche all'handoff; chi la apre scrive la riga. Quante parallele insieme lo decide Mario (REGOLE «Chat e carico»). Titoli: skill `consegne` fase 6.
+- Prompt di avvio: «[AVVIO] Sei la chat parallela <zona> <NN> di <progetto> (ramo <ramo>)» + fetch e merge del ramo + file da leggere (`CLAUDE.md`, `docs/ERRORI.md`, le sue consegne `docs/CONSEGNE-PARALLELA-<lavoro>.md`).
+- Con quella frase la scorta si segna «parallela»: ramo `scorta-parallela-<AAAAMMGG>-<id sessione>/<ramo>` (uno per sessione, C352: due parallele insieme non si pestano), messaggio di Mario in `docs/ULTIMO-MESSAGGIO-PARALLELA.md`. Aperta a mano senza la frase: primo comando `python3 -I .claude/hooks/scorta.py ruolo parallela`.
 - All'avvio unisce solo la sua scorta; quella della principale non si unisce (al massimo `git show <scorta>:<file del messaggio>`).
 - Vive finché ha lavoro nella sua zona. Alla soglia: consegne nelle sue `docs/CONSEGNE-PARALLELA-<lavoro>.md` (mai in `docs/PASSAGGIO-CONSEGNE.md`); sessione parallela nuova solo se resta più di mezza sessione di lavoro, sennò il resto passa alla principale.
-- Finito il lavoro: consegne, push, titolo `🔴 <icona> ✓ CHIUSA · P<NN> · …`, nessuna sessione nuova; le sue zone tornano alla principale in `docs/CHI-FA-COSA.md` e un `send_message` alla principale.
+- Finito il lavoro: consegne, push, titolo col segno «chiusa» della sua catena, `<segno chiusa> <icona> <Nome> <NN> · <cosa ha fatto>` (es. «🟥 <icona> Dov'è 8 · online + Porter»; regola «Titoli»; data di chiusura nella tabella «## Catene»; le sue righe di «## 0. Aspetta Mario» restano), nessuna sessione nuova; le sue zone tornano alla principale in `docs/CHI-FA-COSA.md` e un `send_message` alla principale.
 
 ## Aiuto fra le chat
 - Evento atteso dall'altra (unione, PR, risposta di Mario arrivata qui): `send_message` SUBITO. L'altra può non avere sveglie.
@@ -29,3 +30,27 @@ description: Regole delle due chat sullo stesso ramo (chi fa cosa, chat principa
 - Chat ferma con un lavoro aperto (niente commit né messaggi da più di 1 ora): l'altra guarda `get_session`. Se è morta: una riga a Mario con il testo da incollare; il lavoro urgente (PR pronta, unione) lo prende l'altra, scrivendolo nel file.
 - Sessione nuova: la apre la chat che chiude con `create_session` (a 8 della catena Mario; skill `consegne`, fase 5); l'altra chat non la apre.
 - `send_message` solo a sessioni attive nell'ultima ora; per le altre una riga in `docs/DA-FARE.md`.
+
+## Carico
+- Per guardare le altre sessioni: `list_sessions` sempre con `limit` 4.
+- Prima di passare un lavoro a un'altra chat (anche alla principale) guardo i suoi lavori in corso in `docs/CHI-FA-COSA.md`.
+- Richiesta piccola con l'altra chat carica: la faccio io, se non pesta la sua zona; sennò chat a parte. Passata a una chat carica si perde o arriva tardissimo.
+- Lavoro grosso mentre l'altra ha un lavoro grosso: chat a parte, mai in coda alla sua.
+- Ogni chat cose diverse, mai accavallate: zone e file in `docs/CHI-FA-COSA.md`, le parole di Mario girate intere.
+- Quante chat insieme lo decide Mario, non un numero fisso; una chat avviata su un lavoro importante si finisce.
+
+## Aiutanti
+- Agente dedicato (`.claude/agents/`, motore leggero), mai `general-purpose` (Fable → skill `fable-opus`), rapporto corto, ognuno i suoi file, poi le prove delle parti cambiate; vicino alla soglia niente aiutanti lunghi.
+
+## Ponte tra progetti (C511 p.16, Mario 18/11)
+- Leggere un altro progetto di Mario (es. per copiare una soluzione): solo con l'ok scritto di Mario in chat. `add_repo` con `access: "read"` (con `push` la guardia lo nega), clone sparso in `/home/user/ponte/<repo>` (`git clone --filter=blob:none --sparse`, poi `git sparse-checkout set <cartelle>`), mai dentro il progetto.
+- Niente push, niente commit, niente file scritti là: si legge e basta. Quello che serve si riscrive qui, nel proprio progetto.
+- Con 2 o più repo nella sessione gli hook non partono (guardia compresa): finito il ponte lo dico a Mario, e il lavoro vero lo fa una sessione col SOLO repo del progetto.
+
+## Altri rami (C511 p.24, Mario 18/11)
+- L'avvio elenca i rami di lavoro di altre chat con lavoro non nel ramo («ALTRI RAMI», `avvio-check.py`). Prima di unirne uno:
+  0. la chat di quel ramo lavora ancora (`docs/CHI-FA-COSA.md`, `get_session`)? Sì, o nel dubbio → NON unisco: le scrivo (`send_message`) e lo dico a Mario in una riga;
+  1. cosa pubblica l'unione: i workflow con `on: push` e i loro `paths` (`grep -n -A6 'on:' .github/workflows/*.yml`) toccati dai file di quel ramo (`git diff --stat HEAD origin/<ramo>`);
+  2. le righe «## 0. Aspetta Mario» di quel ramo (`git show origin/<ramo>:docs/DA-FARE.md`);
+  3. se una riga aspetta l'ok di Mario a pubblicare quel lavoro, NON unire: lo dico a Mario in una riga e scrivo alla chat di quel ramo.
+- Niente di questo: merge normale e lo dico.
