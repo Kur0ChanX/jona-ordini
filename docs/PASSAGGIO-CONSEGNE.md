@@ -3,7 +3,7 @@
 Sessione attuale: #147 (dopo la #146 `session_01WTjqUuMXapFYVzQRUuie8s`, chiusa alla soglia 20/11 20:51; la apre la #146 con `create_session` (catena 2 di 8)).
 
 - **Già deciso da Mario (non richiedere)**: v121 approvata («va bene, mettila online», 20/11). D59 salvagente: «vai di tuo consiglio, basta che funziona … iPhone che Android … plug and play» → strada scelta da Claude: accesso Firebase nome utente + password collegato al telefono (`docs/RIENTRO.md`, «Pezzo 3 NUOVA STRADA»), poi passkey. Kit 47 applicato («Si applica»). «Comunicalo in tutto l'account» (fatto, sotto). Causa del telefono svuotato: Mario ha usato «Cancella dati di navigazione» di Chrome con tutto spuntato tranne le password (E59).
-- **Da non rifare**: installazione del kit 47 (43/43 prove degli hook verdi, commit `11b9c1e`); messaggi a RVC (Accessi 6 e Codice 39, 20/11 ~20:50); controllo del provider Firebase (oggi `PASSWORD_LOGIN_DISABLED`); domanda «conferma che tutto l'account ragiona» (risposta data: Jona sì, RVC ha la regola e Accessi 6 lavora, SPA/EdilCannas col kit; conferma di RVC non ancora arrivata).
+- **Da non rifare**: installazione del kit 47 (43/43 prove degli hook verdi, commit `11b9c1e`); messaggi a RVC (Accessi 6 e Codice 39, 20/11 ~20:50); controllo del provider Firebase (oggi `PASSWORD_LOGIN_DISABLED`); domanda «conferma che tutto l'account ragiona» (risposta data: Jona sì, RVC ha la regola e Accessi 6 lavora, SPA/EdilCannas col kit; RVC Accessi 6 ha confermato alle 20:50: stessa strada già in uso in RVC, email finta `<utente>@utenti.rvc-villacarola.pages.dev`; da dire a Mario se non l'ho detto).
 - **Cosa preme a Mario adesso**: è ANCORA FUORI da Jona e vuole una soluzione definitiva, in tutti i progetti: «le app devono avere una base stabile, non pendente a una cronologia».
 
 ## Stato (20/11 20:51 ora italiana)
@@ -44,9 +44,9 @@ Prossimo E libero: E62.
 
 ## Messaggi di Mario di questa sessione
 Scritti dallo script (C469): dopo «→» cosa ne è stato (C…, file, commit o «risposta alla domanda N»).
-- 2026-11-20 20:44 · Domanda 1. Ma com'è possibile che sono io il creatore e mi deve abilitare Mauriz… → 
-- 2026-11-20 20:45 · Domanda 2, va bene, mettila online. Domanda 3, vai di tuo consiglio, basta che f… → 
-- 2026-11-20 20:49 · Questo messaggio va bene, comunicalo in tutto l'account. Mi sono ricordato che l… → 
+- 2026-11-20 20:44 · Domanda 1. Ma com'è possibile che sono io il creatore e mi deve abilitare Mauriz… → risposto: errore mio ammesso (E61), scelte per rientrare rifatte; Mario non ha ancora scelto (riga in «Aspetta Mario»)
+- 2026-11-20 20:45 · Domanda 2, va bene, mettila online. Domanda 3, vai di tuo consiglio, basta che f… → v121 in PR #130 (prove in corso); salvagente: strada accesso Firebase scelta, piano in `docs/RIENTRO.md`, passo Firebase chiesto a Mario
+- 2026-11-20 20:49 · Questo messaggio va bene, comunicalo in tutto l'account. Mi sono ricordato che l… → mandato a RVC Accessi 6 e Codice 39; Accessi 6 ha risposto: in RVC stessa strada già in uso; causa scritta in E59
 
 Ultimo, intero:
 > Questo messaggio va bene, comunicalo in tutto l'account. Mi sono ricordato che la memoria del telefono che mi si è cancellata, se tu stai provando a indagare il motivo, te lo dico io. Probabilmente la colpa è la mia, però non è proprio una colpa, nel senso che io sono entrato, volevo cancellare la cronologia. Mi diceva un giorno, io ho messo tutto quello che c'era e ho cancellato anche dati. Mi ricordo che c'è su Chrome, c'era scritto dati, cronologia, tranne forse accessi non ho toccato, e probabilmente sono stato io, però nel senso non me ne do una colpa, io l'ho toccato su Chrome, quindi diciamo che le colpe sono 50-50, 50 mie e 50 tue. Tu dovevi salvarlo in modo in sicurezza e io non sapevo che cancellando la cronologia e dati da Chrome, io volevo cancellare solo la cronologia ma ho lasciato flaggato anche il resto, mi andasse a cancellare queste cose. Anche immaginati se un cliente, un collega cancella la cronologia, non li si deve cancellare tutto, memoria e quant'altro. Cioè, le app devono avere una base stabile, non pendente a una cronologia, dati volatili così. Mi confermi che in tutto l'account state ragionando per risolvere questo problema definitivamente?
