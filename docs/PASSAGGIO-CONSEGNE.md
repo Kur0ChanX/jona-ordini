@@ -1,35 +1,42 @@
-# Passaggio di consegne (2026-11-20 ~20:15 ora italiana, chiusura della #144)
+# Passaggio di consegne (2026-11-20 ~20:40 ora italiana, chiusura della #145)
 
-Sessione chiusa: #144 (Fable per il piano, poi Opus 5.5; ambiente `env_01PHQTdrmzBJ65UoCn8yQSqE`; impegno `medium`). La prossima è #145.
+Sessione chiusa: #145 (Opus 5.5; ambiente `env_01PHQTdrmzBJ65UoCn8yQSqE`; impegno vero Extra, in `settings.json` resta `medium` come scelto da Mario). La prossima è #146. Catena 2 di 8.
 
-- **Già deciso da Mario (non richiedere)**: D58 «tutto come consiglio» (20/11 19:42): rientro da soli con nome utente e password (pezzo 3); possono ricollegare i telefoni Maurizio, lo sviluppatore, **Mauro** e chi ha l'interruttore «Può ricollegare i telefoni» nel profilo (pezzo 2a). Riga «Telefono» nella scheda della persona: approvata («va bene», FOTO `docs/img/v120/scheda-telefono.png`). Regola di Mario per tutti i progetti: **nessuno deve mai restare bloccato fuori dall'app**. Ragionare con Fable, costruire con Opus (Mario: «fermati il lavoro pesante che ragioniamo con Opus per risparmiare token»).
-- **Da non rifare**: il piano e le scelte tecniche di `docs/RIENTRO.md` (chiuse da Fable: «telefono del server», un solo modo di entrare, prove); la ricerca su `navigator.storage.persist` (fatta il 20/11: Chrome e Safari decidono da soli senza chiedere, Chrome concede di solito all'app installata sulla Home; Firefox mostra un riquadro); la v120 (pezzo 1, fatta e provata); unire le scorte del 23/10 (unite).
-- **Cosa preme a Mario adesso**: D58 🔴 urgenza: che nessuno resti fuori. Il suo Xiaomi è uscito da Jona e da RVC (Chrome ha perso la memoria dei siti, non è il codice).
+- **Già deciso da Mario (non richiedere)**: D58 «tutto come consiglio» (20/11 19:42): rientro da soli con nome utente e password (pezzo 3); sbloccano Maurizio, lo sviluppatore, Mauro (reparto `fb`) e chi ha l'interruttore. Regola «nessuno resta fuori» per TUTTI i progetti («Non deve mai ricapitare in nessun progetto», 20/11): scritta in E59, mandata al kit di RVC.
+- **Da non rifare**: il piano e le scelte tecniche di `docs/RIENTRO.md`; la ricerca su Google nelle app installate (20/11, sotto); il codice e le prove della v121 (fatti, verdi in locale); le foto della v121 (`archivio/foto-v121/`) e le bozze del salvagente (`archivio/bozze-salvagente/`), già mandate a Mario.
+- **Cosa preme a Mario adesso**: è ANCORA FUORI da Jona (foto: «Collega questo telefono»). Vuole un salvagente per ogni profilo che non dipenda dalla memoria del telefono.
 
 ## Stato
-- **PR #129** (v120, pezzo 1: memoria protetta + riga «Telefono») segnata pronta il 20/11 ~20:10: «prove» su GitHub in corso sull'ultimo commit `9cc8eb9` (il commit delle consegne è solo documenti). Verde → squash (titolo corto, `commit_message` corto, E54), poi merge di `main` sul ramo. Rosso → capire la causa, correggere, rifare il giro.
-- Prove in locale verdi (solo Chrome): `test-memoria-protetta` (nuova, nelle veloci), `test-firebase-telefoni`, `test-moduli`, `test-news`, `test-testbar`, `test-giro`. La v100 delle novità spostata in `data/news.json` (E55).
-- Mario: non so se è già rientrato in Jona (gli ho dato i 6 passi: codice d'invito da Maurizio → **Ho già un profilo** → Maurizio approva → nome utente e password). Se scrive che è bloccato: guidarlo da Firebase come il 07/10 (DA-FARE M14).
-- Dal server il suo profilo non l'ho potuto controllare (nessuna chiave di Firebase nel contenitore); dal codice: profilo e dati sono sul server, legati al profilo, il telefono svuotato non li tocca.
+- **PR #129** (v120, memoria protetta): «prove» su GitHub in corso dalle 19:00 UTC sul commit `121ee6c` (unione della scorta, solo documenti). Sottoscritta con `subscribe_pr_activity`: la #146 si deve iscrivere di nuovo.
+- **4-6 commit locali NON ancora su GitHub** (E39: niente push mentre girano le prove della PR): unione della scorta `225b22d`, **v121** `fc9b882`, foto `1553afb`, regola E59 `b6389b2`, consegne. Coperti dalla scorta automatica. Se la #146 non li trova su `origin/claude/jona-ramo-definitivo`: sono in `origin/scorta-principale/claude/jona-ramo-definitivo`, unirla.
+- **v121** (D58 pezzo 2a) fatta: «Approva» chiede «Di chi è questo telefono?» (profilo già scelto se il nome coincide) → «Ricollega» scrive `membri/<uid>.sid` → il telefono entra da solo (`jona_rie`, `rieCheck` in `view`); «Profilo doppio?» per «Sono nuovo» con nome già presente; `canUnlock` (gestori, `fb`, interruttore `sblocca` nel profilo); «sempre almeno 2» (`ulKeep`); voce «Ricollega un telefono» nel menù di chi sblocca senza scheda Staff; «Ho già un profilo» pulsante principale. Dettagli in `.claude/rules/struttura.md` (riga v121) e nella voce NEWS. Regole Firestore invariate (`membro()` può già scrivere `sid`).
+- Prove in locale verdi (solo Chrome): `test-firebase-rientro` NUOVA 24/24 (nelle VELOCI di `tools/prova-ci.sh`), `test-firebase-telefoni` 31/31 (aggiornata: passa da «Non lo so»), `test-news`, `test-moduli`, `test-testbar`, `test-memoria-protetta`, `test-demo`, `test-giro`. NEWS: v101 spostata in cima a `data/news.json` (E55).
+- Server ed emulatori locali erano accesi in sottofondo (persi col contenitore). In locale l'emulatore va svuotato tra una prova Firebase e l'altra (come fa `prova-ci.sh`), sennò `test-firebase-telefoni` non trova la schermata iniziale.
 
-## ✅ PROSSIMI PASSI (#145, continuare da sola)
-1. Esito della PR #129 (una volta, con `pull_request_read` `get_check_runs`): verde → squash e merge di `main` sul ramo; dire a Mario «v120 online».
-2. **Pezzo 2a** di `docs/RIENTRO.md` (solo app): «Ricollega» con scelta del profilo in «Telefoni da approvare» (`phApprove(id,sid)` scrive `sid`; `approval()` → `st.entra`; `rieCheck()` in `render` → `login(sid)`), avviso doppione per «Sono nuovo» con lo stesso nome, «Ho già un profilo» pulsante principale, `canUnlock(u)=isMgr(u)||u.reparto==='fb'||!!u.sblocca` (Mauro = reparto `fb`; interruttore nel profilo), «sempre almeno 2» in `sdel`/`stoggle`/`psaveProfile`/`endSeason`, voce in `meMenu` per chi sblocca senza scheda Staff. Prova `tools/test-firebase-rientro.mjs` parti A, D, E. Foto a Mario prima di andare online.
-3. **Pezzo 2b** (Worker «telefono del server» + codice di rientro), poi **pezzo 3** (rientro da soli), poi **pezzo 4**: tutto scritto in `docs/RIENTRO.md`. Ogni pezzo = una versione, prove, foto, PR.
-4. Dopo D58: aggiornare il kit di Jona (installato 27.3 con Preferenze v27; Mario ha le Preferenze v38) e mandare a Mario a fine giornata il testo di `docs/kit-progetto/PREFERENZE-CHAT.txt` se più vecchio delle sue (regola dell'hook).
-5. Poi i passi vecchi (bolla vera dal Controllo merce, M44), vedi `docs/DA-FARE.md`.
+## Ricerca 20/11/2026 (Google nelle app installate)
+- `signInWithRedirect` su un dominio non Firebase (pages.dev) richiede un proxy di `/__/auth` (documentazione Firebase aggiornata 12/11/2026); `signInWithPopup` va su Android.
+- iPhone/iPad con l'app dalla Home (WKWebView): Google rifiuta l'accesso nel redirect e il popup non riesce a restituire il risultato → Google NON funziona lì (Maurizio ha l'iPhone).
+- Idea tecnica utile: collegare Google all'utente anonimo con `linkWithCredential` tiene lo stesso `uid` → `membri/<uid>` resta approvato con `sid`: su un telefono svuotato basterebbe entrare con Google (niente Worker). `membro()` controlla solo `membri/<auth.uid>`.
+- Le password salvate nel gestore delle password di Google o iCloud NON si cancellano quando si svuotano i dati del sito: con campi `autocomplete="username"`/`"current-password"` il pezzo 3 diventa già un salvagente su tutti i telefoni.
+- Passkey (impronta o viso, salvata in Google o iCloud): funziona anche su iPhone, ma va verificata dal Worker (robot del pezzo 2b).
 
-## Sessione #144 in breve
-- Letto come Jona lega telefono e profilo (`jona_key`, accesso anonimo `membri/<uid>`, `jona_me`; `screenJoin`, `screenPhone`, `phApprove`, `fbJoinKey`, inviti v30/v40, Worker `membro`/`invCrea`/`invLeggi`/`richiesta`).
-- Piano D58 in `docs/RIENTRO.md`, voce 🔴 D58 in `docs/DA-FARE.md`, lezione E59 in `docs/ERRORI.md` e `ERRORI-STORIA.md`.
-- v120: `mpAsk` in `boot`, `mpSave` in `render` (`membri/<uid>` {mp, visto, sid}, ogni 20 ore), `mpRow` nella scheda del profilo, `status().uid`; riga in `.claude/rules/struttura.md`.
-- Server locale ed emulatori avviati in sottofondo (persi col contenitore): `python3 -m http.server 8765` e `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`.
-- Controllo Da fare: 0 voci aggiunte (D58 già scritta; la richiesta «aggiorna il kit» è nei prossimi passi).
+## Domande aperte (rifarle per prime, in 2 righe, se Mario non ha risposto)
+1. Mario rientra stasera con Maurizio (codice d'invito)? 1 · Sì · 2 · No, guidami da Firebase. Consiglio 1. Il suo nome utente dovrebbe essere mario.miscera.
+2. Foto della v121 (4 foto mandate): 1 · Sì, online dopo la 120 · 2 · Cambia qualcosa. Consiglio 1.
+3. Salvagente per tutti i profili (3 bozze mandate): 1 · Google · 2 · Password salvata dal telefono · 3 · Impronta o viso. Consiglio: 2 subito (è il pezzo 3, va su tutti i telefoni) e 3 subito dopo; Google no (non va su iPhone). La domanda NON è ancora stata scritta a Mario per intero: scriverla con «📌 Di cosa parliamo», le foto ci sono già.
 
-## Riferimenti
-- Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`, `model` `claude-opus-5-5`.
-- Sessioni: #144 `session_01WTjqUuhyPadg3fSaD15EQe` (questa), #142 `session_01NZxnf2nfrCUMQYNZLJHtYL`.
-- RVC: la causa è stata trovata lì (telefono svuotato, profilo sul server intatto); i blocchi di RVC sono il modello di D58.
+## ✅ PROSSIMI PASSI (#146, continuare da sola)
+1. `subscribe_pr_activity` PR #129. Esito delle prove (una volta): verde → squash (`unione-pr`), merge di `main` sul ramo, poi push dei commit locali (v121 + documenti) e PR nuova per la v121 in bozza; dire a Mario «v120 online». Rosso → capire la causa.
+2. v121: con l'ok di Mario alle foto, PR pronta, «prove» verde, squash. Senza risposta: aspettare, intanto il punto 3.
+3. Rifare le domande aperte (sopra). Poi D59 secondo la scelta: con il consiglio = pezzo 2b (robot) + pezzo 3 con `autocomplete` per il gestore delle password, poi la passkey.
+4. Pezzo 4 di `docs/RIENTRO.md`; aggiornare il kit di Jona (installato 27.3 con Preferenze v27; Mario ha le Preferenze v38) e, a fine giornata, il testo di `docs/kit-progetto/PREFERENZE-CHAT.txt` se più vecchio delle sue.
+5. Controllare che RVC abbia messo «nessuno resta fuori» nel kit (messaggio mandato alla sessione RVC «Codice 38»).
 
-## Ultimo messaggio di Mario, parola per parola
-«va bene» (risposta 1 alla domanda sulla riga «Telefono»: la metto online e passo al pezzo 2). Prima: «tutto come consiglio».
+## Sessione #145 in breve
+- Unita la scorta della #144 (solo l'ultimo messaggio «va bene»), poi un'altra scorta vuota (in locale).
+- Mario ha scritto 4 volte: foto fuori da Jona; «Non deve mai ricapitare in nessun progetto»; nome utente e salvagente. A tutte risposto; guida di 8 passi per rientrare con Maurizio.
+- Controllo Da fare: 3 voci aggiunte (D59 salvagente, M47 Mario rientra, «regola da portare nel kit» nella parte 1).
+
+## Ultimo messaggio di Mario (20/11/2026 ~20:30)
+«dovrebbe essere mario.miscera
+fammi loggare con Gmail come salvagente o inventati qualcosa però come regola per tutti gli account per abituare questi problemi di oggi e futuri problemi»
