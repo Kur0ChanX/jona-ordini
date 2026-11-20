@@ -1,5 +1,7 @@
 # Passaggio di consegne (2026-10-23 ~22:00 ora italiana, chiusura della #142)
 
+**Aggiornamento #144 (20/11/2026, Fable): urgenza D58 «nessuno resta fuori dall'app».** Il telefono di Mario ha perso la memoria di Chrome. Piano completo e scelte tecniche chiuse in `docs/RIENTRO.md` (commit di oggi). Il kit 27.3 è finito (#143): i «Prossimi passi» qui sotto sono vecchi. Prossimo passo: Pezzo 1 con Opus e impegno Medio, dopo il «via» di Mario; domande 1 e 2 di `docs/RIENTRO.md` ancora aperte; Mario sta rientrando a mano («Ho già un profilo»). Kit di Jona vecchio (Preferenze v27, Mario ha la v38): aggiornarlo dopo l'urgenza.
+
 Sessione attuale: #142 (account Max, ambiente `env_01PHQTdrmzBJ65UoCn8yQSqE`, Opus 5.5, impegno `medium`; catena 6 di 8). La prossima è #143.
 
 - **Già deciso da Mario (non richiedere)**: applicare il kit 27.3 sui file elencati («ok kit» scritto, 23/10, dopo l'elenco dei 50 file). Ordine dei lettori Gemini Flash → Lite → Llama, Pro mai.
