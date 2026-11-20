@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (23/10/2026 21:41 ora italiana)
+# Ultimo messaggio di Mario (20/11/2026 18:15 ora italiana)
 
-ok kit
+Quando hai finito, fermati il lavoro pesante che ragioniamo con Opus per risparmiare token. Fermati però dopo che hai finito il ragionamento pesante con Fable.
