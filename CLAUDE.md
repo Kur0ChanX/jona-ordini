@@ -1,9 +1,10 @@
 # Jona Ordini 👨🏻‍🍳 · regole del progetto
 @docs/kit-progetto/REGOLE.md
 
-Sopra il kit (uguale in tutti i progetti, versione in `docs/kit-progetto/VERSIONE`); qui solo il progetto, che nei dettagli vince. Tetto: ~1.000 token (lo controllano `tools/fai-kit.py` e l'hook `kit-check.py`).- Repo `Kur0ChanX/jona-ordini`, ramo unico **`claude/jona-ramo-definitivo`** (`.claude/ramo-di-lavoro.txt`). Titoli `<segno> 👨🏻‍🍳 <Nome> <numero> · <cosa fa>` (es. «🟢 👨🏻‍🍳 Principale 147 · salvagente»; catene in `docs/CHI-FA-COSA.md`; REGOLE.md «Titoli»). Altri progetti di Mario: RVC 🛎️, SPA Sensorial 🫒, EdilCannas 🏗️.
-- Il resto quando serve: skill del kit (`consegne` 🔒, `chat-parallela`, `cambio-account` 🔒, `pr`, `nuova-regola`, `ricerca-aggiornata`); regole per zona in `.claude/rules/` (con `paths:`): se lavoro in una zona solo con Bash, prima le leggo. Servizi esterni: prima le guide giuste in `docs/` (`GUIDE-GIUSTE.md`).
-- **Eccezione al kit (dichiarata, scelta di Mario #143, non è un conflitto)**: PR dal ramo unico, niente ramo-copia della skill `pr`; bozza → pronta (`draft: false`, un giro) → «prove» verde → squash → controllo online → merge di `main` sul ramo.
+Sopra il kit (uguale in tutti i progetti, versione in `docs/kit-progetto/VERSIONE`); qui solo il progetto, che nei dettagli vince. Tetto: ~1.000 token (lo controllano `tools/fai-kit.py` e l'hook `kit-check.py`).
+- Repo `Kur0ChanX/jona-ordini`, ramo unico **`claude/jona-ramo-definitivo`** (`.claude/ramo-di-lavoro.txt`). Icona dei titoli 👨🏻‍🍳 (es. «🟢 👨🏻‍🍳 Principale 147 · salvagente»; catene in `docs/CHI-FA-COSA.md`). Altri progetti di Mario: RVC 🛎️, SPA Sensorial 🫒, EdilCannas 🏗️.
+- Il resto quando serve: skill del kit; regole per zona in `.claude/rules/` (con `paths:`): se lavoro in una zona solo con Bash, prima le leggo. Servizi esterni: prima le guide giuste in `docs/` (`GUIDE-GIUSTE.md`).
+- **Eccezione al kit (scelta di Mario #143, non un conflitto)**: PR dal ramo unico, niente ramo-copia della skill `pr`; bozza → pronta (`draft: false`, un giro) → «prove» verde → squash → controllo online → merge di `main` sul ramo.
 - Drive di Mario: `.claude/rules/drive.md` (si carica con `tools/drive/`).
 
 ## App con prove
