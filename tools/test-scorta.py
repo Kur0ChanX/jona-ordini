@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # Prova della scorta automatica (.claude/hooks/scorta.py e controllo in avvio-check.py), su repo finti in una cartella temporanea.
+# C148: una scorta per chat (principale e parallela), ruolo dal prompt di avvio o dalla trascrizione, push non in avanti.
+# C252: la scorta di un altro contenitore non si copre mai (E154).
 # Uso: python3 tools/test-scorta.py
 import json, os, subprocess, sys, tempfile, time
 
@@ -26,20 +28,53 @@ def controlla(cond, nome):
     print("ok", nome)
 
 
-def hook(repo, arg, dati=None):
-    env = dict(os.environ, CLAUDE_PROJECT_DIR=repo)
+def hook(repo, arg, dati=None, nopush=False):
+    env = dict(os.environ, CLAUDE_PROJECT_DIR=repo, JONA_SCORTA_NOPUSH="1" if nopush else "0")
     subprocess.run([sys.executable, os.path.join(HOOKS, "scorta.py"), arg], cwd=repo, input=json.dumps(dati or {}),
                    text=True, env=env, timeout=90)
 
 
-def remoto_scorta(repo):
-    for _ in range(100):  # il push parte in background
-        out = git(repo, "ls-remote", "origin", "refs/heads/scorta/claude/prova-1")
-        locale = git(repo, "rev-parse", "-q", "--verify", "refs/scorta/claude/prova-1")
+def remoto_scorta(repo, ruolo="principale"):
+    nome = f"scorta-{ruolo}/claude/prova-1"
+    for _ in range(150):  # il push parte in background
+        out = git(repo, "ls-remote", "origin", f"refs/heads/{nome}")
+        locale = git(repo, "rev-parse", "-q", "--verify", f"refs/{nome}")
         if out and out.split()[0] == locale:
             return out.split()[0]
         time.sleep(0.1)
-    return git(repo, "ls-remote", "origin", "refs/heads/scorta/claude/prova-1").split("\t")[0]
+    return git(repo, "ls-remote", "origin", f"refs/heads/{nome}").split("\t")[0]
+
+
+def hook_out(repo, arg, dati=None):
+    env = dict(os.environ, CLAUDE_PROJECT_DIR=repo, JONA_SCORTA_NOPUSH="0")
+    return subprocess.run([sys.executable, os.path.join(HOOKS, "scorta.py"), arg], cwd=repo, input=json.dumps(dati or {}),
+                          text=True, env=env, timeout=90, capture_output=True).stdout
+
+
+def aspetta_file(percorso):
+    for _ in range(150):  # lo scrive il push in background
+        if os.path.exists(percorso):
+            return True
+        time.sleep(0.1)
+    return False
+
+
+def clona(tmp, nome):
+    cartella = os.path.join(tmp, nome)
+    sh("git", "clone", "-q", "-b", "claude/prova-1", os.path.join(tmp, "origin.git"), cartella, cwd=tmp)
+    for k, v in (("user.name", "Prova"), ("user.email", "prova@example.com"), ("commit.gpgsign", "false")):
+        git(cartella, "config", k, v)
+    return cartella
+
+
+def ruolo_file(repo):
+    try:
+        return open(os.path.join(git(repo, "rev-parse", "--absolute-git-dir"), "scorta-ruolo")).read().strip()
+    except OSError:
+        return ""
+
+
+AVVIO_PAR = "[AVVIO] Sei la chat parallela P40 di RVC (ramo claude/prova-1): git fetch origin claude/prova-1\nLeggi CLAUDE.md"
 
 
 with tempfile.TemporaryDirectory() as tmp:
@@ -97,38 +132,41 @@ with tempfile.TemporaryDirectory() as tmp:
     hook(repo, "stop")
     s3 = remoto_scorta(repo)
     controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "avviso di sistema ignorato")
-    # 3c-bis. un messaggio di un'altra sessione (send_message) non prende il posto del messaggio di Mario (da RVC #62)
-    hook(repo, "msg", {"prompt": "<cross-session-message from-session=\"session_finta\">\nciao da RVC\n</cross-session-message>"})
-    open(os.path.join(repo, "a.txt"), "w").write("tre-bis\n")
-    hook(repo, "stop")
-    s3 = remoto_scorta(repo)
-    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "messaggio di un'altra sessione ignorato")
-    # 3c-ter. il rapporto di un agente (subagente) non prende il posto del messaggio di Mario (#90, E40)
-    hook(repo, "msg", {"prompt": "<agent-message from=\"aea49f\">\n[Subagent hand-back] rapporto\n</agent-message>"})
-    open(os.path.join(repo, "a.txt"), "w").write("tre-ter\n")
-    hook(repo, "stop")
-    s3 = remoto_scorta(repo)
-    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "rapporto di un agente ignorato")
-    # 3c-quater. l'avviso di riavvio della sessione non è un messaggio di Mario (#94, E42)
-    hook(repo, "msg", {"prompt": "This session's worker process was restarted. If your previous turn was already complete, take no action and wait for the next event."})
-    open(os.path.join(repo, "a.txt"), "w").write("tre-quater\n")
-    hook(repo, "stop")
-    s3 = remoto_scorta(repo)
-    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "avviso di riavvio della sessione ignorato")
-    # 3c-quinquies. il prompt di avvio dell'handoff non è un messaggio di Mario (#96, E43)
-    hook(repo, "msg", {"prompt": "git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo\nLeggi CLAUDE.md"})
-    open(os.path.join(repo, "a.txt"), "w").write("tre-quinquies\n")
-    hook(repo, "stop")
-    s3 = remoto_scorta(repo)
-    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "prompt di avvio dell'handoff ignorato")
-    hook(repo, "msg", {"prompt": "ecco https://script.google.com/macros/s/AKfycbSEGRETO123/exec fatto"})
+
+    # 3c. il prompt di avvio della sessione nuova (segno «[AVVIO]») non prende il posto del messaggio di Mario
+    hook(repo, "msg", {"prompt": "[AVVIO] git fetch origin claude/prova-1 && git merge --ff-only origin/claude/prova-1"})
     open(os.path.join(repo, "a.txt"), "w").write("quattro\n")
     hook(repo, "stop")
     s3 = remoto_scorta(repo)
-    u = git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md")
-    controlla("SEGRETO" not in u and "[segreto tolto dalla scorta]" in u and "fatto" in u, "indirizzo dello script di Google Drive nascosto")
+    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "prompt di avvio ignorato")
 
-    # 3d. un segreto incollato in chat non arriva su GitHub (resto del messaggio intatto); solo valori finti
+    # 3c-bis. un messaggio di un'altra sessione (send_message, es. Jona) non prende il posto del messaggio di Mario
+    hook(repo, "msg", {"prompt": "<cross-session-message from-session=\"session_FINTA\">\nciao da Jona\n</cross-session-message>"})
+    open(os.path.join(repo, "a.txt"), "w").write("quattro-bis\n")
+    hook(repo, "stop")
+    s3 = remoto_scorta(repo)
+    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "messaggio di un'altra sessione ignorato")
+
+    # 3c-ter. il rapporto di un aiutante (strumento Agent, #73) non prende il posto del messaggio di Mario
+    hook(repo, "msg", {"prompt": "<agent-message from=\"a0000\">\n[Subagent hand-back] C41 fatto\n</agent-message>"})
+    open(os.path.join(repo, "a.txt"), "w").write("quattro-ter\n")
+    hook(repo, "stop")
+    s3 = remoto_scorta(repo)
+    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "rapporto di un aiutante ignorato")
+    # 3c-quater (Jona, E42). l'avviso di riavvio della sessione non è un messaggio di Mario
+    hook(repo, "msg", {"prompt": "This session's worker process was restarted. If your previous turn was already complete, take no action and wait for the next event."})
+    open(os.path.join(repo, "a.txt"), "w").write("quattro-quater\n")
+    hook(repo, "stop")
+    s3 = remoto_scorta(repo)
+    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "avviso di riavvio della sessione ignorato")
+    # 3c-quinquies (Jona, E43). il prompt di avvio dell'handoff non è un messaggio di Mario
+    hook(repo, "msg", {"prompt": "git fetch origin claude/jona-ramo-definitivo && git merge --ff-only origin/claude/jona-ramo-definitivo\nLeggi CLAUDE.md"})
+    open(os.path.join(repo, "a.txt"), "w").write("quattro-quinquies\n")
+    hook(repo, "stop")
+    s3 = remoto_scorta(repo)
+    controlla("secondo messaggio" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "prompt di avvio dell'handoff ignorato")
+
+    # 3d. E29: un segreto incollato in chat non arriva su GitHub (resto del messaggio intatto)
     url = "https://script.google.com/macros/s/AKfycbFINTO0123456789abcdefghijklmnopqrstuvwxyz_-ABCDEF/exec"
     segreti = [url, "AIzaSyFINTA0123456789abcdefghijklmnopq", "ghp_FINTO0123456789abcdefghijklmnop",
                "sk-ant-api03-FINTA0123456789abcdef", "FINTO9x8y7z6w5v4u3t2s1r0q9p8o7n6m5l4k3", "valore-env-segreto-123"]
@@ -145,21 +183,14 @@ with tempfile.TemporaryDirectory() as tmp:
     controlla(salvato.count("[segreto tolto dalla scorta]") == 6, "ogni segreto segnato come tolto")
     controlla("ecco il link" in salvato and "https://claude.ai/code perché è così" in salvato, "il resto del messaggio resta")
 
-    # 3e. il prompt di avvio di una sessione non prende il posto del messaggio di Mario
-    hook(repo, "msg", {"prompt": "[AVVIO] git fetch origin claude/prova-1"})
-    open(os.path.join(repo, "a.txt"), "w").write("sei\n")
-    hook(repo, "stop")
-    s3 = remoto_scorta(repo)
-    controlla("ecco il link" in git(repo, "show", f"{s3}:docs/ULTIMO-MESSAGGIO.md"), "prompt di avvio ignorato")
-
-    # 3y. Mario 17/10: «salva» scritto col limite finito → la scorta parte già col messaggio, senza aspettare la fine risposta
+    # 3e. Mario 17/10: «salva» scritto col limite finito → la scorta parte già col messaggio, senza aspettare la fine risposta
     open(os.path.join(repo, "a.txt"), "w").write("sei\n")
     hook(repo, "msg", {"prompt": "salva 99%"})
     s4 = remoto_scorta(repo)
     controlla(s4 != s3 and git(repo, "show", f"{s4}:a.txt") == "sei", "il messaggio fa subito la scorta del lavoro")
     controlla("salva 99%" in git(repo, "show", f"{s4}:docs/ULTIMO-MESSAGGIO.md"), "messaggio nella scorta subito")
 
-    # 3z. scorta a metà risposta (dopo uno strumento), al massimo ogni 2 minuti
+    # 3f. scorta a metà risposta (dopo uno strumento), al massimo ogni 2 minuti
     gitdir = git(repo, "rev-parse", "--absolute-git-dir")
     segno = os.path.join(gitdir, "scorta-ora")
     if os.path.exists(segno):
@@ -181,11 +212,97 @@ with tempfile.TemporaryDirectory() as tmp:
     altro = os.path.join(tmp, "altro")
     sh("git", "clone", "-q", "-b", "claude/prova-1", nudo, altro, cwd=tmp)
     env = dict(os.environ, CLAUDE_PROJECT_DIR=altro)
-    out = sh(sys.executable, os.path.join(HOOKS, "avvio-check.py"), cwd=altro, inp="{}", env=env)
-    controlla("SCORTA: origin/scorta/claude/prova-1" in out, "avvio-check segnala la scorta")
-    git(altro, "merge", "-q", "--ff-only", "origin/scorta/claude/prova-1")
+    avvio = lambda: sh(sys.executable, os.path.join(HOOKS, "avvio-check.py"), cwd=altro, inp="{}", env=env)
+    out = avvio()
+    controlla("SCORTA della chat principale: origin/scorta-principale/claude/prova-1" in out, "avvio-check segnala la scorta")
+    git(altro, "merge", "-q", "--ff-only", "origin/scorta-principale/claude/prova-1")
     controlla(git(altro, "rev-parse", "HEAD") == s3, "la scorta si unisce in avanti")
-    out = sh(sys.executable, os.path.join(HOOKS, "avvio-check.py"), cwd=altro, inp="{}", env=env)
-    controlla("SCORTA" not in out, "dopo l'unione nessun avviso")
+    controlla("SCORTA" not in avvio(), "dopo l'unione nessun avviso")
+
+    # 5. C148: la chat parallela ha la sua scorta (ruolo dal prompt di avvio) e il suo file del messaggio
+    controlla(ruolo_file(repo) == "principale", "sessione aperta a mano (niente [AVVIO]) → principale")
+    par = clona(tmp, "parallela")
+    hook(par, "msg", {"prompt": AVVIO_PAR})
+    controlla(ruolo_file(par) == "parallela", "prompt «Sei la chat parallela» → ruolo parallela")
+    hook(par, "msg", {"prompt": "ciao dalla parallela"})
+    open(os.path.join(par, "b.txt"), "w").write("parallela\n")
+    hook(par, "stop")
+    p1 = remoto_scorta(par, "parallela")
+    controlla(bool(p1) and git(par, "show", f"{p1}:b.txt") == "parallela", "scorta della parallela nel suo ramo")
+    controlla("ciao dalla parallela" in git(par, "show", f"{p1}:docs/ULTIMO-MESSAGGIO-PARALLELA.md"),
+              "messaggio della parallela nel suo file")
+    controlla(remoto_scorta(repo) == s3, "la scorta della principale non si muove")
+
+    # 6. il ruolo: avvio della principale che nomina la parallela, riavvio (trascrizione), a mano
+    prin = clona(tmp, "principale2")
+    hook(prin, "msg", {"prompt": "[AVVIO] Sei la sessione principale #283 di RVC (la chat parallela P40 resta): git fetch"},
+         nopush=True)
+    controlla(ruolo_file(prin) == "principale", "avvio della principale che nomina la parallela → principale")
+    riav = clona(tmp, "riavvio")
+    trascr = os.path.join(tmp, "trascrizione.jsonl")
+    with open(trascr, "w") as f:
+        f.write(json.dumps({"type": "system"}) + "\nnon json\n")
+        f.write(json.dumps({"type": "user", "message": {"role": "user", "content": AVVIO_PAR}}) + "\n")
+    hook(riav, "msg", {"prompt": "eccomi, continua", "transcript_path": trascr}, nopush=True)
+    controlla(ruolo_file(riav) == "parallela", "riavvio in un contenitore nuovo: ruolo ritrovato nella trascrizione")
+    out = sh(sys.executable, "-I", os.path.join(HOOKS, "scorta.py"), "ruolo", "parallela", cwd=prin,
+             env=dict(os.environ, CLAUDE_PROJECT_DIR=prin))
+    controlla(out.endswith("parallela") and ruolo_file(prin) == "parallela", "ruolo scritto a mano")
+
+    # 7. C252: push non in avanti (un altro contenitore ha scritto nella stessa scorta): niente unione col proprio
+    #    albero (copriva i suoi file, E154), niente push; avviso «SCORTA FERMA» finché il ramo non la contiene
+    intruso = clona(tmp, "intruso")
+    git(intruso, "merge", "-q", "--ff-only", "origin/scorta-principale/claude/prova-1")
+    open(os.path.join(intruso, "c.txt"), "w").write("intruso\n")
+    git(intruso, "add", "-A")
+    git(intruso, "commit", "-q", "-m", "intruso")
+    git(intruso, "push", "-q", "origin", "HEAD:refs/heads/scorta-principale/claude/prova-1")
+    estraneo = git(intruso, "rev-parse", "HEAD")
+    open(os.path.join(repo, "a.txt"), "w").write("nove\n")
+    hook(repo, "stop")
+    ferma = os.path.join(gitdir, "scorta-ferma")
+    controlla(aspetta_file(ferma), "push rifiutato da una scorta estranea: segno «ferma»")
+    remota = git(repo, "ls-remote", "origin", "refs/heads/scorta-principale/claude/prova-1").split("\t")[0]
+    controlla(remota == estraneo and git(repo, "show", f"{remota}:c.txt") == "intruso",
+              "la scorta dell'altro contenitore resta intatta su GitHub")
+    out = hook_out(repo, "msg", {"prompt": "come va?"})
+    controlla("SCORTA FERMA" in out and "git merge origin/scorta-principale/claude/prova-1" in out,
+              "al messaggio dopo l'avviso con il merge da fare")
+    git(repo, "checkout", "-q", "--", "a.txt")
+    git(repo, "fetch", "-q", "origin")
+    git(repo, "merge", "-q", "--ff-only", "origin/scorta-principale/claude/prova-1")
+    open(os.path.join(repo, "a.txt"), "w").write("nove\n")
+    out = hook_out(repo, "msg", {"prompt": "unita"})
+    s6 = remoto_scorta(repo)
+    controlla("SCORTA FERMA" not in out and not os.path.exists(ferma), "dopo l'unione niente avviso")
+    controlla(subprocess.run(["git", "merge-base", "--is-ancestor", estraneo, s6], cwd=repo).returncode == 0
+              and git(repo, "show", f"{s6}:a.txt") == "nove" and git(repo, "show", f"{s6}:c.txt") == "intruso",
+              "dopo l'unione la scorta riparte con il lavoro di tutti e due")
+
+    # 7b. E154 (avvio della #290): contenitore nuovo, la scorta di prima è su GitHub e non nel ramo → niente scorta
+    nuovo_c = clona(tmp, "contenitore-nuovo")
+    hook(nuovo_c, "msg", {"prompt": "[AVVIO] Sei la sessione principale #2: git fetch"})
+    controlla(git(nuovo_c, "rev-parse", "-q", "--verify", "refs/scorta-principale/claude/prova-1") == ""
+              and git(nuovo_c, "ls-remote", "origin", "refs/heads/scorta-principale/claude/prova-1").split("\t")[0] == s6,
+              "contenitore nuovo: niente scorta finché quella di prima non è unita")
+    controlla(os.path.exists(os.path.join(git(nuovo_c, "rev-parse", "--absolute-git-dir"), "scorta-ferma")),
+              "contenitore nuovo: segno «ferma» scritto")
+    # stessa cosa se il riferimento remoto non è ancora stato scaricato: lo ferma il push rifiutato
+    cieco = clona(tmp, "contenitore-cieco")
+    git(cieco, "update-ref", "-d", "refs/remotes/origin/scorta-principale/claude/prova-1")
+    open(os.path.join(cieco, "d.txt"), "w").write("cieco\n")
+    hook(cieco, "stop")
+    controlla(aspetta_file(os.path.join(git(cieco, "rev-parse", "--absolute-git-dir"), "scorta-ferma"))
+              and git(cieco, "ls-remote", "origin", "refs/heads/scorta-principale/claude/prova-1").split("\t")[0] == s6,
+              "contenitore nuovo senza fetch: push fermato, la scorta di prima resta")
+
+    # 8. avvio-check con due scorte: ruolo non ancora noto → tutte e due; ruolo noto → la sua e una notizia
+    out = avvio()
+    controlla("SCORTA della chat principale" in out and "SCORTA della chat parallela" in out and "Ruolo:" in out,
+              "ruolo non noto: avvisa delle due scorte e dice come scegliere")
+    open(os.path.join(git(altro, "rev-parse", "--absolute-git-dir"), "scorta-ruolo"), "w").write("principale\n")
+    out = avvio()
+    controlla("SCORTA della chat principale" in out and "Notizia: anche origin/scorta-parallela/claude/prova-1" in out
+              and "SCORTA della chat parallela" not in out, "ruolo noto: la sua scorta, l'altra solo notizia")
 
 print(f"Scorta: {ok_n} controlli riusciti")

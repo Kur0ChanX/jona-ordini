@@ -1,57 +1,35 @@
-# Passaggio di consegne (2026-10-16, fine sessione #139)
+# Passaggio di consegne (2026-11-20 ~20:15 ora italiana, chiusura della #144)
 
-Sessione attuale: #141 (`session_01JWjdh7H4WhGcanpaCbUq3A`, altro account, ambiente `env_01Qe5oRkm7hWcHiwpm7zpBcJ`, Opus 5.5 medium; la prossima è #142)
+Sessione chiusa: #144 (Fable per il piano, poi Opus 5.5; ambiente `env_01PHQTdrmzBJ65UoCn8yQSqE`; impegno `medium`). La prossima è #145.
 
-Consegne della #138: `git show 4684063:docs/PASSAGGIO-CONSEGNE.md`. Versione lunga vecchia (#85-#122): `git show eb9eccd:docs/PASSAGGIO-CONSEGNE.md`.
+- **Già deciso da Mario (non richiedere)**: D58 «tutto come consiglio» (20/11 19:42): rientro da soli con nome utente e password (pezzo 3); possono ricollegare i telefoni Maurizio, lo sviluppatore, **Mauro** e chi ha l'interruttore «Può ricollegare i telefoni» nel profilo (pezzo 2a). Riga «Telefono» nella scheda della persona: approvata («va bene», FOTO `docs/img/v120/scheda-telefono.png`). Regola di Mario per tutti i progetti: **nessuno deve mai restare bloccato fuori dall'app**. Ragionare con Fable, costruire con Opus (Mario: «fermati il lavoro pesante che ragioniamo con Opus per risparmiare token»).
+- **Da non rifare**: il piano e le scelte tecniche di `docs/RIENTRO.md` (chiuse da Fable: «telefono del server», un solo modo di entrare, prove); la ricerca su `navigator.storage.persist` (fatta il 20/11: Chrome e Safari decidono da soli senza chiedere, Chrome concede di solito all'app installata sulla Home; Firefox mostra un riquadro); la v120 (pezzo 1, fatta e provata); unire le scorte del 23/10 (unite).
+- **Cosa preme a Mario adesso**: D58 🔴 urgenza: che nessuno resti fuori. Il suo Xiaomi è uscito da Jona e da RVC (Chrome ha perso la memoria dei siti, non è il codice).
 
 ## Stato
-- **#140 (17/10, account Max)**: v118+v119 online (PR #127 unita il 16/10, `APP_VER=119` controllato online il 17/10). Passi 1-3 fatti. Unita `e8ae0e3` dalla sessione madre (scorta anche a metà risposta, `test-scorta` 31/31). Domanda aperta a Mario: a cosa rispondevano «1» e «si» (1 = vado avanti, consigliato). Sessioni RVC #C123 e SPA #22 sull'account Max ferme: Fable 5.1 chiede crediti. Messaggi di Mario del 16-17/10 senza contesto nel repo: «1» (07:39), «si» (00:57), «99%» (01:50, la sessione dell'altro account si è fermata al limite).
-- Ramo unico **`claude/jona-ramo-definitivo`** (anche per le PR).
-- **v117 online** (dal 14/10). **v118 + v119 nella PR #127** (https://github.com/Kur0ChanX/jona-ordini/pull/127), già pronta (non bozza).
-  - Il primo giro di `prove` (solo v118) è partito alle 00:00 del 16/10 ora italiana. All'handoff ho fatto il push della v119 sulla stessa PR: il giro riparte con v118+v119 insieme (un solo giro per due versioni).
-  - Prove locali tutte verdi: `test-gemini-sost`, `test-coda-vino` (PC, Pixel 7, Galaxy Tab; Apple solo su GitHub), `test-coda` (51 controlli, emulatore, parte 5 nuova), `test-bolla`, `test-cantina`, `test-letture-sicure`, `test-foto-vino`, `test-moduli`, `test-news`, `test-testbar`.
-- Motore: Mario ha messo `/model claude-opus-5-5` durante la #139 → la #140 parte su Opus 5.5. `effortLevel` `medium` in `.claude/settings.json` (`get_session` non dà `effort_level`).
-- Routine «Punto ogni 5 ore» `trig_015ZoD3SEjtWzeDDyZhCCJ2K` attiva. Nessuna sveglia.
-- Emulatore Firebase e server 8765 vanno riaccesi se servono (`tools/README.md`).
+- **PR #129** (v120, pezzo 1: memoria protetta + riga «Telefono») segnata pronta il 20/11 ~20:10: «prove» su GitHub in corso sull'ultimo commit `9cc8eb9` (il commit delle consegne è solo documenti). Verde → squash (titolo corto, `commit_message` corto, E54), poi merge di `main` sul ramo. Rosso → capire la causa, correggere, rifare il giro.
+- Prove in locale verdi (solo Chrome): `test-memoria-protetta` (nuova, nelle veloci), `test-firebase-telefoni`, `test-moduli`, `test-news`, `test-testbar`, `test-giro`. La v100 delle novità spostata in `data/news.json` (E55).
+- Mario: non so se è già rientrato in Jona (gli ho dato i 6 passi: codice d'invito da Maurizio → **Ho già un profilo** → Maurizio approva → nome utente e password). Se scrive che è bloccato: guidarlo da Firebase come il 07/10 (DA-FARE M14).
+- Dal server il suo profilo non l'ho potuto controllare (nessuna chiave di Firebase nel contenitore); dal codice: profilo e dati sono sul server, legati al profilo, il telefono svuotato non li tocca.
 
-## Fatto in #139 (15/10 07:27 → 16/10 00:15 ora italiana)
-- Unita la scorta di #138 (diff solo `docs/ULTIMO-MESSAGGIO.md`).
-- **Fatto nuovo (D56)**: scatola nera di Mario 14/10 14:08: «Vino nel mondo: Gemini 2.5 Flash non ha cercato (errore 404: This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash…)». Ricerca web: Google limita i modelli 2.5 a chi li usava già (note di rilascio https://ai.google.dev/gemini-api/docs/changelog); per le chiavi nuove indica 3.8 Flash / 3.5 Flash-Lite. Su Vertex il 2.5 chiude il 20/10/2026. Altra riga di Mario: «Vino: Gemini Flash non ha letto (errore 503) … high demand» = sovraccarico normale, la catena dei lettori c'è già.
-- **Scelta di Mario sull'ordine dei lettori**: «voglio il flash normale in primis ne il pro nel il lite… mettili in ordine di performance se lite è meglio di cloudflare lascia prima lite». Deciso: **Flash → Flash-Lite → Cloudflare Llama**, Pro mai (Lite legge foto e numeri meglio di Llama). È l'ordine che c'era (`GEM_LETT` f25 → l25 → cf): cambia solo il ripiego sul 404.
-- Mario ha l'account Gemini **gratuito**; gli ho detto che la chiave non va cambiata (cambia solo il modello nel codice).
-- **v118 (D56)** in `index.html` vicino a `gemCall`: 404 con «model/available» su `f25`/`l25` → `gemSegnaMorto` (`jona_gem404` via `ls()`, 7 giorni `GEM_SOST_GG`) + riga «Google ha spento … per questa chiave: passo a …» nella scatola nera → `gemSostCall` con `GEM_SOST` {f25:'flash', l25:'lite'} (`gemini-flash-latest`/`-lite-latest`), `thinkingConfig:{thinkingLevel:'minimal'}`, 400 → senza. `gemCall0` = vecchio comportamento (f25 con `thinkingBudget:0`). Vale anche passando dal Worker (il messaggio di Google arriva in `lettoreErr`): Worker invariato. Prova nuova `tools/test-gemini-sost.mjs` (nelle `VELOCI`). NEWS v118, v98 spostata in `data/news.json`, `sw.js` CACHE v122.
-- **v119 (D57)**, Mario: «si va bene se è la miglior soluzione intelligente» (domanda: «Metto anche i vini nella stessa coda di bolle e listini?»). Lettura del vino non riuscita con foto → `vnRiH` mostra **«Leggila da sola: puoi chiudere l'app»** (`vnCoda`; resta sotto «Rileggila tu più tardi» v107) → voce `tipo:'vino'` in coda (`foto`, `fx`, `vid`, `da`), `codaVino` in index.html legge, `CODA.vini` + IndexedDB `coda_vini`, cloud `txt`, avviso «Vino letto: …» a chi ha scattato; Cantina: striscia `vnRisH` «Vino letto dalla foto · Controlla e salva · ✕». Dettagli completi nella riga v119 di `.claude/rules/struttura.md`. Prove `tools/test-coda-vino.mjs` (6 dispositivi, nelle `VELOCI`) e `test-coda` parte 5. NEWS v119, v99 spostata in `data/news.json`, `sw.js` CACHE v123.
-- Lezione rivista: in `index.html` niente «Mario» neanche nei commenti (E57, `test-testbar` l'ha trovato di nuovo).
-- `docs/DA-FARE.md`: D56 e D57 in cima alla tabella.
+## ✅ PROSSIMI PASSI (#145, continuare da sola)
+1. Esito della PR #129 (una volta, con `pull_request_read` `get_check_runs`): verde → squash e merge di `main` sul ramo; dire a Mario «v120 online».
+2. **Pezzo 2a** di `docs/RIENTRO.md` (solo app): «Ricollega» con scelta del profilo in «Telefoni da approvare» (`phApprove(id,sid)` scrive `sid`; `approval()` → `st.entra`; `rieCheck()` in `render` → `login(sid)`), avviso doppione per «Sono nuovo» con lo stesso nome, «Ho già un profilo» pulsante principale, `canUnlock(u)=isMgr(u)||u.reparto==='fb'||!!u.sblocca` (Mauro = reparto `fb`; interruttore nel profilo), «sempre almeno 2» in `sdel`/`stoggle`/`psaveProfile`/`endSeason`, voce in `meMenu` per chi sblocca senza scheda Staff. Prova `tools/test-firebase-rientro.mjs` parti A, D, E. Foto a Mario prima di andare online.
+3. **Pezzo 2b** (Worker «telefono del server» + codice di rientro), poi **pezzo 3** (rientro da soli), poi **pezzo 4**: tutto scritto in `docs/RIENTRO.md`. Ogni pezzo = una versione, prove, foto, PR.
+4. Dopo D58: aggiornare il kit di Jona (installato 27.3 con Preferenze v27; Mario ha le Preferenze v38) e mandare a Mario a fine giornata il testo di `docs/kit-progetto/PREFERENZE-CHAT.txt` se più vecchio delle sue (regola dell'hook).
+5. Poi i passi vecchi (bolla vera dal Controllo merce, M44), vedi `docs/DA-FARE.md`.
 
-## Domande fatte a Mario e risposte
-- «Hai provato una bolla vera dal Controllo merce con la v117?»: **ancora senza risposta** (ha mandato invece le righe della scatola nera).
-- Bolle/listini/vini con schermo spento: spiegato che nessuna app web lavora a schermo spento; bolle e listini ripartono alla riapertura o col ritorno della rete e un altro telefono li legge dal cloud; ora anche i vini (v119).
-
-## Rischi / cose note
-- Gemini 3 (`gemini-flash-latest`) ragiona di partenza: `thinkingLevel:'minimal'` non provato contro Google vero. Se Google lo rifiuta (400) l'app rifà senza. Controllare nella scatola nera «Lettura lenta» o righe «Google ha spento…» dopo la v118.
-- «Vino nel mondo» con Gemini 3 + ricerca Google: nel piano gratis forse «Not available» → ripiega su «senza Google» (annate meno certe). Mario è sul piano gratuito: nessun costo.
-- `test-bolla` (1 volta su 6 al primo giro) e `test-coda` 4b da tenere d'occhio (vedi #138).
-- Nessuna prova con foto vere di Mario (E22).
-
-## ✅ PROSSIMI PASSI (#141, continuare da sola)
-- #141 18/10 19:17: passi 0-3 controllati (file prompt già tolto, scorta unita, PR #127 unita, online `APP_VER=119`). Sveglia `trig_01MrXG4WTQmmFDSZLR54j9Ki` 19/10 07:30 ora italiana per il passo 5. Passo 4 chiesto a Mario.
-0. (#141) Togliere `docs/PROMPT-PROSSIMO-ACCOUNT.md` con `git rm` (serviva solo per il cambio account, Mario: «una volta usato cancelli qll che non serve»), commit e push.
-1. `subscribe_pr_activity` sulla PR #127 (questa sessione era iscritta; la nuova no). Guardare l'esito di `prove` UNA volta quando arriva l'evento (o ≥15 min dal push delle 00:15), con `get_check_runs` (E54).
-2. Verde → squash merge di #127 (`commit_message` corto, titolo «v118+v119: Gemini nuovo da solo, vini in coda») → controllo online `APP_VER=119` su https://jona-ristorante-by-ynoy-corp.pages.dev/ → `git fetch origin main && git merge origin/main` sul ramo e push. Segnare D56/D57 «online» in `docs/DA-FARE.md`. Rosso → capire la causa e correggere.
-3. Dire a Mario che v118+v119 sono online, su quali dispositivi sono provate (6, Apple su GitHub), e cosa provare: Cantina → foto di una bottiglia; se Google è pieno → «Leggila da sola».
-4. Richiedere a Mario (una domanda, numerata): bolla vera dal Controllo merce con la v117+ (si legge bene? quanti secondi?) e una foto di listino. M44: secondi di «cannonau».
-5. Lunedì 19/10: una sola occhiata al giro `tutto` delle 3:17.
+## Sessione #144 in breve
+- Letto come Jona lega telefono e profilo (`jona_key`, accesso anonimo `membri/<uid>`, `jona_me`; `screenJoin`, `screenPhone`, `phApprove`, `fbJoinKey`, inviti v30/v40, Worker `membro`/`invCrea`/`invLeggi`/`richiesta`).
+- Piano D58 in `docs/RIENTRO.md`, voce 🔴 D58 in `docs/DA-FARE.md`, lezione E59 in `docs/ERRORI.md` e `ERRORI-STORIA.md`.
+- v120: `mpAsk` in `boot`, `mpSave` in `render` (`membri/<uid>` {mp, visto, sid}, ogni 20 ore), `mpRow` nella scheda del profilo, `status().uid`; riga in `.claude/rules/struttura.md`.
+- Server locale ed emulatori avviati in sottofondo (persi col contenitore): `python3 -m http.server 8765` e `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`.
+- Controllo Da fare: 0 voci aggiunte (D58 già scritta; la richiesta «aggiorna il kit» è nei prossimi passi).
 
 ## Riferimenti
 - Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`, `model` `claude-opus-5-5`.
-- Sessioni Jona: #139 `session_015F5SwkFDmtb4p6jQoM51GW` (chiusa, depth 5 su 8), #138 `session_01FXo5VVU5Fi6r9mSCckpcfm`.
-- RVC attiva: #152 `session_01T88fifKchYVHw7GcUe8HVK`. SPA: #19 chiusa `session_01X8MjDTxctEEGuQGiLbPm2T`. EdilCannas Fornitori #15 `session_01B67cFRJxX2F4gzrDKbognj`.
-- Server locale `python3 -m http.server 8765`; Playwright da `/opt/node22/lib/node_modules/playwright/index.mjs`; `ls()` salva in JSON con prefisso demo (usare `ls('jona_gemini_key','x')`, non `localStorage.setItem`).
-- Context7 ha finito la quota mensile (15/10): per i documenti di Google usare la ricerca web.
-
-## Consumo #139
-cache_read 7.941.282 · cache_write 244.977 · output 26.549 · cost_usd 3,41 (da `get_session`, campo usage, 16/10 00:10).
+- Sessioni: #144 `session_01WTjqUuhyPadg3fSaD15EQe` (questa), #142 `session_01NZxnf2nfrCUMQYNZLJHtYL`.
+- RVC: la causa è stata trovata lì (telefono svuotato, profilo sul server intatto); i blocchi di RVC sono il modello di D58.
 
 ## Ultimo messaggio di Mario, parola per parola
-«97%» (18/10, limite settimanale dell'account Max → cambio account)
+«va bene» (risposta 1 alla domanda sulla riga «Telefono»: la metto online e passo al pezzo 2). Prima: «tutto come consiglio».

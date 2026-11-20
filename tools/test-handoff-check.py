@@ -1,36 +1,52 @@
 #!/usr/bin/env python3
-# Prova dell'hook .claude/hooks/handoff-check.py: scatta SOLO oltre la soglia di token (o dopo una compressione),
-# mai per il numero di messaggi (regola di Mario, RVC #115 / Jona #127). Uso: python3 -I tools/test-handoff-check.py
+# Prova dell'hook della soglia (.claude/hooks/handoff-check.py). Uso: python3 -I tools/test-handoff-check.py
 import json, os, subprocess, sys, tempfile
 
 HOOK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".claude", "hooks", "handoff-check.py")
 casa = tempfile.mkdtemp()
-env = dict(os.environ, HOME=casa)
-env.pop("JONA_CTX_SOGLIA", None)
-ko = 0
+esiti = []
 
 
-def gira(sid, ctx, *arg):
-    tp = os.path.join(casa, sid + ".jsonl")
-    with open(tp, "w") as f:
-        f.write(json.dumps({"message": {"usage": {"input_tokens": 1, "cache_read_input_tokens": ctx}}}) + "\n")
-    r = subprocess.run([sys.executable, "-I", HOOK, *arg], input=json.dumps({"session_id": sid, "transcript_path": tp}),
-                       capture_output=True, text=True, env=env)
-    return r.stdout.strip()
+def trascrizione(token):
+    p = os.path.join(casa, f"t{token}.jsonl")
+    with open(p, "w") as f:
+        f.write(json.dumps({"message": {"usage": {"input_tokens": 10, "cache_read_input_tokens": token}}}) + "\n")
+    return p
+
+
+def lancia(sid, token, arg=None, **extra):
+    dati = {"session_id": sid, "transcript_path": trascrizione(token), **extra}
+    r = subprocess.run([sys.executable, "-I", HOOK] + ([arg] if arg else []), input=json.dumps(dati),
+                       capture_output=True, text=True, env={**os.environ, "HOME": casa}, timeout=10)
+    return json.loads(r.stdout) if r.stdout.strip() else None
 
 
 def prova(nome, ok):
-    global ko
-    print(("PASS " if ok else "FAIL ") + nome)
-    ko += 0 if ok else 1
+    esiti.append(ok)
+    print(("OK  " if ok else "NO  ") + nome)
 
 
-uscite = [gira("pochi", 50_000) for _ in range(25)]
-prova("25 messaggi sotto la soglia: nessun avviso", all(u == "" for u in uscite))
-u = gira("tanti", 210_000)
-prova("contesto 210k: avviso di handoff", "PROTOCOLLO DI HANDOFF" in u and "210k" in u)
-prova("l'avviso non parla di messaggi", "messaggi in questa sessione" not in u)
-u = gira("compressa", 10_000, "compact")
-prova("dopo una compressione: avviso", "compressa" in u)
-prova("dopo la compressione l'avviso resta", "PROTOCOLLO DI HANDOFF" in gira("compressa", 10_000))
-sys.exit(1 if ko else 0)
+def testo(o):
+    return o["hookSpecificOutput"]["additionalContext"] if o else ""
+
+
+prova("sotto soglia: messaggio muto", lancia("a", 50_000) is None)
+prova("sotto soglia: strumento muto", lancia("a", 50_000, "tool") is None)
+o = lancia("a", 260_000, "tool")
+prova("oltre soglia dopo uno strumento: avviso completo", "OBBLIGATORIO" in testo(o)
+      and o["hookSpecificOutput"]["hookEventName"] == "PostToolUse" and o["systemMessage"].startswith("Soglia 250k"))
+prova("secondo strumento oltre soglia: muto", lancia("a", 261_000, "tool") is None)
+prova("messaggio dopo l'avviso: riga corta", "ancora da fare" in testo(lancia("a", 262_000)))
+prova("dentro un aiutante: muto", lancia("b", 260_000, "tool", agent_id="x") is None)
+prova("messaggio oltre soglia la prima volta: avviso completo", "OBBLIGATORIO" in testo(lancia("c", 255_000)))
+prova("dopo una compressione: avviso completo", "OBBLIGATORIO" in testo(lancia("d", 10_000, "compact")))
+prova("messaggio dopo la compressione: di nuovo completo", "OBBLIGATORIO" in testo(lancia("d", 10_000)))
+for _ in range(60):
+    ultimo = lancia("e", 1_000)
+prova("60 messaggi sotto soglia: muto (niente regola dei 40)", ultimo is None)
+prova("messaggio oltre soglia: avviso col numero dei messaggi", "61 messaggi" in testo(lancia("e", 251_000)))
+prova("gli strumenti non contano come messaggi", lancia("f", 1_000, "tool") is None
+      and not os.path.exists(os.path.join(casa, ".claude", "handoff-check", "f.json")))
+
+print(f"{sum(esiti)}/{len(esiti)} prove dell'hook della soglia verdi")
+sys.exit(0 if all(esiti) else 1)
