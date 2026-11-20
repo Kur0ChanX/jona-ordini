@@ -61,6 +61,7 @@ Le prove Firebase impostano `localStorage.jona_fb_emu` e una configurazione fint
 - `node tools/test-news.mjs`: Novità (contatore per ruolo, contenuto per staff/chef/sviluppatore, intestazione a 320 px, tema scuro).
 
 **Su GitHub (S2):** `tools/prova-ci.sh veloce|tutto` (usato da `.github/workflows/prove.yml`): «veloce» a ogni PR pronta (non in bozza) verso `main` (telefoni, v35, v40, firebase-flow, news, demo, testbar, agenda, responsabile, giro), «tutto» ogni lunedì. I registri restano 14 giorni negli artefatti del workflow. Il workflow ricrea gli stessi percorsi del computer di lavoro (`/opt/node22/lib/node_modules/playwright`, `/opt/pw-browsers/chromium`) e usa `TZ=Europe/Rome`.
+- `node tools/test-firebase-salvagente.mjs` (con l'emulatore, v122): «Metti al sicuro», «Entra» crea l'accesso di riserva, telefono svuotato → «Rientra» → stesso profilo, cambio password del gestore, Email/password spento.
 - `node tools/test-falsi-ok.mjs` (con l'emulatore, S1/v48): scritture bloccate con la rete accesa → dopo 8 s «1 modifica non arrivata · Riprova», poi la modifica arriva davvero al server.
 - `node tools/test-errori.mjs` (con l'emulatore, S3/v49): scatola nera, errori mandati a `/errori` (finto), striscia e elenco per lo sviluppatore. `node tools/test-errori-server.mjs`: `/errori` del Worker con D1 finto.
 - `node tools/test-richieste-gestite.mjs` (D9/v50): scheda Richieste «Da approvare»/«Gestite», gestite per giorno con ora e chi ha deciso, filtri, 320/390 px.
