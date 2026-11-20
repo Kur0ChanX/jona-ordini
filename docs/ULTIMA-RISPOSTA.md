@@ -1,3 +1,3 @@
-# Ultima risposta di Claude (20/11/2026 20:51 ora italiana)
+# Ultima risposta di Claude (20/11/2026 21:29 ora italiana)
 
-Le consegne sono su GitHub. Il push ha fatto ripartire le prove della v121 da capo: ci vogliono circa 10 minuti in più.
+Il banco di prova di Firebase si è fermato da solo dopo il tempo massimo. Le prove erano già finite, tutte verdi: lo riaccendo solo se servono altre prove.
