@@ -1,0 +1,27 @@
+{
+"account": "108763",
+"sessione": "39226ce302a3",
+"giorno": "2026-11-20",
+"turni": 1,
+"peso": 293152,
+"uscita": 6051,
+"contesto_max": 178646,
+"anomalie": [],
+"remota": "01WTjqUuMXap",
+"aiutanti": 0,
+"strumenti": 13,
+"motori": {
+"opus": 293152
+},
+"bilancia": 2,
+"grezzi": {
+"opus": [
+27,
+2382648,
+19684,
+0,
+6051
+]
+},
+"costo": 0.7551
+}
