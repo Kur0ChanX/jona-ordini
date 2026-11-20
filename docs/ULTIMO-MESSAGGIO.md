@@ -1,3 +1,3 @@
-# Ultimo messaggio di Mario (20/11/2026 19:58 ora italiana)
+# Ultimo messaggio di Mario (20/11/2026 20:02 ora italiana)
 
-va bene
+io sono ancora così  giusto per farti capire in che casino mi hai messo
