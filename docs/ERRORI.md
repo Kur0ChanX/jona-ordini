@@ -57,4 +57,4 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 - **E19** Per richieste di gusto: prima 1 immagine con 2-3 bozze ferme e conferma di Mario, poi si costruisce solo quella; «scrivere» = tratti in ordine come una mano.
 
 ## App e codice
-- **E59** Identità e chiavi solo nella memoria del browser = persone fuori dall'app quando il telefono la svuota: ogni app deve avere memoria protetta (`navigator.storage.persist`), rientro da soli, sblocco tramite almeno 2 persone e la prova «telefono svuotato → stesso profilo» (`docs/RIENTRO.md`, D58).
+- **E59** Identità e chiavi solo nella memoria del browser = persone fuori dall'app quando il telefono la svuota: ogni app deve avere memoria protetta (`navigator.storage.persist`), rientro da soli, sblocco tramite almeno 2 persone e la prova automatica «telefono svuotato → stesso profilo» nelle prove di ogni PR (`docs/RIENTRO.md`, D58). Regola di Mario per TUTTI i progetti, sviluppatore compreso: «Non deve mai ricapitare in nessun progetto» (mandata al kit di RVC).

@@ -89,6 +89,7 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 - Passi: (1) https://github.com/Kur0ChanX/jona-ordini/settings → **Transfer** → `Jona-Ristorante-by-YNOY`; (2) Settings → **Change visibility** → Private; (3) aggiornare `source_url` in CLAUDE.md, consegne, `docs/CAMBIO-ACCOUNT.md`, prompt dell'handoff, `git remote set-url origin https://github.com/Jona-Ristorante-by-YNOY/jona-ordini`; controllare prove su GitHub e deploy Cloudflare. Col repo privato riscrivere la regola delle prove su GitHub contando i minuti.
 
 ## 1. Claude da solo
+- **Regola da portare nel kit** (Mario 20/11: «Non deve mai ricapitare in nessun progetto»): «nessuno resta fuori» mandata alla sessione RVC del kit il 20/11; al prossimo kit controllare che ci sia in `REGOLE.md`.
 - **Dopo M14**: far cancellare a Mario i Worker `invito` e `jona-notifiche` dal VECCHIO account (lì resta `fruguponte`, da non toccare).
 - **Fatto M13 (07/10)**: v37 online, indirizzi nuovi controllati (app, notifiche, invito). La prova del workflow del Worker era fallita solo per il sottodominio appena creato: ora riprova fino a 3 minuti (sul ramo, va con la prossima PR).
 
