@@ -1,0 +1,43 @@
+{
+"account": "108763",
+"sessione": "39226ce302a3",
+"giorno": "2026-11-20",
+"turni": 3,
+"peso": 629691,
+"uscita": 11470,
+"contesto_max": 203789,
+"anomalie": [],
+"remota": "01WTjqUuMXap",
+"aiutanti": 0,
+"strumenti": 26,
+"motori": {
+"opus": 629691
+},
+"bilancia": 2,
+"grezzi": {
+"opus": [
+58,
+5240613,
+38577,
+0,
+11470
+]
+},
+"costo": 1.5863,
+"blocchi": {
+"Stop 15 · There are uncommitted changes in": 1,
+"Stop 3 · Consegne non su GitHub (C226,": 1,
+"Stop 8 · Il turno finisce con una": 1
+},
+"esempi_blocchi": {
+"Stop 15 · There are uncommitted changes in": [
+"20:44 · There are uncommitted changes in the repository. Please commit and push these changes to the remote branch."
+],
+"Stop 3 · Consegne non su GitHub (C226,": [
+"20:44 · Consegne non su GitHub (C226, blocco 1/3): docs/ERRORI.md fuori dal commit. Fai commit e push adesso (`git push -u origin claude/jona-ramo-definitivo`), controlla `git rev-parse HEAD origin/claude/jon"
+],
+"Stop 8 · Il turno finisce con una": [
+"20:45 · Il turno finisce con una domanda o un passo a mano per Mario: rinomina la sessione (set_session_title): col giallo della tua catena se dopo questo messaggio ti fermi ad aspettare Mario («<🟡|🟨|💛|✴️|📒> "
+]
+}
+}
