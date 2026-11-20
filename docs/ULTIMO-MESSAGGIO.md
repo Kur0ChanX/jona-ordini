@@ -1,3 +1,5 @@
-# Ultimo messaggio di Mario (20/11/2026 21:40 ora italiana)
+# Ultimo messaggio di Mario (20/11/2026 20:55 ora italiana)
 
-domanda 4 va bene come consiglio guarda se c'è nel kit una soluzione simile per tutti per evitare problemi
+Ok, mi confermi che per i prossimi progetti non succederà mai più questo problema? Anche per i prossimi progetti si salva in quel modo, salvagente, per evitare che cancellando la cronologia e i dati dal telefono posso loggare tranquillamente?
+
+firebase ovviamente che figura ci faccio se no il creatore che rimane chiuso fuori dall'app che chiede aiuto agli utenti... dai cerca di capirmi, per questo non deve ricapitare mai più
