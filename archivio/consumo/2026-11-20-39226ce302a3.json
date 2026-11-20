@@ -2,28 +2,28 @@
 "account": "108763",
 "sessione": "39226ce302a3",
 "giorno": "2026-11-20",
-"turni": 5,
-"peso": 629691,
-"uscita": 11470,
-"contesto_max": 237855,
+"turni": 6,
+"peso": 1044837,
+"uscita": 16411,
+"contesto_max": 275515,
 "anomalie": [],
 "remota": "01WTjqUuMXap",
 "aiutanti": 0,
-"strumenti": 26,
+"strumenti": 43,
 "motori": {
-"opus": 629691
+"opus": 1044837
 },
 "bilancia": 2,
 "grezzi": {
 "opus": [
-58,
-5240613,
-38577,
+84,
+8982787,
+51535,
 0,
-11470
+16411
 ]
 },
-"costo": 1.5863,
+"costo": 2.5373,
 "blocchi": {
 "Stop 15 · There are uncommitted changes in": 1,
 "Stop 3 · Consegne non su GitHub (C226,": 3,
