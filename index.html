@@ -1235,8 +1235,11 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=119;
+const APP_VER=120;
 const NEWS=[
+  {v:120,data:'2026-11-20',titolo:'Telefoni più al sicuro: l\'app chiede di non essere svuotata',
+    chef:['A ogni apertura l\'app chiede al telefono di non cancellare i suoi dati quando manca spazio. Così è più difficile ritrovarsi fuori con «Collega questo telefono».','In Staff, aprendo una persona, vedi il suo telefono: se la memoria è protetta e quando ha aperto l\'app l\'ultima volta.'],
+    dev:['D58 pezzo 1: `mpAsk` in `boot` (`navigator.storage.persisted/persist`, Firefox al massimo ogni 30 giorni con `jona_mp_t`), `mpSave` in `render` scrive `membri/<uid>` {mp, visto, sid} al massimo ogni 20 ore (`jona_mpw`), `mpRow` nella scheda del profilo per i gestori; `status().uid`. Prova `tools/test-memoria-protetta.mjs`.']},
   {v:119,data:'2026-10-15',titolo:'Vini: la foto si legge da sola, anche ad app chiusa',
     chef:['Se l\'IA non legge la foto di un vino (Google pieno o niente rete), tocca «Leggila da sola: puoi chiudere l\'app». La foto resta salvata e si legge appena possibile, anche da un altro telefono del ristorante.','Quando è letta ti arriva l\'avviso «Vino letto». In Cantina Vini trovi «Controlla e salva»: la scheda è già piena, la controlli e salvi.'],
     dev:['D57: voce `tipo:"vino"` nella coda di bolle e listini (`foto` + `fx`, `codaFoto(file,maxB)` con maxB diviso per le foto), `codaVino` (stessi lettori di `vnIaGo`), risultato in `CODA.vini` (IndexedDB `coda_vini`) e sul cloud (`txt`), `codaKo` comune. Cantina: `vnCoda`, `vnRisH`/`vnRisList`/`vnRisApri`/`vnRisVia`, `vnSave` toglie il risultato. Prove `tools/test-coda-vino.mjs` (6 dispositivi) e `test-coda` parte 5.']},
@@ -1295,10 +1298,7 @@ const NEWS=[
     dev:['D50 passo 2: Cantina in `moduli/cantina.js` (`modLoad(\'cantina\')` al primo `vnOpen` → `vnApri`; all\'avvio `vnRestore` carica il modulo solo se c\'è la bozza `jona_vn` → `vnRipristina`). In index restano `VN_TIPI`, `VN_ABB`, `VN_CAMPI`, `vnAll`, `vnGet`, `vnOn`, `vnCan`, `vnMese`, `vnTit`, `vnSub`, `vnCta`. Prova `test-moduli` senza rete vera (server della prova spento: `setOffline` su WebKit blocca il service worker).']},
   {v:101,data:'2026-10-13',titolo:'App più leggera all\'apertura',
     tutti:['L\'app si apre un po\' più in fretta: il Bar e le novità più vecchie si scaricano solo quando li apri.'],
-    dev:['Strada 3 «Geniale» (#119-#120): Bar in `moduli/bar.js` (`modLoad(\'bar\')` al primo `brOpen` → `brApri`; in index restano `isBar`, `brCan`, `brOn`, `brAll`, `brGet`, `brTot`, `brMese`, `brCta`). Novità dalla v89 in giù in `data/news.json` (`newsOld`, `newsList`, caricate da `newsSheet`). Tutti e due in `FILES` di sw.js (si aprono anche senza rete). index.html −98 KB.']},
-  {v:100,data:'2026-10-13',titolo:'iPhone: notifiche spiegate meglio',
-    tutti:['Su iPhone e iPad, se apri Jona da Safari, l\'app ora ti spiega come installarla sulla schermata Home: solo così arrivano le notifiche.'],
-    dev:['#119 (iPhone di Maurizio): in Safari il permesso è «denied» e l\'app diceva «Notifiche bloccate» → Impostazioni → Notifiche → Jona Ordini, che non c\'è. `iosWeb()` → scheda «Prima installa Jona sull\'iPhone» (`PUSH_INST`). Prova `tools/test-push-iphone.mjs`.']}
+    dev:['Strada 3 «Geniale» (#119-#120): Bar in `moduli/bar.js` (`modLoad(\'bar\')` al primo `brOpen` → `brApri`; in index restano `isBar`, `brCan`, `brOn`, `brAll`, `brGet`, `brTot`, `brMese`, `brCta`). Novità dalla v89 in giù in `data/news.json` (`newsOld`, `newsList`, caricate da `newsSheet`). Tutti e due in `FILES` di sw.js (si aprono anche senza rete). index.html −98 KB.']}
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -1517,7 +1517,7 @@ function FirebaseStore(key){
   };
   return{kind:'firebase',collection:c=>Object.assign(query(c),{doc:id=>doc(c,id||uid())}),backup,
     prodServer:async()=>{await readyP;const l=await fs.collection('listini').get({source:'server'});const m={};l.docs.forEach(x=>Object.assign(m,(x.data()||{}).p||{}));return m},
-    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),pendT:st.pendT||0,net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null,reqOk:!!st.reqOk}),
+    status:()=>({ready:st.ready,err:st.err,pend:st.pend+(L.buf.size?1:0),pendT:st.pendT||0,net:st.net,busy:st.busy,step:st.step,wait:st.wait||'',req:st.req||null,reqOk:!!st.reqOk,uid:st.uid||''}),
     netRetry:()=>fs.disableNetwork().then(()=>fs.enableNetwork()),
     phone:{req:r=>fs.doc('membri/'+st.uid).update({req:r}),again:()=>fs.doc('membri/'+st.uid).set(newMember()),
       // entrata libera (v40): con pubblico/porta aperta il telefono si approva da solo e, se nuovo, crea il suo profilo
@@ -1719,7 +1719,7 @@ function paint(el,html){
   if(id){const n=document.getElementById(id);if(n){n.focus({preventScroll:true});try{if(s1!=null)n.setSelectionRange(s1,s2)}catch(e){}}}
 }
 function render(){
-  obxTick();waitCheck();const html=view();
+  obxTick();waitCheck();mpSave();const html=view();
   document.documentElement.classList.toggle('on-wall',S.wallMode);document.documentElement.classList.toggle('on-splash',!!S.splash);
   document.documentElement.classList.toggle('staff-ui',!S.wallMode&&!isMgr(meU()));
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
@@ -1849,6 +1849,23 @@ async function phReject(id){
   const x=PH.list.find(m=>m.id===id);if(!x)return;if(!await ask('Rifiutare questo telefono?',(x.req?x.req.nome+' non':'Il telefono non')+' potrà vedere i dati del ristorante.','Rifiuta',true))return;
   try{await fbTmo(fbInit().fs.doc('membri/'+id).delete(),15000);toast('Telefono rifiutato')}catch(e){toast('Rifiuto non ancora arrivato: controlla la connessione e riprova.','err')}
 }
+/* v120 (D58) memoria protetta: a ogni apertura chiede al browser di non svuotare i dati dell'app (chiave del ristorante,
+   profilo aperto) quando manca spazio. Chrome e Safari decidono da soli senza chiedere; Firefox mostra un riquadro: lì al massimo
+   ogni 30 giorni. Esito in S.mp (true/false, null = non disponibile) e in membri/<uid> {mp, visto, sid}, al massimo ogni 20 ore */
+async function mpAsk(){if(DEMO)return;const sm=navigator.storage;if(!sm||!sm.persist){S.mp=null;return}
+  try{let v=sm.persisted?await sm.persisted():false;
+    if(!v){const ff=/Firefox\//.test(navigator.userAgent);if(!ff||now()-Number(ls('jona_mp_t')||0)>30*864e5){if(ff)ls('jona_mp_t',now());v=await sm.persist()}}
+    S.mp=!!v}catch(e){S.mp=null}schedule()}
+function mpSave(){if(DEMO||!S.me||S.mp===undefined||!S.db||S.db.kind!=='firebase')return;const s=S.db.status();if(!s.ready||!s.uid)return;
+  const k=s.uid+'|'+S.me+'|'+S.mp;if(mpSave.k===k)return;mpSave.k=k;const w=ls('jona_mpw')||{};if(w.k===k&&now()-w.t<20*36e5)return;
+  fbInit().fs.doc('membri/'+s.uid).update({mp:S.mp===true,visto:now(),sid:S.me}).then(()=>ls('jona_mpw',{k,t:now()}),()=>{mpSave.k=''})}
+/* per i gestori, nella scheda della persona: i suoi telefoni con memoria protetta e ultima apertura (letti al massimo ogni 5 minuti) */
+const MPL={};
+function mpRow(id){if(!S.db||S.db.kind!=='firebase'||!isMgr(meU()))return'';const c=MPL[id];
+  if(!c||now()-c.t>3e5){MPL[id]={t:now(),l:c?c.l:null};fbInit().fs.collection('membri').where('sid','==',id).get().then(q=>{MPL[id]={t:now(),l:q.docs.map(d=>d.data()).filter(x=>x.ok!==false).sort((a,b)=>(b.visto||0)-(a.visto||0))};refreshSheet()},()=>{})}
+  const l=MPL[id].l;if(!l)return'';
+  const g=t=>new Date(t).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+  return`<div class="panel mp-row" style="margin-top:14px;padding:12px 16px"><b>Telefono</b>${l.length?l.slice(0,3).map(x=>`<p class="muted small" style="margin:4px 0 0">${phDev(x.ua)} · memoria protetta: <b>${x.mp?'sì':'no'}</b> · aperto il ${g(x.visto)}</p>`).join(''):'<p class="muted small" style="margin:4px 0 0">Nessun telefono aggiornato: si vede dopo la prossima apertura dell\'app.</p>'}</div>`}
 function screenJoin(){
   return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>Collega questo telefono</h1>
   <p class="muted" style="margin-top:0">Chiedi allo chef di mostrarti il <b>QR code</b> dell'app e inquadralo con la <b>fotocamera</b> del telefono. Oppure apri il link che ti hanno mandato su WhatsApp.</p>
@@ -3557,6 +3574,7 @@ function profileSheet(id){
   S.form=Object.assign(clone(u),{pw:'',pw2:''});if(isGM(meU()))Object.assign(S.form,contrOf(u)||CONTR0,{_c:true,libero:orFree(u)});
   openSheet({render:()=>{const u=D().staff[id]||{};return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${self?'Il tuo profilo':esc(fullName(u))}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${profileForm('pf',{roles:mgr&&!self?['staff','gm','dev']:null,pwLabel:'Nuova password (facoltativa)',noRep:isMgr(S.form),contr:mgr})}
+  ${mgr?mpRow(id):''}
   ${mgr&&!self&&u.stato==='invitato'&&S.db&&S.db.kind==='firebase'?`<div class="panel" style="margin-top:18px;padding:14px 16px"><b>Invito non ancora usato.</b> Se il link si è perso, mandane uno nuovo: quello vecchio smette di funzionare.<div style="margin-top:10px"><button type="button" class="btn primary sm" data-a="invMono" data-u="${id}">Nuovo link d'invito</button></div></div>`:''}
   <div class="btns" style="margin-top:22px">${mgr&&!self?`<button type="button" class="btn ghost danger" data-a="sdel" data-u="${id}">${ic('trash')} Elimina</button><button type="button" class="btn ghost" data-a="stoggle" data-u="${id}">${u.stato==='disattivato'?'Riattiva':'Disattiva'}</button>`:''}<button type="button" class="btn primary" data-a="psaveProfile" data-u="${id}">${ic('check')} Salva</button></div>`}});
 }
@@ -6090,7 +6108,7 @@ async function boot(){
   try{await seedIfEmpty()}catch(e){toast(errMsg(e),'err')}
   if(S.db.kind==='locale'&&fbCfg())fbPublic().then(a=>{S.fbActive=a;schedule()});
   Object.keys(COLS).forEach(subscribe);
-  regRestore();vnRestore();codaAvvio();
+  regRestore();vnRestore();codaAvvio();mpAsk();
   setTimeout(()=>{if(!allLoaded()){S.loadTimeout=true;render()}},5000);
 }
 boot();
