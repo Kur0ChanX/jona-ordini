@@ -2,6 +2,28 @@
 
 Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa (date, cosa è successo, cause) in `docs/ERRORI-STORIA.md`, da leggere solo se serve. Le lezioni che servono solo per SCRIVERE codice o prove stanno in `.claude/rules/struttura.md` e `.claude/rules/prove.md` (regole a richiesta). Errore nuovo = una riga qui (o nella regola a richiesta della sua zona) + la riga completa in ERRORI-STORIA.md, poi commit.
 
+## Lezioni ereditate da RVC (numeri «RVC E..»)
+- **RVC E1** Si lavora solo in Claude Code. Ogni file ricevuto va subito in `archivio/` con commit.
+- **RVC E7** Prima di chiedere a Mario (o di scrivere un prompt a un aiutante), `grep` in documenti e archivio.
+- **RVC E11** La sessione nuova la apre Claude con `create_session` (catena di 8); a 8 la apre Mario: nel testo per lui il repo esatto e il ramo.
+- **RVC E19** «unrelated histories» dopo uno squash: prima `git fetch --unshallow origin`, poi merge normale.
+- **RVC E20** Mai `prove … | grep … && git commit`: prima l'esito delle prove, poi il commit a parte.
+- **RVC E21** Mai inventare il nome di un pulsante. Nel selettore: medium = «Medio», high = «Alto», xhigh = «Extra».
+- **RVC E23 E32 E33 E36** Prima `grep -n`, poi solo le righe utili. All'avvio niente `list_sessions` completo, `actions_list`, `list_events`, `Artifact read` di controllo.
+- **RVC E24** Un solo ramo. Il ramo nuovo per sessione ha diviso il lavoro in due.
+- **RVC E28** Mai `add_repo` di un secondo repo: spegne in silenzio gli hook.
+- **RVC E29** Segreti mai in chat né nel repo: vanno nelle impostazioni dell'ambiente.
+- **RVC E30** Mai dire «non è successo» senza una prova che lo possa vedere.
+- **RVC E31** Dopo lo squash: unire `main` PRIMA di ogni altro commit.
+- **RVC E37 E48 E49** Foto: io guardo un'anteprima ≤600 px e ≤40 KB (hook `foto-check.py`); a Mario un telefono per foto, una schermata per foto, pezzi alti al massimo ~1100 px.
+- **RVC E59** File di `.claude/`: ok di Mario (scritto) nella chat di quella sessione.
+- **RVC E60** Dopo un riavvio: unire la scorta e leggere `docs/ULTIMO-MESSAGGIO.md`.
+- **RVC E64** Scheda delle domande persa: rifarla subito, scritta anche in chiaro con le scelte numerate. Foto e domanda nello stesso messaggio.
+- **RVC E61** Prima di ogni push `git fetch`: lavoro di un'altra chat si unisce con un merge normale, mai forzare.
+- **RVC E65** Dopo «worker process was restarted»: se il mio ultimo passo era uno strumento e non il resoconto a Mario, il turno NON è finito: continuo e scrivo il resoconto.
+- **RVC E66** `effort_level` assente in `get_session` = Mario non l'ha scelto nel selettore: non prova «normale». `"effortLevel"` in `.claude/settings.json` vale anche nel cloud.
+- **RVC E67** File con righe lunghissime (tabelle): `grep -n -o '.\{0,80\}parola.\{0,80\}'`, mai `grep` semplice (una riga sola = migliaia di token).
+
 ## Avvio e rami Git
 - **E1** Se la sessione parte su «HEAD staccato»: `git checkout <ramo>` + `git merge --ff-only origin/<ramo>` prima di lavorare (lo segnala `avvio-check.py`).
 - **E5** Se `--ff-only` fallisce per ramo locale vecchio: `git branch -m <ramo> vecchio-locale-…`, poi `git checkout -b <ramo> --track origin/<ramo>`; mai `reset --hard`.
@@ -21,6 +43,8 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 - **E4** Si lavora solo in Claude Code, mai nella chat di claude.ai; ogni file ricevuto si salva subito nel progetto e si committa.
 - **E45** Un agente appena creato in `.claude/agents/` si carica solo dalla sessione dopo: nella stessa usare `general-purpose` con «Prima leggi .claude/agents/<nome>.md».
 
+- **E60** `scarica-kit.py` cercava al massimo 12 parti del pacchetto (il kit 47 ne ha 27) → «pacchetto non trovato»: portato a 60; il kit 47 lo porta a 100. Se il pacchetto «non c'è», provare prima più parti.
+
 ## Scorta automatica (`scorta.py`)
 - **E28** `scorta.py` salta come «ultimo messaggio di Mario» i testi di sistema (`<task-notification`, `<system-reminder`, `<wake `, `[SYSTEM NOTIFICATION`).
 - **E32** `togli_segreti()` in `scorta.py` toglie i link segreti (repo pubblico); controllare la scorta con `git show <commit>:docs/ULTIMO-MESSAGGIO.md`, non `git log -p`.
@@ -31,6 +55,7 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 
 ## Comunicazione con Mario e domande
 - **E2, E29, E37** Superate dal kit 27.3 (scelta di Mario #143): domande SCRITTE con scelte numerate, niente strumento a tocco (vedi `docs/kit-progetto/REGOLE.md`, «Domande a Mario»).
+- **E61** Quando un problema nasce dal mio codice (es. E59, Mario fuori da Jona), lo dico subito e chiaro: «ho sbagliato io», la causa e la difesa; mai solo la soluzione come se fosse capitato da solo (Mario 20/11: «non fai finta di niente»).
 - **E3** Per scelte e confronti mandare un'immagine (prima/dopo).
 - **E30** Se la risposta scritta a mano contiene una domanda o «roba così» non è una scelta: rispondere e rifare la domanda a tocco.
 - **E38** (aperto, causa non chiara: tocco fantasma o risposta automatica) Prima di lavori grossi dopo una risposta a tocco ripetere la scelta in chiaro; se Mario dice di non aver toccato, fermare subito le sessioni aperte (interrupt).
@@ -57,4 +82,4 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 - **E19** Per richieste di gusto: prima 1 immagine con 2-3 bozze ferme e conferma di Mario, poi si costruisce solo quella; «scrivere» = tratti in ordine come una mano.
 
 ## App e codice
-- **E59** Identità e chiavi solo nella memoria del browser = persone fuori dall'app quando il telefono la svuota: ogni app deve avere memoria protetta (`navigator.storage.persist`), rientro da soli, sblocco tramite almeno 2 persone e la prova «telefono svuotato → stesso profilo» (`docs/RIENTRO.md`, D58).
+- **E59** Identità solo nella memoria del browser = persone fuori quando il telefono la svuota (anche «Cancella dati di navigazione» fatto a mano, che la memoria protetta non ferma). Ogni app: accesso sul server recuperabile con password salvata dal telefono o passkey, sblocco tramite almeno 2 persone, prova «telefono svuotato → stesso profilo» (`docs/RIENTRO.md`, D58-D59). Vale per TUTTI i progetti.

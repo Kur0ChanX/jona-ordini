@@ -7,7 +7,7 @@
 #   python3 -I tools/scarica-kit.py --versione          → stampa la riga di VERSIONE del kit su RVC (la usa kit-check.py)
 #   python3 -I tools/scarica-kit.py --cartella <dir> [--indipendente]
 #                                                       → scarica le parti del pacchetto in <dir> (di solito la scratchpad);
-#                                                         poi la sessione segue la parte 1 (ok di Mario, file uno per uno con Write)
+#                                                         poi la sessione segue la parte 1 (ok di Mario, estrai-kit.py --anche-claude, Write per quelli che restano)
 # Uscita: 0 riuscito · 2 manca la chiave · 3 rete o chiave rifiutata.
 import os, re, sys, urllib.error, urllib.request
 
@@ -50,7 +50,7 @@ def main(arg):
         cartella = arg[arg.index("--cartella") + 1]
         nome = f"PACCHETTO-v{m.group(1)}-" + ("indipendente-" if "--indipendente" in arg else "")
         # Il numero delle parti sta nel nome del file (…-1di5.md): si cerca il primo che esiste.
-        parti = next((k for k in range(1, 13) if esiste(f"{KIT}/pacchetto/{nome}1di{k}.md")), 0)
+        parti = next((k for k in range(1, 100) if esiste(f"{KIT}/pacchetto/{nome}1di{k}.md")), 0)
         if not parti:
             print(f"Pacchetto {nome}… non trovato su RVC (versione {versione}).")
             return 3

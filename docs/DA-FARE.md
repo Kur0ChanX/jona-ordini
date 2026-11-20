@@ -8,10 +8,15 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 
 **🔴 = blocca il lavoro nuovo** (regola di Mario: prima si chiudono queste, poi si va avanti; le rifiniture estetiche non bloccano).
 
+## 0. Aspetta Mario
+- 20/11 · 🟡 Principale 146 · attivare «Email/password» in Firebase (salvagente); Mario rientra da solo da Firebase (scelta 2, guida della 147)
+
 ## Riassunto: cosa manca, in ordine
 
 | N. | Cosa | Di chi | Quando |
 |----|------|--------|--------|
+| 🔴 D59 | **Salvagente per ogni profilo** (Mario #146, 20/11: «vai di tuo consiglio… iPhone e Android… plug and play»; «comunicalo in tutto l'account»): accesso Firebase nome utente + password collegato al telefono (stesso uid), password salvata dal telefono, «Rientra» con un tocco; poi passkey. Piano: `docs/RIENTRO.md` «Pezzo 3 NUOVA STRADA». Manca: Mario attiva Email/password in Firebase; codice v122 + prova `test-firebase-salvagente`. |
+| 🔴 M47 | **Mario rientra in Jona** (fermo su «Collega questo telefono»): codice d'invito da Maurizio (Impostazioni → **Invita**) → «Ho già un profilo» → Maurizio approva → nome utente (mario.miscera) e password. Con la v121 online Maurizio può usare «Ricollega» (niente password). | Mario + Maurizio | stasera |
 | 🔴 D58 | **Nessuno resta fuori dall'app** (Mario #144, 20/11, urgenza: il suo Xiaomi ha perso la memoria di Chrome ed è uscito da Jona e RVC). Piano a 4 pezzi in `docs/RIENTRO.md`: memoria protetta a ogni apertura, sblocco tramite un gestore senza password e senza doppioni, rientro da soli in «Collega questo telefono», almeno 2 persone che sbloccano, prova «telefono svuotato → stesso profilo». Scelte di Mario: «tutto come consiglio» (rientro da soli; Mauro + interruttore). Pezzo 1 = v120 fatto in #144 (prove verdi in locale), da mandare online. Manca: pezzi 2a, 2b, 3, 4. | Claude (Opus) → Mario | subito |
 | D56 | **Google ha spento Gemini 2.5 per le chiavi nuove** (404 «no longer available to new users», scatola nera di Mario 14/10 14:08). **v118**: se il 2.5 è spento l'app passa da sola al Flash/Flash-Lite nuovi (ordine scelto da Mario #139: Flash → Lite → Llama, Pro mai). Poi: coda anche per le foto dei vini (D57). | Claude da sola | ✅ v118 online 16/10 |
 | D57 | Foto dei vini nella coda di bolle e listini («sì va bene se è la miglior soluzione intelligente», Mario #139): **v119 fatta in #139** (lettura non riuscita → «Leggila da sola: puoi chiudere l'app»; avviso «Vino letto»; Cantina → «Controlla e salva»). Va online dopo la v118. | Claude da sola | ✅ v119 online 16/10 |
@@ -89,6 +94,7 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 - Passi: (1) https://github.com/Kur0ChanX/jona-ordini/settings → **Transfer** → `Jona-Ristorante-by-YNOY`; (2) Settings → **Change visibility** → Private; (3) aggiornare `source_url` in CLAUDE.md, consegne, `docs/CAMBIO-ACCOUNT.md`, prompt dell'handoff, `git remote set-url origin https://github.com/Jona-Ristorante-by-YNOY/jona-ordini`; controllare prove su GitHub e deploy Cloudflare. Col repo privato riscrivere la regola delle prove su GitHub contando i minuti.
 
 ## 1. Claude da solo
+- **Regola da portare nel kit** (Mario 20/11: «Non deve mai ricapitare in nessun progetto»): «nessuno resta fuori» mandata alla sessione RVC del kit il 20/11; al prossimo kit controllare che ci sia in `REGOLE.md`.
 - **Dopo M14**: far cancellare a Mario i Worker `invito` e `jona-notifiche` dal VECCHIO account (lì resta `fruguponte`, da non toccare).
 - **Fatto M13 (07/10)**: v37 online, indirizzi nuovi controllati (app, notifiche, invito). La prova del workflow del Worker era fallita solo per il sottodominio appena creato: ora riprova fino a 3 minuti (sul ramo, va con la prossima PR).
 

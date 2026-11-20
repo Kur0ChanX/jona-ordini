@@ -1,35 +1,53 @@
-# Passaggio di consegne (2026-11-20 ~20:15 ora italiana, chiusura della #144)
+# Passaggio di consegne (20/11/2026, chiusura della #146)
 
-Sessione chiusa: #144 (Fable per il piano, poi Opus 5.5; ambiente `env_01PHQTdrmzBJ65UoCn8yQSqE`; impegno `medium`). La prossima è #145.
+Sessione attuale: #147 (dopo la #146 `session_01WTjqUuMXapFYVzQRUuie8s`, chiusa alla soglia 20/11 20:51; la apre la #146 con `create_session` (catena 2 di 8)).
 
-- **Già deciso da Mario (non richiedere)**: D58 «tutto come consiglio» (20/11 19:42): rientro da soli con nome utente e password (pezzo 3); possono ricollegare i telefoni Maurizio, lo sviluppatore, **Mauro** e chi ha l'interruttore «Può ricollegare i telefoni» nel profilo (pezzo 2a). Riga «Telefono» nella scheda della persona: approvata («va bene», FOTO `docs/img/v120/scheda-telefono.png`). Regola di Mario per tutti i progetti: **nessuno deve mai restare bloccato fuori dall'app**. Ragionare con Fable, costruire con Opus (Mario: «fermati il lavoro pesante che ragioniamo con Opus per risparmiare token»).
-- **Da non rifare**: il piano e le scelte tecniche di `docs/RIENTRO.md` (chiuse da Fable: «telefono del server», un solo modo di entrare, prove); la ricerca su `navigator.storage.persist` (fatta il 20/11: Chrome e Safari decidono da soli senza chiedere, Chrome concede di solito all'app installata sulla Home; Firefox mostra un riquadro); la v120 (pezzo 1, fatta e provata); unire le scorte del 23/10 (unite).
-- **Cosa preme a Mario adesso**: D58 🔴 urgenza: che nessuno resti fuori. Il suo Xiaomi è uscito da Jona e da RVC (Chrome ha perso la memoria dei siti, non è il codice).
+- **Già deciso da Mario (non richiedere)**: v121 approvata («va bene, mettila online», 20/11). D59 salvagente: «vai di tuo consiglio, basta che funziona … iPhone che Android … plug and play» → strada scelta da Claude: accesso Firebase nome utente + password collegato al telefono (`docs/RIENTRO.md`, «Pezzo 3 NUOVA STRADA»), poi passkey. Kit 47 applicato («Si applica»). «Comunicalo in tutto l'account» (fatto, sotto). Causa del telefono svuotato: Mario ha usato «Cancella dati di navigazione» di Chrome con tutto spuntato tranne le password (E59).
+- **Da non rifare**: installazione del kit 47 (43/43 prove degli hook verdi, commit `11b9c1e`); messaggi a RVC (Accessi 6 e Codice 39, 20/11 ~20:50); controllo del provider Firebase (oggi `PASSWORD_LOGIN_DISABLED`); domanda «conferma che tutto l'account ragiona» (risposta data: Jona sì, RVC ha la regola e Accessi 6 lavora, SPA/EdilCannas col kit; RVC Accessi 6 ha confermato alle 20:50: stessa strada già in uso in RVC, email finta `<utente>@utenti.rvc-villacarola.pages.dev`; da dire a Mario se non l'ho detto).
+- **Cosa preme a Mario adesso**: è ANCORA FUORI da Jona e vuole una soluzione definitiva, in tutti i progetti: «le app devono avere una base stabile, non pendente a una cronologia».
 
-## Stato
-- **PR #129** (v120, pezzo 1: memoria protetta + riga «Telefono») segnata pronta il 20/11 ~20:10: «prove» su GitHub in corso sull'ultimo commit `9cc8eb9` (il commit delle consegne è solo documenti). Verde → squash (titolo corto, `commit_message` corto, E54), poi merge di `main` sul ramo. Rosso → capire la causa, correggere, rifare il giro.
-- Prove in locale verdi (solo Chrome): `test-memoria-protetta` (nuova, nelle veloci), `test-firebase-telefoni`, `test-moduli`, `test-news`, `test-testbar`, `test-giro`. La v100 delle novità spostata in `data/news.json` (E55).
-- Mario: non so se è già rientrato in Jona (gli ho dato i 6 passi: codice d'invito da Maurizio → **Ho già un profilo** → Maurizio approva → nome utente e password). Se scrive che è bloccato: guidarlo da Firebase come il 07/10 (DA-FARE M14).
-- Dal server il suo profilo non l'ho potuto controllare (nessuna chiave di Firebase nel contenitore); dal codice: profilo e dati sono sul server, legati al profilo, il telefono svuotato non li tocca.
+## Stato (20/11 20:51 ora italiana)
+- Ramo comune ≠ origin: PUSH DA FARE (verifica: `git rev-parse HEAD` = `origin/claude/jona-ramo-definitivo`). Giri in corso: Prove automatiche. PR aperte: #130 v121 · Ricollega un telefono al profilo . Scorte NON unite: scorta-principale-20261120-01WTjqUuMXap/claude/jona-ramo-definitivo.
+- PR #130 (v121 + kit 47) aperta e pronta, controllo «prove» partito alle 19:47 UTC (giro 44805394325). Verifica: `pull_request_read get_check_runs` della #130. Verde → squash con `commit_message` corto, poi merge di `main` sul ramo e «v121 online» a Mario (sito: `APP_VER=121` nell'HTML). Rosso → causa vera.
+- Commit di soli documenti fatti durante il giro: pushati dopo il giro (E39), prima di questa chiusura.
+- Firebase Email/password: SPENTO finché Mario non lo accende. Verifica senza creare account: `curl -s -X POST "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=<apiKey di firebase-config.js>" -H "content-type: application/json" -H "Referer: https://jona-ristorante-by-ynoy-corp.pages.dev/" -d '{"email":"prova-inesistente@jona.app","password":"xxxxxx99","returnSecureToken":true}'` → `PASSWORD_LOGIN_DISABLED` = spento; `INVALID_LOGIN_CREDENTIALS`/`EMAIL_NOT_FOUND` = acceso.
+- v120 online (verificato: `APP_VER=120` nel sito, `main` `e875eb9`).
 
-## ✅ PROSSIMI PASSI (#145, continuare da sola)
-1. Esito della PR #129 (una volta, con `pull_request_read` `get_check_runs`): verde → squash e merge di `main` sul ramo; dire a Mario «v120 online».
-2. **Pezzo 2a** di `docs/RIENTRO.md` (solo app): «Ricollega» con scelta del profilo in «Telefoni da approvare» (`phApprove(id,sid)` scrive `sid`; `approval()` → `st.entra`; `rieCheck()` in `render` → `login(sid)`), avviso doppione per «Sono nuovo» con lo stesso nome, «Ho già un profilo» pulsante principale, `canUnlock(u)=isMgr(u)||u.reparto==='fb'||!!u.sblocca` (Mauro = reparto `fb`; interruttore nel profilo), «sempre almeno 2» in `sdel`/`stoggle`/`psaveProfile`/`endSeason`, voce in `meMenu` per chi sblocca senza scheda Staff. Prova `tools/test-firebase-rientro.mjs` parti A, D, E. Foto a Mario prima di andare online.
-3. **Pezzo 2b** (Worker «telefono del server» + codice di rientro), poi **pezzo 3** (rientro da soli), poi **pezzo 4**: tutto scritto in `docs/RIENTRO.md`. Ogni pezzo = una versione, prove, foto, PR.
-4. Dopo D58: aggiornare il kit di Jona (installato 27.3 con Preferenze v27; Mario ha le Preferenze v38) e mandare a Mario a fine giornata il testo di `docs/kit-progetto/PREFERENZE-CHAT.txt` se più vecchio delle sue (regola dell'hook).
-5. Poi i passi vecchi (bolla vera dal Controllo merce, M44), vedi `docs/DA-FARE.md`.
+## Prossimi passi
+1. PR #130: se non è ancora unita, esito di «prove» → squash → merge di `main` sul ramo → «v121 online» a Mario.
+2. Codice v122 salvagente (`docs/RIENTRO.md` «Pezzo 3 NUOVA STRADA»): `linkWithCredential` (EmailAuthProvider, email `<nome utente>@utenti.jona`) a registrazione, `doLogin`, cambio password (`updatePassword`), scheda una tantum «Metti al sicuro il tuo accesso»; «Bentornato!» in `screenJoin` con `<form>` e `autocomplete`; `signInWithEmailAndPassword` → legge `membri/<uid>` (`k`, `sid`) → dentro; `PasswordCredential` su Chrome. Persona con più telefoni: email già usata → entra con quell'account. Tablet di cucina già collegato a un'altra persona: non toccare. Prova nuova `tools/test-firebase-salvagente.mjs` (emulatore auth: email e password vanno sempre) nelle VELOCI; a ogni versione `CACHE`, `NEWS`, `APP_VER`, riga in `struttura.md`. Il codice si può scrivere e provare anche prima che Mario accenda il provider; online solo dopo.
+3. Rifare a Mario le domande aperte («## 0. Aspetta Mario»): come rientra stasera (consiglio: da solo da Firebase, approvando `membri/<uid>` del suo telefono dalla console), passo Firebase Email/password.
+4. Dopo la v122: passkey (impronta o viso) dal Worker, D59 seconda parte.
+5. Risposte di RVC (Accessi 6, Codice 39): se usano un'altra strada, allinearsi. Preferenze: kit 47 = Preferenze v38 = quelle di Mario, niente da mandare.
 
-## Sessione #144 in breve
-- Letto come Jona lega telefono e profilo (`jona_key`, accesso anonimo `membri/<uid>`, `jona_me`; `screenJoin`, `screenPhone`, `phApprove`, `fbJoinKey`, inviti v30/v40, Worker `membro`/`invCrea`/`invLeggi`/`richiesta`).
-- Piano D58 in `docs/RIENTRO.md`, voce 🔴 D58 in `docs/DA-FARE.md`, lezione E59 in `docs/ERRORI.md` e `ERRORI-STORIA.md`.
-- v120: `mpAsk` in `boot`, `mpSave` in `render` (`membri/<uid>` {mp, visto, sid}, ogni 20 ore), `mpRow` nella scheda del profilo, `status().uid`; riga in `.claude/rules/struttura.md`.
-- Server locale ed emulatori avviati in sottofondo (persi col contenitore): `python3 -m http.server 8765` e `npx --yes firebase-tools@13 emulators:start --only firestore,auth --project demo-jona`.
-- Controllo Da fare: 0 voci aggiunte (D58 già scritta; la richiesta «aggiorna il kit» è nei prossimi passi).
+## Strade provate e scartate
+- Pezzo 3 col «telefono del server» (robot nel Worker, vecchio piano di `docs/RIENTRO.md`): scartato per il salvagente perché richiede molto più codice e un segreto potente in D1; l'accesso Firebase fa lo stesso con meno rischio e Firebase blocca da solo i tentativi in serie.
+- Google come salvagente: non funziona sull'iPhone con l'app dalla Home (Maurizio ha l'iPhone).
+- `navigator.storage.persist` (v120) da solo: non ferma la cancellazione fatta a mano da Chrome.
 
-## Riferimenti
-- Handoff: `create_session` con `environment_id` `env_01PHQTdrmzBJ65UoCn8yQSqE`, `source_url` https://github.com/Kur0ChanX/jona-ordini, `source_revision` `claude/jona-ramo-definitivo`, `model` `claude-opus-5-5`.
-- Sessioni: #144 `session_01WTjqUuhyPadg3fSaD15EQe` (questa), #142 `session_01NZxnf2nfrCUMQYNZLJHtYL`.
-- RVC: la causa è stata trovata lì (telefono svuotato, profilo sul server intatto); i blocchi di RVC sono il modello di D58.
+## Sessione #146 in breve
+- v120 confermata online; domande aperte rifatte con le 3 bozze del salvagente.
+- Kit 27.3 → 47: `tools/scarica-kit.py` cercava solo 12 parti (E60, corretto); applicato con `estrai-kit.py --scrivi --anche-claude` + 9 file a mano (segnaposto, `settings.json` unito tenendo `impegno-check.py`, `CLAUDE.md` con i titoli nuovi). 43/43 prove verdi.
+- Mario arrabbiato perché il creatore deve farsi abilitare da Maurizio: ammesso l'errore (E61).
+- PR #130 aperta; salvagente progettato; RVC avvisata.
+- File toccati: `tools/scarica-kit.py`, `tools/estrai-kit.py`, file del kit (`.claude/`, `tools/test-*.py`, `docs/kit-progetto/`, `.mcp.json`, `.github/workflows/pulisci-scorte.yml`, `.gitattributes`, `docs/ACCOUNT.md`, `docs/CHI-FA-COSA.md`, `docs/GUIDE-GIUSTE.md`), `CLAUDE.md` (copia vecchia in `archivio/CLAUDE-prima-del-kit47.md`), `docs/ERRORI.md`, `docs/ERRORI-STORIA.md`, `docs/RIENTRO.md`, `docs/DA-FARE.md`.
+- Controllo Da fare: 0 voci aggiunte (D59 aggiornata con la strada scelta; «Aspetta Mario» con 2 righe).
 
-## Ultimo messaggio di Mario, parola per parola
-«va bene» (risposta 1 alla domanda sulla riga «Telefono»: la metto online e passo al pezzo 2). Prima: «tutto come consiglio».
+## Motore e forza di pensiero
+Motore: **claude-opus-5-5** (Opus 5.5) · impegno **Extra** (`xhigh`, dal registro della sessione): la sessione nuova nasce con questi (C474, `create_session` con `model` ed `effort`), mai chiesti a Mario (E277).
+
+## Numeri liberi
+Prossimo E libero: E62.
+
+## Ultimo messaggio di Mario (20/11/2026 ~20:50)
+«Questo messaggio va bene, comunicalo in tutto l'account. Mi sono ricordato che la memoria del telefono che mi si è cancellata, se tu stai provando a indagare il motivo, te lo dico io. Probabilmente la colpa è la mia, però non è proprio una colpa, nel senso che io sono entrato, volevo cancellare la cronologia. Mi diceva un giorno, io ho messo tutto quello che c'era e ho cancellato anche dati. Mi ricordo che c'è su Chrome, c'era scritto dati, cronologia, tranne forse accessi non ho toccato, e probabilmente sono stato io, però nel senso non me ne do una colpa, io l'ho toccato su Chrome, quindi diciamo che le colpe sono 50-50, 50 mie e 50 tue. Tu dovevi salvarlo in modo in sicurezza e io non sapevo che cancellando la cronologia e dati da Chrome, io volevo cancellare solo la cronologia ma ho lasciato flaggato anche il resto, mi andasse a cancellare queste cose. Anche immaginati se un cliente, un collega cancella la cronologia, non li si deve cancellare tutto, memoria e quant'altro. Cioè, le app devono avere una base stabile, non pendente a una cronologia, dati volatili così. Mi confermi che in tutto l'account state ragionando per risolvere questo problema definitivamente?»
+
+## Messaggi di Mario di questa sessione
+Scritti dallo script (C469): dopo «→» cosa ne è stato (C…, file, commit o «risposta alla domanda N»).
+- 2026-11-20 20:44 · Domanda 1. Ma com'è possibile che sono io il creatore e mi deve abilitare Mauriz… → risposto: errore mio ammesso (E61), scelte per rientrare rifatte; Mario non ha ancora scelto (riga in «Aspetta Mario»)
+- 2026-11-20 20:45 · Domanda 2, va bene, mettila online. Domanda 3, vai di tuo consiglio, basta che f… → v121 in PR #130 (prove in corso); salvagente: strada accesso Firebase scelta, piano in `docs/RIENTRO.md`, passo Firebase chiesto a Mario
+- 2026-11-20 20:49 · Questo messaggio va bene, comunicalo in tutto l'account. Mi sono ricordato che l… → mandato a RVC Accessi 6 e Codice 39; Accessi 6 ha risposto: in RVC stessa strada già in uso; causa scritta in E59
+
+Ultimo, intero:
+> Questo messaggio va bene, comunicalo in tutto l'account. Mi sono ricordato che la memoria del telefono che mi si è cancellata, se tu stai provando a indagare il motivo, te lo dico io. Probabilmente la colpa è la mia, però non è proprio una colpa, nel senso che io sono entrato, volevo cancellare la cronologia. Mi diceva un giorno, io ho messo tutto quello che c'era e ho cancellato anche dati. Mi ricordo che c'è su Chrome, c'era scritto dati, cronologia, tranne forse accessi non ho toccato, e probabilmente sono stato io, però nel senso non me ne do una colpa, io l'ho toccato su Chrome, quindi diciamo che le colpe sono 50-50, 50 mie e 50 tue. Tu dovevi salvarlo in modo in sicurezza e io non sapevo che cancellando la cronologia e dati da Chrome, io volevo cancellare solo la cronologia ma ho lasciato flaggato anche il resto, mi andasse a cancellare queste cose. Anche immaginati se un cliente, un collega cancella la cronologia, non li si deve cancellare tutto, memoria e quant'altro. Cioè, le app devono avere una base stabile, non pendente a una cronologia, dati volatili così. Mi confermi che in tutto l'account state ragionando per risolvere questo problema definitivamente?
+

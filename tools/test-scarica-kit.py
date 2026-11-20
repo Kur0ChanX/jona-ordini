@@ -64,6 +64,16 @@ with tempfile.TemporaryDirectory() as rvc, tempfile.TemporaryDirectory() as fuor
     c, out = esegui("--cartella", dove2, "--indipendente", RVC_KIT_TOKEN="segreto", RVC_KIT_URL=url)
     controlla(c == 0 and len(os.listdir(dove2)) == 3 and all("indipendente" in n for n in os.listdir(dove2)), "pacchetto indipendente", out)
 
+    # collaudo 38.52: pacchetto in 25 parti (prima cercava fino a 12 e diceva «non trovato»)
+    with open(os.path.join(kit, "VERSIONE"), "w") as f:
+        f.write("kit 32.0 · 18/11/2026 · Preferenze v32\n")
+    for i in range(1, 26):
+        with open(os.path.join(kit, "pacchetto", f"PACCHETTO-v32-{i}di25.md"), "w") as f:
+            f.write(f"# parte {i}\n")
+    dove3 = os.path.join(fuori, "venticinque")
+    c, out = esegui("--cartella", dove3, RVC_KIT_TOKEN="segreto", RVC_KIT_URL=url)
+    controlla(c == 0 and len(os.listdir(dove3)) == 25, "38.52: 25 parti scaricate", out)
+
     server.shutdown()
     c, out = esegui("--versione", RVC_KIT_TOKEN="segreto", RVC_KIT_URL=url)
     controlla(c == 3 and "non raggiungibile" in out, "rete chiusa: uscita 3, nessun errore lungo", out)
