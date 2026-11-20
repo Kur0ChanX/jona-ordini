@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Dopo Edit/Write di un file .js (anche .mjs, .cjs) del codice: `node --check` (solo sintassi, ~50 ms).
+"""Dopo Edit/Write di un file .js (anche .mjs, .cjs) del codice: `node --check` (solo sintassi, ~50 ms), poi ESLint
+se il progetto lo ha (`node_modules/.bin/eslint` + `eslint.config.js`, #296): nomi non definiti, chiavi doppie… (~0,3 s).
 
 Zone del codice: `.claude/zone-codice.txt` (in RVC app/, worker/, tests/); senza il file, tutto il
 progetto tranne docs/, archivio/, .claude/, node_modules/, dist/ (kit per gli altri progetti).
@@ -60,10 +61,32 @@ def main():
         esito = subprocess.run(['node', '--check', file_js], cwd=progetto, capture_output=True, text=True, timeout=20)
     except Exception:
         return 0
-    if esito.returncode == 0:
+    if esito.returncode != 0:
+        righe = (esito.stderr or esito.stdout).strip().splitlines()[:8]
+        print('node --check: errore di sintassi in ' + os.path.relpath(file_js, progetto) + '\n' + '\n'.join(righe), file=sys.stderr)
+        return 2
+    return eslint(file_js, progetto)
+
+
+def eslint(file_js, progetto):
+    """ESLint sul solo file cambiato; senza ESLint o senza configurazione: silenzio (kit per gli altri progetti)."""
+    comando = os.path.join(progetto, 'node_modules', '.bin', 'eslint')
+    if not (os.path.isfile(comando) and os.path.isfile(os.path.join(progetto, 'eslint.config.js'))):
         return 0
-    righe = (esito.stderr or esito.stdout).strip().splitlines()[:8]
-    print('node --check: errore di sintassi in ' + os.path.relpath(file_js, progetto) + '\n' + '\n'.join(righe), file=sys.stderr)
+    try:
+        esito = subprocess.run([comando, '--no-warn-ignored', '--format', 'json', file_js], cwd=progetto,
+                               capture_output=True, text=True, timeout=30)
+        risultati = json.loads(esito.stdout or '[]')
+    except Exception:
+        return 0
+    if esito.returncode != 1:  # 0 = pulito; 2 = ESLint rotto (configurazione): non si blocca il lavoro
+        return 0
+    relativo = os.path.relpath(file_js, progetto)
+    righe = [f"{relativo}:{m.get('line')}:{m.get('column')} {m.get('message')} ({m.get('ruleId')})"
+             for r in risultati for m in r.get('messages', []) if m.get('severity') == 2][:8]
+    if not righe:
+        return 0
+    print('ESLint: errore nel codice di ' + relativo + '\n' + '\n'.join(righe), file=sys.stderr)
     return 2
 
 

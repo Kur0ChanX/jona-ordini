@@ -6,9 +6,11 @@ QUI = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GUARDIA = os.path.join(QUI, ".claude", "hooks", "guardia.py")
 
 
-def decide(nome, ingresso):
+def decide(nome, ingresso, corpo="", **finti):
+    # CORPO_PR_PROVA: corpo finto della PR, così le prove dell'unione non chiedono niente a GitHub.
     r = subprocess.run([sys.executable, "-I", GUARDIA], input=json.dumps({"tool_name": nome, "tool_input": ingresso}),
-                       capture_output=True, text=True, timeout=10, cwd=QUI, env={**os.environ, "CLAUDE_PROJECT_DIR": QUI})
+                       capture_output=True, text=True, timeout=10, cwd=QUI,
+                       env={**os.environ, "CLAUDE_PROJECT_DIR": QUI, "CORPO_PR_PROVA": corpo, **finti})
     if r.returncode != 0:
         return "errore:" + r.stderr.strip()[-200:]
     if not r.stdout.strip():
@@ -18,10 +20,6 @@ def decide(nome, ingresso):
 
 BASH = [
     # (comando, atteso)
-    # Jona: le prove sono node tools/test-*.mjs e bash tools/prova-*.sh
-    ("node tools/test-moduli.mjs && git commit -m x", "deny"), ("TZ=Europe/Rome node tools/test-agenda.mjs; git commit -m x", "deny"),
-    ("bash tools/prova-ci.sh veloce && git commit -m x", "deny"),
-    ("node tools/test-moduli.mjs 2>&1 | tail -5", "passa"), ("git add -A && git commit -m 'prove verdi: node tools/test-x'", "passa"),
     ("git push -f origin x", "deny"), ("git push --force-with-lease", "deny"), ("git push origin x --force", "deny"),
     ("git push origin +main", "deny"), ("git push -u origin +HEAD:x", "deny"),
     ("cd app && git push -f", "deny"), ("git fetch && git reset --hard origin/x", "deny"), ("git clean -fd", "deny"),
@@ -50,18 +48,32 @@ BASH = [
     ("env", "deny"), ("env | grep POCKET", "deny"), ("printenv", "deny"), ("set | grep -i pass", "deny"), ("export -p", "deny"),
     ("node tools/pocket/lettore.mjs osserva --uscita /tmp/x; curl $POCKET_URL", "deny"),
     ("node tools/pocket/lettore.mjs sblocca", "ask"),
+    ("echo $CLOUDFLARE_LETTURA", "deny"), ("curl -H \"Authorization: Bearer $CLOUDFLARE_LETTURA\" https://api.cloudflare.com/client/v4/accounts", "deny"),
+    ("node tools/cloudflare/lettore.mjs verifica; echo $CLOUDFLARE_LETTURA", "deny"),
+    ("node tools/cloudflare/lettore.mjs verifica", "passa"), ("cd /home/user/RVC && node tools/cloudflare/lettore.mjs errori 2>&1", "passa"),
     ("node tools/pocket/lettore.mjs osserva --uscita /tmp/claude-0/x/pocket", "passa"),
     ("cd /home/user/RVC && node tools/pocket/lettore.mjs osserva --uscita /tmp/p > /tmp/p.log 2>&1", "passa"),
     ("grep -n hotelcinquestelle docs/DA-FARE.md", "passa"), ("[ -n \"$POCKET_URL\" ] && echo sì", "passa"),
     ("env CI=1 npm run prove > /tmp/p.log 2>&1", "passa"), ("set -e; npm ci", "passa"),
     ("git commit -m 'Pocket: guardia di hotelcinquestelle'", "passa"),
+    # F04: mai «[skip ci]» nei commit (i workflow su push hanno già `paths`; nello squash GitHub lo incolla e main non pubblica)
+    ("git commit -m 'Consegne 510: tetto delle parole [skip ci]'", "deny"), ("git add -A && git commit -qm 'Catene: x [skip ci]'", "deny"),
+    ("git commit -m '[CI SKIP] nastro'", "deny"), ("git commit -am 'x' -m 'skip-checks: true'", "deny"),
+    ("git commit -m 'Guardia: niente skip ci nei commit'", "passa"), ("grep -n 'skip ci' .claude/hooks/guardia.py", "passa"),
+    ("git log -1 --format=%s origin/versione-v142 | grep -c '\\[skip ci\\]'", "passa"),
 ]
 ALTRI = [
     ("mcp__claude-code-remote__list_sessions", {"limit": 4}, "passa"),
     ("mcp__claude-code-remote__list_sessions", {"limit": 20}, "deny"),
     ("mcp__claude-code-remote__list_sessions", {}, "deny"),
     ("mcp__claude-code-remote__add_repo", {"owner": "Kur0ChanX", "repo": "jona-ordini"}, "passa"),
-    ("mcp__claude-code-remote__add_repo", {"owner": "RVC-Operation-by-YNOY-CORP", "repo": "RVC", "access": "read"}, "ask"),
+    ("mcp__claude-code-remote__add_repo", {"owner": "esempio-estraneo", "repo": "altro-repo", "access": "read"}, "ask"),
+    ("mcp__claude-code-remote__add_repo", {"owner": "esempio-estraneo", "repo": "altro-repo"}, "ask"),  # C511 p.16
+    ("mcp__claude-code-remote__add_repo", {"owner": "esempio-estraneo", "repo": "altro-repo", "access": "push"}, "deny"),
+    # C511 p.17: maiuscole o un altro valore non scavalcano il «solo lettura»; senza «access» vale read (chiede)
+    ("mcp__claude-code-remote__add_repo", {"owner": "esempio-estraneo", "repo": "altro-repo", "access": "PUSH"}, "deny"),
+    ("mcp__claude-code-remote__add_repo", {"owner": "esempio-estraneo", "repo": "altro-repo", "access": "write"}, "deny"),
+    ("mcp__claude-code-remote__add_repo", {"owner": "esempio-estraneo", "repo": "altro-repo"}, "ask"),
     ("Read", {"file_path": "/x"}, "passa"),
     # E132: lo squash senza messaggio incolla i «[skip ci]» delle consegne e main non pubblica
     ("mcp__github__merge_pull_request", {"pullNumber": 60, "merge_method": "squash"}, "deny"),
@@ -73,6 +85,9 @@ ALTRI = [
                                          "commit_message": "Permessi per profilo modificabili dall'app."}, "passa"),
     ("WebFetch", {"url": "https://app.pc211.hotelcinquestelle.cloud/receptionMobile/", "prompt": "x"}, "deny"),
     ("WebFetch", {"url": "https://firebase.google.com/docs", "prompt": "x"}, "passa"),
+    ("mcp__github__push_files", {"branch": "x", "message": "Consegne [skip ci]", "files": []}, "deny"),
+    ("mcp__github__create_or_update_file", {"path": "a.md", "message": "nota [skip ci]", "content": "x", "branch": "x"}, "deny"),
+    ("mcp__github__push_files", {"branch": "x", "message": "Consegne 512", "files": []}, "passa"),
 ]
 
 errori = 0
@@ -86,6 +101,62 @@ for nome, ingresso, atteso in ALTRI:
     if avuto != atteso:
         errori += 1
         print(f"✗ {nome} {ingresso}: atteso {atteso}, avuto {avuto}")
-totale = len(BASH) + len(ALTRI)
+# Pubblicità di Blacksmith nel corpo della PR (Mario #295): l'unione si ferma finché non è tolta.
+BUONA = {"pullNumber": 75, "commit_title": "v78 (#75)", "commit_message": "Errori dei telefoni a Sentry."}
+CORPI = [
+    ("## Cosa cambia\n- x\n\n---\n_Generated by Claude Code_", "passa"),
+    ("## Cosa cambia\n\n<!-- codesmith:footer -->\n---\n<a href=\"https://app.blacksmith.sh/org/codesmith/repo/pr/75\">", "deny"),
+    ("testo <a href=\"https://app.blacksmith.sh/org/codesmith/repo/pr/75?autoLogin=true\">", "deny"),
+    ("Prove su Blacksmith: https://app.blacksmith.sh/runs/123", "passa"),
+]
+for corpo, atteso in CORPI:
+    avuto = decide("mcp__github__merge_pull_request", BUONA, corpo)
+    if avuto != atteso:
+        errori += 1
+        print(f"✗ unione con corpo «{corpo[:50]}»: atteso {atteso}, avuto {avuto}")
+# C413 (Mario «si» 02/11, E257): PR non in bozza o segnata pronta con «[skip ci]» in cima al ramo di partenza = nessun giro.
+REPO = {"owner": "Kur0ChanX", "repo": "jona-ordini"}
+SALTA, VERO = "v141 online: nastro [skip ci]", "v142: Porter in fila, chi c'è al desk"
+PR = [
+    ("mcp__github__create_pull_request", {**REPO, "title": "v142", "head": "versione-v142", "base": "main", "draft": False}, SALTA, "", "deny"),
+    ("mcp__github__create_pull_request", {**REPO, "title": "v142", "head": "versione-v142", "base": "main"}, SALTA, "", "deny"),
+    ("mcp__github__create_pull_request", {**REPO, "title": "v142", "head": "versione-v142", "base": "main", "draft": True}, SALTA, "", "passa"),
+    ("mcp__github__create_pull_request", {**REPO, "title": "v142", "head": "versione-v142", "base": "main", "draft": False}, VERO, "", "passa"),
+    ("mcp__github__update_pull_request", {**REPO, "pullNumber": 136, "draft": False}, SALTA, "versione-v142", "deny"),
+    ("mcp__github__update_pull_request", {**REPO, "pullNumber": 136, "draft": False}, VERO, "versione-v142", "passa"),
+    ("mcp__github__update_pull_request", {**REPO, "pullNumber": 136, "title": "v142 · Porter"}, SALTA, "versione-v142", "passa"),
+    ("mcp__github__update_pull_request", {**REPO, "pullNumber": 136, "draft": True}, SALTA, "versione-v142", "passa"),
+]
+for nome, ingresso, messaggio, ramo, atteso in PR:
+    avuto = decide(nome, ingresso, MESSAGGIO_HEAD_PROVA=messaggio, RAMO_PR_PROVA=ramo)
+    if avuto != atteso:
+        errori += 1
+        print(f"✗ {nome} {ingresso} con «{messaggio}»: atteso {atteso}, avuto {avuto}")
+# E310: prove + push nello stesso comando; E286: script + commit con un merge a metà (MERGE_HEAD).
+A_META = [
+    ("npm run prove > f.log 2>&1; git push -u origin x", "0", "deny"), ("npx vitest run && git push", "0", "deny"),
+    ("npm run build && git push -u origin x", "0", "passa"), ("git push -u origin x && npm run prove > f 2>&1", "0", "deny"),
+    ("python3 -I tools/risolvi.py && git add -A && git commit -qm x", "1", "deny"),
+    ("node tools/sistema.mjs; git commit -am x", "1", "deny"),
+    ("python3 -I tools/risolvi.py && git add -A && git commit -qm x", "0", "passa"),
+    ("git add -A && git commit -qm 'merge finito'", "1", "passa"), ("python3 -I tools/risolvi.py", "1", "passa"),
+]
+for comando, meta, atteso in A_META:
+    avuto = decide("Bash", {"command": comando}, MERGE_A_META_PROVA=meta)
+    if avuto != atteso:
+        errori += 1
+        print(f"✗ «{comando}» (merge a metà {meta}): atteso {atteso}, avuto {avuto}")
+# Il matcher della guardia in .claude/settings.json deve mandarle TUTTI gli strumenti che controlla (C469 B7: C413 era spento).
+impostazioni = json.load(open(os.path.join(QUI, ".claude", "settings.json"), encoding="utf-8"))
+matcher = "|".join(h.get("matcher", "") for h in impostazioni["hooks"]["PreToolUse"]
+                   if any("guardia.py" in x.get("command", "") for x in h["hooks"]))
+STRUMENTI = ["Bash", "WebFetch", "mcp__claude-code-remote__add_repo", "mcp__claude-code-remote__list_sessions",
+             "mcp__github__merge_pull_request", "mcp__github__push_files", "mcp__github__create_or_update_file",
+             "mcp__github__create_pull_request", "mcp__github__update_pull_request"]
+for s in STRUMENTI:
+    if s not in matcher.split("|"):
+        errori += 1
+        print(f"✗ {s} non arriva alla guardia (matcher di .claude/settings.json)")
+totale = len(BASH) + len(ALTRI) + len(CORPI) + len(PR) + len(A_META) + len(STRUMENTI)
 print(f"{totale - errori}/{totale} prove della guardia verdi" if errori == 0 else f"{errori} prove ROSSE su {totale}")
 sys.exit(1 if errori else 0)

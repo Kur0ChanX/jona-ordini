@@ -6,7 +6,8 @@
 import glob, os, re, sys
 
 RADICE = os.environ.get("CLAUDE_PROJECT_DIR") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-POSTI = ["CLAUDE.md", "docs/kit-progetto/REGOLE.md", "docs/PREFERENZE-CLAUDE.md", "docs/ERRORI.md",
+POSTI = ["CLAUDE.md", "docs/kit-progetto/REGOLE.md", "docs/PREFERENZE-CLAUDE.md", "docs/kit-progetto/PREFERENZE-CHAT.txt",  # C511 p.22
+         "docs/ERRORI.md",
          ".claude/settings.json", ".claude/skills/*/*.md", ".claude/rules/*.md", ".claude/hooks/*.py", ".claude/agents/*.md"]
 TETTO = 40
 INTORNO = 70

@@ -15,7 +15,7 @@ Mario ha più account Claude; il lavoro vive su GitHub, mai solo nel contenitore
 ## Passi
 1. Consegne complete come dice la skill `consegne` (consegne, controlli, `docs/DA-FARE.md`), fino al push confermato: `git rev-parse HEAD` = `origin/<ramo>`. Anche un solo controllo falso: mi fermo e scrivo a Mario.
 2. La sessione nuova NON la apro io (eccezione alla catena di `create_session`): nascerebbe nell'account senza token.
-3. Titolo di questa sessione: `🔴 <icona> ✓ CHIUSA · #<NN> · …` (icona nel `CLAUDE.md`).
+3. Titolo di questa sessione col segno «chiusa» della sua catena: `🔴 <icona> Principale <NN> · <cosa ha fatto>` (parallela: il segno «chiusa» e il nome della sua catena, es. `🟥 <icona> Dov'è <NN> · …`; regola «Titoli», skill `consegne` fase 6). Le righe di «## 0. Aspetta Mario» in `docs/DA-FARE.md` restano.
 4. A Mario il prompt di 3 righe da incollare nell'altro account, in UN solo riquadro, con repo esatto e ramo presi dal `CLAUDE.md`:
    ```
    [AVVIO] Sessione #<NN+1> di <progetto> (repo <Owner/Repo>, ramo <ramo>): git fetch origin <ramo> && git merge --ff-only origin/<ramo> (se «HEAD detached», prima git checkout <ramo>).
@@ -23,11 +23,11 @@ Mario ha più account Claude; il lavoro vive su GitHub, mai solo nel contenitore
    I numeri delle sessioni continuano da qui.
    ```
    Lo stesso prompt, col titolo nuovo, anche in `docs/PROSSIMA-SESSIONE.md` (skill `consegne`, fase 5), così Mario lo copia da GitHub.
-5. Una riga a Mario: i suoi 3 passi (Preferenze nel profilo, Parallel nella chat, aprire la sessione) sono in `docs/kit-progetto/CAMBIO-ACCOUNT.md`.
+5. Una riga a Mario: i suoi 3 passi (Preferenze nel profilo, Parallel nella chat, aprire la sessione) sono in `docs/kit-progetto/CAMBIO-ACCOUNT.md`. Quale account per quale servizio: rubrica `docs/ACCOUNT.md` (mai password); passi a mano coi pulsanti esatti: la `docs/GUIDA-<servizio>.md` che c'è, sennò `docs/GUIDE-GIUSTE.md` (skill `domande`).
 - Un solo account attivo per progetto alla volta; tutti i progetti passano insieme. I numeri delle sessioni continuano.
 
 ## Salvataggio automatico
-- Il salvataggio continuo lo fa l'hook `.claude/hooks/scorta.py` (zero token): l'ultimo messaggio di Mario in `docs/ULTIMO-MESSAGGIO.md` (chat parallela: `docs/ULTIMO-MESSAGGIO-PARALLELA.md`) e il lavoro nel ramo `scorta-<ruolo>/<ramo>`, una scorta per chat. Non fa partire le prove (prova `python3 -I tools/test-scorta.py`).
+- Il salvataggio continuo lo fa l'hook `.claude/hooks/scorta.py` (zero token): l'ultimo messaggio di Mario in `docs/ULTIMO-MESSAGGIO.md` e gli ultimi 40 in `docs/MESSAGGI-MARIO.md` (chat parallela: `docs/ULTIMO-MESSAGGIO-PARALLELA.md` e `docs/MESSAGGI-MARIO-PARALLELA.md`, C291) e il lavoro nel ramo `scorta-<ruolo>-<AAAAMMGG>-<id sessione>/<ramo>`, una scorta per sessione (C352). Non fa partire le prove (prova `python3 -I tools/test-scorta.py`).
 - Il lavoro finito è già su GitHub (push dopo ogni pezzo, `REGOLE.md`): la scorta copre solo quello a metà. Consegne complete una volta sola, alla soglia.
 
 ## Token finiti di colpo
