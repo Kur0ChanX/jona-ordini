@@ -1434,7 +1434,7 @@ function FirebaseStore(key){
       if(!d.exists){st.wait='no';st.req=null;ping();return}
       const x=d.data();if(x.ok===false){st.wait='attesa';st.req=x.req||null;st.reqOk=!!x.req&&!d.metadata.hasPendingWrites&&!d.metadata.fromCache;ping();return}
       if(d.metadata.hasPendingWrites||d.metadata.fromCache)return;
-      un();st.wait='';st.req=null;ping();res()},e=>{clearTimeout(to);rej(e)})});
+      un();if(x.sid)ls('jona_rie',x.sid);st.wait='';st.req=null;ping();res()},e=>{clearTimeout(to);rej(e)})});
   // al ritorno in primo piano il collegamento vecchio può essere morto senza che Firestore lo sappia: lo rifà subito
   let hidAt=0;
   document.addEventListener('visibilitychange',()=>{if(document.hidden){hidAt=Date.now();return}
@@ -1738,7 +1738,7 @@ function view(){
   if(!S.db||!allLoaded())return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><p class="wall-sub">Un momento…</p>${BY}</div>`;
   if(DEMO&&!meU())return screenDemo();
   if(!Object.keys(D().staff).length)return screenSetup();
-  const me=meU();
+  rieCheck();const me=meU();
   const w=!me&&ls('jona_wait');const wu=w&&D().staff[w.id];
   if(wu&&wu.stato==='in_attesa')return screenWait(wu);
   if(!me||me.stato!=='attivo')return screenLogin();
@@ -1800,11 +1800,12 @@ function screenPhone(s){
   <h1>Ciao ${esc(r.nome)}!</h1>${s.reqOk?`<p class="muted">Richiesta inviata. Maurizio o lo sviluppatore devono <b>approvare questo telefono</b>.</p><p class="muted">Appena lo fanno, l'app si apre da sola: puoi lasciarla aperta o tornare più tardi.</p>`
   :lento?`<p class="ph-warn"><b>La richiesta non è ancora arrivata.</b> La connessione di questo telefono non passa. Prova a passare dal Wi-Fi ai dati mobili (o al contrario), poi tocca «Riprova».</p><div style="margin-top:14px"><button type="button" class="btn primary block big" data-a="phRetry">Riprova</button></div>`
   :`<p class="muted">Sto inviando la richiesta…</p>`}
-  ${r.nuovo?`<p class="muted small">Nuovo profilo · nome utente <b>${esc(r.username)}</b></p>`:`<p class="muted small">Hai già un profilo: dopo l'approvazione entri con il tuo nome utente e la tua password.</p>`}
+  ${r.nuovo?`<p class="muted small">Nuovo profilo · nome utente <b>${esc(r.username)}</b></p>`:`<p class="muted small">Hai già un profilo: dopo l'approvazione entri da solo nel tuo profilo (se te lo chiede, con nome utente e password).</p>`}
   <div style="margin-top:18px"><button type="button" class="btn ghost block" data-a="${r.nuovo?'phNew':'phOld'}">Modifica la richiesta</button></div></div></div>`;
   return`<div class="wall linen">${logo}<div class="wall-card"><h1>Benvenuto!</h1>
-  <p class="muted">Prima di entrare, Maurizio o lo sviluppatore devono approvare questo telefono. Dicci chi sei:</p>
-  <div style="margin-top:18px;display:grid;gap:12px"><button type="button" class="btn primary block big" data-a="phNew">Sono nuovo: creo il mio profilo</button><button type="button" class="btn ghost block big" data-a="phOld">Ho già un profilo</button></div></div></div>`;
+  <p class="muted">Prima di entrare, lo chef o un responsabile devono approvare questo telefono. Dicci chi sei:</p>
+  <div style="margin-top:18px;display:grid;gap:12px"><button type="button" class="btn primary block big" data-a="phOld">Ho già un profilo</button><button type="button" class="btn ghost block big" data-a="phNew">Sono nuovo: creo il mio profilo</button></div>
+  <p class="muted small" style="margin-top:14px">Hai già usato Jona? Tocca <b>Ho già un profilo</b>: ritrovi tutto, anche senza password.</p></div></div>`;
 }
 /* richiesta del telefono non confermata dal server entro PHS_MS: avviso e «Riprova» (ricarica con il long polling, la scrittura resta in coda) */
 const PHS={t:0},PHS_MS=12000;
@@ -1828,27 +1829,60 @@ async function phSend(nuovo){
 /* telefoni in attesa: li vedono e li approvano i gestori (Maurizio e Mario) */
 const PH={on:false,list:[],retry:0,seen:null};
 function phWatch(){
-  const me=realU();if(PH.on||now()<PH.retry||!S.db||S.db.kind!=='firebase'||!S.db.status().ready||!me||!isMgr(me))return;PH.on=true;
+  const me=realU();if(PH.on||now()<PH.retry||!S.db||S.db.kind!=='firebase'||!S.db.status().ready||!me||!canUnlock(me))return;PH.on=true;
   fbInit().fs.collection('membri').where('ok','==',false).onSnapshot(q=>{PH.list=q.docs.map(d=>Object.assign({},d.data(),{id:d.id})).sort((a,b)=>(a.creato||0)-(b.creato||0));
-    const ids=new Set(PH.list.map(x=>x.id));if(PH.seen)for(const x of PH.list)if(x.req&&!PH.seen.has(x.id+(x.req.creato||'')))toast(x.req.nome+' chiede di entrare: approvalo nella scheda Staff.');
+    const ids=new Set(PH.list.map(x=>x.id));if(PH.seen)for(const x of PH.list)if(x.req&&!PH.seen.has(x.id+(x.req.creato||'')))toast(x.req.nome+' chiede di entrare: '+(isMgr(me)?'approvalo nella scheda Staff.':'tocca «Approva» in alto.'));
     PH.seen=new Set(PH.list.filter(x=>x.req).map(x=>x.id+(x.req.creato||'')));void ids;schedule()},()=>{PH.on=false;PH.retry=now()+30000;PH.list=[];setTimeout(schedule,30100)});
 }
 const phPend=()=>PH.list.filter(x=>x.req);
 const phDev=ua=>/iPhone|iPad/.test(ua||'')?'iPhone':/Android/.test(ua||'')?'Android':'telefono';
 function phStaff(r,st,da){let un=r.username||normUser(r.nome);const used=new Set(Object.values(st).filter(u=>u.id!==r.sid).map(u=>u.username));const b=un;let n=2;while(used.has(un))un=b+n++;
   return{nome:r.nome,cognome:r.cognome||'',username:un,ruolo:'staff',reparto:r.reparto||'altro',mansione:r.mansione||'',foto:r.foto||'',stato:'attivo',pass:r.pass,creato:now(),creatoDa:da}}
-async function phApprove(id){
+async function phApprove(id,sid){
   const x=PH.list.find(m=>m.id===id);if(!x||!x.req)return;const r=x.req,me=realU();let msg='Telefono approvato';
-  if(r.nuovo){const st=D().staff,nu=phStaff(r,st,me?me.id:''),un=nu.username;
+  const su=sid&&D().staff[sid];if(sid&&(!su||su.stato!=='attivo'))return toast('Quel profilo non è attivo: riattivalo prima.','warn');
+  if(su)msg=su.nome+' è di nuovo dentro, nel suo profilo';
+  else if(r.nuovo){const st=D().staff,nu=phStaff(r,st,me?me.id:''),un=nu.username;
     if(!st[r.sid])await put('staff',r.sid,nu);
     msg=r.nome+' può entrare'+(un!==r.username?' con il nome utente '+un:'')}
-  try{await fbTmo(fbInit().fs.doc('membri/'+id).update({ok:true,req:firebase.firestore.FieldValue.delete(),approvato:now(),da:me?me.id:''}),15000);toast(msg)}
+  try{await fbTmo(fbInit().fs.doc('membri/'+id).update(Object.assign({ok:true,req:firebase.firestore.FieldValue.delete(),approvato:now(),da:me?me.id:''},su?{sid}:{})),15000);closeSheet();toast(msg)}
   catch(e){toast(e&&e.code==='permission-denied'?'Il database non lo permette ancora: aggiorna le regole (docs/FIREBASE.md).':'Approvazione non riuscita: controlla la connessione e riprova.','err')}
 }
 async function phReject(id){
   const x=PH.list.find(m=>m.id===id);if(!x)return;if(!await ask('Rifiutare questo telefono?',(x.req?x.req.nome+' non':'Il telefono non')+' potrà vedere i dati del ristorante.','Rifiuta',true))return;
   try{await fbTmo(fbInit().fs.doc('membri/'+id).delete(),15000);toast('Telefono rifiutato')}catch(e){toast('Rifiuto non ancora arrivato: controlla la connessione e riprova.','err')}
 }
+/* v121 (D58 pezzo 2a) ricollega: chi può sbloccare (gestori, F&B, chi ha l'interruttore «sblocca») approva un telefono svuotato
+   dicendo di chi è: membri/<uid>.sid → il telefono entra da solo in quel profilo, senza password e senza profili doppi */
+const canUnlock=u=>!!u&&(isMgr(u)||u.reparto==='fb'||!!u.sblocca);
+const unlockers=st=>Object.values(st||D().staff).filter(u=>u.stato==='attivo'&&canUnlock(u));
+/* «sempre almeno 2»: rifiuta un cambio che porta sotto 2 le persone che possono ricollegare i telefoni (patch null = tolto) */
+function ulKeep(ch){const st=Object.assign({},D().staff);for(const[id,p]of Object.entries(ch)){if(p===null)delete st[id];else st[id]=Object.assign({},st[id],p)}
+  const a=unlockers().length,b=unlockers(st).length;if(b<2&&b<a){toast('Resterebbe '+(b?'una sola persona':'nessuno')+' che può ricollegare i telefoni: prima scegline un\'altra (profilo → «Può ricollegare i telefoni»).','warn');return false}return true}
+function rieCheck(){const sid=ls('jona_rie');if(!sid)return;const st=D().staff;if(!Object.keys(st).length)return;ls('jona_rie',null);
+  const u=st[sid];if(!u||u.stato!=='attivo'||S.me===sid)return;S.me=sid;ls('jona_me',sid);S.cart=ls('jona_cart_'+sid)||[];S.tab=null;
+  setTimeout(()=>{toast('Bentornato '+u.nome+': sei nel tuo profilo di prima');pushSync()},50)}
+/* profili che somigliano alla richiesta (stesso nome e cognome o stesso nome utente) */
+const phKey=r=>normUser([r.nome,r.cognome].filter(Boolean).join(' '));
+function phSimili(r){const k=phKey(r),n=normUser(r.nome);const act=Object.values(D().staff).filter(u=>u.stato==='attivo'||u.stato==='disattivato');
+  const a=act.filter(u=>u.id===r.sid&&!r.nuovo||phKey(u)===k||u.username===k||(r.username&&u.username===r.username)||!u.cognome&&normUser(u.nome)===n);
+  return a.length?a:r.cognome?[]:act.filter(u=>normUser(u.nome)===n)}
+/* «Approva»: se la richiesta somiglia a un profilo (o dice «ho già un profilo») chiede di chi è il telefono */
+function phOk(id){const x=PH.list.find(m=>m.id===id);if(!x||!x.req)return;const r=x.req,sim=phSimili(r);
+  if(r.nuovo&&!sim.length)return phApprove(id);
+  const act=Object.values(D().staff).filter(u=>u.stato==='attivo').sort((a,b)=>fullName(a).localeCompare(fullName(b)));
+  S.phSel=sim.length===1?sim[0].id:'';
+  openSheet({render:()=>{const sel=D().staff[S.phSel];return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${r.nuovo?'Profilo doppio?':'Di chi è questo telefono?'}<div class="sh-s">${esc(fullName(r))} · ${phDev(x.ua)}</div></div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${r.nuovo?`<p class="ph-warn" style="margin:0"><b>Sembra ${esc(fullName(sim[0]))}, che ha già un profilo.</b> Se è lui con il telefono svuotato, ricollegalo: ritrova tutto e non nasce un profilo doppio.</p>
+  <div class="btns col" style="margin-top:16px"><button type="button" class="btn primary block big" data-a="phRie" data-v="${id}" data-u="${sim[0].id}">È lui: ricollega</button><button type="button" class="btn ghost block" data-a="phPlain" data-v="${id}">È una persona nuova</button></div>`
+  :`<p class="muted" style="margin:0">Scegli il suo profilo: entra da solo, senza password, con tutto quello che aveva.</p>
+  <label class="lbl" for="ph-sel">È:</label><select class="inp" id="ph-sel" data-ch="phSel"><option value="">Scegli il profilo…</option>${act.map(u=>`<option value="${u.id}"${u.id===S.phSel?' selected':''}>${esc(fullName(u))} (@${esc(u.username||'')})</option>`).join('')}</select>
+  <div class="btns col" style="margin-top:16px"><button type="button" class="btn primary block big" data-a="phRie" data-v="${id}" data-u="${S.phSel}"${sel?'':' disabled'}>${sel?'Ricollega a '+esc(sel.nome):'Ricollega'}</button><button type="button" class="btn ghost block" data-a="phPlain" data-v="${id}">Non lo so: approva e basta</button></div>
+  <p class="muted small">Con «Non lo so» entra con il suo nome utente e la sua password.</p>`}`}})}
+/* gli sblocchi per chi non ha la scheda Staff (es. F&B): telefoni in attesa dal menù del profilo */
+function phSheet(){openSheet({live:()=>true,render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Ricollega un telefono</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  ${phPend().length?`<div class="panel">${phPend().map(x=>`<div class="row">${avatar(x.req,44)}<div class="row-i"><div class="row-t">${esc(fullName(x.req))}</div><div class="row-m">${x.req.nuovo?'nuovo profilo':'ha già un profilo'} · ${phDev(x.ua)}</div></div><button type="button" class="icon-btn danger" data-a="phNo" data-v="${x.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="phOk" data-v="${x.id}">Approva</button></div>`).join('')}</div>`
+  :'<p class="muted">Nessun telefono in attesa. Chi ha il telefono svuotato apre l\'app dal link o dal QR e tocca «Ho già un profilo»: la richiesta compare qui.</p>'}`})}
 /* v120 (D58) memoria protetta: a ogni apertura chiede al browser di non svuotare i dati dell'app (chiave del ristorante,
    profilo aperto) quando manca spazio. Chrome e Safari decidono da soli senza chiedere; Firefox mostra un riquadro: lì al massimo
    ogni 30 giorni. Esito in S.mp (true/false, null = non disponibile) e in membri/<uid> {mp, visto, sid}, al massimo ogni 20 ore */
@@ -3562,6 +3596,7 @@ function vStaff(me){
   const pst=u=>pv&&u.stato==='attivo'?(hasP(u.id)?' · <span class="pst on">🟢 avvisi attivi</span>':' · <span class="pst off">🔴 niente avvisi</span>'):'';
   const row=u=>`<button type="button" class="row link ${u.stato==='disattivato'?'dim':''}" data-a="sedit" data-u="${u.id}">${avatar(u,44)}<div class="row-i"><div class="row-t">${esc(fullName(u))}${isMgr(u)?` <span class="tag gm">${RUOLI[u.ruolo].toLowerCase()}</span>`:''}</div><div class="row-m">@${esc(u.username||'')}${!isMgr(u)&&u.mansione?', '+esc(u.mansione):''}${u.stato==='disattivato'?', disattivato':''}${u.stato==='invitato'?', invito non ancora usato':''}${pst(u)}</div></div>${ic('chev')}</button>`;
   return`<div class="vhead"><div><h1 class="vt">Staff</h1><p class="vsub">${act.filter(u=>u.stato==='attivo').length} profili attivi${noP?` · <span class="pst off">🔴 ${noP} senza avvisi</span>`:''}</p></div><button type="button" class="btn primary" data-a="addProfile">${ic('plus')} Aggiungi</button></div>${sw}
+  ${unlockers().length<2?`<p class="ph-warn">${unlockers().length?'Solo una persona può':'Nessuno può'} ricollegare i telefoni di chi resta fuori. Scegline un'altra: apri il suo profilo → «Può ricollegare i telefoni».</p>`:''}
   ${phPend().length?`<h2 class="sec">Telefoni da approvare<span>${phPend().length}</span></h2><div class="panel">${phPend().map(x=>`<div class="row">${avatar(x.req,48)}<div class="row-i"><div class="row-t">${esc(fullName(x.req))}</div><div class="row-m">${x.req.nuovo?esc(['nuovo profilo',x.req.mansione,REPARTI[x.req.reparto]].filter(Boolean).join(', ')):'ha già un profilo'} · ${phDev(x.ua)}</div></div><button type="button" class="icon-btn danger" data-a="phNo" data-v="${x.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="phOk" data-v="${x.id}">Approva</button></div>`).join('')}</div>`:''}
   ${pend.length?`<h2 class="sec">Da approvare<span>${pend.length}</span></h2><div class="panel">${pend.map(u=>`<div class="row">${avatar(u,48)}<div class="row-i"><div class="row-t">${esc(fullName(u))}</div><div class="row-m">${esc([u.mansione,REPARTI[u.reparto]].filter(Boolean).join(', '))}</div></div><button type="button" class="icon-btn danger" data-a="sno" data-u="${u.id}" aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" data-a="sok" data-u="${u.id}">Approva</button></div>`).join('')}</div>`:''}
   ${mg.length?`<h2 class="sec">Gestione<span>${mg.length}</span></h2><div class="panel">${mg.map(row).join('')}</div>`:''}
@@ -3575,13 +3610,18 @@ function profileSheet(id){
   openSheet({render:()=>{const u=D().staff[id]||{};return`<div class="grab"></div><div class="sh-h"><div class="sh-t">${self?'Il tuo profilo':esc(fullName(u))}</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
   ${profileForm('pf',{roles:mgr&&!self?['staff','gm','dev']:null,pwLabel:'Nuova password (facoltativa)',noRep:isMgr(S.form),contr:mgr})}
   ${mgr?mpRow(id):''}
+  ${mgr&&!isMgr(u)?sblRow(u):''}
   ${mgr&&!self&&u.stato==='invitato'&&S.db&&S.db.kind==='firebase'?`<div class="panel" style="margin-top:18px;padding:14px 16px"><b>Invito non ancora usato.</b> Se il link si è perso, mandane uno nuovo: quello vecchio smette di funzionare.<div style="margin-top:10px"><button type="button" class="btn primary sm" data-a="invMono" data-u="${id}">Nuovo link d'invito</button></div></div>`:''}
   <div class="btns" style="margin-top:22px">${mgr&&!self?`<button type="button" class="btn ghost danger" data-a="sdel" data-u="${id}">${ic('trash')} Elimina</button><button type="button" class="btn ghost" data-a="stoggle" data-u="${id}">${u.stato==='disattivato'?'Riattiva':'Disattiva'}</button>`:''}<button type="button" class="btn primary" data-a="psaveProfile" data-u="${id}">${ic('check')} Salva</button></div>`}});
 }
+/* interruttore «Può ricollegare i telefoni» (solo gestori; l'F&B lo può sempre) */
+function sblRow(u){const fb=u.reparto==='fb';return`<div class="setrow" style="margin-top:14px"><div><b>Può ricollegare i telefoni</b><span>${fb?'Sempre, come F&amp;B':'Approva i telefoni svuotati e li rimette nel profilo giusto'}</span></div>${fb?'':`<div class="seg">${[[1,'Sì'],[0,'No']].map(([k,l])=>`<button type="button" aria-pressed="${!!u.sblocca===!!k}" data-a="sblSet" data-u="${u.id}" data-v="${k}">${l}</button>`).join('')}</div>`}</div>`}
+async function sblSet(id,k){const u=D().staff[id];if(!u)return;const v=k==='1';if(v===!!u.sblocca)return;if(!v&&!ulKeep({[id]:{sblocca:false}}))return;await upd('staff',id,{sblocca:v});refreshSheet();toast(v?u.nome+' può ricollegare i telefoni':u.nome+' non ricollega più i telefoni')}
 async function saveProfile(id){
   const e=checkForm(false,id);if(e)return toast(e,'warn');const f=S.form;const u=D().staff[id];
   const d={nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||''};
   if(isMgr(meU())&&f.ruolo&&f.ruolo!==u.ruolo){if(u.ruolo==='gm'&&Object.values(D().staff).filter(x=>x.ruolo==='gm'&&x.stato==='attivo').length<2)return toast('Serve almeno un amministratore attivo.','warn');d.ruolo=f.ruolo}
+  if(!ulKeep({[id]:{ruolo:d.ruolo||u.ruolo,reparto:d.reparto}}))return;
   if(f.pw)d.pass=await sha(id+':'+f.pw);
   if(f.pw&&D().staff[id]&&D().staff[id].stato==='invitato'){d.stato='attivo';S.db.kind==='firebase'&&S.db.phone.invDel(id).catch(()=>{})}
   if(isGM(meU())&&withContr(f))d.contratto=orContr(f);
@@ -4745,6 +4785,7 @@ function meMenu(){
   openSheet({render:()=>`<div class="grab"></div><div class="pin-head">${avatar(me,72)}<div class="pin-name">${esc(fullName(me))}</div><div class="muted">${isMgr(me)?RUOLI[me.ruolo]:esc([me.mansione,REPARTI[me.reparto]].filter(Boolean).join(', '))}</div></div>
   <div class="imp-opts" style="margin-top:20px"><button type="button" class="imp-opt" data-a="myProfile">${ic('user')}<div><b>Modifica profilo</b><span>Foto, nome, nome utente e password</span></div></button>
   ${S.db&&S.db.kind==='firebase'?(pushActive()?`<div class="imp-opt">${ic('bell')}<div><b>Notifiche sul telefono</b><span>Attive: ti avvisano anche con l'app chiusa</span><div class="btns" style="margin-top:8px"><button type="button" class="btn ghost sm" data-a="pushTest">Prova</button><button type="button" class="btn ghost sm" data-a="pushOff">Spegni</button><button type="button" class="btn ghost sm" data-a="pushHelp">Non arrivano?</button></div></div></div>`:`<button type="button" class="imp-opt" data-a="pushOn">${ic('bell')}<div><b>Attiva le notifiche</b><span>Ti avvisano anche con l'app chiusa</span></div></button><button type="button" class="ph-link" data-a="pushHelp">Problemi con le notifiche? Guida</button>`):''}
+  ${!isMgr(me)&&canUnlock(me)&&S.db&&S.db.kind==='firebase'?`<button type="button" class="imp-opt" data-a="phSheet">${ic('user')}<div><b>Ricollega un telefono</b><span>${phPend().length?phPend().length+' in attesa':'Telefoni di chi è rimasto fuori'}</span></div></button>`:''}
   ${isMgr(me)?`<button type="button" class="imp-opt" data-a="settings">${ic('gear')}<div><b>Impostazioni</b><span>Locale, consegna, backup dei dati</span></div></button>`:''}
   <button type="button" class="imp-opt" data-a="logout">${ic('logout')}<div><b>Esci</b><span>Torna alla schermata di accesso</span></div></button></div>`});
 }
@@ -5479,9 +5520,9 @@ function errSheet(){const nm=u=>{const x=D().staff[u];return x?fullName(x):(u||'
   ${ERR.list.length?`<div class="panel">${ERR.list.map(e=>`<div class="row"><div class="row-i"><div class="row-t">${esc(e.m)}${e.n>1?` <span class="tag">×${e.n}</span>`:''}</div><div class="row-m">${esc(new Date(e.t).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))} · ${esc(nm(e.u))} · v${esc(e.v||'?')}${e.p?' · '+esc(e.p):''}</div>${e.s?`<pre class="err-s">${esc(e.s)}</pre>`:''}</div></div>`).join('')}</div>`:'<p class="muted">Nessun errore registrato.</p>'}
   <div class="btns col" style="margin-top:14px"><button type="button" class="btn primary block" data-a="errSeen">Segna come visti</button></div>`})}
 /* richieste da approvare (telefoni e profili) in cima a ogni scheda dei gestori, con Approva e Rifiuta */
-function phStrip(me){if(!isMgr(me)||!realU()||S.wallMode)return'';
+function phStrip(me){if(!canUnlock(realU())||!realU()||S.wallMode)return'';const mg=isMgr(realU());
   const l=[...phPend().map(x=>({u:x.req,m:(x.req.nuovo?'nuovo profilo':'ha già un profilo')+' · '+phDev(x.ua),no:`data-a="phNo" data-v="${x.id}"`,ok:`data-a="phOk" data-v="${x.id}"`})),
-    ...Object.values(D().staff).filter(u=>u.stato==='in_attesa').map(u=>({u,m:'nuovo profilo',no:`data-a="sno" data-u="${u.id}"`,ok:`data-a="sok" data-u="${u.id}"`}))];
+    ...Object.values(D().staff).filter(u=>mg&&u.stato==='in_attesa').map(u=>({u,m:'nuovo profilo',no:`data-a="sno" data-u="${u.id}"`,ok:`data-a="sok" data-u="${u.id}"`}))];
   if(!l.length)return'';
   return`<div class="ph-strip" role="region" aria-label="Richieste da approvare"><div class="ph-strip-h">${ic('bell')}<b>${l.length===1?'1 richiesta da approvare':l.length+' richieste da approvare'}</b></div>${l.map(x=>`<div class="row">${avatar(x.u,44)}<div class="row-i"><div class="row-t">${esc(fullName(x.u))} chiede di entrare</div><div class="row-m">${esc(x.m)}</div></div><button type="button" class="icon-btn danger" ${x.no} aria-label="Rifiuta">${ic('x')}</button><button type="button" class="btn primary sm" ${x.ok}>Approva</button></div>`).join('')}</div>`}
 /* eventi dei prossimi 7 giorni scritti da altri per me e non ancora visti (o cambiati dopo «Ok, visto») */
@@ -5753,7 +5794,7 @@ const A={
   waitLeave:()=>{ls('jona_wait',null);render()},
   phNew:()=>phoneSheet(true),phOld:()=>phoneSheet(false),phSend:d=>phSend(d.v==='1'),
   phAgain:()=>{ls('jona_wait',null);S.db.phone.again().catch(()=>toast('Non riesco: controlla la connessione e riprova.','err'))},
-  phOk:d=>phApprove(d.v),itGo:()=>itGo(),itRetry:()=>{IT.t='';schedule()},itSkip:()=>{ls('jona_itk',null);IT.t='';schedule()},
+  phOk:d=>phOk(d.v),phRie:d=>phApprove(d.v,d.u),phPlain:d=>phApprove(d.v),phSheet:()=>phSheet(),sblSet:d=>sblSet(d.u,d.v),itGo:()=>itGo(),itRetry:()=>{IT.t='';schedule()},itSkip:()=>{ls('jona_itk',null);IT.t='';schedule()},
   invMono:d=>invMonoSend(d.u),invMonoGo:d=>invMonoShare(d.v),ptSet:d=>ptSet(+d.v),phNo:d=>phReject(d.v),phRetry:()=>{ls('jona_fb_lp',1);location.reload()},
 errOpen:()=>errSheet(),errSeen:()=>{ls('jona_err_vis',now());closeSheet();schedule()},
 syncRetry:()=>{if(!S.db||!S.db.netRetry)return;S.db.netRetry().catch(()=>{});if(!ls('jona_fb_lp')){ls('jona_fb_lp',1);updOn()}toast('Riprovo a inviare. Se resta così, chiudi e riapri l\'app: le modifiche non si perdono.','warn')},
@@ -5868,9 +5909,9 @@ rbest:d=>rswapTo(d.r,d.i,d.p),
   sno:async d=>{const u=D().staff[d.u];if(!await ask('Rifiutare il profilo di '+u.nome+'?','Il profilo viene eliminato.','Rifiuta',true))return;await del('staff',d.u)},
   sedit:d=>profileSheet(d.u),
   psaveProfile:d=>saveProfile(d.u),
-  stoggle:async d=>{const u=D().staff[d.u];await upd('staff',d.u,{stato:u.stato==='disattivato'?'attivo':'disattivato'});closeSheet();toast(u.stato==='disattivato'?'Profilo riattivato':'Profilo disattivato')},
-  sdel:async d=>{const u=D().staff[d.u];if(!await ask('Eliminare il profilo di '+u.nome+'?','Le sue richieste restano nello storico.','Elimina',true))return;closeSheet();if(u.stato==='invitato'&&S.db.kind==='firebase')await S.db.phone.invDel(d.u).catch(()=>{});await del('staff',d.u);toast('Profilo eliminato')},
-  endSeason:async()=>{const us=Object.values(D().staff).filter(u=>u.ruolo==='staff'&&u.stato==='attivo');if(!await ask('Disattivare '+us.length+' profili dello staff?','Restano salvati con il loro storico. A inizio stagione li riattivi uno per uno.','Disattiva',true))return;await runPool(us.map(u=>()=>upd('staff',u.id,{stato:'disattivato'})),4);toast('Staff disattivato per fine stagione')},
+  stoggle:async d=>{const u=D().staff[d.u];if(u.stato!=='disattivato'&&!ulKeep({[d.u]:{stato:'disattivato'}}))return;await upd('staff',d.u,{stato:u.stato==='disattivato'?'attivo':'disattivato'});closeSheet();toast(u.stato==='disattivato'?'Profilo riattivato':'Profilo disattivato')},
+  sdel:async d=>{const u=D().staff[d.u];if(!ulKeep({[d.u]:null}))return;if(!await ask('Eliminare il profilo di '+u.nome+'?','Le sue richieste restano nello storico.','Elimina',true))return;closeSheet();if(u.stato==='invitato'&&S.db.kind==='firebase')await S.db.phone.invDel(d.u).catch(()=>{});await del('staff',d.u);toast('Profilo eliminato')},
+  endSeason:async()=>{const us=Object.values(D().staff).filter(u=>u.ruolo==='staff'&&u.stato==='attivo');if(!ulKeep(Object.fromEntries(us.map(u=>[u.id,{stato:'disattivato'}]))))return;if(!await ask('Disattivare '+us.length+' profili dello staff?','Restano salvati con il loro storico. A inizio stagione li riattivi uno per uno.','Disattiva',true))return;await runPool(us.map(u=>()=>upd('staff',u.id,{stato:'disattivato'})),4);toast('Staff disattivato per fine stagione')},
   hf:d=>{S.hf.stato=d.v;render()},
   wk:d=>{S.wk=+d.v;render()},
   testMake:()=>makeTestData(),
@@ -5917,7 +5958,7 @@ const IN={
   cfgName:t=>{S.cfgName=t.value},
   cfgLuogo:t=>{S.cfgLuogo=t.value}
 };
-const CH={
+const CH={phSel:t=>{S.phSel=t.value;refreshSheet()},
   rcu:t=>{const g=S.rcf&&S.rcf.ing[+t.dataset.i];if(g){g.u=t.value;refreshSheet()}},
   formsel:t=>{S.form[t.dataset.k]=t.value},brfcat:t=>{if(S.brf)S.brf.cat=t.value},
   cv:t=>{const v=num(t.value);setCart(t.dataset.p,v==null?0:v)},
