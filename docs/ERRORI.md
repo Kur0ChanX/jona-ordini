@@ -55,6 +55,7 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 
 ## Comunicazione con Mario e domande
 - **E2, E29, E37** Superate dal kit 27.3 (scelta di Mario #143): domande SCRITTE con scelte numerate, niente strumento a tocco (vedi `docs/kit-progetto/REGOLE.md`, «Domande a Mario»).
+- **E61** Quando un problema nasce dal mio codice (es. E59, Mario fuori da Jona), lo dico subito e chiaro: «ho sbagliato io», la causa e la difesa; mai solo la soluzione come se fosse capitato da solo (Mario 20/11: «non fai finta di niente»).
 - **E3** Per scelte e confronti mandare un'immagine (prima/dopo).
 - **E30** Se la risposta scritta a mano contiene una domanda o «roba così» non è una scelta: rispondere e rifare la domanda a tocco.
 - **E38** (aperto, causa non chiara: tocco fantasma o risposta automatica) Prima di lavori grossi dopo una risposta a tocco ripetere la scelta in chiaro; se Mario dice di non aver toccato, fermare subito le sessioni aperte (interrupt).
