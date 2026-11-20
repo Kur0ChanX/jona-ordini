@@ -83,7 +83,10 @@ Il telefono in attesa diventa approvato con `membri/<uid> {ok:true, sid}`. In `a
   - E: non si scende sotto 2 persone che sbloccano.
 - Tutte e due in `VELOCI` di `tools/prova-ci.sh`. Aggiornare ogni Worker finto (E14: `grep -l jona-notifiche tools/*.mjs`). A ogni versione: `CACHE`, `NEWS`, `APP_VER`, riga in `.claude/rules/struttura.md`.
 
-## Scelte di Mario (chieste il 20/11, 🛑 per i pezzi indicati)
+## Scelte di Mario: «tutto come consiglio» (20/11/2026 19:42)
+- Decise: 1 = rientro da soli con nome utente e password; 2 = Mauro più l'interruttore nel profilo.
+
+### Testo delle domande (storia)
 1. Pezzo 3: rientro da soli con nome utente e password (consiglio) oppure solo tramite chi può sbloccare.
 2. Pezzo 2a: chi può sbloccare oltre a Maurizio e allo sviluppatore (consiglio: Mauro, più l'interruttore nel profilo).
 Pezzi 1 e 2b non dipendono dalle risposte.
