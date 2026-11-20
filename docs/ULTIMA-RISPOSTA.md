@@ -1,3 +1,3 @@
-# Ultima risposta di Claude (20/11/2026 20:51 ora italiana)
+# Ultima risposta di Claude (20/11/2026 21:22 ora italiana)
 
-Le consegne sono su GitHub. Il push ha fatto ripartire le prove della v121 da capo: ci vogliono circa 10 minuti in più.
+✅ La v121 è online: l'ho controllato sul sito. La v122 adesso è su GitHub, in una PR in bozza (n. 131). Va online dopo il tuo «fatto» su Firebase e il tuo ok alle foto.
