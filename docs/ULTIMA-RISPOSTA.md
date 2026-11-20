@@ -1,3 +1,3 @@
-# Ultima risposta di Claude (20/11/2026 20:51 ora italiana)
+# Ultima risposta di Claude (20/11/2026 21:22 ora italiana)
 
-Le consegne sono su GitHub. Il push ha fatto ripartire le prove della v121 da capo: ci vogliono circa 10 minuti in più.
+La notifica era un controllo automatico di GitHub sulla PR in bozza: per te non cambia niente.
