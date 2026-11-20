@@ -11,6 +11,7 @@ Aggiornato: 2026-10-11 (sessione #90: v85 online (PR #96, squash `9cb988a`), D35
 ## 0. Aspetta Mario
 - 20/11 · 🛑 · 🟡 Principale 146 · attivare «Email/password» in Firebase (📌 Di cosa parliamo: l'interruttore che permette il rientro da soli con nome utente e password, v122)
 - 20/11 · 🟢 Principale 147 · rientrare da solo da Firebase (scelta 2 di Mario): passi della 147
+- 20/11 · 🟢 Principale 147 · foto della v122 (📌 Di cosa parliamo: 3 foto in `archivio/D59/`, schermata del telefono svuotato e striscia «Metti al sicuro»; 1 Vanno bene · 2 Cambia qualcosa)
 - 20/11 · 🟢 Principale 147 · ok al kit 48 (📌 Di cosa parliamo: regole nuove «sviluppatore compreso» e «allineamenti misurati»; 1 Sì · 2 No)
 
 ## Riassunto: cosa manca, in ordine
