@@ -1,3 +1,4 @@
-# Ultimo messaggio di Mario (20/11/2026 19:58 ora italiana)
+# Ultimo messaggio di Mario (20/11/2026 20:16 ora italiana)
 
-va bene
+dovrebbe essere mario.miscera
+fammi loggare con Gmail come salvagente o inventati qualcosa però come regola per tutti gli account per abituare questi problemi di oggi e futuri problemi
