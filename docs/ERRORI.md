@@ -21,6 +21,8 @@ Si legge a ogni avvio. Una lezione per riga, numeri E invariati. Storia completa
 - **E4** Si lavora solo in Claude Code, mai nella chat di claude.ai; ogni file ricevuto si salva subito nel progetto e si committa.
 - **E45** Un agente appena creato in `.claude/agents/` si carica solo dalla sessione dopo: nella stessa usare `general-purpose` con «Prima leggi .claude/agents/<nome>.md».
 
+- **E60** `scarica-kit.py` cercava al massimo 12 parti del pacchetto (il kit 47 ne ha 27) → «pacchetto non trovato»: portato a 60; il kit 47 lo porta a 100. Se il pacchetto «non c'è», provare prima più parti.
+
 ## Scorta automatica (`scorta.py`)
 - **E28** `scorta.py` salta come «ultimo messaggio di Mario» i testi di sistema (`<task-notification`, `<system-reminder`, `<wake `, `[SYSTEM NOTIFICATION`).
 - **E32** `togli_segreti()` in `scorta.py` toglie i link segreti (repo pubblico); controllare la scorta con `git show <commit>:docs/ULTIMO-MESSAGGIO.md`, non `git log -p`.

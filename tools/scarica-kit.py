@@ -50,7 +50,7 @@ def main(arg):
         cartella = arg[arg.index("--cartella") + 1]
         nome = f"PACCHETTO-v{m.group(1)}-" + ("indipendente-" if "--indipendente" in arg else "")
         # Il numero delle parti sta nel nome del file (…-1di5.md): si cerca il primo che esiste.
-        parti = next((k for k in range(1, 13) if esiste(f"{KIT}/pacchetto/{nome}1di{k}.md")), 0)
+        parti = next((k for k in range(1, 61) if esiste(f"{KIT}/pacchetto/{nome}1di{k}.md")), 0)
         if not parti:
             print(f"Pacchetto {nome}… non trovato su RVC (versione {versione}).")
             return 3
