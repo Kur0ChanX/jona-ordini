@@ -22,8 +22,10 @@ await A.click('[data-a="formset"][data-v="dev"]');
 for(const [k,v] of Object.entries({nome:'Mario',cognome:'Test',username:'mario',pw:'prova1234',pw2:'prova1234'}))await A.fill('input[data-k="'+k+'"]',v);
 await A.click('[data-a="setupGo"]');await A.waitForTimeout(1200);
 await A.evaluate(()=>{fbActivate()});await A.waitForTimeout(300);await A.click('#ask-ok');
-ok(await wait(A,()=>S.db.kind==='firebase'&&S.db.status().ready,null,30000),'A (sviluppatore) collegato');
-await A.evaluate(()=>makeTestData());await A.waitForTimeout(3000);
+// fbActivate ricarica la pagina: subito dopo S.db è null e l'attesa fallisce (giro locale #147), quindi S.db&& e si riprova
+let pronto=false;for(let i=0;i<3&&!pronto;i++)pronto=await wait(A,()=>S.db&&S.db.kind==='firebase'&&S.db.status().ready,null,15000);
+ok(pronto,'A (sviluppatore) collegato');
+await wait(A,()=>realU()&&isDev(realU()),null,15000);await A.evaluate(()=>makeTestData());await wait(A,()=>!!D().staff.test_u1&&!!D().staff.test_u2,null,15000);
 const link=await A.evaluate(()=>inviteLink());
 await A.evaluate(()=>{S.tab='staff';render()});
 const nStaff=()=>A.evaluate(()=>Object.keys(D().staff).length);
