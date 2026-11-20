@@ -45,7 +45,7 @@ Prossimo E libero: E62.
 
 ## Messaggi di Mario di questa sessione
 Scritti dallo script (C469): dopo «→» cosa ne è stato (C…, file, commit o «risposta alla domanda N»).
-- 2026-11-20 20:52 · [AVVIO] Sessione #147 … → avvio, consegne seguite
+- 2026-11-20 20:52 · [AVVIO] Sessione #147 di Jona Ordini (repo Kur0ChanX/jona-ordini, ramo claude/jo… → avvio fatto, consegne seguite
 - 2026-11-20 21:40 · domanda 4 va bene come consiglio guarda se c'è nel kit una soluzione simile per … → foto approvate (riga tolta da «Aspetta Mario»); kit: risposta + prossimo passo 4, voce D59
 
 Ultimo, intero:
