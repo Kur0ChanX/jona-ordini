@@ -1,0 +1,27 @@
+{
+"account": "108763",
+"sessione": "a9a7a7e13867",
+"giorno": "2026-11-20",
+"turni": 2,
+"peso": 0,
+"uscita": 0,
+"contesto_max": 145445,
+"anomalie": [],
+"blocchi": {
+"Stop 5 · Notifica non letta (in coda": 2,
+"Stop 10 · Promessa a Mario senza voce": 1
+},
+"esempi_blocchi": {
+"Stop 5 · Notifica non letta (in coda": [
+"21:46 · Notifica non letta (in coda dalle 21:46: messaggio di un'altra chat, GitHub o sveglia, E357): chiama ReadNotifications finché dice 0; se cambia qualcosa per Mario (domanda già risposta, lavoro già fat",
+"21:47 · Notifica non letta (in coda dalle 21:47: messaggio di un'altra chat, GitHub o sveglia, E357): chiama ReadNotifications finché dice 0; se cambia qualcosa per Mario (domanda già risposta, lavoro già fat"
+],
+"Stop 10 · Promessa a Mario senza voce": [
+"21:46 · Promessa a Mario senza voce 👁 in docs/DA-FARE.md (C331): «Il kit 48 è scaricato e pronto: col tuo «» lo metto.». Nella sua voce (o in una nuova) scrivi «👁 Lo vedi: <dove la vede Mario> · prova: <foto "
+]
+},
+"remota": "01WTjqUuFkom",
+"aiutanti": 0,
+"strumenti": 0,
+"bilancia": 2
+}
