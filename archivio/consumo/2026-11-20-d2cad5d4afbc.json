@@ -2,15 +2,15 @@
 "account": "108763",
 "sessione": "d2cad5d4afbc",
 "giorno": "2026-11-20",
-"turni": 6,
+"turni": 7,
 "peso": 1434650,
 "uscita": 18640,
-"contesto_max": 347658,
+"contesto_max": 369563,
 "anomalie": [
 "2 uscite di strumento enormi (49 KB la più grande): leggere a pezzi (grep -n, sed -n)"
 ],
 "blocchi": {
-"Stop 5 · Notifica non letta (in coda": 2,
+"Stop 5 · Notifica non letta (in coda": 3,
 "Stop 7 · Domanda a Mario poco chiara": 1,
 "Stop 15 · There are uncommitted changes in": 1,
 "Stop 10 · Promessa a Mario senza voce": 2,
@@ -20,7 +20,8 @@
 "esempi_blocchi": {
 "Stop 5 · Notifica non letta (in coda": [
 "21:14 · Notifica non letta (in coda dalle 20:56: messaggio di un'altra chat, GitHub o sveglia, E357): chiama ReadNotifications finché dice 0; se cambia qualcosa per Mario (domanda già risposta, lavoro già fat",
-"21:22 · Notifica non letta (in coda dalle 21:22: messaggio di un'altra chat, GitHub o sveglia, E357): chiama ReadNotifications finché dice 0; se cambia qualcosa per Mario (domanda già risposta, lavoro già fat"
+"21:22 · Notifica non letta (in coda dalle 21:22: messaggio di un'altra chat, GitHub o sveglia, E357): chiama ReadNotifications finché dice 0; se cambia qualcosa per Mario (domanda già risposta, lavoro già fat",
+"21:42 · Notifica non letta (in coda dalle 21:42: messaggio di un'altra chat, GitHub o sveglia, E357): chiama ReadNotifications finché dice 0; se cambia qualcosa per Mario (domanda già risposta, lavoro già fat"
 ],
 "Stop 7 · Domanda a Mario poco chiara": [
 "21:14 · Domanda a Mario poco chiara («❓ **DOMANDE** **DOMANDA 1 🛑 — Accendere «Email/password» in », C233, E145): manca la riga «📌 Di cosa parliamo:» (cos'è, dove si vede, perché serve adesso). NON riscrivere"
