@@ -676,6 +676,7 @@ html.lite .br-carta{background-image:linear-gradient(90deg,transparent 60px,rgba
 /* ---------- v2 ---------- */
 .local-note{color:#A3978D;font:300 13px/1.4 var(--font);text-align:center;margin:18px 0 0;max-width:420px}
 .login h1{margin-bottom:2px}
+.wall-card+.wall-card{margin-top:16px}
 .nav.n6 button{font-size:10.5px}
 /* controllo arrivo a semaforo: grigio da controllare, verde c'è, rosso manca, giallo meno */
 .sem-top{display:flex;align-items:center;gap:12px;margin:14px 0 8px}
@@ -1180,7 +1181,7 @@ async function runPool(tasks,n=6){let i=0,err=null;const w=async()=>{while(i<tas
 const IC={
 search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>',
 cart:'<circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/><path d="M2.5 3.5h2.6l2.4 11.7a1.6 1.6 0 0 0 1.6 1.3h8.7a1.6 1.6 0 0 0 1.6-1.2L21 7.5H6.2"/>',
-clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>',lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>',
 check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
 x:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
 bell:'<path d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
@@ -1235,8 +1236,12 @@ const ic=(n,cls='')=>`<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" str
 /* ================= novità (versioni) =================
    Ad ogni versione: aggiungi la voce in cima a NEWS e aumenta APP_VER.
    tutti = staff (parole semplici), chef = in più per l'amministratore, dev = parte tecnica per lo sviluppatore. */
-const APP_VER=121;
+const APP_VER=122;
 const NEWS=[
+  {v:122,data:'2026-11-20',titolo:'Telefono svuotato? Rientri da solo con nome utente e password',
+    chef:['Ognuno può mettere al sicuro il suo accesso: in alto compare «Metti al sicuro il tuo accesso», si scrive la password una volta e il telefono la salva.','Se un telefono si svuota, nella prima schermata c\'è «Avevi già l\'app?»: nome utente, password, «Rientra», e la persona è di nuovo nel suo profilo, senza aspettare nessuno.','Aprendo una persona in Staff vedi «Rientro da solo con la password: pronto» oppure «non ancora».'],
+    staff:['Tocca «Metti al sicuro il tuo accesso» e scrivi la tua password: se un giorno l\'app si svuota, tocchi «Rientra» e sei di nuovo nel tuo profilo, da solo.'],
+    dev:['D59 salvagente: accesso Firebase di riserva per persona (`svMail` dal nome utente, `svPw` = sha, copia in `staff.svh`/`svu`, `svo` per il cambio password senza la vecchia), `membri/<uid>` con `sv:true` approvato dal telefono che lo crea (`svEnsure` con l\'app secondaria `sv`). Si crea a «Entra», cambio password, registrazione (svh nella richiesta), «Metti al sicuro» (`svAsk`/`svSheet`), ogni giorno (`svTick`, `svProbe` se Email/password è spento). `screenJoin` con «Avevi già l\'app?» → `svEnter` (accesso → membri → chiave → `staff.pass` → dentro). Prova `tools/test-firebase-salvagente.mjs` (nelle veloci).']},
   {v:121,data:'2026-11-20',titolo:'Telefono svuotato? Si rientra nel proprio profilo con un tocco',
     chef:['Quando un telefono chiede di entrare e la persona ha già un profilo, «Approva» chiede di chi è: scegli il profilo e tocca «Ricollega». Entra da sola, senza password, con tutto quello che aveva.','Se qualcuno tocca «Sono nuovo» ma ha lo stesso nome di un profilo che c\'è, l\'app lo dice: «È lui: ricollega» evita il profilo doppio.','In Staff, aprendo una persona, c\'è «Può ricollegare i telefoni»: così non dipende tutto da te. L\'F&B lo può sempre. Restano sempre almeno 2 persone che possono farlo.'],
     staff:['Telefono nuovo o svuotato? Tocca «Ho già un profilo»: chi approva ti rimette nel tuo profilo, anche se non ricordi la password.'],
@@ -1296,10 +1301,7 @@ const NEWS=[
     dev:['D33: `turPlan`/`turSrv` (in `deadlineTick` per `orPlanner`) mandano al Worker `/turni` {pp: persona → iscrizioni, ev:[{k,at,x,u}]} dei turni `tp` pubblicati (`orPubAt` per reparto) della settimana corrente e dopo, finestra 8 giorni; `turTickSrv` nel cron dei 5 minuti. Funzione `turni` accesa di partenza; spenta → piano vuoto. Impronta in `jona_tupl`. Prova `tools/test-turni.mjs`.']},
   {v:103,data:'2026-10-13',titolo:'Ricette più leggere',
     chef:['Le Ricette e il costo dei piatti si scaricano solo quando le apri: l\'app parte un po\' più in fretta. Funzionano anche senza rete.'],
-    dev:['D50 passo 3: Ricette in `moduli/ricette.js` (`modLoad(\'ricette\')` al primo `rcOpen` → `rcApri`). In index restano `RC_*`, `rcAll`, `rcU`, `rcFatt`, `rcPct`, `rcPrezzo`, `rcCalc`, `rcSalito`, `rcSnap`, `rcPut`, `rcOn`, `rcCta`, `rcStrip`, `rcVisto` (home e Chiedi a Jona). Prova `test-moduli` anche per le Ricette.']},
-  {v:102,data:'2026-10-13',titolo:'Cantina più leggera',
-    tutti:['L\'app si apre ancora un po\' più in fretta: la Cantina Vini si scarica solo quando la apri. Funziona anche senza rete.'],
-    dev:['D50 passo 2: Cantina in `moduli/cantina.js` (`modLoad(\'cantina\')` al primo `vnOpen` → `vnApri`; all\'avvio `vnRestore` carica il modulo solo se c\'è la bozza `jona_vn` → `vnRipristina`). In index restano `VN_TIPI`, `VN_ABB`, `VN_CAMPI`, `vnAll`, `vnGet`, `vnOn`, `vnCan`, `vnMese`, `vnTit`, `vnSub`, `vnCta`. Prova `test-moduli` senza rete vera (server della prova spento: `setOffline` su WebKit blocca il service worker).']},
+    dev:['D50 passo 3: Ricette in `moduli/ricette.js` (`modLoad(\'ricette\')` al primo `rcOpen` → `rcApri`). In index restano `RC_*`, `rcAll`, `rcU`, `rcFatt`, `rcPct`, `rcPrezzo`, `rcCalc`, `rcSalito`, `rcSnap`, `rcPut`, `rcOn`, `rcCta`, `rcStrip`, `rcVisto` (home e Chiedi a Jona). Prova `test-moduli` anche per le Ricette.']}
 ];
 /* Le novità dalla v91 in giù stanno in data/news.json (v101, scaricate solo quando si apre «Novità»: newsOld). */
 
@@ -1333,7 +1335,7 @@ const COLS={staff:null,fornitori:null,prodotti:null,config:null,
 const S={db:null,loadTimeout:false,
   loaded:{},data:{staff:{},fornitori:{},prodotti:{},config:{},richieste:{},ordini:{},notifiche:{}},
   gidx:new Map(),me:ls('jona_me'),viewAs:ls('jona_viewas'),tab:null,q:'',cat:'',grp:'utente',cart:[],cnote:'',
-  drafts:{},removed:{},gmn:{},ometa:{},track:{},rcv:{},rev:null,form:{},login:{u:'',p:''},fe:{},pe:{},imp:null,
+  drafts:{},removed:{},gmn:{},ometa:{},track:{},rcv:{},rev:null,form:{},login:{u:'',p:''},sv:{u:'',p:''},fe:{},pe:{},imp:null,
   supTab:'listino',supQ:'',pkq:'',hf:{stato:'tutte',who:''}};
 if(S.me)S.cart=ls('jona_cart_'+S.me)||[];
 const D=()=>S.data;
@@ -1720,7 +1722,7 @@ function paint(el,html){
   if(id){const n=document.getElementById(id);if(n){n.focus({preventScroll:true});try{if(s1!=null)n.setSelectionRange(s1,s2)}catch(e){}}}
 }
 function render(){
-  obxTick();waitCheck();mpSave();const html=view();
+  obxTick();waitCheck();mpSave();svTick();const html=view();
   document.documentElement.classList.toggle('on-wall',S.wallMode);document.documentElement.classList.toggle('on-splash',!!S.splash);
   document.documentElement.classList.toggle('staff-ui',!S.wallMode&&!isMgr(meU()));
   if(html!==lastHtml){paint($('#app'),html);lastHtml=html}
@@ -1822,7 +1824,7 @@ async function phSend(nuovo){
   const f=S.form,st=S.db&&S.db.kind==='firebase'?S.db.status():null;if(!st||!st.wait)return toast('Un attimo: sto ancora collegando il telefono.','warn');
   let r;
   if(nuovo){const e=checkForm(true);if(e)return toast(e,'warn');const sid=(st.req&&st.req.nuovo&&st.req.sid)||uid();
-    r={nuovo:true,sid,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||'',pass:await sha(sid+':'+f.pw),creato:now()};
+    r={nuovo:true,sid,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),username:normUser(f.username),reparto:f.reparto||'altro',mansione:f.mansione||'',foto:f.foto||'',pass:await sha(sid+':'+f.pw),svh:await svPw(normUser(f.username),f.pw),svu:normUser(f.username),creato:now()};
     ls('jona_wait',{id:sid,t:Date.now()})}
   else{if(!String(f.nome||'').trim())return toast('Scrivi il nome.','warn');r={nuovo:false,nome:f.nome.trim(),cognome:String(f.cognome||'').trim(),creato:now()};ls('jona_wait',null)}
   ls('jona_reg',null);PHS.t=now();setTimeout(schedule,PHS_MS+100);S.db.phone.req(r).then(async()=>{if(await S.db.phone.auto(r).catch(()=>false))return toast('Entrata libera: sei dentro!');await fetch(PUSH_URL+'/richiesta',{method:'POST',headers:{authorization:'Bearer '+await algTok()}}).catch(()=>{})},e=>toast('Richiesta non inviata: controlla la connessione e riprova.','err'));closeSheet();S.form={};
@@ -1838,7 +1840,7 @@ function phWatch(){
 const phPend=()=>PH.list.filter(x=>x.req);
 const phDev=ua=>/iPhone|iPad/.test(ua||'')?'iPhone':/Android/.test(ua||'')?'Android':'telefono';
 function phStaff(r,st,da){let un=r.username||normUser(r.nome);const used=new Set(Object.values(st).filter(u=>u.id!==r.sid).map(u=>u.username));const b=un;let n=2;while(used.has(un))un=b+n++;
-  return{nome:r.nome,cognome:r.cognome||'',username:un,ruolo:'staff',reparto:r.reparto||'altro',mansione:r.mansione||'',foto:r.foto||'',stato:'attivo',pass:r.pass,creato:now(),creatoDa:da}}
+  return{nome:r.nome,cognome:r.cognome||'',username:un,ruolo:'staff',reparto:r.reparto||'altro',mansione:r.mansione||'',foto:r.foto||'',stato:'attivo',pass:r.pass,...(r.svh&&r.svu===un?{svh:r.svh,svu:un}:{}),creato:now(),creatoDa:da}}
 async function phApprove(id,sid){
   const x=PH.list.find(m=>m.id===id);if(!x||!x.req)return;const r=x.req,me=realU();let msg='Telefono approvato';
   const su=sid&&D().staff[sid];if(sid&&(!su||su.stato!=='attivo'))return toast('Quel profilo non è attivo: riattivalo prima.','warn');
@@ -1897,13 +1899,107 @@ function mpSave(){if(DEMO||!S.me||S.mp===undefined||!S.db||S.db.kind!=='firebase
 /* per i gestori, nella scheda della persona: i suoi telefoni con memoria protetta e ultima apertura (letti al massimo ogni 5 minuti) */
 const MPL={};
 function mpRow(id){if(!S.db||S.db.kind!=='firebase'||!isMgr(meU()))return'';const c=MPL[id];
-  if(!c||now()-c.t>3e5){MPL[id]={t:now(),l:c?c.l:null};fbInit().fs.collection('membri').where('sid','==',id).get().then(q=>{MPL[id]={t:now(),l:q.docs.map(d=>d.data()).filter(x=>x.ok!==false).sort((a,b)=>(b.visto||0)-(a.visto||0))};refreshSheet()},()=>{})}
+  if(!c||now()-c.t>3e5){MPL[id]={t:now(),l:c?c.l:null};fbInit().fs.collection('membri').where('sid','==',id).get().then(q=>{MPL[id]={t:now(),l:q.docs.map(d=>d.data()).filter(x=>x.ok!==false&&!x.sv).sort((a,b)=>(b.visto||0)-(a.visto||0))};refreshSheet()},()=>{})}
   const l=MPL[id].l;if(!l)return'';
   const g=t=>new Date(t).toLocaleDateString('it-IT',{day:'numeric',month:'short'});
-  return`<div class="panel mp-row" style="margin-top:14px;padding:12px 16px"><b>Telefono</b>${l.length?l.slice(0,3).map(x=>`<p class="muted small" style="margin:4px 0 0">${phDev(x.ua)} · memoria protetta: <b>${x.mp?'sì':'no'}</b> · aperto il ${g(x.visto)}</p>`).join(''):'<p class="muted small" style="margin:4px 0 0">Nessun telefono aggiornato: si vede dopo la prossima apertura dell\'app.</p>'}</div>`}
-function screenJoin(){
-  return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div><div class="wall-card"><h1>Collega questo telefono</h1>
+  return`<div class="panel mp-row" style="margin-top:14px;padding:12px 16px"><b>Telefono</b>${l.length?l.slice(0,3).map(x=>`<p class="muted small" style="margin:4px 0 0">${phDev(x.ua)} · memoria protetta: <b>${x.mp?'sì':'no'}</b> · aperto il ${g(x.visto)}</p>`).join(''):'<p class="muted small" style="margin:4px 0 0">Nessun telefono aggiornato: si vede dopo la prossima apertura dell\'app.</p>'}<p class="muted small" style="margin:6px 0 0">Rientro da solo con la password: <b>${svOk(D().staff[id])?'pronto':'non ancora'}</b></p></div>`}
+/* salvagente (D59, v122): ogni persona ha un accesso Firebase di riserva, indipendente dai telefoni: email finta dal nome utente
+   (svMail), password = sha di nome utente e password (svPw), copiata in staff.svh come staff.pass. Telefono svuotato → «Avevi già
+   l'app?» → stesso accesso → membri/<uid> (sv:true) → chiave → profilo controllato con staff.pass → dentro. Lo crea e lo ripara
+   qualunque telefono già dentro: registrazione (svh nella richiesta), «Entra», cambio password, «Metti al sicuro», ogni giorno
+   (svTick). Cambio password senza la vecchia: svo = svh di prima, così l'accesso si aggiorna. Niente regole nuove di Firestore. */
+const SV_DOM='@utenti.jona-ristorante-by-ynoy-corp.pages.dev';
+const svMail=u=>String(u||'').replace(/[^a-z0-9]/g,c=>'_'+c.codePointAt(0).toString(16)).slice(0,60)+SV_DOM;
+const svPw=(u,p)=>sha('jona-sv:'+u+':'+p);
+const svOk=u=>!!(u&&u.svh&&u.svu===u.username);
+const SV_BAD=/invalid-credential|wrong-password|user-not-found|invalid-login-credentials|INVALID_LOGIN_CREDENTIALS|EMAIL_NOT_FOUND|INVALID_PASSWORD/;
+const svCode=e=>String(e&&(e.code||e.message)||'');
+function svAux(){fbInit();const a=firebase.apps.find(x=>x.name==='sv')||firebase.initializeApp(fbCfg(),'sv'),auth=a.auth(),fs=a.firestore();
+  if(!svAux.on){svAux.on=1;if(ls('jona_fb_lp'))try{fs.settings({experimentalForceLongPolling:true,merge:true})}catch(e){}
+    const emu=ls('jona_fb_emu');if(emu){fs.useEmulator(emu,8080);auth.useEmulator('http://'+emu+':9099',{disableWarnings:true})}}
+  return{auth,fs}}
+// accesso di riserva: null = credenziali sbagliate (o accesso che non c'è), altri errori passano
+async function svIn(auth,em,pw){try{return await fbTmo(auth.signInWithEmailAndPassword(em,pw))}catch(e){if(SV_BAD.test(svCode(e)))return null;throw e}}
+// crea o ripara l'accesso di riserva di una persona: 'ok', 'vecchia' (password di prima sconosciuta) o '' (non riuscito, si riprova)
+async function svEnsure(id,p,o){
+  const x=Object.assign({},D().staff[id],o||{}),k=ls('jona_key');
+  if(DEMO||!x.username||x.stato==='disattivato'||!k||!S.db||S.db.kind!=='firebase')return'';
+  const em=svMail(x.username),pw=p?await svPw(x.username,p):x.svu===x.username?x.svh:'';if(!pw)return'';
+  const old=x.svu===x.username?x.svh:'';let A=null,c=null;
+  try{A=svAux();await A.auth.setPersistence('none');
+    c=await svIn(A.auth,em,pw);
+    if(!c)try{c=await fbTmo(A.auth.createUserWithEmailAndPassword(em,pw))}catch(e){if(!/email-already-in-use|EMAIL_EXISTS/.test(svCode(e)))throw e}
+    if(!c)c=await svIn(A.auth,em,pw);
+    if(!c)for(const v of [old,x.svo])if(v&&v!==pw&&!c){c=await svIn(A.auth,em,v);
+      if(c){await upd('staff',id,{svh:pw,svu:x.username,svo:v});await fbTmo(c.user.updatePassword(pw))}}
+    if(!c)return'vecchia';
+    const uid=c.user.uid,m=await fbTmo(A.fs.doc('membri/'+uid).get(),12000),d=m.exists?m.data():null;
+    if(!d)await fbTmo(A.fs.doc('membri/'+uid).set({k,ok:false,sid:id,sv:true,creato:now(),ua:'salvagente'}),12000);
+    if(!d||d.ok===false||d.sid!==id||!d.sv)await fbTmo(fbInit().fs.doc('membri/'+uid).update({ok:true,sid:id,sv:true,approvato:now(),da:realU()?realU().id:''}),12000);
+    const st=D().staff[id]||{};if(st.svh!==pw||st.svu!==x.username)await upd('staff',id,{svh:pw,svu:x.username});
+    ls('jona_sv_on',{t:Date.now(),on:true});return'ok'}
+  catch(e){if(/operation-not-allowed|OPERATION_NOT_ALLOWED|PASSWORD_LOGIN_DISABLED/.test(svCode(e)))ls('jona_sv_on',{t:Date.now(),on:false});console.warn('salvagente',e);return''}
+  finally{if(c&&A)A.auth.signOut().catch(()=>{})}
+}
+// il rientro con la password è acceso in Firebase? (una prova al giorno con un accesso che non può esistere)
+async function svProbe(){const c=ls('jona_sv_on');if(c&&Date.now()-c.t<864e5)return c.on;let on=null;
+  try{const A=svAux();await A.auth.setPersistence('none');await A.auth.signInWithEmailAndPassword('prova-'+randKey(8).toLowerCase()+SV_DOM,'x-'+randKey(16))}
+  catch(e){const s=svCode(e);on=/operation-not-allowed|OPERATION_NOT_ALLOWED|PASSWORD_LOGIN_DISABLED/.test(s)?false:SV_BAD.test(s)?true:null}
+  if(on!==null)ls('jona_sv_on',{t:Date.now(),on});return on}
+// una volta al giorno, sul telefono di chi è dentro: ripara l'accesso di riserva o controlla se si può creare
+function svTick(){const me=realU();if(DEMO||svTick.go||!me||!S.db||S.db.kind!=='firebase'||!S.db.status().ready||!ls('jona_key'))return;
+  if(Date.now()-(ls('jona_sv_t')||0)<20*36e5||Date.now()<(svTick.n||0))return;svTick.go=1;svTick.n=Date.now()+6e5;
+  (async()=>{if(svOk(me)){if(await svEnsure(me.id))ls('jona_sv_t',Date.now())}else if(await svProbe()!==null)ls('jona_sv_t',Date.now());render()})().catch(()=>{}).finally(()=>{svTick.go=0})}
+function svNeed(){const me=realU();if(DEMO||S.wallMode||!me||me.stato!=='attivo'||!me.username||!me.pass||svOk(me)||!S.db||S.db.kind!=='firebase'||!S.db.status().ready)return false;
+  const c=ls('jona_sv_on');return!!(c&&c.on)&&Date.now()-(ls('jona_sv_dopo')||0)>864e5}
+function svAsk(){if(!svNeed())return'';
+  return`<div class="obx sv-ask" role="status">${ic('lock')}<div class="obx-i"><b>Metti al sicuro il tuo accesso</b><span>Se un giorno l'app si svuota, rientri da solo nel tuo profilo con nome utente e password.</span></div><div class="obx-b"><button type="button" class="btn ghost sm" data-a="svDopo">Più tardi</button><button type="button" class="btn primary sm" data-a="svSheet">Fallo ora</button></div></div>`}
+function svSheet(){const me=realU();if(!me)return;S.sv={u:me.username,p:''};
+  openSheet({render:()=>`<div class="grab"></div><div class="sh-h"><div class="sh-t">Metti al sicuro il tuo accesso</div><button type="button" class="icon-btn" data-a="closeSheet" aria-label="Chiudi">${ic('x')}</button></div>
+  <form class="sv-form" data-form="svs" autocomplete="on" onsubmit="return false"><p class="muted" style="margin-top:0">Scrivi la tua password una volta. Se il telefono ti chiede di salvarla, tocca <b>Salva</b>.</p>
+  <label class="lbl" for="sv-u2">Nome utente</label><input class="inp" id="sv-u2" autocomplete="username" autocapitalize="none" readonly value="${esc(me.username)}">
+  <label class="lbl" for="sv-p2">Password</label><input class="inp" id="sv-p2" type="password" autocomplete="current-password" data-in="sv" data-k="p" enterkeyhint="go">
+  <p class="muted small" style="margin:10px 0 0">Se un giorno l'app si svuota: apri l'app, tocca <b>Rientra</b> e sei di nuovo nel tuo profilo, con tutto quello che avevi.</p>
+  <div style="margin-top:18px"><button type="submit" class="btn primary block big" data-a="svSave">Metti al sicuro</button></div></form>`})}
+function svStore(u,p,n){try{if(window.PasswordCredential&&navigator.credentials)navigator.credentials.store(new PasswordCredential({id:u,password:p,name:n||u})).catch(()=>{})}catch(e){}}
+const svShake=sel=>{const c=$(sel);if(c){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake')}};
+async function svSave(){const me=realU(),p=S.sv.p;if(!me)return;if(!p)return toast('Scrivi la password.','warn');
+  if(await sha(me.id+':'+p)!==me.pass){svShake('.sv-form');return toast('Password non corretta. Non la ricordi? Chiedi a Maurizio di cambiarla.','err')}
+  toast('Un attimo…');const r=await svEnsure(me.id,p);
+  if(r==='ok'){svStore(me.username,p,fullName(me));S.sv={u:'',p:''};closeSheet();render();return toast('Fatto! Il tuo accesso è al sicuro.')}
+  const c=ls('jona_sv_on');toast(c&&c.on===false?'Non è ancora attivo: riprova domani.':r==='vecchia'?'Non riuscito: scrivi allo sviluppatore.':'Non riuscito: controlla la connessione e riprova.','err')}
+// telefono svuotato: nome utente e password → accesso di riserva → chiave e profilo di prima, senza approvazioni
+async function svEnter(){const u=normUser(S.sv.u),p=S.sv.p;if(!u||!p)return toast('Scrivi nome utente e password.','warn');
+  if(S.sv.busy)return;if(navigator.onLine===false)return toast('Serve la connessione: controlla la rete e riprova.','warn');
+  S.sv.busy=1;toast('Controllo…');let auth=null;const out=async(m,t)=>{if(auth)await auth.signOut().catch(()=>{});toast(m,t||'warn')};
+  try{await need('firebase');const F=fbInit();auth=F.auth;let c;
+    try{c=await fbTmo(auth.signInWithEmailAndPassword(svMail(u),await svPw(u,p)))}
+    catch(e){const s=svCode(e);auth=null;
+      if(SV_BAD.test(s)){svShake('.sv-in');return toast('Nome utente o password non corretti.','err')}
+      if(/operation-not-allowed|OPERATION_NOT_ALLOWED|PASSWORD_LOGIN_DISABLED/.test(s))return toast('Il rientro con la password non è ancora attivo: usa il QR code qui sotto.','warn');
+      if(/too-many-requests|TOO_MANY/.test(s))return toast('Troppi tentativi: aspetta qualche minuto e riprova.','warn');
+      return toast('Serve la connessione: controlla la rete e riprova.','warn')}
+    const m=await fbTmo(F.fs.doc('membri/'+c.user.uid).get({source:'server'}),12000),d=m.exists?m.data():null;
+    if(!d||d.ok===false||!d.k)return out('Il tuo accesso di riserva non vale più: usa il QR code qui sotto e scegli «Ho già un profilo».');
+    const q=await fbTmo(F.fs.collection('staff').where('username','==',u).get({source:'server'}),12000);let x=null;
+    for(const s of q.docs)if(await sha(s.id+':'+p)===s.data().pass){x=Object.assign({},s.data(),{id:s.id});break}
+    if(!x)return out('Questa è la password di prima: usa quella nuova.');
+    if(x.stato==='disattivato')return out('Questo profilo è disattivato. Chiedi a Maurizio di riattivarlo.');
+    ls('jona_key',d.k);ls('jona_member',c.user.uid);ls('jona_me',x.id);ls('jona_sv_t',null);svStore(u,p,fullName(x));S.sv={u:'',p:''};
+    toast('Bentornato '+x.nome+'!');setTimeout(()=>location.reload(),600)}
+  catch(e){await out('Serve la connessione: controlla la rete e riprova.')}
+  finally{S.sv.busy=0}
+}
+function screenJoin(){const V=S.sv;
+  return`<div class="wall linen"><div class="logo-full" role="img" aria-label="Jona Ristorante"></div>
+  <form class="wall-card login sv-in" data-form="sv" autocomplete="on" onsubmit="return false"><h1>Avevi già l'app?</h1>
+  <p class="muted" style="margin-top:0">Rientra nel tuo profilo con nome utente e password.</p>
+  <label class="lbl" for="sv-u">Nome utente</label><input class="inp" id="sv-u" autocomplete="username" autocapitalize="none" spellcheck="false" value="${esc(V.u)}" data-in="sv" data-k="u">
+  <label class="lbl" for="sv-p">Password</label><input class="inp" id="sv-p" type="password" autocomplete="current-password" value="${esc(V.p)}" data-in="sv" data-k="p" enterkeyhint="go">
+  <div style="margin-top:18px"><button type="submit" class="btn primary block big" data-a="svEnter">Rientra</button></div></form>
+  <div class="wall-card"><h1>È la prima volta?</h1>
   <p class="muted" style="margin-top:0">Chiedi allo chef di mostrarti il <b>QR code</b> dell'app e inquadralo con la <b>fotocamera</b> del telefono. Oppure apri il link che ti hanno mandato su WhatsApp.</p>
+  <p class="muted small">Non ricordi la password? Fai lo stesso e scegli <b>Ho già un profilo</b>: chi approva ti rimette nel tuo profilo.</p>
   <label class="lbl" for="join-k">Oppure scrivi il codice d'invito (6 lettere)</label><input class="inp" id="join-k" placeholder="es. K7M4QX" autocapitalize="characters" autocomplete="off" spellcheck="false" value="${esc(S.joinK||'')}" data-in="joinK">
   <div style="margin-top:18px"><button type="button" class="btn primary block big" data-a="fbJoin">Collega</button></div></div></div>`;
 }
@@ -2083,7 +2179,7 @@ async function doLogin(){
   if(!x||await sha(x.id+':'+p)!==x.pass){const c=$('.login');if(c){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake')}return toast('Nome utente o password non corretti.','err')}
   if(x.stato==='in_attesa')return toast('Il tuo profilo aspetta l\'approvazione di Maurizio o dello sviluppatore.','warn');
   if(x.stato==='disattivato')return toast('Questo profilo è disattivato. Chiedi a Maurizio di riattivarlo.','warn');
-  S.login={u:'',p:''};login(x.id);
+  S.login={u:'',p:''};login(x.id);svEnsure(x.id,p);
 }
 function login(id){S.me=id;ls('jona_me',id);S.cart=ls('jona_cart_'+id)||[];S.tab=null;S.q='';S.cat='';window.scrollTo(0,0);render();pushSync();const u=D().staff[id];if(u)toast('Ciao '+u.nome)}
 function logout(){pushUnlink();while(sheets.length)closeSheet(true);if(CHAT.box)chClose();CHAT.seen=null;S.me=null;ls('jona_me',null);S.cart=[];S.drafts={};S.removed={};S.gmn={};window.scrollTo(0,0);render()}
@@ -2109,7 +2205,7 @@ function shell(me){
   <main class="main${nc?' has-bar':''}"><header class="top"><div class="mark" aria-hidden="true"></div><div class="top-t">${esc(cfg().nomeLocale)}</div>${syncPill()}${newsBtn(me)}${agBtn(me)}${htBtn(me)}
   ${(()=>{const c=chUnread(realU());return`<button type="button" class="icon-btn bell" data-a="chatOpen" aria-label="Chat${c?', '+c+' messaggi nuovi':''}">${ic('msg')}${c?`<span class="dot">${c>9?'9+':c}</span>`:''}</button>`})()}
   <button type="button" class="icon-btn bell" data-a="notifs" aria-label="Notifiche${n?', '+n+' nuove':''}">${ic('bell')}${n?`<span class="dot">${n>9?'9+':n}</span>`:''}</button>
-  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${oldUrl()}${pushAsk()}${errStrip()}${phStrip(me)}${agStrip(me)}${rsStrip(me)}${rcStrip(me)}${htStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
+  <button type="button" class="me-btn" data-a="meMenu" aria-label="Il tuo profilo">${avatar(me,36)}</button></header>${obxBar()}${banner()}${oldUrl()}${pushAsk()}${svAsk()}${errStrip()}${phStrip(me)}${agStrip(me)}${rsStrip(me)}${rcStrip(me)}${htStrip(me)}${testBar()}${V[S.tab](me)}</main>${nc?cartBar(nc):''}${isMgr(me)?`<button type="button" class="mic-fab ask-fab" data-a="jonaOpen" aria-label="Chiedi a Jona" title="Chiedi a Jona">${ic('sparkle')}</button>`:micBtn()}`;
 }
 // Staff: barra fissa sopra il menu in basso, porta al carrello per inviare allo chef.
 // Staff: microfono sempre visibile in basso a destra (ordine a voce).
@@ -3626,7 +3722,7 @@ async function saveProfile(id){
   if(f.pw)d.pass=await sha(id+':'+f.pw);
   if(f.pw&&D().staff[id]&&D().staff[id].stato==='invitato'){d.stato='attivo';S.db.kind==='firebase'&&S.db.phone.invDel(id).catch(()=>{})}
   if(isGM(meU())&&withContr(f))d.contratto=orContr(f);
-  await upd('staff',id,d);closeSheet();toast('Profilo salvato');
+  await upd('staff',id,d);if(f.pw)svEnsure(id,f.pw,d);closeSheet();toast('Profilo salvato');
 }
 /* ================= GM: storico ================= */
 function vStorico(){
@@ -5802,7 +5898,7 @@ syncRetry:()=>{if(!S.db||!S.db.netRetry)return;S.db.netRetry().catch(()=>{});if(
   addGo:()=>createProfile('admin'),
   doLogin:()=>doLogin(),
   logout:()=>logout(),
-  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushLater:()=>{ls('jona_push_ask',now()+3*864e5);render()},pushAll:()=>{S.pushAll=true;repaint()},pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
+  pushOn:async()=>{if(await pushOn()){while(sheets.length)closeSheet(true)}},pushHelp:()=>pushHelp(),pushLater:()=>{ls('jona_push_ask',now()+3*864e5);render()},svEnter:()=>svEnter(),svSheet:()=>svSheet(),svSave:()=>svSave(),svDopo:()=>{ls('jona_sv_dopo',Date.now());render()},pushAll:()=>{S.pushAll=true;repaint()},pushBrand:d=>{S.pushBrand=d.v;repaint()},pushOff:async()=>{await pushOff();closeSheet(true)},pushTest:()=>pushTest(),
   photoCam:()=>{regKeep();pickFile({accept:'image/*',capture:'user'},setPhoto)},
   photoLib:()=>{regKeep();pickFile({accept:'image/*'},setPhoto)},
   tab:d=>{if(d.v==='carrello')animPrefetch();if(S.tab&&S.tab!==d.v){NAV.tabs=NAV.tabs.filter(t=>t!==S.tab).slice(-9);NAV.tabs.push(S.tab)}S.tab=d.v;while(sheets.length)closeSheet(true);window.scrollTo(0,0);render()},
@@ -5939,7 +6035,7 @@ const IN={
   sc:t=>{S.sc[t.dataset.k]=t.value},
   q:t=>{S.q=t.value;const r=$('#results');if(r)r.innerHTML=catResults();else render()},
   login:t=>{S.login[t.dataset.k]=t.value},
-  joinK:t=>{S.joinK=t.value},
+  joinK:t=>{S.joinK=t.value},sv:t=>{S.sv[t.dataset.k]=t.value},
   form:t=>{const k=t.dataset.k,f=S.form;f[k]=t.value;
     if((k==='nome'||k==='cognome')&&(!f.username||f.username===f._uSug)){f.username=f._uSug=userSug(f,f.id);const u=t.closest('.sheet,.wall-card');const i=u&&u.querySelector('input[data-k="username"]');if(i)i.value=f.username}},
   cnote:t=>{S.cnote=t.value},
@@ -6103,6 +6199,8 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&sheets.length){closeSheet();return}
   if(e.key==='Escape'&&CHAT.box){if(S.chat&&S.chat.c){S.chat.c=null;chPaint(true)}else chClose();return}
   if(e.key==='Enter'&&e.target&&e.target.closest&&e.target.closest('[data-form="login"]')){e.preventDefault();guard(doLogin)}
+  if(e.key==='Enter'&&e.target&&e.target.closest&&e.target.closest('[data-form="sv"]')){e.preventDefault();guard(svEnter)}
+  if(e.key==='Enter'&&e.target&&e.target.closest&&e.target.closest('[data-form="svs"]')){e.preventDefault();guard(svSave)}
 });
 
 /* ---- indietro del telefono (gesto dal bordo o tasto): torna indietro di un passo dentro l'app invece di uscire.
